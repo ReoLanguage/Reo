@@ -1,6 +1,6 @@
 
-Lykos Reo compiler
-==================
+Reo compiler
+============
 
 .. _Reo: http://reo.project.cwi.nl/reo/wiki
 
