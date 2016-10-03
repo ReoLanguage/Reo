@@ -22,17 +22,25 @@ Moreover, the compiler of the coordination language is able to optimize the actu
 Getting started
 ---------------
 
-1. Install Java (version 1.6 or higher). You can check if the correct java version is already installed via ``java --version``
+1. Install Java (version 1.6 or higher). You can check if the correct version is already installed via ``java -version``
 
-2. Download the ``lykos-1.0.jar`` and put it, for example, in ``/usr/local/lib``.
+2. Install Maven. You can check if the correct version is already installed via ``mvn -version``
 
-3. Create an alias for the compiler via::
+3. Install Eclipse. Available at``https://www.eclipse.org/downloads/``
 
-	alias reoc='java -jar /usr/local/lib/lykos-1.0.jar'
+4. Clone this repository via ``git clone https://github.com/kasperdokter/Reo-compiler.git``
 
-.. tip:: add the alias command to your startup script of your terminal (e.g., ``~/.bash_profile``).
+5. Change directory ``cd Reo-compiler``
 
-4. Test the installation by starting a new terminal and running::
+5. Build the project: ``mvn install``. 
+
+6. Run the compiler: ``java -jar target/reoc-1.0.jar``
+
+7. Generate Eclipse configuration: ``mvn eclipse:eclipse``
+
+8. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
+
+9. Start coding
 
 Compile your first protocol
 ---------------------------
