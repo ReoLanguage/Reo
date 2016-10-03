@@ -26,7 +26,7 @@ Getting started
 
 2. Install Maven. You can check if the correct version is already installed via ``mvn -version``
 
-3. Install Eclipse. Available at``https://www.eclipse.org/downloads/``
+3. Install Eclipse. Available at https://www.eclipse.org/downloads/
 
 4. Clone this repository via ``git clone https://github.com/kasperdokter/Reo-compiler.git``
 
@@ -41,7 +41,3 @@ Getting started
 9. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
 
 10. Start coding
-
-Compile your first protocol
----------------------------
-...
