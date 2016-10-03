@@ -76,17 +76,17 @@ sync_const      : '{' '}'
  * Constraint Automata with State Memory
  */
 
-casm            : '#CASM' casm_stmt* 
+cam             : '#CAM' cam_stmt* 
                 ;
-casm_stmt       : ID '--' sync_const ',' casm_dc '->' ID 
+cam_stmt        : ID '--' sync_const ',' cam_dc '->' ID 
                 ;
-casm_dc         : 'true'                    # casm_dcTrue
-                | casm_term '==' casm_term  # casm_dcEql
+cam_dc          : 'true'                   # cam_dcTrue
+                | cam_term '==' cam_term   # cam_dcEql
                 ;
-casm_term       : STRING        # casm_termData
-                | 'd(' ID ')'   # casm_termPort
-                | ID            # casm_termMemoryCurr
-                | ID '\''       # casm_termMemoryNext
+cam_term        : STRING        # cam_termData
+                | 'd(' ID ')'   # cam_termPort
+                | ID            # cam_termMemoryCurr
+                | ID '\''       # cam_termMemoryNext
                 ;
 
 /**
