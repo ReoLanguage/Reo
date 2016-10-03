@@ -32,15 +32,15 @@ Getting started
 
 5. Change directory ``cd Reo-compiler``
 
-5. Build the project: ``mvn install``. 
+6. Build the project: ``mvn install``. 
 
-6. Run the compiler: ``java -jar target/reoc-1.0.jar``
+7. Run the compiler: ``java -jar target/reoc-1.0.jar``
 
-7. Generate Eclipse configuration: ``mvn eclipse:eclipse``
+8. Generate Eclipse configuration: ``mvn eclipse:eclipse``
 
-8. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
+9. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
 
-9. Start coding
+10. Start coding
 
 Compile your first protocol
 ---------------------------
