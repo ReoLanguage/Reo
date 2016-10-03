@@ -1,0 +1,49 @@
+component(name, originalfile, types, ports, states) ::= 
+<<// Generated from $originalfile$ by Lykos 1.0
+package nl.cwi.reo.runtime;
+
+public class $name$$if(types)$<$types; separator=", "$>$endif$ implements Component {
+
+	$ports:{a | private volatile Port<$a.type$> $a.name$;}; separator="\n"$
+	private String state;
+			
+	public $name$($ports:{a | Port<$a.type$> $a.name$}; separator=", "$) {
+		$ports:{a | $a.name$.$if(a.inpt)$setConsumer(this);$else$setProducer(this);$endif$}; separator="\n"$
+		$ports:{a | this.$a.name$ = $a.name$;}; separator="\n"$
+	}
+	
+	public synchronized void hit() {
+		notify();	
+	}
+	
+	public void run() {
+		while (true) {
+			
+			if () {
+				synchronized (this) {
+					while () {
+						try { wait(); } 
+						catch (InterruptedException e) { }	
+					}
+				}
+			}
+			
+			switch (state) {
+			$states:state(); separator="\n"$
+			}
+		}		
+	}
+}>>
+
+state(q) ::= <<case $q.id$:
+	$transition(q.transitions); separator="\n"$
+	break;>>
+
+
+transition(t) ::= <<if (false) {
+	$t.gets:{p | $p.type$ d_$p.name$ = $p.name$.get();}; separator="\n"$
+	$t.puts:{x | $x.name$.setPut(d_$x.term$);}; separator="\n"$
+}>>
+
+
+guard(t) ::= <<$t.gets:{p | $p.name$.canGet(); separator=" && "}$$if(t.puts)$ && $endif$$t.puts:{p | $p.name$.canPut(); separator=" && "}$$if(t.guard)$ && $endif$$t.guard$>>

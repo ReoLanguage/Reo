@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>nl.cwi.reo</groupId>
+  <artifactId>reo</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+
+  <name>Reo</name>
+  <description>Reo constitutes a strategic long-term research activity of the ​SEN3 research group at the Centre for Mathematics and Computer Science (​CWI).
+
+Reo presents a paradigm for composition of distributed software components and services based on the notion of mobile channels. 
+Reo enforces an exogenous channel-based coordination model that defines how designers can build complex coordinators, called connectors, out of simpler ones. 
+Application designers can use Reo as a "glue code" language for compositional construction of connectors that orchestrate the cooperative behavior of instances of components or services in a component-based system or a service-oriented application.</description>
+  <url>http://reo.project.cwi.nl/reo/</url>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <modules>
+    <module>reo-runtime-c</module>
+    <module>reo-runtime-java</module>
+    <module>reo-compiler</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.5.1</version>
+          <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
