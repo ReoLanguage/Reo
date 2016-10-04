@@ -9,8 +9,14 @@ public class PortWaitNotify<T> implements Port<T> {
 	public void setConsumer(Component c) { cons = c; }
 	public void setGet() { get = true; }
 	public void setPut(T datum) { put = datum; }
-	public boolean canPut() { return get && put == null; }
-	public boolean canGet() { return put != null; }
+	public T take() { 
+		T datum = put;
+		put = null; 
+		get = false; 
+		return datum;
+	}
+	public boolean hasGet() { return get && put == null; }
+	public boolean hasPut() { return put != null; }
 	public void activateProducer() { prod.activate(); }
 	public void activateConsumer() { cons.activate(); }
 	public void put(T datum) {

@@ -1,4 +1,7 @@
-package nl.cwi.reo.runtime.java;
+package nl.cwi.reo.runtime.java.example;
+
+import nl.cwi.reo.runtime.java.Component;
+import nl.cwi.reo.runtime.java.Port;
 
 public class ExclusiveRouter<T> implements Component {
 	
@@ -28,17 +31,19 @@ public class ExclusiveRouter<T> implements Component {
 //					try { wait(); } catch (InterruptedException e) { }	
 //				}
 //			}
-			if (a.canGet() && b.canPut()) {
+			if (a.hasPut() && b.hasGet()) {
 				T d_a = a.get();
 				a.activateProducer();
 				b.setPut(d_a);
 				b.activateConsumer();
+				System.out.println("fire ab");
 			}
-			if (a.canGet() && c.canPut()) {
+			if (a.hasPut() && c.hasGet()) {
 				T d_a = a.get();
 				a.activateProducer();
 				c.setPut(d_a);
 				c.activateConsumer();
+				System.out.println("fire ac");
 			}		
 		}		
 	}

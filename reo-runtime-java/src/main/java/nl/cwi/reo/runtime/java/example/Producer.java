@@ -1,4 +1,7 @@
-package nl.cwi.reo.runtime.java;
+package nl.cwi.reo.runtime.java.example;
+
+import nl.cwi.reo.runtime.java.Component;
+import nl.cwi.reo.runtime.java.Port;
 
 public class Producer implements Component {
 
@@ -16,6 +19,6 @@ public class Producer implements Component {
 	}
 
 	public void run() {	
-		MyProgram.produce(a); 
+		MyTestComponents.produce(a); 
 	}
 }

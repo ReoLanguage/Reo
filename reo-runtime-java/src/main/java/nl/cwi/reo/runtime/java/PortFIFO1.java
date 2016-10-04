@@ -8,8 +8,9 @@ public class PortFIFO1<T> implements Port<T> {
 	public void setConsumer(Component c) { consumer = c; }	
 	public void setGet() { }
 	public void setPut(T datum) { put = datum; }
-	public boolean canPut() { return put == null; }
-	public boolean canGet() { return put != null; }
+	public T take() { T datum = put; put = null; return datum; }
+	public boolean hasGet() { return put == null; }
+	public boolean hasPut() { return put != null; }
 	public void activateProducer() { producer.activate(); }
 	public void activateConsumer() { consumer.activate(); }
 	public void put(T datum) {

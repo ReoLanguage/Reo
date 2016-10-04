@@ -1,10 +1,13 @@
-package nl.cwi.reo.runtime.java;
+package nl.cwi.reo.runtime.java.example;
 
-public class MyProgram {
+import nl.cwi.reo.runtime.java.Input;
+import nl.cwi.reo.runtime.java.Output;
+
+public class MyTestComponents {
 	
 	public static void produce(Output<Integer> A) {
 		long a = System.nanoTime();
-		for (int i = 0; i < 3000000; i++) {
+		for (int i = 0; i < 3000; i++) {
 			A.put(i);
 		}
 		long b = System.nanoTime();
@@ -14,7 +17,7 @@ public class MyProgram {
 	
 	public static void consume(Input<Integer> A) {
 		while (true) {
-			A.get();
+			System.out.println(A.get());
 		}	
 	}
 

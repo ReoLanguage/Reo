@@ -1,4 +1,7 @@
-package nl.cwi.reo.runtime.java;
+package nl.cwi.reo.runtime.java.example;
+
+import nl.cwi.reo.runtime.java.Component;
+import nl.cwi.reo.runtime.java.Port;
 
 public class Consumer implements Component {
 
@@ -10,7 +13,7 @@ public class Consumer implements Component {
 	}
 
 	public void run() {
-		MyProgram.consume(a);
+		MyTestComponents.consume(a);
 	}
 	
 	public synchronized void activate() {
