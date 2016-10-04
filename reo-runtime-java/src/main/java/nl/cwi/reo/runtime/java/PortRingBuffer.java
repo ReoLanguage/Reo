@@ -26,10 +26,9 @@ public class PortRingBuffer<T> implements Port<T> {
 		return tail != ((n = head + 1) == put.length ? 0 : n); 
 	}
 	public T take() { 
-		T t = put[tail];
 		int n;
 		tail = (n = tail + 1) == put.length ? 0 : n;
-	    return t;
+	    return put[tail];
 	}
 	public void activateProducer() { prod.activate(); }
 	public void activateConsumer() { cons.activate(); }

@@ -9,7 +9,7 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		system1();
+		system2();
 		
 		System.exit(0);
 	}

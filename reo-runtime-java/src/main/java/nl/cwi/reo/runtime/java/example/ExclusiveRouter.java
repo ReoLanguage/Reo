@@ -19,32 +19,27 @@ public class ExclusiveRouter<T> implements Component {
 	}
 	
 	public void activate() { 
-//		synchronized (this) {
-//			notify();	
-//		} 
+		synchronized (this) {
+			notify();	
+		} 
 	}
 	
-	public void run() {
-		while (true) {
-//			synchronized (this) {
-//				while (!a.canGet() || (!b.canPut() && !c.canPut())) {
-//					try { wait(); } catch (InterruptedException e) { }	
-//				}
-//			}
+	public void run() {		
+		while (true) {			
 			if (a.hasPut() && b.hasGet()) {
 				T d_a = a.get();
-				a.activateProducer();
-				b.setPut(d_a);
-				b.activateConsumer();
-				System.out.println("fire ab");
+				b.put(d_a);
+				continue;
 			}
 			if (a.hasPut() && c.hasGet()) {
 				T d_a = a.get();
-				a.activateProducer();
-				c.setPut(d_a);
-				c.activateConsumer();
-				System.out.println("fire ac");
-			}		
-		}		
+				c.put(d_a);
+				continue;
+			}
+			synchronized (this) {
+				if (!a.hasPut() || (!b.hasGet() && !c.hasGet())) 
+					try { wait(); } catch (InterruptedException e) { }	
+			}
+		}
 	}
 }
