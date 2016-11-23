@@ -6,7 +6,8 @@ grammar Reo;
 
 file    : includes body EOF 
         ;
-incl	: 'include' 
+incl	: 'include' PATH
+	;
 body 	: (comp | defn)*
 	;
 defn    : 'define' ID params? portset '{' atom '}'  # defnAtomic
@@ -119,11 +120,12 @@ wa_jc           : 'true'           # wa_jcTrue
 /**
  * Tokens
  */
- 
+
 ID      : [a-zA-Z] [a-zA-Z0-9]* ;
 OP	: ('=' | '!' | '<' | '>' | '-')+
 PO	: ('-' | '~')
 INT     : ( '0' | [1-9] [0-9]* ) ;
+PATH    : [-.a-zA-Z0-9:/\]+;
 STRING  : '\'' .*? '\'' ;
 FUNC    : [a-zA-Z] [a-zA-Z0-9_-.:]* ;
 SPACES  : [ \t\r\n]+ -> skip ;
