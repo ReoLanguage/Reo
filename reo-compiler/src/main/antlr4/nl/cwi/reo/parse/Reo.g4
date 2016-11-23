@@ -4,13 +4,16 @@ grammar Reo;
  * Generic structure
  */
 
-file    : (comp | defn)* EOF 
+file    : body EOF 
         ;
-defn    : 'define' ID params? portset '{' atom '}'   # defnAtomic
-        | 'define' ID params? nodeset '{' comp* '}'  # defnComposed
+body 	: (comp | defn)*
+	;
+defn    : 'define' ID params? portset '{' atom '}'  # defnAtomic
+        | 'define' ID params? nodeset '{' body '}'  # defnComposed
+	| ID '=' node
         ;
-comp    : ID assign? nodeset                         # compReference 
-        | 'for' ID '=' expr '...' expr '{' comp* '}' # compForLoop
+comp    : ID assign? nodeset                        # compReference 
+        | 'for' ID '=' expr '...' expr '{' body '}' # compForLoop
         ;
 atom	: java   # atomJava
         | c      # atomC
@@ -29,21 +32,27 @@ value	: ID
 nodeset : '(' ')' 
         | '(' nodes (',' nodes)* ')'
         ;
-nodes	: ID                          # nodesName
+nodes	: node
+	| range
+	; 
+node	: ID                          # nodesName
         | ID '[' expr ']'             # nodesIndex
-        | ID '[' expr '...' expr ']'  # nodesRange
-		;
+	;
+range	: ID '[' expr '...' expr ']'
+	;
 portset	: '(' port (',' port)* ')'
-		;
+	;
 port	: ID '?'  # portInput
         | ID '!'  # portOutput
         ;
 expr 	: ID             # exprParameter
         | INT            # exprInteger
-        | INT ID         # exprScalar
         | '-' expr       # exprUnaryMin
         | expr '+' expr  # exprAddition 
         | expr '-' expr  # exprDifference
+        | expr '*' expr  # exprProduct
+        | expr '\' expr  # exprDivision
+        | expr '%' expr  # exprRemainder
         ;
 
 /**
