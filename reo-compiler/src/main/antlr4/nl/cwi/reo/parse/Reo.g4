@@ -4,8 +4,9 @@ grammar Reo;
  * Generic structure
  */
 
-file    : body EOF 
+file    : includes body EOF 
         ;
+incl	: 'include' 
 body 	: (comp | defn)*
 	;
 defn    : 'define' ID params? portset '{' atom '}'  # defnAtomic
@@ -88,7 +89,8 @@ cam_stmt        : ID '*'? '--' sync_const ',' e '->' ID
                 ;
 		
 		
-e	: t OP e                # cam_dcBinRel
+e	: t OP e                               # cam_exInfix
+	| PO t				       # cam_exInfix
 	| t
 	;
 t 	: STRING                               # cam_termString
@@ -119,7 +121,8 @@ wa_jc           : 'true'           # wa_jcTrue
  */
  
 ID      : [a-zA-Z] [a-zA-Z0-9]* ;
-OP	: ('=' | '!' | '<' | '>')+
+OP	: ('=' | '!' | '<' | '>' | '-')+
+PO	: ('-' | '~')
 INT     : ( '0' | [1-9] [0-9]* ) ;
 STRING  : '\'' .*? '\'' ;
 FUNC    : [a-zA-Z] [a-zA-Z0-9_-.:]* ;
