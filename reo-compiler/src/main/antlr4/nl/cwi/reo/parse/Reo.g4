@@ -10,7 +10,7 @@ body 	: (comp | defn)*
 	;
 defn    : 'define' ID params? portset '{' atom '}'  # defnAtomic
         | 'define' ID params? nodeset '{' body '}'  # defnComposed
-	| ID '=' node
+	| nodes '=' nodes                           # defnJoin
         ;
 comp    : ID assign? nodeset                        # compReference 
         | 'for' ID '=' expr '...' expr '{' body '}' # compForLoop
@@ -32,13 +32,10 @@ value	: ID
 nodeset : '(' ')' 
         | '(' nodes (',' nodes)* ')'
         ;
-nodes	: node
-	| range
-	; 
-node	: ID                          # nodesName
-        | ID '[' expr ']'             # nodesIndex
+nodes	: ID indices*
 	;
-range	: ID '[' expr '...' expr ']'
+indices : '[' expr ']'
+	| '[' expr '...' expr ']'
 	;
 portset	: '(' port (',' port)* ')'
 	;
