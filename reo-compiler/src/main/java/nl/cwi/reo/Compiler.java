@@ -1,7 +1,15 @@
 package nl.cwi.reo;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
+import nl.cwi.reo.automata.Automaton;
+import nl.cwi.reo.automata.EmptyLabel;
+import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.graphgames.GameGraph;
 import nl.cwi.reo.parse.ReoFileParser;
@@ -19,16 +27,18 @@ public class Compiler {
 	 */
 	public static void main(String[] args) {
 		if (args.length == 0) {
-
+			
+			testAutomata();
+			
 			//testWorkAutomata();
 			
 			//testGameGraph();
 
 			// Print a standard message if no arguments are given
-   		System.out.println("Usage: java -jar reoc.jar <options> <reo source files>");
-  		System.out.println("where possible options include:");
-  		System.out.println("  -q     quiet");
-  		System.out.println("  -v     version information");
+			//System.out.println("Usage: java -jar reoc.jar <options> <reo source files>");
+			//System.out.println("where possible options include:");
+			//System.out.println("  -q     quiet");
+			//System.out.println("  -v     version information");
 
 		} else {
 			
@@ -112,6 +122,42 @@ public class Compiler {
 		GameGraph.outputDOT(G, "graph");
 		// to render graph.dot, run:
 		// dot -Tps graph.dot -o graph.ps
+	}
+	
+	/**
+	 * Just a function to test my generic automata implementation
+	 */
+	public static void testAutomata() {
+		
+		Set<String> Q = new HashSet<String>();
+		Set<String> P = new HashSet<String>();
+		P.add("a");
+		P.add("b");
+		Map<String, Set<Transition<EmptyLabel>>> T = new HashMap<String, Set<Transition<EmptyLabel>>>();
+		String q0 = "q0";
+		String q1 = "q1";
+		Q.add(q0);
+		Q.add(q1);
+		Set<Transition<EmptyLabel>> out0 = new TreeSet<Transition<EmptyLabel>>();
+		Set<Transition<EmptyLabel>> out1 = new TreeSet<Transition<EmptyLabel>>();
+		TreeSet<String> N0 = new TreeSet<String>();
+		TreeSet<String> N1 = new TreeSet<String>();
+		N0.add("a");
+		N1.add("b");
+		Transition<EmptyLabel> t0 = new Transition<EmptyLabel>(q0, q1, N0, null);
+		Transition<EmptyLabel> t1 = new Transition<EmptyLabel>(q1, q0, N1, null);
+		out0.add(t0);
+		out1.add(t1);
+		T.put(q0, out0);
+		T.put(q1, out1);
+		
+		Automaton<EmptyLabel> A = new Automaton<EmptyLabel>(Q, P, T, q0);
+
+		System.out.println(A.toString());
+		
+		// Automaton.outputDOT(A, "A") 
+		// to render the file, run:
+		// dot -Tps A.dot -o A.ps
 	}
 }
 
