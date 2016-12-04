@@ -4,7 +4,7 @@ grammar Reo;
  * Generic structure
  */
 
-file    : includes body EOF 
+file    : incl* body EOF 
         ;
 incl    : 'include' PATH
         ;

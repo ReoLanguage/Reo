@@ -3,20 +3,12 @@ grammar treo;
 file    : ('namespace' ID ('.' ID)*)? ('include' STRING)* defn* ;
 defn    : vars '=' values | values '=' vars | ID comp ;  
 vars    : ID ('.' ID)* indices* ;
-indices : '[' expr ']' 
-        | '[' expr '..' expr ']' ;
-values  : NAT 
-        | STRING 
-        | vars
-        | comp
-        | list
-        | array ;
+indices : '[' expr ']' | '[' expr '..' expr ']' ;
+values  : NAT | STRING | vars | comp | list | array ;
 list    : '<' '>' | '<' values (',' values)* '>' ;
 array   : '[' ']' | '[' values (',' values)* ']' ;
 type    : ID | '<' ID (';' type) '>' | '(' type '->' type ')';
-param   : vars                                               # paramUntyped
-        | vars nodes                                         # paramComponent
-        | vars ':' type                                      # paramTyped ;
+param   : vars # paramUntyped | vars nodes # paramComp | vars ':' type # paramTyped ;
 srcnode : vars? '?' type? ;
 snknode : vars? '!' type? ;
 mixnode : vars? type? ;
@@ -48,7 +40,8 @@ expr    : '(' expr ')'                                       # brackets
 atom    : gpl                                                # atomGPL
         | pa                                                 # atomPA
         | cam                                                # atomCAM
-        | wa                                                 # atomWA ;
+        | wa                                                 # atomWA 
+        | sa                                                 # atomSA ;
 gpl     : '#GPL' STRING ;
 pa      : '#PA' pa_tr* ;
 pa_tr   : ID '*'? '->' ID ':' idset ;
@@ -83,6 +76,10 @@ jc      : 'true'                                             # jcBool
         | ID '>=' NAT                                        # jcGEQ
         | jc '&&' jc                                         # jcAND
         | jc '||' jc                                         # jcOR ;
+sa      : '#SA' sa_tr* ;
+sa_tr   : ID '*'? '->' ID ':' idset ',' sf;
+sf      : ( ID ':=' pe (',' ID ':=' pe) )? ;
+pe      : 'true' | 'false' | ID | pe '&&' pe | pe '||' pe ;
 
 ID      : [a-zA-Z_] [a-zA-Z0-9_]*;
 NAT     : ( '0' | [1-9] [0-9]* ) ;
