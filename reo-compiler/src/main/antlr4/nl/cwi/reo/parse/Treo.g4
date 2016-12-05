@@ -1,30 +1,42 @@
-grammar treo;
+grammar Treo;
 
-file    : ('namespace' ID ('.' ID)*)? ('include' STRING)* defn* ;
+file    : ('namespace' ID ('.' ID)*)? ('using' ID ('.' ID)*)* ('include' STRING)* defn* ;
+
+// Definitions: variables and values
 defn    : vars '=' values | values '=' vars | ID comp ;  
 vars    : ID ('.' ID)* indices* ;
 indices : '[' expr ']' | '[' expr '..' expr ']' ;
 values  : NAT | STRING | vars | comp | list | array ;
-list    : '<' '>' | '<' values (',' values)* '>' ;
 array   : '[' ']' | '[' values (',' values)* ']' ;
-type    : ID | '<' ID (';' type) '>' | '(' type '->' type ')';
-param   : vars # paramUntyped | vars nodes # paramComp | vars ':' type # paramTyped ;
-srcnode : vars? '?' type? ;
-snknode : vars? '!' type? ;
-mixnode : vars? type? ;
-port    : srcnode | snknode ;
-node    : srcnode | snknode | mixnode ;
-params  : '<' '>' | '<' param (',' param)* '>' ;
-ports   : '(' port (',' port)* ')' ;
-nodes   : '(' ')' | '(' node (',' node)* ')' ;
+list    : '<' '>' | '<' values (',' values)* '>' ;
 intface : '(' ')' | '(' vars (',' vars)* ')' ;
-inst    : comp list? intface                                 # instance
-        | 'for' ID '=' expr '..' expr body                   # iteration
-        | 'if' expr body (('else' expr body)* 'else' body)?  # condition ;
+
+// Components and instances
 comp    : vars                                               # reference
         | params? ports '{' atom '}'                         # atomic
         | params? nodes body                                 # anonymous ;
+inst    : comp list? intface                                 # instance
+        | 'for' ID '=' expr '..' expr body                   # iteration
+        | 'if' expr body (('else' expr body)* 'else' body)?  # condition ;
 body    : '{' (inst | defn)* '}' ;
+
+// Parameters, nodes and types
+param   : vars # paramUntyped | vars nodes # paramComp | vars ':' type # paramTyped ;
+params  : '<' '>' | '<' param (',' param)* '>' ;
+
+// Nodes and ports
+srcnode : vars? '?' type? ;
+snknode : vars? '!' type? ;
+mixnode : vars? type? ;
+node    : srcnode | snknode | mixnode ;
+nodes   : '(' ')' | '(' node (',' node)* ')' ;
+port    : srcnode | snknode ;
+ports   : '(' ')' | '(' port (',' port)* ')' ;
+
+// Type tags
+type    : ID | ID ('*' type) | '(' type ')' | <assoc=right> type ':' type ;
+
+// Integer expressions
 expr    : '(' expr ')'                                       # brackets
         | NAT                                                # natural
         | vars                                               # variable
@@ -37,6 +49,8 @@ expr    : '(' expr ')'                                       # brackets
         | expr op=('==' | '!=') expr                         # disequality
         | expr '&&' expr                                     # conjunction
         | expr '||' expr                                     # disjunction ;
+        
+// Semantics
 atom    : gpl                                                # atomGPL
         | pa                                                 # atomPA
         | cam                                                # atomCAM
@@ -81,6 +95,7 @@ sa_tr   : ID '*'? '->' ID ':' idset ',' sf;
 sf      : ( ID ':=' pe (',' ID ':=' pe) )? ;
 pe      : 'true' | 'false' | ID | pe '&&' pe | pe '||' pe ;
 
+// Tokens
 ID      : [a-zA-Z_] [a-zA-Z0-9_]*;
 NAT     : ( '0' | [1-9] [0-9]* ) ;
 STRING  : '\"' .*? '\"' ;

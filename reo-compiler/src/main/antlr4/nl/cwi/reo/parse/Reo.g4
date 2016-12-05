@@ -4,20 +4,15 @@ grammar Reo;
  * Generic structure
  */
 
-file    : incl* body EOF 
+file    : (comp | defn)* EOF 
         ;
-incl    : 'include' PATH
+defn    : 'define' ID params? portset '{' atom '}'   # defnAtomic
+        | 'define' ID params? nodeset '{' comp* '}'  # defnComposed
         ;
-body    : (comp | defn)*
+comp    : ID assign? nodeset                         # compReference 
+        | 'for' ID '=' expr '...' expr '{' comp* '}' # compForLoop
         ;
-defn    : 'define' ID params? portset '{' atom '}'  # defnAtomic
-        | 'define' ID params? nodeset '{' body '}'  # defnComposed
-        | nodes '=' nodes                           # defnJoin
-        ;
-comp    : ID assign? nodeset                        # compReference 
-        | 'for' ID '=' expr '...' expr '{' body '}' # compForLoop
-        ;
-atom    : java   # atomJava
+atom	: java   # atomJava
         | c      # atomC
         | pa     # atomPA
         | cam    # atomCAM
@@ -27,31 +22,28 @@ params  : '<' ID (',' ID)* '>'
         ;
 assign  : '<' value (',' value)* '>' 
         ;
-value   : ID
+value	: ID
         | INT
         | STRING
         ;
 nodeset : '(' ')' 
         | '(' nodes (',' nodes)* ')'
         ;
-nodes   : ID indices*
-        ;
-indices : '[' expr ']'
-        | '[' expr '...' expr ']'
-        ;
-portset : '(' port (',' port)* ')'
-        ;
-port    : ID '?'  # portInput
+nodes	: ID                          # nodesName
+        | ID '[' expr ']'             # nodesIndex
+        | ID '[' expr '...' expr ']'  # nodesRange
+		;
+portset	: '(' port (',' port)* ')'
+		;
+port	: ID '?'  # portInput
         | ID '!'  # portOutput
         ;
-expr    : ID             # exprParameter
+expr 	: ID             # exprParameter
         | INT            # exprInteger
+        | INT ID         # exprScalar
         | '-' expr       # exprUnaryMin
         | expr '+' expr  # exprAddition 
         | expr '-' expr  # exprDifference
-        | expr '*' expr  # exprProduct
-        | expr '\' expr  # exprDivision
-        | expr '%' expr  # exprRemainder
         ;
 
 /**
@@ -66,79 +58,58 @@ java    : '#Java' FUNC
  */
 
 c       : '#C' FUNC
-        ;     
-
-/**
- * Synchronization constraints
- */
-
-sc      : '{' '}'
-        | '{' ID (',' ID)* '}'
         ;
-
-/**
- * Data constraints
- */
- 
-dc      : t OP dc                              # dcInfix
-        | PO t                                 # dcPrefix
-        | t                                    # dcTerm
-        ;
-t       : STRING                               # tString
-        | INT                                  # tInteger
-        | ID                                   # tPortOrMem
-        | ID '\''                              # tMemoryNext
-        | ID '(' t (',' t )* ')'               # tFunction
-        | '(' dc ')'                           # tBrackets
-        ;
-
-/**
- * Job constraints
- */
-   
-jc      : 'true'           # jcTrue
-        | ID '==' INT      # jcEql
-        | ID '<=' INT      # jcLeq
-        | jc '&' jc        # jcAnd
-        ;
-                
+			
 /**
  * Port Automata
  */
 
-pa      : '#PA' pa_tr* 
-        ;
-pa_tr   : ID '*'? '--' sc '->' ID 
-        ;
+pa              : '#PA' pa_stmt* 
+                ;
+pa_stmt	        : ID '--' sync_const '->' ID 
+                ;
+sync_const      : '{' '}'
+	        | '{' ID (',' ID)* '}'
+                ;
 
 /**
- * Constraint Automata with Memory
+ * Constraint Automata with State Memory
  */
 
-cam     : '#CAM' cam_tr* 
-        ;
-cam_tr  : ID '*'? '--' sc ',' dc '->' ID 
-        ;
+cam             : '#CAM' cam_stmt* 
+                ;
+cam_stmt        : ID '--' sync_const ',' cam_dc '->' ID 
+                ;
+cam_dc          : 'true'                   # cam_dcTrue
+                | cam_term '==' cam_term   # cam_dcEql
+                ;
+cam_term        : STRING        # cam_termData
+                | 'd(' ID ')'   # cam_termPort
+                | ID            # cam_termMemoryCurr
+                | ID '\''       # cam_termMemoryNext
+                ;
 
 /**
  * Work Automata
  */
 
-wa      : '#WA' wa_stmt* 
-        ;
-wa_stmt : ID '*'? ':' jc                   # wa_stmtInvar
-        | ID '*'? '--' sc ',' jc '->' ID   # wa_stmtTrans
-        ;
+wa              : '#WA' wa_stmt* 
+                ;
+wa_stmt         : ID ':' wa_jc                           # wa_stmtInvar
+                | ID '--' sync_const ',' wa_jc '->' ID   # wa_stmtTrans
+                ;
+wa_jc           : 'true'           # wa_jcTrue
+                | ID '==' INT      # wa_jcEql
+                | ID '<=' INT      # wa_jcLeq
+                | wa_jc '&' wa_jc  # wa_jcAnd
+                ;
 
 /**
  * Tokens
  */
-
+ 
 ID      : [a-zA-Z] [a-zA-Z0-9]* ;
-OP	: ('=' | '!' | '<' | '>' | '-')+
-PO	: ('-' | '~')
 INT     : ( '0' | [1-9] [0-9]* ) ;
-PATH    : [-.a-zA-Z0-9:/\]+;
 STRING  : '\'' .*? '\'' ;
 FUNC    : [a-zA-Z] [a-zA-Z0-9_-.:]* ;
 SPACES  : [ \t\r\n]+ -> skip ;
