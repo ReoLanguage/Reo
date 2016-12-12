@@ -1,4 +1,4 @@
-package nl.cwi.reo.workautomata;
+package nl.cwi.reo.interpret;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ import nl.cwi.reo.workautomata.WorkAutomaton;
  *
  * @author	Kasper Dokter
  */
-public class WorkAutomatonListener extends ReoFileBaseListener {
+public class ListenerWorkAutomata extends ListenerBase {
 	
 	/**
 	 * Work automaton parse tree properties.

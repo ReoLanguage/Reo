@@ -12,9 +12,9 @@ import nl.cwi.reo.automata.EmptyLabel;
 import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.graphgames.GameGraph;
+import nl.cwi.reo.interpret.ListenerWorkAutomata;
 import nl.cwi.reo.parse.ReoFileParser;
 import nl.cwi.reo.semantics.Program;
-import nl.cwi.reo.workautomata.WorkAutomatonListener;
 
 /**
  * A compiler for the coordination language Reo.
@@ -46,7 +46,7 @@ public class Compiler {
 			String name = file.getName();
 
 			// Parse the Reo file.
-			WorkAutomatonListener listener = new WorkAutomatonListener();
+			ListenerWorkAutomata listener = new ListenerWorkAutomata();
 			ReoFileParser parser = new ReoFileParser(listener);
 			Program program = parser.parse(args[0]);
 

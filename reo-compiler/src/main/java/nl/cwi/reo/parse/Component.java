@@ -14,7 +14,7 @@ public interface Component {
 	 * Gets a concrete {link nl.cwi.reo.Program} from this parameterized component.
 	 * @param parameters	parameter assignment
 	 * @param generator		generator of fresh node names
-	 * @return a set of component instances of type {@link nl.cwi.reo.semantics.Instance}.
+	 * @return a set of component instances of type {@link nl.cwi.reo.semantics.Atom}.
 	 * @throws Exception if not all required parameters are assigned.
 	 */
 	public Program getProgram(Map<String, String> parameters, NodeGenerator generator) throws Exception;
