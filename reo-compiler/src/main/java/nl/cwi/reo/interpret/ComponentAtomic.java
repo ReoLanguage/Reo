@@ -1,6 +1,9 @@
 package nl.cwi.reo.interpret;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An atomic definition {@link nl.cwi.reo.parse.Definition} of a component defined in an abstract semantics of Reo.
@@ -15,12 +18,12 @@ public class ComponentAtomic implements ComponentExpression {
 	/**
 	 * Sorted set of typed parameter names.
 	 */
-	private final Signature params;
+	private final ParameterListExpression params;
 
 	/**
 	 * Sorted set of typed node names.
 	 */
-	private final Signature intface;
+	private final ParameterListExpression intface;
 	
 	/**
 	 * Constructor.
@@ -28,7 +31,7 @@ public class ComponentAtomic implements ComponentExpression {
 	 * @param parameters	list of parameter names
 	 * @param intface		list of node names 
 	 */
-	public ComponentAtomic(Atom atom, Signature params, Signature intface) {
+	public ComponentAtomic(Atom atom, ParameterListExpression params, ParameterListExpression intface) {
 		this.atom = atom;
 		this.params = params;
 		this.intface = intface;
@@ -43,8 +46,18 @@ public class ComponentAtomic implements ComponentExpression {
 	public Component evaluate(Map<String, Value> p) 
 			throws Exception {	
 		Component C = new Component(atom);
-		C.restrict(intface.evaluate(p).keySet());
+		C.restrict((Set)intface.evaluate(p).params);
 		return C;
+	}
+	
+	/**
+	 * Gets all variables in order of occurrence. 
+	 * @return list of all variables in order of occurrence.
+	 */
+	public List<String> variables() {
+		List<String> vars = new ArrayList<String>(params.variables());
+		vars.addAll(intface.variables());
+		return vars;
 	}
 	
 	/**
@@ -53,7 +66,7 @@ public class ComponentAtomic implements ComponentExpression {
 	 */
 	public Map<String, String> getParameters(Map<String, Value> p) 
 			throws Exception {
-		return this.params.evaluate(p);
+		return null;// this.params.evaluate(p);
 	}
 
 	/**
@@ -62,7 +75,7 @@ public class ComponentAtomic implements ComponentExpression {
 	 */
 	public Map<String, String> getInterface(Map<String, Value> p) 
 			throws Exception {
-		return this.intface.evaluate(p);
+		return null;// this.intface.evaluate(p);
 	}
 
 }

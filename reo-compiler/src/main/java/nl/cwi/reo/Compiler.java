@@ -1,18 +1,21 @@
 package nl.cwi.reo;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import nl.cwi.reo.automata.Automaton;
-import nl.cwi.reo.automata.EmptyLabel;
+import nl.cwi.reo.automata.Void;
+import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.graphgames.GameGraph;
-import nl.cwi.reo.interpret.ListenerWorkAutomata;
+//import nl.cwi.reo.interpret.ListenerWorkAutomata;
 import nl.cwi.reo.parse.ReoFileParser;
 import nl.cwi.reo.semantics.Program;
 
@@ -42,17 +45,17 @@ public class Compiler {
 
 		} else {
 			
-			File file = new File(args[0]);
-			String name = file.getName();
-
-			// Parse the Reo file.
-			ListenerWorkAutomata listener = new ListenerWorkAutomata();
-			ReoFileParser parser = new ReoFileParser(listener);
-			Program program = parser.parse(args[0]);
-
-			// Generate the classes.
-			JavaCompiler JC = new JavaCompiler(name, "");
-			JC.compile(program);
+//			File file = new File(args[0]);
+//			String name = file.getName();
+//
+//			// Parse the Reo file.
+//			ListenerWorkAutomata listener = new ListenerWorkAutomata();
+//			ReoFileParser parser = new ReoFileParser(listener);
+//			Program program = parser.parse(args[0]);
+//
+//			// Generate the classes.
+//			JavaCompiler JC = new JavaCompiler(name, "");
+//			JC.compile(program);
 		}
 	}
 	
@@ -129,29 +132,29 @@ public class Compiler {
 	 */
 	public static void testAutomata() {
 		
-		Set<String> Q = new HashSet<String>();
+		Set<State> Q = new HashSet<State>();
 		Set<String> P = new HashSet<String>();
 		P.add("a");
 		P.add("b");
-		Map<String, Set<Transition<EmptyLabel>>> T = new HashMap<String, Set<Transition<EmptyLabel>>>();
-		String q0 = "q0";
-		String q1 = "q1";
+		Map<State, List<Transition<Void>>> T = new HashMap<State, List<Transition<Void>>>();
+		State q0 = new State("q0");
+		State q1 = new State("q1");
 		Q.add(q0);
 		Q.add(q1);
-		Set<Transition<EmptyLabel>> out0 = new TreeSet<Transition<EmptyLabel>>();
-		Set<Transition<EmptyLabel>> out1 = new TreeSet<Transition<EmptyLabel>>();
+		List<Transition<Void>> out0 = new ArrayList<Transition<Void>>();
+		List<Transition<Void>> out1 = new ArrayList<Transition<Void>>();
 		TreeSet<String> N0 = new TreeSet<String>();
 		TreeSet<String> N1 = new TreeSet<String>();
 		N0.add("a");
 		N1.add("b");
-		Transition<EmptyLabel> t0 = new Transition<EmptyLabel>(q0, q1, N0, null);
-		Transition<EmptyLabel> t1 = new Transition<EmptyLabel>(q1, q0, N1, null);
+		Transition<Void> t0 = new Transition<Void>(q0, q1, N0, null);
+		Transition<Void> t1 = new Transition<Void>(q1, q0, N1, null);
 		out0.add(t0);
 		out1.add(t1);
 		T.put(q0, out0);
 		T.put(q1, out1);
 		
-		Automaton<EmptyLabel> A = new Automaton<EmptyLabel>(Q, P, T, q0);
+		Automaton<Void> A = new Automaton<Void>(Q, P, T, q0);
 
 		System.out.println(A.toString());
 		

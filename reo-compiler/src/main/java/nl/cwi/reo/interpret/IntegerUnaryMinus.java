@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class IntegerUnaryMinus implements IntegerExpression {
@@ -13,6 +15,10 @@ public class IntegerUnaryMinus implements IntegerExpression {
 	@Override
 	public Integer evaluate(Map<String, Value> p) throws Exception {
 		return -e.evaluate(p);
+	}
+
+	public List<String> variables() {
+		return new ArrayList<String>(e.variables());
 	}
 
 }

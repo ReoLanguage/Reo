@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ValueExpression implements Evaluable<Value> {
+public class ValueExpression implements Expression<Value> {
 	
 	/**
 	 * Type.
@@ -39,7 +39,7 @@ public class ValueExpression implements Evaluable<Value> {
 	/**
 	 * List value
 	 */
-	private final ListValue list;
+	private final List<ValueExpression> list;
 	
 	/**
 	 * Constructs a reference value.
@@ -115,7 +115,7 @@ public class ValueExpression implements Evaluable<Value> {
 	 * Constructs a string value.
 	 * @param string	string value.
 	 */
-	public ValueExpression(ListValue list) {
+	public ValueExpression(List<ValueExpression> list) {
 		this.type = ValueType.LIST;
 		this.refc = null;
 		this.strg = null;
@@ -129,10 +129,10 @@ public class ValueExpression implements Evaluable<Value> {
 	public Value evaluate(Map<String, Value> p) throws Exception {
 		switch (this.type) {
 		case VARIABLE:
-			Map<String, String> vars = refc.evaluate(p); 
+			List<String> vars = refc.evaluate(p); 
 			List<Value> values = new ArrayList<Value>();
-			for (Map.Entry<String, String> entry : vars.entrySet())
-				values.add(p.get(entry.getKey()));
+			for (String v : vars)
+				values.add(p.get(v));
 			return new Value(values);
 		case STRING:
 			return new Value(strg);
@@ -143,10 +143,41 @@ public class ValueExpression implements Evaluable<Value> {
 		case COMPONENT:
 			return new Value(comp.evaluate(p));
 		case LIST:
-			return new Value(list.evaluate(p));
+			List<Value> vals = new ArrayList<Value>();
+			for (ValueExpression e : list)
+				vals.add(e.evaluate(p));
+			return new Value(vals);
 		default:
 			return null;				
 		}
+	}
+
+	@Override
+	public List<String> variables() {
+		List<String> vars = new ArrayList<String>();
+		switch (this.type) {
+		case VARIABLE:
+			vars.addAll(refc.variables());
+			break;
+		case STRING:
+			break;
+		case INTEGER:
+			vars.addAll(iexp.variables());
+			break;
+		case BOOLEAN:
+			vars.addAll(bexp.variables());
+			break;
+		case COMPONENT:
+			vars.addAll(comp.variables());
+			break;
+		case LIST:
+			for (ValueExpression e : list)
+				vars.addAll(e.variables());
+			break;
+		default:			
+			break;
+		}
+		return vars;
 	}
 
 }

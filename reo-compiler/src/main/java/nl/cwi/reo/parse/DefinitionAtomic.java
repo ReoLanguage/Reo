@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.semantics.Program;
-import nl.cwi.reo.semantics.Atom;
+import nl.cwi.reo.semantics.Instance;
 
 /**
  * An atomic definition {@link nl.cwi.reo.parse.Definition} of a component defined in an abstract semantics of Reo.
@@ -83,7 +83,7 @@ public class DefinitionAtomic implements Definition {
 	 */
 	@Override
 	public Program getProgram(Map<String, String> parameters, NodeGenerator gen) throws Exception {
-		Set<Atom> instances = new HashSet<Atom>();
+		Set<Instance> instances = new HashSet<Instance>();
 		Map<String, String> input = new HashMap<String, String>();
 		Map<String, String> output = new HashMap<String, String>();
 		for (String port : this.intface) {
@@ -92,7 +92,7 @@ public class DefinitionAtomic implements Definition {
 			else
 				output.put(port, port);		
 		}
-		instances.add(new Atom(this.name, this.atom, input, output));
+		instances.add(new Instance(this.name, this.atom, input, output));
 		return new Program(instances);
 	}
 

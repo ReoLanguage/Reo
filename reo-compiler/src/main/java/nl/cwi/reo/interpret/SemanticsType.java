@@ -1,5 +1,5 @@
 package nl.cwi.reo.interpret;
 
-public enum Semantics {
+public enum SemanticsType {
 	PA, CAM, WA, SA
 }

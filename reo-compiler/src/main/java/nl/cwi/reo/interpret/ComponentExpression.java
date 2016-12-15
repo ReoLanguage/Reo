@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.util.Map;
 
-public interface ComponentExpression extends Evaluable<Component> {
+public interface ComponentExpression extends Expression<Component> {
 
 	public Map<String, String> getParameters(Map<String, Value> p)
 			throws Exception;

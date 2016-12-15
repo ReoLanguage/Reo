@@ -3,16 +3,16 @@ grammar Treo;
 file    : ('namespace' ID ('.' ID)*)? ('using' ID ('.' ID)*)* ('include' STRING)* defn* ;
 
 // Definitions
-defn    : value '=' value                                    # defn_equation
-        | var comp                                           # defn_definition ;  
-value   : ref | STRING | bexp | iexp | comp | list;
+defn    : value '=' value                                     # defn_equation
+        | var comp                                            # defn_definition ;  
+value   : var | STRING | bexp | iexp | comp | list;
 list    : '<' '>' | '<' value (',' value)* '>' ;
 
 // Components
-comp    : ref                                                 # comp_variable
-        | params? ports '{' atom '}'                          # comp_atomic
-        | params? nodes body                                  # comp_composite ;
-inst    : comp list? intface                                  # inst_reference
+comp    : var                                                 # comp_variable
+        | sign '{' atom '}'                                   # comp_atomic
+        | sign body                                           # comp_composite ;
+inst    : comp list? nodes                                    # inst_reference
         | 'for' ID '=' iexp '..' iexp body                    # inst_iteration
         | 'if' bexp body (('else' bexp body)* 'else' body)?   # inst_condition ;
 body    : '{' (inst | defn)* '}' ;
@@ -27,25 +27,22 @@ bexp    : BOOL                                                # bexp_boolean
         | bexp '||' bexp                                      # bexp_disjunction ;
 
 // Signatures
+sign    : params? iface ;
 params  : '<' '>' | '<' param (',' param)* '>' ;
-param   : var? ':' type | var params nodes | var ;
-nodes   : '(' ')' | '(' node (',' node)* ')' ;
-node    : srcnode | snknode | mixnode ;
-ports   : '(' ')' | '(' port (',' port)* ')' ;
-port    : srcnode | snknode ;
-srcnode : var? '?' type? ;
-snknode : var? '!' type? ;
-mixnode : var? ':' type | var;
+param   : var? ptype | var ;
+ptype   : ':' type                                            # ptype_typetag
+        | sign                                                # ptype_signature ;
+iface   : '(' ')' | '(' node (',' node)* ')' ;
+node    : var? io=('?' | '!' | ':') type? | var ;
 
 // Type tags for uninterpreted data
 type    : ID | ID ('*' type) | '(' type ')' | <assoc=right> type ':' type ; 
 
 // Interface instantiation
-intface : '(' ')' | '(' var (',' var)* ')' ;
+nodes : '(' ')' | '(' var (',' var)* ')' ;
         
 // Variable lists
-ref     : (ID '.')* var ;
-var     : ID indices* ;
+var     : (ID '.')* ID indices* ;
 indices : '[' iexp ']' | '[' iexp '..' iexp ']' ;
 
 // Integer expressions

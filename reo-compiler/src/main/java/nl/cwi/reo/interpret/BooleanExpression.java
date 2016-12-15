@@ -1,6 +1,6 @@
 package nl.cwi.reo.interpret;
 
-public interface BooleanExpression extends Evaluable<Boolean> {
+public interface BooleanExpression extends Expression<Boolean> {
 	/**
 	 *  I need this empty interface to be able to distinguish
 	 *  between Evaluable of type Boolean and Evaluable of type 

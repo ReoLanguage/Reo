@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.cwi.reo.semantics.Atom;
+import nl.cwi.reo.semantics.Instance;
 import nl.cwi.reo.semantics.Program;
 
 /**
  * A parameterized reference to component definition {@link nl.cwi.reo.parse.Definition}.
  */
-public final class ComponentReference implements Atom {
+public final class ComponentReference implements Component {
 	
 	/**
 	 * Parameter assignment.
@@ -70,7 +70,7 @@ public final class ComponentReference implements Atom {
 		
 		// Hide all nodes outside the definition interface 
 		Set<String> internalnodes = new HashSet<String>();
-		for (Atom inst : raw_program.getInstances()) {
+		for (Instance inst : raw_program.getInstances()) {
 			for (Map.Entry<String, String> link : inst.getInputs().entrySet()) 
 				if (!defn_intface.contains(link.getValue()))
 					internalnodes.add(link.getValue());
@@ -89,9 +89,9 @@ public final class ComponentReference implements Atom {
 			r.put(defn_intface.get(i), refc_intface.get(i));
 		
 		// Rename the interface according to r
-		Set<Atom> instances = new HashSet<Atom>();
-		for (Atom raw : raw_program.getInstances())
-			instances.add(new Atom(raw, r));
+		Set<Instance> instances = new HashSet<Instance>();
+		for (Instance raw : raw_program.getInstances())
+			instances.add(new Instance(raw, r));
 		
 		return new Program(instances);
 	}

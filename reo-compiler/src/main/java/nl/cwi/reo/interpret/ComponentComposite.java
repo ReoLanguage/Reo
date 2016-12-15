@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -7,9 +9,9 @@ import java.util.Map;
  */
 public class ComponentComposite implements ComponentExpression {
 	
-	private Signature params;
+	private ParameterListExpression params;
 	
-	private Signature intface;
+	private ParameterListExpression intface;
 	
 	private ComponentBody body;
 	
@@ -19,7 +21,7 @@ public class ComponentComposite implements ComponentExpression {
 	 * @param intface		interface of the definition 
 	 * @param components	set of subcomponents
 	 */
-	public ComponentComposite(ComponentBody body, Signature params, Signature intface) {
+	public ComponentComposite(ComponentBody body, ParameterListExpression params, ParameterListExpression intface) {
 		this.intface = intface;
 		this.params = params;
 		this.body = body;
@@ -38,12 +40,22 @@ public class ComponentComposite implements ComponentExpression {
 
 	public Map<String, String> getParameters(Map<String, Value> p)
 			throws Exception {
-		return params.evaluate(p);
+		return null; //params.evaluate(p);
 	}
 
 	public Map<String, String> getInterface(Map<String, Value> p)
 			throws Exception {
-		return intface.evaluate(p);
+		return null; //intface.evaluate(p);
 	}
-
+	
+	/**
+	 * Gets all variables in order of occurrence. 
+	 * @return list of all variables in order of occurrence.
+	 */
+	public List<String> variables() {
+		List<String> vars = new ArrayList<String>(params.variables());
+		vars.addAll(intface.variables());
+		return vars;
+	}
+	
 }

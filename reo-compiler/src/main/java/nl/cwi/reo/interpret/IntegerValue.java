@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class IntegerValue implements IntegerExpression {
@@ -25,6 +27,9 @@ public class IntegerValue implements IntegerExpression {
 	public Integer evaluate(Map<String, Value> p) throws Exception {
 		return this.n;
 	}
-	
+
+	public List<String> variables() {
+		return new ArrayList<String>();
+	}	
 	
 }

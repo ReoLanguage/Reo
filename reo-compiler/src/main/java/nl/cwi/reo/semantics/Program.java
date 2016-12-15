@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A program that consist of a set of component instances {@link nl.cwi.reo.semantics.Atom}.
+ * A Reo program that consist of a set of component instances {@link nl.cwi.reo.semantics.Instance}.
  * Instances synchronize via put and get operations on shared nodes.
  */
 public class Program {
@@ -12,63 +12,49 @@ public class Program {
 	/**
 	 * Set of component instances.
 	 */
-	private Set<Atom> atoms;
+	private Set<Instance> instances;
 	
 	/**
-	 * Constructs an empty program.
+	 * Constructs an empty Reo program.
 	 */
 	public Program() {
-		this.atoms = new HashSet<Atom>();
+		this.instances = new HashSet<Instance>();
 	}
 	
 	/**
-	 * Constructs a single atom program.
+	 * Constructor.
+	 * @param instances		set of component instances
 	 */
-	public Program(Atom atom) {
-		this.atoms = new HashSet<Atom>();
-		atoms.add(atom);
-	}
-	
-	/**
-	 * Composes a set of programs into a single program.
-	 * @param progs		set of component instances
-	 */
-	public Program(Set<Program> progs) {
-		this.atoms = new HashSet<Atom>();
-		int i = 0;
-		for (Program p : progs) {
-			p.addSuffixToHidden(i++);
-			this.atoms.addAll(p.getInstances());
-		}
+	public Program(Set<Instance> instances) {
+		this.instances = instances;
 	}
 	
 	/**
 	 * Gets the component instances.
 	 * @return set of component instances.
 	 */
-	public Set<Atom> getInstances() {
-		return this.atoms;
+	public Set<Instance> getInstances() {
+		return this.instances;
 	}
 	
 	/**
-	 * Adds an integer suffix to each internal port of each atom.
-	 * @return set of component instances.
+	 * Adds the instances of a given program to the current program.
+	 * @param program		Reo program
+	 * @return true if the program is successfully added. 
 	 */
-	public void addSuffixToHidden(int suffix) {
-		for (Atom a : this.atoms) {
-			a.addSuffixToHidden("" + suffix);
-		}
+	public boolean add(Program program) {
+		return this.instances.addAll(program.instances);
 	}
 	
 	/**
-	 * Get the string representation of a program.
+	 * Get the string representation of a Reo program.
 	 */
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 		
 		int i = 0;
-		for (Atom a : this.atoms)
-			str.append("Component " + ++i + ": \n" + a + "\n");
+		for (Instance inst : this.instances)
+			str.append("Component Instance " + ++i + ": \n" + inst + "\n");
 		 
 		return str.toString();
 		

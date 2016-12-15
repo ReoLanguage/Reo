@@ -1,14 +1,16 @@
 package nl.cwi.reo.interpret;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class ComponentForLoop implements Evaluable<Component> {
+public class ComponentForLoop implements Expression<Component> {
 
 	/**
 	 * Name of the iterated parameter.
@@ -68,5 +70,15 @@ public class ComponentForLoop implements Evaluable<Component> {
 		}
 		
 		return new Component(subcomponents);
+	}
+	
+	/**
+	 * Gets all variables in order of occurrence. 
+	 * @return list of all variables in order of occurrence.
+	 */
+	public List<String> variables() {
+		List<String> vars = new ArrayList<String>(body.variables());
+		vars.remove(parameter);
+		return vars;
 	}
 }

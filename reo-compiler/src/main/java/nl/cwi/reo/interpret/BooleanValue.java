@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class BooleanValue implements BooleanExpression {
@@ -13,6 +15,10 @@ public class BooleanValue implements BooleanExpression {
 	@Override
 	public Boolean evaluate(Map<String, Value> p) throws Exception {
 		return bool;
+	}
+
+	public List<String> variables() {
+		return new ArrayList<String>();
 	}
 
 }

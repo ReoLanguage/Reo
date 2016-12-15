@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Iterates over the Cartesian product of a non-empty list of local transitions. 
@@ -45,31 +44,31 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 	/**
 	 * Constructor.
 	 * @param automata				list of automata
-	 * @param s1					list of current local states, i.e., s1.get(i) is the current state of automata.get(i).
-	 * @param localtransitions		list of sets of local outgoing transitions, such that localtransitions.get(i)
-	 * consists of all outgoing transitions at s1.get() in automata.get(i).
 	 */
-	public TransitionIterator(List<Automaton<L>> automata, List<String> s1, List<List<Transition<L>>> localtransitions) {
+	public TransitionIterator(List<Automaton<L>> automata) {
 		
 		// Initialize all fields.
 		this.automata = automata;
-		this.localtransitions = localtransitions;
+		this.localtransitions = new ArrayList<List<Transition<L>>>();
 		this.iterators = new ArrayList<Iterator<Transition<L>>>();
 		this.isNext = false;
 		
-		// Insert a local silent self loop transition a the start of each list of local transitions.
-		for (int i = 0; i < localtransitions.size(); i++) 
-			this.localtransitions.get(i).add(0, new Transition<L>(s1.get(i), s1.get(i), new TreeSet<String>(), null));
-
-		// Initialize iterators.
-		for (List<Transition<L>> Tlocal : localtransitions) {
-			Iterator<Transition<L>> iterator = Tlocal.iterator();
-			iterators.add(iterator);
+		for (Automaton<L> A : automata) {
+			
+			List<Transition<L>> outA = new ArrayList<Transition<L>>(A.outgoingTransitions.get(A.initial));
+			
+			// Insert a local silent self loop transition a the start of each list of local transitions.
+			outA.add(0, new Transition<L>(A.initial));
+			
+			localtransitions.add(outA);
+			
+			Iterator<Transition<L>> iterA = outA.iterator();
+			
+			iterators.add(iterA);
+			
+			tuple.add(iterA.next());	
+			
 		}
-		
-		// Initialize the tuple. This sets all local transitions to a silent self loop transition.
-		for (int i = 0; i < localtransitions.size(); i++) 
-			tuple.set(i, iterators.get(i).next());	
 		
 		// Skip this first tuple, and initialize the isNext flag.
 		jumpToNext();
@@ -131,9 +130,9 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 					
 					// Find the interfaces and synchronization constraints.
 					Set<String> Pi = tuple.get(i).getSyncConstraint();
-					Set<String> Ni = automata.get(i).getInterface();
+					Set<String> Ni = automata.get(i).iface;
 					Set<String> Pj = tuple.get(j).getSyncConstraint();
-					Set<String> Nj = automata.get(j).getInterface();
+					Set<String> Nj = automata.get(j).iface;
 					
 					// Check if composability is broken.
 					if (Pi.retainAll(Nj) != Pj.retainAll(Ni)) 

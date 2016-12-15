@@ -1,15 +1,17 @@
 package nl.cwi.reo.interpret;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class ComponentIfThenElse implements Evaluable<Component> {
+public class ComponentIfThenElse implements Expression<Component> {
 	
 	/**
-	 * Lower bound of iteration.
+	 * Conditions for each branch. If there are more conditions than branches, 
+	 * then the additional conditions are ignored.
 	 */
 	public List<BooleanExpression> conditions;
 	
@@ -41,5 +43,19 @@ public class ComponentIfThenElse implements Evaluable<Component> {
 			}
 		}
 		return new Component();
+	}
+	
+	/**
+	 * Gets all variables in order of occurrence. 
+	 * @return list of all variables in order of occurrence.
+	 */
+	public List<String> variables() {
+		List<String> vars = new ArrayList<String>();
+		for (int i = 0; i < branches.size(); ++i) {
+			if (i < conditions.size())
+				vars.addAll(conditions.get(i).variables());
+			vars.addAll(branches.get(i).variables());
+		}
+		return vars;
 	}
 }

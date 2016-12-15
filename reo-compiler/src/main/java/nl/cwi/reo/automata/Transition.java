@@ -1,23 +1,29 @@
 package nl.cwi.reo.automata;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
  * A transition, labeled with a generic label of type L, that is used in a {@link nl.cwi.reo.automata.Automaton}.
+ * If the transition label type L is immutable, then Transition<L> is immutable too.
+ * @param L 	transition label type
  */
-public final class Transition<L extends Label<L>> implements Comparable<Transition<L>> {
+public class Transition<L extends Label<L>> implements Comparable<Transition<L>> {
 
 	/**
 	 * Source state.
 	 */
-	private final String q1; 
+	private final State q1; 
 	
 	/**
 	 * Target state.
 	 */
-	private final String q2; 
+	private final State q2; 
 
 	/**
 	 * Synchronization constraint.
@@ -30,6 +36,17 @@ public final class Transition<L extends Label<L>> implements Comparable<Transiti
 	private final L lbl;
 	
 	/**
+	 * Constructs a silent self loop transition at state q.
+	 * @param q 	state
+	 */
+	public Transition(State q) {
+		this.q1 = q;
+		this.q2 = q;
+		this.N = new TreeSet<String>();
+		this.lbl = null;	
+	}
+	
+	/**
 	 * Constructs a new transition.
 	 * 
 	 * @param q1		name of the source state
@@ -38,17 +55,44 @@ public final class Transition<L extends Label<L>> implements Comparable<Transiti
 	 * @param lbl		transition label
 	 */
 	public Transition(String q1, String q2, SortedSet<String> N, L lbl) {
+		this.q1 = new State(q1);
+		this.q2 = new State(q2);
+		this.N = Collections.unmodifiableSortedSet(new TreeSet<String>(N));
+		this.lbl = lbl;
+	}
+	
+	/**
+	 * Constructs a new transition.
+	 * 
+	 * @param q1		source state
+	 * @param q2		target state
+	 * @param N			synchronization constraint
+	 * @param lbl		transition label
+	 */
+	public Transition(State q1, State q2, SortedSet<String> N, L lbl) {
 		this.q1 = q1;
 		this.q2 = q2;
-		this.N = N;
+		this.N = Collections.unmodifiableSortedSet(new TreeSet<String>(N));
 		this.lbl = lbl;
+	}
+	
+	/**
+	 * Constructs a copy of this transition.
+	 * @param t		original transition.
+	 */
+	public Transition(Transition<? extends L> t) {
+		this.q1 = t.q1;
+		this.q2 = t.q2;
+		this.N = t.N;
+		this.lbl = t.lbl;
+		
 	}
 	
 	/**
 	 * Retrieves the source state of the current transition.
 	 * @return name of source state
 	 */
-	public String getSource() {
+	public State getSource() {
 		return this.q1;
 	}
 	
@@ -56,7 +100,7 @@ public final class Transition<L extends Label<L>> implements Comparable<Transiti
 	 * Retrieves the target state of the current transition.
 	 * @return name of target state
 	 */
-	public String getTarget() {
+	public State getTarget() {
 		return this.q2;
 	}
 	
@@ -75,17 +119,54 @@ public final class Transition<L extends Label<L>> implements Comparable<Transiti
 	public L getLabel() {
 		return this.lbl;
 	}
-	
+
 	/**
-	 * Renames the ports in the synchronization constraint.
-	 * @param r		renaming map
-	 * @return transition with renamed synchronization constraint.
+	 * Composes this transition with of a list of transitions.
+	 * @param automata		a list of work automata
+	 * @return Composed transition.
 	 */
-	public Transition<L> rename(Map<String, String> r) {
+	public Transition<L> compose(List<Transition<L>> transitions) {
+		List<State> sources = new ArrayList<State>();
+		List<State> targets = new ArrayList<State>();
+		TreeSet<String> syncs = new TreeSet<String>();
+		List<L> labels = new ArrayList<L>();
+		for (Transition<L> t : transitions) {
+			sources.add(t.q1);
+			targets.add(t.q2);
+			syncs.addAll(t.N);
+			labels.add(t.getLabel());
+		}
+		State q1 = this.q1.compose(sources);
+		State q2 = this.q1.compose(targets);
+		SortedSet<String> N = new TreeSet<String>(this.N);
+		N.addAll(syncs);
+		L lbl = this.lbl.compose(labels);
+		
+		return new Transition<L>(q1, q2, N, lbl);
+	}
+
+	/**
+	 * Restricts the interface of this transition
+	 * @param intface			smaller interface
+	 * @returns Transition with interface intface.
+	 */
+	public Transition<L> restrict(Set<String> intface) {
+		SortedSet<String> N = new TreeSet<String>(this.N);
+		N.retainAll(intface);		
+		L lbl = this.lbl.restrict(intface);
+		return new Transition<L>(this.q1, this.q2, N, lbl);
+	}
+
+	/**
+	 * Renames entry.Key() to entry.Value() for every entry renaming map.
+	 * @param links		renaming map
+	 * @return renamed transition.
+	 */
+	public Transition<L> rename(Map<String, String> links) {
 		SortedSet<String> rN = new TreeSet<String>(this.N);
 		for (String port : this.N) {
 			String newport;
-			if ((newport = r.get(port)) == null)
+			if ((newport = links.get(port)) == null)
 				newport = port;
 			rN.add(newport);
 		}
