@@ -74,7 +74,7 @@ public final class WorkAutomaton {
 	 * @param T		mapping from states to outgoing transitions
 	 * @param q0 	initial state
 	 */
-	public WorkAutomaton(Set<String> Q, Set<String> P, Set<String> J, Map<String, JobConstraint>I, 
+	public WorkAutomaton(Set<String> Q, Set<String> P, Set<String> J, Map<String, JobConstraint> I, 
 			Map<String, Set<Transition>> T, String q0) {
 		this.Q = Q;
 		this.P = P;
@@ -82,6 +82,40 @@ public final class WorkAutomaton {
 		this.I = I;
 		this.T = T;
 		this.q0 = q0;
+	}
+	
+	/**
+	 * Constructs a node automaton that is used for merger-replicator behavior.
+	 * @param name  name
+	 * @param m		number of input ports
+	 * @param n		number of output ports
+	 * @return Node with input ports name[1]!,...,name[m]!, which correspond to 
+	 * coincident sink ends, and output ports name[1]?,...,name[n]?, which correspond 
+	 * to coincident source ends.
+	 */
+	public WorkAutomaton(String name, int m, int n) {
+		this.q0 = "q";
+		this.Q = new HashSet<String>();
+		Q.add(q0);
+		SortedSet<String> inputs = new TreeSet<String>();
+		for (int i = 1; i <= m; ++i)
+			inputs.add(name + '[' + i + ']' + '?');
+		SortedSet<String> outputs = new TreeSet<String>();
+		for (int i = 1; i <= n; ++i)
+			outputs.add(name + '[' + i + ']' + '!');
+		this.P = new HashSet<String>(inputs);
+		P.addAll(outputs);
+		this.J = new HashSet<String>();
+		this.I = new HashMap<String, JobConstraint>();
+		I.put(q0, new JobConstraint(true));
+		this.T = new HashMap<String, Set<Transition>>();
+		T.put(q0, new HashSet<Transition>());
+		for (String a : inputs) {
+			SortedSet<String> N = new TreeSet<String>(outputs);
+			N.add(a);
+			Transition t = new Transition(q0, q0, N, new JobConstraint(true)); 
+			T.get(q0).add(t);
+		}
 	}
 	
 	/**

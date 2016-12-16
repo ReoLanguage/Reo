@@ -49,21 +49,6 @@ public class Transition<L extends Label<L>> implements Comparable<Transition<L>>
 	/**
 	 * Constructs a new transition.
 	 * 
-	 * @param q1		name of the source state
-	 * @param q2		name of the target state
-	 * @param N			synchronization constraint
-	 * @param lbl		transition label
-	 */
-	public Transition(String q1, String q2, SortedSet<String> N, L lbl) {
-		this.q1 = new State(q1);
-		this.q2 = new State(q2);
-		this.N = Collections.unmodifiableSortedSet(new TreeSet<String>(N));
-		this.lbl = lbl;
-	}
-	
-	/**
-	 * Constructs a new transition.
-	 * 
 	 * @param q1		source state
 	 * @param q2		target state
 	 * @param N			synchronization constraint
@@ -137,10 +122,10 @@ public class Transition<L extends Label<L>> implements Comparable<Transition<L>>
 			labels.add(t.getLabel());
 		}
 		State q1 = this.q1.compose(sources);
-		State q2 = this.q1.compose(targets);
+		State q2 = this.q2.compose(targets);
 		SortedSet<String> N = new TreeSet<String>(this.N);
 		N.addAll(syncs);
-		L lbl = this.lbl.compose(labels);
+		L lbl = this.lbl == null ? null : this.lbl.compose(labels);
 		
 		return new Transition<L>(q1, q2, N, lbl);
 	}
@@ -153,7 +138,7 @@ public class Transition<L extends Label<L>> implements Comparable<Transition<L>>
 	public Transition<L> restrict(Set<String> intface) {
 		SortedSet<String> N = new TreeSet<String>(this.N);
 		N.retainAll(intface);		
-		L lbl = this.lbl.restrict(intface);
+		L lbl = this.lbl == null ? null : this.lbl.restrict(intface);
 		return new Transition<L>(this.q1, this.q2, N, lbl);
 	}
 
@@ -163,14 +148,15 @@ public class Transition<L extends Label<L>> implements Comparable<Transition<L>>
 	 * @return renamed transition.
 	 */
 	public Transition<L> rename(Map<String, String> links) {
-		SortedSet<String> rN = new TreeSet<String>(this.N);
+		SortedSet<String> rN = new TreeSet<String>();
 		for (String port : this.N) {
 			String newport;
 			if ((newport = links.get(port)) == null)
 				newport = port;
 			rN.add(newport);
 		}
-		return new Transition<L>(this.q1, this.q2, rN, this.lbl);
+		L lbl = this.lbl == null ? null : this.lbl.rename(links);
+		return new Transition<L>(this.q1, this.q2, rN, lbl);
 	}
 	
 	/**

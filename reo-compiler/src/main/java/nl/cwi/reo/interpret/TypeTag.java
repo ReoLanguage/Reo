@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret;
 
+import nl.cwi.reo.automata.State;
+
 public class TypeTag implements ParameterType {
 	
 	private String tag;
@@ -8,15 +10,22 @@ public class TypeTag implements ParameterType {
 		this.tag = tag;
 	}
 
-	public boolean equals(ParameterType t) {
-		if (t instanceof TypeTag) {
-			TypeTag x = (TypeTag)t;
-			return x.tag.equals(tag);
-		}
-		return false;
-	}
-
 	public String name() {
 		return tag;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof TypeTag)) return false;
+	    TypeTag t = (TypeTag)other;
+	   	return this.tag.equals(t.tag);
+	}
+	
+    @Override
+    public int hashCode() {
+        return this.tag.hashCode();
+    }
+	
 }

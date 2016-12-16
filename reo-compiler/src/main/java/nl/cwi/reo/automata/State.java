@@ -31,8 +31,8 @@ public class State {
 	 * @return Composed global state.
 	 */
 	public State compose(List<State> qs) {
-		String s = qs.get(0).name;
-		for (int i = 1; i < qs.size(); i++) 
+		String s = this.name;
+		for (int i = 0; i < qs.size(); i++) 
 			s += "|" + qs.get(i).name;
 		return new State(s);
 	}
@@ -43,4 +43,18 @@ public class State {
 	public String toString() {
 		return this.name;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof State)) return false;
+	    State q = (State)other;
+	   	return this.name.equals(q.name);
+	}
+	
+    @Override
+    public int hashCode() {
+        return this.name.hashCode();
+    }
 }

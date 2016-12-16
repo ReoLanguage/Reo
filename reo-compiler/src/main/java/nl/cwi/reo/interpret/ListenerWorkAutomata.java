@@ -1,4 +1,7 @@
-//package nl.cwi.reo.interpret;
+package nl.cwi.reo.interpret;
+
+public class ListenerWorkAutomata {}
+
 //
 //import java.util.HashMap;
 //import java.util.HashSet;

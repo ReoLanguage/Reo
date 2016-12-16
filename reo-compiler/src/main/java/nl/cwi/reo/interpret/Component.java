@@ -65,10 +65,9 @@ public class Component {
 	 * Relabels the interface of this component.
 	 * @param r		maps old node names to new node names.
 	 */
-	public Component relabel(Map<String,String> r) {
+	public void relabel(Map<String,String> r) {
 		for (Atom A : atoms) 
 			A.relabel(r);
-		return new Component();
 	}
 	
 	/**

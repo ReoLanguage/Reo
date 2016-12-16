@@ -37,11 +37,9 @@ public class ComponentIfThenElse implements Expression<Component> {
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
 	public Component evaluate(Map<String,Value> p) throws Exception {
-		for (int i = 0; i < conditions.size(); ++i) {
-			if (conditions.get(i).evaluate(p) == true) {
+		for (int i = 0; i < conditions.size(); ++i)
+			if (conditions.get(i).evaluate(p) == true)
 				return branches.get(i).evaluate(p);
-			}
-		}
 		return new Component();
 	}
 	

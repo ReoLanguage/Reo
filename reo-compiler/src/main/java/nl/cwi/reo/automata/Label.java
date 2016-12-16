@@ -7,6 +7,7 @@ import java.util.Set;
 /**
  * A label is an object that decorates a transition of an automaton.
  * Although not strictly enforced, labels must be immutable.
+ * We use null as the silent label.
  * @param <L> label type.
  */
 public interface Label<L> {

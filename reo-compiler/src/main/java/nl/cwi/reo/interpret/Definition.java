@@ -28,6 +28,10 @@ public final class Definition implements Expression<Map<String, Value>> {
 		this.value = value;
 	}
 	
+	/**
+	 * Evaluates this definition into an assignment of values to variables.
+	 * @param p 		parameter assignment
+	 */
 	public Map<String, Value> evaluate(Map<String, Value> p) throws Exception {
 		
 		Map<String, Value> defs = new HashMap<String, Value>();
@@ -35,22 +39,15 @@ public final class Definition implements Expression<Map<String, Value>> {
 		List<String> varp = this.var.evaluate(p);
 		Value valuep = this.value.evaluate(p);
 		
-		
 		if (varp.size() > 1) {
 			if (valuep.getType() == ValueType.LIST) {
-				List<Value> list = valuep.getList();
-				
-				
+				List<Value> list = valuep.getList();				
 				Iterator<String> vars = varp.iterator();
 				Iterator<Value> vals = list.iterator();
-				
 				while (vars.hasNext() && vals.hasNext()) 
 				    defs.put(vars.next(), vals.next());
-				
 				if (vars.hasNext() || vals.hasNext())
 					throw new Exception("ERROR: List sizes of " + varp + " and " + valuep + " do not match.");
-				
-				
 			} else {
 				throw new Exception("ERROR: Value " + valuep + " is not of type list.");				
 			}

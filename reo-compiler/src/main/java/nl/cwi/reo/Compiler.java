@@ -13,11 +13,9 @@ import nl.cwi.reo.automata.Automaton;
 import nl.cwi.reo.automata.Void;
 import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
-import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.graphgames.GameGraph;
-//import nl.cwi.reo.interpret.ListenerWorkAutomata;
-import nl.cwi.reo.parse.ReoFileParser;
-import nl.cwi.reo.semantics.Program;
+import nl.cwi.reo.interpret.Interpreter;
+import nl.cwi.reo.workautomata.WorkAutomaton;
 
 /**
  * A compiler for the coordination language Reo.
@@ -37,22 +35,21 @@ public class Compiler {
 			
 			//testGameGraph();
 
-			// Print a standard message if no arguments are given
-			//System.out.println("Usage: java -jar reoc.jar <options> <reo source files>");
-			//System.out.println("where possible options include:");
-			//System.out.println("  -q     quiet");
-			//System.out.println("  -v     version information");
+//			// Print a standard message if no arguments are given
+//			System.out.println("Usage: java -jar reoc.jar <options> <reo source files>");
+//			System.out.println("where possible options include:");
+//			System.out.println("  -q     quiet");
+//			System.out.println("  -v     version information");
 
 		} else {
 			
-//			File file = new File(args[0]);
-//			String name = file.getName();
-//
-//			// Parse the Reo file.
-//			ListenerWorkAutomata listener = new ListenerWorkAutomata();
-//			ReoFileParser parser = new ReoFileParser(listener);
-//			Program program = parser.parse(args[0]);
-//
+			File file = new File(args[0]);
+			String name = file.getName();
+			Interpreter interpreter = new Interpreter();
+			List<WorkAutomaton> program = interpreter.getWorkAutomata(name);
+			
+			System.out.println(program);
+
 //			// Generate the classes.
 //			JavaCompiler JC = new JavaCompiler(name, "");
 //			JC.compile(program);
@@ -156,7 +153,18 @@ public class Compiler {
 		
 		Automaton<Void> A = new Automaton<Void>(Q, P, T, q0);
 
-		System.out.println(A.toString());
+		System.out.println(A);
+		
+		Map<String, String> links = new HashMap<String, String>();
+		links.put("a", "c");
+		links.put("b", "d");
+		Automaton<Void> B = A.rename(links);
+		
+		System.out.println(B);
+		
+		System.out.println(A.compose(B));
+		
+		//System.out.println(A.compose(A));
 		
 		// Automaton.outputDOT(A, "A") 
 		// to render the file, run:

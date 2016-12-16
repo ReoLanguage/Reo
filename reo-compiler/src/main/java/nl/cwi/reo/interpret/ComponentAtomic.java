@@ -1,29 +1,24 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * An atomic definition {@link nl.cwi.reo.parse.Definition} of a component defined in an abstract semantics of Reo.
  */
 public class ComponentAtomic implements ComponentExpression {
+
+	/**
+	 * Signature.
+	 */
+	private final SignatureExpression sign;
 	
 	/**
 	 * Atomic component
 	 */
-	private final Atom atom;
-
-	/**
-	 * Sorted set of typed parameter names.
-	 */
-	private final ParameterListExpression params;
-
-	/**
-	 * Sorted set of typed node names.
-	 */
-	private final ParameterListExpression intface;
+	private final AtomExpression atom;
 	
 	/**
 	 * Constructor.
@@ -31,10 +26,9 @@ public class ComponentAtomic implements ComponentExpression {
 	 * @param parameters	list of parameter names
 	 * @param intface		list of node names 
 	 */
-	public ComponentAtomic(Atom atom, ParameterListExpression params, ParameterListExpression intface) {
+	public ComponentAtomic(SignatureExpression sign, AtomExpression atom) {
 		this.atom = atom;
-		this.params = params;
-		this.intface = intface;
+		this.sign = sign;
 	}	
 
 	/**
@@ -43,10 +37,9 @@ public class ComponentAtomic implements ComponentExpression {
 	 * @return concrete program {@link nl.cwi.reo.semantics.Program} for this parameterized component
 	 * @throws Exception if not all required parameters are assigned.
 	 */
-	public Component evaluate(Map<String, Value> p) 
-			throws Exception {	
-		Component C = new Component(atom);
-		C.restrict((Set)intface.evaluate(p).params);
+	public Component evaluate(Map<String, Value> p) throws Exception {	
+		Component C = new Component(atom.evaluate(p));		
+		C.restrict(new HashSet<String>(sign.evaluate(p).getNodeNames()));
 		return C;
 	}
 	
@@ -55,8 +48,8 @@ public class ComponentAtomic implements ComponentExpression {
 	 * @return list of all variables in order of occurrence.
 	 */
 	public List<String> variables() {
-		List<String> vars = new ArrayList<String>(params.variables());
-		vars.addAll(intface.variables());
+		List<String> vars = new ArrayList<String>(sign.variables());
+		vars.addAll(atom.variables());
 		return vars;
 	}
 	

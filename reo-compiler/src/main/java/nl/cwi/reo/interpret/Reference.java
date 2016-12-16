@@ -79,7 +79,9 @@ public final class Reference implements Expression<Component> {
 		if (Edef.hasNext() || Eref.hasNext())
 			throw new Exception("Interfaces " + Pdef + " and " + Eref + " do not match.");
 		
-		return C.relabel(r);
+		C.relabel(r);
+		
+		return C;
 	}
 
 	public List<String> variables() {

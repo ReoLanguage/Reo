@@ -17,7 +17,7 @@ import java.util.HashMap;
  * a generic label of type L. If the transition label type L is immutable, then Automaton<L> 
  * is immutable too.
  */
-public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
+public class Automaton<L extends Label<L>> {
 
 	/**
 	 * Set of states
@@ -32,7 +32,7 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 	/**
 	 * List of outgoing transitions.
 	 */
-	public final Map<State, List<Transition<L>>> outgoingTransitions;
+	public final Map<State, List<Transition<L>>> out;
 
 	/**
 	 * Initial state.
@@ -46,10 +46,10 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 	public Automaton() {
 		this.states = new HashSet<State>();
 		this.iface = new HashSet<String>();
-		this.outgoingTransitions = new HashMap<State, List<Transition<L>>>();
+		this.out = new HashMap<State, List<Transition<L>>>();
 		this.initial = new State("q0");
 		states.add(initial);
-		outgoingTransitions.put(initial, new ArrayList<Transition<L>>());
+		out.put(initial, new ArrayList<Transition<L>>());
 	}
 	
 	/**
@@ -60,12 +60,21 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 	 * @param q0 	initial state
 	 */
 	public Automaton(Set<State> Q, Set<String> P, Map<State, List<Transition<L>>> T, State q0) {
+		if (Q == null)
+			throw new NullPointerException("No set of states specified.");	
+		if (P == null)
+			throw new NullPointerException("No interface specified.");	
+		for (State q : Q) 
+			if (T.get(q) == null)
+				throw new NullPointerException("State " + q + " does not have outgoing transitions.");
+		if (q0 == null)
+			throw new NullPointerException("No initial state specified.");	
 		this.states = Collections.unmodifiableSet(new HashSet<State>(Q));
 		this.iface = Collections.unmodifiableSet(new HashSet<String>(P));
 		Map<State, List<Transition<L>>> out = new HashMap<State, List<Transition<L>>>();
 		for (Map.Entry<State, List<Transition<L>>> entry : T.entrySet())
-			out.put(entry.getKey(), new ArrayList<Transition<L>>(entry.getValue()));
-		this.outgoingTransitions = Collections.unmodifiableMap(out);
+			out.put(entry.getKey(), new ArrayList<Transition<L>>(entry.getValue()));		
+		this.out = Collections.unmodifiableMap(out);
 		this.initial = q0;
 	}
 	
@@ -76,7 +85,7 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 	public Automaton(Automaton<L> A) {
 		this.states = A.states;
 		this.iface = A.iface;
-		this.outgoingTransitions = A.outgoingTransitions;
+		this.out = A.out;
 		this.initial = A.initial;
 	}
 	
@@ -85,12 +94,26 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 	 * @param A		original automaton.
 	 */
 	public Automaton(Automaton<L> A, State q0) {
+		if (!A.states.contains(q0)) 
+			throw new NullPointerException("State " + q0 + " is not a state in this automaton.");
 		this.states = A.states;
 		this.iface = A.iface;
-		this.outgoingTransitions = A.outgoingTransitions;
+		this.out = A.out;
 		this.initial = q0;
 	}
-
+	
+	/**
+	 * Compose this automaton with a single automaton by means of
+	 * a breadth first algorithm.
+	 * @param automata		a list of work automata
+	 * @return the product automaton.
+	 */
+	public Automaton<L> compose(Automaton<L> automaton) {
+		List<Automaton<L>> As = new ArrayList<Automaton<L>>();
+		As.add(automaton);
+		return this.compose(As);
+	}
+	
 	/**
 	 * Compose this automaton with a list of automata by means of
 	 * a breadth first algorithm.
@@ -123,7 +146,7 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 		Queue<Pair<State,List<State>>> L = new LinkedList<Pair<State,List<State>>>();
 		
 		// Add the initial state to the queue.
-		L.add(Pair.create(q0, qi0));
+		L.add(Pair.create(this.initial, qi0));
 		Q.add(q0);
 		T.put(q0, new ArrayList<Transition<L>>());
 		
@@ -133,6 +156,10 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 			// Get and remove the first unexplored global state in L.
 			Pair<State,List<State>> s1 = L.poll();
 			State q1 = s1.first.compose(s1.second);
+			
+			System.out.println("Exploring state " + q1);
+			System.out.println("s1.first " + s1.first);
+			System.out.println("s1.second " + s1.second);
 			
 			// Add global state s1 to the set of states Q
 			Q.add(q1);
@@ -150,19 +177,33 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 				// Get the next composable combination of local transitions.
 				List<Transition<L>> tuple = combination.next();
 				
+				System.out.println("Next combination " + tuple);
+				
 				// Construct the global transition.
 				Transition<L> t0 = tuple.get(0);
 				List<Transition<L>> ti = new ArrayList<Transition<L>>(tuple);
 				ti.remove(0);
 				Transition<L> t = t0.compose(ti);
+				System.out.println("Global transition " + t);
+
+				// Construct the target state.
+				State q02 = t0.getTarget();
+				List<State> qi2 = new ArrayList<State>();
+				for (Transition<L> tr : ti)
+					qi2.add(tr.getTarget());
+				Pair<State,List<State>> s2 = Pair.create(q02, qi2);
+				State q2 = s2.first.compose(s2.second);
+				System.out.println("Target state " + q2);
+				
 
 				// Add the target state to the work automaton, and add it to the queue if its new.
-				if (!Q.add(t.getTarget())) {
-					List<State> qi2 = new ArrayList<State>();
-					for (Transition<L> tr : ti)
-						qi2.add(tr.getTarget());
-					L.add(Pair.create(t0.getTarget(), qi2));
+				if (Q.add(q2)) {
+					T.put(q2, new ArrayList<Transition<L>>());
+					System.out.println("Found new state " + q2);
+					L.add(s2);
 				}
+				
+				System.out.println("q2 in Q: " + Q.contains(q2));
 				
 				// Add the global transition to the work automaton
 				T.get(q1).add(t);				
@@ -179,7 +220,7 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 	 */
 	public Automaton<L> restrict(Set<String> intface) {
 		Map<State, List<Transition<L>>> out = new HashMap<State, List<Transition<L>>>();
-		for (Map.Entry<State, List<Transition<L>>> entry : this.outgoingTransitions.entrySet()) {
+		for (Map.Entry<State, List<Transition<L>>> entry : this.out.entrySet()) {
 			List<Transition<L>> outq = new ArrayList<Transition<L>>();
 			for (Transition<L> t : entry.getValue()) 
 				outq.add(t.restrict(intface));
@@ -196,7 +237,7 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 		
 		// Initialize the automaton
 		Set<State> Q = this.states;
-		Set<String> P = new HashSet<String>(this.iface);
+		Set<String> P = new HashSet<String>();
 		Map<State, List<Transition<L>>> T = new HashMap<State, List<Transition<L>>>();
 		
 		// Rename the ports in the interface
@@ -208,9 +249,12 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 		}
 		
 		// Add relabeled transitions to the set of transition
-		for (List<Transition<L>> outgoing : this.outgoingTransitions.values())
-			for (Transition<L> t : outgoing) 
-				T.get(t.getSource()).add(t.rename(links));
+		for (Map.Entry<State, List<Transition<L>>> entry : this.out.entrySet()) {
+			List<Transition<L>> outq = new ArrayList<Transition<L>>();
+			for (Transition<L> t : entry.getValue()) 
+				outq.add(t.rename(links));
+			T.put(entry.getKey(), outq);
+		}
 		
 		return new Automaton<L>(Q, P, T, this.initial);
 	}
@@ -222,16 +266,17 @@ public  class Automaton<L extends Label<L>> implements Semantics<Automaton<L>> {
 	public String toString() {
 		StringBuilder str = new StringBuilder();
 		 
-		str.append("// Automaton with interface " + this.iface + "\n");
+		str.append("// Automaton with interface " + this.iface + " and initial state " + this.initial + "\n");
 		str.append("digraph {\n");
 		for (State q : this.states) 
 			str.append("\t" + q + " [label=\"" + q + "\"];\n");
 		for (State q : this.states) {
-			for (Transition<L> t : this.outgoingTransitions.get(q)) {
-				String q1 = t.getSource().toString();
-				String q2 = t.getTarget().toString();
+			for (Transition<L> t : this.out.get(q)) {
+				State q1 = t.getSource();
+				State q2 = t.getTarget();
 				String sc = t.getSyncConstraint().toString();
-				str.append("\t" + q1 + " -> "+ q2 + " [label=\"" + sc + "\"];\n");
+				L lb = t.getLabel();
+				str.append("\t" + q1 + " -> "+ q2 + " [label=\"" + sc + ", " + lb + "\"];\n");
 			}
 		}
 		str.append("}");

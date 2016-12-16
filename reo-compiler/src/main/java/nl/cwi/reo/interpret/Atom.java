@@ -34,6 +34,7 @@ public final class Atom {
 	/**
 	 * Constructor.
 	 * @param name 		name
+	 * @param type 		type
 	 * @param atom		semantics
 	 * @param links		map from ports to nodes
 	 * @param types 	map from ports to types
@@ -103,8 +104,8 @@ public final class Atom {
 	 * Gets the type of each port.
 	 * @return map from port names to types
 	 */
-	public Map<String, String> getTypes() {
-		return this.types;
+	public String getPortType(String port) {
+		return this.types.get(port);
 	}
 	
 	/**

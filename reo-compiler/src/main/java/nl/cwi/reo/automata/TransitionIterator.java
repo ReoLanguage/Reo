@@ -1,6 +1,7 @@
 package nl.cwi.reo.automata;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -20,12 +21,12 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 	/**
 	 * List of local transitions.
 	 */
-	private final List<List<Transition<L>>> localtransitions;
+	private final List<List<Transition<L>>> outs;
 
 	/**
 	 * List of iterators of each collection
 	 */
-	private final List<Iterator<Transition<L>>> iterators;
+	private final List<Iterator<Transition<L>>> iters;
 
 	/**
 	 * Current combination of local transitions.
@@ -37,56 +38,50 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 	 */
 	private boolean isNext;
 	
-	// Just for fun: counting the actual and total number of increments
-	public int actual = 0; 
-	public int total = 0; 
-
 	/**
-	 * Constructor.
-	 * @param automata				list of automata
+	 * Constructs an iterator that enumerates all global transitions 
+	 * originating from the global initial state.
+	 * @param automata			list of automata
+	 * @throws NullPointerException if the list is null or empty, or 
+	 * if the list contains a null automaton. 
 	 */
 	public TransitionIterator(List<Automaton<L>> automata) {
 		
+		if (automata == null)
+			throw new NullPointerException("Undefined list of automata.");
+		
 		// Initialize all fields.
 		this.automata = automata;
-		this.localtransitions = new ArrayList<List<Transition<L>>>();
-		this.iterators = new ArrayList<Iterator<Transition<L>>>();
+		this.outs = new ArrayList<List<Transition<L>>>();
+		this.iters = new ArrayList<Iterator<Transition<L>>>();
+		this.tuple = new ArrayList<Transition<L>>();
 		this.isNext = false;
 		
 		for (Automaton<L> A : automata) {
+			if (A == null)
+				throw new NullPointerException("Undefined automaton in list of automata.");
 			
-			List<Transition<L>> outA = new ArrayList<Transition<L>>(A.outgoingTransitions.get(A.initial));
-			
-			// Insert a local silent self loop transition a the start of each list of local transitions.
-			outA.add(0, new Transition<L>(A.initial));
-			
-			localtransitions.add(outA);
-			
-			Iterator<Transition<L>> iterA = outA.iterator();
-			
-			iterators.add(iterA);
-			
+			List<Transition<L>> outA = new ArrayList<Transition<L>>();
+			outA.add(0, new Transition<L>(A.initial));			
+			outA.addAll(A.out.get(A.initial));			
+			outs.add(outA);			
+			Iterator<Transition<L>> iterA = outA.iterator();			
+			iters.add(iterA);			
 			tuple.add(iterA.next());	
 			
 		}
 		
 		// Skip this first tuple, and initialize the isNext flag.
-		jumpToNext();
-		
-		// Just for fun: count total amount of increments.
-		this.actual = 0;
-		this.total = 1;
-		for (int i = 0; i < localtransitions.size(); i++)
-			total *= localtransitions.get(i).size();
-		
+		findNext();		
 	}
 	
 	/**
 	 * Checks is there exists another composable combination of local transitions.
 	 */
 	@Override
-	public boolean hasNext() {		
-		return jumpToNext();
+	public boolean hasNext() {
+		findNext();
+		return isNext;
 	}
 	
 	/**
@@ -96,8 +91,9 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 	 */
 	@Override
 	public List<Transition<L>> next() {
-		if (!isNext) 
-			throw new NoSuchElementException();
+		findNext();
+		if (!isNext) throw new NoSuchElementException();
+		isNext = false;
 		return new ArrayList<Transition<L>>(tuple);
 	}
 
@@ -107,40 +103,41 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 	}
 	
 	/**
-	 * Updates the current combination of local transitions to the next
-	 * composable combination, if possible. The isNext flag is set to true,
-	 * if the updated combination is composable, and false otherwise.
-	 * @return true iff there exists a next composable combination.
+	 * Updates, if possible and necessary, the current combination of local 
+	 * transitions to the next composable combination and sets the isNext flag 
+	 * to true. If no composable combination exists, the isNext flag is set to false.
 	 */
-	private boolean jumpToNext() {
+	private void findNext() {	
 		
-		// get the next tuple
-		boolean hasNext = increment(0);
+		// Nothing to do: current tuple is a new combination. 
+		if (isNext) return;
 		
-		if (!hasNext) return false;
-		
-		boolean composable = true;
-		
-		do {			
-			// Find the index of the first local transition that does not compose 
-			// with another local transition, if it exists.
+		boolean hasNext = findNext(0);
+				
+		while (hasNext) {
 			int i;
-			for (i = 0; composable && i < localtransitions.size() - 1; i++) {
-				for (int j = i + 1; composable && j < localtransitions.size(); j++) {
+			
+		loops:
+			for (i = 0; i < outs.size() - 1; i++) {
+				for (int j = i + 1; j < outs.size(); j++) {
 					
-					// Find the interfaces and synchronization constraints.
-					Set<String> Pi = tuple.get(i).getSyncConstraint();
-					Set<String> Ni = automata.get(i).iface;
-					Set<String> Pj = tuple.get(j).getSyncConstraint();
-					Set<String> Nj = automata.get(j).iface;
+					Set<String> Nij = new HashSet<String>(tuple.get(i).getSyncConstraint());
+					Nij.retainAll(automata.get(j).iface);
+					Set<String> Nji = new HashSet<String>(tuple.get(j).getSyncConstraint());
+					Nji.retainAll(automata.get(i).iface);
 					
-					// Check if composability is broken.
-					if (Pi.retainAll(Nj) != Pj.retainAll(Ni)) 
-						composable = false;
+					if (!Nij.equals(Nji)) 
+						break loops;
 				}
 			}
 			
-			if (!composable) {	
+			if (i + 1 == outs.size()) {
+				isNext = true;
+				return;
+			} else {
+				// if current tuple is not composable, increment i-th iterator, because
+				// the tuple remains incomposable after incrementing any k-th iterator (k < i).
+				// Note that this optimization does not skip any tuples:
 				// Increment the first iterator at index j greater or equal to i, the problematic
 				// index, and reset all iterators prior to j. The usual procedure would increment 
 				// the first iterator that has a next value. This general procedure would continue 
@@ -149,18 +146,10 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 				// the first iterator at index j starting from index i that has a next value and 
 				// reset all iterators before index j. Thus, simply incrementing the first iterator 
 				// at index j greater or equal to i and resetting all iterators before index j yields 
-				// the same result as the general procedure. 
-				hasNext = increment(i);
+				// the same result as the general procedure.
+				hasNext = findNext(i);
 			}
-			
-		} while (hasNext && !composable);
-		
-		if (composable)
-			isNext = true;
-		else
-			isNext = false;
-		
-		return hasNext;
+		}
 	}
 	
 	/**
@@ -168,28 +157,25 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 	 * @param i 	lower bound of incremented index.
 	 * @return true if the increment was possible, and false if there is no next tuple.
 	 */
-	private boolean increment(int i) {
-		
-		// just for fun: count the actual increments.
-		this.actual += 1;
+	private boolean findNext(int i) {
 		
 		// Find first iterator j the has a next element, starting from i.
 		int j;
-		for (j = i; j < iterators.size(); j++)
-			if (iterators.get(j).hasNext()) 
+		for (j = i; j < iters.size(); j++)
+			if (iters.get(j).hasNext()) 
 				break;
 		
-		// if there is no next, return false
-		if (i == iterators.size())
-			return false;
+		// if there is no next j, return false
+		if (j == iters.size())
+			return false;		
 		
 		// Reset all iterators before index.
 		for (int k = 0; k < j; k++) 
-			iterators.set(k, localtransitions.get(k).iterator());
+			iters.set(k, outs.get(k).iterator());
 
 		// Update the tuple at all indices up to j.
 		for (int k = 0; k <= j; k++) 
-			tuple.set(k, iterators.get(k).next());	
+			tuple.set(k, iters.get(k).next());	
 		
 		return true;
 	}
