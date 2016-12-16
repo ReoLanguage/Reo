@@ -28,16 +28,18 @@ Getting started
 
 3. Install Eclipse. Available at https://www.eclipse.org/downloads/
 
-4. Clone this repository via ``git clone https://github.com/kasperdokter/Reo-compiler.git``
+4. Change directory to eclipse workspace ``cd ../workspace``
 
-5. Change directory ``cd Reo-compiler``
+5. Clone this repository via ``git clone https://github.com/kasperdokter/Reo.git``
 
-6. Build the project: ``mvn install``. 
+6. Change directory ``cd Reo``
 
-7. Run the compiler: ``java -jar target/reoc-1.0.jar``
+7. Build the project: ``mvn install``. 
 
-8. Generate Eclipse configuration: ``mvn eclipse:eclipse``
+8. Run the compiler: ``java -jar reo-compiler/target/reoc.jar``
 
-9. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
+9. Generate Eclipse configuration: ``mvn eclipse:eclipse``
 
-10. Start coding
+10. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
+
+11. Start coding
