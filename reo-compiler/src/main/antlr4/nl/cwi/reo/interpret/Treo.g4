@@ -1,24 +1,36 @@
 grammar Treo;
 
-file    : ('namespace' ID ('.' ID)*)? ('using' ID ('.' ID)*)* ('include' STRING)* defn* ;
+// File structure
+file    : secn? imps* ID cexpr ;
+secn    : 'section' name ';';
+imps    : 'import' name ';';
+name    : (ID '.')* ID ;
+
+// Programs
+prog    : '{' stmt* '}' ;
+stmt    : defn                                                # stmt_definition
+        | cexpr list? iface                                   # stmt_instance
+        | 'for' ID '=' iexpr '..' iexpr prog                  # stmt_iteration
+        | 'if' bexpr prog (('else' bexpr prog)* 'else' prog)? # stmt_condition ;
 
 // Definitions
-defn    : value '=' value                                     # defn_equation
+defn    : expr '=' expr                                       # defn_equation
         | var cexpr                                           # defn_definition ;  
-value   : var | STRING | bexpr | iexpr | cexpr | list;
-list    : '<' '>' | '<' value (',' value)* '>' ;
+expr    : var                                                 # expr_variable
+        | STRING                                              # expr_string
+        | bexpr                                               # expr_boolean
+        | iexpr                                               # expr_integer
+        | cexpr                                               # expr_component
+        | list                                                # expr_list ;
+list    : '<' '>' | '<' expr (',' expr)* '>' ;
 
-// Components
-cexpr    : var                                                # comp_variable
-        | sign '{' atom '}'                                   # comp_atomic
-        | sign body                                           # comp_composite ;
-cterm   : cexpr list? nodes                                   # inst_reference
-        | 'for' ID '=' iexpr '..' iexpr body                  # inst_iteration
-        | 'if' bexpr body (('else' bexpr body)* 'else' body)? # inst_condition ;
-body    : '{' (cterm | defn)* '}' ;
+// Component expressions
+cexpr   : name indices*                                       # cexpr_variable
+        | sign '{' atom '}'                                   # cexpr_atomic
+        | sign prog                                           # cexpr_composite ;
 
 // Boolean expressions
-bexpr    : BOOL                                               # bexpr_boolean
+bexpr   : BOOL                                                # bexpr_boolean
         | var                                                 # bexpr_variable
         | iexpr op=(LEQ | LT | GEQ | GT | EQ | NEQ) iexpr     # bexpr_relation
         | '(' bexpr ')'                                       # bexpr_brackets
@@ -27,26 +39,26 @@ bexpr    : BOOL                                               # bexpr_boolean
         | bexpr OR bexpr                                      # bexpr_disjunction ;
 
 // Signatures
-sign    : params? iface ;
+sign    : params? nodes ;
 params  : '<' '>' | '<' param (',' param)* '>' ;
 param   : var? ptype | var ;
 ptype   : ':' type                                            # ptype_typetag
         | sign                                                # ptype_signature ;
-iface   : '(' ')' | '(' node (',' node)* ')' ;
+nodes   : '(' ')' | '(' node (',' node)* ')' ;
 node    : var? io=(IN | OUT | MIX) type? | var ;
 
 // Type tags for uninterpreted data
 type    : ID | ID ('*' type) | '(' type ')' | <assoc=right> type ':' type ; 
 
 // Interface instantiation
-nodes : '(' ')' | '(' var (',' var)* ')' ;
+iface   : '(' ')' | '(' var (',' var)* ')' ;
         
-// Variable lists
-var     : (ID '.')* ID indices* ;
+// Variables (and ranges of variables)
+var     : ID indices* ;
 indices : '[' iexpr ']' | '[' iexpr '..' iexpr ']' ;
 
 // Integer expressions
-iexpr    : NAT                                                # iexpr_natural
+iexpr   : NAT                                                 # iexpr_natural
         | var                                                 # iexpr_variable
         | '(' iexpr ')'                                       # iexpr_brackets
         | <assoc=right> iexpr POW iexpr                       # iexpr_exponent

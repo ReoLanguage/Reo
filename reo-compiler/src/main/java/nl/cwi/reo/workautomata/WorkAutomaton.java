@@ -15,10 +15,14 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.HashMap;
 
+import nl.cwi.reo.interpret.DefinitionList;
+import nl.cwi.reo.interpret.NodeName;
+import nl.cwi.reo.interpret.Semantics;
+
 /**
  * A work automaton.
  */
-public final class WorkAutomaton {
+public final class WorkAutomaton implements Semantics<WorkAutomaton>{
 
 	/**
 	 * Set of states
@@ -167,7 +171,7 @@ public final class WorkAutomaton {
 	 * Connects the ports of the work automaton to nodes.
 	 * @param links		relabeling function
 	 */
-	public WorkAutomaton attach(Map<String, String> links) {
+	public WorkAutomaton rename(Map<String, String> links) {
 		
 		// Initialize the Work Automaton fields.
 		Set<String> Q = new HashSet<String>(this.Q);
@@ -357,6 +361,11 @@ public final class WorkAutomaton {
 		return new WorkAutomaton(Q, P, J, I, T, q0);
 	}
 
+	@Override
+	public WorkAutomaton getNode(List<NodeName> node) {
+		return null;
+	}
+
 	/**
 	 * Gets a global state from a list of local states.
 	 * @param q			list of local states
@@ -367,5 +376,11 @@ public final class WorkAutomaton {
 		for (int i = 1; i < q.size(); i++) 
 			s += "|" + q.get(i);
 		return s;
+	}
+
+	@Override
+	public Semantics<WorkAutomaton> evaluate(DefinitionList params)
+			throws Exception {
+		return this;
 	}
 }

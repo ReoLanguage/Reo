@@ -1,24 +1,19 @@
 package nl.cwi.reo.interpret;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-public class IntegerUnaryMinus implements IntegerExpression {
+public final class IntegerUnaryMinus implements IntegerExpression {
 
-	private IntegerExpression e;
+	private final IntegerExpression e;
 	
 	public IntegerUnaryMinus(IntegerExpression e) {
 		this.e = e;
 	}
 
 	@Override
-	public Integer evaluate(Map<String, Value> p) throws Exception {
-		return -e.evaluate(p);
+	public IntegerExpression evaluate(DefinitionList params) throws Exception {
+		IntegerExpression x = e.evaluate(params);
+		if (x instanceof IntegerValue)
+			return IntegerValue.unarymin((IntegerValue)x);
+		return new IntegerUnaryMinus(x);
 	}
-
-	public List<String> variables() {
-		return new ArrayList<String>(e.variables());
-	}
-
 }

@@ -1,26 +1,21 @@
 package nl.cwi.reo.interpret;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-public class BooleanConjunction implements BooleanExpression {
+public final class BooleanConjunction implements BooleanExpression {
 	
-	private BooleanExpression e1;
-	private BooleanExpression e2;
+	private final BooleanExpression e1;
+	private final BooleanExpression e2;
 	
 	public BooleanConjunction(BooleanExpression e1, BooleanExpression e2) {
 		this.e1 = e1;
 		this.e2 = e2;
 	}
 	
-	public Boolean evaluate(Map<String, Value> p) throws Exception {
-		return e1.evaluate(p) && e2.evaluate(p);
-	}
-
-	public List<String> variables() {
-		List<String> vars = new ArrayList<String>(e1.variables());
-		vars.addAll(e2.variables());
-		return vars;
+	public BooleanExpression evaluate(DefinitionList params) throws Exception {
+		BooleanExpression x1 = e1.evaluate(params);
+		BooleanExpression x2 = e2.evaluate(params);
+		if (x1 instanceof BooleanValue && x2 instanceof BooleanValue)
+			return BooleanValue.conjunction((BooleanValue)x1, (BooleanValue)x2);
+		return new BooleanConjunction(x1, x2);
 	}
 }

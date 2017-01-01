@@ -1,23 +1,18 @@
 package nl.cwi.reo.interpret;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-public class BooleanNegation implements BooleanExpression {
+public final class BooleanNegation implements BooleanExpression {
 	
-	private BooleanExpression e;
+	private final BooleanExpression e;
 	
 	public BooleanNegation(BooleanExpression e) {
 		this.e = e;
 	}
 	
-	public Boolean evaluate(Map<String, Value> p) throws Exception {
-		return !e.evaluate(p);
-	}
-
-	public List<String> variables() {
-		List<String> vars = new ArrayList<String>(e.variables());
-		return vars;
+	public BooleanExpression evaluate(DefinitionList params) throws Exception {
+		BooleanExpression x = e.evaluate(params);
+		if (x instanceof BooleanValue)
+			return BooleanValue.negation((BooleanValue)x);
+		return new BooleanNegation(x);
 	}
 }

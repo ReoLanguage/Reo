@@ -1,13 +1,21 @@
 package nl.cwi.reo.interpret;
 
-import java.util.Map;
 
-public interface ComponentExpression extends Expression<Component> {
+public interface ComponentExpression extends Expression {
 
-	public Map<String, String> getParameters(Map<String, Value> p)
+	/**
+	 * Substitutes (component) variables with (component) expressions.
+	 */
+	public ComponentExpression evaluate(DefinitionList params) 
 			throws Exception;
 	
-	public Map<String, String> getInterface(Map<String, Value> p)
-			throws Exception;
+	/**
+	 * 
+	 * @param values
+	 * @param nodes
+	 * @return
+	 */
+	public ComponentExpression instantiate(ExpressionList values, 
+			VariableList nodes) throws Exception;
 
 }

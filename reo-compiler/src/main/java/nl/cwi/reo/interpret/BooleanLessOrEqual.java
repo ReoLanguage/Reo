@@ -1,14 +1,11 @@
 package nl.cwi.reo.interpret;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-public class BooleanLessOrEqual implements BooleanExpression {
+public final class BooleanLessOrEqual implements BooleanExpression {
 
-	private IntegerExpression e1;
+	private final IntegerExpression e1;
 	
-	private IntegerExpression e2;
+	private final IntegerExpression e2;
 	
 	public BooleanLessOrEqual(IntegerExpression e1, IntegerExpression e2) {
 		this.e1 = e1;
@@ -16,14 +13,11 @@ public class BooleanLessOrEqual implements BooleanExpression {
 	}
 
 	@Override
-	public Boolean evaluate(Map<String, Value> p) throws Exception {
-		return e1.evaluate(p) <= e2.evaluate(p);
+	public BooleanExpression evaluate(DefinitionList params) throws Exception {
+		IntegerExpression x1 = e1.evaluate(params);
+		IntegerExpression x2 = e2.evaluate(params);
+		if (x1 instanceof IntegerValue && x2 instanceof IntegerValue)
+			return IntegerValue.leq((IntegerValue)x1, (IntegerValue)x2);
+		return new BooleanEquality(x1, x2);
 	}
-
-	public List<String> variables() {
-		List<String> vars = new ArrayList<String>(e1.variables());
-		vars.addAll(e2.variables());
-		return vars;
-	}
-
 }

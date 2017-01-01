@@ -1,0 +1,10 @@
+section treo.conn;
+
+sequencer<k>(a[1..k]) {
+	fifofull(x[0],x[1])
+	syncdrain(a[1],x[1])
+	for i = 2..k {
+		fifo1(x[i-1],x[i])
+		syncdrain(a[i],x[i])
+	}
+}

@@ -1,6 +1,5 @@
 package nl.cwi.reo;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +13,7 @@ import nl.cwi.reo.automata.Void;
 import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.graphgames.GameGraph;
-import nl.cwi.reo.interpret.Interpreter;
+import nl.cwi.reo.interpret.TreoInterpreter;
 import nl.cwi.reo.workautomata.WorkAutomaton;
 
 /**
@@ -29,7 +28,7 @@ public class Compiler {
 	public static void main(String[] args) {
 		if (args.length == 0) {
 			
-			testAutomata();
+			//testAutomata();
 			
 			//testWorkAutomata();
 			
@@ -43,10 +42,9 @@ public class Compiler {
 
 		} else {
 			
-			File file = new File(args[0]);
-			String name = file.getName();
-			Interpreter interpreter = new Interpreter();
-			List<WorkAutomaton> program = interpreter.getWorkAutomata(name);
+			TreoInterpreter<WorkAutomaton> interpreter = new TreoInterpreter<WorkAutomaton>(new WorkAutomaton());
+			
+			List<WorkAutomaton> program = interpreter.getProgram(args[0]);
 			
 			System.out.println(program);
 
