@@ -26,7 +26,7 @@ public class ComponentVariable implements ComponentExpression {
 
 	@Override
 	public ComponentExpression instantiate(ExpressionList values,
-			VariableList nodes) throws Exception {
+			Interface iface) throws Exception {
 		return this;
 	}
 }

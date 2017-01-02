@@ -1,9 +1,7 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
@@ -31,20 +29,23 @@ public class ProgramBody implements ProgramExpression {
 	 * @throws Exception if not all required parameters are provided.
 	 */
 	public ProgramExpression evaluate(DefinitionList params) throws Exception {	
+		
+		// TODO Evaluate the subcomponents in this body is the correct order, such that
+		// local definitions are resolved. (Hence, recognize possible recursive definitions)
+		
 		List<ProgramExpression> stmts_p = new ArrayList<ProgramExpression>();
 		boolean instancesAreValue = true;
-		List<InstanceExpression> insts = new ArrayList<InstanceExpression>();
-		List<InstanceValue> insts_val = new ArrayList<InstanceValue>();
+		List<Instance> insts = new ArrayList<Instance>();
 		DefinitionList definitions = new DefinitionList(params);
 		for (ProgramExpression e : stmts) {
 			ProgramExpression pe = e.evaluate(params);
 			stmts_p.add(pe);
 			if (e instanceof ProgramValue) {
 				ProgramValue B = (ProgramValue)pe;
-				InstanceExpression inst = B.getInstances();
+				Instance inst = B.getInstances();
 				insts.add(inst);
-				if (inst instanceof InstanceValue) {
-					insts_val.add((InstanceValue)inst);
+				if (inst instanceof Instance) {
+					insts.add((Instance)inst);
 				} else {
 					instancesAreValue = false;
 				}
@@ -52,7 +53,7 @@ public class ProgramBody implements ProgramExpression {
 			}
 		}
 		if (instancesAreValue) {			
-			return new ProgramValue(new InstanceValue().compose(insts_val), definitions);			
+			return new ProgramValue(new Instance().compose(insts), definitions);			
 		}
 		return new ProgramBody(stmts_p);
 	}

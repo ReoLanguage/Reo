@@ -94,25 +94,38 @@ public class TreoInterpreter<T extends Semantics<T>> {
 		}
 		
 		// Split shared ports in every atom in main, and insert a node
-		Map<String, List<NodeName>> nodes = new HashMap<String, List<NodeName>>();
+		Map<Port, List<Port>> nodes = new HashMap<Port, List<Port>>();
 		
-		for (Map.Entry<Semantics<?>, Map<String, NodeName>> atom : main.getInstance().getAtomics().entrySet()) {
+		for (Map.Entry<Semantics<?>, Map<String, Port>> atom : main.getInstance().getAtomics().entrySet()) {			
 			if (atom.getKey().getClass().equals(unit.getClass())) {	
-		    	@SuppressWarnings("unchecked")
-				T X = (T)atom.getKey();				
-				Map<String, String> r = new HashMap<String, String>();				
-				for (Map.Entry<String, NodeName> link : atom.getValue().entrySet()) {	
-					List<NodeName> node = nodes.get(link.getValue().getName());
+							
+				Map<String, String> r = new HashMap<String, String>();
+
+				// For every port of this component, add the current node size as a suffix.
+				for (Map.Entry<String, Port> link : atom.getValue().entrySet()) {	
+					// Get the current node of this port, or create a new node.
+					List<Port> node = nodes.get(link.getValue().getName());
 					if (node == null)
-						node = new ArrayList<NodeName>();
-					node.add(link.getValue().rename(link.getValue().getName() + "-" + node.size()));
-				}				
+						node = new ArrayList<Port>();
+					
+					// Rename the port by adding a suffix.
+					Port portWithSuffix = link.getValue().addSuffix("-" + node.size());
+					
+					// Add the renamed port to this node.
+					node.add(portWithSuffix);
+					
+					// Register how to rename the ports in the semantics.
+					r.put(link.getKey(), portWithSuffix.getName());
+				}
+				
+		    	@SuppressWarnings("unchecked")
+				T X = (T)atom.getKey();					
 				X.rename(r);				
 				program.add(X);
 			}
 		}
 		
-		for (Map.Entry<String, List<NodeName>> node : nodes.entrySet()) 
+		for (Map.Entry<Port, List<Port>> node : nodes.entrySet()) 
 			program.add(unit.getNode(node.getValue()));
 		
 		return program;

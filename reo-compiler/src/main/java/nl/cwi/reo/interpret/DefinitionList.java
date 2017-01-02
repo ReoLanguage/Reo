@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefinitionList implements DefinitionExpression {
+public class DefinitionList implements Definition {
 
 	private Map<VariableName, Expression> list;
 	

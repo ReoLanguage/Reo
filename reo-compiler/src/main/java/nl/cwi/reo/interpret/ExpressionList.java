@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExpressionList implements Expression {
+public class ExpressionList implements Value {
 	
 	private List<Expression> entries; 
 	

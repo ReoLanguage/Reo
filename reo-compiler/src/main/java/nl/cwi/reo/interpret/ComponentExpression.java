@@ -12,10 +12,10 @@ public interface ComponentExpression extends Expression {
 	/**
 	 * 
 	 * @param values
-	 * @param nodes
+	 * @param iface
 	 * @return
 	 */
 	public ComponentExpression instantiate(ExpressionList values, 
-			VariableList nodes) throws Exception;
+			Interface iface) throws Exception;
 
 }

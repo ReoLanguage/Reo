@@ -14,14 +14,14 @@ stmt    : defn                                                # stmt_definition
         | 'if' bexpr prog (('else' bexpr prog)* 'else' prog)? # stmt_condition ;
 
 // Definitions
-defn    : expr '=' expr                                       # defn_equation
+defn    : value '=' value                                     # defn_equation
         | var cexpr                                           # defn_definition ;  
+value   : expr | list ;
 expr    : var                                                 # expr_variable
         | STRING                                              # expr_string
         | bexpr                                               # expr_boolean
         | iexpr                                               # expr_integer
-        | cexpr                                               # expr_component
-        | list                                                # expr_list ;
+        | cexpr                                               # expr_component ;
 list    : '<' '>' | '<' expr (',' expr)* '>' ;
 
 // Component expressions

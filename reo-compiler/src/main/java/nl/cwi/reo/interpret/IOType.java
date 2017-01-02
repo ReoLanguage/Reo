@@ -1,5 +1,5 @@
 package nl.cwi.reo.interpret;
 
-public enum NodeType {
+public enum IOType {
 	FREE, SOURCE, SINK, MIXED
 }

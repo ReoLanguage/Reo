@@ -16,13 +16,14 @@ import java.util.TreeSet;
 import java.util.HashMap;
 
 import nl.cwi.reo.interpret.DefinitionList;
-import nl.cwi.reo.interpret.NodeName;
+import nl.cwi.reo.interpret.IOType;
+import nl.cwi.reo.interpret.Port;
 import nl.cwi.reo.interpret.Semantics;
 
 /**
  * A work automaton.
  */
-public final class WorkAutomaton implements Semantics<WorkAutomaton>{
+public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 
 	/**
 	 * Set of states
@@ -87,39 +88,34 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton>{
 		this.T = T;
 		this.q0 = q0;
 	}
-	
-	/**
-	 * Constructs a node automaton that is used for merger-replicator behavior.
-	 * @param name  name
-	 * @param m		number of input ports
-	 * @param n		number of output ports
-	 * @return Node with input ports name[1]!,...,name[m]!, which correspond to 
-	 * coincident sink ends, and output ports name[1]?,...,name[n]?, which correspond 
-	 * to coincident source ends.
-	 */
-	public WorkAutomaton(String name, int m, int n) {
-		this.q0 = "q";
-		this.Q = new HashSet<String>();
+
+	@Override
+	public WorkAutomaton getNode(List<Port> node) {
+
+		Set<String> Q = new HashSet<String>();
+		Set<String> P = new HashSet<String>();
+		Set<String> J = new HashSet<String>();
+		Map<String, JobConstraint> I = new HashMap<String, JobConstraint>();
+		Map<String, Set<Transition>> T = new HashMap<String, Set<Transition>>();
+		String q0 = "q";
 		Q.add(q0);
-		SortedSet<String> inputs = new TreeSet<String>();
-		for (int i = 1; i <= m; ++i)
-			inputs.add(name + '[' + i + ']' + '?');
-		SortedSet<String> outputs = new TreeSet<String>();
-		for (int i = 1; i <= n; ++i)
-			outputs.add(name + '[' + i + ']' + '!');
-		this.P = new HashSet<String>(inputs);
-		P.addAll(outputs);
-		this.J = new HashSet<String>();
-		this.I = new HashMap<String, JobConstraint>();
 		I.put(q0, new JobConstraint(true));
-		this.T = new HashMap<String, Set<Transition>>();
-		T.put(q0, new HashSet<Transition>());
-		for (String a : inputs) {
-			SortedSet<String> N = new TreeSet<String>(outputs);
-			N.add(a);
-			Transition t = new Transition(q0, q0, N, new JobConstraint(true)); 
-			T.get(q0).add(t);
+		
+		Set<String> outs = new HashSet<String>();
+		for (Port p : node) 
+			if (p.getIOType() == IOType.SINK)
+				outs.add(p.getName());
+		
+		for (Port p : node) {
+			if (p.getIOType() == IOType.SOURCE) {
+				SortedSet<String> N = new TreeSet<String>(outs);
+				N.add(p.getName());
+				Transition t = new Transition(q0, q0, N, new JobConstraint(true)); 
+				T.get(q0).add(t);
+			}
 		}
+		
+		return new WorkAutomaton(Q, P, J, I, T, q0);
 	}
 	
 	/**
@@ -359,11 +355,6 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton>{
 		System.out.println("Actual/total number of increments: " + actual + "/" + total);
 		
 		return new WorkAutomaton(Q, P, J, I, T, q0);
-	}
-
-	@Override
-	public WorkAutomaton getNode(List<NodeName> node) {
-		return null;
 	}
 
 	/**

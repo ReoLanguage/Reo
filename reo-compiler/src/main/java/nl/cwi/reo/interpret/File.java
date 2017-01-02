@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.util.List;
 
-public final class File implements DefinitionExpression {
+public final class File implements Definition {
 	
 	/**
 	 * Section.

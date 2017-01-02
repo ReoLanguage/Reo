@@ -3,9 +3,9 @@ package nl.cwi.reo.interpret;
 
 public final class ProgramDefinition implements ProgramExpression {
 
-	private final DefinitionExpression def;
+	private final Definition def;
 	
-	public ProgramDefinition(DefinitionExpression def) {
+	public ProgramDefinition(Definition def) {
 		this.def = def;
 	}
 	

@@ -6,10 +6,10 @@ public final class ProgramInstance implements ProgramExpression {
 
 	public final ExpressionList plist;
 	
-	private final VariableList iface;
+	private final Interface iface;
 
 	public ProgramInstance(ComponentExpression cexpr, ExpressionList plist, 
-			VariableList iface) {
+			Interface iface) {
 		this.cexpr = cexpr;
 		this.plist = plist;
 		this.iface = iface;
@@ -19,7 +19,7 @@ public final class ProgramInstance implements ProgramExpression {
 	public ProgramExpression evaluate(DefinitionList params) throws Exception {
 		
 		ExpressionList parameters_p = plist.evaluate(params); 
-		VariableList intface_p = iface.evaluate(params); 
+		Interface intface_p = iface.evaluate(params); 
 		
 		ComponentExpression compexpr_p = cexpr.instantiate(parameters_p, intface_p); 
 		

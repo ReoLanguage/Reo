@@ -5,7 +5,7 @@ public final class ProgramValue implements ProgramExpression {
 	/**
 	 * Components.
 	 */
-	private final InstanceExpression instances;
+	private final Instance instances;
 	
 	/**
 	 * Local definitions.
@@ -25,7 +25,7 @@ public final class ProgramValue implements ProgramExpression {
 	 * @param components	set of component expressions
 	 * @param definitions	map of definitions
 	 */
-	public ProgramValue(InstanceExpression component, 
+	public ProgramValue(Instance component, 
 			DefinitionList definitions) {
 		this.instances = component;
 		this.definitions = definitions;
@@ -35,7 +35,7 @@ public final class ProgramValue implements ProgramExpression {
 	 * Gets the component defined by this body.
 	 * @return defined component
 	 */
-	public InstanceExpression getInstances() {
+	public Instance getInstances() {
 		return instances;
 	}
 	

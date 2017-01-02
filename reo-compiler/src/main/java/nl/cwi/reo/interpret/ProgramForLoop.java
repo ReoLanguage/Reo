@@ -65,8 +65,7 @@ public class ProgramForLoop implements ProgramExpression {
 				
 			// Iterate to find all concrete components. 
 			boolean instancesAreValue = true;
-			List<InstanceExpression> insts = new ArrayList<InstanceExpression>();
-			List<InstanceValue> insts_val = new ArrayList<InstanceValue>();
+			List<Instance> insts = new ArrayList<Instance>();
 			DefinitionList defs = new DefinitionList(params);
 			for (int i = a; i <= b; i++) {
 				defs.put(parameter, new IntegerValue(Integer.valueOf(i)));
@@ -74,10 +73,10 @@ public class ProgramForLoop implements ProgramExpression {
 				if (e instanceof ProgramValue) {
 					ProgramValue B = (ProgramValue)e;
 					defs.putAll(B.getDefinitions()); // Overwriting semantics of for-loop
-					InstanceExpression inst = B.getInstances();
+					Instance inst = B.getInstances();
 					insts.add(inst);
-					if (inst instanceof InstanceValue) {
-						insts_val.add((InstanceValue)inst);
+					if (inst instanceof Instance) {
+						insts.add((Instance)inst);
 					} else {
 						instancesAreValue = false;
 					}
@@ -88,7 +87,7 @@ public class ProgramForLoop implements ProgramExpression {
 			
 			if (instancesAreValue) {
 				defs.remove(parameter);				
-				return new ProgramValue(new InstanceValue().compose(insts_val), defs);
+				return new ProgramValue(new Instance().compose(insts), defs);
 			}
 		}
 		

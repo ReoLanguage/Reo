@@ -8,7 +8,7 @@ public interface Semantics<T> extends Evaluable<Semantics<T>> {
 	
 	public Set<String> getInterface();
 	
-	public T getNode(List<NodeName> node);
+	public T getNode(List<Port> node);
 	
 	//public T compose(List<T> automata);
 	
