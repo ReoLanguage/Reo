@@ -10,6 +10,8 @@ public final class Parameter implements Evaluable<Parameter> {
 	private final ParameterType type;
 	
 	public Parameter(Variable var, ParameterType type) {
+		if (var == null || type == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.var = var;
 		this.type = type;
 	}

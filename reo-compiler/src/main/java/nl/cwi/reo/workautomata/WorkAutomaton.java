@@ -171,7 +171,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 		
 		// Initialize the Work Automaton fields.
 		Set<String> Q = new HashSet<String>(this.Q);
-		Set<String> P = new HashSet<String>(this.P);
+		Set<String> P = new HashSet<String>();
 		Set<String> J = new HashSet<String>(this.J);
 		Map<String, JobConstraint> I = new HashMap<String, JobConstraint>(this.I);
 		Map<String, Set<Transition>> T = new HashMap<String, Set<Transition>>();
@@ -179,16 +179,18 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 		
 		// Rename the ports in the interface
 		for (String a : this.P) {
-			String port;
-			if ((port = links.get(a)) == null)
-				port = a;
+			String port = links.get(a);
+			if (port == null) port = a;
 			P.add(port);
 		}
 		
 		// Add relabeled transitions to the set of transition
-		for (Set<Transition> outgoing : this.T.values())
-			for (Transition t : outgoing) 
-				T.get(t.getSource()).add(t.rename(links));
+		for (Map.Entry<String, Set<Transition>> pair : this.T.entrySet()) {
+			Set<Transition> outgoing = new TreeSet<Transition>();
+			for (Transition t : pair.getValue()) 
+				outgoing.add(t.rename(links));
+			T.put(pair.getKey(), outgoing);
+		}
 		
 		return new WorkAutomaton(Q, P, J, I, T, q0);
 	}

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class ProgramForLoop implements ProgramExpression {
+public class ProgramForLoop implements Program {
 
 	/**
 	 * Name of the iterated parameter.
@@ -25,7 +25,7 @@ public class ProgramForLoop implements ProgramExpression {
 	/**
 	 * Iterated subprogram definition.
 	 */
-	public ProgramExpression body;
+	public Program body;
 
 	/**
 	 * Constructs a parameterized for loop. 
@@ -35,7 +35,9 @@ public class ProgramForLoop implements ProgramExpression {
 	 * @param upper			expression defining the upper iteration bound
 	 * @param subprogram	iterated subprogram definition
 	 */
-	public ProgramForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ProgramExpression body) {
+	public ProgramForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, Program body) {
+		if (parameter == null || lower == null || upper == null || body == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.parameter = parameter;
 		this.lower = lower;
 		this.upper = upper;
@@ -49,7 +51,7 @@ public class ProgramForLoop implements ProgramExpression {
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
 	@Override
-	public ProgramExpression evaluate(DefinitionList params) throws Exception {
+	public Program evaluate(DefinitionList params) throws Exception {
 		
 		if (params.get(parameter) != null)
 			throw new Exception("Parameter " + parameter + " is already used.");
@@ -69,7 +71,7 @@ public class ProgramForLoop implements ProgramExpression {
 			DefinitionList defs = new DefinitionList(params);
 			for (int i = a; i <= b; i++) {
 				defs.put(parameter, new IntegerValue(Integer.valueOf(i)));
-				ProgramExpression e = body.evaluate(defs);
+				Program e = body.evaluate(defs);
 				if (e instanceof ProgramValue) {
 					ProgramValue B = (ProgramValue)e;
 					defs.putAll(B.getDefinitions()); // Overwriting semantics of for-loop

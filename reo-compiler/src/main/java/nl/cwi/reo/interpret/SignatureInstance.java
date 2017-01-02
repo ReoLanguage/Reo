@@ -9,6 +9,8 @@ public class SignatureInstance {
 	private Map<Node, Node> links;
 	
 	public SignatureInstance(DefinitionList defs, Map<Node, Node> links) {
+		if (defs == null || links == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.defs = defs;
 		this.links = links;
 	}

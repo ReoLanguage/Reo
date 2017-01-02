@@ -79,7 +79,7 @@ public final class Transition implements Comparable<Transition> {
 	/**
 	 * Returns a silent self loop transition at the given state.
 	 * @param q		name of the state.
-	 * @return silent self loop transition
+	 * @return new silent self loop transition
 	 */
 	public static Transition getIdlingTransition(String q) {
 		SortedSet<String> N = new TreeSet<String>();
@@ -90,7 +90,7 @@ public final class Transition implements Comparable<Transition> {
 	/**
 	 * Renames the ports in the synchronization constraint.
 	 * @param r		renaming map
-	 * @return transition with renamed synchronization constraint.
+	 * @return new transition with renamed synchronization constraint.
 	 */
 	public Transition rename(Map<String, String> r) {
 		SortedSet<String> rN = new TreeSet<String>(this.N);

@@ -1,9 +1,0 @@
-section my.section;
-
-producer(a!, b!) {
-  #WA 
-  q0 : x <= 5
-  q0 -> q1 : {}, x == 5 // produce the data
-  q1 -> q0 : {a}, true	
-  q1 -> q0 : {b}, true 
-}

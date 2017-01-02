@@ -4,7 +4,13 @@ public final class TypeTag implements ParameterType {
 	
 	private final String tag;
 	
+	public TypeTag() {
+		this.tag = "";
+	}
+	
 	public TypeTag(String tag) {
+		if (tag == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
 		this.tag = tag;
 	}
 

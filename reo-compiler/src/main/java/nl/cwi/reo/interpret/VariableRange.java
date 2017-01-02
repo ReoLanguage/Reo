@@ -24,6 +24,8 @@ public final class VariableRange implements Variable, Sequence {
 	 * @param name		name of the node
 	 */
 	public VariableRange(String name, List<List<IntegerExpression>> indices) {
+		if (name == null || indices == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.name = name;
 		this.indices = indices;		
 	}

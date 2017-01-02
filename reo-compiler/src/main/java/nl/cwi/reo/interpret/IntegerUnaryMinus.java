@@ -6,6 +6,8 @@ public final class IntegerUnaryMinus implements IntegerExpression {
 	private final IntegerExpression e;
 	
 	public IntegerUnaryMinus(IntegerExpression e) {
+		if (e == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.e = e;
 	}
 

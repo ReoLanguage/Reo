@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.util.List;
 
-public final class File implements Definition {
+public final class DefinitionMain implements Definition {
 	
 	/**
 	 * Section.
@@ -24,7 +24,9 @@ public final class File implements Definition {
 	 */
 	private final ComponentExpression cexpr;
 	
-	public File(String section, List<String> imports, String name, ComponentExpression cexpr) {
+	public DefinitionMain(String section, List<String> imports, String name, ComponentExpression cexpr) {
+		if (section == null || imports == null || name == null || cexpr == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.section = section;
 		this.imports = imports;
 		this.name = name;
@@ -34,12 +36,16 @@ public final class File implements Definition {
 	public List<String> getImports() {
 		return imports;
 	}
+	
+	public VariableName getVariableName() {
+		return new VariableName(section.equals("") ? name : section + "." + name); 
+	}
 
 	@Override
 	public DefinitionList evaluate(DefinitionList params)
 			throws Exception {
 		DefinitionList defs = new DefinitionList();
-		defs.put(new VariableName(section + "." + name), cexpr.evaluate(params));
+		defs.put(getVariableName(), cexpr.evaluate(params));
 		return defs;
 	}
 }

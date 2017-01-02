@@ -120,7 +120,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class TreoProgramListener extends TreoBaseListener {
 	
 	// Main program expression
-	private File program;
+	private DefinitionMain program;
 	
 	// Error log
 	private ErrorLog log;
@@ -131,10 +131,9 @@ public class TreoProgramListener extends TreoBaseListener {
 	// File structure
 	private String section = "";	
 	private List<String> imports = new ArrayList<String>();
-	private ParseTreeProperty<String> names = new ParseTreeProperty<String>();	
 	
 	// Programs
-	private ParseTreeProperty<ProgramExpression> progs = new ParseTreeProperty<ProgramExpression>();
+	private ParseTreeProperty<Program> progs = new ParseTreeProperty<Program>();
 	
 	// Definitions	
 	private ParseTreeProperty<DefinitionEquation> defns = new ParseTreeProperty<DefinitionEquation>();
@@ -164,7 +163,7 @@ public class TreoProgramListener extends TreoBaseListener {
 	       
 	// Variables
 	private ParseTreeProperty<Variable> variables = new ParseTreeProperty<Variable>();	
-	private ParseTreeProperty<List<IntegerExpression>> indices = new ParseTreeProperty<List<IntegerExpression>>();	
+	private ParseTreeProperty<List<IntegerExpression>> bounds = new ParseTreeProperty<List<IntegerExpression>>();	
 
 	// Integer expressions
 	private ParseTreeProperty<IntegerExpression> iexprs = new ParseTreeProperty<IntegerExpression>();
@@ -188,7 +187,7 @@ public class TreoProgramListener extends TreoBaseListener {
 	 * Gets the program expression.
 	 * @return program expression
 	 */
-	public File getProgramSection() {
+	public DefinitionMain getFile() {
 		return program;
 	}
 
@@ -206,7 +205,7 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void exitFile(FileContext ctx) {
-		program = new File(section, imports, ctx.ID().getText(), cexprs.get(ctx.cexpr()));
+		program = new DefinitionMain(section, imports, ctx.ID().getText(), cexprs.get(ctx.cexpr()));
 	}
 
 	@Override
@@ -223,7 +222,7 @@ public class TreoProgramListener extends TreoBaseListener {
 	}
 	
 	/**
-	 * Bodies
+	 * Programs
 	 */
 	
 	@Override
@@ -231,7 +230,7 @@ public class TreoProgramListener extends TreoBaseListener {
 	
 	@Override
 	public void exitProg(ProgContext ctx) {
-		List<ProgramExpression> stmts = new ArrayList<ProgramExpression>();
+		List<Program> stmts = new ArrayList<Program>();
 		for (StmtContext stmt_ctx : ctx.stmt())
 			stmts.add(progs.get(stmt_ctx));
 		progs.put(ctx, new ProgramBody(stmts));
@@ -250,8 +249,11 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void exitStmt_instance(Stmt_instanceContext ctx) {	
-		progs.put(ctx, new ProgramInstance(cexprs.get(ctx.cexpr()), 
-				lists.get(ctx.list()), ifaces.get(ctx.iface())));
+		ComponentExpression cexpr = cexprs.get(ctx.cexpr());
+		ExpressionList list = lists.get(ctx.list());
+		if (list == null) list = new ExpressionList();
+		Interface iface = ifaces.get(ctx.iface());
+		progs.put(ctx, new ProgramInstance(cexpr, list, iface));
 	}
 	
 	@Override
@@ -262,7 +264,7 @@ public class TreoProgramListener extends TreoBaseListener {
 		VariableName p = new VariableName(ctx.ID().getText());
 		IntegerExpression a = iexprs.get(ctx.iexpr(0));
 		IntegerExpression b = iexprs.get(ctx.iexpr(1));
-		ProgramExpression B = progs.get(ctx.prog());
+		Program B = progs.get(ctx.prog());
 		progs.put(ctx, new ProgramForLoop(p, a, b, B));
 	}
 
@@ -274,7 +276,7 @@ public class TreoProgramListener extends TreoBaseListener {
 		List<BooleanExpression> guards = new ArrayList<BooleanExpression>();
 		for (BexprContext bexpr_ctx : ctx.bexpr())
 			guards.add(bexprs.get(bexpr_ctx));
-		List<ProgramExpression> branches = new ArrayList<ProgramExpression>();
+		List<Program> branches = new ArrayList<Program>();
 		for (ProgContext body_ctx : ctx.prog())
 			branches.add(progs.get(body_ctx));
 		progs.put(ctx, new ProgramIfThenElse(guards, branches));
@@ -357,7 +359,8 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void exitCexpr_variable(Cexpr_variableContext ctx) {
-		cexprs.put(ctx, new ComponentVariable(variables.get(ctx)));
+		Variable var = variables.get(ctx.var());		
+		cexprs.put(ctx, new ComponentVariable(var));
 	}
 
 	@Override
@@ -472,6 +475,7 @@ public class TreoProgramListener extends TreoBaseListener {
 	@Override
 	public void exitSign(SignContext ctx) {
 		ParameterList params = parameterlists.get(ctx.params());
+		if (params == null) params = new ParameterList();
 		NodeList nodes = nodelists.get(ctx.nodes());
 		signatures.put(ctx, new Signature(params, nodes));
 	}
@@ -493,7 +497,10 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void exitParam(ParamContext ctx) {
-		parameters.put(ctx, new Parameter(variables.get(ctx.var()), parametertypes.get(ctx.ptype())));
+		Variable var = variables.get(ctx.var());
+		ParameterType type = parametertypes.get(ctx.ptype());
+		if (type == null) type = new TypeTag("");
+		parameters.put(ctx, new Parameter(var, type));
 	}
 
 	@Override
@@ -529,28 +536,27 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void exitNode(NodeContext ctx) {
-		
 		Variable var = variables.get(ctx.var());
-		
-		TypeTag type = typetags.get(ctx.type());
-		
-		IOType pol = null; 
-		
-		switch (ctx.io.getType()) {
-		case TreoParser.IN:
-			pol = IOType.SOURCE;
-			break;
-		case TreoParser.OUT:
-			pol = IOType.SINK;
-			break;
-		case TreoParser.MIX:
-			pol = IOType.MIXED;
-			break;
-		default:
-			break;
+		if (var == null) var = new VariableName();
+		TypeTag tag = typetags.get(ctx.type());
+		if (tag == null) tag = new TypeTag();
+		IOType type = IOType.FREE;
+		if (ctx.io != null) {
+			switch (ctx.io.getType()) {
+			case TreoParser.IN:
+				type = IOType.SOURCE;
+				break;
+			case TreoParser.OUT:
+				type = IOType.SINK;
+				break;
+			case TreoParser.MIX:
+				type = IOType.MIXED;
+				break;
+			default:
+				break;
+			}
 		}
-		
-		nodes.put(ctx, new Node(var, pol, type));
+		nodes.put(ctx, new Node(var, type, tag));
 	}
 
 	/**
@@ -585,26 +591,16 @@ public class TreoProgramListener extends TreoBaseListener {
 	public void enterVar(VarContext ctx) { }
 
 	@Override
-	public void exitVar(VarContext ctx) {
-		
-		String name = ctx.ID().getText();
-		
-		List<List<IntegerExpression>> indcs_range = new ArrayList<List<IntegerExpression>>();
-		
-		for (IndicesContext indices_ctx : ctx.indices()) {
-			List<IntegerExpression> bounds = indices.get(indices_ctx);
-			indcs_range.add(bounds);
-		}
-		
-		variables.put(ctx, new VariableRange(name, indcs_range));
+	public void exitVar(VarContext ctx) {		
+		String name = ctx.name().getText();		
+		List<List<IntegerExpression>> indices = new ArrayList<List<IntegerExpression>>();		
+		for (IndicesContext indices_ctx : ctx.indices())
+			indices.add(bounds.get(indices_ctx));
+		variables.put(ctx, new VariableRange(name, indices));
 	}
 
 	@Override
 	public void exitName(NameContext ctx) {
-		String name = ctx.ID(0).getText();
-		for (int i = 1; i < ctx.ID().size(); ++i)
-			name += "." + ctx.ID(i);
-		names.put(ctx, name);
 	}
 
 	@Override
@@ -612,10 +608,10 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void exitIndices(IndicesContext ctx) {
-		List<IntegerExpression> bounds = new ArrayList<IntegerExpression>();
+		List<IntegerExpression> list = new ArrayList<IntegerExpression>();
 		for (IexprContext iexpr_ctx : ctx.iexpr())
-			bounds.add(iexprs.get(iexpr_ctx));
-		indices.put(ctx, bounds);
+			list.add(iexprs.get(iexpr_ctx));
+		bounds.put(ctx, list);
 	}
 
 	/**
@@ -875,8 +871,6 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void enterWa_jc_leq(Wa_jc_leqContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -891,8 +885,6 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void enterWa_jc_eq(Wa_jc_eqContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -907,24 +899,20 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void enterWa_transition(Wa_transitionContext ctx) {
+	}
+
+	@Override
+	public void exitWa_transition(Wa_transitionContext ctx) {
 		String q1 = ctx.ID(0).getText();
 		String q2 = ctx.ID(1).getText();
 		SortedSet<String> sc = idsets.get(ctx.idset(0));
 		JobConstraint jc = wa_jobconstraints.get(ctx.jc());
 //		SortedSet<String> resets = wa_resets.get(ctx.idset(1));
-		wa_transitions.put(ctx, new Transition(q1, q2, sc, jc));
-	}
-
-	@Override
-	public void exitWa_transition(Wa_transitionContext ctx) {
-		// TODO Auto-generated method stub
-		
+		wa_transitions.put(ctx, new Transition(q1, q2, sc, jc));		
 	}
 
 	@Override
 	public void enterWa_invariant(Wa_invariantContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -934,20 +922,14 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void enterWa_jc_geq(Wa_jc_geqContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void exitWa_jc_geq(Wa_jc_geqContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void enterWa_jc_bool(Wa_jc_boolContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -957,8 +939,6 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void enterWa_jc_and(Wa_jc_andContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -970,14 +950,10 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void enterWa_jc_or(Wa_jc_orContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void exitWa_jc_or(Wa_jc_orContext ctx) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	/**

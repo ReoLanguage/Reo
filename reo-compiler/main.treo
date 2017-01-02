@@ -1,5 +1,3 @@
-section nl.cwi.reo;
-
 import treo.conn.fifo1;
 import treo.conn.sequencer;
 
@@ -10,6 +8,8 @@ main(){
 			fifo1(a[i],a[i+1])
 		}
 	} 
+	
+	fifo<2>(x,y)
 	
 	sequencer<3>(a,b,c) 
 }

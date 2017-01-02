@@ -4,7 +4,6 @@ grammar Treo;
 file    : secn? imps* ID cexpr ;
 secn    : 'section' name ';';
 imps    : 'import' name ';';
-name    : (ID '.')* ID ;
 
 // Programs
 prog    : '{' stmt* '}' ;
@@ -25,7 +24,7 @@ expr    : var                                                 # expr_variable
 list    : '<' '>' | '<' expr (',' expr)* '>' ;
 
 // Component expressions
-cexpr   : name indices*                                       # cexpr_variable
+cexpr   : var                                                 # cexpr_variable
         | sign '{' atom '}'                                   # cexpr_atomic
         | sign prog                                           # cexpr_composite ;
 
@@ -54,7 +53,8 @@ type    : ID | ID ('*' type) | '(' type ')' | <assoc=right> type ':' type ;
 iface   : '(' ')' | '(' var (',' var)* ')' ;
         
 // Variables (and ranges of variables)
-var     : ID indices* ;
+var     : name indices* ;
+name    : (ID '.')* ID ;
 indices : '[' iexpr ']' | '[' iexpr '..' iexpr ']' ;
 
 // Integer expressions

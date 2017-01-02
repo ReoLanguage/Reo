@@ -14,6 +14,8 @@ public final class Signature implements ParameterType {
 	private final NodeList nodes;
 	
 	public Signature(ParameterList params, NodeList nodes) {
+		if (params == null || nodes == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.params = params;
 		this.nodes = nodes;
 	}

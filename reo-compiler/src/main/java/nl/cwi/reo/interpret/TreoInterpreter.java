@@ -1,7 +1,12 @@
 package nl.cwi.reo.interpret;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,12 +20,21 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-public class TreoInterpreter<T extends Semantics<T>> {
+public final class TreoInterpreter<T extends Semantics<T>> {
 	
-	private T unit;
+	private final T unit;
+	
+	private final List<String> dirs;
 	
 	public TreoInterpreter(T unit) {
+		if (unit == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
 		this.unit = unit;
+		List<String> dirs = new ArrayList<String>();
+		String comppath = System.getenv("COMPPATH");
+		if (comppath != null)
+			dirs.addAll(Arrays.asList(comppath.split(":")));
+		this.dirs = Collections.unmodifiableList(dirs);
 	}
 
 	/**
@@ -30,23 +44,24 @@ public class TreoInterpreter<T extends Semantics<T>> {
 	 */
 	public List<T> getProgram(String mainfile) {
 		
+		VariableName vmain = null; 
+		
 		// A stack of program expressions, whose bottom is the main program expression.
-		Stack<File> programs = new Stack<File>();	
+		Stack<DefinitionMain> programs = new Stack<DefinitionMain>();	
 		
-		// A list of marked imports.
-		List<String> imports = new ArrayList<String>();
+		// A list of already included components.
+		List<String> includedFiles = new ArrayList<String>();
 		
-		// A queue to to do imports.
-		Queue<String> todo = new LinkedList<String>();
-		todo.add(mainfile);
+		// A queue of files that need to be interpreted.
+		Queue<String> files = new LinkedList<String>();
+		files.add(mainfile);
 		
-		while (!todo.isEmpty()) {
+		while (!files.isEmpty()) {
 			
 			// Grab the head of the queue, and mark it as imported. 
-			String file = todo.poll();
-			imports.add(file);
+			String file = files.poll();
+			includedFiles.add(file);
 			
-			// Try to parse and interpret the program in this file.
 			try {
 				// Parse the file
 				CharStream c = new ANTLRFileStream(file);
@@ -59,18 +74,23 @@ public class TreoInterpreter<T extends Semantics<T>> {
 				ParseTreeWalker walker = new ParseTreeWalker();
 				TreoProgramListener listener = new TreoProgramListener();
 				walker.walk(listener, tree);
-				File program = listener.getProgramSection();	
+				DefinitionMain program = listener.getFile();	
 				
 				// Add the program to the stack
 				programs.push(program);
+				if (vmain == null)
+					vmain = program.getVariableName();
 				
-				// Add imports of program to the queue, if not yet imported
-				for (String importfile : program.getImports()) 
-					if (!imports.contains(importfile))
-						imports.add(importfile);
-
+				// Find new source files from imports, and, if necessary, add them to the list.
+				for (String comp : program.getImports()) {
+					String new_file = findSoureFile(comp);
+					if (new_file == null)
+						System.out.println("Component " + comp + " could not be found.");
+					if (!includedFiles.contains(new_file))
+						files.add(new_file);
+				}
 			} catch (IOException e) {
-				System.out.println("File " + file + " cannot be found.");
+				System.out.println("Cannot open file " + file + ".");
 			}
 		}
 
@@ -86,12 +106,15 @@ public class TreoInterpreter<T extends Semantics<T>> {
 		// Get the main component from the program.
 		List<T> program = new ArrayList<T>();
 		ComponentValue main;
-		Expression v = defs.getMain();		
+		System.out.println("var main " + vmain);
+		Expression v = defs.get(vmain);		
+		System.out.println("expression" + v);
 		if (v instanceof ComponentValue) {
 			main = (ComponentValue)v;
 		} else {
 			return program;
 		}
+		
 		
 		// Split shared ports in every atom in main, and insert a node
 		Map<Port, List<Port>> nodes = new HashMap<Port, List<Port>>();
@@ -130,4 +153,22 @@ public class TreoInterpreter<T extends Semantics<T>> {
 		
 		return program;
 	}
+	
+	private String findSoureFile(String comp) {
+		
+		String[] names = comp.split("\\.");
+		names[names.length - 1] += ".treo";
+		
+		for (String dir : dirs) {
+			Path path = Paths.get(dir, names);
+			String filename = path.toString();
+			System.out.println("checking path " + filename);
+			File f = new File(filename);
+			if (f.exists() && !f.isDirectory()) 
+				return filename;
+		}
+		
+		return null;
+	}
+	
 }

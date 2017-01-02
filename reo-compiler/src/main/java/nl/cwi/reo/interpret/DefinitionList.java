@@ -15,6 +15,8 @@ public class DefinitionList implements Definition {
 	}
 	
 	public DefinitionList(DefinitionList defs) {
+		if (defs == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
 		this.list = defs.list;
 	}
 	

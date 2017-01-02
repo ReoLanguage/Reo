@@ -8,6 +8,8 @@ public final class Interface implements Evaluable<Interface> {
 	private List<Variable> vars;
 	
 	public Interface(List<Variable> vars) {
+		if (vars == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.vars = vars;
 	}
 	

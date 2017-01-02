@@ -6,6 +6,8 @@ public final class BooleanNegation implements BooleanExpression {
 	private final BooleanExpression e;
 	
 	public BooleanNegation(BooleanExpression e) {
+		if (e == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
 		this.e = e;
 	}
 	

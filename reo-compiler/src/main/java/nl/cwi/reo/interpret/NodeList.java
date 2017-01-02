@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NodeList implements Evaluable<NodeList> {
@@ -8,7 +9,9 @@ public class NodeList implements Evaluable<NodeList> {
 	private final List<Node> list;
 	
 	public NodeList(List<Node> list) {
-		this.list = list;
+		if (list == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
+		this.list = Collections.unmodifiableList(list);
 	}
 
 	public List<Node> getList() {

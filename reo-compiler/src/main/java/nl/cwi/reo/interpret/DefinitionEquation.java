@@ -9,6 +9,8 @@ public final class DefinitionEquation implements Definition {
 	private final Value val;
 	
 	public DefinitionEquation(Variable var, Value val) {
+		if (var == null || val == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.var = var;
 		this.val = val;
 	}

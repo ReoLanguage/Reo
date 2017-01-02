@@ -1,6 +1,6 @@
 package nl.cwi.reo.interpret;
 
-public final class ProgramValue implements ProgramExpression {
+public final class ProgramValue implements Program {
 	
 	/**
 	 * Components.
@@ -16,7 +16,7 @@ public final class ProgramValue implements ProgramExpression {
 	 * Constructs an empty body of components and definitions.
 	 */
 	public ProgramValue() {
-		this.instances = null;
+		this.instances = new Instance();
 		this.definitions = new DefinitionList();
 	}
 
@@ -25,8 +25,9 @@ public final class ProgramValue implements ProgramExpression {
 	 * @param components	set of component expressions
 	 * @param definitions	map of definitions
 	 */
-	public ProgramValue(Instance component, 
-			DefinitionList definitions) {
+	public ProgramValue(Instance component, DefinitionList definitions) {
+		if (component == null || definitions == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.instances = component;
 		this.definitions = definitions;
 	}

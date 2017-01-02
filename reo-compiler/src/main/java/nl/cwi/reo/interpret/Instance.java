@@ -28,6 +28,8 @@ public final class Instance implements Evaluable<Instance> {
 	 * Constructs a single atom program.
 	 */
 	public Instance(Semantics<?> component, Map<String, Port> links) {
+		if (component == null || links == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		Map<Semantics<?>, Map<String, Port>> atoms = new HashMap<Semantics<?>, Map<String, Port>>();
 		atoms.put(component, links);
 		this.atoms = Collections.unmodifiableMap(atoms);		

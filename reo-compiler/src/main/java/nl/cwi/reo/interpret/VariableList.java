@@ -9,6 +9,8 @@ public final class VariableList implements Variable, Sequence {
 	private final List<Variable> list;
 	
 	public VariableList(List<Variable> list) {
+		if (list == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
 		this.list = Collections.unmodifiableList(list);
 	}
 

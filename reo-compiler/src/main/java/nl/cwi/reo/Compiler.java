@@ -34,14 +34,15 @@ public class Compiler {
 			
 			//testGameGraph();
 
-//			// Print a standard message if no arguments are given
-//			System.out.println("Usage: java -jar reoc.jar <options> <reo source files>");
-//			System.out.println("where possible options include:");
-//			System.out.println("  -q     quiet");
-//			System.out.println("  -v     version information");
+			// Print a standard message if no arguments are given
+			System.out.println("Usage: java -jar reoc.jar <options> <reo source files>");
+			System.out.println("where possible options include:");
+			System.out.println("  -cp <dir>(;<dir>)*   semicolon se");
+			System.out.println("  -q                   quiet");
+			System.out.println("  -v                   version information");
 
 		} else {
-			
+
 			TreoInterpreter<WorkAutomaton> interpreter = new TreoInterpreter<WorkAutomaton>(new WorkAutomaton());
 			
 			List<WorkAutomaton> program = interpreter.getProgram(args[0]);

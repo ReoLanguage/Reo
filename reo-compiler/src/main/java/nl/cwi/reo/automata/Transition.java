@@ -55,9 +55,17 @@ public class Transition<L extends Label<L>> implements Comparable<Transition<L>>
 	 * @param lbl		transition label
 	 */
 	public Transition(State q1, State q2, SortedSet<String> N, L lbl) {
+		if (q1 == null)
+			throw new IllegalArgumentException("No source state specified.");	
+		if (q2 == null)
+			throw new IllegalArgumentException("No target state specified.");
+		if (N == null)
+			throw new IllegalArgumentException("No synchronization constraint specified.");
+		if (lbl == null)
+			throw new IllegalArgumentException("No transition label specified.");
 		this.q1 = q1;
 		this.q2 = q2;
-		this.N = Collections.unmodifiableSortedSet(new TreeSet<String>(N));
+		this.N = Collections.unmodifiableSortedSet(N);
 		this.lbl = lbl;
 	}
 	

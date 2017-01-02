@@ -12,6 +12,8 @@ public final class Node implements Evaluable<Node> {
 	private final TypeTag tag;
 	
 	public Node(Variable var, IOType type, TypeTag tag) {
+		if (var == null || type == null || tag == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.var = var;
 		this.type = type;
 		this.tag = tag;

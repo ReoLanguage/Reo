@@ -6,19 +6,21 @@ import java.util.List;
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class ProgramBody implements ProgramExpression {
+public class ProgramBody implements Program {
 	
 	/**
 	 * Program statements.
 	 */
-	public List<ProgramExpression> stmts;
+	public List<Program> stmts;
 
 	/**
 	 * Constructs a body of components and definitions.
 	 * @param components	set of component expressions
 	 * @param definitions	list of definitions
 	 */
-	public ProgramBody(List<ProgramExpression> stmts) {
+	public ProgramBody(List<Program> stmts) {
+		if (stmts == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
 		this.stmts = stmts;
 	}
 	
@@ -28,17 +30,17 @@ public class ProgramBody implements ProgramExpression {
 	 * @return Concrete instance of this body.
 	 * @throws Exception if not all required parameters are provided.
 	 */
-	public ProgramExpression evaluate(DefinitionList params) throws Exception {	
+	public Program evaluate(DefinitionList params) throws Exception {	
 		
 		// TODO Evaluate the subcomponents in this body is the correct order, such that
 		// local definitions are resolved. (Hence, recognize possible recursive definitions)
 		
-		List<ProgramExpression> stmts_p = new ArrayList<ProgramExpression>();
+		List<Program> stmts_p = new ArrayList<Program>();
 		boolean instancesAreValue = true;
 		List<Instance> insts = new ArrayList<Instance>();
 		DefinitionList definitions = new DefinitionList(params);
-		for (ProgramExpression e : stmts) {
-			ProgramExpression pe = e.evaluate(params);
+		for (Program e : stmts) {
+			Program pe = e.evaluate(params);
 			stmts_p.add(pe);
 			if (e instanceof ProgramValue) {
 				ProgramValue B = (ProgramValue)pe;

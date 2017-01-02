@@ -61,12 +61,12 @@ public class Automaton<L extends Label<L>> {
 	 */
 	public Automaton(Set<State> Q, Set<String> P, Map<State, List<Transition<L>>> T, State q0) {
 		if (Q == null)
-			throw new NullPointerException("No set of states specified.");	
+			throw new IllegalArgumentException("No set of states specified.");	
 		if (P == null)
-			throw new NullPointerException("No interface specified.");	
+			throw new IllegalArgumentException("No interface specified.");	
 		for (State q : Q) 
 			if (T.get(q) == null)
-				throw new NullPointerException("State " + q + " does not have outgoing transitions.");
+				throw new IllegalArgumentException("State " + q + " does not have outgoing transitions.");
 		if (q0 == null)
 			throw new NullPointerException("No initial state specified.");	
 		this.states = Collections.unmodifiableSet(new HashSet<State>(Q));

@@ -4,9 +4,11 @@ public class ComponentComposite implements ComponentExpression {
 	
 	private Signature sign;
 	
-	private ProgramExpression body;
+	private Program body;
 
-	public ComponentComposite(Signature sign, ProgramExpression body) {
+	public ComponentComposite(Signature sign, Program body) {
+		if (sign == null || body == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.sign = sign;
 		this.body = body;
 	}

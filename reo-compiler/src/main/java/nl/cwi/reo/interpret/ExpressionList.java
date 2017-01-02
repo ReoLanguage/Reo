@@ -1,14 +1,21 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class ExpressionList implements Value {
+public final class ExpressionList implements Value {
 	
-	private List<Expression> entries; 
+	private final List<Expression> entries; 
+	
+	public ExpressionList() {
+		this.entries = Collections.unmodifiableList(new ArrayList<Expression>());
+	}
 	
 	public ExpressionList(List<Expression> entries) {
-		this.entries = entries;
+		if (entries == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
+		this.entries = Collections.unmodifiableList(entries);
 	}
 	
 	public List<Expression> getList() {

@@ -1,8 +1,0 @@
-section treo.conn;
-
-fifo1(a?, b!) {
-	#WA 
-	q0* -> q1 	: {a}, true 
-	q1 -> q0 	: {b}, true 	
-}
-

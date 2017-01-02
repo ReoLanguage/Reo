@@ -1,6 +1,6 @@
 package nl.cwi.reo.interpret;
 
-public final class ProgramInstance implements ProgramExpression {
+public final class ProgramInstance implements Program {
 
 	public final ComponentExpression cexpr;
 
@@ -10,13 +10,15 @@ public final class ProgramInstance implements ProgramExpression {
 
 	public ProgramInstance(ComponentExpression cexpr, ExpressionList plist, 
 			Interface iface) {
+		if (cexpr == null || plist == null || iface == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");		
 		this.cexpr = cexpr;
 		this.plist = plist;
 		this.iface = iface;
 	}
 	
 	@Override
-	public ProgramExpression evaluate(DefinitionList params) throws Exception {
+	public Program evaluate(DefinitionList params) throws Exception {
 		
 		ExpressionList parameters_p = plist.evaluate(params); 
 		Interface intface_p = iface.evaluate(params); 

@@ -24,6 +24,8 @@ public class ComponentValue implements ComponentExpression {
 	 * @param inst			component instance
 	 */
 	public ComponentValue(Signature sign, Semantics<?> atom) {
+		if (sign == null || atom == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.sign = sign;
 		
 		Map<String, Port> links = new HashMap<String, Port>();

@@ -6,6 +6,8 @@ public class ComponentVariable implements ComponentExpression {
 	private Variable var;
 	
 	public ComponentVariable(Variable var) {
+		if (var == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.var = var;
 	}
 	

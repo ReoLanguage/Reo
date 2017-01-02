@@ -8,6 +8,8 @@ public final class IntegerExponentiation implements IntegerExpression {
 	private final IntegerExpression e2;
 	
 	public IntegerExponentiation(IntegerExpression e1, IntegerExpression e2) {
+		if (e1 == null || e2 == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.e1 = e1;
 		this.e2 = e2;
 	}

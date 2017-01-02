@@ -13,13 +13,17 @@ public final class Port {
 	private final boolean hidden;
 
 	public Port(String name) {
+		if (name == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
 		this.name = name;
-		this.tag = new TypeTag("");
+		this.tag = new TypeTag();
 		this.type = IOType.FREE;
 		this.hidden = true;
 	}
 	
 	public Port(String name, IOType type, TypeTag tag, boolean hidden) {
+		if (name == null || type == null || tag == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.name = name;
 		this.type = type;
 		this.tag = tag;

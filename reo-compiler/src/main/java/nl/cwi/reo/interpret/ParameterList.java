@@ -1,14 +1,21 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ParameterList implements Evaluable<ParameterList> {
 	
 	private final List<Parameter> list;
 	
+	public ParameterList() {
+		this.list = Collections.unmodifiableList(new ArrayList<Parameter>());
+	}
+	
 	public ParameterList(List<Parameter> list) {
-		this.list = list;
+		if (list == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
+		this.list = Collections.unmodifiableList(list);
 	}
 
 	public List<Parameter> getList() {

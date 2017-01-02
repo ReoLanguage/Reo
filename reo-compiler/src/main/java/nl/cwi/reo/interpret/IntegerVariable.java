@@ -13,6 +13,8 @@ public class IntegerVariable implements IntegerExpression {
 	 * @param s 	string representation of a natural number
 	 */
 	public IntegerVariable(Variable var) {
+		if (var == null)
+			throw new IllegalArgumentException("Argument cannot be null.");
 		this.var = var;
 	}
 	
