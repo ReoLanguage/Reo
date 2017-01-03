@@ -75,7 +75,7 @@ public class ProgramForLoop implements Program {
 				if (e instanceof ProgramValue) {
 					ProgramValue B = (ProgramValue)e;
 					defs.putAll(B.getDefinitions()); // Overwriting semantics of for-loop
-					Instance inst = B.getInstances();
+					Instance inst = B.getInstance();
 					insts.add(inst);
 					if (inst instanceof Instance) {
 						insts.add((Instance)inst);

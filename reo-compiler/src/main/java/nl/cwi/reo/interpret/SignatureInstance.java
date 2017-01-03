@@ -6,9 +6,9 @@ public class SignatureInstance {
 	
 	private DefinitionList defs;
 	
-	private Map<Node, Node> links;
+	private Map<Port, Port> links;
 	
-	public SignatureInstance(DefinitionList defs, Map<Node, Node> links) {
+	public SignatureInstance(DefinitionList defs, Map<Port, Port> links) {
 		if (defs == null || links == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.defs = defs;
@@ -19,7 +19,7 @@ public class SignatureInstance {
 		return this.defs;
 	}
 	
-	public Map<Node, Node> getLinks() {
+	public Map<Port, Port> getLinks() {
 		return this.links;
 	}
 

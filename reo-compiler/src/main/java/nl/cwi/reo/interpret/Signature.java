@@ -13,6 +13,11 @@ public final class Signature implements ParameterType {
 	
 	private final NodeList nodes;
 	
+	public Signature() {
+		this.params = new ParameterList();
+		this.nodes = new NodeList();
+	}
+	
 	public Signature(ParameterList params, NodeList nodes) {
 		if (params == null || nodes == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
@@ -39,7 +44,7 @@ public final class Signature implements ParameterType {
 		}
 		
 		// Find the links of the interface. 
-		Map<Node, Node> links = new HashMap<Node, Node>();	
+		Map<Port, Port> links = new HashMap<Port, Port>();	
 		
 		Iterator<Node> node = nodes.evaluate(definitions).getList().iterator();
 		Iterator<Variable> var = iface.getList().iterator();
@@ -49,12 +54,12 @@ public final class Signature implements ParameterType {
 			Variable v = var.next();
 			
 			if (!(x.getVariable() instanceof VariableName))
-				throw new Exception("Node " + x + " is not a valid node name.");
+				throw new Exception("Port " + x + " is not a valid node name.");
 			
 			if (!(v instanceof VariableName))
-				throw new Exception("Node " + v + " is not a valid node name.");
+				throw new Exception("Port " + v + " is not a valid node name.");
 			
-			links.put(x, x.rename(v));
+			links.put(x.toPort(), x.rename(v).toPort());
 		}
 		
 		return new SignatureInstance(definitions, links);

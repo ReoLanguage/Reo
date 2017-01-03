@@ -19,17 +19,15 @@ public final class ProgramInstance implements Program {
 	
 	@Override
 	public Program evaluate(DefinitionList params) throws Exception {
-		
-		ExpressionList parameters_p = plist.evaluate(params); 
-		Interface intface_p = iface.evaluate(params); 
-		
-		ComponentExpression compexpr_p = cexpr.instantiate(parameters_p, intface_p); 
-		
-		if (compexpr_p instanceof ComponentValue)
-			return new ProgramValue(((ComponentValue)compexpr_p).getInstance(), 
-					new DefinitionList());
-		
-		return new ProgramInstance(cexpr, parameters_p, intface_p);
+		ComponentExpression cexpr_p = cexpr.evaluate(params);
+		ExpressionList plist_p = plist.evaluate(params); 
+		Interface iface_p = iface.evaluate(params); 
+		ComponentExpression cexpr_p_eval = cexpr_p.instantiate(plist_p, iface_p); 
+		if (cexpr_p_eval instanceof ComponentValue) {
+			Instance inst = ((ComponentValue)cexpr_p_eval).getInstance();
+			return new ProgramValue(inst, new DefinitionList());
+		}
+		return new ProgramInstance(cexpr_p, plist_p, iface_p);
 	}
 	
 }

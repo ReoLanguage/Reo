@@ -18,6 +18,11 @@ public class ComponentValue implements ComponentExpression {
 	 */
 	private final Instance inst;
 	
+	public ComponentValue() {
+		this.sign = new Signature();
+		this.inst = new Instance();
+	}
+	
 	/**
 	 * Constructor.
 	 * @param sign			signature expression
@@ -59,6 +64,7 @@ public class ComponentValue implements ComponentExpression {
 	public ComponentExpression instantiate(ExpressionList values, 
 			Interface iface) throws Exception {
 		SignatureInstance v = sign.evaluate(values, iface);
-		return new ComponentValue(sign, inst.evaluate(v.getDefinitions()));	
+		Instance inst_p = inst.evaluate(v.getDefinitions()).restrictAndRename(v.getLinks());
+		return new ComponentValue(sign, inst_p);	
 	}	
 }

@@ -36,7 +36,7 @@ public final class ProgramValue implements Program {
 	 * Gets the component defined by this body.
 	 * @return defined component
 	 */
-	public Instance getInstances() {
+	public Instance getInstance() {
 		return instances;
 	}
 	

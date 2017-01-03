@@ -8,6 +8,10 @@ public class NodeList implements Evaluable<NodeList> {
 	
 	private final List<Node> list;
 	
+	public NodeList() {
+		this.list = Collections.unmodifiableList(new ArrayList<Node>());
+	}
+	
 	public NodeList(List<Node> list) {
 		if (list == null)
 			throw new IllegalArgumentException("Argument cannot be null.");

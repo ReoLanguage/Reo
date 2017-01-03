@@ -13,7 +13,7 @@ import nl.cwi.reo.automata.Void;
 import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.graphgames.GameGraph;
-import nl.cwi.reo.interpret.TreoInterpreter;
+import nl.cwi.reo.interpret.Interpreter;
 import nl.cwi.reo.workautomata.WorkAutomaton;
 
 /**
@@ -37,13 +37,13 @@ public class Compiler {
 			// Print a standard message if no arguments are given
 			System.out.println("Usage: java -jar reoc.jar <options> <reo source files>");
 			System.out.println("where possible options include:");
-			System.out.println("  -cp <dir>(;<dir>)*   semicolon se");
+			System.out.println("  -cp <dir>(;<dir>)*   colon separated list of directories");
 			System.out.println("  -q                   quiet");
 			System.out.println("  -v                   version information");
 
 		} else {
 
-			TreoInterpreter<WorkAutomaton> interpreter = new TreoInterpreter<WorkAutomaton>(new WorkAutomaton());
+			Interpreter<WorkAutomaton> interpreter = new Interpreter<WorkAutomaton>(new WorkAutomaton());
 			
 			List<WorkAutomaton> program = interpreter.getProgram(args[0]);
 			

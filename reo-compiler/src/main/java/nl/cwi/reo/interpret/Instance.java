@@ -67,14 +67,18 @@ public final class Instance implements Evaluable<Instance> {
 		comps.add(0, this);
 		
 		// To avoid sharing hidden ports, add an suffix to them
-		int i = 0;
+		int i = -1;
 		for (Instance C : comps) {
+			i += 1;
 			for (Map.Entry<Semantics<?>, Map<String, Port>> atom : C.atoms.entrySet()) {
 				Map<String, Port> links = new HashMap<String, Port>();
 				for (Map.Entry<String, Port> entry : atom.getValue().entrySet()) {
 					Port n = entry.getValue();
-					if (n.isHidden()) 
-						links.put(entry.getKey(), n.addSuffix(":" + i++)); 
+					if (n.isHidden()) {
+						links.put(entry.getKey(), n.addSuffix("#" + i)); 
+					} else {
+						links.put(entry.getKey(), n); 						
+					}
 				}	
 				// TODO this code relies on the assumption that two copies of the same component are
 				// different iff they are different Java object instances.
@@ -82,29 +86,10 @@ public final class Instance implements Evaluable<Instance> {
 			}
 		}
 		
-		return new Instance(atoms);
+		Instance composition = new Instance(atoms);
+		
+		return composition;
 	}
-	
-//	/**
-//	 * Restricts the interface of this component by hiding all non-exposed nodes.
-//	 * @param intface		resulting interface of this component
-//	 */
-//	public InstanceValue restrict(Set<String> intface) {
-//		
-//		Map<Semantics<?>, Map<String, Port>> atoms = new HashMap<Semantics<?>, Map<String, Port>>();
-//		
-//		for (Map.Entry<Semantics<?>, Map<String, Port>> atom : this.atoms.entrySet()) {
-//			Map<String, Port> links = new HashMap<String, Port>();
-//			for (Map.Entry<String, Port> entry : atom.getValue().entrySet()) {
-//				Port n = entry.getValue();
-//				if (!n.isHidden() && !intface.contains(n.getName()))
-//					links.put(entry.getKey(), n.hide());
-//			}
-//			atoms.put(atom.getKey(), links);
-//		}
-//		
-//		return new InstanceValue(atoms);
-//	}	
 	
 	/**
 	 * Relabels the interface of this component.
@@ -132,9 +117,8 @@ public final class Instance implements Evaluable<Instance> {
 	 */
 	public String toString() {
 		StringBuilder str = new StringBuilder();
-		int i = 0;
 		for (Map.Entry<Semantics<?>, Map<String, Port>> atom : this.atoms.entrySet()) {
-			str.append("Component " + ++i + ": \n");
+			str.append("\n");
 			str.append("Ports  : " + atom.getValue() + "\n");
 			str.append("Atom   : " + atom.getKey() + "\n");	
 		}

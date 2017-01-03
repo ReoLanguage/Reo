@@ -18,7 +18,7 @@ public final class Port {
 		this.name = name;
 		this.tag = new TypeTag();
 		this.type = IOType.FREE;
-		this.hidden = true;
+		this.hidden = false;
 	}
 	
 	public Port(String name, IOType type, TypeTag tag, boolean hidden) {
@@ -68,5 +68,14 @@ public final class Port {
 	public int hashCode() {
 	    return Objects.hash(this.name, this.hidden);
 	}	
+	
+	@Override
+	public String toString() {
+		if (type == IOType.SOURCE) 
+			return (hidden ? "*": "") + name + "?" + tag.name(); 
+		if (type == IOType.SINK) 
+			return (hidden ? "*": "") + name + "!" + tag.name();
+		return (hidden ? "*": "") + name + ":" + tag.name();
+	}
 	
 }

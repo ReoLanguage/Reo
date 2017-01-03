@@ -20,6 +20,11 @@ public final class VariableRange implements Variable, Sequence {
 	private final List<List<IntegerExpression>> indices;
 	
 	/**
+	 * Indicates if this range is a list.
+	 */
+	private final boolean isList;
+	
+	/**
 	 * Constructs a variable list.
 	 * @param name		name of the node
 	 */
@@ -27,7 +32,12 @@ public final class VariableRange implements Variable, Sequence {
 		if (name == null || indices == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.name = name;
-		this.indices = indices;		
+		this.indices = indices;	
+		boolean isList = false;
+		for (List<IntegerExpression> bounds : indices)
+			if (bounds.size() > 1)
+				isList = true;
+		this.isList = isList;
 	}
 	
 	/**
@@ -138,26 +148,30 @@ public final class VariableRange implements Variable, Sequence {
 				}			
 			}
 			
-			List<Variable> vars = new ArrayList<Variable>();
+			List<VariableName> vars = new ArrayList<VariableName>();
 			for (String x : variables) 
 				vars.add(new VariableName(x));
 
-			return new VariableList(vars);
+			if (isList)
+				return new VariableNameList(vars);
+			else
+				return vars.get(0);
+			
 		}
 		
 		return new VariableRange(this.name, indices_p);
 	}
 	
-//	@Override
-//	public String toString() {
-//		String s = name;	
-//		for (List<IntegerExpression> bounds : this.indices) {			
-//			if (bounds.size() == 1) {
-//				s += "[" + bounds.get(0) + "]";
-//			} else if (bounds.size() == 2) {
-//				s += "[" + bounds.get(0)  + ".." + bounds.get(1) + "]";
-//			}			
-//		}	
-//		return s;
-//	}
+	@Override
+	public String toString() {
+		String s = name;	
+		for (List<IntegerExpression> bounds : this.indices) {			
+			if (bounds.size() == 1) {
+				s += "[" + bounds.get(0) + "]";
+			} else if (bounds.size() == 2) {
+				s += "[" + bounds.get(0)  + ".." + bounds.get(1) + "]";
+			}			
+		}	
+		return s;
+	}
 }

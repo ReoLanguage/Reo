@@ -51,4 +51,12 @@ public class DefinitionList implements Definition {
 		return new DefinitionList(list_p);
 	}
 
+	@Override
+	public String toString() {
+		String s = "";
+		for (Map.Entry<VariableName, Expression> def : list.entrySet()) {
+			s += def.getKey().getName() + " : " + def.getValue().toString() + "\n";
+		}
+		return s;
+	}
 }

@@ -117,10 +117,10 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * Listens to events triggered by a {@link org.antlr.v4.runtime.tree.ParseTreeWalker}.
  * Returns a {@link nl.cwi.reo.interpret.p}.
  */
-public class TreoProgramListener extends TreoBaseListener {
+public class Listener extends TreoBaseListener {
 	
 	// Main program expression
-	private DefinitionMain program;
+	private SourceFile program;
 	
 	// Error log
 	private ErrorLog log;
@@ -187,7 +187,7 @@ public class TreoProgramListener extends TreoBaseListener {
 	 * Gets the program expression.
 	 * @return program expression
 	 */
-	public DefinitionMain getFile() {
+	public SourceFile getFile() {
 		return program;
 	}
 
@@ -205,7 +205,7 @@ public class TreoProgramListener extends TreoBaseListener {
 
 	@Override
 	public void exitFile(FileContext ctx) {
-		program = new DefinitionMain(section, imports, ctx.ID().getText(), cexprs.get(ctx.cexpr()));
+		program = new SourceFile(section, imports, ctx.ID().getText(), cexprs.get(ctx.cexpr()));
 	}
 
 	@Override

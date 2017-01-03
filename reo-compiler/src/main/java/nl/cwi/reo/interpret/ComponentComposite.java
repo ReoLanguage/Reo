@@ -14,13 +14,19 @@ public class ComponentComposite implements ComponentExpression {
 	}
 	
 	public ComponentExpression evaluate(DefinitionList params) throws Exception {
-		return new ComponentComposite(sign, body.evaluate(params));
+		Program prog = body.evaluate(params);
+		if (prog instanceof ProgramValue)
+			return new ComponentValue(sign, ((ProgramValue)prog).getInstance());
+		return new ComponentComposite(sign, prog);
 	}
 
 	@Override
 	public ComponentExpression instantiate(ExpressionList values, 
 			Interface iface) throws Exception {
 		SignatureInstance v = sign.evaluate(values, iface);
-		return new ComponentComposite(sign, body.evaluate(v.getDefinitions()));
+		Program prog = body.evaluate(v.getDefinitions());
+		if (prog instanceof ProgramValue)
+			return new ComponentValue(sign, ((ProgramValue)prog).getInstance());
+		return new ComponentComposite(sign, prog);
 	}
 }

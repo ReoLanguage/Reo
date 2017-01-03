@@ -39,23 +39,22 @@ public class ProgramBody implements Program {
 		boolean instancesAreValue = true;
 		List<Instance> insts = new ArrayList<Instance>();
 		DefinitionList definitions = new DefinitionList(params);
-		for (Program e : stmts) {
-			Program pe = e.evaluate(params);
-			stmts_p.add(pe);
-			if (e instanceof ProgramValue) {
-				ProgramValue B = (ProgramValue)pe;
-				Instance inst = B.getInstances();
+		for (Program prog : stmts) {
+			Program prog_p = prog.evaluate(params);
+			stmts_p.add(prog_p);
+			if (prog_p instanceof ProgramValue) {
+				ProgramValue B = (ProgramValue)prog_p;
+				Instance inst = B.getInstance();
 				insts.add(inst);
-				if (inst instanceof Instance) {
-					insts.add((Instance)inst);
-				} else {
-					instancesAreValue = false;
-				}
 				definitions.putAll(B.getDefinitions());
+			} else {
+				instancesAreValue = false;
 			}
 		}
-		if (instancesAreValue) {			
-			return new ProgramValue(new Instance().compose(insts), definitions);			
+		if (instancesAreValue) {
+			Instance instances = new Instance();
+			instances = instances.compose(insts);
+			return new ProgramValue(instances, definitions);
 		}
 		return new ProgramBody(stmts_p);
 	}

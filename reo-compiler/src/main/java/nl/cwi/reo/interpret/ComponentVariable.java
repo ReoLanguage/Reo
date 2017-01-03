@@ -13,17 +13,17 @@ public class ComponentVariable implements ComponentExpression {
 	
 	@Override
 	public ComponentExpression evaluate(DefinitionList params) throws Exception {
-		Variable x = var.evaluate(params);
-		if (x instanceof VariableName) {
-			VariableName n = (VariableName)x;
-			Expression e = params.get(n);
-			if (e instanceof ComponentValue) {
-				return (ComponentValue)e;
+		Variable var_p = var.evaluate(params);
+		if (var_p instanceof VariableName) {
+			VariableName name = (VariableName)var_p;
+			Expression expr = params.get(name);
+			if (expr instanceof ComponentValue) {
+				return (ComponentValue)expr;
 			} else {
-				throw new Exception("Variable " + n + " is not of type boolean.");
+				throw new Exception("Variable " + name + " is not of type component.");
 			}
 		}
-		return new ComponentVariable(x);		
+		return new ComponentVariable(var_p);		
 	}
 
 	@Override
