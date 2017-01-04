@@ -30,9 +30,9 @@ public final class Signature implements ParameterType {
 	public SignatureInstance evaluate(ExpressionList values, Interface iface) throws Exception {
 		
 		// Find the assignment of parameters.
-		BodyDefinitionList definitions = new BodyDefinitionList();		
+		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();		
 		
-		Iterator<Parameter> param = params.evaluate(new BodyDefinitionList()).getList().iterator();
+		Iterator<Parameter> param = params.evaluate(definitions).getList().iterator();
 		Iterator<Expression> value = values.getList().iterator();	
 		
 		while (param.hasNext() && value.hasNext()) {

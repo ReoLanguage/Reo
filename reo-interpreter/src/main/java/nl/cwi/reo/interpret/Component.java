@@ -3,12 +3,12 @@ package nl.cwi.reo.interpret;
 import java.util.Map;
 
 
-public interface ComponentExpression extends Expression {
+public interface Component extends Expression {
 
 	/**
 	 * Substitutes (component) variables with (component) expressions.
 	 */
-	public ComponentExpression evaluate(Map<VariableName, Expression> params) 
+	public Component evaluate(Map<VariableName, Expression> params) 
 			throws Exception;
 	
 	/**
@@ -17,7 +17,7 @@ public interface ComponentExpression extends Expression {
 	 * @param iface
 	 * @return
 	 */
-	public ComponentExpression instantiate(ExpressionList values, 
+	public Component instantiate(ExpressionList values, 
 			Interface iface) throws Exception;
 
 }

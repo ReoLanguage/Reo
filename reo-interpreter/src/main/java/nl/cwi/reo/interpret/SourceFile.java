@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret;
 import java.util.List;
 import java.util.Map;
 
-public final class SourceFile implements BodyDefinition {
+public final class SourceFile implements ZDefinition {
 	
 	/**
 	 * Section.
@@ -23,9 +23,9 @@ public final class SourceFile implements BodyDefinition {
 	/**
 	 * Main component.
 	 */
-	private final ComponentExpression cexpr;
+	private final Component cexpr;
 	
-	public SourceFile(String section, List<String> imports, String name, ComponentExpression cexpr) {
+	public SourceFile(String section, List<String> imports, String name, Component cexpr) {
 		if (section == null || imports == null || name == null || cexpr == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.section = section;
@@ -42,14 +42,14 @@ public final class SourceFile implements BodyDefinition {
 		return new VariableName(section.equals("") ? name : section + "." + name); 
 	}
 	
-	public ComponentExpression getComponent() {
+	public Component getComponent() {
 		return cexpr;
 	}
 
 	@Override
-	public BodyDefinitionList evaluate(Map<VariableName, Expression> params)
+	public ZDefinitionList evaluate(Map<VariableName, Expression> params)
 			throws Exception {
-		BodyDefinitionList defs = new BodyDefinitionList();
+		ZDefinitionList defs = new ZDefinitionList();
 		defs.put(getVariableName(), cexpr.evaluate(params));
 		return defs;
 	}

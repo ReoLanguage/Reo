@@ -143,7 +143,7 @@ public final class Interpreter<T extends Semantics<T>> {
 	 */
 	private InstanceList evaluatePrograms(Stack<SourceFile> programs) {
 		
-		BodyDefinitionList definitions = new BodyDefinitionList();
+		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();
 		VariableName main = null;		
 		try {
 			while (!programs.isEmpty()) {
@@ -158,10 +158,10 @@ public final class Interpreter<T extends Semantics<T>> {
 		Expression pexpr = definitions.get(main);
 		
 		// Check if the evaluated program expression is a component value.
-		if (!(pexpr instanceof ComponentValue)) 
+		if (!(pexpr instanceof ZComponentValue)) 
 			return new InstanceList();
 				
-		return ((ComponentValue)pexpr).getInstanceList();
+		return ((ZComponentValue)pexpr).getInstanceList();
 	}
 	
 	/**

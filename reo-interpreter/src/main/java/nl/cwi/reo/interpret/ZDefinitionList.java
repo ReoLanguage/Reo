@@ -3,18 +3,18 @@ package nl.cwi.reo.interpret;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BodyDefinitionList implements BodyDefinition {
+public class ZDefinitionList implements ZDefinition {
 
 	private Map<VariableName, Expression> list;
 	
 	/**
 	 * Constructs an empty list of definitions.
 	 */
-	public BodyDefinitionList() {
+	public ZDefinitionList() {
 		this.list = new HashMap<VariableName, Expression>();
 	}
 	
-	public BodyDefinitionList(BodyDefinitionList defs) {
+	public ZDefinitionList(ZDefinitionList defs) {
 		if (defs == null)
 			throw new IllegalArgumentException("Argument cannot be null.");
 		this.list = defs.list;
@@ -32,7 +32,7 @@ public class BodyDefinitionList implements BodyDefinition {
 		list.put(x, e);
 	}
 	
-	public void putAll(BodyDefinitionList defs) {
+	public void putAll(ZDefinitionList defs) {
 		list.putAll(defs.list);
 	}
 	
@@ -41,14 +41,14 @@ public class BodyDefinitionList implements BodyDefinition {
 	}
 
 	@Override
-	public BodyDefinitionList evaluate(Map<VariableName, Expression> params)
+	public ZDefinitionList evaluate(Map<VariableName, Expression> params)
 			throws Exception {
 
-		BodyDefinitionList list_p = new BodyDefinitionList();
+		ZDefinitionList list_p = new ZDefinitionList();
 		for (Map.Entry<VariableName, Expression> def : list.entrySet()) 
 			list_p.put(def.getKey(), def.getValue().evaluate(params));
 		
-		return new BodyDefinitionList(list_p);
+		return new ZDefinitionList(list_p);
 	}
 
 	@Override

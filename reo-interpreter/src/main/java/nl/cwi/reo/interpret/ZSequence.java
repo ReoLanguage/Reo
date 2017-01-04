@@ -1,5 +1,5 @@
 package nl.cwi.reo.interpret;
 
-public interface Sequence {
+public interface ZSequence {
 
 }

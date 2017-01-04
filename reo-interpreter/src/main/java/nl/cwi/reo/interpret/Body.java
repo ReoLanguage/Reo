@@ -7,19 +7,19 @@ import java.util.Map;
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class BodyList implements BodyExpression {
+public class Body implements ProgramExpression {
 	
 	/**
 	 * Program statements.
 	 */
-	public List<BodyExpression> stmts;
+	public List<ProgramExpression> stmts;
 
 	/**
 	 * Constructs a body of components and definitions.
 	 * @param components	set of component expressions
 	 * @param definitions	list of definitions
 	 */
-	public BodyList(List<BodyExpression> stmts) {
+	public Body(List<ProgramExpression> stmts) {
 		if (stmts == null)
 			throw new IllegalArgumentException("Argument cannot be null.");
 		this.stmts = stmts;
@@ -31,27 +31,27 @@ public class BodyList implements BodyExpression {
 	 * @return Concrete instance of this body.
 	 * @throws Exception if not all required parameters are provided.
 	 */
-	public BodyExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
 		boolean instancesAreValue = true;
-		List<BodyExpression> stmts_p = new ArrayList<BodyExpression>();				
-		BodyValue body = new BodyValue(params); 
-		for (BodyExpression stmt : stmts) {
-			BodyExpression expr = stmt.evaluate(body.getDefinitions());
+		List<ProgramExpression> stmts_p = new ArrayList<ProgramExpression>();				
+		Program body = new Program(params); 
+		for (ProgramExpression stmt : stmts) {
+			ProgramExpression expr = stmt.evaluate(body.getDefinitions());
 			stmts_p.add(expr);
-			if (expr instanceof BodyValue) {
-				body = body.compose((BodyValue)expr);
+			if (expr instanceof Program) {
+				body = body.compose((Program)expr);
 			} else {
 				instancesAreValue = false;
 			}
 		}
 		if (instancesAreValue) return body;
-		return new BodyList(stmts_p);
+		return new Body(stmts_p);
 	}
 	
 	@Override
 	public String toString() {
 		String s = "";
-		for (BodyExpression x : stmts)
+		for (ProgramExpression x : stmts)
 			s += "" + x + "\n";
 		return s;
 	}

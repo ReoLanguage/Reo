@@ -8,7 +8,7 @@ import java.util.Map;
  * A parameterized set of variable names, such as, for example, 
  * (a.b, c[-31], x.y.z[-1][0...1-k][5]).
  */
-public final class VariableRange implements Variable, Sequence {
+public final class VariableRange implements Variable, ZSequence {
 
 	/**
 	 * Fully qualified name.
@@ -49,9 +49,9 @@ public final class VariableRange implements Variable, Sequence {
 	 * @return null, if values cannot be found, and a map that assigns each
 	 * parameter name to an integer value otherwise.
 	 */
-	public BodyDefinitionList findParamFromSize(int size) {
+	public ZDefinitionList findParamFromSize(int size) {
 		
-		BodyDefinitionList params = new BodyDefinitionList();
+		ZDefinitionList params = new ZDefinitionList();
 		
 		for (List<IntegerExpression> bounds : indices) {
 			switch (bounds.size()) {

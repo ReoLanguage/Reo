@@ -9,7 +9,7 @@ import nl.cwi.reo.semantics.Semantics;
 /**
  * An atomic component with a signature.
  */
-public class ComponentValue implements ComponentExpression {
+public class ZComponentValue implements Component {
 
 	/**
 	 * Signature expression.
@@ -21,7 +21,7 @@ public class ComponentValue implements ComponentExpression {
 	 */
 	private final InstanceList inst;
 	
-	public ComponentValue() {
+	public ZComponentValue() {
 		this.sign = new Signature();
 		this.inst = new InstanceList();
 	}
@@ -31,7 +31,7 @@ public class ComponentValue implements ComponentExpression {
 	 * @param sign			signature expression
 	 * @param inst			component instance
 	 */
-	public ComponentValue(Signature sign, Semantics<?> atom) {
+	public ZComponentValue(Signature sign, Semantics<?> atom) {
 		if (sign == null || atom == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.sign = sign;
@@ -48,7 +48,7 @@ public class ComponentValue implements ComponentExpression {
 	 * @param sign			signature expression
 	 * @param inst			component instance
 	 */
-	public ComponentValue(Signature sign, InstanceList inst) {
+	public ZComponentValue(Signature sign, InstanceList inst) {
 		this.inst = inst;
 		this.sign = sign;
 	}
@@ -58,17 +58,17 @@ public class ComponentValue implements ComponentExpression {
 	}
 
 	@Override
-	public ComponentExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		return new ComponentValue(sign, inst.evaluate(params));
+	public Component evaluate(Map<VariableName, Expression> params) throws Exception {
+		return new ZComponentValue(sign, inst.evaluate(params));
 		// TODO Possibly local variables in this definition get instantiated by variables from the context.
 	}
 
 	@Override
-	public ComponentExpression instantiate(ExpressionList values, 
+	public Component instantiate(ExpressionList values, 
 			Interface iface) throws Exception {
 		SignatureInstance v = sign.evaluate(values, iface);
 		InstanceList inst_p = inst.evaluate(v.getDefinitions()).restrictAndRename(v.getLinks());
-		return new ComponentValue(sign, inst_p);	
+		return new ZComponentValue(sign, inst_p);	
 	}
 	
 	@Override

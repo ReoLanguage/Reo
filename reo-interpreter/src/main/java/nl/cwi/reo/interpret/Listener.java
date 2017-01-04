@@ -43,9 +43,9 @@ import nl.cwi.reo.interpret.TreoParser.Cam_dt_notContext;
 import nl.cwi.reo.interpret.TreoParser.Cam_dt_unaryMinContext;
 import nl.cwi.reo.interpret.TreoParser.Cam_dt_variableContext;
 import nl.cwi.reo.interpret.TreoParser.Cam_trContext;
-import nl.cwi.reo.interpret.TreoParser.Cexpr_atomicContext;
-import nl.cwi.reo.interpret.TreoParser.Cexpr_compositeContext;
-import nl.cwi.reo.interpret.TreoParser.Cexpr_variableContext;
+import nl.cwi.reo.interpret.TreoParser.Comp_atomicContext;
+import nl.cwi.reo.interpret.TreoParser.Comp_compositeContext;
+import nl.cwi.reo.interpret.TreoParser.Comp_variableContext;
 import nl.cwi.reo.interpret.TreoParser.ExprContext;
 import nl.cwi.reo.interpret.TreoParser.Expr_variableContext;
 import nl.cwi.reo.interpret.TreoParser.Expr_stringContext;
@@ -119,9 +119,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  */
 public class Listener extends TreoBaseListener {
 	
-	// Main program expression
-	private SourceFile program;
-	
 	// Error log
 	private ErrorLog log;
 	
@@ -129,20 +126,21 @@ public class Listener extends TreoBaseListener {
 //	private Map<String, ValueType> symbols = new HashMap<String, ValueType>();
 	
 	// File structure
+	private SourceFile program;
 	private String section = "";	
 	private List<String> imports = new ArrayList<String>();
 	
-	// Programs
-	private ParseTreeProperty<BodyList> bodies = new ParseTreeProperty<BodyList>();
-	private ParseTreeProperty<BodyExpression> stmts = new ParseTreeProperty<BodyExpression>();
+	// Components
+	private ParseTreeProperty<Component> comps = new ParseTreeProperty<Component>();
 	
-	// Definitions	
+	// Bodies
+	private ParseTreeProperty<Body> bodies = new ParseTreeProperty<Body>();
+	private ParseTreeProperty<Statement> stmts = new ParseTreeProperty<Statement>();
+	
+	// Values	
 	private ParseTreeProperty<Value> values = new ParseTreeProperty<Value>();	
 	private ParseTreeProperty<Expression> exprs = new ParseTreeProperty<Expression>();
 	private ParseTreeProperty<ExpressionList> lists = new ParseTreeProperty<ExpressionList>();
-	
-	// Components
-	private ParseTreeProperty<ComponentExpression> cexprs = new ParseTreeProperty<ComponentExpression>();
 	
 	// Boolean expressions
 	private ParseTreeProperty<BooleanExpression> bexprs = new ParseTreeProperty<BooleanExpression>();
@@ -205,7 +203,7 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitFile(FileContext ctx) {
-		program = new SourceFile(section, imports, ctx.ID().getText(), cexprs.get(ctx.cexpr()));
+		program = new SourceFile(section, imports, ctx.ID().getText(), comps.get(ctx.cexpr()));
 	}
 
 	@Override
@@ -216,9 +214,6 @@ public class Listener extends TreoBaseListener {
 	@Override
 	public void exitImps(ImpsContext ctx) {
 		imports.add(ctx.name().getText());
-//		String filename = ctx.STRING().getText();
-//		filename.substring(1, filename.length() - 1);
-//		includes.add(new File(filename));
 	}
 	
 	/**
@@ -230,10 +225,10 @@ public class Listener extends TreoBaseListener {
 	
 	@Override
 	public void exitBody(BodyContext ctx) {
-		List<BodyExpression> stmtlist = new ArrayList<BodyExpression>();
+		List<ProgramExpression> stmtlist = new ArrayList<ProgramExpression>();
 		for (StmtContext stmt_ctx : ctx.stmt())
 			stmtlist.add(stmts.get(stmt_ctx));
-		bodies.put(ctx, new BodyList(stmtlist));
+		bodies.put(ctx, new Body(stmtlist));
 	}
 	
 	@Override
@@ -244,9 +239,9 @@ public class Listener extends TreoBaseListener {
 		Value x = values.get(ctx.value(0));
 		Value y = values.get(ctx.value(1));
 		if (x instanceof Variable) {
-			stmts.put(ctx, new BodyEquation((Variable)x, y));
+			stmts.put(ctx, new StatementEquation((Variable)x, y));
 		} else if (x instanceof Variable) {
-			stmts.put(ctx, new BodyEquation((Variable)y, x));
+			stmts.put(ctx, new StatementEquation((Variable)y, x));
 		} else {
 			// Incorrect definition.
 			// ignore this equation.
@@ -259,7 +254,7 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitStmt_compdefn(Stmt_compdefnContext ctx) {
-		stmts.put(ctx, new BodyEquation(variables.get(ctx.var()), cexprs.get(ctx.cexpr())));
+		stmts.put(ctx, new StatementEquation(variables.get(ctx.var()), comps.get(ctx.cexpr())));
 	}
 	
 	@Override
@@ -267,11 +262,11 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitStmt_instance(Stmt_instanceContext ctx) {	
-		ComponentExpression cexpr = cexprs.get(ctx.cexpr());
+		Component cexpr = comps.get(ctx.cexpr());
 		ExpressionList list = lists.get(ctx.list());
 		if (list == null) list = new ExpressionList();
 		Interface iface = ifaces.get(ctx.iface());
-		stmts.put(ctx, new BodyInstance(cexpr, list, iface));
+		stmts.put(ctx, new StatementInstance(cexpr, list, iface));
 	}
 	
 	@Override
@@ -282,8 +277,8 @@ public class Listener extends TreoBaseListener {
 		VariableName p = new VariableName(ctx.ID().getText());
 		IntegerExpression a = iexprs.get(ctx.iexpr(0));
 		IntegerExpression b = iexprs.get(ctx.iexpr(1));
-		BodyExpression B = bodies.get(ctx.body());
-		stmts.put(ctx, new BodyForLoop(p, a, b, B));
+		ProgramExpression B = bodies.get(ctx.body());
+		stmts.put(ctx, new StatementForLoop(p, a, b, B));
 	}
 
 	@Override
@@ -294,10 +289,10 @@ public class Listener extends TreoBaseListener {
 		List<BooleanExpression> guards = new ArrayList<BooleanExpression>();
 		for (BexprContext bexpr_ctx : ctx.bexpr())
 			guards.add(bexprs.get(bexpr_ctx));
-		List<BodyExpression> branches = new ArrayList<BodyExpression>();
+		List<ProgramExpression> branches = new ArrayList<ProgramExpression>();
 		for (BodyContext body_ctx : ctx.body())
 			branches.add(bodies.get(body_ctx));
-		stmts.put(ctx, new BodyIfThenElse(guards, branches));
+		stmts.put(ctx, new StatementIfThenElse(guards, branches));
 	}
 		
 	/**
@@ -331,7 +326,7 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitExpr_component(Expr_componentContext ctx) {
-		exprs.put(ctx, cexprs.get(ctx.cexpr()));
+		exprs.put(ctx, comps.get(ctx.cexpr()));
 	}
 
 	@Override
@@ -347,10 +342,10 @@ public class Listener extends TreoBaseListener {
 	 */
 
 	@Override
-	public void enterCexpr_variable(Cexpr_variableContext ctx) { }
+	public void enterComp_variable(Comp_variableContext ctx) { }
 
 	@Override
-	public void exitCexpr_variable(Cexpr_variableContext ctx) {
+	public void exitComp_variable(Comp_variableContext ctx) {
 		Variable var = variables.get(ctx.var());
 		if (var instanceof VariableName) {
 			for (String imprt : imports) {
@@ -360,23 +355,23 @@ public class Listener extends TreoBaseListener {
 				}
 			}
 		}
-		cexprs.put(ctx, new ComponentVariable(var));
+		comps.put(ctx, new ComponentVariable(var));
 	}
 
 	@Override
-	public void enterCexpr_atomic(Cexpr_atomicContext ctx) { }
+	public void enterComp_atomic(Comp_atomicContext ctx) { }
 
 	@Override
-	public void exitCexpr_atomic(Cexpr_atomicContext ctx) {
-		cexprs.put(ctx, new ComponentValue(signatures.get(ctx.sign()), atoms.get(ctx.atom())));
+	public void exitComp_atomic(Comp_atomicContext ctx) {
+		comps.put(ctx, new ZComponentValue(signatures.get(ctx.sign()), atoms.get(ctx.atom())));
 	}
 
 	@Override
-	public void enterCexpr_composite(Cexpr_compositeContext ctx) { }
+	public void enterComp_composite(Comp_compositeContext ctx) { }
 
 	@Override
-	public void exitCexpr_composite(Cexpr_compositeContext ctx) {
-		cexprs.put(ctx, new ComponentComposite(signatures.get(ctx.sign()), bodies.get(ctx.body())));		
+	public void exitComp_composite(Comp_compositeContext ctx) {
+		comps.put(ctx, new ComponentComposite(signatures.get(ctx.sign()), bodies.get(ctx.body())));		
 	}
 	
 	/**

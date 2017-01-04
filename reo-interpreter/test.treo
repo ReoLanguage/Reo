@@ -4,4 +4,13 @@ test() {
 	for k = 1..2 {
 		fifo1(a,b[k])
 	}
+	
+	x = 3
+	
+	fifo[0] = (a?,b!){ a = b }
+	for k = 1..x {
+		fifo[k] = (a?,b!) { fifo1(a,d) fifo[k-1](d,b) }
+	}
+	
+	fifo[x](s,t)
 }

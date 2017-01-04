@@ -6,18 +6,18 @@ import nl.cwi.reo.semantics.Port;
 
 public class SignatureInstance {
 	
-	private BodyDefinitionList defs;
+	private Map<VariableName, Expression> defs;
 	
 	private Map<Port, Port> links;
 	
-	public SignatureInstance(BodyDefinitionList defs, Map<Port, Port> links) {
+	public SignatureInstance(Map<VariableName, Expression> defs, Map<Port, Port> links) {
 		if (defs == null || links == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.defs = defs;
 		this.links = links;
 	}
 	
-	public BodyDefinitionList getDefinitions() {
+	public Map<VariableName, Expression> getDefinitions() {
 		return this.defs;
 	}
 	

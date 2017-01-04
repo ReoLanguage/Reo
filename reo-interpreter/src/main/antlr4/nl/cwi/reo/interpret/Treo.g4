@@ -1,15 +1,20 @@
 grammar Treo;
 
 // File structure
-file    : secn? imps* ID '='? cexpr ;
+file    : secn? imps* ID '='? comp ;
 secn    : 'section' name ';';
 imps    : 'import' name ';';
+
+// Component expressions
+comp    : var                                                 # cexpr_variable
+        | sign '{' atom '}'                                   # cexpr_atomic
+        | sign body                                           # cexpr_composite ;
 
 // Bodies
 body    : '{' stmt* '}' ;
 stmt    : value '=' value                                     # stmt_equation
-        | var cexpr                                           # stmt_compdefn
-        | cexpr list? iface                                   # stmt_instance
+        | var comp                                            # stmt_compdefn
+        | comp list? iface                                    # stmt_instance
         | 'for' ID '=' iexpr '..' iexpr body                  # stmt_iteration
         | 'if' bexpr body (('else' bexpr body)* 'else' body)? # stmt_condition ;
 
@@ -19,13 +24,8 @@ expr    : var                                                 # expr_variable
         | STRING                                              # expr_string
         | bexpr                                               # expr_boolean
         | iexpr                                               # expr_integer
-        | cexpr                                               # expr_component ;
+        | comp                                                # expr_component ;
 list    : '<' '>' | '<' expr (',' expr)* '>' ;
-
-// Component expressions
-cexpr   : var                                                 # cexpr_variable
-        | sign '{' atom '}'                                   # cexpr_atomic
-        | sign body                                           # cexpr_composite ;
 
 // Boolean expressions
 bexpr   : BOOL                                                # bexpr_boolean

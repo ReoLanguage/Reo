@@ -2,33 +2,33 @@ package nl.cwi.reo.interpret;
 
 import java.util.Map;
 
-public class ComponentComposite implements ComponentExpression {
+public class ComponentComposite implements Component {
 	
 	private Signature sign;
 	
-	private BodyExpression body;
+	private ProgramExpression body;
 
-	public ComponentComposite(Signature sign, BodyExpression body) {
+	public ComponentComposite(Signature sign, ProgramExpression body) {
 		if (sign == null || body == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.sign = sign;
 		this.body = body;
 	}
 	
-	public ComponentExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		BodyExpression prog = body.evaluate(params);
-		if (prog instanceof BodyValue)
-			return new ComponentValue(sign, ((BodyValue)prog).getInstance());
+	public Component evaluate(Map<VariableName, Expression> params) throws Exception {
+		ProgramExpression prog = body.evaluate(params);
+		if (prog instanceof Program)
+			return new ZComponentValue(sign, ((Program)prog).getInstance());
 		return new ComponentComposite(sign, prog);
 	}
 
 	@Override
-	public ComponentExpression instantiate(ExpressionList values, 
+	public Component instantiate(ExpressionList values, 
 			Interface iface) throws Exception {
 		SignatureInstance v = sign.evaluate(values, iface);
-		BodyExpression prog = body.evaluate(v.getDefinitions());
-		if (prog instanceof BodyValue)
-			return new ComponentValue(sign, ((BodyValue)prog).getInstance());
+		ProgramExpression prog = body.evaluate(v.getDefinitions());
+		if (prog instanceof Program)
+			return new ZComponentValue(sign, ((Program)prog).getInstance());
 		return new ComponentComposite(sign, prog);
 	}
 	

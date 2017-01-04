@@ -7,8 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.Semantics;
 
-public final class BodyValue implements BodyExpression {
+public final class Program implements ProgramExpression {
+	
+	/**
+	 * Signature expression.
+	 */
+	private final Signature sign;
 	
 	/**
 	 * Definitions.
@@ -23,19 +29,44 @@ public final class BodyValue implements BodyExpression {
 	/**
 	 * Constructs an empty body of components and definitions.
 	 */
-	public BodyValue() {
-		this.instances = new ArrayList<Instance>();
+	public Program() {
+		this.sign = new Signature();
 		this.defns = new HashMap<VariableName, Expression>();
+		this.instances = new ArrayList<Instance>();
 	}
+	
+	public Program(Signature sign, Semantics<?> atom) {
+		if (sign == null || atom == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
+		this.sign = sign;
+		this.defns = new HashMap<VariableName, Expression>();
+		Map<String, Port> links = new HashMap<String, Port>();
+		for (String a : atom.getInterface()) 
+			links.put(a, new Port(a));
+		List<Instance> instances = new ArrayList<Instance>();
+		instances.add(new Instance(atom, links));
+		this.instances = Collections.unmodifiableList(instances);
+	}
+	
 
+	
+	public Program(Signature sign, List<Instance> instances) {
+		if (sign == null || atom == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
+		this.sign = sign;
+		this.defns = new HashMap<VariableName, Expression>();
+		this.instances = Collections.unmodifiableList(instances);
+	}
+		
 	/**
 	 * Constructs a collection of definitions and component instances.
 	 * @param definitions	map of definitions
 	 * @param instance		single component instance
 	 */
-	public BodyValue(Map<VariableName, Expression> definitions) {
+	public Program(Map<VariableName, Expression> definitions) {
 		if (definitions == null)
 			throw new IllegalArgumentException("Argument cannot be null.");
+		this.sign = new Signature();
 		this.defns = Collections.unmodifiableMap(definitions);
 		this.instances = Collections.unmodifiableList(new ArrayList<Instance>());
 	}
@@ -44,9 +75,10 @@ public final class BodyValue implements BodyExpression {
 	 * Constructs a collection of definitions and component instances.
 	 * @param instance		single component instance
 	 */
-	public BodyValue(Instance instance) {
+	public Program(Instance instance) {
 		if (instance == null)
 			throw new IllegalArgumentException("Argument cannot be null.");
+		this.sign = new Signature();
 		this.defns = Collections.unmodifiableMap(new HashMap<VariableName, Expression>());
 		List<Instance> instances = new ArrayList<Instance>();
 		instances.add(instance);
@@ -58,9 +90,10 @@ public final class BodyValue implements BodyExpression {
 	 * @param definitions	map of definitions
 	 * @param instance		single component instance
 	 */
-	public BodyValue(Map<VariableName, Expression> definitions, Instance instance) {
+	public Program(Map<VariableName, Expression> definitions, Instance instance) {
 		if (definitions == null || instance == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
+		this.sign = new Signature();
 		this.defns = Collections.unmodifiableMap(definitions);
 		List<Instance> instances = new ArrayList<Instance>();
 		instances.add(instance);
@@ -72,9 +105,10 @@ public final class BodyValue implements BodyExpression {
 	 * @param definitions	map of definitions
 	 * @param instances		list of component instances
 	 */
-	public BodyValue(Map<VariableName, Expression> definitions, List<Instance> instances) {
+	public Program(Map<VariableName, Expression> definitions, List<Instance> instances) {
 		if (definitions == null || instances == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
+		this.sign = new Signature();
 		this.defns = Collections.unmodifiableMap(definitions);
 		this.instances = Collections.unmodifiableList(instances);
 	}
@@ -115,7 +149,7 @@ public final class BodyValue implements BodyExpression {
 	 * Composes a set of programs into a single program.
 	 * @param progs		set of component instances
 	 */
-	public BodyValue compose(BodyValue body) {
+	public Program compose(Program body) {
 		Map<VariableName, Expression> _defns = 
 				new HashMap<VariableName, Expression>(defns);
 		_defns.putAll(body.defns); // TODO IS THIS OK? e.g., in case of recursion, this code just overwrites the old definition.
@@ -125,26 +159,26 @@ public final class BodyValue implements BodyExpression {
 			_instances.add(comp.renameHidden(i));
 		for (Instance comp : body.instances)
 			_instances.add(comp.renameHidden(i));
-		return new BodyValue(_defns, _instances);
+		return new Program(_defns, _instances);
 	}
 	
 	/**
 	 * Composes a set of programs into a single program.
 	 * @param progs		set of component instances
 	 */
-	public BodyValue compose(List<BodyValue> bodies) {
+	public Program compose(List<Program> bodies) {
 		Map<VariableName, Expression> _defns = 
 				new HashMap<VariableName, Expression>(defns);
 		List<Instance> _instances = new ArrayList<Instance>();
 		Integer i = 0;
 		for (Instance comp : this.instances) 
 			_instances.add(comp.renameHidden(i));
-		for (BodyValue body : bodies) {
+		for (Program body : bodies) {
 			_defns.putAll(body.defns);
 			for (Instance comp : body.instances)
 				_instances.add(comp.renameHidden(i));
 		}
-		return new BodyValue(_defns, _instances);
+		return new Program(_defns, _instances);
 	}
 	
 	/**
@@ -159,17 +193,28 @@ public final class BodyValue implements BodyExpression {
 	}
 
 	@Override
-	public BodyValue evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Program evaluate(Map<VariableName, Expression> params) throws Exception {
 		Map<VariableName, Expression> defns_p = new HashMap<VariableName, Expression>();
 		for (Map.Entry<VariableName, Expression> def : defns.entrySet()) 
 			defns_p.put(def.getKey(), def.getValue().evaluate(params));
-		return new BodyValue(defns_p, instances);
+		return new Program(defns_p, instances);
 		// TODO Add code to evaluate semantics too.
+		// TODO Possibly local variables in this definition get instantiated by variables from the context.
 	}
 
 	@Override
-	public String toString() {
-		return defns + "\n" + instances;
+	public Component instantiate(ExpressionList values, Interface iface) throws Exception {
+		SignatureInstance v = sign.evaluate(values, iface);
+		List<Instance> _instances = inst.evaluate(v.getDefinitions()).restrictAndRename(v.getLinks());
+		for (Instance comp : instances) {
+			_instances.add(comp.e)
+		}
+		return new Program(sign, _instances);	
 	}
-
+	
+	@Override
+	public String toString() {
+		// TODO use ANTLR string template to generate pretty strings.
+		return sign + "{" + defns + "\n" + instances + "}";
+	}
 }

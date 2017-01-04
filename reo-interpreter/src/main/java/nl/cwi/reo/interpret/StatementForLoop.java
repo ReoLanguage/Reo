@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class BodyForLoop implements BodyExpression {
+public class StatementForLoop implements Statement {
 
 	/**
 	 * Name of the iterated parameter.
@@ -26,7 +26,7 @@ public class BodyForLoop implements BodyExpression {
 	/**
 	 * Iterated subprogram definition.
 	 */
-	public BodyExpression body;
+	public ProgramExpression body;
 
 	/**
 	 * Constructs a parameterized for loop. 
@@ -36,7 +36,7 @@ public class BodyForLoop implements BodyExpression {
 	 * @param upper			expression defining the upper iteration bound
 	 * @param subprogram	iterated subprogram definition
 	 */
-	public BodyForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, BodyExpression body) {
+	public StatementForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ProgramExpression body) {
 		if (parameter == null || lower == null || upper == null || body == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.parameter = parameter;
@@ -52,7 +52,7 @@ public class BodyForLoop implements BodyExpression {
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
 	@Override
-	public BodyExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
 		
 		if (params.get(parameter) != null)
 			throw new Exception("Parameter " + parameter + " is already used.");
@@ -71,12 +71,12 @@ public class BodyForLoop implements BodyExpression {
 			// Iterate to find all concrete components. 
 			boolean instancesAreValue = true;
 			List<InstanceList> insts = new ArrayList<InstanceList>();
-			BodyDefinitionList defs = new BodyDefinitionList(params);
+			ZDefinitionList defs = new ZDefinitionList(params);
 			for (int i = a; i <= b; i++) {
 				defs.put(parameter, new IntegerValue(Integer.valueOf(i)));
-				BodyExpression e = body.evaluate(defs);
-				if (e instanceof BodyValue) {
-					BodyValue B = (BodyValue)e;
+				ProgramExpression e = body.evaluate(defs);
+				if (e instanceof Program) {
+					Program B = (Program)e;
 					defs.putAll(B.getDefinitions()); // Overwriting semantics of for-loop
 					InstanceList inst = B.getInstance();
 					System.out.println("++++++++body " + inst);
@@ -93,10 +93,10 @@ public class BodyForLoop implements BodyExpression {
 			
 			if (instancesAreValue) {
 				defs.remove(parameter);				
-				return new BodyValue(new InstanceList().compose(insts), defs);
+				return new Program(new InstanceList().compose(insts), defs);
 			}
 		}
 		
-		return new BodyForLoop(parameter, x, y, body.evaluate(params));
+		return new StatementForLoop(parameter, x, y, body.evaluate(params));
 	}
 }

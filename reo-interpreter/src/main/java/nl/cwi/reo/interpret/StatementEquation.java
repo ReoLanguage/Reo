@@ -3,13 +3,13 @@ package nl.cwi.reo.interpret;
 import java.util.Iterator;
 import java.util.Map;
 
-public final class BodyEquation implements BodyDefinition {
+public final class StatementEquation implements Statement {
 
 	private final Variable var;
 	
 	private final Value val;
 	
-	public BodyEquation(Variable var, Value val) {
+	public StatementEquation(Variable var, Value val) {
 		if (var == null || val == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.var = var;
@@ -17,12 +17,12 @@ public final class BodyEquation implements BodyDefinition {
 	}
 
 	@Override
-	public BodyDefinition evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ZDefinition evaluate(Map<VariableName, Expression> params) throws Exception {
 		
 		Variable var_p = var.evaluate(params);
 		Value val_p = val.evaluate(params);
 		
-		BodyDefinitionList definitions = new BodyDefinitionList();
+		ZDefinitionList definitions = new ZDefinitionList();
 		
 		if (var_p instanceof VariableName) {
 			if (val_p instanceof Expression) {
@@ -43,7 +43,7 @@ public final class BodyEquation implements BodyDefinition {
 			}
 		} 
 		
-		return new BodyEquation(var_p, val_p);
+		return new StatementEquation(var_p, val_p);
 	}	
 
 	@Override
