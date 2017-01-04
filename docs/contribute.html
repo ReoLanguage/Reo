@@ -1,0 +1,324 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Contribute &mdash; Reo 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Reo 1.0 documentation" href="index.html"/>
+        <link rel="prev" title="Syntax of Reo" href="syntax.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Reo
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax of Reo</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build-the-project">Build the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-eclipse">Setting up Eclipse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-my-own-semantics-to-lykos">Adding my own semantics to Lykos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-of-this-repository">Structure of this repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#future-work">Future work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Reo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Contribute</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="_sources/contribute.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="contribute">
+<h1>Contribute<a class="headerlink" href="#contribute" title="Permalink to this headline">¶</a></h1>
+<p>This page describes how to contribute to the Lykos Reo compiler.</p>
+<div class="section" id="clone-the-repository">
+<h2>Clone the repository<a class="headerlink" href="#clone-the-repository" title="Permalink to this headline">¶</a></h2>
+<p>Confirm with <tt class="docutils literal"><span class="pre">git</span> <span class="pre">--version</span></tt> that Git is installed on your system.
+Clone the git repository:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">kasperdokter</span><span class="nd">@bitbucket.org</span><span class="o">/</span><span class="n">kasperdokter</span><span class="o">/</span><span class="n">lykos</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">At the time of writing, this repository is private.</p>
+</div>
+<p>The structure of follows the standard Java conventions. All (manually implemented) source code can be found in the <tt class="docutils literal"><span class="pre">src</span></tt> folder.
+This folder contains two subfolders, namely <tt class="docutils literal"><span class="pre">main</span></tt> and <tt class="docutils literal"><span class="pre">site</span></tt>.
+The <tt class="docutils literal"><span class="pre">site</span></tt> subfolder contains the sources of this website.
+The <tt class="docutils literal"><span class="pre">main</span></tt> subfolder contains the sources of the Lykos compiler, which consists of three parts:</p>
+<ol class="arabic simple">
+<li>a folder <tt class="docutils literal"><span class="pre">antlr4</span></tt> that contains the ANLTR4 grammar files of the Reo language.</li>
+<li>a folder <tt class="docutils literal"><span class="pre">java</span></tt> that contains the Java sources of the Lykos compiler.</li>
+<li>a folder <tt class="docutils literal"><span class="pre">st4</span></tt> that contains the String Templates for code generation.</li>
+</ol>
+<p>The java source code in the <tt class="docutils literal"><span class="pre">java</span></tt> folder is completely documented using Javadoc.
+Below, we show how to generate the Javadoc documentation.
+For further  details on ANTLR4, we refer to the manual <a class="reference internal" href="#parr13">[Parr13]</a>.</p>
+</div>
+<div class="section" id="build-the-project">
+<h2>Build the project<a class="headerlink" href="#build-the-project" title="Permalink to this headline">¶</a></h2>
+<p>This compiler project is build using Apache Maven, a software project management and comprehension tool.
+Confirm with <tt class="docutils literal"><span class="pre">mvn</span> <span class="pre">-v</span></tt> that Maven is installed on your system.
+Otherwise (on Ubuntu), run command:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">maven</span>
+</pre></div>
+</div>
+<p>to install the latest Apache Maven.</p>
+<p>Maven automatically takes care of all the dependencies of this project (such as the dependency on ANTLR4 for lexer and parser generation).</p>
+<p>To build the project, run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mvn</span> <span class="n">package</span>
+</pre></div>
+</div>
+<p>This Maven command creates a folder called <tt class="docutils literal"><span class="pre">target</span></tt> that contains all generated lexer and parser sources as well as all executable code.
+To be precise, it generates an self-contained executable Java archive <tt class="docutils literal"><span class="pre">target/lykos-1.0.jar</span></tt> that contains the Lykos Reo compiler.</p>
+<p>The source code is documented using Javadoc. The static Javadoc documentation of the Lykos Reo compiler can be generated by running:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mvn</span> <span class="n">javadoc</span><span class="p">:</span><span class="n">javadoc</span>
+</pre></div>
+</div>
+<p>The sources of the documentation that you are currently reading can be generated by running:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mvn</span> <span class="n">site</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-up-eclipse">
+<h2>Setting up Eclipse<a class="headerlink" href="#setting-up-eclipse" title="Permalink to this headline">¶</a></h2>
+<p>If you use Eclipse as development environment, run:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mvn</span> <span class="n">eclipse</span><span class="p">:</span><span class="n">eclipse</span>
+</pre></div>
+</div>
+<p>to generate eclipse configuration files, such as <tt class="docutils literal"><span class="pre">.project</span></tt> and <tt class="docutils literal"><span class="pre">.classpath</span></tt>.
+Manually define the M2_REPO classpath variable in Eclipse IDE as follows:</p>
+<ol class="arabic simple">
+<li>Eclipse IDE, menu bar;</li>
+<li>Select Window &gt; Preferences;</li>
+<li>Select Java &gt; Build Path &gt; Classpath Variables;</li>
+<li>Click on the new button &gt; define a new variable called <tt class="docutils literal"><span class="pre">M2_REPO</span></tt> and point it to your local Maven repository (i.e., <tt class="docutils literal"><span class="pre">~/.m2/repository</span></tt> in Linux).</li>
+</ol>
+</div>
+<div class="section" id="adding-my-own-semantics-to-lykos">
+<h2>Adding my own semantics to Lykos<a class="headerlink" href="#adding-my-own-semantics-to-lykos" title="Permalink to this headline">¶</a></h2>
+<p>Lykos&#8217; program logic for parsing of Reo files is completely independent of the actual semantics of Reo components.
+It is therefore pretty easy to extend the current version of Lykos for parsing a new kind of semantics for Reo components.
+Let us now describe step-by-step how to implement a new semantics, and how to get Lykos to parse it.</p>
+<p>First, we need to create a new package, called <tt class="docutils literal"><span class="pre">nl.cwi.reo.&lt;new</span> <span class="pre">semantics&gt;</span></tt>.
+Next, we add a class <tt class="docutils literal"><span class="pre">&lt;new</span> <span class="pre">semantic</span> <span class="pre">object&gt;.java</span></tt> to this package.
+Since Lykos accepts arbitrary Java objects as semantics for Reo components, there is no need to inherit special interfaces.</p>
+</div>
+<div class="section" id="structure-of-this-repository">
+<h2>Structure of this repository<a class="headerlink" href="#structure-of-this-repository" title="Permalink to this headline">¶</a></h2>
+<p>As Lykos is a Java project, we applied the standard directory structure induced by Maven.
+The <cite>src/main/</cite> directory contains all (manually implemented) source files of the project, such as the compiler and the ANTLR4 grammar.
+Maven automatically generates the lexer and parser sources for the grammars from <cite>src/main/antlr4</cite> into <cite>targer/generated-sources/antlr4</cite>.
+Directory <cite>src/main/java</cite> contains the main compiler program <cite>Compiler.java</cite>, a directory <cite>automata</cite> containing the implementation of Work Automata, and a directory <cite>graphgames</cite> containing the implementation of strategy synthesis algorithms for graph games.
+Directory <cite>src/main/antlr4</cite> contains a [ANTLR4](<a class="reference external" href="https://github.com/antlr/antlr4">https://github.com/antlr/antlr4</a>) grammar file <cite>Reo.g4</cite> for protocol specification, and a grammar file <cite>TIGA.g4</cite> for parsing strategies produced by UPPAAL TIGA.</p>
+<blockquote>
+<div>For more information on how Reo is parsed, see [parser](docs/parser.md)</div></blockquote>
+</div>
+<div class="section" id="future-work">
+<h2>Future work<a class="headerlink" href="#future-work" title="Permalink to this headline">¶</a></h2>
+<p>Since this is a young project, many features are yet to be implemented:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Syntax highlighting of Reo specifications in Eclipse</li>
+<li>Autocompletion or Reo specifications</li>
+<li>Bundling of source code into packages to avoid name conflicts</li>
+<li>Generating an MCRL2 specification from a Reo connector to enable model checking</li>
+<li>Generation of propositional formulas with linear arithmetic from Timed Constraint Automata, for use in bounded model checking</li>
+<li>Develop a graphical editor that is synchronized with a textual representation</li>
+<li>Implement dynamic reconfiguration of connectors using algebraic graph transformations</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<table class="docutils citation" frame="void" id="parr13" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[Parr13]</a></td><td>Terence Parr. 2013. The Definitive ANTLR 4 Reference (2nd ed.). Pragmatic Bookshelf.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="syntax.html" class="btn btn-neutral" title="Syntax of Reo" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Kasper Dokter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

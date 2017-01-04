@@ -1,0 +1,411 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Syntax of Reo &mdash; Reo 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Reo 1.0 documentation" href="index.html"/>
+        <link rel="next" title="Contribute" href="contribute.html"/>
+        <link rel="prev" title="Getting Started" href="getting-started.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Reo
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Syntax of Reo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#components-and-interfaces">Components and interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#definition">Definition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#composition">Composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#iteration">Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#abstraction">Abstraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parametrization">Parametrization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Reo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Syntax of Reo</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="_sources/syntax.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="syntax-of-reo">
+<h1>Syntax of Reo<a class="headerlink" href="#syntax-of-reo" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="components-and-interfaces">
+<h2>Components and interfaces<a class="headerlink" href="#components-and-interfaces" title="Permalink to this headline">¶</a></h2>
+<p>In Reo, programs consist of <em>components</em> that interact via shared <em>nodes</em>.
+Each component has access to a given set of nodes, called an <em>interface</em>.
+A component may synchronize with its environment via <em>puts</em> and <em>gets</em> on nodes in its interface.
+An atomic-component uses each port either as input or as output, but not both.</p>
+</div>
+<div class="section" id="definition">
+<h2>Definition<a class="headerlink" href="#definition" title="Permalink to this headline">¶</a></h2>
+<p>Before we can start using components, we need to define them.
+The following example shows how we can define a component by referring to Java source code</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre>define producer(a!) {
+  #Java com.example.Producer
+}
+</pre></div>
+</td></tr></table></div>
+<p>The producer component is defined by the implementation of the Java method <tt class="docutils literal"><span class="pre">Producer</span></tt> in package <tt class="docutils literal"><span class="pre">com.example</span></tt>.
+The <tt class="docutils literal"><span class="pre">#Java</span></tt> tag indicates that the function is a Java function.
+Arguments of the Java function are automatically linked to the nodes in the interface of the defined component.
+The exclamation mark (<tt class="docutils literal"><span class="pre">!</span></tt>) indicates that component <tt class="docutils literal"><span class="pre">producer</span></tt> uses node a as output.
+A question mark (<tt class="docutils literal"><span class="pre">?</span></tt>) after a node A in the interface would indicate the the component uses A as an input node.
+A question mark followed by a exclamation mark (<tt class="docutils literal"><span class="pre">?!</span></tt>) after a node A would indicate that the component uses A
+both as input and as output.</p>
+<p>Components can also be defined by methods written other general purpose languages, such as C/C++</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre>define producer(a!) {
+  #C/C++ example::Producer
+}
+</pre></div>
+</td></tr></table></div>
+<p>Another possibility is to define a component via a particular semantic model, such as <em>constraint automaton with state memory</em></p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre>define fifo1(a?,b!) {
+  #CASM
+  q0 -- {a}, x&#39; == d(a) -&gt; q1
+  q1 -- {b}, d(b) == x  -&gt; q0
+}
+</pre></div>
+</td></tr></table></div>
+<p>By now, there are more than thirty semantics for Reo. Therefore, it is possible to provide a second definition of the
+<em>same</em> component, using a <em>different</em> semantics. For example, the <em>work automaton</em> semantics</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre>define fifo1(a?,b!) {
+  #WA
+  q0 -- {a}, true -&gt; q1
+  q1 -- {b}, true -&gt; q0
+}
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">fifo1</span></tt> component is one of the basic components in Reo. Its has the semantics of a
+1-place buffer that accepts input from node a and offers output at node b. Components with
+exactly two nodes are called <strong>channels</strong>.</p>
+</div>
+</div>
+<div class="section" id="composition">
+<h2>Composition<a class="headerlink" href="#composition" title="Permalink to this headline">¶</a></h2>
+<p>Now that we defined the <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel, we may start using it by <em>instantiating</em> our <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel as follows</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>fifo1(a,b)
+</pre></div>
+</td></tr></table></div>
+<p>This single statement accomplishes <em>two</em> tasks:</p>
+<ol class="arabic simple">
+<li>it instantiates the <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel defined above;</li>
+<li>it instantiates two new nodes a and b.</li>
+</ol>
+<p>We may compose multiple component by placing them next to each other.
+The composition is established by sharing nodes.
+For example, the following code shows the composition of two <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channels.</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre>fifo1(a,b) // first
+fifo1(b,c) // second
+</pre></div>
+</td></tr></table></div>
+<p>The first and second <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel share the common node b.
+Recall that the first <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel uses node b as an output node and that
+the second <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel uses node b as in input channel.</p>
+<p>The two <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channels communicate via shared node A using the <strong>broadcast</strong> mechanism,
+that is, a <em>put/send operation</em> by a <strong>single</strong> component that uses node A as an <em>output node</em>
+synchronizes with a <em>get/receive operation</em> by <strong>all</strong> components that use node A as an <em>input node</em>.</p>
+<p>Note that the broadcast communication mechanism</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This broadcast communication mechanism should not be confused with broadcast communication
+as used by other models of concurrency. Usually a single send operation on a node A (also
+called a <em>channel</em> in the literature) synchronizes with multiple, but <strong>arbitrary</strong> number,
+receive operations on A.</p>
+</div>
+</div>
+<div class="section" id="iteration">
+<h2>Iteration<a class="headerlink" href="#iteration" title="Permalink to this headline">¶</a></h2>
+<p>The composition of the two <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel explicitly instantiates each <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel individually.
+In this case, may could obtain the same construction using only <em>one</em> explicit instantiation using a <strong>for loop</strong></p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre>for i = 0 ... 1 {
+  fifo1(a[i],a[i+1])
+}
+</pre></div>
+</td></tr></table></div>
+<p>This for loop is equivalent to the composition</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre>fifo1(a[0],a[1])
+fifo1(a[1],a[2])
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="abstraction">
+<h2>Abstraction<a class="headerlink" href="#abstraction" title="Permalink to this headline">¶</a></h2>
+<p>In the composition of the two <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channels, shared node b is still visible to the environment.
+Hence, another component, say <tt class="docutils literal"><span class="pre">producer</span></tt>, may synchronize with node b as follows</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre>fifo1(a,b)
+fifo1(b,c)
+producer(b) // this component synchronizes on the &#39;internal&#39; node b
+</pre></div>
+</td></tr></table></div>
+<p>The data provided by the producer flows via the <strong>second</strong> <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel from node b to node c,
+while leaving the <strong>first</strong> <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel from node a to node b unused.
+This may, or may not be the intended use of the composition of the two <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channels</p>
+<p>To avoid some other component X from putting data on node b, we may hide node b from the environment
+by wrapping the composition of the two <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channels in a new component <tt class="docutils literal"><span class="pre">fifo2</span></tt> and then instantiate
+this new component</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre>define fifo2(a,c) {
+  fifo1(a,b)
+  fifo1(b,c)
+}
+
+fifo2(a,c)
+producer(b) // node b is different from node b used in the definition of fifo2
+</pre></div>
+</td></tr></table></div>
+<p>Since we know for each component in the definition of <tt class="docutils literal"><span class="pre">fifo2</span></tt> whether a node is used as input, output or both,
+there is no need to make this explicit in the interface.</p>
+</div>
+<div class="section" id="parametrization">
+<h2>Parametrization<a class="headerlink" href="#parametrization" title="Permalink to this headline">¶</a></h2>
+<p>Recall the for-loop construction that allowed us to minimize the number of explicit instantiations.
+The lower and upper bounds for the iterated parameter consist of integer numbers.
+In may be useful to allow variable iteration bounds</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre>define fifo&lt;k&gt;(a[0], a[1...k-1], a[k]) {
+  for i = 0 ... k-1  {
+    fifo1(a[i],a[i+1])
+  }
+}
+</pre></div>
+</td></tr></table></div>
+<p>The variable used in the upper bound of the iteration is instantiated as a parameter in the surrounding
+component definition.</p>
+<p>We may also use parameters in the following way</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre>transformer&lt;f&gt;(a,b) {
+  #CASM
+  q -- {a,b}, d(b) == f(d(a)) -&gt; q;
+}
+</pre></div>
+</td></tr></table></div>
+<p>Or, as follows</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre>filter&lt;R&gt;(a,b) {
+  #CASM
+  q -- {a,b}, R(d_a) -&gt; q;
+  q -- {a}, ~R(d_a) -&gt; q;
+}
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contribute.html" class="btn btn-neutral float-right" title="Contribute" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="getting-started.html" class="btn btn-neutral" title="Getting Started" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Kasper Dokter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

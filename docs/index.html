@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to Reo’s documentation! &mdash; Reo 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Reo 1.0 documentation" href="#"/>
+        <link rel="next" title="Getting Started" href="getting-started.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> Reo
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax of Reo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">Reo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>Welcome to Reo&#8217;s documentation!</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-reo-s-documentation">
+<h1>Welcome to Reo&#8217;s documentation!<a class="headerlink" href="#welcome-to-reo-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://reo.project.cwi.nl/reo/wiki">Reo</a> is an <em>exogenous coordination language</em> designed by prof. dr. F. Arbab at the Centre for Mathematics and Computer Science (​CWI) in Amsterdam.
+Reo allows the programmer to specify protocols that describe interaction among components in a concurrent application.</p>
+<div class="section" id="what-are-protocols-and-why-do-we-care">
+<h2>What are protocols, and why do we care?<a class="headerlink" href="#what-are-protocols-and-why-do-we-care" title="Permalink to this headline">¶</a></h2>
+<p>Protocols, such as mutual exclusion protocol and producer/consumer, orchestrate interaction amongst concurrently executing processes.
+Unfortunately, most general purpose programming languages do not provide syntax for expressing these protocols.
+This absence requires programmers to implement their protocols by manually adding locks and buffers and ensuring their correct usage.
+Even if the implementation correctly resembles the intended protocol, the implicit encoding of the protocol makes it hard, if not impossible, to reason about its correctness and efficiency.</p>
+<p>Reo addresses this problem by providing syntax that enables explicit high-level construction of protocols.
+If the protocol is specified explicitly, it becomes easier to write correct protocols that are free of dead-locks, live-locks and data races.
+Moreover, the compiler of the coordination language is able to optimize the actual implementation of the protocol.</p>
+</div>
+</div>
+<div class="section" id="reo-compiler">
+<h1>Reo compiler<a class="headerlink" href="#reo-compiler" title="Permalink to this headline">¶</a></h1>
+<p>This documentation describes the usage of a Reo compiler that generates a multithreaded application from single-threaded components and a Reo protocol.</p>
+</div>
+<div class="section" id="contents-of-this-documentation">
+<h1>Contents of this documentation<a class="headerlink" href="#contents-of-this-documentation" title="Permalink to this headline">¶</a></h1>
+<p>The contents of the documentation is as follows:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax of Reo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#components-and-interfaces">Components and interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#definition">Definition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#composition">Composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#iteration">Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#abstraction">Abstraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#parametrization">Parametrization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#build-the-project">Build the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#setting-up-eclipse">Setting up Eclipse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#adding-my-own-semantics-to-lykos">Adding my own semantics to Lykos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#structure-of-this-repository">Structure of this repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#future-work">Future work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="getting-started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Kasper Dokter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

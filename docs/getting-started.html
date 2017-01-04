@@ -1,0 +1,284 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started &mdash; Reo 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Reo 1.0 documentation" href="index.html"/>
+        <link rel="next" title="Syntax of Reo" href="syntax.html"/>
+        <link rel="prev" title="Welcome to Reo’s documentation!" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Reo
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#unix">UNIX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#windows">WINDOWS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax of Reo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Reo</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Getting Started</li>
+    <li class="wy-breadcrumbs-aside">
+      
+          
+          <a href="_sources/getting-started.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="unix">
+<h3>UNIX<a class="headerlink" href="#unix" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Install Java (version 1.6 or higher). You can check if the correct java version is already installed via <tt class="docutils literal"><span class="pre">java</span> <span class="pre">--version</span></tt></p>
+</li>
+<li><p class="first">Download the <tt class="docutils literal"><span class="pre">lykos-1.0.jar</span></tt> and put it, for example, in <tt class="docutils literal"><span class="pre">/usr/local/lib</span></tt>.</p>
+</li>
+<li><p class="first">Create an alias for the compiler via:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">alias</span> <span class="n">reoc</span><span class="o">=</span><span class="s">&#39;java -jar /usr/local/lib/lykos-1.0.jar&#39;</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">add the alias command to your startup script of your terminal (e.g., <tt class="docutils literal"><span class="pre">~/.bash_profile</span></tt>).</p>
+</div>
+<ol class="arabic" start="4">
+<li><p class="first">Test the installation by starting a new terminal and running:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">reoc</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="windows">
+<h3>WINDOWS<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Install Java (version 1.6 or higher)</li>
+</ol>
+<p>2. Download <tt class="docutils literal"><span class="pre">lykos-1.0-jar-with-dependencies.jar</span></tt>.
+Save to your directory for 3rd party Java libraries, say <tt class="docutils literal"><span class="pre">C:\Javalib</span></tt></p>
+<ol class="arabic simple" start="3">
+<li>Add <tt class="docutils literal"><span class="pre">lykos-1.0-jar-with-dependencies.jar</span></tt> to CLASSPATH, either:</li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p class="first">permanently: Using System Properties dialog &gt; Environment variables &gt; Create or append to CLASSPATH variable</p>
+</li>
+<li><p class="first">temporarily, at command line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">SET</span> <span class="n">CLASSPATH</span><span class="o">=.</span><span class="p">;</span><span class="n">C</span><span class="p">:</span>\<span class="n">Javalib</span>\<span class="n">antlr</span><span class="o">-</span><span class="mf">4.5</span><span class="o">-</span><span class="n">complete</span><span class="o">.</span><span class="n">jar</span><span class="p">;</span><span class="o">%</span><span class="n">CLASSPATH</span><span class="o">%</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="4">
+<li>Create short convenient commands for the Reo compiler, using batch files or doskey commands:</li>
+</ol>
+<blockquote>
+<div><ul>
+<li><p class="first">Batch files (in directory in system PATH):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">//</span><span class="n">reoc</span><span class="o">.</span><span class="n">bat</span>
+<span class="n">java</span> <span class="n">nl</span><span class="o">.</span><span class="n">cwi</span><span class="o">.</span><span class="n">reo</span><span class="o">.</span><span class="n">Compiler</span> <span class="o">%*</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Or, use doskey commands:</p>
+<div class="highlight-python"><pre>doskey reoc=java nl.cwi.reo.Compiler $*</pre>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="syntax.html" class="btn btn-neutral float-right" title="Syntax of Reo" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to Reo’s documentation!" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Kasper Dokter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
