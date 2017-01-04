@@ -1,5 +1,0 @@
-import producer;
-
-inst(){
-	producer(x,y)
-}

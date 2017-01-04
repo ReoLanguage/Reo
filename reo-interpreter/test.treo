@@ -1,0 +1,7 @@
+import reo.fifo1;
+
+test() {
+	for k = 1..2 {
+		fifo1(a,b[k])
+	}
+}

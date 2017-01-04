@@ -10,17 +10,11 @@
     <version>1.0</version>
   </parent>
 
-  <artifactId>reo-compiler</artifactId>
+  <artifactId>reo-interpreter</artifactId>
 
-  <name>Reo compiler</name>
+  <name>Reo interpreter</name>
 
   <dependencies>
-    <dependency>
-      <groupId>nl.cwi.reo</groupId>
-      <artifactId>reo-interpreter</artifactId>
-      <version>1.0</version>
-    </dependency>
-
     <dependency>
       <groupId>nl.cwi.reo</groupId>
       <artifactId>reo-semantics</artifactId>
@@ -28,33 +22,41 @@
     </dependency>
 
     <dependency>
-      <groupId>nl.cwi.reo</groupId>
-      <artifactId>reo-scheduler</artifactId>
-      <version>1.0</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.antlr</groupId>
-      <artifactId>ST4</artifactId>
-      <version>4.0.8</version>
+      <artifactId>antlr4</artifactId>
+      <version>4.3</version>
     </dependency>
   </dependencies>
 
   <build>
-    <plugins>
+    <plugins>      
+      <plugin>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>4.3</version>
+        <executions>
+          <execution>
+            <id>antlr</id>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <archive>
             <manifest>
-              <mainClass>nl.cwi.reo.Compiler</mainClass>
+              <mainClass>nl.cwi.reo.Debug</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <finalName>reoc</finalName>
+          <finalName>interpret</finalName>
           <appendAssemblyId>false</appendAssemblyId>
         </configuration>
         <executions>

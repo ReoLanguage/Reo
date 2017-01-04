@@ -7,31 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.cwi.reo.interpret.InstanceList;
+
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import nl.cwi.reo.semantics.Program;
-
 public class JavaCompiler {
 	
-	/**
-	 * Name of the main program.
-	 */
-	private String name;
-	
-	/**
-	 *  Package name of the generated code.
-	 */
-	private String pkg;
-	
-	public JavaCompiler(String name, String pkg) {
-		this.name = name;
-		this.pkg = pkg;
-	}
-	
-
-	public void compile(Program program) {
+	public void compile(InstanceList program) {
 		
 		STGroup group = new STGroupFile("resources/Java.stg", '$', '$');
         ST component = group.getInstanceOf("component");

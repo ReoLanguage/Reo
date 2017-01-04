@@ -10,10 +10,9 @@
     <artifactId>reo</artifactId>
     <version>1.0</version>
   </parent>
-  <groupId>nl.cwi.reo</groupId>
+
   <artifactId>reo-runtime-c</artifactId>
   <packaging>nar</packaging>
-  <version>1.0-SNAPSHOT</version>
 
   <name>Runtime for C/C++</name>
 

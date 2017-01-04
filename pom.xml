@@ -7,8 +7,8 @@
 
   <groupId>nl.cwi.reo</groupId>
   <artifactId>reo</artifactId>
-  <packaging>pom</packaging>
   <version>1.0</version>
+  <packaging>pom</packaging>
 
   <name>Reo</name>
   <description>Reo constitutes a strategic long-term research activity of the ​SEN3 research group at the Centre for Mathematics and Computer Science (​CWI).
@@ -26,9 +26,13 @@ Application designers can use Reo as a "glue code" language for compositional co
   </licenses>
 
   <modules>
+    <module>reo-semantics</module>
+    <module>reo-interpreter</module>
     <module>reo-runtime-c</module>
     <module>reo-runtime-java</module>
+    <module>reo-scheduler</module>
     <module>reo-compiler</module>
+    <module>reo-docsite</module>
   </modules>
 
   <build>
@@ -43,7 +47,32 @@ Application designers can use Reo as a "glue code" language for compositional co
             <target>1.8</target>
           </configuration>
         </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <configuration>
+          <show>private</show>
+          <nohelp>true</nohelp>
+        </configuration>
+      </plugin>
       </plugins>
     </pluginManagement>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.4</version>
+        <reportSets>
+          <reportSet>
+            <reports></reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

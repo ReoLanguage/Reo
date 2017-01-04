@@ -1,0 +1,102 @@
+package nl.cwi.reo.interpret;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
+ */
+public class BodyForLoop implements BodyExpression {
+
+	/**
+	 * Name of the iterated parameter.
+	 */
+	public VariableName parameter;
+
+	/**
+	 * Lower bound of iteration.
+	 */
+	public IntegerExpression lower;
+
+	/**
+	 * Upper bound of iteration.
+	 */
+	public IntegerExpression upper;
+	/**
+	 * Iterated subprogram definition.
+	 */
+	public BodyExpression body;
+
+	/**
+	 * Constructs a parameterized for loop. 
+	 * 
+	 * @param parameter		name of the iteration parameter
+	 * @param lower			expression defining the lower iteration bound
+	 * @param upper			expression defining the upper iteration bound
+	 * @param subprogram	iterated subprogram definition
+	 */
+	public BodyForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, BodyExpression body) {
+		if (parameter == null || lower == null || upper == null || body == null)
+			throw new IllegalArgumentException("Arguments cannot be null.");
+		this.parameter = parameter;
+		this.lower = lower;
+		this.upper = upper;
+		this.body = body;
+	}
+	
+	/**
+	 * Gets a {link nl.cwi.reo.ProgramInstance} for a particular parameter assignment.
+	 * @param parameters		parameter assignment
+	 * @return Program instance {link nl.cwi.reo.ProgramInstance} for this parameterized component
+	 * @throws Exception if the provided parameters do not match the signature of this program.
+	 */
+	@Override
+	public BodyExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+		
+		if (params.get(parameter) != null)
+			throw new Exception("Parameter " + parameter + " is already used.");
+		
+		IntegerExpression x = lower.evaluate(params);
+		IntegerExpression y = upper.evaluate(params);
+		
+		if (x instanceof IntegerValue && y instanceof IntegerValue) {
+			
+			// Evaluate the lower and upper iteration bound.
+			int a = ((IntegerValue)x).toInteger();
+			int b = ((IntegerValue)y).toInteger();
+			
+			System.out.println("for" + a + " to " + b);
+				
+			// Iterate to find all concrete components. 
+			boolean instancesAreValue = true;
+			List<InstanceList> insts = new ArrayList<InstanceList>();
+			BodyDefinitionList defs = new BodyDefinitionList(params);
+			for (int i = a; i <= b; i++) {
+				defs.put(parameter, new IntegerValue(Integer.valueOf(i)));
+				BodyExpression e = body.evaluate(defs);
+				if (e instanceof BodyValue) {
+					BodyValue B = (BodyValue)e;
+					defs.putAll(B.getDefinitions()); // Overwriting semantics of for-loop
+					InstanceList inst = B.getInstance();
+					System.out.println("++++++++body " + inst);
+					insts.add(inst);
+					if (inst instanceof InstanceList) {
+						insts.add((InstanceList)inst);
+					} else {
+						instancesAreValue = false;
+					}
+				} else {
+					instancesAreValue = false;
+				}
+			}
+			
+			if (instancesAreValue) {
+				defs.remove(parameter);				
+				return new BodyValue(new InstanceList().compose(insts), defs);
+			}
+		}
+		
+		return new BodyForLoop(parameter, x, y, body.evaluate(params));
+	}
+}
