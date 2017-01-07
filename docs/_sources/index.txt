@@ -1,3 +1,5 @@
+   :github_url:
+
 Welcome to Reo's documentation!
 ===============================
 

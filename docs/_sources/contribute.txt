@@ -1,3 +1,5 @@
+   :github_url: https://github.com/kasperdokter/Reo/blob/master/reo-docsite/src/site/sphinx/index.rst
+
 Contribute
 ==========
 
