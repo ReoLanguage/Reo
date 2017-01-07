@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.util.Map;
 
-public class ComponentComposite implements Component {
+public class ComponentComposite implements ComponentExpression {
 	
 	private Signature sign;
 	
@@ -15,20 +15,10 @@ public class ComponentComposite implements Component {
 		this.body = body;
 	}
 	
-	public Component evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ComponentExpression evaluate(Map<VariableName, Expression> params) throws Exception {
 		ProgramExpression prog = body.evaluate(params);
-		if (prog instanceof Program)
-			return new ZComponentValue(sign, ((Program)prog).getInstance());
-		return new ComponentComposite(sign, prog);
-	}
-
-	@Override
-	public Component instantiate(ExpressionList values, 
-			Interface iface) throws Exception {
-		SignatureInstance v = sign.evaluate(values, iface);
-		ProgramExpression prog = body.evaluate(v.getDefinitions());
-		if (prog instanceof Program)
-			return new ZComponentValue(sign, ((Program)prog).getInstance());
+		if (prog instanceof ProgramValue)
+			return (ProgramValue)prog;
 		return new ComponentComposite(sign, prog);
 	}
 	

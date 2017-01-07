@@ -1,13 +1,14 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class StatementForLoop implements Statement {
+public class ProgramForLoop implements ProgramExpression {
 
 	/**
 	 * Name of the iterated parameter.
@@ -36,7 +37,7 @@ public class StatementForLoop implements Statement {
 	 * @param upper			expression defining the upper iteration bound
 	 * @param subprogram	iterated subprogram definition
 	 */
-	public StatementForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ProgramExpression body) {
+	public ProgramForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ProgramExpression body) {
 		if (parameter == null || lower == null || upper == null || body == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.parameter = parameter;
@@ -65,38 +66,35 @@ public class StatementForLoop implements Statement {
 			// Evaluate the lower and upper iteration bound.
 			int a = ((IntegerValue)x).toInteger();
 			int b = ((IntegerValue)y).toInteger();
-			
-			System.out.println("for" + a + " to " + b);
 				
 			// Iterate to find all concrete components. 
-			boolean instancesAreValue = true;
-			List<InstanceList> insts = new ArrayList<InstanceList>();
-			ZDefinitionList defs = new ZDefinitionList(params);
+			boolean isProgram = true;
+			Map<VariableName, Expression> defns = new HashMap<VariableName, Expression>(params);
+			List<ProgramExpression> bodies = new ArrayList<ProgramExpression>();
+			List<ProgramValue> progs = new ArrayList<ProgramValue>();
 			for (int i = a; i <= b; i++) {
-				defs.put(parameter, new IntegerValue(Integer.valueOf(i)));
-				ProgramExpression e = body.evaluate(defs);
-				if (e instanceof Program) {
-					Program B = (Program)e;
-					defs.putAll(B.getDefinitions()); // Overwriting semantics of for-loop
-					InstanceList inst = B.getInstance();
-					System.out.println("++++++++body " + inst);
-					insts.add(inst);
-					if (inst instanceof InstanceList) {
-						insts.add((InstanceList)inst);
-					} else {
-						instancesAreValue = false;
-					}
+				defns.put(parameter, new IntegerValue(Integer.valueOf(i)));
+				ProgramExpression e = body.evaluate(defns);
+				if (e instanceof ProgramValue) {
+					progs.add((ProgramValue)e);
 				} else {
-					instancesAreValue = false;
+					isProgram = false;
 				}
 			}
 			
-			if (instancesAreValue) {
-				defs.remove(parameter);				
-				return new Program(new InstanceList().compose(insts), defs);
+			if (isProgram) {
+				ProgramValue prog = new ProgramValue();
+				return prog.compose(progs).remove(parameter);
 			}
+			
+			return new ProgramBody(bodies);
 		}
 		
-		return new StatementForLoop(parameter, x, y, body.evaluate(params));
+		return new ProgramForLoop(parameter, x, y, body.evaluate(params));
+	}
+	
+	@Override
+	public String toString() {
+		return "for " + parameter + "=" + lower + ".." + upper + "{" + body + "}";
 	}
 }

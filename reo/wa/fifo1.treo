@@ -1,4 +1,4 @@
-section reo;
+section reo.wa;
 
 fifo1(a?, b!) {
 	#WA 

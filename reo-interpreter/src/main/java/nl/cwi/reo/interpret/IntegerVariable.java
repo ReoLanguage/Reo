@@ -35,8 +35,9 @@ public class IntegerVariable implements IntegerExpression {
 		if (x instanceof VariableName) {
 			VariableName n = (VariableName)x;
 			Expression e = params.get(n);
-			if (e instanceof IntegerValue) {
-				return (IntegerValue)e;
+			if (e == null || e instanceof IntegerExpression) {
+				if (e instanceof IntegerValue)
+					return (IntegerValue)e;
 			} else {
 				throw new Exception("Variable " + n + " is not of type integer.");
 			}

@@ -1,4 +1,4 @@
-import reo.fifo1;
+import reo.wa.fifo1;
 
 test() {
 	for k = 1..2 {

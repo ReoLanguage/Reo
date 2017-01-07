@@ -253,7 +253,8 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	 * if the list is size 1; the product work automaton, if the list contains at least 2 
 	 * work automata.
 	 */
-	public static WorkAutomaton product(List<WorkAutomaton> automata) {
+	@Override
+	public WorkAutomaton compose(List<WorkAutomaton> automata) {
 		
 		// Get the number of work automata.
 		int size = automata.size();
@@ -278,7 +279,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 		List<String> s0 = new ArrayList<String>();
 		for (int i = 0; i < size; i++) 
 			s0.add(automata.get(i).q0);
-		q0 = compose(s0);
+		q0 = composeState(s0);
 		
 		// Initialize the queue L of unexplored global states.
 		Queue<List<String>> L = new LinkedList<List<String>>();
@@ -299,7 +300,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 			List<String> s1 = L.poll();
 			
 			// Add global state q1 to the set of states Q
-			Q.add(compose(s1));
+			Q.add(composeState(s1));
 
 			// For each work automaton A.get(i), find the list localtransitions.get(i) of all possible 
 			// local transitions from the local state s1.get(i).
@@ -340,8 +341,8 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 				}
 				
 				// Construct the source and target state and job constraint.
-				String q1 = compose(s1);
-				String q2 = compose(s2);
+				String q1 = composeState(s1);
+				String q2 = composeState(s2);
 				JobConstraint jc = new JobConstraint(w, R);
 				
 				// Construct the global transition.
@@ -371,7 +372,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	 * @param q			list of local states
 	 * @return name of the global state.
 	 */
-	private static String compose(List<String> q) {
+	private String composeState(List<String> q) {
 		String s = q.get(0);
 		for (int i = 1; i < q.size(); i++) 
 			s += "|" + q.get(i);
@@ -381,5 +382,10 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	@Override
 	public WorkAutomaton evaluate(Map<String, String> params) {
 		return this;
+	}
+
+	@Override
+	public WorkAutomaton restrict(Set<String> intface) {
+		return null;
 	}
 }

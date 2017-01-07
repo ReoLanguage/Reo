@@ -25,4 +25,8 @@ public final class TypeTag implements ParameterType {
 	   	return this.tag.equals(tag.tag);
 	}
 	
+	@Override
+	public String toString() {
+		return tag;
+	}	
 }

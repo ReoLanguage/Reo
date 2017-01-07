@@ -55,13 +55,16 @@ public final class Signature implements ParameterType {
 			Node x = node.next();
 			Variable v = var.next();
 			
-			if (!(x.getVariable() instanceof VariableName))
+			Port src = x.toPort();
+			Port snk = x.rename(v).toPort();
+			
+			if (src == null)
 				throw new Exception("Port " + x + " is not a valid node name.");
 			
-			if (!(v instanceof VariableName))
+			if (snk == null)
 				throw new Exception("Port " + v + " is not a valid node name.");
 			
-			links.put(x.toPort(), x.rename(v).toPort());
+			links.put(src, snk);
 		}
 		
 		return new SignatureInstance(definitions, links);
@@ -71,6 +74,11 @@ public final class Signature implements ParameterType {
 	public boolean equalType(ParameterType t) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "" + params + nodes;
 	}
 
 }

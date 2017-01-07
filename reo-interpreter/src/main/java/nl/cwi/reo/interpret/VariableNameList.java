@@ -21,5 +21,10 @@ public final class VariableNameList implements Variable {
 	@Override
 	public VariableNameList evaluate(Map<VariableName, Expression> params) throws Exception {
 		return this;
-	}	
+	}
+	
+	@Override
+	public String toString() {
+		return "" + list;
+	}
 }

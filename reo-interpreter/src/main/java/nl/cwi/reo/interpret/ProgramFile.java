@@ -1,9 +1,10 @@
 package nl.cwi.reo.interpret;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class SourceFile implements ZDefinition {
+public final class ProgramFile implements ProgramExpression {
 	
 	/**
 	 * Section.
@@ -23,9 +24,9 @@ public final class SourceFile implements ZDefinition {
 	/**
 	 * Main component.
 	 */
-	private final Component cexpr;
+	private final ComponentExpression cexpr;
 	
-	public SourceFile(String section, List<String> imports, String name, Component cexpr) {
+	public ProgramFile(String section, List<String> imports, String name, ComponentExpression cexpr) {
 		if (section == null || imports == null || name == null || cexpr == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.section = section;
@@ -42,15 +43,23 @@ public final class SourceFile implements ZDefinition {
 		return new VariableName(section.equals("") ? name : section + "." + name); 
 	}
 	
-	public Component getComponent() {
+	public ComponentExpression getComponent() {
 		return cexpr;
 	}
 
 	@Override
-	public ZDefinitionList evaluate(Map<VariableName, Expression> params)
+	public ProgramExpression evaluate(Map<VariableName, Expression> params)
 			throws Exception {
-		ZDefinitionList defs = new ZDefinitionList();
+		Map<VariableName, Expression> defs = new HashMap<VariableName, Expression>();
 		defs.put(getVariableName(), cexpr.evaluate(params));
-		return defs;
+		return new ProgramValue(defs);
+	}
+	
+	@Override
+	public String toString() {
+		String imps = "";
+		for (String comp : imports)
+			imps += "import " + comp + ";";
+		return "Section " + section + ";" + imps + getVariableName().getName() + "=" + cexpr;
 	}
 }

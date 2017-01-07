@@ -25,4 +25,8 @@ public class SignatureInstance {
 		return this.links;
 	}
 
+	@Override
+	public String toString() {
+		return defs + "" + links;
+	}
 }

@@ -2,8 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.util.Map;
 
-
-public class ComponentVariable implements Component {
+public class ComponentVariable implements ComponentExpression {
 	
 	private Variable var;
 	
@@ -14,24 +13,20 @@ public class ComponentVariable implements Component {
 	}
 	
 	@Override
-	public Component evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ComponentExpression evaluate(Map<VariableName, Expression> params) throws Exception {
 		Variable var_p = var.evaluate(params);
 		if (var_p instanceof VariableName) {
 			VariableName name = (VariableName)var_p;
-			Expression expr = params.get(name);
-			if (expr instanceof ZComponentValue) {
-				return (ZComponentValue)expr;
+			Expression e = params.get(name);
+			if (e == null || e instanceof ComponentExpression) {
+				if (e instanceof ComponentValue)
+					return (ComponentValue)e;
 			} else {
+				System.out.println("value of variable : " + e);
 				throw new Exception("Variable " + name.getName() + " is not of type component.");
 			}
 		}
 		return new ComponentVariable(var_p);		
-	}
-
-	@Override
-	public Component instantiate(ExpressionList values,
-			Interface iface) throws Exception {
-		return this;
 	}
 	
 	@Override

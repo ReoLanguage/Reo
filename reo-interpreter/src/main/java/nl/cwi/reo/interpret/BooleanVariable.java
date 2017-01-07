@@ -31,8 +31,9 @@ public class BooleanVariable implements BooleanExpression {
 		if (x instanceof VariableName) {
 			VariableName n = (VariableName)x;
 			Expression e = params.get(n);
-			if (e instanceof BooleanValue) {
-				return (BooleanValue)e;
+			if (e == null || e instanceof BooleanExpression) {
+				if (e instanceof BooleanValue)
+					return (BooleanValue)e;
 			} else {
 				throw new Exception("Variable " + n + " is not of type boolean.");
 			}

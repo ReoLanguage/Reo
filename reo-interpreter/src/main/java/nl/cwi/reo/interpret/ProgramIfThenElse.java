@@ -1,13 +1,14 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class StatementIfThenElse implements Statement {
+public class ProgramIfThenElse implements ProgramExpression {
 	
 	/**
 	 * Conditions for each branch. If there are more conditions than branches, 
@@ -25,7 +26,7 @@ public class StatementIfThenElse implements Statement {
 	 * @param conditions		guards of each branch
 	 * @param branches			subcomponent and definitions
 	 */
-	public StatementIfThenElse(List<BooleanExpression> conditions, List<ProgramExpression> branches) {
+	public ProgramIfThenElse(List<BooleanExpression> conditions, List<ProgramExpression> branches) {
 		if (conditions == null || branches == null)
 			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.conditions = conditions;
@@ -39,18 +40,30 @@ public class StatementIfThenElse implements Statement {
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
 	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		
 		List<BooleanExpression> conditions_p = new ArrayList<BooleanExpression>();
 		List<ProgramExpression> branches_p = new ArrayList<ProgramExpression>();
-		
-		for (int i = 0; i < conditions.size(); ++i) {
-			BooleanExpression e = conditions.get(i).evaluate(params);
-			ProgramExpression b = branches.get(i).evaluate(params);
+		Iterator<BooleanExpression> condition = conditions.iterator();
+		Iterator<ProgramExpression> branch =  branches.iterator();
+		while (condition.hasNext() && branch.hasNext()) {
+			BooleanExpression e = condition.next().evaluate(params);
+			ProgramExpression b = branch.next().evaluate(params);
 			conditions_p.add(e);
 			if (e instanceof BooleanValue && ((BooleanValue)e).toBoolean() == true)
-				return b;
+				return b;			
 		}
-		
-		return new StatementIfThenElse(conditions_p, branches_p);
+		return new ProgramIfThenElse(conditions_p, branches_p);
+	}
+	
+	@Override
+	public String toString() {
+		String s = "";
+		boolean first = true;
+		Iterator<BooleanExpression> condition = conditions.iterator();
+		Iterator<ProgramExpression> branch =  branches.iterator();
+		while (condition.hasNext() && branch.hasNext()) {
+			s += (first ? "if " : " else " ) + condition.next() + " {" + branch.next() + "}";
+			first = false;
+		}
+		return s;
 	}
 }

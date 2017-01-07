@@ -53,24 +53,30 @@ public final class Interpreter<T extends Semantics<T>> {
 	public List<T> getProgram(String mainfile) {
 
 		// Construct a stack of all required program definitions.
-		Stack<SourceFile> programs = findPrograms(mainfile);		
+		Stack<ProgramFile> stack = findProgramFiles(mainfile);	
+		System.out.println("\nProgram stack : \n\n" + stack);	
 		
 		// Evaluate this stack of program definitions.
-		InstanceList instancelist = evaluatePrograms(programs);
-
+		ComponentValue comp = evaluateProgramStack(stack);
+		System.out.println("\nComponent : \n" + comp);
+		
+		// Check if the evaluated program expression is a component value.
+		if (!(comp instanceof ComponentValue)) 
+			return new ArrayList<T>(); // TODO return an error message.
+		
 		// Construct a set of atomic components of generic type T.
 		List<T> program = new ArrayList<T>();
 		
 		// Split shared ports in every atom in main, and insert a node
 		Map<Port, List<Port>> nodes = new HashMap<Port, List<Port>>();
 		
-		for (Instance comp : instancelist.getInstances()) {			
-			if (comp.getAtom().getClass().equals(unit.getClass())) {	
+		for (Instance inst : comp.getInstances()) {			
+			if (inst.getAtom().getClass().equals(unit.getClass())) {	
 							
 				Map<String, String> r = new HashMap<String, String>();
 
 				// For every port of this component, add the current node size as a suffix.
-				for (Map.Entry<String, Port> link : comp.getLinks().entrySet()) {
+				for (Map.Entry<String, Port> link : inst.getLinks().entrySet()) {
 					Port p = link.getValue();
 					
 					// Get the current node of this port, or create a new node.
@@ -81,7 +87,7 @@ public final class Interpreter<T extends Semantics<T>> {
 					}
 					
 					// Rename the port by adding a suffix.
-					Port portWithSuffix = p.rename(p.getName() + A.size());
+					Port portWithSuffix = p.setName(p.getName() + A.size());
 					
 					// Add the renamed port to this node.
 					A.add(portWithSuffix);
@@ -93,7 +99,7 @@ public final class Interpreter<T extends Semantics<T>> {
 				}
 				
 		    	@SuppressWarnings("unchecked")
-				T X = ((T)comp.getAtom()).rename(r);
+				T X = ((T)inst.getAtom()).rename(r);
 				program.add(X);
 			}
 		}
@@ -111,15 +117,15 @@ public final class Interpreter<T extends Semantics<T>> {
 	 * @param mainfile		initial file, containing the main component.
 	 * @return stack of component definitions, whose bottom is the main component.
 	 */
-	private Stack<SourceFile> findPrograms(String mainfile) {
-		Stack<SourceFile> programs = new Stack<SourceFile>();	
+	private Stack<ProgramFile> findProgramFiles(String mainfile) {
+		Stack<ProgramFile> programs = new Stack<ProgramFile>();	
 		List<String> includedFiles = new ArrayList<String>();
 		Queue<String> files = new LinkedList<String>();
 		files.add(mainfile);		
 		while (!files.isEmpty()) {
 			String file = files.poll();
 			includedFiles.add(file);			
-			SourceFile program = parseFile(file);			
+			ProgramFile program = parseFile(file);			
 			if (program != null) {
 				programs.push(program);
 				for (String comp : program.getImports()) {
@@ -138,30 +144,32 @@ public final class Interpreter<T extends Semantics<T>> {
 	
 	/**
 	 * Evaluate a stack of program definitions by repeated substitution.
-	 * @param programs		stack of program definitions.
+	 * @param stack		stack of program definitions.
 	 * @return ComponentValue
 	 */
-	private InstanceList evaluatePrograms(Stack<SourceFile> programs) {
+	private ComponentValue evaluateProgramStack(Stack<ProgramFile> stack) {
 		
-		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();
-		VariableName main = null;		
+		Map<VariableName, Expression> cexprs = new HashMap<VariableName, Expression>();
+		VariableName name = null;		
 		try {
-			while (!programs.isEmpty()) {
-				SourceFile program = programs.pop();
-				main = program.getVariableName();
-				definitions.putAll(program.evaluate(definitions));
+			while (!stack.isEmpty()) {
+				ProgramFile program = stack.pop();
+				name = program.getVariableName();
+				Expression cexpr = program.getComponent().evaluate(cexprs);
+				cexprs.put(name, cexpr);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		Expression pexpr = definitions.get(main);
+		Expression expr = cexprs.get(name);
 		
-		// Check if the evaluated program expression is a component value.
-		if (!(pexpr instanceof ZComponentValue)) 
-			return new InstanceList();
+		System.out.println("\n\nMain expression : " + expr);
+		
+		if (!(expr instanceof ComponentValue)) 
+			return null;
 				
-		return ((ZComponentValue)pexpr).getInstanceList();
+		return (ComponentValue)expr;
 	}
 	
 	/**
@@ -171,7 +179,7 @@ public final class Interpreter<T extends Semantics<T>> {
 	 * @param file		source file
 	 * @return an interpreted source file, or null in case of an error.
 	 */
-	private SourceFile parseFile(String file) {		
+	private ProgramFile parseFile(String file) {		
 		CharStream c = null;		
 		try {
 			c = new ANTLRFileStream(file);

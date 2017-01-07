@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,10 @@ public final class ExpressionList implements Value {
 	
 	@Override
 	public String toString() {
-		return "" + entries;
+		String s = "<";
+		Iterator<Expression> expr = entries.iterator();
+		while (expr.hasNext())
+			s += expr.next() + (expr.hasNext() ? ", " : "" );
+		return s + ">";
 	}
 }

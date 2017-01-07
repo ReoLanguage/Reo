@@ -1,4 +1,4 @@
-section reo;
+section reo.wa;
 
 sequencer<k>(a[1..k]) {
 	fifofull(x[0],x[1])

@@ -1,5 +1,9 @@
 package nl.cwi.reo.interpret;
 
-public interface ProgramExpression extends Component {
+import java.util.Map;
+
+public interface ProgramExpression {
+	
+	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception;
 
 }

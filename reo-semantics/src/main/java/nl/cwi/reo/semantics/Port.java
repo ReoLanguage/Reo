@@ -12,12 +12,12 @@ public final class Port {
 	
 	private final boolean hidden;
 
-	public Port(String name) {
+	public Port(String name, PortType type) {
 		if (name == null)
 			throw new IllegalArgumentException("Argument cannot be null.");
 		this.name = name;
+		this.type = type;
 		this.tag = "";
-		this.type = null;
 		this.hidden = false;
 	}
 	
@@ -50,7 +50,11 @@ public final class Port {
 		return new Port(name, type, tag, true);
 	}
 	
-	public Port rename(String name) {
+	public Port setName(String name) {
+		return new Port(name, type, tag, hidden);
+	}
+	
+	public Port setType(PortType type) {
 		return new Port(name, type, tag, hidden);
 	}
 	
@@ -60,13 +64,12 @@ public final class Port {
 	    if (other == this) return true;
 	    if (!(other instanceof Port)) return false;
 	    Port p = (Port)other;
-	   	return Objects.equals(this.name, p.name) && 
-	   			Objects.equals(this.hidden, p.hidden);
+	   	return Objects.equals(this.name, p.name);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(this.name, this.hidden);
+	    return Objects.hash(this.name);
 	}	
 	
 	@Override

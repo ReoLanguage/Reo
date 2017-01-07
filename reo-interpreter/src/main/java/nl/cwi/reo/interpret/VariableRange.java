@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +9,7 @@ import java.util.Map;
  * A parameterized set of variable names, such as, for example, 
  * (a.b, c[-31], x.y.z[-1][0...1-k][5]).
  */
-public final class VariableRange implements Variable, ZSequence {
+public final class VariableRange implements Variable {
 
 	/**
 	 * Fully qualified name.
@@ -39,7 +40,6 @@ public final class VariableRange implements Variable, ZSequence {
 			if (bounds.size() > 1)
 				isList = true;
 		this.isList = isList;
-		System.out.println("New range variable " + this);
 	}
 	
 	/**
@@ -49,9 +49,9 @@ public final class VariableRange implements Variable, ZSequence {
 	 * @return null, if values cannot be found, and a map that assigns each
 	 * parameter name to an integer value otherwise.
 	 */
-	public ZDefinitionList findParamFromSize(int size) {
+	public Map<VariableName, Expression> findParamFromSize(int size) {
 		
-		ZDefinitionList params = new ZDefinitionList();
+		Map<VariableName, Expression> params = new HashMap<VariableName, Expression>();
 		
 		for (List<IntegerExpression> bounds : indices) {
 			switch (bounds.size()) {
@@ -153,8 +153,6 @@ public final class VariableRange implements Variable, ZSequence {
 			List<VariableName> vars = new ArrayList<VariableName>();
 			for (String x : variables) 
 				vars.add(new VariableName(x));
-
-			System.out.println("variable " + this + " -> " + vars);
 
 			if (isList)
 				return new VariableNameList(vars);

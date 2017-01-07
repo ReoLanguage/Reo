@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.PortType;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class Instance {
+public final class Instance implements Evaluable<Instance> {
 	
 	private final Semantics<?> atom;
 	
@@ -34,7 +35,7 @@ public final class Instance {
 			String a = link.getKey();
 			Port p = link.getValue();
 			if (p.isHidden()) {
-				newlinks.put(a, p.rename("#" + i++)); 
+				newlinks.put(a, p.setName("#" + i++)); 
 			} else {
 				newlinks.put(a, p); 						
 			}		
@@ -42,11 +43,13 @@ public final class Instance {
 		return new Instance(atom, newlinks);
 	}
 	
-	public Instance restrictAndRename(Map<Port, Port> iface) {
+	public Instance instantiate(Map<Port, Port> iface) {
 		Map<String, Port> newlinks = new HashMap<String, Port>();
 		for (Map.Entry<String, Port> link : links.entrySet()) {
 			Port n = iface.get(link.getValue());
 			if (n == null) n = link.getValue().hide();
+			if (link.getValue().getType() != PortType.UNKNOWN)
+				n = n.setType(link.getValue().getType());
 			newlinks.put(link.getKey(), n);
 		}
 		return new Instance(atom, newlinks);	
@@ -57,5 +60,11 @@ public final class Instance {
 	 */
 	public String toString() {
 		return links + "\n" + atom + "\n";
+	}
+
+	@Override
+	public Instance evaluate(Map<VariableName, Expression> params)
+			throws Exception {
+		return this;
 	}
 }

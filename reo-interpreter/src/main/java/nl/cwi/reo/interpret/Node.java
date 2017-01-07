@@ -38,10 +38,18 @@ public final class Node implements Evaluable<Node> {
 	public Port toPort() {
 		Port p = null;
 		if (var instanceof VariableName) { 
-			if (type == NodeType.SOURCE)
-				p = new Port(((VariableName)var).getName(), PortType.IN, tag.name(), false);
-			if (type == NodeType.SINK)
-				p = new Port(((VariableName)var).getName(), PortType.OUT, tag.name(), false);
+			VariableName vname = (VariableName)var;
+			switch (type) {
+			case SOURCE:
+				p = new Port(vname.getName(), PortType.IN, tag.name(), false);
+				break;
+			case SINK:
+				p = new Port(vname.getName(), PortType.OUT, tag.name(), false);
+				break;
+			default: 
+				p = new Port(vname.getName(), PortType.UNKNOWN, tag.name(), false);
+				break;
+			}
 		}
 		return p;
 	}
