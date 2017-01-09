@@ -28,7 +28,7 @@ public class ProgramIfThenElse implements ProgramExpression {
 	 */
 	public ProgramIfThenElse(List<BooleanExpression> conditions, List<ProgramExpression> branches) {
 		if (conditions == null || branches == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.conditions = conditions;
 		this.branches = branches;
 	}
@@ -61,7 +61,7 @@ public class ProgramIfThenElse implements ProgramExpression {
 		Iterator<BooleanExpression> condition = conditions.iterator();
 		Iterator<ProgramExpression> branch =  branches.iterator();
 		while (condition.hasNext() && branch.hasNext()) {
-			s += (first ? "if " : " else " ) + condition.next() + " {" + branch.next() + "}";
+			s += (first ? "if " : " else " ) + condition.next() + " " + branch.next();
 			first = false;
 		}
 		return s;

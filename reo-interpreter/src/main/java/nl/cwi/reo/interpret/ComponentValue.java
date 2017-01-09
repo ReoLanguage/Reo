@@ -1,6 +1,5 @@
 package nl.cwi.reo.interpret;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +22,7 @@ public final class ComponentValue implements ComponentExpression {
 	 */
 	public ComponentValue(Signature sign, ProgramValue prog) {
 		if (sign == null || prog == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.sign = sign;
 		this.prog = prog;
 	}
@@ -34,10 +33,10 @@ public final class ComponentValue implements ComponentExpression {
 
 	public ProgramValue instantiate(ExpressionList values, Interface iface) throws Exception {
 		SignatureInstance v = sign.evaluate(values, iface);
-		List<Instance> _instances = new ArrayList<Instance>();
-		for (Instance comp : prog.getInstances())	
-			_instances.add(comp.instantiate(v.getLinks()));
-		return new ProgramValue(_instances);	
+		ProgramValue program = prog.join(v.getLinks());
+		program = program.instantiate(v.getLinks());
+//		System.out.println("Evaluate " + this + values + iface + " gives " + program);	
+		return program;
 	}
 
 	@Override

@@ -8,7 +8,7 @@ public class ComponentVariable implements ComponentExpression {
 	
 	public ComponentVariable(Variable var) {
 		if (var == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.var = var;
 	}
 	
@@ -20,7 +20,7 @@ public class ComponentVariable implements ComponentExpression {
 			Expression e = params.get(name);
 			if (e == null || e instanceof ComponentExpression) {
 				if (e instanceof ComponentValue)
-					return (ComponentValue)e;
+					return (ComponentValue)e; // TODO copy constructor of component value
 			} else {
 				System.out.println("value of variable : " + e);
 				throw new Exception("Variable " + name.getName() + " is not of type component.");

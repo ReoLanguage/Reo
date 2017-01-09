@@ -10,7 +10,7 @@ public class ComponentComposite implements ComponentExpression {
 
 	public ComponentComposite(Signature sign, ProgramExpression body) {
 		if (sign == null || body == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.sign = sign;
 		this.body = body;
 	}
@@ -18,12 +18,12 @@ public class ComponentComposite implements ComponentExpression {
 	public ComponentExpression evaluate(Map<VariableName, Expression> params) throws Exception {
 		ProgramExpression prog = body.evaluate(params);
 		if (prog instanceof ProgramValue)
-			return (ProgramValue)prog;
+			return new ComponentValue(sign, (ProgramValue)prog);
 		return new ComponentComposite(sign, prog);
 	}
 	
 	@Override
 	public String toString() {
-		return sign + "{" + body + "}";
+		return "" + sign + body;
 	}
 }

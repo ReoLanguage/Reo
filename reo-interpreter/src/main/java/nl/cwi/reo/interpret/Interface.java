@@ -11,7 +11,7 @@ public final class Interface implements Evaluable<Interface> {
 	
 	public Interface(List<Variable> vars) {
 		if (vars == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.vars = vars;
 	}
 	

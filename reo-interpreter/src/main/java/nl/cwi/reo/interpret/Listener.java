@@ -368,7 +368,8 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitCexpr_atomic(Cexpr_atomicContext ctx) {
-		ProgramValue prog = new ProgramValue(atoms.get(ctx.atom()));
+		
+		ProgramValue prog = new ProgramValue(new Definitions(), new InstanceList(atoms.get(ctx.atom())));
 		cexprs.put(ctx, new ComponentValue(signatures.get(ctx.sign()), prog));
 	}
 

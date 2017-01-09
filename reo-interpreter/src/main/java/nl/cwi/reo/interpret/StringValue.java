@@ -9,7 +9,7 @@ public class StringValue implements Expression {
 	
 	public StringValue(String str) {
 		if (str == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.str = str;
 	}
 	

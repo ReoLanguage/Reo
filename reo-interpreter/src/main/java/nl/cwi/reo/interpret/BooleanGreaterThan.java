@@ -11,7 +11,7 @@ public final class BooleanGreaterThan implements BooleanExpression {
 	
 	public BooleanGreaterThan(IntegerExpression e1, IntegerExpression e2) {
 		if (e1 == null || e2 == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.e1 = e1;
 		this.e2 = e2;
 	}

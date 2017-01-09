@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class NodeList implements Evaluable<NodeList> {
+public final class NodeList implements Evaluable<NodeList> {
 	
 	private final List<Node> list;
 	
@@ -16,7 +16,7 @@ public class NodeList implements Evaluable<NodeList> {
 	
 	public NodeList(List<Node> list) {
 		if (list == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.list = Collections.unmodifiableList(list);
 	}
 

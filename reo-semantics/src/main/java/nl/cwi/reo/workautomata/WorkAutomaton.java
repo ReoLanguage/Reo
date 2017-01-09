@@ -206,8 +206,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	/**
 	 * Gets the string representation of this work automaton in .dot format.
 	 */
-	@Override
-	public String toString() {
+	public String toDOT() {
 		StringBuilder str = new StringBuilder();
 		 
 		str.append("// WorkAutomaton with interface " + this.P + " and jobs " + this.J + "\n");
@@ -228,6 +227,15 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 		return str.toString();
 	}
 	
+	
+	/**
+	 * Gets the string representation of this work automaton.
+	 */
+	@Override
+	public String toString() {		 
+		return "(" + this.Q + "," + this.P + "," + this.J + "," + this.I + "," + this.T + "," + this.q0 + ")";
+	}
+	
 	/**
 	 * Produces a .dot file containing the work automaton.
 	 * @param A				work automaton
@@ -237,7 +245,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	public static boolean outputDOT(WorkAutomaton A, String fileName) {
 		try {
 			FileWriter out = new FileWriter(fileName + ".dot");
-			out.write(A.toString());
+			out.write(A.toDOT());
 			out.close();
 		} catch (IOException e) {
 			return false;

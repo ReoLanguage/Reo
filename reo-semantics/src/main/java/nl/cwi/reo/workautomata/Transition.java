@@ -109,7 +109,7 @@ public final class Transition implements Comparable<Transition> {
 	 */
 	@Override 
 	public String toString() { 
-		return q1 + " -- " + N + ", " + jc + " -> " + q2;
+		return "(" + q1 + "," + q2 + "," + N + "," + jc + ")";
 	}
 
 	/**

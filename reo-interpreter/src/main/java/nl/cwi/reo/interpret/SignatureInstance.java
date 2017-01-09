@@ -12,7 +12,7 @@ public class SignatureInstance {
 	
 	public SignatureInstance(Map<VariableName, Expression> defs, Map<Port, Port> links) {
 		if (defs == null || links == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.defs = defs;
 		this.links = links;
 	}

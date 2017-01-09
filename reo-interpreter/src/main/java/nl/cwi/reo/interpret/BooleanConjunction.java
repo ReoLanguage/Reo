@@ -10,7 +10,7 @@ public final class BooleanConjunction implements BooleanExpression {
 	
 	public BooleanConjunction(BooleanExpression e1, BooleanExpression e2) {
 		if (e1 == null || e2 == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.e1 = e1;
 		this.e2 = e2;
 	}

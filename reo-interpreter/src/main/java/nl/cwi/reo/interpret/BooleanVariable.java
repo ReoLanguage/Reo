@@ -16,7 +16,7 @@ public class BooleanVariable implements BooleanExpression {
 	 */
 	public BooleanVariable(Variable var) {
 		if (var == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.var = var;
 	}
 	

@@ -39,7 +39,7 @@ public class ProgramForLoop implements ProgramExpression {
 	 */
 	public ProgramForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ProgramExpression body) {
 		if (parameter == null || lower == null || upper == null || body == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.parameter = parameter;
 		this.lower = lower;
 		this.upper = upper;
@@ -95,6 +95,6 @@ public class ProgramForLoop implements ProgramExpression {
 	
 	@Override
 	public String toString() {
-		return "for " + parameter + "=" + lower + ".." + upper + "{" + body + "}";
+		return "for " + parameter + "=" + lower + ".." + upper + body;
 	}
 }

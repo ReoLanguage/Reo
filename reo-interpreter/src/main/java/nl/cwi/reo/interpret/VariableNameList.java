@@ -10,7 +10,7 @@ public final class VariableNameList implements Variable {
 	
 	public VariableNameList(List<VariableName> list) {
 		if (list == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.list = Collections.unmodifiableList(list);
 	}
 

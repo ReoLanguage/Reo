@@ -16,7 +16,7 @@ public final class ExpressionList implements Value {
 	
 	public ExpressionList(List<Expression> entries) {
 		if (entries == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.entries = Collections.unmodifiableList(entries);
 	}
 	

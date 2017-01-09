@@ -12,24 +12,24 @@ public final class Port {
 	
 	private final boolean hidden;
 
-	public Port(String name, PortType type) {
+	public Port(String name) {
 		if (name == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.name = name;
-		this.type = type;
+		this.type = PortType.UNKNOWN;
 		this.tag = "";
 		this.hidden = false;
 	}
 	
 	public Port(String name, PortType type, String tag, boolean hidden) {
 		if (name == null || type == null || tag == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.name = name;
 		this.type = type;
 		this.tag = tag;
 		this.hidden = hidden;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -50,11 +50,11 @@ public final class Port {
 		return new Port(name, type, tag, true);
 	}
 	
-	public Port setName(String name) {
+	public Port rename(String name) {
 		return new Port(name, type, tag, hidden);
 	}
 	
-	public Port setType(PortType type) {
+	public Port retype(PortType type) {
 		return new Port(name, type, tag, hidden);
 	}
 	

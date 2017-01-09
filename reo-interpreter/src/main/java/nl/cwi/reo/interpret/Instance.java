@@ -1,6 +1,5 @@
 package nl.cwi.reo.interpret;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,58 +7,74 @@ import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.PortType;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class Instance implements Evaluable<Instance> {
+public final class Instance extends HashMap<String, Port> implements Evaluable<Instance> {
+	
+	/**
+	 * Serial version ID.
+	 */
+	private static final long serialVersionUID = 6594525018732378080L;
 	
 	private final Semantics<?> atom;
 	
-	private final Map<String, Port> links;
+	/**
+	 * Constructs a new instance from an atom.
+	 * @param atom
+	 */
+	public Instance(Semantics<?> atom) {
+		this.atom = atom;
+		for (String a : atom.getInterface()) 
+			super.put(a, new Port(a));
+	}
 	
 	public Instance(Semantics<?> atom, Map<String, Port> links) {
-		if (atom == null || links == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
 		this.atom = atom;
-		this.links = Collections.unmodifiableMap(links);
+		super.putAll(links);
+	}
+	
+	/**
+	 * Copy constructor.
+	 * @param instance
+	 */
+	public Instance(Instance instance) {
+		if (instance == null)
+			throw new NullPointerException();
+		this.atom = instance.atom;
+		super.putAll(new HashMap<String, Port>(instance));
 	}
 	
 	public Semantics<?> getAtom() {
 		return atom;
 	}
 	
-	public Map<String, Port> getLinks() {
-		return links;
+	public void rename(Map<String, String> renaming) {
+		for (Map.Entry<String, Port> link : this.entrySet()) {
+			Port x = link.getValue();
+			String name = renaming.get(x.getName());
+			if (name == null) name = x.getName();
+			link.setValue(x.rename(name));
+		}
 	}
 	
-	public Instance renameHidden(Integer i) {
-		Map<String, Port> newlinks = new HashMap<String, Port>();
-		for (Map.Entry<String, Port> link : links.entrySet()) {
-			String a = link.getKey();
-			Port p = link.getValue();
-			if (p.isHidden()) {
-				newlinks.put(a, p.setName("#" + i++)); 
-			} else {
-				newlinks.put(a, p); 						
-			}		
-		}
-		return new Instance(atom, newlinks);
-	}
-	
-	public Instance instantiate(Map<Port, Port> iface) {
-		Map<String, Port> newlinks = new HashMap<String, Port>();
-		for (Map.Entry<String, Port> link : links.entrySet()) {
-			Port n = iface.get(link.getValue());
-			if (n == null) n = link.getValue().hide();
-			if (link.getValue().getType() != PortType.UNKNOWN)
-				n = n.setType(link.getValue().getType());
-			newlinks.put(link.getKey(), n);
-		}
-		return new Instance(atom, newlinks);	
+	public void renameHidden(Integer i) {
+		for (Map.Entry<String, Port> link : this.entrySet())
+			if (link.getValue().isHidden())
+				link.setValue(link.getValue().rename("#" + i++));
 	}
 	
 	/**
-	 * Get the string representation of a program.
+	 * Renames the external ports, and hides all internal ports
+	 * @param iface		maps external ports to new ports.
 	 */
-	public String toString() {
-		return links + "\n" + atom + "\n";
+	public void instantiate(Map<Port, Port> iface) {
+		for (Map.Entry<String, Port> link : this.entrySet()) {
+			Port x = link.getValue();
+			Port y = iface.get(x);
+			if (y == null) 
+				y = x.hide();
+			if (x.getType() != PortType.UNKNOWN)
+				y = y.retype(x.getType());
+			link.setValue(y);
+		}
 	}
 
 	@Override

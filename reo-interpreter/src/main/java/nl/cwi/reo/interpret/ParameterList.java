@@ -16,7 +16,7 @@ public class ParameterList implements Evaluable<ParameterList> {
 	
 	public ParameterList(List<Parameter> list) {
 		if (list == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.list = Collections.unmodifiableList(list);
 	}
 

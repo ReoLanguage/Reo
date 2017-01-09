@@ -10,7 +10,7 @@ public final class TypeTag implements ParameterType {
 	
 	public TypeTag(String tag) {
 		if (tag == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.tag = tag;
 	}
 

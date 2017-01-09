@@ -9,7 +9,7 @@ public final class BooleanNegation implements BooleanExpression {
 	
 	public BooleanNegation(BooleanExpression e) {
 		if (e == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.e = e;
 	}
 	

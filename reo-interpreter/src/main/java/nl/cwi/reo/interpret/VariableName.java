@@ -13,7 +13,7 @@ public final class VariableName implements Variable {
 	
 	public VariableName(String name) {
 		if (name == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.name = name;
 	}
 	

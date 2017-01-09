@@ -37,7 +37,7 @@ public final class Interpreter<T extends Semantics<T>> {
 	
 	public Interpreter(T unit) {
 		if (unit == null)
-			throw new IllegalArgumentException("Argument cannot be null.");
+			throw new NullPointerException();
 		this.unit = unit;
 		List<String> dirs = new ArrayList<String>();
 		String comppath = System.getenv("COMPPATH");
@@ -54,11 +54,11 @@ public final class Interpreter<T extends Semantics<T>> {
 
 		// Construct a stack of all required program definitions.
 		Stack<ProgramFile> stack = findProgramFiles(mainfile);	
-		System.out.println("\nProgram stack : \n\n" + stack);	
+//		System.out.println("\nProgram stack : \n" + stack);	
 		
 		// Evaluate this stack of program definitions.
 		ComponentValue comp = evaluateProgramStack(stack);
-		System.out.println("\nComponent : \n" + comp);
+		System.out.println("\nMain component : \n" + comp);
 		
 		// Check if the evaluated program expression is a component value.
 		if (!(comp instanceof ComponentValue)) 
@@ -76,7 +76,7 @@ public final class Interpreter<T extends Semantics<T>> {
 				Map<String, String> r = new HashMap<String, String>();
 
 				// For every port of this component, add the current node size as a suffix.
-				for (Map.Entry<String, Port> link : inst.getLinks().entrySet()) {
+				for (Map.Entry<String, Port> link : inst.entrySet()) {
 					Port p = link.getValue();
 					
 					// Get the current node of this port, or create a new node.
@@ -87,7 +87,7 @@ public final class Interpreter<T extends Semantics<T>> {
 					}
 					
 					// Rename the port by adding a suffix.
-					Port portWithSuffix = p.setName(p.getName() + A.size());
+					Port portWithSuffix = p.rename(p.getName() + "[" + A.size() + "]");
 					
 					// Add the renamed port to this node.
 					A.add(portWithSuffix);
@@ -101,6 +101,8 @@ public final class Interpreter<T extends Semantics<T>> {
 		    	@SuppressWarnings("unchecked")
 				T X = ((T)inst.getAtom()).rename(r);
 				program.add(X);
+			} else {
+				System.out.println("ERROR: not every atom is of type " + unit.getClass());
 			}
 		}
 		
@@ -163,8 +165,6 @@ public final class Interpreter<T extends Semantics<T>> {
 		}
 		
 		Expression expr = cexprs.get(name);
-		
-		System.out.println("\n\nMain expression : " + expr);
 		
 		if (!(expr instanceof ComponentValue)) 
 			return null;

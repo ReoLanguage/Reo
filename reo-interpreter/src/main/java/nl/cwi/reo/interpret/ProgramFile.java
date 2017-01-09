@@ -28,7 +28,7 @@ public final class ProgramFile implements ProgramExpression {
 	
 	public ProgramFile(String section, List<String> imports, String name, ComponentExpression cexpr) {
 		if (section == null || imports == null || name == null || cexpr == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.section = section;
 		this.imports = imports;
 		this.name = name;
@@ -48,11 +48,10 @@ public final class ProgramFile implements ProgramExpression {
 	}
 
 	@Override
-	public ProgramExpression evaluate(Map<VariableName, Expression> params)
-			throws Exception {
-		Map<VariableName, Expression> defs = new HashMap<VariableName, Expression>();
-		defs.put(getVariableName(), cexpr.evaluate(params));
-		return new ProgramValue(defs);
+	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();
+		definitions.put(getVariableName(), cexpr.evaluate(params));
+		return new ProgramValue(new Definitions(definitions), new InstanceList());
 	}
 	
 	@Override
@@ -60,6 +59,6 @@ public final class ProgramFile implements ProgramExpression {
 		String imps = "";
 		for (String comp : imports)
 			imps += "import " + comp + ";";
-		return "Section " + section + ";" + imps + getVariableName().getName() + "=" + cexpr;
+		return "section " + section + ";" + imps + getVariableName().getName() + "=" + cexpr;
 	}
 }

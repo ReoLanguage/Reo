@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +33,15 @@ public final class VariableRange implements Variable {
 	 */
 	public VariableRange(String name, List<List<IntegerExpression>> indices) {
 		if (name == null || indices == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.name = name;
-		this.indices = indices;	
 		boolean isList = false;
-		for (List<IntegerExpression> bounds : indices)
-			if (bounds.size() > 1)
-				isList = true;
+		List<List<IntegerExpression>> unmod_indices = new ArrayList<List<IntegerExpression>>();
+		for (List<IntegerExpression> bounds : indices) {
+			unmod_indices.add(Collections.unmodifiableList(bounds));
+			if (bounds.size() > 1) isList = true;
+		}
+		this.indices = Collections.unmodifiableList(unmod_indices);	
 		this.isList = isList;
 	}
 	

@@ -22,7 +22,7 @@ public final class Signature implements ParameterType {
 	
 	public Signature(ParameterList params, NodeList nodes) {
 		if (params == null || nodes == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.params = params;
 		this.nodes = nodes;
 	}
@@ -64,6 +64,7 @@ public final class Signature implements ParameterType {
 			if (snk == null)
 				throw new Exception("Port " + v + " is not a valid node name.");
 			
+//			definitions.put(new VariableName(src.getName()), new VariableName(snk.getName()));
 			links.put(src, snk);
 		}
 		

@@ -9,7 +9,7 @@ public final class IntegerUnaryMinus implements IntegerExpression {
 	
 	public IntegerUnaryMinus(IntegerExpression e) {
 		if (e == null)
-			throw new IllegalArgumentException("Arguments cannot be null.");
+			throw new NullPointerException();
 		this.e = e;
 	}
 
