@@ -2,9 +2,12 @@ import reo.wa.fifo1;
 
 test() {
 
-  fifo2 = (a?,b!) { fifo1(a,x) fifo1(x,b) }
+	if (true) { fifo1(a,b) }
+
+
+  //fifo2 = (a?,b!) { fifo1(a,x) fifo1(x,b) }
 	
-	(a,b) { fifo2(a,y) fifo2(y,b) } (s,t)
+	//(a,b) { fifo2(a,y) fifo2(y,b) } (s,t)
 
 	//n = 3
 	

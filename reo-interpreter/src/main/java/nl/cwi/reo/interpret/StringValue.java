@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret;
 import java.util.Map;
 
 
-public class StringValue implements Expression {
+public class StringValue implements StringExpression {
 	
 	private final String str; 
 	
@@ -13,8 +13,12 @@ public class StringValue implements Expression {
 		this.str = str;
 	}
 	
-	public Expression evaluate(Map<VariableName, Expression> params) {
+	public StringValue evaluate(Map<VariableName, Expression> params) {
 		return this;
+	}
+	
+	public static StringValue concatenate(StringValue v1, StringValue v2) {
+		return new StringValue(v1.str + v2.str);
 	}
 	
 	@Override

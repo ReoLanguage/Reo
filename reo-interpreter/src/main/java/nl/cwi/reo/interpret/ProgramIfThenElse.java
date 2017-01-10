@@ -49,7 +49,7 @@ public class ProgramIfThenElse implements ProgramExpression {
 			ProgramExpression b = branch.next().evaluate(params);
 			conditions_p.add(e);
 			if (e instanceof BooleanValue && ((BooleanValue)e).toBoolean() == true)
-				return b;			
+				return b;
 		}
 		return new ProgramIfThenElse(conditions_p, branches_p);
 	}

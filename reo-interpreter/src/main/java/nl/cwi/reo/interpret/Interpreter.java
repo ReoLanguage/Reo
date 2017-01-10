@@ -40,10 +40,12 @@ public final class Interpreter<T extends Semantics<T>> {
 			throw new NullPointerException();
 		this.unit = unit;
 		List<String> dirs = new ArrayList<String>();
+		dirs.add(".");
 		String comppath = System.getenv("COMPPATH");
 		if (comppath != null)
 			dirs.addAll(Arrays.asList(comppath.split(":")));
-		this.dirs = Collections.unmodifiableList(dirs);	}
+		this.dirs = Collections.unmodifiableList(dirs);	
+	}
 
 	/**
 	 * Interprets the main component of the input file as a list of work automata.

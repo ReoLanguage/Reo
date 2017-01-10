@@ -2,8 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.util.Map;
 
-
-public class BooleanVariable implements BooleanExpression {
+public class StringVariable implements StringExpression {
 
 	/**
 	 * Variable name.
@@ -14,7 +13,7 @@ public class BooleanVariable implements BooleanExpression {
 	 * Constructs a natural number from a string.
 	 * @param s 	string representation of a natural number
 	 */
-	public BooleanVariable(Variable var) {
+	public StringVariable(Variable var) {
 		if (var == null)
 			throw new NullPointerException();
 		this.var = var;
@@ -26,15 +25,15 @@ public class BooleanVariable implements BooleanExpression {
 	 * @return Integer evaluation with respect to parameter assignment.
 	 */
 	@Override
-	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public StringExpression evaluate(Map<VariableName, Expression> params) throws Exception {
 		Variable x = var.evaluate(params);
 		if (x instanceof VariableName) {
 			VariableName n = (VariableName)x;
 			Expression e = params.get(n);
-			if (e instanceof BooleanExpression) 
-				return (BooleanExpression)e;
+			if (e instanceof StringExpression) 
+				return (StringExpression)e;
 		}
-		return new BooleanVariable(x);
+		return new StringVariable(x);
 	}
 	
 	@Override

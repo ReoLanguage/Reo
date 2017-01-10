@@ -12,14 +12,14 @@ cexpr   : var                                                 # cexpr_variable
 
 // Bodies
 body    : '{' stmt* '}' ;
-stmt    : value '=' value                                     # stmt_equation
+stmt    : array '=' array                                     # stmt_equation
         | var cexpr                                           # stmt_compdefn
         | cexpr list? iface                                   # stmt_instance
         | 'for' ID '=' iexpr '..' iexpr body                  # stmt_iteration
         | 'if' bexpr body (('else' bexpr body)* 'else' body)? # stmt_condition ;
 
-// Values
-value   : expr                                                # value_expr 
+// Arrays of expressions
+array   : expr                                                # value_expr 
         | list                                                # value_list ;
 expr    : var                                                 # expr_variable
         | STRING                                              # expr_string
@@ -98,7 +98,7 @@ dt      : '(' dc ')'                                          # cam_dt_brackets
 wa      : '#WA' wa_expr* ;
 wa_expr : ID '*'? ':' jc                                      # wa_invariant
         | ID '*'? '->' ID ':' idset ',' jc ',' idset          # wa_transition ;   
-jc      : 'true'                                              # wa_jc_bool
+jc      : BOOL                                                # wa_jc_bool
         | '(' jc ')'                                          # wa_jc_brackets
         | ID '==' NAT                                         # wa_jc_eq
         | ID '<=' NAT                                         # wa_jc_leq

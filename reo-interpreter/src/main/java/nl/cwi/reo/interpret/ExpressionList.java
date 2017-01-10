@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public final class ExpressionList implements Value {
+public final class ExpressionList implements Array {
 	
 	private final List<Expression> entries; 
 	

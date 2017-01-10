@@ -16,18 +16,22 @@ public final class Instance extends HashMap<String, Port> implements Evaluable<I
 	
 	private final Semantics<?> atom;
 	
+	private final SourceCode source;
+	
 	/**
 	 * Constructs a new instance from an atom.
 	 * @param atom
 	 */
 	public Instance(Semantics<?> atom) {
 		this.atom = atom;
+		this.source = new SourceCode();
 		for (String a : atom.getInterface()) 
 			super.put(a, new Port(a));
 	}
 	
-	public Instance(Semantics<?> atom, Map<String, Port> links) {
+	public Instance(Semantics<?> atom, Map<String, Port> links, SourceCode source) {
 		this.atom = atom;
+		this.source = source;
 		super.putAll(links);
 	}
 	
@@ -39,11 +43,16 @@ public final class Instance extends HashMap<String, Port> implements Evaluable<I
 		if (instance == null)
 			throw new NullPointerException();
 		this.atom = instance.atom;
+		this.source = instance.source;
 		super.putAll(new HashMap<String, Port>(instance));
 	}
 	
 	public Semantics<?> getAtom() {
 		return atom;
+	}
+	
+	public SourceCode getSourceCode() {
+		return source;
 	}
 	
 	public void rename(Map<String, String> renaming) {

@@ -138,7 +138,7 @@ public class Listener extends TreoBaseListener {
 	private ParseTreeProperty<ProgramExpression> progs = new ParseTreeProperty<ProgramExpression>();
 	
 	// Values	
-	private ParseTreeProperty<Value> values = new ParseTreeProperty<Value>();	
+	private ParseTreeProperty<Array> values = new ParseTreeProperty<Array>();	
 	private ParseTreeProperty<Expression> exprs = new ParseTreeProperty<Expression>();
 	private ParseTreeProperty<ExpressionList> lists = new ParseTreeProperty<ExpressionList>();
 	
@@ -236,8 +236,8 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitStmt_equation(Stmt_equationContext ctx) {
-		Value x = values.get(ctx.value(0));
-		Value y = values.get(ctx.value(1));
+		Array x = values.get(ctx.array(0));
+		Array y = values.get(ctx.array(1));
 		if (x instanceof Variable) {
 			progs.put(ctx, new ProgramEquation((Variable)x, y));
 		} else if (x instanceof Variable) {
@@ -287,11 +287,17 @@ public class Listener extends TreoBaseListener {
 	@Override
 	public void exitStmt_condition(Stmt_conditionContext ctx) {
 		List<BooleanExpression> guards = new ArrayList<BooleanExpression>();
+		List<ProgramExpression> branches = new ArrayList<ProgramExpression>();
 		for (BexprContext bexpr_ctx : ctx.bexpr())
 			guards.add(bexprs.get(bexpr_ctx));
-		List<ProgramExpression> branches = new ArrayList<ProgramExpression>();
 		for (BodyContext body_ctx : ctx.body())
 			branches.add(progs.get(body_ctx));
+		if (guards.size() == branches.size()) {
+			guards.add(new BooleanValue(true));
+			branches.add(new ProgramValue());
+		} else {
+			guards.add(new BooleanValue(true));
+		}
 		progs.put(ctx, new ProgramIfThenElse(guards, branches));
 	}
 		

@@ -18,13 +18,8 @@ public class ComponentVariable implements ComponentExpression {
 		if (var_p instanceof VariableName) {
 			VariableName name = (VariableName)var_p;
 			Expression e = params.get(name);
-			if (e == null || e instanceof ComponentExpression) {
-				if (e instanceof ComponentValue)
-					return (ComponentValue)e; // TODO copy constructor of component value
-			} else {
-				System.out.println("value of variable : " + e);
-				throw new Exception("Variable " + name.getName() + " is not of type component.");
-			}
+			if (e instanceof ComponentExpression)
+					return (ComponentExpression)e;
 		}
 		return new ComponentVariable(var_p);		
 	}

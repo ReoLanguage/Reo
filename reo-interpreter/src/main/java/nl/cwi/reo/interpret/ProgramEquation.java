@@ -7,9 +7,9 @@ public final class ProgramEquation implements ProgramExpression {
 
 	private final Variable var;
 	
-	private final Value val;
+	private final Array val;
 	
-	public ProgramEquation(Variable var, Value val) {
+	public ProgramEquation(Variable var, Array val) {
 		if (var == null || val == null)
 			throw new NullPointerException();
 		this.var = var;
@@ -22,7 +22,7 @@ public final class ProgramEquation implements ProgramExpression {
 		ProgramExpression prog = null;
 		
 		Variable var_p = var.evaluate(params);
-		Value val_p = val.evaluate(params);
+		Array val_p = val.evaluate(params);
 		
 		if (var_p instanceof VariableName) {
 			if (val_p instanceof Expression) {

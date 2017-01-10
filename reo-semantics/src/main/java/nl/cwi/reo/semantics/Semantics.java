@@ -7,7 +7,7 @@ import java.util.Set;
 public interface Semantics<T> {
 	
 	public Set<String> getInterface();
-	
+		
 	public T getNode(List<Port> node);
 	
 	public T compose(List<T> automata);

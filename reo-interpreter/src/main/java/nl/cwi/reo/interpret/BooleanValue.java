@@ -2,7 +2,6 @@ package nl.cwi.reo.interpret;
 
 import java.util.Map;
 
-
 public final class BooleanValue implements BooleanExpression {
 	
 	private final boolean bool;
