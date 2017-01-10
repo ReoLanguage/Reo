@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,15 +34,10 @@ public final class Interpreter<T extends Semantics<T>> {
 	 */
 	private final List<String> dirs;
 	
-	public Interpreter(T unit) {
+	public Interpreter(T unit, List<String> dirs) {
 		if (unit == null)
 			throw new NullPointerException();
 		this.unit = unit;
-		List<String> dirs = new ArrayList<String>();
-		dirs.add(".");
-		String comppath = System.getenv("COMPPATH");
-		if (comppath != null)
-			dirs.addAll(Arrays.asList(comppath.split(":")));
 		this.dirs = Collections.unmodifiableList(dirs);	
 	}
 
@@ -52,15 +46,13 @@ public final class Interpreter<T extends Semantics<T>> {
 	 * @param file		name of the file
 	 * @return list of work automata.
 	 */
-	public List<T> getProgram(String mainfile) {
+	public List<T> getProgram(List<String> files) {
 
 		// Construct a stack of all required program definitions.
-		Stack<ProgramFile> stack = findProgramFiles(mainfile);	
-//		System.out.println("\nProgram stack : \n" + stack);	
+		Stack<ProgramFile> stack = findProgramFiles(files);	
 		
 		// Evaluate this stack of program definitions.
 		ComponentValue comp = evaluateProgramStack(stack);
-		System.out.println("\nMain component : \n" + comp);
 		
 		// Check if the evaluated program expression is a component value.
 		if (!(comp instanceof ComponentValue)) 
@@ -121,11 +113,11 @@ public final class Interpreter<T extends Semantics<T>> {
 	 * @param mainfile		initial file, containing the main component.
 	 * @return stack of component definitions, whose bottom is the main component.
 	 */
-	private Stack<ProgramFile> findProgramFiles(String mainfile) {
+	private Stack<ProgramFile> findProgramFiles(List<String> srcfiles) {
 		Stack<ProgramFile> programs = new Stack<ProgramFile>();	
 		List<String> includedFiles = new ArrayList<String>();
 		Queue<String> files = new LinkedList<String>();
-		files.add(mainfile);		
+		files.addAll(srcfiles);		
 		while (!files.isEmpty()) {
 			String file = files.poll();
 			includedFiles.add(file);			
@@ -159,8 +151,11 @@ public final class Interpreter<T extends Semantics<T>> {
 			while (!stack.isEmpty()) {
 				ProgramFile program = stack.pop();
 				name = program.getVariableName();
+				System.out.println("Evaluating : " + program);
 				Expression cexpr = program.getComponent().evaluate(cexprs);
+				System.out.println("New component : " + name + " = " + cexpr + "\n");
 				cexprs.put(name, cexpr);
+				System.out.println("Components : " + cexprs.keySet());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

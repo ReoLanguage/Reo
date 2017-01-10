@@ -126,6 +126,6 @@ public final class ProgramValue implements ProgramExpression, ComponentExpressio
 	
 	@Override
 	public String toString() {
-		return definitions + " " + instances;
+		return "" + definitions + instances;
 	}
 }

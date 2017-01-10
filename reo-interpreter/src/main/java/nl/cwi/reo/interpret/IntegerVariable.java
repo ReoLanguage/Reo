@@ -31,14 +31,13 @@ public class IntegerVariable implements IntegerExpression {
 	 */
 	@Override
 	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		Variable x = var.evaluate(params);
-		if (x instanceof VariableName) {
-			VariableName n = (VariableName)x;
-			Expression e = params.get(n);
-			if (e instanceof IntegerExpression) 
-					return (IntegerExpression)e;
-		}
-		return new IntegerVariable(x);
+		Expression e = var.evaluate(params);
+		if (e instanceof IntegerExpression) {
+			return (IntegerExpression)e;
+		} else if (e instanceof Variable) {
+			return new IntegerVariable((Variable)e);
+		} 
+		return this;	
 	}
 	
 	@Override

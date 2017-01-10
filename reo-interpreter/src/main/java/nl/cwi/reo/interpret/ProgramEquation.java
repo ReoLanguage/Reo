@@ -20,8 +20,11 @@ public final class ProgramEquation implements ProgramExpression {
 	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
 		
 		ProgramExpression prog = null;
-		
-		Variable var_p = var.evaluate(params);
+
+		Expression e = var.evaluate(params);
+		if (!(e instanceof Variable))
+			e = var;
+		Variable var_p = (Variable)e;		
 		Array val_p = val.evaluate(params);
 		
 		if (var_p instanceof VariableName) {

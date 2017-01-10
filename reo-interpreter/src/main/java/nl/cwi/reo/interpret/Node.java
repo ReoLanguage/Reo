@@ -70,7 +70,10 @@ public final class Node implements Evaluable<Node> {
 
 	@Override
 	public Node evaluate(Map<VariableName, Expression> params) throws Exception {
-		return new Node(var.evaluate(params), type, tag);
+		Expression e = var.evaluate(params);
+		if (!(e instanceof Variable))
+			e = var;
+		return new Node((Variable)e, type, tag);
 	}
 	
 	@Override

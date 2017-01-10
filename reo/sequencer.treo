@@ -1,0 +1,8 @@
+section reo;
+
+sequencer = <k, fifo1(?,!), fifofull(?,!), syncdrain(?,?)>(a[1..k]) {
+	for i = 1..k {
+		if (i == 1) { fifofull(x[0],x[1]) } else { fifo1(x[i-1],x[i]) }
+		syncdrain(a[i],x[i])
+	}
+}

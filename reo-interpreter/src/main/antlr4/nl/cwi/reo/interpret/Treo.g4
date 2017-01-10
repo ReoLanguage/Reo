@@ -7,7 +7,7 @@ imps    : 'import' name ';';
 
 // Component expressions
 cexpr   : var                                                 # cexpr_variable
-        | sign '{' atom '}'                                   # cexpr_atomic
+        | sign '{' atom source? '}'                           # cexpr_atomic
         | sign body                                           # cexpr_composite ;
 
 // Bodies
@@ -65,6 +65,12 @@ iexpr   : NAT                                                 # iexpr_natural
         | MIN iexpr                                           # iexpr_unarymin
         | iexpr op=(MUL | DIV | MOD) iexpr                    # iexpr_multdivrem
         | iexpr op=(ADD | MIN) iexpr                          # iexpr_addsub ;
+
+// Sources
+source  : target ':' STRING ;
+target  : 'Java' ; 
+        //| 'C/C++' 
+        //| 'URL' ;
 
 // Semantics
 atom    : gpl                                                 # atom_sourcecode

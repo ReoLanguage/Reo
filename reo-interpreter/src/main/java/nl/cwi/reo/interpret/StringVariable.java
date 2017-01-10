@@ -26,14 +26,13 @@ public class StringVariable implements StringExpression {
 	 */
 	@Override
 	public StringExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		Variable x = var.evaluate(params);
-		if (x instanceof VariableName) {
-			VariableName n = (VariableName)x;
-			Expression e = params.get(n);
-			if (e instanceof StringExpression) 
-				return (StringExpression)e;
-		}
-		return new StringVariable(x);
+		Expression e = var.evaluate(params);
+		if (e instanceof StringExpression) {
+			return (StringExpression)e;
+		} else if (e instanceof Variable) {
+			return new StringVariable((Variable)e);
+		} 
+		return this;
 	}
 	
 	@Override

@@ -22,8 +22,12 @@ public final class Interface implements Evaluable<Interface> {
 	@Override
 	public Interface evaluate(Map<VariableName, Expression> params) throws Exception {
 		List<Variable> vars_p = new ArrayList<Variable>();
-		for (Variable x : vars) 
-			vars_p.add(x.evaluate(params));
+		for (Variable x : vars) {
+			Expression x_p = x.evaluate(params);
+			if (!(x_p instanceof Variable))
+				x_p = x;
+			vars_p.add((Variable)x_p);
+		}
 		return new Interface(vars_p);
 	}
 	

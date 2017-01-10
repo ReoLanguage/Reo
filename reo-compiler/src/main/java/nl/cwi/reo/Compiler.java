@@ -1,12 +1,16 @@
 package nl.cwi.reo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.automata.Automaton;
 import nl.cwi.reo.automata.Void;
@@ -20,40 +24,61 @@ import nl.cwi.reo.workautomata.WorkAutomaton;
  * A compiler for the coordination language Reo.
  */
 public class Compiler {
+		
+	/**
+	 * List of provided Reo source files.
+	 */
+	@Parameter(description = ".treo files")
+	private List<String> files = new ArrayList<String>();
 
 	/**
-	 * Entry for the Reo compiler.
-	 * @param args		command line parameters
+	 * List of of directories that contain all necessary Reo components
 	 */
-	public static void main(String[] args) {
-		if (args.length == 0) {
-			
-			//testAutomata();
-			
-			//testWorkAutomata();
-			
-			//testGameGraph();
+    @Parameter(names = {"-cp", "--compath"}, description = "comma-separated list of directories that contain all necessary Reo components")
+    private List<String> directories = new ArrayList<String>();
 
-			// Print a standard message if no arguments are given
-			System.out.println("Usage: java -jar reoc.jar <options> <reo source files>");
-			System.out.println("where possible options include:");
-			System.out.println("  -cp <dir>(;<dir>)*   colon separated list of directories");
-			System.out.println("  -q                   quiet");
-			System.out.println("  -v                   version information");
+	/**
+	 * List of of directories that contain all necessary Reo components
+	 */
+    @Parameter(names = {"-h", "--help"}, description = "shows all available options", help = true)
+    private boolean help;
 
+	public static void main(String[] args) {	
+		
+		// Parse the command line parameters using JCommand
+		Compiler compiler = new Compiler();
+		JCommander jc = new JCommander(compiler, args);
+		jc.setProgramName("reoc"); 
+		
+		// If no arguments are given, print a standard message. Otherwise, run the compiler.
+		if (compiler.files.size() == 0) {
+			jc.usage();
 		} else {
-
-			Interpreter<WorkAutomaton> interpreter = new Interpreter<WorkAutomaton>(new WorkAutomaton());
-			
-			List<WorkAutomaton> program = interpreter.getProgram(args[0]);
-			
-			System.out.println(program);
-
-//			// Generate the classes.
-//			JavaCompiler JC = new JavaCompiler(name, "");
-//			JC.compile(program);
+	        compiler.run();			
 		}
 	}
+	
+    public void run() {
+
+    	// Construct the compath, which is a list of directories containing all required Reo components.
+		directories.add(".");
+		String comppath = System.getenv("COMPATH");
+		if (comppath != null)
+			directories.addAll(Arrays.asList(comppath.split(":")));
+
+		Interpreter<WorkAutomaton> interpreter = new Interpreter<WorkAutomaton>(new WorkAutomaton(), directories);
+		
+		List<WorkAutomaton> program = interpreter.getProgram(files);
+		
+		int i = 1;
+		for (WorkAutomaton X : program) 
+			System.out.println(String.format("%-10s", "#" + i++) + " : " + X);	
+		
+//		// Generate the classes.
+//		JavaCompiler JC = new JavaCompiler(name, "");
+//		JC.compile(program);
+	}
+	
 	
 //	/**
 //	 * Just a function to test my WorkAutomata implementation

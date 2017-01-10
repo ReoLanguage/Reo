@@ -37,7 +37,10 @@ public final class Parameter implements Evaluable<Parameter> {
 
 	@Override
 	public Parameter evaluate(Map<VariableName, Expression> params) throws Exception {
-		return new Parameter(var.evaluate(params), type);
+		Expression e = var.evaluate(params);
+		if (!(e instanceof Variable))
+			e = var;
+		return new Parameter((Variable)e, type);
 	}
 	
 	@Override

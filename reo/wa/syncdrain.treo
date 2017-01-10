@@ -1,0 +1,7 @@
+section reo.wa;
+
+syncdrain(a?, b?) {
+	#WA 
+	q0* -> q0 	: {a, b}, true, {}	
+}
+

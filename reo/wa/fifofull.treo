@@ -2,6 +2,6 @@ section reo.wa;
 
 fifofull = (a?,b!) {
 	#WA 
-	q0 -> q1 	: {a}, true 
-	q1* -> q0 	: {b}, true 	
+	q0 -> q1 	: {a}, true, {}
+	q1* -> q0 	: {b}, true, {} 	
 }

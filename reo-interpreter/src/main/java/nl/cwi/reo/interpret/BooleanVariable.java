@@ -27,14 +27,13 @@ public class BooleanVariable implements BooleanExpression {
 	 */
 	@Override
 	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		Variable x = var.evaluate(params);
-		if (x instanceof VariableName) {
-			VariableName n = (VariableName)x;
-			Expression e = params.get(n);
-			if (e instanceof BooleanExpression) 
-				return (BooleanExpression)e;
-		}
-		return new BooleanVariable(x);
+		Expression e = var.evaluate(params);
+		if (e instanceof BooleanExpression) {
+			return (BooleanExpression)e;
+		} else if (e instanceof Variable) {
+			return new BooleanVariable((Variable)e);
+		} 
+		return this;
 	}
 	
 	@Override

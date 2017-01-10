@@ -14,14 +14,13 @@ public class ComponentVariable implements ComponentExpression {
 	
 	@Override
 	public ComponentExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		Variable var_p = var.evaluate(params);
-		if (var_p instanceof VariableName) {
-			VariableName name = (VariableName)var_p;
-			Expression e = params.get(name);
-			if (e instanceof ComponentExpression)
-					return (ComponentExpression)e;
-		}
-		return new ComponentVariable(var_p);		
+		Expression e = var.evaluate(params);
+		if (e instanceof ComponentExpression) {
+			return (ComponentExpression)e;
+		} else if (e instanceof Variable) {
+			return new ComponentVariable((Variable)e);
+		} 
+		return this;	
 	}
 	
 	@Override

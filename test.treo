@@ -1,8 +1,14 @@
+import reo.sequencer;
 import reo.wa.fifo1;
+import reo.wa.fifofull;
+import reo.wa.syncdrain;
+//import reo.wa.sequencer;
 
 test() {
 
-	if (true) { fifo1(a,b) }
+sequencer = <k>(a[1..k]) { reo.sequencer<k, fifo1, fifofull, syncdrain>(a[1..k]) }
+
+	//sequencer<2>(a,b)
 
 
   //fifo2 = (a?,b!) { fifo1(a,x) fifo1(x,b) }
