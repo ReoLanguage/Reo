@@ -17,6 +17,7 @@ import java.util.HashMap;
 
 import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.SemanticsType;
 
 /**
  * A work automaton.
@@ -395,5 +396,10 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	@Override
 	public WorkAutomaton restrict(Set<String> intface) {
 		return null;
+	}
+
+	@Override
+	public SemanticsType getType() {
+		return SemanticsType.WA;
 	}
 }

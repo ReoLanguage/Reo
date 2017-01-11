@@ -26,7 +26,7 @@ public final class ProgramInstance implements ProgramExpression {
 		Interface iface_p = iface.evaluate(params); 
 		if (cexpr_p instanceof ComponentValue) {
 			ProgramExpression prog = ((ComponentValue)cexpr_p).instantiate(plist_p, iface_p);
-//			System.out.println("Component " + String.format("%1$15s", cexpr) + String.format("%1$25s", " evaluated in " + plist_p + iface_p) + " gives " + prog);
+			System.out.println("Component " + String.format("%1$15s", cexpr) + String.format("%1$25s", " evaluated in " + plist_p + iface_p) + " gives " + prog);
 			return prog; 
 		}
 		return new ProgramInstance(cexpr_p, plist_p, iface_p);

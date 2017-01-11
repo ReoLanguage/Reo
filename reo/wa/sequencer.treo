@@ -1,8 +1,0 @@
-section reo.wa;
-
-import reo.sequencer;
-import reo.wa.fifo1;
-import reo.wa.fifofull;
-import reo.wa.syncdrain;
-
-sequencer = <k>(a[1..k]) { reo.sequencer<k, fifo1, fifofull, syncdrain>(a[1..k]) }

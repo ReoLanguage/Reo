@@ -1,14 +1,12 @@
-import reo.sequencer;
-import reo.wa.fifo1;
-import reo.wa.fifofull;
-import reo.wa.syncdrain;
-//import reo.wa.sequencer;
+//import reo.testseq;
+import reo.fifo1;
+//import reo.fifofull;
+//import reo.syncdrain;
 
 test() {
-
-sequencer = <k>(a[1..k]) { reo.sequencer<k, fifo1, fifofull, syncdrain>(a[1..k]) }
-
-	//sequencer<2>(a,b)
+	
+	x=<k>(){for i = 1..2 { fifo1(a,b[i]) }
+	//reo.testseq<2, fifo1, fifofull, syncdrain>(a,b)
 
 
   //fifo2 = (a?,b!) { fifo1(a,x) fifo1(x,b) }

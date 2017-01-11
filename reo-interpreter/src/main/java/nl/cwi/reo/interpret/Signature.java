@@ -68,6 +68,8 @@ public final class Signature implements ParameterType {
 			links.put(src, snk);
 		}
 		
+		System.out.println("Instantiation " + definitions + links);
+		
 		return new SignatureInstance(definitions, links);
 	}
 

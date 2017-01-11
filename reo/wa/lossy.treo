@@ -1,4 +1,4 @@
-section reo.wa;
+section reo;
 
 lossy(a?, b) {
 	#WA 

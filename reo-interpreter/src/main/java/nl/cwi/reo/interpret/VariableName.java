@@ -27,7 +27,7 @@ public final class VariableName implements Variable {
 
 	@Override
 	public Expression evaluate(Map<VariableName, Expression> params) throws Exception {
-		Expression e = params.get(name);
+		Expression e = params.get(this);
 		if (e instanceof Expression) 
 			return (Expression)e;
 		return this;

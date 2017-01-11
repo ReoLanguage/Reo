@@ -39,8 +39,8 @@ public final class ProgramFile implements ProgramExpression {
 		return imports;
 	}
 	
-	public VariableName getVariableName() {
-		return new VariableName(section.equals("") ? name : section + "." + name); 
+	public String getName() {
+		return section.equals("") ? name : section + "." + name; 
 	}
 	
 	public ComponentExpression getComponent() {
@@ -50,7 +50,7 @@ public final class ProgramFile implements ProgramExpression {
 	@Override
 	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
 		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();
-		definitions.put(getVariableName(), cexpr.evaluate(params));
+		definitions.put(new VariableName(getName()), cexpr.evaluate(params));
 		return new ProgramValue(new Definitions(definitions), new InstanceList());
 	}
 	
@@ -59,6 +59,6 @@ public final class ProgramFile implements ProgramExpression {
 		String imps = "";
 		for (String comp : imports)
 			imps += "import " + comp + ";";
-		return "section " + section + ";" + imps + getVariableName().getName() + "=" + cexpr;
+		return "section " + section + ";" + imps + getName() + "=" + cexpr;
 	}
 }

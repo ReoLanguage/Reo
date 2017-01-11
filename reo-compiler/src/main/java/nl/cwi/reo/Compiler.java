@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
@@ -18,6 +17,7 @@ import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.graphgames.GameGraph;
 import nl.cwi.reo.interpret.Interpreter;
+import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.workautomata.WorkAutomaton;
 
 /**
@@ -66,9 +66,9 @@ public class Compiler {
 		if (comppath != null)
 			directories.addAll(Arrays.asList(comppath.split(":")));
 
-		Interpreter<WorkAutomaton> interpreter = new Interpreter<WorkAutomaton>(new WorkAutomaton(), directories);
+		Interpreter<WorkAutomaton> interpreter = new Interpreter<WorkAutomaton>(directories, SemanticsType.WA);
 		
-		List<WorkAutomaton> program = interpreter.getProgram(files);
+		List<WorkAutomaton> program = interpreter.interpret(files);
 		
 		int i = 1;
 		for (WorkAutomaton X : program) 

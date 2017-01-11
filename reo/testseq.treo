@@ -1,10 +1,6 @@
 section reo;
 
-import reo.fifo1;
-import reo.fifofull;
-import reo.syncdrain;
-
-sequencer = <k>(a[1..k]) {
+testseq = <k, fifo1(?,!), fifofull(?,!), syncdrain(?,?)>(a[1..k]) {
 	for i = 1..k {
 		if (i == 1) { fifofull(x[0],x[1]) } else { fifo1(x[i-1],x[i]) }
 		syncdrain(a[i],x[i])

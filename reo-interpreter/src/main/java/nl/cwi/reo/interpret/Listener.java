@@ -548,7 +548,7 @@ public class Listener extends TreoBaseListener {
 		if (var == null) var = new VariableName();
 		TypeTag tag = typetags.get(ctx.type());
 		if (tag == null) tag = new TypeTag();
-		NodeType type = NodeType.FREE;
+		NodeType type = NodeType.MIXED;
 		if (ctx.io != null) {
 			switch (ctx.io.getType()) {
 			case TreoParser.IN:

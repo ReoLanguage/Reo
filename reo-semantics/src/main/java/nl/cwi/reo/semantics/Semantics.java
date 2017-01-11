@@ -7,6 +7,8 @@ import java.util.Set;
 public interface Semantics<T> {
 	
 	public Set<String> getInterface();
+	
+	public SemanticsType getType();
 		
 	public T getNode(List<Port> node);
 	
