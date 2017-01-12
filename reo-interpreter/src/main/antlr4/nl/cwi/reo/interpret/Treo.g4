@@ -18,15 +18,15 @@ stmt    : array '=' array                                     # stmt_equation
         | 'for' ID '=' iexpr '..' iexpr body                  # stmt_iteration
         | 'if' bexpr body (('else' bexpr body)* 'else' body)? # stmt_condition ;
 
-// Arrays of expressions
-array   : expr                                                # value_expr 
-        | list                                                # value_list ;
-expr    : var                                                 # expr_variable
-        | STRING                                              # expr_string
+// Arrays
+array   : var                                                 # array_variable
+        | expr                                                # array_expr 
+        | list                                                # array_list ;
+list    : '<' '>' | '<' array (',' array)* '>' ;
+expr    : STRING                                              # expr_string
         | bexpr                                               # expr_boolean
         | iexpr                                               # expr_integer
         | cexpr                                               # expr_component ;
-list    : '<' '>' | '<' expr (',' expr)* '>' ;
 
 // Boolean expressions
 bexpr   : BOOL                                                # bexpr_boolean

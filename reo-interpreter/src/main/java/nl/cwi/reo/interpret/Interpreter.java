@@ -23,6 +23,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.components.ComponentValue;
+import nl.cwi.reo.interpret.programs.ProgramFile;
+import nl.cwi.reo.interpret.semantics.Instance;
+import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
@@ -71,7 +76,7 @@ public final class Interpreter<T extends Semantics<T>> {
 					parsed.add(program.getName());
 					components.addAll(program.getImports());
 				} else {
-					System.out.println("ERROR: file " + file + " could not be parsed.");
+					System.out.println("[error] File " + file + " could not be parsed.");
 				}
 			}		
 			
@@ -86,7 +91,7 @@ public final class Interpreter<T extends Semantics<T>> {
 						newComponents.removeAll(parsed);
 						components.addAll(newComponents);
 					} else {
-						System.out.println("ERROR: Component " + comp + " cannot be found.");
+						System.out.println("[error] Component " + comp + " cannot be found.");
 					}
 
 				}
@@ -103,7 +108,7 @@ public final class Interpreter<T extends Semantics<T>> {
 				ProgramFile program = stack.pop();
 				name = new VariableName(program.getName());
 				Expression cexpr = program.getComponent().evaluate(cexprs);
-				System.out.println("Component : " + name + " = " + cexpr + "\n");
+				System.out.println("[info] Found component " + name + " = " + cexpr);
 				cexprs.put(name, cexpr);
 			}
 		} catch (Exception e) {
@@ -145,7 +150,7 @@ public final class Interpreter<T extends Semantics<T>> {
 					}
 					
 					// Rename the port by adding a suffix.
-					Port portWithSuffix = p.rename(p.getName() + (A.isEmpty() ? "": A.size()));
+					Port portWithSuffix = p.rename(p.getName() + "." + A.size());
 					
 					// Add the renamed port to this node.
 					A.add(portWithSuffix);

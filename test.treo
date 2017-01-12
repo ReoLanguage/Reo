@@ -1,12 +1,13 @@
-//import reo.testseq;
+import reo.testseq;
 import reo.fifo1;
-//import reo.fifofull;
-//import reo.syncdrain;
+import reo.fifofull;
+import reo.syncdrain;
 
 test() {
 	
-	x=<k>(){for i = 1..2 { fifo1(a,b[i]) }
-	//reo.testseq<2, fifo1, fifofull, syncdrain>(a,b)
+	x=<k>(){for i = 1..k { fifo1(a,b[i]) } }
+	x<2>
+	//reo.testseq<2, reo.fifo1, reo.fifofull, reo.syncdrain>(a,b)
 
 
   //fifo2 = (a?,b!) { fifo1(a,x) fifo1(x,b) }

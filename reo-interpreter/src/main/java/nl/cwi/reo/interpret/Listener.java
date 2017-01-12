@@ -10,6 +10,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import nl.cwi.reo.errors.ErrorLog;
+import nl.cwi.reo.interpret.TreoParser.ArrayContext;
+import nl.cwi.reo.interpret.TreoParser.Array_exprContext;
+import nl.cwi.reo.interpret.TreoParser.Array_listContext;
+import nl.cwi.reo.interpret.TreoParser.Array_variableContext;
 import nl.cwi.reo.interpret.TreoParser.Atom_constraintautomataContext;
 import nl.cwi.reo.interpret.TreoParser.Atom_portautomataContext;
 import nl.cwi.reo.interpret.TreoParser.Atom_seepageautomataContext;
@@ -46,8 +50,6 @@ import nl.cwi.reo.interpret.TreoParser.Cam_trContext;
 import nl.cwi.reo.interpret.TreoParser.Cexpr_atomicContext;
 import nl.cwi.reo.interpret.TreoParser.Cexpr_compositeContext;
 import nl.cwi.reo.interpret.TreoParser.Cexpr_variableContext;
-import nl.cwi.reo.interpret.TreoParser.ExprContext;
-import nl.cwi.reo.interpret.TreoParser.Expr_variableContext;
 import nl.cwi.reo.interpret.TreoParser.Expr_stringContext;
 import nl.cwi.reo.interpret.TreoParser.Expr_booleanContext;
 import nl.cwi.reo.interpret.TreoParser.Expr_integerContext;
@@ -92,8 +94,6 @@ import nl.cwi.reo.interpret.TreoParser.Stmt_compdefnContext;
 import nl.cwi.reo.interpret.TreoParser.Stmt_iterationContext;
 import nl.cwi.reo.interpret.TreoParser.TypeContext;
 import nl.cwi.reo.interpret.TreoParser.SecnContext;
-import nl.cwi.reo.interpret.TreoParser.Value_exprContext;
-import nl.cwi.reo.interpret.TreoParser.Value_listContext;
 import nl.cwi.reo.interpret.TreoParser.VarContext;
 import nl.cwi.reo.interpret.TreoParser.WaContext;
 import nl.cwi.reo.interpret.TreoParser.Wa_exprContext;
@@ -106,6 +106,57 @@ import nl.cwi.reo.interpret.TreoParser.Wa_jc_geqContext;
 import nl.cwi.reo.interpret.TreoParser.Wa_jc_leqContext;
 import nl.cwi.reo.interpret.TreoParser.Wa_jc_orContext;
 import nl.cwi.reo.interpret.TreoParser.Wa_transitionContext;
+import nl.cwi.reo.interpret.arrays.Array;
+import nl.cwi.reo.interpret.arrays.ArrayRange;
+import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.booleans.BooleanConjunction;
+import nl.cwi.reo.interpret.booleans.BooleanDisequality;
+import nl.cwi.reo.interpret.booleans.BooleanDisjunction;
+import nl.cwi.reo.interpret.booleans.BooleanEquality;
+import nl.cwi.reo.interpret.booleans.BooleanExpression;
+import nl.cwi.reo.interpret.booleans.BooleanGreaterOrEqual;
+import nl.cwi.reo.interpret.booleans.BooleanGreaterThan;
+import nl.cwi.reo.interpret.booleans.BooleanLessOrEqual;
+import nl.cwi.reo.interpret.booleans.BooleanLessThan;
+import nl.cwi.reo.interpret.booleans.BooleanValue;
+import nl.cwi.reo.interpret.booleans.BooleanVariable;
+import nl.cwi.reo.interpret.components.ComponentComposite;
+import nl.cwi.reo.interpret.components.ComponentExpression;
+import nl.cwi.reo.interpret.components.ComponentValue;
+import nl.cwi.reo.interpret.components.ComponentVariable;
+import nl.cwi.reo.interpret.integers.IntegerAddition;
+import nl.cwi.reo.interpret.integers.IntegerDivision;
+import nl.cwi.reo.interpret.integers.IntegerExponentiation;
+import nl.cwi.reo.interpret.integers.IntegerExpression;
+import nl.cwi.reo.interpret.integers.IntegerMultiplication;
+import nl.cwi.reo.interpret.integers.IntegerRemainder;
+import nl.cwi.reo.interpret.integers.IntegerSubstraction;
+import nl.cwi.reo.interpret.integers.IntegerUnaryMinus;
+import nl.cwi.reo.interpret.integers.IntegerValue;
+import nl.cwi.reo.interpret.integers.IntegerVariable;
+import nl.cwi.reo.interpret.programs.ProgramBody;
+import nl.cwi.reo.interpret.programs.ProgramEquation;
+import nl.cwi.reo.interpret.programs.ProgramExpression;
+import nl.cwi.reo.interpret.programs.ProgramFile;
+import nl.cwi.reo.interpret.programs.ProgramForLoop;
+import nl.cwi.reo.interpret.programs.ProgramIfThenElse;
+import nl.cwi.reo.interpret.programs.ProgramInstance;
+import nl.cwi.reo.interpret.programs.ProgramValue;
+import nl.cwi.reo.interpret.semantics.Definitions;
+import nl.cwi.reo.interpret.semantics.InstanceList;
+import nl.cwi.reo.interpret.signatures.Interface;
+import nl.cwi.reo.interpret.signatures.Node;
+import nl.cwi.reo.interpret.signatures.NodeList;
+import nl.cwi.reo.interpret.signatures.NodeType;
+import nl.cwi.reo.interpret.signatures.Parameter;
+import nl.cwi.reo.interpret.signatures.ParameterList;
+import nl.cwi.reo.interpret.signatures.ParameterType;
+import nl.cwi.reo.interpret.signatures.SignatureExpression;
+import nl.cwi.reo.interpret.signatures.TypeTag;
+import nl.cwi.reo.interpret.strings.StringValue;
+import nl.cwi.reo.interpret.variables.Variable;
+import nl.cwi.reo.interpret.variables.VariableName;
+import nl.cwi.reo.interpret.variables.VariableRange;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.workautomata.JobConstraint;
 import nl.cwi.reo.workautomata.Transition;
@@ -138,15 +189,15 @@ public class Listener extends TreoBaseListener {
 	private ParseTreeProperty<ProgramExpression> progs = new ParseTreeProperty<ProgramExpression>();
 	
 	// Values	
-	private ParseTreeProperty<Array> values = new ParseTreeProperty<Array>();	
+	private ParseTreeProperty<Array> arrays = new ParseTreeProperty<Array>();	
 	private ParseTreeProperty<Expression> exprs = new ParseTreeProperty<Expression>();
-	private ParseTreeProperty<ExpressionList> lists = new ParseTreeProperty<ExpressionList>();
+	private ParseTreeProperty<ArrayRange> lists = new ParseTreeProperty<ArrayRange>();
 	
 	// Boolean expressions
 	private ParseTreeProperty<BooleanExpression> bexprs = new ParseTreeProperty<BooleanExpression>();
 	
 	// Signatures
-	private ParseTreeProperty<Signature> signatures = new ParseTreeProperty<Signature>();
+	private ParseTreeProperty<SignatureExpression> signatureExpressions = new ParseTreeProperty<SignatureExpression>();
 	private ParseTreeProperty<ParameterList> parameterlists = new ParseTreeProperty<ParameterList>();
 	private ParseTreeProperty<Parameter> parameters = new ParseTreeProperty<Parameter>();
 	private ParseTreeProperty<ParameterType> parametertypes = new ParseTreeProperty<ParameterType>();
@@ -236,8 +287,8 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitStmt_equation(Stmt_equationContext ctx) {
-		Array x = values.get(ctx.array(0));
-		Array y = values.get(ctx.array(1));
+		Array x = arrays.get(ctx.array(0));
+		Array y = arrays.get(ctx.array(1));
 		if (x instanceof Variable) {
 			progs.put(ctx, new ProgramEquation((Variable)x, y));
 		} else if (x instanceof Variable) {
@@ -263,8 +314,8 @@ public class Listener extends TreoBaseListener {
 	@Override
 	public void exitStmt_instance(Stmt_instanceContext ctx) {	
 		ComponentExpression cexpr = cexprs.get(ctx.cexpr());
-		ExpressionList list = lists.get(ctx.list());
-		if (list == null) list = new ExpressionList();
+		ArrayRange list = lists.get(ctx.list());
+		if (list == null) list = new ArrayRange();
 		Interface iface = ifaces.get(ctx.iface());
 		progs.put(ctx, new ProgramInstance(cexpr, list, iface));
 	}
@@ -304,20 +355,20 @@ public class Listener extends TreoBaseListener {
 	/**
 	 * Values	
 	 */
-	
-	@Override
-	public void exitValue_expr(Value_exprContext ctx) {
-		values.put(ctx, exprs.get(ctx.expr()));
-	}
-	
-	@Override
-	public void exitValue_list(Value_listContext ctx) {
-		values.put(ctx, lists.get(ctx.list()));
-	}
 
 	@Override
-	public void exitExpr_variable(Expr_variableContext ctx) {
-		exprs.put(ctx, variables.get(ctx.var()));
+	public void exitArray_variable(Array_variableContext ctx) {
+		arrays.put(ctx, variables.get(ctx.var()));
+	}
+	
+	@Override
+	public void exitArray_expr(Array_exprContext ctx) {
+		arrays.put(ctx, exprs.get(ctx.expr()));
+	}
+	
+	@Override
+	public void exitArray_list(Array_listContext ctx) {
+		arrays.put(ctx, lists.get(ctx.list()));
 	}
 
 	@Override
@@ -342,10 +393,10 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitList(ListContext ctx) {
-		List<Expression> list = new ArrayList<Expression>();
-		for (ExprContext expr_ctx : ctx.expr())
-			list.add(exprs.get(expr_ctx));
-		lists.put(ctx, new ExpressionList(list));
+		List<Array> list = new ArrayList<Array>();
+		for (ArrayContext expr_ctx : ctx.array())
+			list.add(arrays.get(expr_ctx));
+		lists.put(ctx, new ArrayRange(list));
 	}
 
 	/**
@@ -358,14 +409,6 @@ public class Listener extends TreoBaseListener {
 	@Override
 	public void exitCexpr_variable(Cexpr_variableContext ctx) {
 		Variable var = variables.get(ctx.var());
-		if (var instanceof VariableName) {
-			for (String imprt : imports) {
-				if (imprt.endsWith(((VariableName)var).getName())) {
-					var = new VariableName(imprt);
-					break;
-				}
-			}
-		}
 		cexprs.put(ctx, new ComponentVariable(var));
 	}
 
@@ -376,7 +419,7 @@ public class Listener extends TreoBaseListener {
 	public void exitCexpr_atomic(Cexpr_atomicContext ctx) {
 		
 		ProgramValue prog = new ProgramValue(new Definitions(), new InstanceList(atoms.get(ctx.atom())));
-		cexprs.put(ctx, new ComponentValue(signatures.get(ctx.sign()), prog));
+		cexprs.put(ctx, new ComponentValue(signatureExpressions.get(ctx.sign()), prog));
 	}
 
 	@Override
@@ -384,7 +427,7 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitCexpr_composite(Cexpr_compositeContext ctx) {
-		cexprs.put(ctx, new ComponentComposite(signatures.get(ctx.sign()), progs.get(ctx.body())));		
+		cexprs.put(ctx, new ComponentComposite(signatureExpressions.get(ctx.sign()), progs.get(ctx.body())));		
 	}
 	
 	/**
@@ -485,7 +528,7 @@ public class Listener extends TreoBaseListener {
 		ParameterList params = parameterlists.get(ctx.params());
 		if (params == null) params = new ParameterList();
 		NodeList nodes = nodelists.get(ctx.nodes());
-		signatures.put(ctx, new Signature(params, nodes));
+		signatureExpressions.put(ctx, new SignatureExpression(params, nodes));
 	}
 	
 	@Override
@@ -525,7 +568,7 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitPtype_signature(Ptype_signatureContext ctx) {
-		parametertypes.put(ctx, signatures.get(ctx.sign()));
+		parametertypes.put(ctx, signatureExpressions.get(ctx.sign()));
 	}
 	
 	@Override
@@ -600,7 +643,13 @@ public class Listener extends TreoBaseListener {
 
 	@Override
 	public void exitVar(VarContext ctx) {		
-		String name = ctx.name().getText();			
+		String name = ctx.name().getText();	
+		for (String imprt : imports) {
+			if (imprt.endsWith(name)) {
+				name = imprt;
+				break;
+			}
+		}		
 		List<List<IntegerExpression>> indices = new ArrayList<List<IntegerExpression>>();		
 		for (IndicesContext indices_ctx : ctx.indices())
 			indices.add(bounds.get(indices_ctx));

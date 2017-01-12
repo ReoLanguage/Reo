@@ -2,6 +2,9 @@ package nl.cwi.reo.interpret;
 
 import java.util.Map;
 
+import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.variables.VariableName;
+
 /**
  * A Treo expression that unifies strings, boolean expressions, integer expressions, 
  * component expressions, and lists of expressions.

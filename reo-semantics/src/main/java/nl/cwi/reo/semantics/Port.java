@@ -2,7 +2,7 @@ package nl.cwi.reo.semantics;
 
 import java.util.Objects;
 
-public final class Port {
+public class Port {
 
 	private final String name;
 
@@ -29,6 +29,21 @@ public final class Port {
 		this.tag = tag;
 		this.hidden = hidden;
 	}
+	
+	/**
+	 * Updates this port by inheriting, if necessary, the type, tag and visibility of port y.
+	 * @param x		port
+	 * @param y		port
+	 * @returns a copy of port x, with possibly its type, tag and visibility inherited from port y.
+	 */
+	public Port update(Port y) {
+		if (y == null)
+			throw new NullPointerException();
+		PortType _type = type == PortType.UNKNOWN ? y.type : type;
+		String _tag = tag.equals("") ? y.tag : tag;
+		boolean _hidden = hidden || y.hidden;
+		return new Port(name, _type, _tag, _hidden);
+	}
 
 	public String getName() {
 		return name;
@@ -41,21 +56,17 @@ public final class Port {
 	public String getTypeTag() {
 		return tag;
 	}
-	
+
 	public boolean isHidden() {
 		return hidden;
 	}
 	
+	public Port rename(String name) {
+		return new Port(name, type, tag, hidden);		
+	}
+	
 	public Port hide() {
 		return new Port(name, type, tag, true);
-	}
-	
-	public Port rename(String name) {
-		return new Port(name, type, tag, hidden);
-	}
-	
-	public Port retype(PortType type) {
-		return new Port(name, type, tag, hidden);
 	}
 	
 	@Override
@@ -76,11 +87,11 @@ public final class Port {
 	public String toString() {
 		switch (type) {
 		case IN: 
-			return (hidden ? "*": "") + name + "?" + tag;
+			return name + "?" + tag;
 		case OUT: 
-			return (hidden ? "*": "") + name + "!" + tag;
+			return name + "!" + tag;
 		default: 
-			return (hidden ? "*": "") + name + ":" + tag;
+			return name + ":" + tag;
 		}
 	}
 	
