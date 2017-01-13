@@ -4,19 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.Evaluable;
-import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class Instance extends HashMap<String, Port> implements Evaluable<Instance> {
+
+public final class Instance<T extends Semantics<T>> extends HashMap<String, Port> implements Evaluable<Instance<T>> {
 	
 	/**
 	 * Serial version ID.
 	 */
 	private static final long serialVersionUID = 6594525018732378080L;
 	
-	private final Semantics<?> atom;
+	private final T atom;
 	
 	private final SourceCode source;
 	
@@ -24,14 +25,14 @@ public final class Instance extends HashMap<String, Port> implements Evaluable<I
 	 * Constructs a new instance from an atom.
 	 * @param atom		semantics object
 	 */
-	public Instance(Semantics<?> atom) {
+	public Instance(T atom) {
 		this.atom = atom;
 		this.source = new SourceCode();
 		for (String a : atom.getInterface()) 
 			super.put(a, new Port(a));
 	}
 	
-	public Instance(Semantics<?> atom, Map<String, Port> links, SourceCode source) {
+	public Instance(T atom, Map<String, Port> links, SourceCode source) {
 		this.atom = atom;
 		this.source = source;
 		super.putAll(links);
@@ -41,7 +42,7 @@ public final class Instance extends HashMap<String, Port> implements Evaluable<I
 	 * Copy constructor.
 	 * @param instance
 	 */
-	public Instance(Instance instance) {
+	public Instance(Instance<T> instance) {
 		if (instance == null)
 			throw new NullPointerException();
 		this.atom = instance.atom;
@@ -49,7 +50,7 @@ public final class Instance extends HashMap<String, Port> implements Evaluable<I
 		super.putAll(new HashMap<String, Port>(instance));
 	}
 	
-	public Semantics<?> getAtom() {
+	public T getAtom() {
 		return atom;
 	}
 	
@@ -61,17 +62,17 @@ public final class Instance extends HashMap<String, Port> implements Evaluable<I
 	 * Renames the external ports, and hides all internal ports
 	 * @param links		maps external ports to new ports.
 	 */
-	public void join(Map<Port, Port> links) {
+	public void joinAndHide(Map<Port, Port> links) {
 		for (Map.Entry<String, Port> link : this.entrySet()) {
 			Port x = link.getValue();
 			Port y = links.get(x);
 			if (y == null) y = x.hide();
-			link.setValue(y.update(x));
+			link.setValue(y.join(x));
 		}
 	}
 
 	@Override
-	public Instance evaluate(Map<VariableName, Expression> params)
+	public Instance<T> evaluate(Map<VariableName, Expression> params)
 			throws Exception {
 		return this;
 	}

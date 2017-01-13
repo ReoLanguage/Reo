@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import nl.cwi.reo.semantics.Port;
+
 /**
  * A work automaton transition that is used in a {@link nl.cwi.reo.workautomata.WorkAutomaton}.
  */
@@ -92,11 +94,11 @@ public final class Transition implements Comparable<Transition> {
 	 * @param r		renaming map
 	 * @return new transition with renamed synchronization constraint.
 	 */
-	public Transition rename(Map<String, String> r) {
+	public Transition rename(Map<String, Port> r) {
 		SortedSet<String> rN = new TreeSet<String>();
 		for (String port : this.N) {
 			String newport;
-			if ((newport = r.get(port)) == null)
+			if ((newport = r.get(port).getName()) == null)
 				newport = port;
 			rN.add(newport);
 		}

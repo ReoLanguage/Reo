@@ -4,12 +4,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.ranges.Range;
 
 /**
  * An immutable list of variable names.
  */
-public final class VariableNameList implements Variable {
+public final class VariableNameList implements Variable, Range {
 	
 	private final List<VariableName> list;
 	

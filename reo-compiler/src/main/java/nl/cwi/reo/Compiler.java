@@ -1,5 +1,6 @@
 package nl.cwi.reo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.graphgames.GameGraph;
 import nl.cwi.reo.interpret.Interpreter;
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.interpret.InterpreterWA;
 import nl.cwi.reo.workautomata.WorkAutomaton;
 
 /**
@@ -64,15 +65,20 @@ public class Compiler {
 		directories.add(".");
 		String comppath = System.getenv("COMPATH");
 		if (comppath != null)
-			directories.addAll(Arrays.asList(comppath.split(":")));
+			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));
 
-		Interpreter<WorkAutomaton> interpreter = new Interpreter<WorkAutomaton>(directories, SemanticsType.WA);
+		Interpreter<WorkAutomaton> interpreter = new InterpreterWA(directories);
 		
 		List<WorkAutomaton> program = interpreter.interpret(files);
 		
 		int i = 1;
 		for (WorkAutomaton X : program) 
-			System.out.println(String.format("%-10s", "#" + i++) + " : " + X);	
+			System.out.println(String.format("%-10s", "#" + i++) + " : " + X);
+		
+		WorkAutomaton X = new WorkAutomaton();
+		X.compose(program);
+		
+		System.out.println("Product automaton : \n" + X);
 		
 //		// Generate the classes.
 //		JavaCompiler JC = new JavaCompiler(name, "");

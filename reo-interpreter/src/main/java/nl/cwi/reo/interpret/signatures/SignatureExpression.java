@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Expression;
-import nl.cwi.reo.interpret.arrays.ExpressionRange;
+import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.Definitions;
-import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
+import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.interpret.variables.VariableRange;
 import nl.cwi.reo.semantics.Port;
 
@@ -33,7 +33,7 @@ public final class SignatureExpression implements ParameterType {
 		this.nodes = nodes;
 	}
 	
-	public Signature evaluate(ExpressionRange values, Interface iface) throws Exception {
+	public Signature evaluate(ExpressionList values, VariableNameList iface) throws Exception {
 		
 		Definitions definitions = new Definitions();		
 
@@ -75,7 +75,7 @@ public final class SignatureExpression implements ParameterType {
 				throw new Exception("Parameter " + node.getVariable() + " is not a valid parameter name.");
 			}
 		}
-		int size_nodes = iface.size() - k_nodes;
+		int size_nodes = iface.getList().size() - k_nodes;
 		
 		if (rng_nodes != null) {
 			Definitions defs = rng_nodes.findParamFromSize(size_nodes);
@@ -89,12 +89,8 @@ public final class SignatureExpression implements ParameterType {
 				System.out.println("[error] Wrong number of parameter values: " + iface);
 		}
 
-		// Evaluate the parameters and nodes using the found parameters.
-		ParameterList _params = params.evaluate(definitions);
-		NodeList _nodes = nodes.evaluate(definitions);
-
 		// Find the assignment of parameters.
-		Iterator<Parameter> param = _params.iterator();
+		Iterator<Parameter> param = params.evaluate(definitions).iterator();
 		Iterator<Expression> value = values.iterator();	
 		
 		while (param.hasNext() && value.hasNext()) {
@@ -102,7 +98,7 @@ public final class SignatureExpression implements ParameterType {
 			Expression v = value.next();
 			
 			if (!(x.getVariable() instanceof VariableName)) 
-				throw new Exception("Parameter " + x + " is not a valid parameter name.");
+				throw new Exception(x + " is not a valid parameter name.");
 			
 			definitions.put((VariableName)x.getVariable(), v);
 		}
@@ -110,12 +106,12 @@ public final class SignatureExpression implements ParameterType {
 		// Find the links of the interface. 
 		Map<Port, Port> links = new HashMap<Port, Port>();	
 		
-		Iterator<Node> node = _nodes.evaluate(definitions).iterator();
-		Iterator<Variable> var = iface.iterator();
+		Iterator<Node> node = nodes.evaluate(definitions).iterator();
+		Iterator<VariableName> var = iface.getList().iterator();
 		
 		while (node.hasNext() && var.hasNext()) {
 			Node x = node.next();
-			Variable v = var.next();
+			VariableName v = var.next();
 			
 			Port src = x.toPort();
 			Port snk = x.rename(v).toPort();
@@ -123,11 +119,9 @@ public final class SignatureExpression implements ParameterType {
 			if (src == null)
 				throw new Exception(x + " is not a valid node name.");
 			
-			if (snk == null)
-				throw new Exception(v + " is not a valid node name.");
-			
 			links.put(src, snk);
 		}
+
 		
 		return new Signature(definitions, links);
 	}

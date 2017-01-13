@@ -23,16 +23,16 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import nl.cwi.reo.interpret.arrays.Expression;
 import nl.cwi.reo.interpret.components.ComponentValue;
+import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.programs.ProgramFile;
-import nl.cwi.reo.interpret.semantics.Instance;
+import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.semantics.InstanceList;
 import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 
-public final class Interpreter<T extends Semantics<T>> {
+public class Interpreter<T extends Semantics<T>> {
 	
 	/**
 	 * Type of semantics.
@@ -45,12 +45,18 @@ public final class Interpreter<T extends Semantics<T>> {
 	private final List<String> dirs;
 	
 	/**
+	 * ANTLR listener.
+	 */
+	private final Listener<T> listener;
+	
+	/**
 	 * Constructs a Reo interpreter.
 	 * @param dirs		list of directories of Reo components
 	 */
-	public Interpreter(List<String> dirs, SemanticsType semantics) {
+	public Interpreter(SemanticsType semantics, List<String> dirs, Listener<T> listener) {
 		this.semantics = semantics;
 		this.dirs = Collections.unmodifiableList(dirs);	
+		this.listener = listener;
 	}
 
 	/**
@@ -59,18 +65,17 @@ public final class Interpreter<T extends Semantics<T>> {
 	 * @param file		non-empty list of Reo file names.
 	 * @return list of work automata.
 	 */
+	@SuppressWarnings("unchecked")
 	public List<T> interpret(List<String> srcfiles) {
 		
-		List<T> system = new ArrayList<T>();
-		
 		// Find all available component expressions.
-		Stack<ProgramFile> stack = new Stack<ProgramFile>();	
+		Stack<ProgramFile<T>> stack = new Stack<ProgramFile<T>>();	
 		try {
 			List<String> parsed = new ArrayList<String>();
 			Queue<String> components = new LinkedList<String>();
 			
 			for (String file : srcfiles) {
-				ProgramFile program = parse(new ANTLRFileStream(file));
+				ProgramFile<T> program = parse(new ANTLRFileStream(file));
 				if (program != null) {
 					stack.push(program);
 					parsed.add(program.getName());
@@ -84,7 +89,7 @@ public final class Interpreter<T extends Semantics<T>> {
 				String comp = components.poll();
 				if (!parsed.contains(comp)) {
 					parsed.add(comp);
-					ProgramFile program = parseComponent(comp);
+					ProgramFile<T> program = parseComponent(comp);
 					if (program != null) {
 						stack.push(program);
 						List<String> newComponents = program.getImports();
@@ -105,10 +110,9 @@ public final class Interpreter<T extends Semantics<T>> {
 		VariableName name = null;		
 		try {
 			while (!stack.isEmpty()) {
-				ProgramFile program = stack.pop();
+				ProgramFile<T> program = stack.pop();
 				name = new VariableName(program.getName());
 				Expression cexpr = program.getComponent().evaluate(cexprs);
-				System.out.println("[info] Found component " + name + " = " + cexpr);
 				cexprs.put(name, cexpr);
 			}
 		} catch (Exception e) {
@@ -116,65 +120,16 @@ public final class Interpreter<T extends Semantics<T>> {
 		}
 
 		// Get the instance from the main component.
-		List<Instance> instances = null;
+		InstanceList<T> instances = null;
 		Expression expr = cexprs.get(name);		
-		if (expr instanceof ComponentValue) {
-			instances = ((ComponentValue)expr).getInstances();
-		} else {
-			return system;
-		}				
-		
-		if (instances.size() == 0)
-			return system;
-		
-    	@SuppressWarnings("unchecked")
-		T unit = (T) instances.get(0).getAtom();
-		
-		// Split shared ports in every atom in main, and insert a node
-		Map<Port, List<Port>> nodes = new HashMap<Port, List<Port>>();
-		
-		for (Instance inst : instances) {			
-			if (inst.getAtom().getType() == semantics) {	
-							
-				Map<String, String> r = new HashMap<String, String>();
-
-				// For every port of this component, add the current node size as a suffix.
-				for (Map.Entry<String, Port> link : inst.entrySet()) {
-					Port p = link.getValue();
-					
-					// Get the current node of this port, or create a new node.
-					List<Port> A = nodes.get(p);
-					if (A == null) {
-						A = new ArrayList<Port>();
-						nodes.put(p, A);
-					}
-					
-					// Rename the port by adding a suffix.
-					Port portWithSuffix = p.rename(p.getName() + "." + A.size());
-					
-					// Add the renamed port to this node.
-					A.add(portWithSuffix);
-
-					nodes.put(link.getValue(), A);
-					
-					// Register how to rename the ports in the semantics.
-					r.put(link.getKey(), portWithSuffix.getName());
-				}
-
-		    	@SuppressWarnings("unchecked")
-				T X = ((T)inst.getAtom()).rename(r);
-		    	system.add(X);
-			} else {
-				System.out.println("ERROR: not every component is of type " + semantics);
-			}
+		if (expr instanceof ComponentValue<?>) {
+			instances = ((ComponentValue<T>)expr).getInstances();
+			
+			instances.insertNodes(true, false);
+			
+			return instances.getInstances();
 		}
-		
-		for (Map.Entry<Port, List<Port>> node : nodes.entrySet()) 
-			if (node.getValue().size() > 1)
-				system.add(unit.getNode(node.getValue()));
-
-
-		return system;
+		return new ArrayList<T>();
 	}
 	
 	/**
@@ -185,9 +140,9 @@ public final class Interpreter<T extends Semantics<T>> {
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	private ProgramFile parseComponent(String component) throws IOException {
+	private ProgramFile<T> parseComponent(String component) throws IOException {
 		
-		ProgramFile prog = null;
+		ProgramFile<T> prog = null;
 		
 		int k = component.lastIndexOf('.') + 1;
 		String name = component.substring(k);
@@ -257,13 +212,16 @@ public final class Interpreter<T extends Semantics<T>> {
 	 * @return an interpreted source file, or null in case of an error.
 	 * @throws IOException 
 	 */
-	private ProgramFile parse(CharStream c) throws IOException  {
+	private ProgramFile<T> parse(CharStream c) throws IOException  {
 		TreoLexer lexer = new TreoLexer(c); 
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		
 		TreoParser parser = new TreoParser(tokens);
+		parser.removeErrorListeners();
+		parser.addErrorListener(new ErrorListener());
+		
 		ParseTree tree = parser.file();
 		ParseTreeWalker walker = new ParseTreeWalker();
-		Listener listener = new Listener();
 		walker.walk(listener, tree);
 		return listener.getFile();
 	}

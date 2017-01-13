@@ -2,15 +2,16 @@ package nl.cwi.reo.interpret.components;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Array;
-import nl.cwi.reo.interpret.arrays.Expression;
-import nl.cwi.reo.interpret.arrays.ExpressionRange;
 import nl.cwi.reo.interpret.programs.ProgramExpression;
-import nl.cwi.reo.interpret.signatures.Interface;
+import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
+import nl.cwi.reo.interpret.variables.VariableNameList;
+import nl.cwi.reo.semantics.Semantics;
 
-public class ComponentVariable implements ComponentExpression {
+public class ComponentVariable<T extends Semantics<T>> implements ComponentExpression<T> {
 	
 	private Variable var;
 	
@@ -21,16 +22,18 @@ public class ComponentVariable implements ComponentExpression {
 	}
 
 	@Override
-	public ProgramExpression instantiate(ExpressionRange values, Interface iface) throws Exception {
+	public ProgramExpression<T> instantiate(ExpressionList values, VariableNameList iface) throws Exception {
 		return null;
 	}
+	
+	@SuppressWarnings("unchecked")
 	@Override
-	public ComponentExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		Array e = var.evaluate(params);
+	public ComponentExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+		Range e = var.evaluate(params);
 		if (e instanceof ComponentExpression) {
-			return (ComponentExpression)e;
+			return (ComponentExpression<T>)e;
 		} else if (e instanceof Variable) {
-			return new ComponentVariable((Variable)e);
+			return new ComponentVariable<T>((Variable)e);
 		} 
 		return this;	
 	}

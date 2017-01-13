@@ -3,22 +3,23 @@ package nl.cwi.reo.interpret.programs;
 import java.util.Iterator;
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Array;
-import nl.cwi.reo.interpret.arrays.Expression;
-import nl.cwi.reo.interpret.arrays.ExpressionRange;
+import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.InstanceList;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
+import nl.cwi.reo.semantics.Semantics;
 
-public final class ProgramEquation implements ProgramExpression {
+public final class ProgramEquation<T extends Semantics<T>> implements ProgramExpression<T> {
 
 	private final Variable var;
 	
-	private final Array val;
+	private final Range val;
 	
-	public ProgramEquation(Variable var, Array val) {
+	public ProgramEquation(Variable var, Range val) {
 		if (var == null || val == null)
 			throw new NullPointerException();
 		this.var = var;
@@ -26,37 +27,37 @@ public final class ProgramEquation implements ProgramExpression {
 	}
 
 	@Override
-	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		
-		ProgramExpression prog = null;
+		ProgramExpression<T> prog = null;
 
-		Array e = var.evaluate(params);
+		Range e = var.evaluate(params);
 		if (!(e instanceof Variable))
 			e = var;
 		Variable var_p = (Variable)e;
-		Array val_p = val.evaluate(params);
+		Range val_p = val.evaluate(params);
 		
 		if (var_p instanceof VariableName) {
 			if (val_p instanceof Expression) {
 				Definitions definitions = new Definitions();
 				definitions.put((VariableName)var_p, (Expression)val_p);
-				prog = new ProgramValue(definitions, new InstanceList());
-			} else if (val_p instanceof ExpressionRange) {
+				prog = new ProgramValue<T>(definitions, new InstanceList<T>());
+			} else if (val_p instanceof ExpressionList) {
 				throw new Exception("Value " + val_p + " must be of type expression.");	
 			} 
 		} else if (var_p instanceof VariableNameList) {	
-			if (val_p instanceof ExpressionRange) {	
+			if (val_p instanceof ExpressionList) {	
 				Definitions definitions = new Definitions();
 				Iterator<VariableName> var = ((VariableNameList) var_p).getList().iterator();
-				Iterator<Expression> exp = ((ExpressionRange)val_p).iterator();				
+				Iterator<Expression> exp = ((ExpressionList)val_p).iterator();				
 				while (var.hasNext() && exp.hasNext()) definitions.put(var.next(), exp.next());
-				prog = new ProgramValue(definitions, new InstanceList());
+				prog = new ProgramValue<T>(definitions, new InstanceList<T>());
 				
 			} else if (val_p instanceof Expression) {
 				throw new Exception("Value " + val_p + " must be of type list.");				
 			}
 		} else {
-			prog = new ProgramEquation(var_p, val_p);
+			prog = new ProgramEquation<T>(var_p, val_p);
 		}
 		
 		return prog;

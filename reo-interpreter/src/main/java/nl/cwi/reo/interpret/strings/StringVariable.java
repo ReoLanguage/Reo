@@ -2,8 +2,8 @@ package nl.cwi.reo.interpret.strings;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Array;
-import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 
@@ -31,7 +31,7 @@ public class StringVariable implements StringExpression {
 	 */
 	@Override
 	public StringExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		Array e = var.evaluate(params);
+		Range e = var.evaluate(params);
 		if (e instanceof StringExpression) {
 			return (StringExpression)e;
 		} else if (e instanceof Variable) {

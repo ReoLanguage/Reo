@@ -12,17 +12,17 @@ cexpr   : var                                                 # cexpr_variable
 
 // Bodies
 body    : '{' stmt* '}' ;
-stmt    : array '=' array                                     # stmt_equation
+stmt    : range '=' range                                     # stmt_equation
         | var cexpr                                           # stmt_compdefn
         | cexpr list? iface                                   # stmt_instance
         | 'for' ID '=' iexpr '..' iexpr body                  # stmt_iteration
         | 'if' bexpr body (('else' bexpr body)* 'else' body)? # stmt_condition ;
 
-// Arrays
-array   : var                                                 # array_variable
-        | expr                                                # array_expr 
-        | list                                                # array_list ;
-list    : '<' '>' | '<' array (',' array)* '>' ;
+// Ranges
+range   : var                                                 # range_variable
+        | expr                                                # range_expr 
+        | list                                                # range_list ;
+list    : '<' '>' | '<' range (',' range)* '>' ;
 expr    : STRING                                              # expr_string
         | bexpr                                               # expr_boolean
         | iexpr                                               # expr_integer

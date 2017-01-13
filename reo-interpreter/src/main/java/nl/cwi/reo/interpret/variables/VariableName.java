@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret.variables;
 import java.util.Map;
 import java.util.Objects;
 
-import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.ranges.Expression;
 
 /**
  * An immutable implementation of a variable name.
@@ -33,8 +33,7 @@ public final class VariableName implements Variable, Expression {
 	@Override
 	public Expression evaluate(Map<VariableName, Expression> params) throws Exception {
 		Expression e = params.get(this);
-		if (e instanceof Expression) 
-			return (Expression)e;
+		if (e != null) return e;
 		return this;
 	}
 	

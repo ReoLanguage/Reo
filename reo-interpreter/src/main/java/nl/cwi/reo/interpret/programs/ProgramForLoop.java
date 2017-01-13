@@ -1,19 +1,20 @@
 package nl.cwi.reo.interpret.programs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Expression;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
+import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.variables.VariableName;
+import nl.cwi.reo.semantics.Semantics;
 
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class ProgramForLoop implements ProgramExpression {
+public class ProgramForLoop<T extends Semantics<T>> implements ProgramExpression<T> {
 
 	/**
 	 * Name of the iterated parameter.
@@ -32,7 +33,7 @@ public class ProgramForLoop implements ProgramExpression {
 	/**
 	 * Iterated subprogram definition.
 	 */
-	public ProgramExpression body;
+	public ProgramExpression<T> body;
 
 	/**
 	 * Constructs a parameterized for loop. 
@@ -42,7 +43,7 @@ public class ProgramForLoop implements ProgramExpression {
 	 * @param upper			expression defining the upper iteration bound
 	 * @param subprogram	iterated subprogram definition
 	 */
-	public ProgramForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ProgramExpression body) {
+	public ProgramForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ProgramExpression<T> body) {
 		if (parameter == null || lower == null || upper == null || body == null)
 			throw new NullPointerException();
 		this.parameter = parameter;
@@ -58,7 +59,7 @@ public class ProgramForLoop implements ProgramExpression {
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
 	@Override
-	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		
 		if (params.get(parameter) != null)
 			throw new Exception("Parameter " + parameter + " is already used.");
@@ -74,28 +75,29 @@ public class ProgramForLoop implements ProgramExpression {
 				
 			// Iterate to find all concrete components. 
 			boolean isProgram = true;
-			Map<VariableName, Expression> defns = new HashMap<VariableName, Expression>(params);
-			List<ProgramExpression> bodies = new ArrayList<ProgramExpression>();
-			List<ProgramValue> progs = new ArrayList<ProgramValue>();
+			Definitions defns = new Definitions(params);
+			List<ProgramExpression<T>> bodies = new ArrayList<ProgramExpression<T>>();
+			List<ProgramValue<T>> progs = new ArrayList<ProgramValue<T>>();
 			for (int i = a; i <= b; i++) {
 				defns.put(parameter, new IntegerValue(Integer.valueOf(i)));
-				ProgramExpression e = body.evaluate(defns);
+				ProgramExpression<T> e = body.evaluate(defns);
+				bodies.add(e);
 				if (e instanceof ProgramValue) {
-					progs.add((ProgramValue)e);
+					progs.add((ProgramValue<T>)e);
 				} else {
 					isProgram = false;
 				}
 			}
 			
 			if (isProgram) {
-				ProgramValue prog = new ProgramValue();
+				ProgramValue<T> prog = new ProgramValue<T>();
 				return prog.compose(progs).remove(parameter);
 			}
 			
-			return new ProgramBody(bodies);
+			return new ProgramBody<T>(bodies);
 		}
 		
-		return new ProgramForLoop(parameter, x, y, body.evaluate(params));
+		return new ProgramForLoop<T>(parameter, x, y, body.evaluate(params));
 	}
 	
 	@Override

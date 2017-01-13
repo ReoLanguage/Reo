@@ -1,10 +1,10 @@
-package nl.cwi.reo.interpret.arrays;
+package nl.cwi.reo.interpret.ranges;
 
 import java.util.Map;
 
 import nl.cwi.reo.interpret.variables.VariableName;
 
-public interface Expression extends Array {
+public interface Expression extends Range {
 	
 	public Expression evaluate(Map<VariableName, Expression> params) throws Exception;
 

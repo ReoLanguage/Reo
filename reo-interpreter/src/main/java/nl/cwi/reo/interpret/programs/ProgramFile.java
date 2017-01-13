@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Expression;
 import nl.cwi.reo.interpret.components.ComponentExpression;
+import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.InstanceList;
 import nl.cwi.reo.interpret.variables.VariableName;
+import nl.cwi.reo.semantics.Semantics;
 
-public final class ProgramFile implements ProgramExpression {
+public final class ProgramFile<T extends Semantics<T>> implements ProgramExpression<T> {
 	
 	/**
 	 * Section.
@@ -30,9 +31,9 @@ public final class ProgramFile implements ProgramExpression {
 	/**
 	 * Main component.
 	 */
-	private final ComponentExpression cexpr;
+	private final ComponentExpression<T> cexpr;
 	
-	public ProgramFile(String section, List<String> imports, String name, ComponentExpression cexpr) {
+	public ProgramFile(String section, List<String> imports, String name, ComponentExpression<T> cexpr) {
 		if (section == null || imports == null || name == null || cexpr == null)
 			throw new NullPointerException();
 		this.section = section;
@@ -49,15 +50,15 @@ public final class ProgramFile implements ProgramExpression {
 		return section.equals("") ? name : section + "." + name; 
 	}
 	
-	public ComponentExpression getComponent() {
+	public ComponentExpression<T> getComponent() {
 		return cexpr;
 	}
 
 	@Override
-	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();
 		definitions.put(new VariableName(getName()), cexpr.evaluate(params));
-		return new ProgramValue(new Definitions(definitions), new InstanceList());
+		return new ProgramValue<T>(new Definitions(definitions), new InstanceList<T>());
 	}
 	
 	@Override

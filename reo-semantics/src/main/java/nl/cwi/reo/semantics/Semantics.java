@@ -12,12 +12,12 @@ public interface Semantics<T> {
 		
 	public T getNode(List<Port> node);
 	
+	public T rename(Map<String, Port> links);
+
+	public T evaluate(Map<String, String> params);
+	
 	public T compose(List<T> automata);
 	
 	public T restrict(Set<String> intface);
-	
-	public T rename(Map<String, String> links);
-
-	public T evaluate(Map<String, String> params);
 	
 }

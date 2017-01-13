@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.arrays;
+package nl.cwi.reo.interpret.ranges;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,19 +7,19 @@ import java.util.Map;
 
 import nl.cwi.reo.interpret.variables.VariableName;
 
-public class ArrayRange extends ArrayList<Array> implements Array {
+public class RangeList extends ArrayList<Range> implements Range {
 	
 	/**
 	 * Serial version ID.
 	 */
 	private static final long serialVersionUID = -2252873175064572188L;
 	
-	public ArrayRange() { }
+	public RangeList() { }
 	
-	public ArrayRange(List<Array> entries) {
+	public RangeList(List<Range> entries) {
 		if (entries == null)
 			throw new NullPointerException();
-		for (Array e : entries) {
+		for (Range e : entries) {
 			if (e == null)
 				throw new NullPointerException();
 			super.add(e);
@@ -27,21 +27,21 @@ public class ArrayRange extends ArrayList<Array> implements Array {
 	}
 
 	@Override
-	public Array evaluate(Map<VariableName, Expression> params)
+	public Range evaluate(Map<VariableName, Expression> params)
 			throws Exception {
 		boolean isExpressionRange = true;
-		List<Array> entries = new ArrayList<Array>();
+		List<Range> entries = new ArrayList<Range>();
 		List<Expression> expressions = new ArrayList<Expression>();
-		for (Array e : this) {
-			Array e_p = e.evaluate(params);
-			if (e_p instanceof ExpressionRange) {
-				for (Expression x : (ExpressionRange)e_p) {
+		for (Range e : this) {
+			Range e_p = e.evaluate(params);
+			if (e_p instanceof ExpressionList) {
+				for (Expression x : (ExpressionList)e_p) {
 					entries.add(x);	
 					expressions.add(x);			
 				}
-			} else if (e_p instanceof ArrayRange) {
+			} else if (e_p instanceof RangeList) {
 				isExpressionRange = false;
-				for (Array x : (ArrayRange)e_p) 
+				for (Range x : (RangeList)e_p) 
 					entries.add(x);						
 			} else {
 				entries.add(e_p);
@@ -53,14 +53,14 @@ public class ArrayRange extends ArrayList<Array> implements Array {
 			}
 		}
 		if (isExpressionRange)
-			return new ExpressionRange(expressions);
-		return new ArrayRange(entries);
+			return new ExpressionList(expressions);
+		return new RangeList(entries);
 	}
 	
 	@Override
 	public String toString() {
 		String s = "<";
-		Iterator<Array> expr = this.iterator();
+		Iterator<Range> expr = this.iterator();
 		while (expr.hasNext())
 			s += expr.next() + (expr.hasNext() ? ", " : "" );
 		return s + ">";

@@ -175,7 +175,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	 * Connects the ports of the work automaton to nodes.
 	 * @param links		relabeling function
 	 */
-	public WorkAutomaton rename(Map<String, String> links) {
+	public WorkAutomaton rename(Map<String, Port> links) {
 		
 		// Initialize the Work Automaton fields.
 		Set<String> Q = new HashSet<String>(this.Q);
@@ -187,7 +187,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 		
 		// Rename the ports in the interface
 		for (String a : this.P) {
-			String port = links.get(a);
+			String port = links.get(a).getName();
 			if (port == null) port = a;
 			P.add(port);
 		}

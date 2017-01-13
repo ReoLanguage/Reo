@@ -2,23 +2,23 @@ package nl.cwi.reo.interpret.programs;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Array;
-import nl.cwi.reo.interpret.arrays.Expression;
-import nl.cwi.reo.interpret.arrays.ExpressionRange;
 import nl.cwi.reo.interpret.components.ComponentExpression;
-import nl.cwi.reo.interpret.signatures.Interface;
+import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.variables.VariableName;
+import nl.cwi.reo.interpret.variables.VariableNameList;
+import nl.cwi.reo.semantics.Semantics;
 
-public final class ProgramInstance implements ProgramExpression {
+public final class ProgramInstance<T extends Semantics<T>> implements ProgramExpression<T> {
 
-	public final ComponentExpression cexpr;
+	public final ComponentExpression<T> cexpr;
 
-	public final Array plist;
+	public final Range plist;
 	
-	private final Interface iface;
+	private final Range iface;
 
-	public ProgramInstance(ComponentExpression cexpr, Array plist, 
-			Interface iface) {
+	public ProgramInstance(ComponentExpression<T> cexpr, Range plist, Range iface) {
 		if (cexpr == null || plist == null || iface == null)
 			throw new NullPointerException();		
 		this.cexpr = cexpr;
@@ -27,20 +27,18 @@ public final class ProgramInstance implements ProgramExpression {
 	}
 	
 	@Override
-	public ProgramExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		ComponentExpression cexpr_p = cexpr.evaluate(params);
-		Array plist_p = plist.evaluate(params); 
-		Interface iface_p = iface.evaluate(params); 
-		ProgramExpression prog = new ProgramInstance(cexpr_p, plist_p, iface_p);
-		if (plist_p instanceof ExpressionRange) {
-			ExpressionRange values = (ExpressionRange)plist_p;
-			if (cexpr_p instanceof ComponentExpression) {
-				ProgramExpression _prog = ((ComponentExpression)cexpr_p).instantiate(values, iface_p);
-				if (_prog != null) prog = _prog;
-			}
+	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+		ComponentExpression<T> cexpr_p = cexpr.evaluate(params);
+		Range plist_p = plist.evaluate(params); 
+		Range iface_p = iface.evaluate(params); 
+		if (plist_p instanceof ExpressionList && iface_p instanceof VariableNameList) {
+			ExpressionList values = (ExpressionList)plist_p;
+			VariableNameList nodes = (VariableNameList)iface_p;
+			ProgramExpression<T> e = cexpr_p.instantiate(values, nodes);
+			if (e != null) 
+				return e.evaluate(params);
 		}
-//		System.out.println("[info] " + cexpr + plist + iface + " becomes " + prog + " using " + params);
-		return prog;
+		return new ProgramInstance<T>(cexpr_p, plist_p, iface_p);
 	}
 	
 	@Override

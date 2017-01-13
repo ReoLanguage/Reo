@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.Instance;
 import nl.cwi.reo.interpret.semantics.InstanceList;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.Semantics;
 
-public final class ProgramValue implements ProgramExpression {
+public final class ProgramValue<T extends Semantics<T>> implements ProgramExpression<T> {
 	
 	/**
 	 * Definitions.
@@ -22,14 +23,14 @@ public final class ProgramValue implements ProgramExpression {
 	/**
 	 * Instances.
 	 */
-	private final InstanceList instances;
+	private final InstanceList<T> instances;
 
 	/**
 	 * Constructs an empty body of components and definitions.
 	 */
 	public ProgramValue() {
 		this.definitions = new Definitions();
-		this.instances = new InstanceList();
+		this.instances = new InstanceList<T>();
 	}
 	
 	/**
@@ -37,11 +38,11 @@ public final class ProgramValue implements ProgramExpression {
 	 * @param definitions
 	 * @param instances
 	 */
-	public ProgramValue(Definitions definitions, InstanceList instances) {
+	public ProgramValue(Definitions definitions, InstanceList<T> instances) {
 		if (definitions == null || instances == null)
 			throw new NullPointerException();
 		this.definitions = new Definitions(definitions);
-		this.instances = new InstanceList(instances);
+		this.instances = new InstanceList<T>(instances);
 	}
 	
 	/**
@@ -57,36 +58,35 @@ public final class ProgramValue implements ProgramExpression {
 	 * @return set of component instances.
 	 */
 	public Map<VariableName, Expression> getUnifications() {
-		Map<VariableName, Expression>  defs = definitions.getUnifications();
-		return Collections.unmodifiableMap(defs);
+		return Collections.unmodifiableMap(definitions.getUnifications());
 	}
 	
 	/**
 	 * Gets the component instances.
 	 * @return set of component instances.
 	 */
-	public List<Instance> getInstances() {
-		return Collections.unmodifiableList(instances);
+	public InstanceList<T> getInstances() {
+		return new InstanceList<T>(Collections.unmodifiableList(instances));
 	}
 	
-	public ProgramValue remove(VariableName x) {
+	public ProgramValue<T> remove(VariableName x) {
 		Definitions _definitions = new Definitions(definitions);
 		_definitions.remove(x);
-		return new ProgramValue(_definitions, instances);
+		return new ProgramValue<T>(_definitions, instances);
 	}
 	
 	/**
 	 * Composes a set of programs into a single program.
 	 * @param progs		set of component instances
 	 */
-	public ProgramValue compose(List<ProgramValue> bodies) {
+	public ProgramValue<T> compose(List<ProgramValue<T>> bodies) {
 		Definitions _definitions = new Definitions(definitions);
-		InstanceList _instances = new InstanceList(instances);
-		for (ProgramValue body : bodies) {
+		InstanceList<T> _instances = new InstanceList<T>(instances);
+		for (ProgramValue<T> body : bodies) {
 			_definitions.putAll(body.definitions);
 			_instances.compose(body.instances);
 		}
-		return new ProgramValue(_definitions, _instances);
+		return new ProgramValue<T>(_definitions, _instances);
 	}
 	
 	/**
@@ -96,9 +96,9 @@ public final class ProgramValue implements ProgramExpression {
 	 * all internal ports)
 	 * @return an instantiate ProgramValue.
 	 */
-	public ProgramValue instantiate(Map<Port, Port> iface) {
+	public ProgramValue<T> instantiate(Map<Port, Port> iface) {
 		Definitions _definitions = new Definitions();
-		InstanceList _instances = new InstanceList(instances);
+		InstanceList<T> _instances = new InstanceList<T>(instances);
 		Map<Port, Port> _iface = new HashMap<Port, Port>(iface);		
 		
 		// Collect all necessary unifications, and rename the variables in these definitions.
@@ -131,18 +131,18 @@ public final class ProgramValue implements ProgramExpression {
 		}
 
 		// Instantiate  
-		for (Instance inst : _instances)			
-			inst.join(_iface);
+		for (Instance<T> inst : _instances)			
+			inst.joinAndHide(_iface);
 		
-		return new ProgramValue(_definitions, _instances);
+		return new ProgramValue<T>(_definitions, _instances);
 	}
 
 	@Override
-	public ProgramValue evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ProgramValue<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		Definitions definitions_p = definitions.evaluate(params);
 		// TODO Possibly local variables in this definition get instantiated by variables from the context.
 		// TODO Add code to evaluate semantics too.
-		return new ProgramValue(definitions_p, instances);
+		return new ProgramValue<T>(definitions_p, instances);
 	}
 	
 	@Override

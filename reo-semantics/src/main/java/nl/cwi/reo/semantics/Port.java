@@ -31,17 +31,18 @@ public class Port {
 	}
 	
 	/**
-	 * Updates this port by inheriting, if necessary, the type, tag and visibility of port y.
+	 * Joins this port to port x by inheriting, if necessary, 
+	 * the type, tag and visibility of port x.
 	 * @param x		port
-	 * @param y		port
-	 * @returns a copy of port x, with possibly its type, tag and visibility inherited from port y.
+	 * @returns a copy of this port, with possibly its type, 
+	 * tag and visibility inherited from port x.
 	 */
-	public Port update(Port y) {
-		if (y == null)
+	public Port join(Port x) {
+		if (x == null)
 			throw new NullPointerException();
-		PortType _type = type == PortType.UNKNOWN ? y.type : type;
-		String _tag = tag.equals("") ? y.tag : tag;
-		boolean _hidden = hidden || y.hidden;
+		PortType _type = type == PortType.UNKNOWN ? x.type : type;
+		String _tag = tag.equals("") ? x.tag : tag;
+		boolean _hidden = hidden || x.hidden;
 		return new Port(name, _type, _tag, _hidden);
 	}
 
@@ -87,11 +88,11 @@ public class Port {
 	public String toString() {
 		switch (type) {
 		case IN: 
-			return name + "?" + tag;
+			return (hidden ? "*" : "") + name + "?" + tag;
 		case OUT: 
-			return name + "!" + tag;
+			return (hidden ? "*" : "") + name + "!" + tag;
 		default: 
-			return name + ":" + tag;
+			return (hidden ? "*" : "") + name + ":" + tag;
 		}
 	}
 	

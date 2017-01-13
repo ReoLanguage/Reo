@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.arrays;
+package nl.cwi.reo.interpret.ranges;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,16 +7,16 @@ import java.util.Map;
 
 import nl.cwi.reo.interpret.variables.VariableName;
 
-public class ExpressionRange extends ArrayList<Expression> implements Array {
+public class ExpressionList extends ArrayList<Expression> implements Range {
 	
 	/**
 	 * Serial version ID.
 	 */
 	private static final long serialVersionUID = -2252873175064572188L;
 	
-	public ExpressionRange() { }
+	public ExpressionList() { }
 	
-	public ExpressionRange(List<Expression> entries) {
+	public ExpressionList(List<Expression> entries) {
 		if (entries == null)
 			throw new NullPointerException();
 		for (Expression e : entries) {
@@ -27,12 +27,12 @@ public class ExpressionRange extends ArrayList<Expression> implements Array {
 	}
 
 	@Override
-	public ExpressionRange evaluate(Map<VariableName, Expression> params)
+	public ExpressionList evaluate(Map<VariableName, Expression> params)
 			throws Exception {
 		List<Expression> entries = new ArrayList<Expression>();
 		for (Expression e : this)
 			entries.add(e.evaluate(params));
-		return new ExpressionRange(entries);
+		return new ExpressionList(entries);
 	}
 	
 	@Override

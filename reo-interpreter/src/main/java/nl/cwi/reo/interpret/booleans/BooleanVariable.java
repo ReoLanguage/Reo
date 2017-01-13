@@ -2,8 +2,8 @@ package nl.cwi.reo.interpret.booleans;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.arrays.Array;
-import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 
@@ -32,7 +32,7 @@ public class BooleanVariable implements BooleanExpression {
 	 */
 	@Override
 	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws Exception {
-		Array e = var.evaluate(params);
+		Range e = var.evaluate(params);
 		if (e instanceof BooleanExpression) {
 			return (BooleanExpression)e;
 		} else if (e instanceof Variable) {

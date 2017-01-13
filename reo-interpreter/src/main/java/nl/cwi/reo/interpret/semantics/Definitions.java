@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.Evaluable;
-import nl.cwi.reo.interpret.arrays.Expression;
+import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
 
 public class Definitions extends HashMap<VariableName, Expression> implements Evaluable<Definitions> {
