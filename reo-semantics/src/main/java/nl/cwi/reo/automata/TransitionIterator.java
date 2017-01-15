@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeSet;
+
+import nl.cwi.reo.semantics.Port;
 
 /**
  * Iterates over the Cartesian product of a non-empty list of local transitions. 
@@ -62,7 +65,7 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 				throw new NullPointerException("Undefined automaton in list of automata.");
 			
 			List<Transition<L>> outA = new ArrayList<Transition<L>>();
-			outA.add(0, new Transition<L>(A.initial));			
+			outA.add(0, new Transition<L>(A.initial, A.initial, new TreeSet<Port>(), A.lbl));			
 			outA.addAll(A.out.get(A.initial));			
 			outs.add(outA);			
 			Iterator<Transition<L>> iterA = outA.iterator();			
@@ -121,9 +124,9 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 			for (i = 0; i < outs.size() - 1; i++) {
 				for (int j = i + 1; j < outs.size(); j++) {
 					
-					Set<String> Nij = new HashSet<String>(tuple.get(i).getSyncConstraint());
+					Set<Port> Nij = new HashSet<Port>(tuple.get(i).getSyncConstraint());
 					Nij.retainAll(automata.get(j).iface);
-					Set<String> Nji = new HashSet<String>(tuple.get(j).getSyncConstraint());
+					Set<Port> Nji = new HashSet<Port>(tuple.get(j).getSyncConstraint());
 					Nji.retainAll(automata.get(i).iface);
 					
 					if (!Nij.equals(Nji)) 

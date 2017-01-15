@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.SortedSet;
+
+import nl.cwi.reo.semantics.Port;
 
 /**
  * Iterates over the Cartesian product of a non-empty list of local transitions. 
@@ -129,10 +131,10 @@ public class TransitionIterator implements Iterator<List<Transition>> {
 				for (int j = i + 1; composable && j < localtransitions.size(); j++) {
 					
 					// Find the interfaces and synchronization constraints.
-					Set<String> Pi = tuple.get(i).getSyncConstraint();
-					Set<String> Ni = automata.get(i).getInterface();
-					Set<String> Pj = tuple.get(j).getSyncConstraint();
-					Set<String> Nj = automata.get(j).getInterface();
+					SortedSet<Port> Pi = tuple.get(i).getSyncConstraint();
+					SortedSet<Port> Ni = automata.get(i).getInterface();
+					SortedSet<Port> Pj = tuple.get(j).getSyncConstraint();
+					SortedSet<Port> Nj = automata.get(j).getInterface();
 					
 					// Check if composability is broken.
 					if (Pi.retainAll(Nj) != Pj.retainAll(Ni)) 

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import nl.cwi.reo.automata.Label;
+import nl.cwi.reo.semantics.Port;
 
 public class SeepageFunction implements Label<SeepageFunction> {
 	
@@ -32,13 +33,22 @@ public class SeepageFunction implements Label<SeepageFunction> {
 	}
 
 	@Override
-	public SeepageFunction restrict(Set<String> intface) {
+	public SeepageFunction restrict(Set<Port> intface) {
 		return new SeepageFunction(this);
 	}
 
 	@Override
-	public SeepageFunction rename(Map<String, String> links) {
-		// TODO Auto-generated method stub
+	public SeepageFunction rename(Map<Port, Port> links) {
+		return null;
+	}
+
+	@Override
+	public SeepageFunction getLabel(Set<Port> N) {
+		return null;
+	}
+
+	@Override
+	public SeepageFunction evaluate(Map<String, String> params) {
 		return null;
 	}
 }

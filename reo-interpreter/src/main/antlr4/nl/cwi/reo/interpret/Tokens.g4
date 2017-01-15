@@ -1,0 +1,28 @@
+lexer grammar Tokens;
+
+LEQ     : '<=' ;
+LT      : '<' ;
+GEQ     : '>=' ;
+GT      : '>' ;
+FORALL  : 'A' ;
+EXISTS  : 'E' ;
+EQ      : '==' ;
+NEQ     : '!=' ;
+AND     : '&&' ;
+OR      : '||' ;
+IN      : '?' ;
+OUT     : '!' ;
+MIX     : ':' ;
+POW     : '^' ;
+MUL     : '*' ;
+DIV     : '/' ;
+MOD     : '%' ;
+ADD     : '+' ;
+MIN     : '-' ;
+NAT     : ('0'|[1-9][0-9]*) ;
+BOOL    : 'true'|'false' ;
+ID      : [a-zA-Z_][a-zA-Z0-9_]*;
+STRING  : '\"' .*? '\"' ;
+SPACES  : [ \t\r\n]+ -> skip ;
+SL_COMM : '//' .*? ('\n'|EOF) -> skip ;
+ML_COMM : '/*' .*? '*/' -> skip ;

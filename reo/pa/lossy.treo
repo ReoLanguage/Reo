@@ -1,0 +1,8 @@
+section reo;
+
+lossy(a?, b) {
+	#PA 
+	q0 -> q0 : {a, b}	
+	q0 -> q0 : {a}	
+}
+

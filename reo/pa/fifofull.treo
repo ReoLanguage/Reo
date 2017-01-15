@@ -1,0 +1,8 @@
+section reo;
+
+fifofull = (a?,b!) {
+	#PA 
+	q1 : initial
+	q0 -> q1 : {a}
+	q1 -> q0 : {b}
+}

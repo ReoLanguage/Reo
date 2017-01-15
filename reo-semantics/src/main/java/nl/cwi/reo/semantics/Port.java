@@ -2,7 +2,7 @@ package nl.cwi.reo.semantics;
 
 import java.util.Objects;
 
-public class Port {
+public class Port implements Comparable<Port> {
 
 	private final String name;
 
@@ -71,6 +71,18 @@ public class Port {
 	}
 	
 	@Override
+	public String toString() {
+		switch (type) {
+		case IN: 
+			return (hidden ? "*" : "") + name + "?" + tag;
+		case OUT: 
+			return (hidden ? "*" : "") + name + "!" + tag;
+		default: 
+			return (hidden ? "*" : "") + name + ":" + tag;
+		}
+	}
+	
+	@Override
 	public boolean equals(Object other) {
 	    if (other == null) return false;
 	    if (other == this) return true;
@@ -83,17 +95,9 @@ public class Port {
 	public int hashCode() {
 	    return Objects.hash(this.name);
 	}	
-	
+
 	@Override
-	public String toString() {
-		switch (type) {
-		case IN: 
-			return (hidden ? "*" : "") + name + "?" + tag;
-		case OUT: 
-			return (hidden ? "*" : "") + name + "!" + tag;
-		default: 
-			return (hidden ? "*" : "") + name + ":" + tag;
-		}
-	}
-	
+	public int compareTo(Port other) {
+		return this.name.compareTo(other.name);
+	}	
 }

@@ -24,7 +24,7 @@ public final class Transition implements Comparable<Transition> {
 	/**
 	 * Synchronization constraint of the transition.
 	 */
-	private final SortedSet<String> N;
+	private final SortedSet<Port> N;
 
 	/**
 	 * Job constraint of the transition.
@@ -39,7 +39,7 @@ public final class Transition implements Comparable<Transition> {
 	 * @param N			synchronization constraint
 	 * @param jc		job constraint
 	 */
-	public Transition(String q1, String q2, SortedSet<String> N, JobConstraint jc) {
+	public Transition(String q1, String q2, SortedSet<Port> N, JobConstraint jc) {
 		this.q1 = q1;
 		this.q2 = q2;
 		this.N = N;
@@ -66,7 +66,7 @@ public final class Transition implements Comparable<Transition> {
 	 * Retrieves the synchronization constraint of the current transition.
 	 * @return synchronization constraint
 	 */
-	public SortedSet<String> getSyncConstraint() {
+	public SortedSet<Port> getSyncConstraint() {
 		return this.N;
 	}
 	
@@ -84,7 +84,7 @@ public final class Transition implements Comparable<Transition> {
 	 * @return new silent self loop transition
 	 */
 	public static Transition getIdlingTransition(String q) {
-		SortedSet<String> N = new TreeSet<String>();
+		SortedSet<Port> N = new TreeSet<Port>();
 		JobConstraint jc = new JobConstraint(true);
 		return new Transition(q, q, N, jc);
 	}
@@ -94,11 +94,11 @@ public final class Transition implements Comparable<Transition> {
 	 * @param r		renaming map
 	 * @return new transition with renamed synchronization constraint.
 	 */
-	public Transition rename(Map<String, Port> r) {
-		SortedSet<String> rN = new TreeSet<String>();
-		for (String port : this.N) {
-			String newport;
-			if ((newport = r.get(port).getName()) == null)
+	public Transition rename(Map<Port, Port> r) {
+		SortedSet<Port> rN = new TreeSet<Port>();
+		for (Port port : this.N) {
+			Port newport;
+			if ((newport = r.get(port)) == null)
 				newport = port;
 			rN.add(newport);
 		}

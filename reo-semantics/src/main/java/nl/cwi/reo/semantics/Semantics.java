@@ -2,22 +2,22 @@ package nl.cwi.reo.semantics;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.SortedSet;
 
 public interface Semantics<T> {
 	
-	public Set<String> getInterface();
+	public SortedSet<Port> getInterface();
 	
 	public SemanticsType getType();
 		
-	public T getNode(List<Port> node);
+	public T getNode(SortedSet<Port> node);
 	
-	public T rename(Map<String, Port> links);
+	public T rename(Map<Port, Port> links);
 
 	public T evaluate(Map<String, String> params);
 	
 	public T compose(List<T> automata);
 	
-	public T restrict(Set<String> intface);
+	public T restrict(SortedSet<Port> intface);
 	
 }

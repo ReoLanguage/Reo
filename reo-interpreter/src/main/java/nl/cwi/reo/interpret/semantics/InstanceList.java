@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
@@ -67,7 +69,7 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 		Map<Port, Integer> outs = new HashMap<Port, Integer>();
 		Map<Port, Integer> ins = new HashMap<Port, Integer>();
 		for (Instance<T> inst : this) {
-			for (Map.Entry<String, Port> link : inst.entrySet()) {
+			for (Map.Entry<Port, Port> link : inst.entrySet()) {
 				Port p = link.getValue();
 				Integer out = outs.get(p);
 				if (out == null) {
@@ -85,21 +87,21 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 		}
 		
 		// Split shared ports in every atom in main, and insert a node
-		Map<Port, List<Port>> nodes = new HashMap<Port, List<Port>>();
+		Map<Port, SortedSet<Port>> nodes = new HashMap<Port, SortedSet<Port>>();
 		
 		for (Instance<T> inst : this) {	
 							
 			Map<Port, Port> links = new HashMap<Port, Port>();
 
 			// For every port of this component, add the current node size as a suffix.
-			for (Map.Entry<String, Port> link : inst.entrySet()) {
+			for (Map.Entry<Port, Port> link : inst.entrySet()) {
 				Port p = link.getValue();
 				Port pi = null;
 				
 				// Get the current node A of this port, or create a new node A.
-				List<Port> A = nodes.get(p);
+				SortedSet<Port> A = nodes.get(p);
 				if (A == null) {
-					A = new ArrayList<Port>();
+					A = new TreeSet<Port>();
 					nodes.put(p, A);
 				}
 				
@@ -136,7 +138,7 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 
 		// Insert new instances of nodes in this list.
 		T unit = this.get(0).getAtom();
-		for (Map.Entry<Port, List<Port>> node : nodes.entrySet()) 
+		for (Map.Entry<Port, SortedSet<Port>> node : nodes.entrySet()) 
 			if (node.getValue().size() > 1)
 				this.add(new Instance<T>(unit.getNode(node.getValue())));
 	}
@@ -168,7 +170,7 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 	private int renameHidden(int i) {
 		Map<Port, Port> links = new HashMap<Port, Port>();
 		for (Instance<T> comp : this) {
-			for (Map.Entry<String, Port> link : comp.entrySet()) {
+			for (Map.Entry<Port, Port> link : comp.entrySet()) {
 				Port x = link.getValue();
 				if (!links.containsKey(x)) {
 					if (x.isHidden()) {

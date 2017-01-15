@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.workautomata.Transition;
 import nl.cwi.reo.workautomata.WorkAutomaton;
 
@@ -88,7 +89,7 @@ public class GameGraph {
 		for (String x : A.getJobs()) p0.put(x, 0);
 		TreeMap<String, Integer> d0 = new TreeMap<String, Integer>();  
 		for (String x : A.getJobs()) d0.put(x, 0);
-		SGVertex a0 = new SGVertex(p0, A.getInitial(), new TreeSet<String>(), d0);
+		SGVertex a0 = new SGVertex(p0, A.getInitial(), new TreeSet<Port>(), d0);
 		this.v0 = addVertex(a0);
 
 		// Add a0 to the list L of unexplored vertices
@@ -157,7 +158,7 @@ public class GameGraph {
 						//System.out.println("p=" + p);
 						//System.out.println(fires);
 
-						Set<String> N;
+						Set<Port> N;
 
 						int w = 0;
 						
@@ -166,7 +167,7 @@ public class GameGraph {
 							N = tau.getSyncConstraint();
 							w = tau.getSyncConstraint().contains(port) ? 1 : 0;
 						} else {
-							N = new TreeSet<String>();
+							N = new TreeSet<Port>();
 						}
 
 						// Construct the next vertex b
@@ -186,7 +187,7 @@ public class GameGraph {
 					// Construct the next vertex b
 					TreeMap<String,Integer> d = new TreeMap<String, Integer>();  
 					for (String x : A.getJobs())  d.put(x, 0);
-					SGVertex b = new SGVertex(a.p, a.q, new TreeSet<String>(), d);
+					SGVertex b = new SGVertex(a.p, a.q, new TreeSet<Port>(), d);
 
 					// If vertex b is new, add b to L
 					if (vert.get(b.name) == null) L.add(b);

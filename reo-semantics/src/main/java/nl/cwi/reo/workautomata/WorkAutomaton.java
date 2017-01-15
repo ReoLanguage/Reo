@@ -32,7 +32,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	/**
 	 * Set of ports
 	 */
-	private final Set<String> P;
+	private final SortedSet<Port> P;
 
 	/**
 	 * Set of jobs.
@@ -59,7 +59,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	 */
 	public WorkAutomaton() {
 		this.Q = new HashSet<String>();
-		this.P = new HashSet<String>();
+		this.P = new TreeSet<Port>();
 		this.J = new HashSet<String>();
 		this.I = new HashMap<String, JobConstraint>();
 		this.T = new HashMap<String, Set<Transition>>();
@@ -78,7 +78,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	 * @param T		mapping from states to outgoing transitions
 	 * @param q0 	initial state
 	 */
-	public WorkAutomaton(Set<String> Q, Set<String> P, Set<String> J, Map<String, JobConstraint> I, 
+	public WorkAutomaton(Set<String> Q, SortedSet<Port> P, Set<String> J, Map<String, JobConstraint> I, 
 			Map<String, Set<Transition>> T, String q0) {
 		this.Q = Q;
 		this.P = P;
@@ -89,9 +89,9 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	}
 
 	@Override
-	public WorkAutomaton getNode(List<Port> node) {
+	public WorkAutomaton getNode(SortedSet<Port> node) {
 		Set<String> Q = new HashSet<String>();
-		Set<String> P = new HashSet<String>();
+		SortedSet<Port> P = new TreeSet<Port>();
 		Set<String> J = new HashSet<String>();
 		Map<String, JobConstraint> I = new HashMap<String, JobConstraint>();
 		Map<String, Set<Transition>> T = new HashMap<String, Set<Transition>>();
@@ -100,24 +100,24 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 		I.put(q0, new JobConstraint(true));
 		T.put(q0, new HashSet<Transition>());
 
-		Set<String> ins = new HashSet<String>();
-		Set<String> outs = new HashSet<String>();
+		Set<Port> ins = new HashSet<Port>();
+		Set<Port> outs = new HashSet<Port>();
 		for (Port p : node) {
-			P.add(p.getName());
+			P.add(p);
 			switch (p.getType()) {
 			case IN:
-				outs.add(p.getName());
+				outs.add(p);
 				break;
 			case OUT: 
-				ins.add(p.getName());
+				ins.add(p);
 				break;
 			default:
 				break;
 			}
 		}
 		
-		for (String p : ins) {
-			SortedSet<String> N = new TreeSet<String>(outs);
+		for (Port p : ins) {
+			SortedSet<Port> N = new TreeSet<Port>(outs);
 			N.add(p);
 			Transition t = new Transition(q0, q0, N, new JobConstraint(true)); 
 			T.get(q0).add(t);
@@ -136,7 +136,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	/**
 	 * Gets the set of ports in the interface of this work automaton.
 	 */
-	public Set<String> getInterface() {
+	public SortedSet<Port> getInterface() {
 		return this.P;
 	}
 	
@@ -175,19 +175,19 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	 * Connects the ports of the work automaton to nodes.
 	 * @param links		relabeling function
 	 */
-	public WorkAutomaton rename(Map<String, Port> links) {
+	public WorkAutomaton rename(Map<Port, Port> links) {
 		
 		// Initialize the Work Automaton fields.
 		Set<String> Q = new HashSet<String>(this.Q);
-		Set<String> P = new HashSet<String>();
+		SortedSet<Port> P = new TreeSet<Port>();
 		Set<String> J = new HashSet<String>(this.J);
 		Map<String, JobConstraint> I = new HashMap<String, JobConstraint>(this.I);
 		Map<String, Set<Transition>> T = new HashMap<String, Set<Transition>>();
 		String q0 = this.q0;	
 		
 		// Rename the ports in the interface
-		for (String a : this.P) {
-			String port = links.get(a).getName();
+		for (Port a : this.P) {
+			Port port = links.get(a);
 			if (port == null) port = a;
 			P.add(port);
 		}
@@ -278,7 +278,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 
 		// Initialize the work automaton fields.
 		Set<String> Q = new HashSet<String>();
-		Set<String> P = new HashSet<String>();
+		SortedSet<Port> P = new TreeSet<Port>();
 		Set<String> J = new HashSet<String>();
 		Map<String, JobConstraint> I = new HashMap<String, JobConstraint>();
 		Map<String, Set<Transition>> T = new HashMap<String, Set<Transition>>();
@@ -328,7 +328,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 				
 				// Instantiate the synchronization constraint, job constraint and target state of the
 				// global transition.
-				SortedSet<String> N = new TreeSet<String>();
+				SortedSet<Port> N = new TreeSet<Port>();
 				SortedMap<String, Integer> w = new TreeMap<String, Integer>();
 				Set<String> R = new HashSet<String>();
 				List<String> s2 = new ArrayList<String>();
@@ -394,7 +394,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	}
 
 	@Override
-	public WorkAutomaton restrict(Set<String> intface) {
+	public WorkAutomaton restrict(SortedSet<Port> intface) {
 		return null;
 	}
 

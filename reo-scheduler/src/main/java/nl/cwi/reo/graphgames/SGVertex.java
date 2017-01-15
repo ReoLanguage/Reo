@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import nl.cwi.reo.semantics.Port;
+
 /**
  * Implements a {@link nl.cwi.reo.graphgames.Vertex} used in the scheduling game. 
  */
@@ -23,7 +25,7 @@ public class SGVertex extends Vertex {
 	/**
 	 * Synchronization constraint of last action
 	 */
-	public final Set<String> N; 
+	public final Set<Port> N; 
 
 	/**
 	 * Progress of jobs during last action
@@ -42,7 +44,7 @@ public class SGVertex extends Vertex {
 	 * @param N		synchronization constraint of last action
 	 * @param d		progress of jobs during last action
 	 */
-	public SGVertex(Map<String, Integer> p, String q, Set<String> N, Map<String, Integer> d) {
+	public SGVertex(Map<String, Integer> p, String q, Set<Port> N, Map<String, Integer> d) {
 		super(name(p, q, N, d, new TreeSet<String>(), 0), 0);
 		this.p = p;
 		this.q = q;
@@ -58,10 +60,10 @@ public class SGVertex extends Vertex {
 	 * @param s		scheduled jobs
 	 */
 	public SGVertex(Map<String, Integer> p, String q, Set<String> s) {
-		super(name(p, q, new TreeSet<String>(), new TreeMap<String, Integer>(), s, 1), 1);
+		super(name(p, q, new TreeSet<Port>(), new TreeMap<String, Integer>(), s, 1), 1);
 		this.p = p;
 		this.q = q;
-		this.N = new TreeSet<String>();
+		this.N = new TreeSet<Port>();
 		this.d = new TreeMap<String, Integer>();
 		this.s = s;
 	}	
@@ -74,7 +76,7 @@ public class SGVertex extends Vertex {
 	 * @param d		progress of jobs during last action
 	 * @param s		scheduled jobs
 	 */
-	private static String name(Map<String, Integer> p, String q, Set<String> N, Map<String, Integer> d, Set<String> s, int owner) { 
+	private static String name(Map<String, Integer> p, String q, Set<Port> N, Map<String, Integer> d, Set<String> s, int owner) { 
 		String nm = "";
 		for(Map.Entry<String, Integer> entry : p.entrySet()) 
 			nm += entry.getValue();
@@ -82,7 +84,7 @@ public class SGVertex extends Vertex {
 		if (owner == 0) {
 			for (Map.Entry<String, Integer> entry : d.entrySet()) 
 				nm += entry.getValue();
-			for (String x : N) 
+			for (Port x : N) 
 				nm += x;
 		} else {
 			for (Map.Entry<String, Integer> entry : p.entrySet()) {

@@ -4,12 +4,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import nl.cwi.reo.automata.Automaton;
-import nl.cwi.reo.automata.Void;
 import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
+import nl.cwi.reo.portautomata.NullLabel;
+import nl.cwi.reo.semantics.Port;
 
 /**
  * Test class for debugging.
@@ -27,40 +29,43 @@ public class Debug {
 	 */
 	public static void testAutomata() {
 		
-		Set<State> Q = new HashSet<State>();
-		Set<String> P = new HashSet<String>();
-		P.add("a");
-		P.add("b");
-		Map<State, List<Transition<Void>>> T = new HashMap<State, List<Transition<Void>>>();
+		SortedSet<State> Q = new TreeSet<State>();
+		SortedSet<Port> P = new TreeSet<Port>();
+		P.add(new Port("a"));
+		P.add(new Port("b"));
+		Map<State, Set<Transition<NullLabel>>> T = new HashMap<State, Set<Transition<NullLabel>>>();
 		State q0 = new State("q0");
 		State q1 = new State("q1");
 		Q.add(q0);
 		Q.add(q1);
-		List<Transition<Void>> out0 = new ArrayList<Transition<Void>>();
-		List<Transition<Void>> out1 = new ArrayList<Transition<Void>>();
-		TreeSet<String> N0 = new TreeSet<String>();
-		TreeSet<String> N1 = new TreeSet<String>();
-		N0.add("a");
-		N1.add("b");
-		Transition<Void> t0 = new Transition<Void>(q0, q1, N0, null);
-		Transition<Void> t1 = new Transition<Void>(q1, q0, N1, null);
+		Set<Transition<NullLabel>> out0 = new HashSet<Transition<NullLabel>>();
+		Set<Transition<NullLabel>> out1 = new HashSet<Transition<NullLabel>>();
+		TreeSet<Port> N0 = new TreeSet<Port>();
+		TreeSet<Port> N1 = new TreeSet<Port>();
+		N0.add(new Port("a"));
+		N1.add(new Port("b"));
+		Transition<NullLabel> t0 = new Transition<NullLabel>(q0, q1, N0, new NullLabel());
+		Transition<NullLabel> t1 = new Transition<NullLabel>(q1, q0, N1, new NullLabel());
 		out0.add(t0);
 		out1.add(t1);
 		T.put(q0, out0);
 		T.put(q1, out1);
 		
-		Automaton<Void> A = new Automaton<Void>(Q, P, T, q0);
+		Automaton<NullLabel> A = new Automaton<NullLabel>(Q, P, T, q0, new NullLabel());
 
 		System.out.println(A);
 		
-		Map<String, String> links = new HashMap<String, String>();
-		links.put("a", "c");
-		links.put("b", "d");
-		Automaton<Void> B = A.rename(links);
+		Map<Port, Port> links = new HashMap<Port, Port>();
+		links.put(new Port("a"), new Port("c"));
+		links.put(new Port("b"), new Port("d"));
+		Automaton<NullLabel> B = A.rename(links);
 		
 		System.out.println(B);
 		
-		System.out.println(A.compose(B));
+		List<Automaton<NullLabel>> lst = new ArrayList<Automaton<NullLabel>>();
+		lst.add(B);
+		
+		System.out.println(A.compose(lst));
 		
 		//System.out.println(A.compose(A));
 		

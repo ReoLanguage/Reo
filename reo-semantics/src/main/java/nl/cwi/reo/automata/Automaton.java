@@ -4,13 +4,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import nl.cwi.reo.semantics.Port;
+
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * A port automaton in which each transition has, besides a synchronization constraint, 
@@ -22,124 +28,150 @@ public class Automaton<L extends Label<L>> {
 	/**
 	 * Set of states
 	 */
-	public final Set<State> states;
+	protected final SortedSet<State> states;
 
 	/**
 	 * Set of ports
 	 */
-	public final Set<String> iface;
+	protected final SortedSet<Port> iface;
 
 	/**
 	 * List of outgoing transitions.
 	 */
-	public final Map<State, List<Transition<L>>> out;
+	protected final Map<State, Set<Transition<L>>> out;
 
 	/**
 	 * Initial state.
 	 */
-	public final State initial;
-
+	protected final State initial;
+	
+	/**
+	 * Instance of a label.
+	 */
+	protected final L lbl;
+	
 	/**
 	 * Constructs the identity automaton with respect to composition, which
-	 * is a single state automaton without transitions.
+	 * is a single state automaton with empty interface and no transitions.
+	 * @param type 	type of semantics
+	 * @param lbl 	instance of a label
 	 */
-	public Automaton() {
-		this.states = new HashSet<State>();
-		this.iface = new HashSet<String>();
-		this.out = new HashMap<State, List<Transition<L>>>();
-		this.initial = new State("q0");
+	public Automaton(L lbl) {
+		this.initial = new State("*");
+		
+		SortedSet<State> states = new TreeSet<State>();
 		states.add(initial);
-		out.put(initial, new ArrayList<Transition<L>>());
+		this.states = Collections.unmodifiableSortedSet(states);
+		
+		this.iface = Collections.unmodifiableSortedSet(new TreeSet<Port>());
+		
+		Map<State, Set<Transition<L>>> out = new HashMap<State, Set<Transition<L>>>();
+		out.put(initial, Collections.unmodifiableSet(new HashSet<Transition<L>>()));
+		this.out = Collections.unmodifiableMap(out);
+		
+		this.lbl = lbl;
 	}
 	
 	/**
-	 * Constructs a new work automaton.
+	 * Constructs a new work automaton. If the initial state is not present in the set of 
+	 * states, then it is added to the set of states.
 	 * @param Q		set of states
 	 * @param P		set of ports
 	 * @param T		mapping from states to outgoing transitions
 	 * @param q0 	initial state
+	 * @param type 	type of semantics
+	 * @param lbl 	instance of a label
 	 */
-	public Automaton(Set<State> Q, Set<String> P, Map<State, List<Transition<L>>> T, State q0) {
+	public Automaton(SortedSet<State> Q, SortedSet<Port> P, Map<State, Set<Transition<L>>> T, State q0, L lbl) {
 		if (Q == null)
-			throw new IllegalArgumentException("No set of states specified.");	
+			throw new NullPointerException("No set of states specified.");	
 		if (P == null)
-			throw new IllegalArgumentException("No interface specified.");	
+			throw new NullPointerException("No interface specified.");	
 		for (State q : Q) 
 			if (T.get(q) == null)
-				throw new IllegalArgumentException("State " + q + " does not have outgoing transitions.");
+				throw new NullPointerException("State " + q + " does not have outgoing transitions.");
 		if (q0 == null)
-			throw new NullPointerException("No initial state specified.");	
-		this.states = Collections.unmodifiableSet(new HashSet<State>(Q));
-		this.iface = Collections.unmodifiableSet(new HashSet<String>(P));
-		Map<State, List<Transition<L>>> out = new HashMap<State, List<Transition<L>>>();
-		for (Map.Entry<State, List<Transition<L>>> entry : T.entrySet())
-			out.put(entry.getKey(), new ArrayList<Transition<L>>(entry.getValue()));		
+			throw new NullPointerException("No initial state specified.");
+		
+		this.initial = q0;
+		
+		SortedSet<State> states = new TreeSet<State>(Q);
+		states.add(initial);
+		this.states = Collections.unmodifiableSortedSet(states);
+		
+		this.iface = Collections.unmodifiableSortedSet(new TreeSet<Port>(P));
+		
+		Map<State, Set<Transition<L>>> out = new HashMap<State, Set<Transition<L>>>();
+		for (Map.Entry<State, Set<Transition<L>>> entry : T.entrySet())
+			out.put(entry.getKey(), Collections.unmodifiableSet(new HashSet<Transition<L>>(entry.getValue())));
+		if (out.get(initial) == null)
+			out.put(initial, Collections.unmodifiableSet(new HashSet<Transition<L>>()));
 		this.out = Collections.unmodifiableMap(out);
-		this.initial = q0;
+		
+		this.lbl = lbl;
 	}
 	
 	/**
-	 * Constructs a copy of an automaton.
-	 * @param A		original automaton.
+	 * Gets the set of states of this automaton.
+	 * @return set of states
 	 */
-	public Automaton(Automaton<L> A) {
-		this.states = A.states;
-		this.iface = A.iface;
-		this.out = A.out;
-		this.initial = A.initial;
+	public SortedSet<State> getStates() {
+		return this.states;
 	}
 	
 	/**
-	 * Constructs a copy of an automaton, with given initial state.
-	 * @param A		original automaton.
+	 * Gets the interface of this automaton.
+	 * @return set of names.
 	 */
-	public Automaton(Automaton<L> A, State q0) {
-		if (!A.states.contains(q0)) 
-			throw new NullPointerException("State " + q0 + " is not a state in this automaton.");
-		this.states = A.states;
-		this.iface = A.iface;
-		this.out = A.out;
-		this.initial = q0;
+	public SortedSet<Port> getInterface() {
+		return this.iface;
+	}
+
+	/**
+	 * Gets the outgoing transitions from a given state.
+	 * @return list of outgoing transitions.
+	 */
+	public Map<State, Set<Transition<L>>> getTransitions() {
+		return this.out;
 	}
 	
 	/**
-	 * Compose this automaton with a single automaton by means of
+	 * Gets the initial state of this automaton.
+	 * @return initial state.
+	 */
+	public State getInitial() {
+		return this.initial;
+	}
+	
+	/**
+	 * Returns a copy of this automaton with given initial state.
+	 * @param q0	new initial state.
+	 */
+	public Automaton<L> setInitial(State q0) {
+		return new Automaton<L>(states, iface, out, q0, lbl);
+	}
+	
+	/**
+	 * Compose this automaton with an array of automata by means of
 	 * a breadth first algorithm.
-	 * @param automata		a list of work automata
-	 * @return the product automaton.
-	 */
-	public Automaton<L> compose(Automaton<L> automaton) {
-		List<Automaton<L>> As = new ArrayList<Automaton<L>>();
-		As.add(automaton);
-		return this.compose(As);
-	}
-	
-	/**
-	 * Compose this automaton with a list of automata by means of
-	 * a breadth first algorithm.
-	 * @param automata		a list of work automata
-	 * @return this automaton, if the list is empty, and the product 
+	 * @param automata		a array of automata
+	 * @return this automaton, if the array is empty, and the product 
 	 * automaton, otherwise.
 	 */
-	public Automaton<L> compose(List<Automaton<L>> automata) {
-		
-		// Get the number of work automata.
-		int size = automata.size();
-		
-		// If the product is empty, return the identity automaton.
-		if (size == 0) 
-			return this;
+	public Automaton<L> compose(Iterable<? extends Automaton<L>> automata) {
 
 		// Initialize the automaton fields.
-		Set<State> Q = new HashSet<State>();
-		Set<String> P = new HashSet<String>();
-		Map<State, List<Transition<L>>> T = new HashMap<State, List<Transition<L>>>();
+		SortedSet<State> Q = new TreeSet<State>();
+		SortedSet<Port> P = new TreeSet<Port>();
+		Map<State, Set<Transition<L>>> T = new HashMap<State, Set<Transition<L>>>();
 		State q0;
 
 		// Find the global initial state.
 		List<State> qi0 = new ArrayList<State>();
-		for (int i = 0; i < size; i++) 
-			qi0.add(automata.get(i).initial);
+		for (Automaton<L> Ai : automata) {
+			qi0.add(Ai.initial);
+			P.addAll(Ai.iface);
+		}
 		q0 = this.initial.compose(qi0);
 		
 		// Initialize the queue L of unexplored global states.
@@ -148,7 +180,7 @@ public class Automaton<L extends Label<L>> {
 		// Add the initial state to the queue.
 		L.add(Pair.create(this.initial, qi0));
 		Q.add(q0);
-		T.put(q0, new ArrayList<Transition<L>>());
+		T.put(q0, new HashSet<Transition<L>>());
 		
 		// Loop until the queue is empty.
 		while (!L.isEmpty()) {
@@ -157,18 +189,17 @@ public class Automaton<L extends Label<L>> {
 			Pair<State,List<State>> s1 = L.poll();
 			State q1 = s1.first.compose(s1.second);
 			
-			System.out.println("Exploring state " + q1);
-			System.out.println("s1.first " + s1.first);
-			System.out.println("s1.second " + s1.second);
-			
 			// Add global state s1 to the set of states Q
 			Q.add(q1);
 
 			// Iterate over all *composable* combinations of local transitions from s1.
+			// TODO this.setInitial(q) unnecessarily copies the whole automaton.
 			List<Automaton<L>> As = new ArrayList<Automaton<L>>();
-			As.add(new Automaton<L>(this, s1.first));
-			for (int i = 0; i < automata.size(); ++i) 
-				As.add(new Automaton<L>(automata.get(i), s1.second.get(i)));
+			As.add(this.setInitial(s1.first)); 
+			Iterator<? extends Automaton<L>> Ai = automata.iterator();
+			Iterator<State> si = s1.second.iterator();
+			while (Ai.hasNext() && si.hasNext())
+				As.add(Ai.next().setInitial(si.next()));
 			TransitionIterator<L> combination = new TransitionIterator<L>(As);
 
 			// Iterate over all combinations of local transitions.
@@ -177,14 +208,11 @@ public class Automaton<L extends Label<L>> {
 				// Get the next composable combination of local transitions.
 				List<Transition<L>> tuple = combination.next();
 				
-				System.out.println("Next combination " + tuple);
-				
 				// Construct the global transition.
 				Transition<L> t0 = tuple.get(0);
 				List<Transition<L>> ti = new ArrayList<Transition<L>>(tuple);
 				ti.remove(0);
 				Transition<L> t = t0.compose(ti);
-				System.out.println("Global transition " + t);
 
 				// Construct the target state.
 				State q02 = t0.getTarget();
@@ -193,24 +221,20 @@ public class Automaton<L extends Label<L>> {
 					qi2.add(tr.getTarget());
 				Pair<State,List<State>> s2 = Pair.create(q02, qi2);
 				State q2 = s2.first.compose(s2.second);
-				System.out.println("Target state " + q2);
 				
 
 				// Add the target state to the work automaton, and add it to the queue if its new.
 				if (Q.add(q2)) {
-					T.put(q2, new ArrayList<Transition<L>>());
-					System.out.println("Found new state " + q2);
+					T.put(q2, new HashSet<Transition<L>>());
 					L.add(s2);
 				}
-				
-				System.out.println("q2 in Q: " + Q.contains(q2));
 				
 				// Add the global transition to the work automaton
 				T.get(q1).add(t);				
 			}
 		}
 		
-		return new Automaton<L>(Q, P, T, q0);
+		return new Automaton<L>(Q, P, T, q0, lbl);
 	}
 
 	/**
@@ -218,45 +242,44 @@ public class Automaton<L extends Label<L>> {
 	 * @param intface			smaller interface
 	 * @returns Automaton with interface intface.
 	 */
-	public Automaton<L> restrict(Set<String> intface) {
-		Map<State, List<Transition<L>>> out = new HashMap<State, List<Transition<L>>>();
-		for (Map.Entry<State, List<Transition<L>>> entry : this.out.entrySet()) {
-			List<Transition<L>> outq = new ArrayList<Transition<L>>();
+	public Automaton<L> restrict(SortedSet<Port> intface) {
+		Map<State, Set<Transition<L>>> out = new HashMap<State, Set<Transition<L>>>();
+		for (Map.Entry<State, Set<Transition<L>>> entry : this.out.entrySet()) {
+			Set<Transition<L>> outq = new HashSet<Transition<L>>();
 			for (Transition<L> t : entry.getValue()) 
 				outq.add(t.restrict(intface));
 			out.put(entry.getKey(), outq);		
 		}
-		return new Automaton<L>(this.states, intface, out, this.initial);
+		return new Automaton<L>(states, intface, out, initial, lbl);
 	}
 
 	/**
 	 * Relabels a name x to a name y, for every key-value pair (x,y) in r.
 	 * @param links		relabeling function
 	 */
-	public Automaton<L> rename(Map<String, String> links) {
+	public Automaton<L> rename(Map<Port, Port> links) {
 		
 		// Initialize the automaton
-		Set<State> Q = this.states;
-		Set<String> P = new HashSet<String>();
-		Map<State, List<Transition<L>>> T = new HashMap<State, List<Transition<L>>>();
+		SortedSet<State> Q = this.states;
+		SortedSet<Port> P = new TreeSet<Port>();
+		Map<State, Set<Transition<L>>> T = new HashMap<State, Set<Transition<L>>>();
 		
 		// Rename the ports in the interface
-		for (String a : this.iface) {
-			String port;
-			if ((port = links.get(a)) == null)
-				port = a;
-			P.add(port);
+		for (Port a : this.iface) {
+			Port b = links.get(a);
+			if (b == null) b = a;
+			P.add(b);
 		}
 		
 		// Add relabeled transitions to the set of transition
-		for (Map.Entry<State, List<Transition<L>>> entry : this.out.entrySet()) {
-			List<Transition<L>> outq = new ArrayList<Transition<L>>();
+		for (Map.Entry<State, Set<Transition<L>>> entry : this.out.entrySet()) {
+			Set<Transition<L>> outq = new HashSet<Transition<L>>();
 			for (Transition<L> t : entry.getValue()) 
 				outq.add(t.rename(links));
 			T.put(entry.getKey(), outq);
 		}
 		
-		return new Automaton<L>(Q, P, T, this.initial);
+		return new Automaton<L>(Q, P, T, initial, lbl);
 	}
 	
 	/**
@@ -265,21 +288,17 @@ public class Automaton<L extends Label<L>> {
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
-		 
-		str.append("// Automaton with interface " + this.iface + " and initial state " + this.initial + "\n");
-		str.append("digraph {\n");
-		for (State q : this.states) 
-			str.append("\t" + q + " [label=\"" + q + "\"];\n");
+
+		str.append("Interface " + iface + "; initial state "+ initial + "\n");
 		for (State q : this.states) {
 			for (Transition<L> t : this.out.get(q)) {
 				State q1 = t.getSource();
 				State q2 = t.getTarget();
 				String sc = t.getSyncConstraint().toString();
 				L lb = t.getLabel();
-				str.append("\t" + q1 + " -> "+ q2 + " [label=\"" + sc + ", " + lb + "\"];\n");
+				str.append("\t" + q1 + " -> "+ q2 + " : " + sc + ", " + lb + "\n");
 			}
 		}
-		str.append("}");
 		 
 		return str.toString();
 	}
@@ -290,14 +309,72 @@ public class Automaton<L extends Label<L>> {
 	 * @param fileName		the name of the file without .dot extension
 	 * @return true if file is successfully written.
 	 */
-	public boolean toFile(String fileName) {
+	public boolean toDOTFile(String fileName) {
 		try {
 			FileWriter out = new FileWriter(fileName + ".dot");
-			out.write(this.toString());
+			out.write("// Automaton with interface " + this.iface + " and initial state " + this.initial + "\n");
+			out.write("digraph {\n");
+			for (State q : this.states) 
+				out.write("\t" + q + " [label=\"" + q + "\"];\n");
+			for (State q : this.states) {
+				for (Transition<L> t : this.out.get(q)) {
+					State q1 = t.getSource();
+					State q2 = t.getTarget();
+					String sc = t.getSyncConstraint().toString();
+					L lb = t.getLabel();
+					out.write("\t" + q1 + " -> "+ q2 + " [label=\"" + sc + ", " + lb + "\"];\n");
+				}
+			}
+			out.write("}");
 			out.close();
 		} catch (IOException e) {
 			return false;
 		} 
 		return true;
+	}
+
+	public Automaton<L> getNode(Set<Port> node) {
+		SortedSet<State> Q = new TreeSet<State>();
+		SortedSet<Port> P = new TreeSet<Port>();
+		Map<State, Set<Transition<L>>> T = new HashMap<State, Set<Transition<L>>>();
+		State q0 = new State("q");
+		Q.add(q0);
+		T.put(q0, new HashSet<Transition<L>>());
+
+		SortedSet<Port> ins = new TreeSet<Port>();
+		SortedSet<Port> outs = new TreeSet<Port>();
+		for (Port p : node) {
+			P.add(p);
+			switch (p.getType()) {
+			case IN:
+				outs.add(p);
+				break;
+			case OUT: 
+				ins.add(p);
+				break;
+			default:
+				break;
+			}
+		}
+		
+		for (Port p : ins) {
+			SortedSet<Port> N = new TreeSet<Port>(outs);
+			N.add(p);
+			Transition<L> t = new Transition<L>(q0, q0, N, lbl.getLabel(N)); 
+			T.get(q0).add(t);
+		}
+		
+		return new Automaton<L>(Q, P, T, q0, lbl);
+	}
+
+	public Automaton<L> evaluate(Map<String, String> params) {
+		Map<State, Set<Transition<L>>> out = new HashMap<State, Set<Transition<L>>>();
+		for (Map.Entry<State, Set<Transition<L>>> entry : this.out.entrySet()) {
+			Set<Transition<L>> outq =  new HashSet<Transition<L>>();
+			for (Transition<L> t : entry.getValue())
+				outq.add(t.evaluate(params));
+			out.put(entry.getKey(), outq);		
+		}
+		return new Automaton<L>(states, iface, out, initial, lbl);
 	}
 }

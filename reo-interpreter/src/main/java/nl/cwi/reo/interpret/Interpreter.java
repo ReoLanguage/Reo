@@ -213,10 +213,10 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @throws IOException 
 	 */
 	private ProgramFile<T> parse(CharStream c) throws IOException  {
-		TreoLexer lexer = new TreoLexer(c); 
+		ReoLexer lexer = new ReoLexer(c); 
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		
-		TreoParser parser = new TreoParser(tokens);
+		ReoParser parser = new ReoParser(tokens);
 		parser.removeErrorListeners();
 		parser.addErrorListener(new ErrorListener());
 		

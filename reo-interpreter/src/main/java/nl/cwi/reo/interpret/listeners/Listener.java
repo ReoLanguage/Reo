@@ -4,58 +4,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.cwi.reo.errors.ErrorLog;
-import nl.cwi.reo.interpret.TreoBaseListener;
-import nl.cwi.reo.interpret.TreoParser;
-import nl.cwi.reo.interpret.TreoParser.BexprContext;
-import nl.cwi.reo.interpret.TreoParser.Bexpr_booleanContext;
-import nl.cwi.reo.interpret.TreoParser.Bexpr_bracketsContext;
-import nl.cwi.reo.interpret.TreoParser.Bexpr_conjunctionContext;
-import nl.cwi.reo.interpret.TreoParser.Bexpr_disjunctionContext;
-import nl.cwi.reo.interpret.TreoParser.Bexpr_negationContext;
-import nl.cwi.reo.interpret.TreoParser.Bexpr_relationContext;
-import nl.cwi.reo.interpret.TreoParser.Bexpr_variableContext;
-import nl.cwi.reo.interpret.TreoParser.BodyContext;
-import nl.cwi.reo.interpret.TreoParser.Cexpr_atomicContext;
-import nl.cwi.reo.interpret.TreoParser.Cexpr_compositeContext;
-import nl.cwi.reo.interpret.TreoParser.Cexpr_variableContext;
-import nl.cwi.reo.interpret.TreoParser.Expr_stringContext;
-import nl.cwi.reo.interpret.TreoParser.Expr_booleanContext;
-import nl.cwi.reo.interpret.TreoParser.Expr_integerContext;
-import nl.cwi.reo.interpret.TreoParser.Expr_componentContext;
-import nl.cwi.reo.interpret.TreoParser.FileContext;
-import nl.cwi.reo.interpret.TreoParser.IexprContext;
-import nl.cwi.reo.interpret.TreoParser.Iexpr_addsubContext;
-import nl.cwi.reo.interpret.TreoParser.Iexpr_bracketsContext;
-import nl.cwi.reo.interpret.TreoParser.Iexpr_exponentContext;
-import nl.cwi.reo.interpret.TreoParser.Iexpr_multdivremContext;
-import nl.cwi.reo.interpret.TreoParser.Iexpr_naturalContext;
-import nl.cwi.reo.interpret.TreoParser.Iexpr_unaryminContext;
-import nl.cwi.reo.interpret.TreoParser.Iexpr_variableContext;
-import nl.cwi.reo.interpret.TreoParser.IfaceContext;
-import nl.cwi.reo.interpret.TreoParser.ImpsContext;
-import nl.cwi.reo.interpret.TreoParser.IndicesContext;
-import nl.cwi.reo.interpret.TreoParser.ListContext;
-import nl.cwi.reo.interpret.TreoParser.NameContext;
-import nl.cwi.reo.interpret.TreoParser.NodeContext;
-import nl.cwi.reo.interpret.TreoParser.NodesContext;
-import nl.cwi.reo.interpret.TreoParser.ParamContext;
-import nl.cwi.reo.interpret.TreoParser.ParamsContext;
-import nl.cwi.reo.interpret.TreoParser.Ptype_signatureContext;
-import nl.cwi.reo.interpret.TreoParser.Ptype_typetagContext;
-import nl.cwi.reo.interpret.TreoParser.RangeContext;
-import nl.cwi.reo.interpret.TreoParser.Range_exprContext;
-import nl.cwi.reo.interpret.TreoParser.Range_listContext;
-import nl.cwi.reo.interpret.TreoParser.Range_variableContext;
-import nl.cwi.reo.interpret.TreoParser.SignContext;
-import nl.cwi.reo.interpret.TreoParser.StmtContext;
-import nl.cwi.reo.interpret.TreoParser.Stmt_conditionContext;
-import nl.cwi.reo.interpret.TreoParser.Stmt_instanceContext;
-import nl.cwi.reo.interpret.TreoParser.Stmt_equationContext;
-import nl.cwi.reo.interpret.TreoParser.Stmt_compdefnContext;
-import nl.cwi.reo.interpret.TreoParser.Stmt_iterationContext;
-import nl.cwi.reo.interpret.TreoParser.TypeContext;
-import nl.cwi.reo.interpret.TreoParser.SecnContext;
-import nl.cwi.reo.interpret.TreoParser.VarContext;
+import nl.cwi.reo.interpret.ReoBaseListener;
+import nl.cwi.reo.interpret.ReoParser;
+import nl.cwi.reo.interpret.ReoParser.BexprContext;
+import nl.cwi.reo.interpret.ReoParser.Bexpr_booleanContext;
+import nl.cwi.reo.interpret.ReoParser.Bexpr_bracketsContext;
+import nl.cwi.reo.interpret.ReoParser.Bexpr_conjunctionContext;
+import nl.cwi.reo.interpret.ReoParser.Bexpr_disjunctionContext;
+import nl.cwi.reo.interpret.ReoParser.Bexpr_negationContext;
+import nl.cwi.reo.interpret.ReoParser.Bexpr_relationContext;
+import nl.cwi.reo.interpret.ReoParser.Bexpr_variableContext;
+import nl.cwi.reo.interpret.ReoParser.BodyContext;
+import nl.cwi.reo.interpret.ReoParser.Cexpr_atomicContext;
+import nl.cwi.reo.interpret.ReoParser.Cexpr_compositeContext;
+import nl.cwi.reo.interpret.ReoParser.Cexpr_variableContext;
+import nl.cwi.reo.interpret.ReoParser.Expr_stringContext;
+import nl.cwi.reo.interpret.ReoParser.Expr_booleanContext;
+import nl.cwi.reo.interpret.ReoParser.Expr_integerContext;
+import nl.cwi.reo.interpret.ReoParser.Expr_componentContext;
+import nl.cwi.reo.interpret.ReoParser.FileContext;
+import nl.cwi.reo.interpret.ReoParser.IexprContext;
+import nl.cwi.reo.interpret.ReoParser.Iexpr_addsubContext;
+import nl.cwi.reo.interpret.ReoParser.Iexpr_bracketsContext;
+import nl.cwi.reo.interpret.ReoParser.Iexpr_exponentContext;
+import nl.cwi.reo.interpret.ReoParser.Iexpr_multdivremContext;
+import nl.cwi.reo.interpret.ReoParser.Iexpr_naturalContext;
+import nl.cwi.reo.interpret.ReoParser.Iexpr_unaryminContext;
+import nl.cwi.reo.interpret.ReoParser.Iexpr_variableContext;
+import nl.cwi.reo.interpret.ReoParser.IfaceContext;
+import nl.cwi.reo.interpret.ReoParser.ImpsContext;
+import nl.cwi.reo.interpret.ReoParser.IndicesContext;
+import nl.cwi.reo.interpret.ReoParser.ListContext;
+import nl.cwi.reo.interpret.ReoParser.NameContext;
+import nl.cwi.reo.interpret.ReoParser.NodeContext;
+import nl.cwi.reo.interpret.ReoParser.NodesContext;
+import nl.cwi.reo.interpret.ReoParser.ParamContext;
+import nl.cwi.reo.interpret.ReoParser.ParamsContext;
+import nl.cwi.reo.interpret.ReoParser.Ptype_signatureContext;
+import nl.cwi.reo.interpret.ReoParser.Ptype_typetagContext;
+import nl.cwi.reo.interpret.ReoParser.RangeContext;
+import nl.cwi.reo.interpret.ReoParser.Range_exprContext;
+import nl.cwi.reo.interpret.ReoParser.Range_listContext;
+import nl.cwi.reo.interpret.ReoParser.Range_variableContext;
+import nl.cwi.reo.interpret.ReoParser.SignContext;
+import nl.cwi.reo.interpret.ReoParser.StmtContext;
+import nl.cwi.reo.interpret.ReoParser.Stmt_conditionContext;
+import nl.cwi.reo.interpret.ReoParser.Stmt_instanceContext;
+import nl.cwi.reo.interpret.ReoParser.Stmt_equationContext;
+import nl.cwi.reo.interpret.ReoParser.Stmt_compdefnContext;
+import nl.cwi.reo.interpret.ReoParser.Stmt_iterationContext;
+import nl.cwi.reo.interpret.ReoParser.TypeContext;
+import nl.cwi.reo.interpret.ReoParser.SecnContext;
+import nl.cwi.reo.interpret.ReoParser.VarContext;
 import nl.cwi.reo.interpret.booleans.BooleanConjunction;
 import nl.cwi.reo.interpret.booleans.BooleanDisequality;
 import nl.cwi.reo.interpret.booleans.BooleanDisjunction;
@@ -115,7 +115,7 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  * Listens to events triggered by a {@link org.antlr.v4.runtime.tree.ParseTreeWalker}.
  * Returns a {@link nl.cwi.reo.interpret.p}.
  */
-public class Listener<T extends Semantics<T>> extends TreoBaseListener {
+public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	
 	// Error log
 	private ErrorLog log;
@@ -377,22 +377,22 @@ public class Listener<T extends Semantics<T>> extends TreoBaseListener {
 		IntegerExpression e2 = iexprs.get(ctx.iexpr(1));
 		
 		switch (ctx.op.getType()) {
-		case TreoParser.LEQ:
+		case ReoParser.LEQ:
 			bexprs.put(ctx, new BooleanLessOrEqual(e1, e2));
 			break;
-		case TreoParser.LT:
+		case ReoParser.LT:
 			bexprs.put(ctx, new BooleanLessThan(e1, e2));
 			break;
-		case TreoParser.GEQ:
+		case ReoParser.GEQ:
 			bexprs.put(ctx, new BooleanGreaterOrEqual(e1, e2));
 			break;
-		case TreoParser.GT:
+		case ReoParser.GT:
 			bexprs.put(ctx, new BooleanGreaterThan(e1, e2));
 			break;
-		case TreoParser.EQ:
+		case ReoParser.EQ:
 			bexprs.put(ctx, new BooleanEquality(e1, e2));
 			break;
-		case TreoParser.NEQ:
+		case ReoParser.NEQ:
 			bexprs.put(ctx, new BooleanDisequality(e1, e2));
 			break;
 		default:
@@ -527,13 +527,13 @@ public class Listener<T extends Semantics<T>> extends TreoBaseListener {
 		NodeType type = NodeType.MIXED;
 		if (ctx.io != null) {
 			switch (ctx.io.getType()) {
-			case TreoParser.IN:
+			case ReoParser.IN:
 				type = NodeType.SOURCE;
 				break;
-			case TreoParser.OUT:
+			case ReoParser.OUT:
 				type = NodeType.SINK;
 				break;
-			case TreoParser.MIX:
+			case ReoParser.MIX:
 				type = NodeType.MIXED;
 				break;
 			default:
@@ -628,13 +628,13 @@ public class Listener<T extends Semantics<T>> extends TreoBaseListener {
 		IntegerExpression e1 = iexprs.get(ctx.iexpr(0));
 		IntegerExpression e2 = iexprs.get(ctx.iexpr(1));		
 		switch (ctx.op.getType()) {
-		case TreoParser.MUL:
+		case ReoParser.MUL:
 			iexprs.put(ctx, new IntegerMultiplication(e1, e2));
 			break;
-		case TreoParser.DIV:
+		case ReoParser.DIV:
 			iexprs.put(ctx, new IntegerDivision(e1, e2));
 			break;
-		case TreoParser.GEQ:
+		case ReoParser.GEQ:
 			iexprs.put(ctx, new IntegerRemainder(e1, e2));
 			break;
 		default:
@@ -661,10 +661,10 @@ public class Listener<T extends Semantics<T>> extends TreoBaseListener {
 		IntegerExpression e1 = iexprs.get(ctx.iexpr(0));
 		IntegerExpression e2 = iexprs.get(ctx.iexpr(1));		
 		switch (ctx.op.getType()) {
-		case TreoParser.ADD:
+		case ReoParser.ADD:
 			iexprs.put(ctx, new IntegerAddition(e1, e2));
 			break;
-		case TreoParser.MIN:
+		case ReoParser.MIN:
 			iexprs.put(ctx, new IntegerSubstraction(e1, e2));
 			break;
 		default:

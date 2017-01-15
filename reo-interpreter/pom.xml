@@ -40,6 +40,9 @@
             <goals>
               <goal>antlr4</goal>
             </goals>
+            <configuration>
+               <libDirectory>src/main/antlr4/nl/cwi/reo/interpret</libDirectory>
+            </configuration>
           </execution>
         </executions>
       </plugin>

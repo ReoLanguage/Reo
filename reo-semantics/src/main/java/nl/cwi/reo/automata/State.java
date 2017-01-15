@@ -1,8 +1,9 @@
 package nl.cwi.reo.automata;
 
 import java.util.List;
+import java.util.Objects;
 
-public class State {
+public class State implements Comparable<State> {
 	
 	/**
 	 * State name.
@@ -36,10 +37,8 @@ public class State {
 			s += "|" + qs.get(i).name;
 		return new State(s);
 	}
-	
-	/**
-	 * String represenation of this state.
-	 */
+
+	@Override
 	public String toString() {
 		return this.name;
 	}
@@ -50,11 +49,16 @@ public class State {
 	    if (other == this) return true;
 	    if (!(other instanceof State)) return false;
 	    State q = (State)other;
-	   	return this.name.equals(q.name);
+	   	return Objects.equals(this.name, q.name);
 	}
 	
     @Override
     public int hashCode() {
-        return this.name.hashCode();
+	    return Objects.hash(this.name);
     }
+	
+	@Override
+	public int compareTo(State other) {
+		return this.name.compareTo(other.name);
+	}
 }

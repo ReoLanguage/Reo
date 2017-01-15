@@ -7,19 +7,20 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.interpret.TreoParser.Atom_workautomataContext;
-import nl.cwi.reo.interpret.TreoParser.IdsetContext;
-import nl.cwi.reo.interpret.TreoParser.WaContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_exprContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_invariantContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_jc_andContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_jc_boolContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_jc_bracketsContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_jc_eqContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_jc_geqContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_jc_leqContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_jc_orContext;
-import nl.cwi.reo.interpret.TreoParser.Wa_transitionContext;
+import nl.cwi.reo.interpret.ReoParser.AtomContext;
+import nl.cwi.reo.interpret.ReoParser.WaContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_exprContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_invariantContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_andContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_boolContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_bracketsContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_eqContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_geqContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_leqContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_orContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_setContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_transitionContext;
+import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.workautomata.JobConstraint;
 import nl.cwi.reo.workautomata.Transition;
 import nl.cwi.reo.workautomata.WorkAutomaton;
@@ -35,13 +36,13 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 		
 	private ParseTreeProperty<WorkAutomaton> workautomata = new ParseTreeProperty<WorkAutomaton>();
 	private ParseTreeProperty<JobConstraint> wa_jobconstraints = new ParseTreeProperty<JobConstraint>();
-	private ParseTreeProperty<SortedSet<String>> idsets = new ParseTreeProperty<SortedSet<String>>();
+	private ParseTreeProperty<SortedSet<Port>> idsets = new ParseTreeProperty<SortedSet<Port>>();
 //	private ParseTreeProperty<SortedSet<String>> wa_resets = new ParseTreeProperty<SortedSet<String>>();	
 	private ParseTreeProperty<Transition> wa_transitions = new ParseTreeProperty<Transition>();	
 	private ParseTreeProperty<String> wa_states = new ParseTreeProperty<String>();
 
 	@Override
-	public void exitAtom_workautomata(Atom_workautomataContext ctx) {
+	public void exitAtom(AtomContext ctx) {
 		atoms.put(ctx, workautomata.get(ctx.wa()));
 	}
 	
@@ -53,7 +54,7 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 	public void exitWa(WaContext ctx) {
 		// Initialize all work automaton fields.
 		Set<String> Q = new HashSet<String>();
-		Set<String> P = new HashSet<String>();
+		SortedSet<Port> P = new TreeSet<Port>();
 		Set<String> J = new HashSet<String>();
 		Map<String, JobConstraint> I = new HashMap<String, JobConstraint>();
 		Map<String, Set<Transition>> T = new HashMap<String, Set<Transition>>();
@@ -129,14 +130,14 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 	}
 
 	@Override
-	public void enterIdset(IdsetContext ctx) {
+	public void enterWa_set(Wa_setContext ctx) {
 	}
 
 	@Override
-	public void exitIdset(IdsetContext ctx) {
-		SortedSet<String> sc = new TreeSet<String>();
+	public void exitWa_set(Wa_setContext ctx) {
+		SortedSet<Port> sc = new TreeSet<Port>();
 		for (TerminalNode id : ctx.ID())
-			sc.add(id.getText());
+			sc.add(new Port(id.getText()));
 		idsets.put(ctx, sc);
 	}
 
@@ -185,7 +186,7 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 	public void exitWa_transition(Wa_transitionContext ctx) {
 		String q1 = ctx.ID(0).getText();
 		String q2 = ctx.ID(1).getText();
-		SortedSet<String> sc = idsets.get(ctx.idset(0));
+		SortedSet<Port> sc = idsets.get(ctx.wa_set(0));
 		JobConstraint jc = wa_jobconstraints.get(ctx.jc());
 //		SortedSet<String> resets = wa_resets.get(ctx.idset(1));
 		wa_transitions.put(ctx, new Transition(q1, q2, sc, jc));		
