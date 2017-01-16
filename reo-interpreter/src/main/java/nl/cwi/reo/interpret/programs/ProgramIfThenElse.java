@@ -55,6 +55,7 @@ public class ProgramIfThenElse<T extends Semantics<T>> implements ProgramExpress
 			BooleanExpression e = condition.next().evaluate(params);
 			ProgramExpression<T> b = branch.next().evaluate(params);
 			conditions_p.add(e);
+			branches_p.add(b);
 			if (canEvaluate && e instanceof BooleanValue) {
 				if (((BooleanValue)e).toBoolean() == true)
 					return b;

@@ -3,7 +3,6 @@ package nl.cwi.reo.interpret.listeners;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.cwi.reo.errors.ErrorLog;
 import nl.cwi.reo.interpret.ReoBaseListener;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.ReoParser.BexprContext;
@@ -117,12 +116,6 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  */
 public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	
-	// Error log
-	private ErrorLog log;
-	
-	// Symbol table
-//	private Map<String, ValueType> symbols = new HashMap<String, ValueType>();
-	
 	// File structure
 	private ProgramFile<T> program;
 	private String section = "";	
@@ -170,16 +163,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	 * Gets the program expression.
 	 * @return program expression
 	 */
-	public ProgramFile<T> getFile() {
+	public ProgramFile<T> getMain() {
 		return program;
-	}
-
-	/**
-	 * Gets the error log.
-	 * @return error log
-	 */
-	public ErrorLog getErrorLog() {
-		return log;
 	}
 
 	/**
@@ -222,9 +207,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitStmt_equation(Stmt_equationContext ctx) {
 		Range x = arrays.get(ctx.range(0));
-		Range y = arrays.get(ctx.range(1));
+		Range y = arrays.get(ctx.range(1));		
 		if (x instanceof Variable) {
 			progs.put(ctx, new ProgramEquation<T>((Variable)x, y));
+			
 		} else if (x instanceof Variable) {
 			progs.put(ctx, new ProgramEquation<T>((Variable)y, x));
 		} else {

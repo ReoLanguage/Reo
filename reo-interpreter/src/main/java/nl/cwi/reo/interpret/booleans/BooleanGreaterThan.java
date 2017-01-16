@@ -27,7 +27,7 @@ public final class BooleanGreaterThan implements BooleanExpression {
 		IntegerExpression x2 = e2.evaluate(params);
 		if (x1 instanceof IntegerValue && x2 instanceof IntegerValue)
 			return IntegerValue.gt((IntegerValue)x1, (IntegerValue)x2);
-		return new BooleanEquality(x1, x2);
+		return new BooleanGreaterThan(x1, x2);
 	}
 	
 	@Override

@@ -8,7 +8,7 @@ import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.InstanceList;
-import nl.cwi.reo.interpret.signatures.Signature;
+import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
@@ -36,7 +36,7 @@ public class ComponentComposite<T extends Semantics<T>> implements ComponentExpr
 
 	@Override
 	public ProgramExpression<T> instantiate(ExpressionList values, VariableNameList iface) throws Exception {
-		Signature v = sign.evaluate(values, iface);
+		SignatureConcrete v = sign.evaluate(values, iface);
 		ProgramExpression<T> _body = body.evaluate(v.getDefinitions());
 		if (_body instanceof ProgramValue) {
 			Definitions _definitions = new Definitions(((ProgramValue<T>)_body).getUnifications());

@@ -1,5 +1,6 @@
 package nl.cwi.reo.seepageautomata;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -47,7 +48,7 @@ public class SeepageAutomaton extends Automaton<SeepageFunction> implements Sema
 	}
 
 	@Override
-	public SeepageAutomaton restrict(SortedSet<Port> intface) {
+	public SeepageAutomaton restrict(Collection<? extends Port> intface) {
 		return new SeepageAutomaton(super.restrict(intface));
 	}
 }

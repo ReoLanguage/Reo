@@ -46,7 +46,7 @@ public class ProgramBody<T extends Semantics<T>> implements ProgramExpression<T>
 	 */
 	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {	
 		
-//		System.out.println("[info] Evaluating " + this + " using " + params.keySet());
+//		System.out.println("[info] Evaluating " + this);
 
 		Definitions definitions = new Definitions(params);
 		
@@ -95,7 +95,8 @@ public class ProgramBody<T extends Semantics<T>> implements ProgramExpression<T>
 		else
 			prog = new ProgramBody<T>(stmts_p);
 
-//		System.out.println("[info] " + this + " evaluates to " + prog + " using " + params.keySet());
+//		System.out.println("[info] " + this + " evaluates to ");
+//		System.out.println("       " + prog + " using " + params.keySet());
 		return prog;
 	}
 	

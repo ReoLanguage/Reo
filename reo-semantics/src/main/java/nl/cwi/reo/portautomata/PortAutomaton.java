@@ -1,5 +1,6 @@
 package nl.cwi.reo.portautomata;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +56,7 @@ public class PortAutomaton extends Automaton<NullLabel> implements Semantics<Por
 	}
 
 	@Override
-	public PortAutomaton restrict(SortedSet<Port> intface) {
+	public PortAutomaton restrict(Collection<? extends Port> intface) {
 		return new PortAutomaton(super.restrict(intface));
 	}
 }

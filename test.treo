@@ -3,7 +3,7 @@ import reo.fifo1;
 //import reo.fifofull;
 //import reo.syncdrain;
 
-test() {
+test(a,b) {
 
 	fifo<k>(a?, b!) { 
 	
@@ -13,7 +13,7 @@ test() {
 			fifo[k](a,b)
 		}
 	
-		for i = 0..n {
+		for i = 0..k {
 			if (i == 0) {
 				fifo[0](a?,b!) {
 					a = b
@@ -27,8 +27,10 @@ test() {
 		}
 	}
 
-	x=<k>(){for i = 1..k { fifo1(a[i],b) } }
-	x<2>()
+	//x=<k>(){for i = 1..k { fifo1(a[i],b) } }
+	//x<2>()
+
+	fifo<1>(a,b)
 
 }
 

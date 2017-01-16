@@ -33,7 +33,7 @@ public final class SignatureExpression implements ParameterType {
 		this.nodes = nodes;
 	}
 	
-	public Signature evaluate(ExpressionList values, VariableNameList iface) throws Exception {
+	public SignatureConcrete evaluate(ExpressionList values, VariableNameList iface) throws Exception {
 		
 		Definitions definitions = new Definitions();		
 
@@ -63,32 +63,6 @@ public final class SignatureExpression implements ParameterType {
 				System.out.println("[error] Wrong number of parameter values: " + values);
 		}
 
-		// Try to find the parameter value for a correct number of nodes
-		int k_nodes = 0;
-		VariableRange rng_nodes = null;
-		for (Node node : nodes) {
-			if (node.getVariable() instanceof VariableName) {
-				k_nodes += 1;
-			} else if (node.getVariable() instanceof VariableRange) {
-				rng_nodes = (VariableRange)node.getVariable();
-			} else {
-				throw new Exception("Parameter " + node.getVariable() + " is not a valid parameter name.");
-			}
-		}
-		int size_nodes = iface.getList().size() - k_nodes;
-		
-		if (rng_nodes != null) {
-			Definitions defs = rng_nodes.findParamFromSize(size_nodes);
-			if (defs != null) {
-				definitions.putAll(defs);
-			} else {
-				System.out.println("[error] Parameters in " + rng_nodes + " cannot be deduced from its length.");				
-			}
-		} else {
-			if (size_nodes != 0)
-				System.out.println("[error] Wrong number of parameter values: " + iface);
-		}
-
 		// Find the assignment of parameters.
 		Iterator<Parameter> param = params.evaluate(definitions).iterator();
 		Iterator<Expression> value = values.iterator();	
@@ -107,23 +81,66 @@ public final class SignatureExpression implements ParameterType {
 		Map<Port, Port> links = new HashMap<Port, Port>();	
 		
 		Iterator<Node> node = nodes.evaluate(definitions).iterator();
-		Iterator<VariableName> var = iface.getList().iterator();
 		
-		while (node.hasNext() && var.hasNext()) {
-			Node x = node.next();
-			VariableName v = var.next();
-			
-			Port src = x.toPort();
-			Port snk = x.rename(v).toPort();
-			
-			if (src == null)
-				throw new Exception(x + " is not a valid node name.");
-			
-			links.put(src, snk);
-		}
+		if (iface == null) {
 
+			// Create a the default set of links for this interface
+			while (node.hasNext()) {
+				Node x = node.next();
+				
+				Port p = x.toPort();
+				
+				if (p == null)
+					throw new Exception(x + " is not a valid node name.");
+				
+				links.put(p, p);
+			}
+			
+		} else {
+
+			// Try to find the parameter value for a correct number of nodes
+			int k_nodes = 0;
+			VariableRange rng_nodes = null;
+			for (Node x : nodes) {
+				if (x.getVariable() instanceof VariableName) {
+					k_nodes += 1;
+				} else if (x.getVariable() instanceof VariableRange) {
+					rng_nodes = (VariableRange)x.getVariable();
+				} else {
+					throw new Exception("Parameter " + x.getVariable() + " is not a valid parameter name.");
+				}
+			}
+			int size_nodes = iface.getList().size() - k_nodes;
+			
+			if (rng_nodes != null) {
+				Definitions defs = rng_nodes.findParamFromSize(size_nodes);
+				if (defs != null) {
+					definitions.putAll(defs);
+				} else {
+					System.out.println("[error] Parameters in " + rng_nodes + " cannot be deduced from its length.");				
+				}
+			} else {
+				if (size_nodes != 0)
+					System.out.println("[error] Wrong number of parameter values: " + iface);
+			}
+
+			Iterator<VariableName> var = iface.getList().iterator();
+			
+			while (node.hasNext() && var.hasNext()) {
+				Node x = node.next();
+				VariableName v = var.next();
+				
+				Port p = x.toPort();
+				Port q = x.rename(v).toPort();
+				
+				if (p == null)
+					throw new Exception(x + " is not a valid node name.");
+				
+				links.put(p, q);
+			}
+		}
 		
-		return new Signature(definitions, links);
+		return new SignatureConcrete(definitions, links);
 	}
 
 	@Override

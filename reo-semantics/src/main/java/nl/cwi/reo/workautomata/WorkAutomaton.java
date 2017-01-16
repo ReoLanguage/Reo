@@ -3,6 +3,7 @@ package nl.cwi.reo.workautomata;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -394,7 +395,7 @@ public final class WorkAutomaton implements Semantics<WorkAutomaton> {
 	}
 
 	@Override
-	public WorkAutomaton restrict(SortedSet<Port> intface) {
+	public WorkAutomaton restrict(Collection<? extends Port> intface) {
 		return null;
 	}
 

@@ -143,7 +143,7 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 				this.add(new Instance<T>(unit.getNode(node.getValue())));
 	}
 	
-	public List<T> getInstances() {
+	public List<T> getComponents() {
 		List<T> list = new ArrayList<T>();
 		for (Instance<T> inst : this)
 			list.add(inst.getAtom().rename(inst));

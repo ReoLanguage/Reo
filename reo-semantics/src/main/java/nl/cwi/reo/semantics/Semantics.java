@@ -1,5 +1,6 @@
 package nl.cwi.reo.semantics;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -18,6 +19,6 @@ public interface Semantics<T> {
 	
 	public T compose(List<T> automata);
 	
-	public T restrict(SortedSet<Port> intface);
+	public T restrict(Collection<? extends Port> intface);
 	
 }

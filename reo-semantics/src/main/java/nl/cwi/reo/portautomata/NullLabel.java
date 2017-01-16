@@ -1,5 +1,6 @@
 package nl.cwi.reo.portautomata;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +16,7 @@ public class NullLabel implements Label<NullLabel> {
 	}
 	
 	@Override
-	public NullLabel restrict(Set<Port> intface) {
+	public NullLabel restrict(Collection<? extends Port> intface) {
 		return new NullLabel();
 	}
 

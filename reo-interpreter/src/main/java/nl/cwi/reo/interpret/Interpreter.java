@@ -7,10 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
@@ -26,8 +24,14 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import nl.cwi.reo.interpret.components.ComponentValue;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.programs.ProgramFile;
+import nl.cwi.reo.interpret.programs.ProgramValue;
 import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.ranges.ExpressionList;
+import nl.cwi.reo.interpret.semantics.Assembly;
+import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.InstanceList;
+import nl.cwi.reo.interpret.signatures.SignatureConcrete;
+import nl.cwi.reo.interpret.strings.StringValue;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
@@ -40,23 +44,31 @@ public class Interpreter<T extends Semantics<T>> {
 	private final SemanticsType semantics;
 	
 	/**
-	 * Component paths: base directories of component files.
-	 */
-	private final List<String> dirs;
-	
-	/**
 	 * ANTLR listener.
 	 */
 	private final Listener<T> listener;
 	
 	/**
+	 * Component paths: base directories of component files.
+	 */
+	private final List<String> dirs;
+	
+	/**
+	 * list of parameters to instantiate the main component.
+	 */
+	private final List<String> params;
+	
+	/**
 	 * Constructs a Reo interpreter.
 	 * @param dirs		list of directories of Reo components
 	 */
-	public Interpreter(SemanticsType semantics, List<String> dirs, Listener<T> listener) {
+	public Interpreter(SemanticsType semantics, Listener<T> listener, List<String> dirs, List<String> params) {
+		if (semantics == null || listener == null || dirs == null || params == null)
+			throw new NullPointerException();
 		this.semantics = semantics;
-		this.dirs = Collections.unmodifiableList(dirs);	
 		this.listener = listener;
+		this.dirs = Collections.unmodifiableList(dirs);	
+		this.params = Collections.unmodifiableList(params);	
 	}
 
 	/**
@@ -66,11 +78,10 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @return list of work automata.
 	 */
 	@SuppressWarnings("unchecked")
-	public List<T> interpret(List<String> srcfiles) {
-		
-		// Find all available component expressions.
-		Stack<ProgramFile<T>> stack = new Stack<ProgramFile<T>>();	
-		try {
+	public Assembly<T> interpret(List<String> srcfiles) {
+		try {			
+			// Find all available component expressions.
+			Stack<ProgramFile<T>> stack = new Stack<ProgramFile<T>>();	
 			List<String> parsed = new ArrayList<String>();
 			Queue<String> components = new LinkedList<String>();
 			
@@ -101,35 +112,40 @@ public class Interpreter<T extends Semantics<T>> {
 
 				}
 			}
-		} catch (IOException e) {
-			System.out.print(e.getMessage());
-		}		
 
-		// Evaluate these component expressions.
-		Map<VariableName, Expression> cexprs = new HashMap<VariableName, Expression>();
-		VariableName name = null;		
-		try {
+			// Evaluate these component expressions.
+			Definitions definitions = new Definitions();
+			VariableName name = null;		
 			while (!stack.isEmpty()) {
 				ProgramFile<T> program = stack.pop();
 				name = new VariableName(program.getName());
-				Expression cexpr = program.getComponent().evaluate(cexprs);
-				cexprs.put(name, cexpr);
+				Expression cexpr = program.getComponent().evaluate(definitions);
+				definitions.put(name, cexpr);
 			}
+			
+			// Get the instance from the main component.		
+			Expression expr = definitions.get(name);		
+			if (expr instanceof ComponentValue<?>) {				
+				ComponentValue<T> main = (ComponentValue<T>)expr;
+				ExpressionList values = new ExpressionList();
+				for (String x : params) values.add(new StringValue(x));
+				SignatureConcrete sign = main.getSignature().evaluate(values, null);
+				
+				ProgramValue<T> main_p = main.instantiate(values, null);
+				
+				InstanceList<T> instances = main_p.getInstances();
+				
+				instances.insertNodes(true, false);
+				
+				return new Assembly<T>(instances.getComponents(), name.getName(), sign.keySet());
+			}
+		} catch (IOException e) {
+			System.out.print(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}		
 
-		// Get the instance from the main component.
-		InstanceList<T> instances = null;
-		Expression expr = cexprs.get(name);		
-		if (expr instanceof ComponentValue<?>) {
-			instances = ((ComponentValue<T>)expr).getInstances();
-			
-			instances.insertNodes(true, false);
-			
-			return instances.getInstances();
-		}
-		return new ArrayList<T>();
+		return null;
 	}
 	
 	/**
@@ -223,7 +239,7 @@ public class Interpreter<T extends Semantics<T>> {
 		ParseTree tree = parser.file();
 		ParseTreeWalker walker = new ParseTreeWalker();
 		walker.walk(listener, tree);
-		return listener.getFile();
+		return listener.getMain();
 	}
 	
 }

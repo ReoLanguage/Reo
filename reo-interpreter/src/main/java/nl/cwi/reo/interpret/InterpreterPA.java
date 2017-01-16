@@ -9,10 +9,10 @@ import nl.cwi.reo.semantics.SemanticsType;
 public class InterpreterPA extends Interpreter<PortAutomaton> {
 	
 	/**
-	 * Constructs a Reo interpreter for Work Automaton semantics.
+	 * Constructs a Reo interpreter for Port Automaton semantics.
 	 * @param dirs		list of directories of Reo components
 	 */
-	public InterpreterPA(List<String> dirs) {
-		super(SemanticsType.PA, dirs, new ListenerPA());	
+	public InterpreterPA(List<String> dirs, List<String> params) {
+		super(SemanticsType.PA, new ListenerPA(), dirs, params);	
 	}	
 }

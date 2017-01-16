@@ -27,7 +27,7 @@ public final class BooleanLessThan implements BooleanExpression {
 		IntegerExpression x2 = e2.evaluate(params);
 		if (x1 instanceof IntegerValue && x2 instanceof IntegerValue)
 			return IntegerValue.lt((IntegerValue)x1, (IntegerValue)x2);
-		return new BooleanEquality(x1, x2);
+		return new BooleanLessThan(x1, x2);
 	}
 	
 	@Override

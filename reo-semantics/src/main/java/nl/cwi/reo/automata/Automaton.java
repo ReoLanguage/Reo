@@ -3,6 +3,7 @@ package nl.cwi.reo.automata;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -242,7 +243,8 @@ public class Automaton<L extends Label<L>> {
 	 * @param intface			smaller interface
 	 * @returns Automaton with interface intface.
 	 */
-	public Automaton<L> restrict(SortedSet<Port> intface) {
+	public Automaton<L> restrict(Collection<? extends Port> intface) {
+		SortedSet<Port> iface = new TreeSet<Port>(intface);
 		Map<State, Set<Transition<L>>> out = new HashMap<State, Set<Transition<L>>>();
 		for (Map.Entry<State, Set<Transition<L>>> entry : this.out.entrySet()) {
 			Set<Transition<L>> outq = new HashSet<Transition<L>>();
@@ -250,7 +252,7 @@ public class Automaton<L extends Label<L>> {
 				outq.add(t.restrict(intface));
 			out.put(entry.getKey(), outq);		
 		}
-		return new Automaton<L>(states, intface, out, initial, lbl);
+		return new Automaton<L>(states, iface, out, initial, lbl);
 	}
 
 	/**
@@ -268,7 +270,7 @@ public class Automaton<L extends Label<L>> {
 		for (Port a : this.iface) {
 			Port b = links.get(a);
 			if (b == null) b = a;
-			P.add(b);
+			P.add(b);//P.add(new Port(b.getName()));
 		}
 		
 		// Add relabeled transitions to the set of transition

@@ -12,7 +12,7 @@ public class InterpreterWA extends Interpreter<WorkAutomaton> {
 	 * Constructs a Reo interpreter for Work Automaton semantics.
 	 * @param dirs		list of directories of Reo components
 	 */
-	public InterpreterWA(List<String> dirs) {
-		super(SemanticsType.WA, dirs, new ListenerWA());	
+	public InterpreterWA(List<String> dirs, List<String> params) {
+		super(SemanticsType.WA, new ListenerWA(), params, dirs);	
 	}	
 }

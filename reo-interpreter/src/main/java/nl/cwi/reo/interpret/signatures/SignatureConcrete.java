@@ -7,7 +7,7 @@ import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Port;
 
-public class Signature extends HashMap<Port, Port> {
+public class SignatureConcrete extends HashMap<Port, Port> {
 	
 	/**
 	 * Serial version ID.
@@ -16,7 +16,7 @@ public class Signature extends HashMap<Port, Port> {
 	
 	private Map<VariableName, Expression> defs;
 	
-	public Signature(Map<VariableName, Expression> defs, Map<Port, Port> links) {
+	public SignatureConcrete(Map<VariableName, Expression> defs, Map<Port, Port> links) {
 		if (defs == null || links == null)
 			throw new NullPointerException();
 		this.defs = defs;

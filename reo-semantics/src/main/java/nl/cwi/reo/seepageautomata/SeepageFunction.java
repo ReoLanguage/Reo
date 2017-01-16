@@ -1,6 +1,7 @@
 package nl.cwi.reo.seepageautomata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class SeepageFunction implements Label<SeepageFunction> {
 	}
 
 	@Override
-	public SeepageFunction restrict(Set<Port> intface) {
+	public SeepageFunction restrict(Collection<? extends Port> intface) {
 		return new SeepageFunction(this);
 	}
 

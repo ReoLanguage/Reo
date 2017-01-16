@@ -27,7 +27,7 @@ public final class BooleanGreaterOrEqual implements BooleanExpression {
 		IntegerExpression x2 = e2.evaluate(params);
 		if (x1 instanceof IntegerValue && x2 instanceof IntegerValue)
 			return IntegerValue.geq((IntegerValue)x1, (IntegerValue)x2);
-		return new BooleanEquality(x1, x2);
+		return new BooleanGreaterOrEqual(x1, x2);
 	}
 	
 	@Override

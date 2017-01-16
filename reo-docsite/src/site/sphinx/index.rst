@@ -38,7 +38,6 @@ The contents of the documentation is as follows:
    getting-started
    syntax
    contribute
-   parser
 
 Indices and tables
 ==================

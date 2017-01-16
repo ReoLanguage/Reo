@@ -1,11 +1,11 @@
 package nl.cwi.reo.automata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -121,7 +121,7 @@ public final class Transition<L extends Label<L>> {
 	 * @param intface			smaller interface
 	 * @returns Transition with interface intface.
 	 */
-	public Transition<L> restrict(Set<Port> intface) {
+	public Transition<L> restrict(Collection<? extends Port> intface) {
 		SortedSet<Port> N = new TreeSet<Port>(this.N);
 		N.retainAll(intface);		
 		L lbl = this.lbl.restrict(intface);
@@ -138,7 +138,7 @@ public final class Transition<L extends Label<L>> {
 		for (Port port : this.N) {
 			Port newport = links.get(port);
 			if (newport == null) newport = port;
-			rN.add(newport);
+			rN.add(newport); //rN.add(new Port(newport.getName()));
 		}
 		L lbl = this.lbl.rename(links);
 		return new Transition<L>(this.q1, this.q2, rN, lbl);

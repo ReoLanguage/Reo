@@ -1,5 +1,6 @@
 package nl.cwi.reo.automata;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +30,7 @@ public interface Label<L> {
 	 * @param intface		set of names in the interface.
 	 * @return restricted label
 	 */
-	public L restrict(Set<Port> intface);
+	public L restrict(Collection<? extends Port> intface);
 	
 	/**
 	 * Renames entry.Key() to entry.Value() for every entry 
