@@ -87,6 +87,7 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Syntax of Reo</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#components-and-interfaces">Components and interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#definition">Definition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#composition">Composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#iteration">Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#abstraction">Abstraction</a></li>
@@ -172,12 +173,14 @@
 <p>In Reo, programs consist of <em>components</em> that interact via shared <em>nodes</em>.
 Each component has access to a given set of nodes, called an <em>interface</em>.
 A component may synchronize with its environment via <em>puts</em> and <em>gets</em> on nodes in its interface.
-An atomic-component uses each port either as input or as output, but not both.
-Definition
-&#8212;&#8212;&#8212;-</p>
+An atomic-component uses each port either as input or as output, but not both.</p>
+</div>
+<div class="section" id="definition">
+<h2>Definition<a class="headerlink" href="#definition" title="Permalink to this headline">¶</a></h2>
 <p>Before we can start using components, we need to define them.
 The following example shows how we can define a component by referring to Java source code</p>
-<div class="highlight-text"><div class="highlight"><pre>producer(a!) {
+<div class="highlight-text"><div class="highlight"><pre>// producer.treo
+producer(a!) {
    Java :
       com.example.Producer(a)
      }
@@ -187,32 +190,31 @@ The following example shows how we can define a component by referring to Java s
 The <tt class="docutils literal"><span class="pre">Java</span></tt> tag indicates that the reference links to a Java class. Components can also be defined by methods
 written other general purpose languages, such as C/C++</p>
 <p>Arguments of the Java function are automatically linked to the nodes in the interface of the defined component.
-The exclamation mark (<tt class="docutils literal"><span class="pre">!</span></tt>) indicates that component <tt class="docutils literal"><span class="pre">producer</span></tt> uses node a as output.
-A question mark (<tt class="docutils literal"><span class="pre">?</span></tt>) after a node a in the interface indicates the the component uses a as an input node.
-A colon (<tt class="docutils literal"><span class="pre">:</span></tt>) after a node a indicates that the component uses a both as input and as output.</p>
+The exclamation mark (<cite>!</cite>) indicates that Reo component <tt class="docutils literal"><span class="pre">producer</span></tt> uses node <cite>a</cite> as output.
+A question mark (<cite>?</cite>) after a node <cite>a</cite> in the interface indicates the the component uses a as an input node.
+A colon (<cite>:</cite>) after a node <cite>a</cite> indicates that the component uses <cite>a</cite> both as input and as output.</p>
 <p>Another possibility is to define a component via a particular semantic model, such as <em>constraint automaton with state memory</em></p>
-<div class="highlight-text"><div class="highlight"><pre>producer(a?,b!) {
+<div class="highlight-text"><div class="highlight"><pre>// buffer.treo
+buffer(a?,b!) {
    CASM :
       q0 -&gt; q1 : {a}, x&#39; == d(a)
       q1 -&gt; q0 : {b}, d(b) == x
    C/C++ :
-      example::Producer(a)
+      example::Buffer(a,b)
 }
 </pre></div>
 </div>
 <p>By now, there are more than thirty semantics for Reo. Therefore, it is possible to provide a second definition of the
 <em>same</em> component, using a <em>different</em> semantics. For example, the <em>work automaton</em> semantics</p>
-<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre>define fifo1(a?,b!) {
-  #WA
-  q0 -- {a}, true -&gt; q1
-  q1 -- {b}, true -&gt; q0
-}
+<div class="highlight-text"><div class="highlight"><pre>// fifo1.wa.treo
+     define fifo1(a?,b!) {
+   WA :
+      q0 : initial
+      q0 -&gt; q1 : {a}, true, {}
+      q1 -&gt; q0 : {b}, true, {}
+     }
 </pre></div>
-</td></tr></table></div>
+</div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The <tt class="docutils literal"><span class="pre">fifo1</span></tt> component is one of the basic components in Reo. Its has the semantics of a
@@ -223,13 +225,20 @@ exactly two nodes are called <strong>channels</strong>.</p>
 <div class="section" id="composition">
 <h2>Composition<a class="headerlink" href="#composition" title="Permalink to this headline">¶</a></h2>
 <p>Now that we defined the <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel, we may start using it by <em>instantiating</em> our <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel as follows</p>
-<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>fifo1(a,b)
+<div class="highlight-text"><div class="highlight"><pre>// main.treo
+import fifo1;
+
+main() {
+       fifo1(x,y)
+}
 </pre></div>
-</td></tr></table></div>
-<p>This single statement accomplishes <em>two</em> tasks:</p>
+</div>
+<p>This Reo program accomplishes the following tasks:</p>
 <ol class="arabic simple">
-<li>it instantiates the <tt class="docutils literal"><span class="pre">fifo1</span></tt>-channel defined above;</li>
-<li>it instantiates two new nodes a and b.</li>
+<li>is imports the Reo component called <tt class="docutils literal"><span class="pre">fifo1</span></tt>.</li>
+<li>it defines a new Reo component called <tt class="docutils literal"><span class="pre">main</span></tt>.</li>
+<li>it creates two new nodes <cite>x</cite> and <cite>y</cite>.</li>
+<li>it creates an instance of the Reo component <tt class="docutils literal"><span class="pre">fifo1</span></tt> with <cite>a</cite> substituted by <cite>x</cite> and <cite>b</cite> substituted by <cite>y</cite>.</li>
 </ol>
 <p>We may compose multiple component by placing them next to each other.
 The composition is established by sharing nodes.
