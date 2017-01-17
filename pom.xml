@@ -35,6 +35,10 @@ Application designers can use Reo as a "glue code" language for compositional co
     <module>reo-docsite</module>
   </modules>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <build>
     <pluginManagement>
       <plugins>

@@ -11,6 +11,7 @@
   </parent>
 
   <artifactId>reo-docsite</artifactId>
+  <packaging>pom</packaging>
 
   <name>Documentation website</name>
 
@@ -33,13 +34,18 @@
 -->
     </plugins>
   </build>
-  
+
   <reporting>
     <plugins>      
       <plugin>
         <groupId>org.tomdz.maven</groupId>
         <artifactId>sphinx-maven-plugin</artifactId>
         <version>1.0.1</version>
+<!-- 
+        <configuration>
+          <outputDirectory>${project.parent.basedir}/docs</outputDirectory>
+        </configuration>
+-->
       </plugin>
     </plugins>
   </reporting>

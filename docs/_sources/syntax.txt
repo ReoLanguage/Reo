@@ -2,19 +2,6 @@ Syntax of Reo
 =============
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 Components and interfaces
 -------------------------
 
