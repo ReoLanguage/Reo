@@ -85,8 +85,23 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax of Reo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax of Reo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#components-and-interfaces">Components and interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#composition">Composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#iteration">Iteration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#abstraction">Abstraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#parametrization">Parametrization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#build-the-project">Build the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#setting-up-eclipse">Setting up Eclipse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#adding-new-semantics-to-the-compiler">Adding new semantics to the compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#future-work">Future work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -150,17 +165,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <blockquote>
-<div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">github_url:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</div></blockquote>
-<div class="section" id="getting-started">
+  <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
@@ -169,10 +174,10 @@
 <ol class="arabic">
 <li><p class="first">Install Java (version 1.6 or higher). You can check if the correct java version is already installed via <tt class="docutils literal"><span class="pre">java</span> <span class="pre">--version</span></tt></p>
 </li>
-<li><p class="first">Download the <tt class="docutils literal"><span class="pre">lykos-1.0.jar</span></tt> and put it, for example, in <tt class="docutils literal"><span class="pre">/usr/local/lib</span></tt>.</p>
+<li><p class="first">Download the <tt class="docutils literal"><span class="pre">reo-1.0.jar</span></tt> and put it, for example, in <tt class="docutils literal"><span class="pre">~/reo/</span></tt>.</p>
 </li>
 <li><p class="first">Create an alias for the compiler via:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">alias</span> <span class="n">reoc</span><span class="o">=</span><span class="s">&#39;java -jar /usr/local/lib/lykos-1.0.jar&#39;</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">alias</span> <span class="n">reo</span><span class="o">=</span><span class="s">&#39;java -jar /usr/local/lib/reo-1.0.jar&#39;</span>
 </pre></div>
 </div>
 </li>
@@ -183,7 +188,7 @@
 </div>
 <ol class="arabic" start="4">
 <li><p class="first">Test the installation by starting a new terminal and running:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">reoc</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">reo</span>
 </pre></div>
 </div>
 </li>
@@ -194,39 +199,30 @@
 <ol class="arabic simple">
 <li>Install Java (version 1.6 or higher)</li>
 </ol>
-<p>2. Download <tt class="docutils literal"><span class="pre">lykos-1.0-jar-with-dependencies.jar</span></tt>.
+<p>2. Download <tt class="docutils literal"><span class="pre">reo-1.0.jar</span></tt>.
 Save to your directory for 3rd party Java libraries, say <tt class="docutils literal"><span class="pre">C:\Javalib</span></tt></p>
 <ol class="arabic simple" start="3">
-<li>Add <tt class="docutils literal"><span class="pre">lykos-1.0-jar-with-dependencies.jar</span></tt> to CLASSPATH, either:</li>
-</ol>
-<blockquote>
-<div><ul>
-<li><p class="first">permanently: Using System Properties dialog &gt; Environment variables &gt; Create or append to CLASSPATH variable</p>
-</li>
-<li><p class="first">temporarily, at command line:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">SET</span> <span class="n">CLASSPATH</span><span class="o">=.</span><span class="p">;</span><span class="n">C</span><span class="p">:</span>\<span class="n">Javalib</span>\<span class="n">antlr</span><span class="o">-</span><span class="mf">4.5</span><span class="o">-</span><span class="n">complete</span><span class="o">.</span><span class="n">jar</span><span class="p">;</span><span class="o">%</span><span class="n">CLASSPATH</span><span class="o">%</span>
-</pre></div>
-</div>
-</li>
-</ul>
-</div></blockquote>
-<ol class="arabic simple" start="4">
 <li>Create short convenient commands for the Reo compiler, using batch files or doskey commands:</li>
 </ol>
 <blockquote>
 <div><ul>
 <li><p class="first">Batch files (in directory in system PATH):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="o">//</span><span class="n">reoc</span><span class="o">.</span><span class="n">bat</span>
-<span class="n">java</span> <span class="n">nl</span><span class="o">.</span><span class="n">cwi</span><span class="o">.</span><span class="n">reo</span><span class="o">.</span><span class="n">Compiler</span> <span class="o">%*</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="o">//</span><span class="n">reo</span><span class="o">.</span><span class="n">bat</span>
+<span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">C</span><span class="p">:</span>\<span class="n">Javalib</span>\<span class="n">reo</span><span class="o">-</span><span class="mf">1.0</span><span class="o">.</span><span class="n">jar</span> <span class="o">%*</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">Or, use doskey commands:</p>
-<div class="highlight-python"><pre>doskey reoc=java nl.cwi.reo.Compiler $*</pre>
+<div class="highlight-python"><pre>doskey reo=java -jar C:\Javalib\reo-1.0.jar $*</pre>
 </div>
 </li>
 </ul>
 </div></blockquote>
+<ol class="arabic" start="4">
+<li><p class="first">Test the installation by starting a new terminal and running:</p>
+<p>reo</p>
+</li>
+</ol>
 </div>
 </div>
 </div>

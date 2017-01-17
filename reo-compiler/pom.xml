@@ -60,8 +60,9 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <finalName>reoc</finalName>
+          <finalName>reo</finalName>
           <appendAssemblyId>false</appendAssemblyId>
+          <outputDirectory>${project.parent.basedir}/bin</outputDirectory>
         </configuration>
         <executions>
           <execution>

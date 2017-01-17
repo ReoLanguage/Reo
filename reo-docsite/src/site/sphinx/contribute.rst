@@ -1,4 +1,3 @@
-
 Contribute
 ==========
 
@@ -81,26 +80,29 @@ This tutorial provides a step-by-step procedure that extends the current Reo com
 1. Implement your semantics as java objects.
 
 	a. In the ``reo-semantics`` module, add an alternative ``MRS`` to the enum ``nl.cwi.reo.semantics.SemanticsType``.
-	Update the ``toString()`` method by adding a case 
+      Update the ``toString()`` method by adding a case 
 
-	.. code-block:: java
+      .. code-block:: java
+   
+         ...
+         case MRS: return "mrs";
+            break;
+         ...
 
-		case MRS: return "mrs";
-			break;
-
-	.. note:: 
-		The value of the ``toString()`` method determines the name of the subfolder in which the Reo compiler is looking when it searches component definitions in on the file system.
+      .. note:: 
+         
+         The value of the ``toString()`` method is used by the Reo compiler when it searches component definitions in on the file system.
 
 	b. In the ``reo-semantics`` module, create a new package called ``nl.cwi.reo.myreosemantics``, 
-	and add a class called ``MyReoSemantics`` that implements ``nl.cwi.reo.semantics.Semantics`` as follows:
+      and add a class called ``MyReoSemantics`` that implements ``nl.cwi.reo.semantics.Semantics`` as follows:
 
-	.. code-block:: java
+      .. code-block:: java
 	
-		package nl.cwi.reo.myreosemantics;
+         package nl.cwi.reo.myreosemantics;
 	
-		import nl.cwi.reo.semantics.Semantics;
+         import nl.cwi.reo.semantics.Semantics;
 
-		public class MyReoSemantics implements Semantics<MyReoSemantics> { }
+         public class MyReoSemantics implements Semantics<MyReoSemantics> { }
 
 	If ``MyReoSemantics`` can be viewed as an extension of port automata with a particular type of labels on its transitions, then 
 	we can reuse the generic automaton implementation and instantiate it using our own type of labels on the transitions.
@@ -257,5 +259,8 @@ Since this is a young project, many features are yet to be implemented:
 References
 ----------
 
-.. _[Parr13] Terence Parr. 2013. The Definitive ANTLR 4 Reference (2nd ed.). Pragmatic Bookshelf. 
-.. _[JA12] Sung-Shik T. Q. Jongmans, Farhad Arbab: Overview of Thirty Semantic Formalisms for Reo. Sci. Ann. Comp. Sci. 22(1): 201-251 (2012)
+.. [Parr13] Terence Parr. 2013. 
+   The Definitive ANTLR 4 Reference (2nd ed.). Pragmatic Bookshelf. 
+
+.. [JA12] Sung-Shik T. Q. Jongmans, Farhad Arbab: 
+   Overview of Thirty Semantic Formalisms for Reo. Sci. Ann. Comp. Sci. 22(1): 201-251 (2012)

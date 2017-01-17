@@ -1,7 +1,19 @@
-   :github_url:
-
 Syntax of Reo
 =============
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Components and interfaces
 -------------------------
@@ -11,8 +23,6 @@ Each component has access to a given set of nodes, called an *interface*.
 A component may synchronize with its environment via *puts* and *gets* on nodes in its interface.
 An atomic-component uses each port either as input or as output, but not both.
 
-
-
 Definition
 ----------
 
@@ -20,50 +30,46 @@ Before we can start using components, we need to define them.
 The following example shows how we can define a component by referring to Java source code
 
 .. code-block:: text
-	:linenos:
-
-	define producer(a!) { 
-	  #Java com.example.Producer
+   
+   // producer.treo
+   producer(a!) { 
+      Java : 
+         com.example.Producer(a)
 	}
 
-The producer component is defined by the implementation of the Java method ``Producer`` in package ``com.example``.
-The ``#Java`` tag indicates that the function is a Java function.
+The producer component is defined by the implementation of the Java class ``Producer`` in package ``com.example``.
+The ``Java`` tag indicates that the reference links to a Java class. Components can also be defined by methods 
+written other general purpose languages, such as C/C++
+
 Arguments of the Java function are automatically linked to the nodes in the interface of the defined component.
-The exclamation mark (``!``) indicates that component ``producer`` uses node a as output.
-A question mark (``?``) after a node A in the interface would indicate the the component uses A as an input node.
-A question mark followed by a exclamation mark (``?!``) after a node A would indicate that the component uses A
-both as input and as output.
-
-Components can also be defined by methods written other general purpose languages, such as C/C++
-
-.. code-block:: text
-	:linenos:
-	
-	define producer(a!) {
-	  #C/C++ example::Producer
-	}
+The exclamation mark (`!`) indicates that Reo component ``producer`` uses node `a` as output.
+A question mark (`?`) after a node `a` in the interface indicates the the component uses a as an input node.
+A colon (`:`) after a node `a` indicates that the component uses `a` both as input and as output.
 
 Another possibility is to define a component via a particular semantic model, such as *constraint automaton with state memory*
 
 .. code-block:: text
-	:linenos:
-	
-	define fifo1(a?,b!) {
-	  #CASM 
-	  q0 -- {a}, x' == d(a) -> q1
-	  q1 -- {b}, d(b) == x  -> q0
-	}
+   
+   // buffer.treo 
+   buffer(a?,b!) {
+      CASM :
+         q0 -> q1 : {a}, x' == d(a) 
+         q1 -> q0 : {b}, d(b) == x  
+      C/C++ :
+         example::Buffer(a,b)
+   }
 
 By now, there are more than thirty semantics for Reo. Therefore, it is possible to provide a second definition of the 
 *same* component, using a *different* semantics. For example, the *work automaton* semantics
 
 .. code-block:: text
-	:linenos:
-	
+
+   // fifo1.wa.treo
 	define fifo1(a?,b!) {
-	  #WA 
-	  q0 -- {a}, true -> q1
-	  q1 -- {b}, true -> q0
+      WA :
+         q0 : initial
+         q0 -> q1 : {a}, true, {}
+         q1 -> q0 : {b}, true, {}
 	}
 
 .. note:: 
@@ -77,14 +83,20 @@ Composition
 Now that we defined the ``fifo1``-channel, we may start using it by *instantiating* our ``fifo1``-channel as follows
 
 .. code-block:: text
-	:linenos:
 	
-	fifo1(a,b)
+   // main.treo
+   import fifo1;
+   
+   main() {
+	  fifo1(x,y)
+   }
 
-This single statement accomplishes *two* tasks:
+This Reo program accomplishes the following tasks:
 
-1. it instantiates the ``fifo1``-channel defined above;
-2. it instantiates two new nodes a and b.
+1. is imports the Reo component called ``fifo1``.
+2. it defines a new Reo component called ``main``.
+3. it creates two new nodes `x` and `y`.
+4. it creates an instance of the Reo component ``fifo1`` with `a` substituted by `x` and `b` substituted by `y`.
 
 We may compose multiple component by placing them next to each other.
 The composition is established by sharing nodes.

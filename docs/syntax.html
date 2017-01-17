@@ -77,17 +77,31 @@
             
             
                 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#unix">UNIX</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#windows">WINDOWS</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Syntax of Reo</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#components-and-interfaces">Components and interfaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#definition">Definition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#composition">Composition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#iteration">Iteration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#abstraction">Abstraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#parametrization">Parametrization</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#build-the-project">Build the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#setting-up-eclipse">Setting up Eclipse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#adding-new-semantics-to-the-compiler">Adding new semantics to the compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#future-work">Future work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#references">References</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -151,63 +165,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <blockquote>
-<div><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">github_url:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</div></blockquote>
-<div class="section" id="syntax-of-reo">
+  <div class="section" id="syntax-of-reo">
 <h1>Syntax of Reo<a class="headerlink" href="#syntax-of-reo" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="components-and-interfaces">
 <h2>Components and interfaces<a class="headerlink" href="#components-and-interfaces" title="Permalink to this headline">¶</a></h2>
 <p>In Reo, programs consist of <em>components</em> that interact via shared <em>nodes</em>.
 Each component has access to a given set of nodes, called an <em>interface</em>.
 A component may synchronize with its environment via <em>puts</em> and <em>gets</em> on nodes in its interface.
-An atomic-component uses each port either as input or as output, but not both.</p>
-</div>
-<div class="section" id="definition">
-<h2>Definition<a class="headerlink" href="#definition" title="Permalink to this headline">¶</a></h2>
+An atomic-component uses each port either as input or as output, but not both.
+Definition
+&#8212;&#8212;&#8212;-</p>
 <p>Before we can start using components, we need to define them.
 The following example shows how we can define a component by referring to Java source code</p>
-<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3</pre></div></td><td class="code"><div class="highlight"><pre>define producer(a!) {
-  #Java com.example.Producer
-}
+<div class="highlight-text"><div class="highlight"><pre>producer(a!) {
+   Java :
+      com.example.Producer(a)
+     }
 </pre></div>
-</td></tr></table></div>
-<p>The producer component is defined by the implementation of the Java method <tt class="docutils literal"><span class="pre">Producer</span></tt> in package <tt class="docutils literal"><span class="pre">com.example</span></tt>.
-The <tt class="docutils literal"><span class="pre">#Java</span></tt> tag indicates that the function is a Java function.
-Arguments of the Java function are automatically linked to the nodes in the interface of the defined component.
+</div>
+<p>The producer component is defined by the implementation of the Java class <tt class="docutils literal"><span class="pre">Producer</span></tt> in package <tt class="docutils literal"><span class="pre">com.example</span></tt>.
+The <tt class="docutils literal"><span class="pre">Java</span></tt> tag indicates that the reference links to a Java class. Components can also be defined by methods
+written other general purpose languages, such as C/C++</p>
+<p>Arguments of the Java function are automatically linked to the nodes in the interface of the defined component.
 The exclamation mark (<tt class="docutils literal"><span class="pre">!</span></tt>) indicates that component <tt class="docutils literal"><span class="pre">producer</span></tt> uses node a as output.
-A question mark (<tt class="docutils literal"><span class="pre">?</span></tt>) after a node A in the interface would indicate the the component uses A as an input node.
-A question mark followed by a exclamation mark (<tt class="docutils literal"><span class="pre">?!</span></tt>) after a node A would indicate that the component uses A
-both as input and as output.</p>
-<p>Components can also be defined by methods written other general purpose languages, such as C/C++</p>
-<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3</pre></div></td><td class="code"><div class="highlight"><pre>define producer(a!) {
-  #C/C++ example::Producer
-}
-</pre></div>
-</td></tr></table></div>
+A question mark (<tt class="docutils literal"><span class="pre">?</span></tt>) after a node a in the interface indicates the the component uses a as an input node.
+A colon (<tt class="docutils literal"><span class="pre">:</span></tt>) after a node a indicates that the component uses a both as input and as output.</p>
 <p>Another possibility is to define a component via a particular semantic model, such as <em>constraint automaton with state memory</em></p>
-<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
-2
-3
-4
-5</pre></div></td><td class="code"><div class="highlight"><pre>define fifo1(a?,b!) {
-  #CASM
-  q0 -- {a}, x&#39; == d(a) -&gt; q1
-  q1 -- {b}, d(b) == x  -&gt; q0
+<div class="highlight-text"><div class="highlight"><pre>producer(a?,b!) {
+   CASM :
+      q0 -&gt; q1 : {a}, x&#39; == d(a)
+      q1 -&gt; q0 : {b}, d(b) == x
+   C/C++ :
+      example::Producer(a)
 }
 </pre></div>
-</td></tr></table></div>
+</div>
 <p>By now, there are more than thirty semantics for Reo. Therefore, it is possible to provide a second definition of the
 <em>same</em> component, using a <em>different</em> semantics. For example, the <em>work automaton</em> semantics</p>
 <div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
