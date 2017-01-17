@@ -80,29 +80,29 @@ This tutorial provides a step-by-step procedure that extends the current Reo com
 1. Implement your semantics as java objects.
 
 	a. In the ``reo-semantics`` module, add an alternative ``MRS`` to the enum ``nl.cwi.reo.semantics.SemanticsType``.
-      Update the ``toString()`` method by adding a case 
+	Update the ``toString()`` method by adding a case 
 
-      .. code-block:: java
+	.. code-block:: java
    
-         ...
-         case MRS: return "mrs";
-            break;
-         ...
+		...
+		case MRS: return "mrs";
+		break;
+		...
 
-      .. note:: 
+	.. note:: 
          
-         The value of the ``toString()`` method is used by the Reo compiler when it searches component definitions in on the file system.
+		The value of the ``toString()`` method is used by the Reo compiler when it searches component definitions in on the file system.
 
 	b. In the ``reo-semantics`` module, create a new package called ``nl.cwi.reo.myreosemantics``, 
-      and add a class called ``MyReoSemantics`` that implements ``nl.cwi.reo.semantics.Semantics`` as follows:
+	and add a class called ``MyReoSemantics`` that implements ``nl.cwi.reo.semantics.Semantics`` as follows:
 
-      .. code-block:: java
+	.. code-block:: java
 	
-         package nl.cwi.reo.myreosemantics;
+		package nl.cwi.reo.myreosemantics;
 	
-         import nl.cwi.reo.semantics.Semantics;
+		import nl.cwi.reo.semantics.Semantics;
 
-         public class MyReoSemantics implements Semantics<MyReoSemantics> { }
+		public class MyReoSemantics implements Semantics<MyReoSemantics> { }
 
 	If ``MyReoSemantics`` can be viewed as an extension of port automata with a particular type of labels on its transitions, then 
 	we can reuse the generic automaton implementation and instantiate it using our own type of labels on the transitions.
@@ -116,11 +116,11 @@ This tutorial provides a step-by-step procedure that extends the current Reo com
 		.. code-block:: java
 	
 			package nl.cwi.reo.myreosemantics;
-			
+
 			import nl.cwi.reo.automata.Automaton;
 			import nl.cwi.reo.myreosemantics.MyReoSemanticsLabel;
 			import nl.cwi.reo.semantics.Semantics;
-		
+
 			public class MyReoSemantics extends Automaton<MyReoSemanticsLabel> 
 					implements Semantics<MyReoSemantics> { }
 
@@ -132,9 +132,9 @@ This tutorial provides a step-by-step procedure that extends the current Reo com
 	.. code-block:: text
 	
 		grammar MRS;
-		
+
 		import Tokens;
-		
+
 		mrs : //...// ;
 
 	b. Add an alternative ``| mrs ;`` to the rule of ``atom`` in the main grammar ``Reo.g4`` of Reo.
@@ -147,17 +147,17 @@ This tutorial provides a step-by-step procedure that extends the current Reo com
 	.. code-block:: java
 	
 		package nl.cwi.reo.interpret.listeners;
-		
+
 		import org.antlr.v4.runtime.tree.ParseTreeProperty;
-	
+
 		import nl.cwi.reo.interpret.listeners.Listener;
 		import nl.cwi.reo.myreosemantics.MyReoSemantics;
-		
+
 		public class ListenerMRS extends Listener<MyReoSemantics> {
-		
+
 			private ParseTreeProperty<MyReoSemantics> myReoSemantics = 
 					new ParseTreeProperty<MyReoSemantics>();
-		
+
 			public void exitAtom(AtomContext ctx) {
 				atoms.put(ctx, automata.get(ctx.pa()));
 			} 
@@ -212,15 +212,14 @@ This tutorial provides a step-by-step procedure that extends the current Reo com
 .. code-block:: java
 
 	package nl.cwi.reo.interpret;
-	
+
 	import java.util.List;
-	
+
 	import nl.cwi.reo.interpret.listeners.ListenerMRS;
 	import nl.cwi.reo.myreosemantics.MyReoSemantics;
 	import nl.cwi.reo.semantics.SemanticsType;
-	
+
 	public class InterpreterMRS extends Interpreter<MyReoSemantics> {
-		
 		/**
 		 * Constructs a Reo interpreter for MyReoSemantics.
 		 * @param dirs		list of directories of Reo components
@@ -235,7 +234,7 @@ This tutorial provides a step-by-step procedure that extends the current Reo com
 
 .. code-block:: java
 	
-    public void run() {
+	public void run() {
 		...
 		Interpreter<MyReoSemantics> interpreter = new InterpreterMRS(directories, params);
 		Assembly<MyReoSemantics> program = interpreter.interpret(files);
