@@ -31,11 +31,12 @@ Contents of this documentation
 The contents of the documentation is as follows:
 
 .. toctree::
-   :maxdepth: 2
+	:maxdepth: 2
 
-   getting-started
-   syntax
-   contribute
+	introduction
+	getting-started
+	syntax
+	contribute
 
 Indices and tables
 ==================
