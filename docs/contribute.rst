@@ -2,6 +2,7 @@ Contribute
 ==========
 
 This page describes how to contribute to the Reo compiler.
+Reo is a super cool language.
 
 Clone the repository
 --------------------
@@ -92,6 +93,7 @@ This tutorial provides a step-by-step procedure that extends the current Reo com
 	.. note:: 
          
 		The value of the ``toString()`` method is used by the Reo compiler when it searches component definitions in on the file system.
+		
 
 	b. In the ``reo-semantics`` module, create a new package called ``nl.cwi.reo.myreosemantics``, 
 	and add a class called ``MyReoSemantics`` that implements ``nl.cwi.reo.semantics.Semantics`` as follows:
