@@ -7,6 +7,10 @@ Reo compiler
 Reo_ is an *exogenous coordination language* designed by prof. dr. F. Arbab at the Centre for Mathematics and Computer Science (​CWI) in Amsterdam.
 Reo allows the programmer to specify protocols that describe interaction among components in a concurrent application.
 
+Documentation
+-------------
+The documentation is available on http://reo.readthedocs.io/en/latest/
+
 What are protocols, and why do we care?
 ---------------------------------------
 
