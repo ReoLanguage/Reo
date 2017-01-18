@@ -163,7 +163,7 @@ public class Interpreter<T extends Semantics<T>> {
 		int k = component.lastIndexOf('.') + 1;
 		String name = component.substring(k);
 		String directory = component.substring(0, k).replace('.', File.separatorChar);
-		String cp1 = directory + semantics + File.separator + name + ".treo";
+		String cp1 = directory + name + "." + semantics + ".treo";
 		String cp2 = directory + name + ".treo";
 	
 	search:
