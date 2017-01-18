@@ -1,4 +1,4 @@
-Hello and Welcome to Reo's documentation!
+Welcome to Reo's documentation!
 ===============================
 
 .. _Reo: http://reo.project.cwi.nl/reo/wiki
