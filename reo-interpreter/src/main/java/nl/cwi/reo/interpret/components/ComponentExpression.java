@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret.components;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.programs.ProgramExpression;
+import nl.cwi.reo.interpret.blocks.Statement;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.variables.VariableName;
@@ -19,7 +19,7 @@ public interface ComponentExpression<T extends Semantics<T>> extends Expression 
 	 * @return 
 	 * @throws Exception
 	 */
-	public ProgramExpression<T> instantiate(ExpressionList values, VariableNameList iface) 
+	public Statement<T> instantiate(ExpressionList values, VariableNameList iface) 
 			throws Exception;
 
 	/**

@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.programs;
+package nl.cwi.reo.interpret.blocks;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,25 +14,22 @@ import nl.cwi.reo.interpret.strings.StringValue;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Semantics;
 
-/**
- * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
- */
-public class ProgramBody<T extends Semantics<T>> implements ProgramExpression<T> {
+public class Block<T extends Semantics<T>> implements Statement<T> {
 	
 	/**
-	 * Program statements.
+	 * List of statements.
 	 */
-	public List<ProgramExpression<T>> stmts;
+	public List<Statement<T>> stmts;
 
 	/**
 	 * Constructs a body of components and definitions.
 	 * @param components	set of component expressions
 	 * @param definitions	list of definitions
 	 */
-	public ProgramBody(List<ProgramExpression<T>> stmts) {
+	public Block(List<Statement<T>> stmts) {
 		if (stmts == null)
 			throw new NullPointerException();
-		for (ProgramExpression<T> stmt : stmts)
+		for (Statement<T> stmt : stmts)
 			if (stmt == null)
 				throw new NullPointerException();
 		this.stmts = stmts;
@@ -44,34 +41,34 @@ public class ProgramBody<T extends Semantics<T>> implements ProgramExpression<T>
 	 * @return Concrete instance of this body.
 	 * @throws Exception if not all required parameters are provided.
 	 */
-	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {	
+	public Statement<T> evaluate(Map<VariableName, Expression> params) throws Exception {	
 		
 //		System.out.println("[info] Evaluating " + this);
 
 		Definitions definitions = new Definitions(params);
 		
-		List<ProgramExpression<T>> stmts = new ArrayList<ProgramExpression<T>>();
-		List<ProgramExpression<T>> stmts_p = new ArrayList<ProgramExpression<T>>(this.stmts);	
-		List<ProgramValue<T>> progs = new ArrayList<ProgramValue<T>>(); 
+		List<Statement<T>> stmts = new ArrayList<Statement<T>>();
+		List<Statement<T>> stmts_p = new ArrayList<Statement<T>>(this.stmts);	
+		List<Program<T>> progs = new ArrayList<Program<T>>(); 
 		boolean isProgramValue = true;
 		boolean loop = true;
 		
 		while (loop) {
 			
-			stmts = new ArrayList<ProgramExpression<T>>(stmts_p);
-			stmts_p = new ArrayList<ProgramExpression<T>>();			
-			progs = new ArrayList<ProgramValue<T>>();
+			stmts = new ArrayList<Statement<T>>(stmts_p);
+			stmts_p = new ArrayList<Statement<T>>();			
+			progs = new ArrayList<Program<T>>();
 			isProgramValue = true;
 			loop = false;
 			
-			for (ProgramExpression<T> s : stmts) {			
+			for (Statement<T> s : stmts) {			
 				
-				ProgramExpression<T> s_p = s.evaluate(definitions);
+				Statement<T> s_p = s.evaluate(definitions);
 				stmts_p.add(s_p);
 				
-				if (s_p instanceof ProgramValue) {
-					progs.add((ProgramValue<T>)s_p);
-					Map<VariableName, Expression> progDefs = ((ProgramValue<T>)s_p).getDefinitions();
+				if (s_p instanceof Program) {
+					progs.add((Program<T>)s_p);
+					Map<VariableName, Expression> progDefs = ((Program<T>)s_p).getDefinitions();
 					for (Map.Entry<VariableName, Expression> def : progDefs.entrySet()) {
 						if (!definitions.containsKey(def.getKey())) {
 							definitions.put(def.getKey(), def.getValue());
@@ -88,12 +85,12 @@ public class ProgramBody<T extends Semantics<T>> implements ProgramExpression<T>
 			
 		}
 		
-		ProgramExpression<T> prog = null;
+		Statement<T> prog = null;
 		
 		if (isProgramValue) 
-			prog = new ProgramValue<T>().compose(progs);
+			prog = new Program<T>().compose(progs);
 		else
-			prog = new ProgramBody<T>(stmts_p);
+			prog = new Block<T>(stmts_p);
 
 //		System.out.println("[info] " + this + " evaluates to ");
 //		System.out.println("       " + prog + " using " + params.keySet());
@@ -103,7 +100,7 @@ public class ProgramBody<T extends Semantics<T>> implements ProgramExpression<T>
 	@Override
 	public String toString() {
 		String s = "{";
-		Iterator<ProgramExpression<T>> stmt = stmts.iterator();
+		Iterator<Statement<T>> stmt = stmts.iterator();
 		while (stmt.hasNext()) 
 			s += stmt.next() + (stmt.hasNext() ? ", " : "");
 		return s + "}";

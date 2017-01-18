@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret.components;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.programs.ProgramValue;
+import nl.cwi.reo.interpret.blocks.Program;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.InstanceList;
@@ -22,14 +22,14 @@ public final class ComponentValue<T extends Semantics<T>> implements ComponentEx
 	/**
 	 * Program.
 	 */
-	private final ProgramValue<T> prog;
+	private final Program<T> prog;
 	
 	/**
 	 * Constructs a new component value.
 	 * @param sign
 	 * @param prog
 	 */
-	public ComponentValue(SignatureExpression sign, ProgramValue<T> prog) {
+	public ComponentValue(SignatureExpression sign, Program<T> prog) {
 		if (sign == null || prog == null)
 			throw new NullPointerException();
 		this.sign = sign;
@@ -50,9 +50,9 @@ public final class ComponentValue<T extends Semantics<T>> implements ComponentEx
 	}
 
 	@Override
-	public ProgramValue<T> instantiate(ExpressionList values, VariableNameList iface) throws Exception {
+	public Program<T> instantiate(ExpressionList values, VariableNameList iface) throws Exception {
 		SignatureConcrete links = sign.evaluate(values, iface);
-		ProgramValue<T> _prog = prog.instantiate(links);
+		Program<T> _prog = prog.instantiate(links);
 		return _prog;
 	}
 	

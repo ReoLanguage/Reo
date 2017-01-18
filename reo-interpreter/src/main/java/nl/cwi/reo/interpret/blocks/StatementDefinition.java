@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.programs;
+package nl.cwi.reo.interpret.blocks;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -13,13 +13,13 @@ import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class ProgramEquation<T extends Semantics<T>> implements ProgramExpression<T> {
+public final class StatementDefinition<T extends Semantics<T>> implements Statement<T> {
 
 	private final Variable var;
 	
 	private final Range val;
 	
-	public ProgramEquation(Variable var, Range val) {
+	public StatementDefinition(Variable var, Range val) {
 		if (var == null || val == null)
 			throw new NullPointerException();
 		this.var = var;
@@ -27,9 +27,9 @@ public final class ProgramEquation<T extends Semantics<T>> implements ProgramExp
 	}
 
 	@Override
-	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Statement<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		
-		ProgramExpression<T> prog = null;
+		Statement<T> prog = null;
 
 		Range e = var.evaluate(params);
 		if (!(e instanceof Variable))
@@ -41,7 +41,7 @@ public final class ProgramEquation<T extends Semantics<T>> implements ProgramExp
 			if (val_p instanceof Expression) {
 				Definitions definitions = new Definitions();
 				definitions.put((VariableName)var_p, (Expression)val_p);
-				prog = new ProgramValue<T>(definitions, new InstanceList<T>());
+				prog = new Program<T>(definitions, new InstanceList<T>());
 			} else if (val_p instanceof ExpressionList) {
 				throw new Exception("Value " + val_p + " must be of type expression.");	
 			} 
@@ -51,13 +51,13 @@ public final class ProgramEquation<T extends Semantics<T>> implements ProgramExp
 				Iterator<VariableName> var = ((VariableNameList) var_p).getList().iterator();
 				Iterator<Expression> exp = ((ExpressionList)val_p).iterator();				
 				while (var.hasNext() && exp.hasNext()) definitions.put(var.next(), exp.next());
-				prog = new ProgramValue<T>(definitions, new InstanceList<T>());
+				prog = new Program<T>(definitions, new InstanceList<T>());
 				
 			} else if (val_p instanceof Expression) {
 				throw new Exception("Value " + val_p + " must be of type list.");				
 			}
 		} else {
-			prog = new ProgramEquation<T>(var_p, val_p);
+			prog = new StatementDefinition<T>(var_p, val_p);
 		}
 		
 		return prog;

@@ -21,10 +21,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import nl.cwi.reo.interpret.blocks.Program;
 import nl.cwi.reo.interpret.components.ComponentValue;
 import nl.cwi.reo.interpret.listeners.Listener;
-import nl.cwi.reo.interpret.programs.ProgramFile;
-import nl.cwi.reo.interpret.programs.ProgramValue;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.Assembly;
@@ -81,12 +80,12 @@ public class Interpreter<T extends Semantics<T>> {
 	public Assembly<T> interpret(List<String> srcfiles) {
 		try {			
 			// Find all available component expressions.
-			Stack<ProgramFile<T>> stack = new Stack<ProgramFile<T>>();	
+			Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();	
 			List<String> parsed = new ArrayList<String>();
 			Queue<String> components = new LinkedList<String>();
 			
 			for (String file : srcfiles) {
-				ProgramFile<T> program = parse(new ANTLRFileStream(file));
+				ReoFile<T> program = parse(new ANTLRFileStream(file));
 				if (program != null) {
 					stack.push(program);
 					parsed.add(program.getName());
@@ -100,7 +99,7 @@ public class Interpreter<T extends Semantics<T>> {
 				String comp = components.poll();
 				if (!parsed.contains(comp)) {
 					parsed.add(comp);
-					ProgramFile<T> program = parseComponent(comp);
+					ReoFile<T> program = parseComponent(comp);
 					if (program != null) {
 						stack.push(program);
 						List<String> newComponents = program.getImports();
@@ -117,7 +116,7 @@ public class Interpreter<T extends Semantics<T>> {
 			Definitions definitions = new Definitions();
 			VariableName name = null;		
 			while (!stack.isEmpty()) {
-				ProgramFile<T> program = stack.pop();
+				ReoFile<T> program = stack.pop();
 				name = new VariableName(program.getName());
 				Expression cexpr = program.getComponent().evaluate(definitions);
 				definitions.put(name, cexpr);
@@ -131,7 +130,7 @@ public class Interpreter<T extends Semantics<T>> {
 				for (String x : params) values.add(new StringValue(x));
 				SignatureConcrete sign = main.getSignature().evaluate(values, null);
 				
-				ProgramValue<T> main_p = main.instantiate(values, null);
+				Program<T> main_p = main.instantiate(values, null);
 				
 				InstanceList<T> instances = main_p.getInstances();
 				
@@ -156,9 +155,9 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	private ProgramFile<T> parseComponent(String component) throws IOException {
+	private ReoFile<T> parseComponent(String component) throws IOException {
 		
-		ProgramFile<T> prog = null;
+		ReoFile<T> prog = null;
 		
 		int k = component.lastIndexOf('.') + 1;
 		String name = component.substring(k);
@@ -228,7 +227,7 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @return an interpreted source file, or null in case of an error.
 	 * @throws IOException 
 	 */
-	private ProgramFile<T> parse(CharStream c) throws IOException  {
+	private ReoFile<T> parse(CharStream c) throws IOException  {
 		ReoLexer lexer = new ReoLexer(c); 
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		

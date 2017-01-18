@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.programs;
+package nl.cwi.reo.interpret.blocks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import nl.cwi.reo.semantics.Semantics;
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class ProgramForLoop<T extends Semantics<T>> implements ProgramExpression<T> {
+public class StatementForLoop<T extends Semantics<T>> implements Statement<T> {
 
 	/**
 	 * Name of the iterated parameter.
@@ -33,7 +33,7 @@ public class ProgramForLoop<T extends Semantics<T>> implements ProgramExpression
 	/**
 	 * Iterated subprogram definition.
 	 */
-	public ProgramExpression<T> body;
+	public Statement<T> body;
 
 	/**
 	 * Constructs a parameterized for loop. 
@@ -43,7 +43,7 @@ public class ProgramForLoop<T extends Semantics<T>> implements ProgramExpression
 	 * @param upper			expression defining the upper iteration bound
 	 * @param subprogram	iterated subprogram definition
 	 */
-	public ProgramForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ProgramExpression<T> body) {
+	public StatementForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, Statement<T> body) {
 		if (parameter == null || lower == null || upper == null || body == null)
 			throw new NullPointerException();
 		this.parameter = parameter;
@@ -59,7 +59,7 @@ public class ProgramForLoop<T extends Semantics<T>> implements ProgramExpression
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
 	@Override
-	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Statement<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		
 		if (params.get(parameter) != null)
 			throw new Exception("Parameter " + parameter + " is already used.");
@@ -76,28 +76,28 @@ public class ProgramForLoop<T extends Semantics<T>> implements ProgramExpression
 			// Iterate to find all concrete components. 
 			boolean isProgram = true;
 			Definitions defns = new Definitions(params);
-			List<ProgramExpression<T>> bodies = new ArrayList<ProgramExpression<T>>();
-			List<ProgramValue<T>> progs = new ArrayList<ProgramValue<T>>();
+			List<Statement<T>> bodies = new ArrayList<Statement<T>>();
+			List<Program<T>> progs = new ArrayList<Program<T>>();
 			for (int i = a; i <= b; i++) {
 				defns.put(parameter, new IntegerValue(Integer.valueOf(i)));
-				ProgramExpression<T> e = body.evaluate(defns);
+				Statement<T> e = body.evaluate(defns);
 				bodies.add(e);
-				if (e instanceof ProgramValue) {
-					progs.add((ProgramValue<T>)e);
+				if (e instanceof Program) {
+					progs.add((Program<T>)e);
 				} else {
 					isProgram = false;
 				}
 			}
 			
 			if (isProgram) {
-				ProgramValue<T> prog = new ProgramValue<T>();
+				Program<T> prog = new Program<T>();
 				return prog.compose(progs).remove(parameter);
 			}
 			
-			return new ProgramBody<T>(bodies);
+			return new Block<T>(bodies);
 		}
 		
-		return new ProgramForLoop<T>(parameter, x, y, body.evaluate(params));
+		return new StatementForLoop<T>(parameter, x, y, body.evaluate(params));
 	}
 	
 	@Override

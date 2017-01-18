@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.programs;
+package nl.cwi.reo.interpret.blocks;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class ProgramValue<T extends Semantics<T>> implements ProgramExpression<T> {
+public final class Program<T extends Semantics<T>> implements Statement<T> {
 	
 	/**
 	 * Definitions.
@@ -28,7 +28,7 @@ public final class ProgramValue<T extends Semantics<T>> implements ProgramExpres
 	/**
 	 * Constructs an empty body of components and definitions.
 	 */
-	public ProgramValue() {
+	public Program() {
 		this.definitions = new Definitions();
 		this.instances = new InstanceList<T>();
 	}
@@ -38,7 +38,7 @@ public final class ProgramValue<T extends Semantics<T>> implements ProgramExpres
 	 * @param definitions
 	 * @param instances
 	 */
-	public ProgramValue(Definitions definitions, InstanceList<T> instances) {
+	public Program(Definitions definitions, InstanceList<T> instances) {
 		if (definitions == null || instances == null)
 			throw new NullPointerException();
 		this.definitions = new Definitions(definitions);
@@ -69,24 +69,24 @@ public final class ProgramValue<T extends Semantics<T>> implements ProgramExpres
 		return new InstanceList<T>(Collections.unmodifiableList(instances));
 	}
 	
-	public ProgramValue<T> remove(VariableName x) {
+	public Program<T> remove(VariableName x) {
 		Definitions _definitions = new Definitions(definitions);
 		_definitions.remove(x);
-		return new ProgramValue<T>(_definitions, instances);
+		return new Program<T>(_definitions, instances);
 	}
 	
 	/**
 	 * Composes a set of programs into a single program.
 	 * @param progs		set of component instances
 	 */
-	public ProgramValue<T> compose(List<ProgramValue<T>> bodies) {
+	public Program<T> compose(List<Program<T>> bodies) {
 		Definitions _definitions = new Definitions(definitions);
 		InstanceList<T> _instances = new InstanceList<T>(instances);
-		for (ProgramValue<T> body : bodies) {
+		for (Program<T> body : bodies) {
 			_definitions.putAll(body.definitions);
 			_instances.compose(body.instances);
 		}
-		return new ProgramValue<T>(_definitions, _instances);
+		return new Program<T>(_definitions, _instances);
 	}
 	
 	/**
@@ -96,7 +96,7 @@ public final class ProgramValue<T extends Semantics<T>> implements ProgramExpres
 	 * all internal ports)
 	 * @return an instantiate ProgramValue.
 	 */
-	public ProgramValue<T> instantiate(Map<Port, Port> iface) {
+	public Program<T> instantiate(Map<Port, Port> iface) {
 		Definitions _definitions = new Definitions();
 		InstanceList<T> _instances = new InstanceList<T>(instances);
 		Map<Port, Port> _iface = new HashMap<Port, Port>(iface);		
@@ -134,15 +134,15 @@ public final class ProgramValue<T extends Semantics<T>> implements ProgramExpres
 		for (Instance<T> inst : _instances)			
 			inst.joinAndHide(_iface);
 		
-		return new ProgramValue<T>(_definitions, _instances);
+		return new Program<T>(_definitions, _instances);
 	}
 
 	@Override
-	public ProgramValue<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Program<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		Definitions definitions_p = definitions.evaluate(params);
 		// TODO Possibly local variables in this definition get instantiated by variables from the context.
 		// TODO Add code to evaluate semantics too.
-		return new ProgramValue<T>(definitions_p, instances);
+		return new Program<T>(definitions_p, instances);
 	}
 	
 	@Override

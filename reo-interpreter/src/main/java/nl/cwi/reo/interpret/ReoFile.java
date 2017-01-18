@@ -1,9 +1,10 @@
-package nl.cwi.reo.interpret.programs;
+package nl.cwi.reo.interpret;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.cwi.reo.interpret.blocks.Program;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
@@ -11,7 +12,7 @@ import nl.cwi.reo.interpret.semantics.InstanceList;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class ProgramFile<T extends Semantics<T>> implements ProgramExpression<T> {
+public final class ReoFile<T extends Semantics<T>> implements Evaluable<Program<T>> {
 	
 	/**
 	 * Section.
@@ -33,7 +34,7 @@ public final class ProgramFile<T extends Semantics<T>> implements ProgramExpress
 	 */
 	private final ComponentExpression<T> cexpr;
 	
-	public ProgramFile(String section, List<String> imports, String name, ComponentExpression<T> cexpr) {
+	public ReoFile(String section, List<String> imports, String name, ComponentExpression<T> cexpr) {
 		if (section == null || imports == null || name == null || cexpr == null)
 			throw new NullPointerException();
 		this.section = section;
@@ -55,10 +56,10 @@ public final class ProgramFile<T extends Semantics<T>> implements ProgramExpress
 	}
 
 	@Override
-	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Program<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();
 		definitions.put(new VariableName(getName()), cexpr.evaluate(params));
-		return new ProgramValue<T>(new Definitions(definitions), new InstanceList<T>());
+		return new Program<T>(new Definitions(definitions), new InstanceList<T>());
 	}
 	
 	@Override

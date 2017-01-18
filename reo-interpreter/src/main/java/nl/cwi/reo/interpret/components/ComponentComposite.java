@@ -2,8 +2,8 @@ package nl.cwi.reo.interpret.components;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.programs.ProgramExpression;
-import nl.cwi.reo.interpret.programs.ProgramValue;
+import nl.cwi.reo.interpret.blocks.Program;
+import nl.cwi.reo.interpret.blocks.Statement;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.Definitions;
@@ -18,9 +18,9 @@ public class ComponentComposite<T extends Semantics<T>> implements ComponentExpr
 	
 	private SignatureExpression sign;
 	
-	private ProgramExpression<T> body;
+	private Statement<T> body;
 
-	public ComponentComposite(SignatureExpression sign, ProgramExpression<T> body) {
+	public ComponentComposite(SignatureExpression sign, Statement<T> body) {
 		if (sign == null || body == null)
 			throw new NullPointerException();
 		this.sign = sign;
@@ -28,20 +28,20 @@ public class ComponentComposite<T extends Semantics<T>> implements ComponentExpr
 	}
 	
 	public ComponentExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
-		ProgramExpression<T> prog = body.evaluate(params);
-		if (prog instanceof ProgramValue)
-			return new ComponentValue<T>(sign, (ProgramValue<T>)prog);
+		Statement<T> prog = body.evaluate(params);
+		if (prog instanceof Program)
+			return new ComponentValue<T>(sign, (Program<T>)prog);
 		return new ComponentComposite<T>(sign, prog);
 	}
 
 	@Override
-	public ProgramExpression<T> instantiate(ExpressionList values, VariableNameList iface) throws Exception {
+	public Statement<T> instantiate(ExpressionList values, VariableNameList iface) throws Exception {
 		SignatureConcrete v = sign.evaluate(values, iface);
-		ProgramExpression<T> _body = body.evaluate(v.getDefinitions());
-		if (_body instanceof ProgramValue) {
-			Definitions _definitions = new Definitions(((ProgramValue<T>)_body).getUnifications());
-			InstanceList<T> _instances = new InstanceList<T>(((ProgramValue<T>)_body).getInstances());
-			return new ProgramValue<T>(_definitions, _instances);
+		Statement<T> _body = body.evaluate(v.getDefinitions());
+		if (_body instanceof Program) {
+			Definitions _definitions = new Definitions(((Program<T>)_body).getUnifications());
+			InstanceList<T> _instances = new InstanceList<T>(((Program<T>)_body).getInstances());
+			return new Program<T>(_definitions, _instances);
 		}
 		return _body;
 	}

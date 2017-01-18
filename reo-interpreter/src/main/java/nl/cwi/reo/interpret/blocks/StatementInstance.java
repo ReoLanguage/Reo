@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.programs;
+package nl.cwi.reo.interpret.blocks;
 
 import java.util.Map;
 
@@ -10,7 +10,7 @@ import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class ProgramInstance<T extends Semantics<T>> implements ProgramExpression<T> {
+public final class StatementInstance<T extends Semantics<T>> implements Statement<T> {
 
 	public final ComponentExpression<T> cexpr;
 
@@ -18,7 +18,7 @@ public final class ProgramInstance<T extends Semantics<T>> implements ProgramExp
 	
 	private final Range iface;
 
-	public ProgramInstance(ComponentExpression<T> cexpr, Range plist, Range iface) {
+	public StatementInstance(ComponentExpression<T> cexpr, Range plist, Range iface) {
 		if (cexpr == null || plist == null || iface == null)
 			throw new NullPointerException();		
 		this.cexpr = cexpr;
@@ -27,18 +27,18 @@ public final class ProgramInstance<T extends Semantics<T>> implements ProgramExp
 	}
 	
 	@Override
-	public ProgramExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Statement<T> evaluate(Map<VariableName, Expression> params) throws Exception {
 		ComponentExpression<T> cexpr_p = cexpr.evaluate(params);
 		Range plist_p = plist.evaluate(params); 
 		Range iface_p = iface.evaluate(params); 
 		if (plist_p instanceof ExpressionList && iface_p instanceof VariableNameList) {
 			ExpressionList values = (ExpressionList)plist_p;
 			VariableNameList nodes = (VariableNameList)iface_p;
-			ProgramExpression<T> e = cexpr_p.instantiate(values, nodes);
+			Statement<T> e = cexpr_p.instantiate(values, nodes);
 			if (e != null) 
 				return e.evaluate(params);
 		}
-		return new ProgramInstance<T>(cexpr_p, plist_p, iface_p);
+		return new StatementInstance<T>(cexpr_p, plist_p, iface_p);
 	}
 	
 	@Override
