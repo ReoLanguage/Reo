@@ -20,6 +20,9 @@ import nl.cwi.reo.interpret.ReoParser.BlockContext;
 import nl.cwi.reo.interpret.ReoParser.Cexpr_atomicContext;
 import nl.cwi.reo.interpret.ReoParser.Cexpr_compositeContext;
 import nl.cwi.reo.interpret.ReoParser.Cexpr_variableContext;
+import nl.cwi.reo.interpret.ReoParser.Comp_instanceContext;
+import nl.cwi.reo.interpret.ReoParser.Comp_productContext;
+import nl.cwi.reo.interpret.ReoParser.Comp_sumContext;
 import nl.cwi.reo.interpret.ReoParser.Expr_stringContext;
 import nl.cwi.reo.interpret.ReoParser.Expr_booleanContext;
 import nl.cwi.reo.interpret.ReoParser.Expr_integerContext;
@@ -46,7 +49,9 @@ import nl.cwi.reo.interpret.ReoParser.Ptype_typetagContext;
 import nl.cwi.reo.interpret.ReoParser.RangeContext;
 import nl.cwi.reo.interpret.ReoParser.Range_exprContext;
 import nl.cwi.reo.interpret.ReoParser.Range_listContext;
-import nl.cwi.reo.interpret.ReoParser.Range_operatorContext;
+import nl.cwi.reo.interpret.ReoParser.Range_commaContext;
+import nl.cwi.reo.interpret.ReoParser.Range_productContext;
+import nl.cwi.reo.interpret.ReoParser.Range_sumContext;
 import nl.cwi.reo.interpret.ReoParser.Range_variableContext;
 import nl.cwi.reo.interpret.ReoParser.SignContext;
 import nl.cwi.reo.interpret.ReoParser.StmtContext;
@@ -244,8 +249,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 			stmts.put(ctx, new StatementDefinition<T>((Variable)y, x));
 		} else {
 			stmts.put(ctx, new Program<T>());			
-			System.out.println(new Message(MessageType.ERROR, ctx.start, ctx.getText() + " is not a valid definition and will be ignored."));
-			//throw new Exception("Either the left-hand-side or the right-hand-side of an equation must be a variable.")
+			System.out.println(new Message(MessageType.WARNING, ctx.start, ctx.getText() + " is not a valid definition and will be ignored. "
+					+ "Either the left-hand-side or the right-hand-side of an equation must be a variable."));
 		}
 	}
 
@@ -256,11 +261,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitStmt_instance(Stmt_instanceContext ctx) {	
-		ComponentExpression<T> cexpr = cexprs.get(ctx.cexpr());
-		RangeList list = lists.get(ctx.list());
-		if (list == null) list = new RangeList();
-		InterfaceExpression iface = ifaces.get(ctx.iface());
-		stmts.put(ctx, new StatementInstance<T>(cexpr, list, iface));
+		stmts.put(ctx, stmts.get(ctx.comp()));
 	}
 
 	@Override
@@ -293,6 +294,33 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		}
 		stmts.put(ctx, new StatementIfThenElse<T>(guards, branches));
 	}
+	
+	@Override
+	public void exitComp_instance(Comp_instanceContext ctx) {
+		ComponentExpression<T> cexpr = cexprs.get(ctx.cexpr());
+		RangeList list = lists.get(ctx.list());
+		if (list == null) list = new RangeList();
+		InterfaceExpression iface = ifaces.get(ctx.iface());
+		stmts.put(ctx, new StatementInstance<T>(cexpr, list, iface));
+	}
+	
+	@Override
+	public void exitComp_product(Comp_productContext ctx) {
+		List<Statement<T>> list = new ArrayList<Statement<T>>();
+		list.add(new StatementDefinition<T>(new VariableName("(*)"), new StringValue("product")));
+		list.add(stmts.get(ctx.comp(0)));
+		list.add(stmts.get(ctx.comp(1)));
+		stmts.put(ctx, new Block<T>(list));
+	}
+	
+	@Override
+	public void exitComp_sum(Comp_sumContext ctx) {
+		List<Statement<T>> list = new ArrayList<Statement<T>>();
+		list.add(new StatementDefinition<T>(new VariableName("(+)"), new StringValue("sum")));
+		list.add(stmts.get(ctx.comp(0)));
+		list.add(stmts.get(ctx.comp(1)));
+		stmts.put(ctx, new Block<T>(list));
+	}
 		
 	/**
 	 * Ranges	
@@ -304,8 +332,18 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 	
 	@Override
-	public void exitRange_operator(Range_operatorContext ctx) {
-//		ranges.put(ctx, lists.get(ctx.));
+	public void exitRange_comma(Range_commaContext ctx) {
+		ranges.put(ctx, new VariableName(ctx.getText()));
+	}
+	
+	@Override
+	public void exitRange_product(Range_productContext ctx) {
+		ranges.put(ctx, new VariableName(ctx.getText()));
+	}
+	
+	@Override
+	public void exitRange_sum(Range_sumContext ctx) {
+		ranges.put(ctx, new VariableName(ctx.getText()));
 	}
 	
 	@Override

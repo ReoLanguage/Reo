@@ -87,11 +87,12 @@ public class Block<T extends Semantics<T>> implements Statement<T> {
 		
 		Statement<T> prog = null;
 		
-		if (isProgramValue) 
+		if (isProgramValue) {
 			prog = new Program<T>().compose(progs);
-		else
+		} else {
 			prog = new Block<T>(stmts_p);
-
+		}
+		
 //		System.out.println("[info] " + this + " evaluates to ");
 //		System.out.println("       " + prog + " using " + params.keySet());
 		return prog;
