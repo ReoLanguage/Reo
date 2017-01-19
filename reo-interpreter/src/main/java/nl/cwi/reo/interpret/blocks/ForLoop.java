@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.ranges.Expression;
@@ -14,7 +15,7 @@ import nl.cwi.reo.semantics.Semantics;
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
  */
-public class StatementForLoop<T extends Semantics<T>> implements Statement<T> {
+public class ForLoop<T extends Semantics<T>> implements ReoBlock<T> {
 
 	/**
 	 * Name of the iterated parameter.
@@ -33,7 +34,7 @@ public class StatementForLoop<T extends Semantics<T>> implements Statement<T> {
 	/**
 	 * Iterated subprogram definition.
 	 */
-	public Statement<T> body;
+	public ReoBlock<T> reoBlock;
 
 	/**
 	 * Constructs a parameterized for loop. 
@@ -43,13 +44,13 @@ public class StatementForLoop<T extends Semantics<T>> implements Statement<T> {
 	 * @param upper			expression defining the upper iteration bound
 	 * @param subprogram	iterated subprogram definition
 	 */
-	public StatementForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, Statement<T> body) {
+	public ForLoop(VariableName parameter, IntegerExpression lower, IntegerExpression upper, ReoBlock<T> body) {
 		if (parameter == null || lower == null || upper == null || body == null)
 			throw new NullPointerException();
 		this.parameter = parameter;
 		this.lower = lower;
 		this.upper = upper;
-		this.body = body;
+		this.reoBlock = body;
 	}
 	
 	/**
@@ -59,10 +60,10 @@ public class StatementForLoop<T extends Semantics<T>> implements Statement<T> {
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
 	@Override
-	public Statement<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ReoBlock<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		
 		if (params.get(parameter) != null)
-			throw new Exception("Parameter " + parameter + " is already used.");
+			throw new CompilationException(parameter.getToken(), "Parameter " + parameter + " is already used.");
 		
 		IntegerExpression x = lower.evaluate(params);
 		IntegerExpression y = upper.evaluate(params);
@@ -76,32 +77,32 @@ public class StatementForLoop<T extends Semantics<T>> implements Statement<T> {
 			// Iterate to find all concrete components. 
 			boolean isProgram = true;
 			Definitions defns = new Definitions(params);
-			List<Statement<T>> bodies = new ArrayList<Statement<T>>();
-			List<Program<T>> progs = new ArrayList<Program<T>>();
+			List<ReoBlock<T>> bodies = new ArrayList<ReoBlock<T>>();
+			List<Assembly<T>> progs = new ArrayList<Assembly<T>>();
 			for (int i = a; i <= b; i++) {
 				defns.put(parameter, new IntegerValue(Integer.valueOf(i)));
-				Statement<T> e = body.evaluate(defns);
+				ReoBlock<T> e = reoBlock.evaluate(defns);
 				bodies.add(e);
-				if (e instanceof Program) {
-					progs.add((Program<T>)e);
+				if (e instanceof Assembly) {
+					progs.add((Assembly<T>)e);
 				} else {
 					isProgram = false;
 				}
 			}
 			
 			if (isProgram) {
-				Program<T> prog = new Program<T>();
+				Assembly<T> prog = new Assembly<T>();
 				return prog.compose(progs).remove(parameter);
 			}
 			
-			return new Block<T>(bodies);
+			return new Body<T>(bodies);
 		}
 		
-		return new StatementForLoop<T>(parameter, x, y, body.evaluate(params));
+		return new ForLoop<T>(parameter, x, y, reoBlock.evaluate(params));
 	}
 	
 	@Override
 	public String toString() {
-		return "for " + parameter + "=" + lower + ".." + upper + body;
+		return "for " + parameter + "=" + lower + ".." + upper + reoBlock;
 	}
 }

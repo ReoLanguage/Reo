@@ -3,6 +3,9 @@ package nl.cwi.reo.interpret.variables;
 import java.util.Map;
 import java.util.Objects;
 
+import org.antlr.v4.runtime.Token;
+
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 
 /**
@@ -12,26 +15,30 @@ public final class VariableName implements Variable, Expression {
 
 	private final String name;
 	
-	public VariableName() {
-		this.name = "";
-	}
+	private final Token token;
 	
-	public VariableName(String name) {
+	public VariableName(String name, Token token) {
 		if (name == null)
 			throw new NullPointerException();
 		this.name = name;
+		this.token = token;
 	}
 	
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public Token getToken() {
+		return token;
+	}
 	
 	public VariableName addPrefix(String prefix) {
-		return new VariableName(prefix + name);
+		return new VariableName(prefix + name, token);
 	}
 
 	@Override
-	public Expression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Expression evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		Expression e = params.get(this);
 		if (e != null) return e;
 		return this;

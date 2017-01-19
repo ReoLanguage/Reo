@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.antlr.v4.runtime.Token;
+
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.Definitions;
@@ -21,19 +24,25 @@ public final class SignatureExpression implements ParameterType {
 	
 	private final NodeList nodes;
 	
-	public SignatureExpression() {
+	private final Token token;
+	
+	public SignatureExpression(Token token) {
+		if (token == null)
+			throw new NullPointerException();
 		this.params = new ParameterList();
 		this.nodes = new NodeList();
+		this.token =  token;
 	}
 	
-	public SignatureExpression(ParameterList params, NodeList nodes) {
-		if (params == null || nodes == null)
+	public SignatureExpression(ParameterList params, NodeList nodes, Token token) {
+		if (params == null || nodes == null || token == null)
 			throw new NullPointerException();
 		this.params = params;
 		this.nodes = nodes;
+		this.token =  token;
 	}
 	
-	public SignatureConcrete evaluate(ExpressionList values, VariableNameList iface) throws Exception {
+	public SignatureConcrete evaluate(ExpressionList values, VariableNameList iface) throws CompilationException {
 		
 		Definitions definitions = new Definitions();		
 
@@ -46,7 +55,7 @@ public final class SignatureExpression implements ParameterType {
 			} else if (param.getVariable() instanceof VariableRange) {
 				rng_params = (VariableRange)param.getVariable();
 			} else {
-				throw new Exception("Parameter " + param.getVariable() + " is not a valid parameter name.");
+				throw new CompilationException(token, "Parameter " + param.getVariable() + " is not a valid parameter name.");
 			}
 		}
 		int size_params = values.size() - k_params;
@@ -56,11 +65,11 @@ public final class SignatureExpression implements ParameterType {
 			if (defs != null) {
 				definitions.putAll(defs);
 			} else {
-				System.out.println("[error] Parameters in " + rng_params + " cannot be deduced from its length.");				
+				throw new CompilationException(token, "Parameters in " + rng_params + " cannot be deduced from its length.");
 			}
 		} else {
 			if (size_params != 0)
-				System.out.println("[error] Wrong number of parameter values: " + values);
+				throw new CompilationException(token, "Wrong number of parameter values.");
 		}
 
 		// Find the assignment of parameters.
@@ -72,7 +81,7 @@ public final class SignatureExpression implements ParameterType {
 			Expression v = value.next();
 			
 			if (!(x.getVariable() instanceof VariableName)) 
-				throw new Exception(x + " is not a valid parameter name.");
+				throw new CompilationException(x.getVariable().getToken(), x + " is not a valid parameter name.");
 			
 			definitions.put((VariableName)x.getVariable(), v);
 		}
@@ -91,7 +100,7 @@ public final class SignatureExpression implements ParameterType {
 				Port p = x.toPort();
 				
 				if (p == null)
-					throw new Exception(x + " is not a valid node name.");
+					throw new CompilationException(x.getVariable().getToken(), x + " is not a valid node name.");
 				
 				links.put(p, p);
 			}
@@ -107,7 +116,7 @@ public final class SignatureExpression implements ParameterType {
 				} else if (x.getVariable() instanceof VariableRange) {
 					rng_nodes = (VariableRange)x.getVariable();
 				} else {
-					throw new Exception("Parameter " + x.getVariable() + " is not a valid parameter name.");
+					throw new CompilationException(x.getVariable().getToken(), "Parameter " + x.getVariable() + " is not a valid parameter name.");
 				}
 			}
 			int size_nodes = iface.getList().size() - k_nodes;
@@ -117,11 +126,11 @@ public final class SignatureExpression implements ParameterType {
 				if (defs != null) {
 					definitions.putAll(defs);
 				} else {
-					System.out.println("[error] Parameters in " + rng_nodes + " cannot be deduced from its length.");				
+					throw new CompilationException(token, "Parameters in " + rng_nodes + " cannot be deduced from its length.");
 				}
 			} else {
 				if (size_nodes != 0)
-					System.out.println("[error] Wrong number of parameter values: " + iface);
+					throw new CompilationException(token, "Wrong number of nodes.");
 			}
 
 			Iterator<VariableName> var = iface.getList().iterator();
@@ -134,7 +143,7 @@ public final class SignatureExpression implements ParameterType {
 				Port q = x.rename(v).toPort();
 				
 				if (p == null)
-					throw new Exception(x + " is not a valid node name.");
+					throw new CompilationException(x.getVariable().getToken(), x + " is not a valid node name.");
 				
 				links.put(p, q);
 			}

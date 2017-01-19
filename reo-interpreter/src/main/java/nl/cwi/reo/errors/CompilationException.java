@@ -22,6 +22,7 @@ public class CompilationException extends Exception {
 		return token;
 	}
 	
+	@Override
 	public String getMessage() {
 		return msg;
 	}

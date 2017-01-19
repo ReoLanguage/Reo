@@ -2,9 +2,9 @@ package nl.cwi.reo.interpret.integers;
 
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
-
 
 public final class IntegerUnaryMinus implements IntegerExpression {
 
@@ -17,7 +17,7 @@ public final class IntegerUnaryMinus implements IntegerExpression {
 	}
 
 	@Override
-	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		IntegerExpression x = e.evaluate(params);
 		if (x instanceof IntegerValue)
 			return IntegerValue.unarymin((IntegerValue)x);

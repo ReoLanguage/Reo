@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.signatures;
 
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.interpret.ranges.Expression;
@@ -65,10 +66,10 @@ public final class Node implements Evaluable<Node> {
 	}
 
 	@Override
-	public Node evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Node evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		Range e = var.evaluate(params);
 		if (!(e instanceof Variable))
-			throw new Exception("Node variable " + var + " cannot be assigned to " + e);
+			throw new CompilationException(var.getToken(), "Node variable " + var + " cannot be assigned to " + e);
 		return new Node((Variable)e, type, tag);
 	}
 	

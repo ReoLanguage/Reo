@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
@@ -30,7 +31,7 @@ public class ParameterList extends ArrayList<Parameter> implements Evaluable<Par
 	}
 
 	@Override
-	public ParameterList evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ParameterList evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		List<Parameter> list_p = new ArrayList<Parameter>();
 		for (Parameter x : this) {
 			Parameter x_p = x.evaluate(params);	

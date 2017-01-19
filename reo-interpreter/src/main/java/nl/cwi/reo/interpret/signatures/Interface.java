@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
 
@@ -31,7 +32,7 @@ public final class Interface extends ArrayList<VariableName> implements Range {
 	}
 
 	@Override
-	public Interface evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Interface evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		return this;
 	}
 	

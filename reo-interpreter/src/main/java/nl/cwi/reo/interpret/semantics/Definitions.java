@@ -3,6 +3,7 @@ package nl.cwi.reo.interpret.semantics;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
@@ -29,7 +30,7 @@ public class Definitions extends HashMap<VariableName, Expression> implements Ev
 	}
 
 	@Override
-	public Definitions evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Definitions evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		Map<VariableName, Expression> defns_p = new HashMap<VariableName, Expression>();
 		for (Map.Entry<VariableName, Expression> def : super.entrySet()) 
 			defns_p.put(def.getKey(), def.getValue().evaluate(params));

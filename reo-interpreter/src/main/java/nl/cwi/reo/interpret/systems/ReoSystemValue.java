@@ -1,18 +1,19 @@
-package nl.cwi.reo.interpret.components;
+package nl.cwi.reo.interpret.systems;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.blocks.Program;
+import nl.cwi.reo.errors.CompilationException;
+import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
-import nl.cwi.reo.interpret.semantics.InstanceList;
+import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class ComponentValue<T extends Semantics<T>> implements ComponentExpression<T> {
+public final class ReoSystemValue<T extends Semantics<T>> implements ReoSystem<T> {
 	
 	/**
 	 * Signature expression.
@@ -22,14 +23,14 @@ public final class ComponentValue<T extends Semantics<T>> implements ComponentEx
 	/**
 	 * Program.
 	 */
-	private final Program<T> prog;
+	private final Assembly<T> prog;
 	
 	/**
 	 * Constructs a new component value.
 	 * @param sign
 	 * @param prog
 	 */
-	public ComponentValue(SignatureExpression sign, Program<T> prog) {
+	public ReoSystemValue(SignatureExpression sign, Assembly<T> prog) {
 		if (sign == null || prog == null)
 			throw new NullPointerException();
 		this.sign = sign;
@@ -40,19 +41,19 @@ public final class ComponentValue<T extends Semantics<T>> implements ComponentEx
 		return sign;
 	}
 	
-	public InstanceList<T> getInstances() {
+	public ComponentList<T> getInstances() {
 		return prog.getInstances();
 	}
 
 	@Override
-	public ComponentValue<T> evaluate(Map<VariableName, Expression> params) throws Exception {
-		return new ComponentValue<T>(sign, prog.evaluate(params));
+	public ReoSystemValue<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+		return new ReoSystemValue<T>(sign, prog.evaluate(params));
 	}
 
 	@Override
-	public Program<T> instantiate(ExpressionList values, VariableNameList iface) throws Exception {
+	public Assembly<T> instantiate(ExpressionList values, VariableNameList iface) throws CompilationException {
 		SignatureConcrete links = sign.evaluate(values, iface);
-		Program<T> _prog = prog.instantiate(links);
+		Assembly<T> _prog = prog.instantiate(links);
 		return _prog;
 	}
 	

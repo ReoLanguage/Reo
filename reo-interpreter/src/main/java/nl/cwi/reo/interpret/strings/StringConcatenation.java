@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.strings;
 
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
 
@@ -17,7 +18,7 @@ public final class StringConcatenation implements StringExpression {
 		this.e2 = e2;
 	}
 	
-	public StringExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public StringExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		StringExpression x1 = e1.evaluate(params);
 		StringExpression x2 = e2.evaluate(params);
 		if (x1 instanceof StringValue && x2 instanceof StringValue)

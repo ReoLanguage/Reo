@@ -8,34 +8,35 @@ import nl.cwi.reo.errors.MessageType;
 import nl.cwi.reo.interpret.ReoBaseListener;
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoParser;
-import nl.cwi.reo.interpret.ReoParser.BexprContext;
-import nl.cwi.reo.interpret.ReoParser.Bexpr_booleanContext;
-import nl.cwi.reo.interpret.ReoParser.Bexpr_bracketsContext;
-import nl.cwi.reo.interpret.ReoParser.Bexpr_conjunctionContext;
-import nl.cwi.reo.interpret.ReoParser.Bexpr_disjunctionContext;
-import nl.cwi.reo.interpret.ReoParser.Bexpr_negationContext;
-import nl.cwi.reo.interpret.ReoParser.Bexpr_relationContext;
-import nl.cwi.reo.interpret.ReoParser.Bexpr_variableContext;
+import nl.cwi.reo.interpret.ReoParser.BoolContext;
+import nl.cwi.reo.interpret.ReoParser.Bool_booleanContext;
+import nl.cwi.reo.interpret.ReoParser.Bool_bracketsContext;
+import nl.cwi.reo.interpret.ReoParser.Bool_conjunctionContext;
+import nl.cwi.reo.interpret.ReoParser.Bool_disjunctionContext;
+import nl.cwi.reo.interpret.ReoParser.Bool_negationContext;
+import nl.cwi.reo.interpret.ReoParser.Bool_relationContext;
+import nl.cwi.reo.interpret.ReoParser.Bool_variableContext;
 import nl.cwi.reo.interpret.ReoParser.BlockContext;
-import nl.cwi.reo.interpret.ReoParser.Cexpr_atomicContext;
-import nl.cwi.reo.interpret.ReoParser.Cexpr_compositeContext;
-import nl.cwi.reo.interpret.ReoParser.Cexpr_variableContext;
+import nl.cwi.reo.interpret.ReoParser.Rsys_atomicContext;
+import nl.cwi.reo.interpret.ReoParser.Rsys_compositeContext;
+import nl.cwi.reo.interpret.ReoParser.Rsys_variableContext;
 import nl.cwi.reo.interpret.ReoParser.Comp_instanceContext;
 import nl.cwi.reo.interpret.ReoParser.Comp_productContext;
+import nl.cwi.reo.interpret.ReoParser.Comp_semicolonContext;
 import nl.cwi.reo.interpret.ReoParser.Comp_sumContext;
 import nl.cwi.reo.interpret.ReoParser.Expr_stringContext;
 import nl.cwi.reo.interpret.ReoParser.Expr_booleanContext;
 import nl.cwi.reo.interpret.ReoParser.Expr_integerContext;
 import nl.cwi.reo.interpret.ReoParser.Expr_componentContext;
 import nl.cwi.reo.interpret.ReoParser.FileContext;
-import nl.cwi.reo.interpret.ReoParser.IexprContext;
-import nl.cwi.reo.interpret.ReoParser.Iexpr_addsubContext;
-import nl.cwi.reo.interpret.ReoParser.Iexpr_bracketsContext;
-import nl.cwi.reo.interpret.ReoParser.Iexpr_exponentContext;
-import nl.cwi.reo.interpret.ReoParser.Iexpr_multdivremContext;
-import nl.cwi.reo.interpret.ReoParser.Iexpr_naturalContext;
-import nl.cwi.reo.interpret.ReoParser.Iexpr_unaryminContext;
-import nl.cwi.reo.interpret.ReoParser.Iexpr_variableContext;
+import nl.cwi.reo.interpret.ReoParser.IntrContext;
+import nl.cwi.reo.interpret.ReoParser.Intr_addsubContext;
+import nl.cwi.reo.interpret.ReoParser.Intr_bracketsContext;
+import nl.cwi.reo.interpret.ReoParser.Intr_exponentContext;
+import nl.cwi.reo.interpret.ReoParser.Intr_multdivremContext;
+import nl.cwi.reo.interpret.ReoParser.Intr_naturalContext;
+import nl.cwi.reo.interpret.ReoParser.Intr_unaryminContext;
+import nl.cwi.reo.interpret.ReoParser.Intr_variableContext;
 import nl.cwi.reo.interpret.ReoParser.IfaceContext;
 import nl.cwi.reo.interpret.ReoParser.ImpsContext;
 import nl.cwi.reo.interpret.ReoParser.IndicesContext;
@@ -49,9 +50,6 @@ import nl.cwi.reo.interpret.ReoParser.Ptype_typetagContext;
 import nl.cwi.reo.interpret.ReoParser.RangeContext;
 import nl.cwi.reo.interpret.ReoParser.Range_exprContext;
 import nl.cwi.reo.interpret.ReoParser.Range_listContext;
-import nl.cwi.reo.interpret.ReoParser.Range_commaContext;
-import nl.cwi.reo.interpret.ReoParser.Range_productContext;
-import nl.cwi.reo.interpret.ReoParser.Range_sumContext;
 import nl.cwi.reo.interpret.ReoParser.Range_variableContext;
 import nl.cwi.reo.interpret.ReoParser.SignContext;
 import nl.cwi.reo.interpret.ReoParser.StmtContext;
@@ -61,16 +59,18 @@ import nl.cwi.reo.interpret.ReoParser.Stmt_instanceContext;
 import nl.cwi.reo.interpret.ReoParser.Stmt_equationContext;
 import nl.cwi.reo.interpret.ReoParser.Stmt_compdefnContext;
 import nl.cwi.reo.interpret.ReoParser.Stmt_iterationContext;
+import nl.cwi.reo.interpret.ReoParser.Strg_stringContext;
+import nl.cwi.reo.interpret.ReoParser.Strg_variableContext;
 import nl.cwi.reo.interpret.ReoParser.TypeContext;
 import nl.cwi.reo.interpret.ReoParser.SecnContext;
 import nl.cwi.reo.interpret.ReoParser.VarContext;
-import nl.cwi.reo.interpret.blocks.Block;
-import nl.cwi.reo.interpret.blocks.Program;
-import nl.cwi.reo.interpret.blocks.Statement;
-import nl.cwi.reo.interpret.blocks.StatementDefinition;
-import nl.cwi.reo.interpret.blocks.StatementForLoop;
-import nl.cwi.reo.interpret.blocks.StatementIfThenElse;
-import nl.cwi.reo.interpret.blocks.StatementInstance;
+import nl.cwi.reo.interpret.blocks.Body;
+import nl.cwi.reo.interpret.blocks.Assembly;
+import nl.cwi.reo.interpret.blocks.ReoBlock;
+import nl.cwi.reo.interpret.blocks.Definition;
+import nl.cwi.reo.interpret.blocks.ForLoop;
+import nl.cwi.reo.interpret.blocks.IfThenElse;
+import nl.cwi.reo.interpret.blocks.InstanceReference;
 import nl.cwi.reo.interpret.booleans.BooleanConjunction;
 import nl.cwi.reo.interpret.booleans.BooleanDisequality;
 import nl.cwi.reo.interpret.booleans.BooleanDisjunction;
@@ -82,10 +82,6 @@ import nl.cwi.reo.interpret.booleans.BooleanLessOrEqual;
 import nl.cwi.reo.interpret.booleans.BooleanLessThan;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
 import nl.cwi.reo.interpret.booleans.BooleanVariable;
-import nl.cwi.reo.interpret.components.ComponentComposite;
-import nl.cwi.reo.interpret.components.ComponentExpression;
-import nl.cwi.reo.interpret.components.ComponentValue;
-import nl.cwi.reo.interpret.components.ComponentVariable;
 import nl.cwi.reo.interpret.integers.IntegerAddition;
 import nl.cwi.reo.interpret.integers.IntegerDivision;
 import nl.cwi.reo.interpret.integers.IntegerExponentiation;
@@ -100,7 +96,7 @@ import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.interpret.ranges.RangeList;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
-import nl.cwi.reo.interpret.semantics.InstanceList;
+import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.InterfaceExpression;
 import nl.cwi.reo.interpret.signatures.Node;
 import nl.cwi.reo.interpret.signatures.NodeList;
@@ -110,7 +106,13 @@ import nl.cwi.reo.interpret.signatures.ParameterList;
 import nl.cwi.reo.interpret.signatures.ParameterType;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.interpret.signatures.TypeTag;
+import nl.cwi.reo.interpret.strings.StringExpression;
 import nl.cwi.reo.interpret.strings.StringValue;
+import nl.cwi.reo.interpret.strings.StringVariable;
+import nl.cwi.reo.interpret.systems.ReoSystemComposite;
+import nl.cwi.reo.interpret.systems.ReoSystem;
+import nl.cwi.reo.interpret.systems.ReoSystemValue;
+import nl.cwi.reo.interpret.systems.ReoSystemVariable;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableRange;
@@ -130,11 +132,11 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	private List<String> imports = new ArrayList<String>();
 	
 	// Components
-	private ParseTreeProperty<ComponentExpression<T>> cexprs = new ParseTreeProperty<ComponentExpression<T>>();
+	private ParseTreeProperty<ReoSystem<T>> systems = new ParseTreeProperty<ReoSystem<T>>();
 	
 	// Blocks
-	private ParseTreeProperty<Block<T>> blocks = new ParseTreeProperty<Block<T>>();
-	private ParseTreeProperty<Statement<T>> stmts = new ParseTreeProperty<Statement<T>>();
+	private ParseTreeProperty<Body<T>> bodies = new ParseTreeProperty<Body<T>>();
+	private ParseTreeProperty<ReoBlock<T>> blocks = new ParseTreeProperty<ReoBlock<T>>();
 	
 	// Values	
 	private ParseTreeProperty<Range> ranges = new ParseTreeProperty<Range>();	
@@ -142,7 +144,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	private ParseTreeProperty<RangeList> lists = new ParseTreeProperty<RangeList>();
 	
 	// Boolean expressions
-	private ParseTreeProperty<BooleanExpression> bexprs = new ParseTreeProperty<BooleanExpression>();
+	private ParseTreeProperty<BooleanExpression> bools = new ParseTreeProperty<BooleanExpression>();
+	
+	// String expressions
+	private ParseTreeProperty<StringExpression> strgs = new ParseTreeProperty<StringExpression>();
 	
 	// Signatures
 	private ParseTreeProperty<SignatureExpression> signatureExpressions = new ParseTreeProperty<SignatureExpression>();
@@ -163,7 +168,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	private ParseTreeProperty<List<IntegerExpression>> bounds = new ParseTreeProperty<List<IntegerExpression>>();	
 
 	// Integer expressions
-	private ParseTreeProperty<IntegerExpression> iexprs = new ParseTreeProperty<IntegerExpression>();
+	private ParseTreeProperty<IntegerExpression> intrs = new ParseTreeProperty<IntegerExpression>();
 
 	// Semantics
 	protected ParseTreeProperty<T> atoms = new ParseTreeProperty<T>();
@@ -182,7 +187,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitFile(FileContext ctx) {
-		program = new ReoFile<T>(section, imports, ctx.ID().getText(), cexprs.get(ctx.cexpr()));
+		program = new ReoFile<T>(section, imports, ctx.ID().getText(), systems.get(ctx.rsys()));
 	}
 
 	@Override
@@ -200,31 +205,31 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	 */
 
 	@Override
-	public void enterCexpr_variable(Cexpr_variableContext ctx) { }
+	public void enterRsys_variable(Rsys_variableContext ctx) { }
 
 	@Override
-	public void exitCexpr_variable(Cexpr_variableContext ctx) {
+	public void exitRsys_variable(Rsys_variableContext ctx) {
 		Variable var = variables.get(ctx.var());
-		cexprs.put(ctx, new ComponentVariable<T>(var));
+		systems.put(ctx, new ReoSystemVariable<T>(var));
 	}
 
 	@Override
-	public void enterCexpr_atomic(Cexpr_atomicContext ctx) { }
+	public void enterRsys_atomic(Rsys_atomicContext ctx) { }
 
 	@Override
-	public void exitCexpr_atomic(Cexpr_atomicContext ctx) {
+	public void exitRsys_atomic(Rsys_atomicContext ctx) {
 		T atom = atoms.get(ctx.atom());
 //		if (atom == null) throw new Exception();
-		Program<T> prog = new Program<T>(new Definitions(), new InstanceList<T>(atom));
-		cexprs.put(ctx, new ComponentValue<T>(signatureExpressions.get(ctx.sign()), prog));
+		Assembly<T> prog = new Assembly<T>(new Definitions(), new ComponentList<T>(atom));
+		systems.put(ctx, new ReoSystemValue<T>(signatureExpressions.get(ctx.sign()), prog));
 	}
 
 	@Override
-	public void enterCexpr_composite(Cexpr_compositeContext ctx) { }
+	public void enterRsys_composite(Rsys_compositeContext ctx) { }
 
 	@Override
-	public void exitCexpr_composite(Cexpr_compositeContext ctx) {
-		cexprs.put(ctx, new ComponentComposite<T>(signatureExpressions.get(ctx.sign()), stmts.get(ctx.block())));		
+	public void exitRsys_composite(Rsys_compositeContext ctx) {
+		systems.put(ctx, new ReoSystemComposite<T>(signatureExpressions.get(ctx.sign()), blocks.get(ctx.block())));		
 	}
 	
 	/**
@@ -233,10 +238,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	
 	@Override
 	public void exitBlock(BlockContext ctx) {
-		List<Statement<T>> stmtlist = new ArrayList<Statement<T>>();
+		List<ReoBlock<T>> stmtlist = new ArrayList<ReoBlock<T>>();
 		for (StmtContext stmt_ctx : ctx.stmt())
-			stmtlist.add(stmts.get(stmt_ctx));
-		blocks.put(ctx, new Block<T>(stmtlist));
+			stmtlist.add(blocks.get(stmt_ctx));
+		bodies.put(ctx, new Body<T>(stmtlist));
 	}
 
 	@Override
@@ -244,11 +249,11 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		Range x = ranges.get(ctx.range(0));
 		Range y = ranges.get(ctx.range(1));		
 		if (x instanceof Variable) {
-			stmts.put(ctx, new StatementDefinition<T>((Variable)x, y));			
+			blocks.put(ctx, new Definition<T>((Variable)x, y));			
 		} else if (x instanceof Variable) {
-			stmts.put(ctx, new StatementDefinition<T>((Variable)y, x));
+			blocks.put(ctx, new Definition<T>((Variable)y, x));
 		} else {
-			stmts.put(ctx, new Program<T>());			
+			blocks.put(ctx, new Assembly<T>());			
 			System.out.println(new Message(MessageType.WARNING, ctx.start, ctx.getText() + " is not a valid definition and will be ignored. "
 					+ "Either the left-hand-side or the right-hand-side of an equation must be a variable."));
 		}
@@ -256,70 +261,79 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitStmt_compdefn(Stmt_compdefnContext ctx) {
-		stmts.put(ctx, new StatementDefinition<T>(variables.get(ctx.var()), cexprs.get(ctx.cexpr())));
+		blocks.put(ctx, new Definition<T>(variables.get(ctx.var()), systems.get(ctx.rsys())));
 	}
 
 	@Override
 	public void exitStmt_instance(Stmt_instanceContext ctx) {	
-		stmts.put(ctx, stmts.get(ctx.comp()));
+		blocks.put(ctx, blocks.get(ctx.comp()));
 	}
 
 	@Override
 	public void exitStmt_block(Stmt_blockContext ctx) {
-		stmts.put(ctx, stmts.get(ctx.block()));
+		blocks.put(ctx, blocks.get(ctx.block()));
 	}
 
 	@Override
 	public void exitStmt_iteration(Stmt_iterationContext ctx) {
-		VariableName p = new VariableName(ctx.ID().getText());
-		IntegerExpression a = iexprs.get(ctx.iexpr(0));
-		IntegerExpression b = iexprs.get(ctx.iexpr(1));
-		Statement<T> B = stmts.get(ctx.block());
-		stmts.put(ctx, new StatementForLoop<T>(p, a, b, B));
+		VariableName p = new VariableName(ctx.ID().getText(), ctx.start);
+		IntegerExpression a = intrs.get(ctx.intr(0));
+		IntegerExpression b = intrs.get(ctx.intr(1));
+		ReoBlock<T> B = blocks.get(ctx.block());
+		blocks.put(ctx, new ForLoop<T>(p, a, b, B));
 	}
 
 	@Override
 	public void exitStmt_condition(Stmt_conditionContext ctx) {
 		List<BooleanExpression> guards = new ArrayList<BooleanExpression>();
-		List<Statement<T>> branches = new ArrayList<Statement<T>>();
-		for (BexprContext bexpr_ctx : ctx.bexpr())
-			guards.add(bexprs.get(bexpr_ctx));
+		List<ReoBlock<T>> branches = new ArrayList<ReoBlock<T>>();
+		for (BoolContext Bool_ctx : ctx.bool())
+			guards.add(bools.get(Bool_ctx));
 		for (BlockContext block_ctx : ctx.block())
-			branches.add(stmts.get(block_ctx));
+			branches.add(blocks.get(block_ctx));
 		if (guards.size() == branches.size()) {
 			guards.add(new BooleanValue(true));
-			branches.add(new Program<T>());
+			branches.add(new Assembly<T>());
 		} else {
 			guards.add(new BooleanValue(true));
 		}
-		stmts.put(ctx, new StatementIfThenElse<T>(guards, branches));
+		blocks.put(ctx, new IfThenElse<T>(guards, branches));
 	}
 	
 	@Override
 	public void exitComp_instance(Comp_instanceContext ctx) {
-		ComponentExpression<T> cexpr = cexprs.get(ctx.cexpr());
+		ReoSystem<T> cexpr = systems.get(ctx.rsys());
 		RangeList list = lists.get(ctx.list());
 		if (list == null) list = new RangeList();
 		InterfaceExpression iface = ifaces.get(ctx.iface());
-		stmts.put(ctx, new StatementInstance<T>(cexpr, list, iface));
+		blocks.put(ctx, new InstanceReference<T>(cexpr, list, iface));
 	}
 	
 	@Override
 	public void exitComp_product(Comp_productContext ctx) {
-		List<Statement<T>> list = new ArrayList<Statement<T>>();
-		list.add(new StatementDefinition<T>(new VariableName("(*)"), new StringValue("product")));
-		list.add(stmts.get(ctx.comp(0)));
-		list.add(stmts.get(ctx.comp(1)));
-		stmts.put(ctx, new Block<T>(list));
+//		List<ReoBlock<T>> list = new ArrayList<ReoBlock<T>>();
+//		list.add(new Definition<T>(new VariableName("*", ctx.mul.start), new StringValue("product")));
+//		list.add(stmts.get(ctx.comp(0)));
+//		list.add(stmts.get(ctx.comp(1)));
+//		stmts.put(ctx, new Body<T>(list));
 	}
 	
 	@Override
 	public void exitComp_sum(Comp_sumContext ctx) {
-		List<Statement<T>> list = new ArrayList<Statement<T>>();
-		list.add(new StatementDefinition<T>(new VariableName("(+)"), new StringValue("sum")));
-		list.add(stmts.get(ctx.comp(0)));
-		list.add(stmts.get(ctx.comp(1)));
-		stmts.put(ctx, new Block<T>(list));
+//		List<ReoBlock<T>> list = new ArrayList<ReoBlock<T>>();
+//		list.add(new Definition<T>(new VariableName("+", ctx.add.start), new StringValue("sum")));
+//		list.add(stmts.get(ctx.comp(0)));
+//		list.add(stmts.get(ctx.comp(1)));
+//		stmts.put(ctx, new Body<T>(list));
+	}
+	
+	@Override
+	public void exitComp_semicolon(Comp_semicolonContext ctx) {
+//		List<ReoBlock<T>> list = new ArrayList<ReoBlock<T>>();
+//		list.add(new Definition<T>(new VariableName("+", ctx.scl.start), new StringValue("semicolon")));
+//		list.add(stmts.get(ctx.comp(0)));
+//		list.add(stmts.get(ctx.comp(1)));
+//		stmts.put(ctx, new Body<T>(list));
 	}
 		
 	/**
@@ -329,21 +343,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitRange_variable(Range_variableContext ctx) {
 		ranges.put(ctx, variables.get(ctx.var()));
-	}
-	
-	@Override
-	public void exitRange_comma(Range_commaContext ctx) {
-		ranges.put(ctx, new VariableName(ctx.getText()));
-	}
-	
-	@Override
-	public void exitRange_product(Range_productContext ctx) {
-		ranges.put(ctx, new VariableName(ctx.getText()));
-	}
-	
-	@Override
-	public void exitRange_sum(Range_sumContext ctx) {
-		ranges.put(ctx, new VariableName(ctx.getText()));
 	}
 	
 	@Override
@@ -358,22 +357,22 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitExpr_string(Expr_stringContext ctx) {
-		exprs.put(ctx, new StringValue(ctx.STRING().getText()));
+		exprs.put(ctx, strgs.get(ctx.strg()));
 	}
 
 	@Override
 	public void exitExpr_boolean(Expr_booleanContext ctx) {
-		exprs.put(ctx, bexprs.get(ctx.bexpr()));
+		exprs.put(ctx, bools.get(ctx.bool()));
 	}
 
 	@Override
 	public void exitExpr_integer(Expr_integerContext ctx) {
-		exprs.put(ctx, iexprs.get(ctx.iexpr()));
+		exprs.put(ctx, intrs.get(ctx.intr()));
 	}
 
 	@Override
 	public void exitExpr_component(Expr_componentContext ctx) {
-		exprs.put(ctx, cexprs.get(ctx.cexpr()));
+		exprs.put(ctx, systems.get(ctx.rsys()));
 	}
 
 	@Override
@@ -389,29 +388,29 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	 */
 
 	@Override
-	public void exitBexpr_relation(Bexpr_relationContext ctx) {
+	public void exitBool_relation(Bool_relationContext ctx) {
 		
-		IntegerExpression e1 = iexprs.get(ctx.iexpr(0));
-		IntegerExpression e2 = iexprs.get(ctx.iexpr(1));
+		IntegerExpression e1 = intrs.get(ctx.intr(0));
+		IntegerExpression e2 = intrs.get(ctx.intr(1));
 		
 		switch (ctx.op.getType()) {
 		case ReoParser.LEQ:
-			bexprs.put(ctx, new BooleanLessOrEqual(e1, e2));
+			bools.put(ctx, new BooleanLessOrEqual(e1, e2));
 			break;
 		case ReoParser.LT:
-			bexprs.put(ctx, new BooleanLessThan(e1, e2));
+			bools.put(ctx, new BooleanLessThan(e1, e2));
 			break;
 		case ReoParser.GEQ:
-			bexprs.put(ctx, new BooleanGreaterOrEqual(e1, e2));
+			bools.put(ctx, new BooleanGreaterOrEqual(e1, e2));
 			break;
 		case ReoParser.GT:
-			bexprs.put(ctx, new BooleanGreaterThan(e1, e2));
+			bools.put(ctx, new BooleanGreaterThan(e1, e2));
 			break;
 		case ReoParser.EQ:
-			bexprs.put(ctx, new BooleanEquality(e1, e2));
+			bools.put(ctx, new BooleanEquality(e1, e2));
 			break;
 		case ReoParser.NEQ:
-			bexprs.put(ctx, new BooleanDisequality(e1, e2));
+			bools.put(ctx, new BooleanDisequality(e1, e2));
 			break;
 		default:
 			break;
@@ -419,39 +418,53 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
-	public void exitBexpr_boolean(Bexpr_booleanContext ctx) {
-		bexprs.put(ctx, new BooleanValue(Boolean.parseBoolean(ctx.BOOL().getText())));
+	public void exitBool_boolean(Bool_booleanContext ctx) {
+		bools.put(ctx, new BooleanValue(Boolean.parseBoolean(ctx.BOOL().getText())));
 	}
 
 	@Override
-	public void exitBexpr_disjunction(Bexpr_disjunctionContext ctx) {
-		BooleanExpression e1 = bexprs.get(ctx.bexpr(0));
-		BooleanExpression e2 = bexprs.get(ctx.bexpr(1));
-		bexprs.put(ctx, new BooleanDisjunction(e1, e2));
+	public void exitBool_disjunction(Bool_disjunctionContext ctx) {
+		BooleanExpression e1 = bools.get(ctx.bool(0));
+		BooleanExpression e2 = bools.get(ctx.bool(1));
+		bools.put(ctx, new BooleanDisjunction(e1, e2));
 	}
 
 	@Override
-	public void exitBexpr_negation(Bexpr_negationContext ctx) {
-		bexprs.put(ctx, bexprs.get(ctx.bexpr()));
+	public void exitBool_negation(Bool_negationContext ctx) {
+		bools.put(ctx, bools.get(ctx.bool()));
 	}
 
 	@Override
-	public void exitBexpr_conjunction(Bexpr_conjunctionContext ctx) {
-		BooleanExpression e1 = bexprs.get(ctx.bexpr(0));
-		BooleanExpression e2 = bexprs.get(ctx.bexpr(1));
-		bexprs.put(ctx, new BooleanConjunction(e1, e2));
+	public void exitBool_conjunction(Bool_conjunctionContext ctx) {
+		BooleanExpression e1 = bools.get(ctx.bool(0));
+		BooleanExpression e2 = bools.get(ctx.bool(1));
+		bools.put(ctx, new BooleanConjunction(e1, e2));
 	}
 
 	@Override
-	public void exitBexpr_brackets(Bexpr_bracketsContext ctx) {
-		bexprs.put(ctx, bexprs.get(ctx.bexpr()));
+	public void exitBool_brackets(Bool_bracketsContext ctx) {
+		bools.put(ctx, bools.get(ctx.bool()));
 	}
 
 	@Override
-	public void exitBexpr_variable(Bexpr_variableContext ctx) {
-		bexprs.put(ctx, new BooleanVariable(variables.get(ctx.var())));		
+	public void exitBool_variable(Bool_variableContext ctx) {
+		bools.put(ctx, new BooleanVariable(variables.get(ctx.var())));		
 	}
 
+	/**
+	 * String Expressions
+	 */
+	
+	@Override
+	public void exitStrg_string(Strg_stringContext ctx) {
+		exprs.put(ctx, new StringValue(ctx.STRING().getText()));	
+	}
+
+	@Override
+	public void exitStrg_variable(Strg_variableContext ctx) {
+		strgs.put(ctx, new StringVariable(variables.get(ctx.var())));		
+	}
+	
 	/**
 	 * Signatures
 	 */
@@ -461,7 +474,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		ParameterList params = parameterlists.get(ctx.params());
 		if (params == null) params = new ParameterList();
 		NodeList nodes = nodelists.get(ctx.nodes());
-		signatureExpressions.put(ctx, new SignatureExpression(params, nodes));
+		signatureExpressions.put(ctx, new SignatureExpression(params, nodes, ctx.start));
 	}
 
 	@Override
@@ -502,7 +515,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitNode(NodeContext ctx) {
 		Variable var = variables.get(ctx.var());
-		if (var == null) var = new VariableName();
+		if (var == null) var = new VariableName("", ctx.start);
 		TypeTag tag = typetags.get(ctx.type());
 		if (tag == null) tag = new TypeTag();
 		NodeType type = NodeType.MIXED;
@@ -542,7 +555,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		List<Variable> list = new ArrayList<Variable>();
 		for (VarContext node_ctx : ctx.var())
 			list.add(variables.get(node_ctx));
-		ifaces.put(ctx, new InterfaceExpression(list));
+		ifaces.put(ctx, new InterfaceExpression(list, ctx.start));
 	}
      
 	/**
@@ -562,17 +575,17 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (IndicesContext indices_ctx : ctx.indices())
 			indices.add(bounds.get(indices_ctx));
 		if (indices.isEmpty()) {
-			variables.put(ctx, new VariableName(name));
+			variables.put(ctx, new VariableName(name, ctx.start));
 		} else { 
-			variables.put(ctx, new VariableRange(name, indices));
+			variables.put(ctx, new VariableRange(name, indices, ctx.start));
 		}
 	}
 
 	@Override
 	public void exitIndices(IndicesContext ctx) {
 		List<IntegerExpression> list = new ArrayList<IntegerExpression>();
-		for (IexprContext iexpr_ctx : ctx.iexpr())
-			list.add(iexprs.get(iexpr_ctx));
+		for (IntrContext Intr_ctx : ctx.intr())
+			list.add(intrs.get(Intr_ctx));
 		bounds.put(ctx, list);
 	}
 
@@ -581,23 +594,23 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	 */
 
 	@Override
-	public void exitIexpr_variable(Iexpr_variableContext ctx) {
-		iexprs.put(ctx, new IntegerVariable(variables.get(ctx.var())));
+	public void exitIntr_variable(Intr_variableContext ctx) {
+		intrs.put(ctx, new IntegerVariable(variables.get(ctx.var())));
 	}
 
 	@Override
-	public void exitIexpr_multdivrem(Iexpr_multdivremContext ctx) {
-		IntegerExpression e1 = iexprs.get(ctx.iexpr(0));
-		IntegerExpression e2 = iexprs.get(ctx.iexpr(1));		
+	public void exitIntr_multdivrem(Intr_multdivremContext ctx) {
+		IntegerExpression e1 = intrs.get(ctx.intr(0));
+		IntegerExpression e2 = intrs.get(ctx.intr(1));		
 		switch (ctx.op.getType()) {
 		case ReoParser.MUL:
-			iexprs.put(ctx, new IntegerMultiplication(e1, e2));
+			intrs.put(ctx, new IntegerMultiplication(e1, e2));
 			break;
 		case ReoParser.DIV:
-			iexprs.put(ctx, new IntegerDivision(e1, e2));
+			intrs.put(ctx, new IntegerDivision(e1, e2, ctx.DIV().getSymbol()));
 			break;
-		case ReoParser.GEQ:
-			iexprs.put(ctx, new IntegerRemainder(e1, e2));
+		case ReoParser.MOD:
+			intrs.put(ctx, new IntegerRemainder(e1, e2, ctx.MOD().getSymbol()));
 			break;
 		default:
 			break;
@@ -605,22 +618,22 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
-	public void exitIexpr_exponent(Iexpr_exponentContext ctx) {
-		IntegerExpression e1 = iexprs.get(ctx.iexpr(0));
-		IntegerExpression e2 = iexprs.get(ctx.iexpr(1));
-		iexprs.put(ctx, new IntegerExponentiation(e1, e2));
+	public void exitIntr_exponent(Intr_exponentContext ctx) {
+		IntegerExpression e1 = intrs.get(ctx.intr(0));
+		IntegerExpression e2 = intrs.get(ctx.intr(1));
+		intrs.put(ctx, new IntegerExponentiation(e1, e2));
 	}
 
 	@Override
-	public void exitIexpr_addsub(Iexpr_addsubContext ctx) {
-		IntegerExpression e1 = iexprs.get(ctx.iexpr(0));
-		IntegerExpression e2 = iexprs.get(ctx.iexpr(1));		
+	public void exitIntr_addsub(Intr_addsubContext ctx) {
+		IntegerExpression e1 = intrs.get(ctx.intr(0));
+		IntegerExpression e2 = intrs.get(ctx.intr(1));		
 		switch (ctx.op.getType()) {
 		case ReoParser.ADD:
-			iexprs.put(ctx, new IntegerAddition(e1, e2));
+			intrs.put(ctx, new IntegerAddition(e1, e2));
 			break;
 		case ReoParser.MIN:
-			iexprs.put(ctx, new IntegerSubstraction(e1, e2));
+			intrs.put(ctx, new IntegerSubstraction(e1, e2));
 			break;
 		default:
 			break;
@@ -628,19 +641,19 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
-	public void exitIexpr_unarymin(Iexpr_unaryminContext ctx) {
-		IntegerExpression e = iexprs.get(ctx.iexpr());
-		iexprs.put(ctx, new IntegerUnaryMinus(e));
+	public void exitIntr_unarymin(Intr_unaryminContext ctx) {
+		IntegerExpression e = intrs.get(ctx.intr());
+		intrs.put(ctx, new IntegerUnaryMinus(e));
 	}
 
 	@Override
-	public void exitIexpr_natural(Iexpr_naturalContext ctx) {
-		iexprs.put(ctx, new IntegerValue(Integer.parseInt(ctx.NAT().getText())));
+	public void exitIntr_natural(Intr_naturalContext ctx) {
+		intrs.put(ctx, new IntegerValue(Integer.parseInt(ctx.NAT().getText())));
 	}
 
 	@Override
-	public void exitIexpr_brackets(Iexpr_bracketsContext ctx) {
-		iexprs.put(ctx, iexprs.get(ctx.iexpr()));
+	public void exitIntr_brackets(Intr_bracketsContext ctx) {
+		intrs.put(ctx, intrs.get(ctx.intr()));
 	}
 	
 }

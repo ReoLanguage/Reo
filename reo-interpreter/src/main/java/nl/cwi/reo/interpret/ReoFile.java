@@ -4,15 +4,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.cwi.reo.interpret.blocks.Program;
-import nl.cwi.reo.interpret.components.ComponentExpression;
+import nl.cwi.reo.errors.CompilationException;
+import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
-import nl.cwi.reo.interpret.semantics.InstanceList;
+import nl.cwi.reo.interpret.semantics.ComponentList;
+import nl.cwi.reo.interpret.systems.ReoSystem;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class ReoFile<T extends Semantics<T>> implements Evaluable<Program<T>> {
+public final class ReoFile<T extends Semantics<T>> implements Evaluable<Assembly<T>> {
 	
 	/**
 	 * Section.
@@ -32,9 +33,9 @@ public final class ReoFile<T extends Semantics<T>> implements Evaluable<Program<
 	/**
 	 * Main component.
 	 */
-	private final ComponentExpression<T> cexpr;
+	private final ReoSystem<T> cexpr;
 	
-	public ReoFile(String section, List<String> imports, String name, ComponentExpression<T> cexpr) {
+	public ReoFile(String section, List<String> imports, String name, ReoSystem<T> cexpr) {
 		if (section == null || imports == null || name == null || cexpr == null)
 			throw new NullPointerException();
 		this.section = section;
@@ -51,15 +52,15 @@ public final class ReoFile<T extends Semantics<T>> implements Evaluable<Program<
 		return section.equals("") ? name : section + "." + name; 
 	}
 	
-	public ComponentExpression<T> getComponent() {
+	public ReoSystem<T> getComponent() {
 		return cexpr;
 	}
 
 	@Override
-	public Program<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Assembly<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();
-		definitions.put(new VariableName(getName()), cexpr.evaluate(params));
-		return new Program<T>(new Definitions(definitions), new InstanceList<T>());
+		definitions.put(new VariableName(getName(), null), cexpr.evaluate(params));
+		return new Assembly<T>(new Definitions(definitions), new ComponentList<T>());
 	}
 	
 	@Override

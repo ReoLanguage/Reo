@@ -21,16 +21,19 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import nl.cwi.reo.interpret.blocks.Program;
-import nl.cwi.reo.interpret.components.ComponentValue;
+import nl.cwi.reo.errors.CompilationException;
+import nl.cwi.reo.errors.Message;
+import nl.cwi.reo.errors.MessageType;
+import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
-import nl.cwi.reo.interpret.semantics.Assembly;
+import nl.cwi.reo.interpret.semantics.FlatAssembly;
 import nl.cwi.reo.interpret.semantics.Definitions;
-import nl.cwi.reo.interpret.semantics.InstanceList;
+import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.strings.StringValue;
+import nl.cwi.reo.interpret.systems.ReoSystemValue;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
@@ -77,7 +80,7 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @return list of work automata.
 	 */
 	@SuppressWarnings("unchecked")
-	public Assembly<T> interpret(List<String> srcfiles) {
+	public FlatAssembly<T> interpret(List<String> srcfiles) {
 		try {			
 			// Find all available component expressions.
 			Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();	
@@ -117,31 +120,31 @@ public class Interpreter<T extends Semantics<T>> {
 			VariableName name = null;		
 			while (!stack.isEmpty()) {
 				ReoFile<T> program = stack.pop();
-				name = new VariableName(program.getName());
+				name = new VariableName(program.getName(), null);
 				Expression cexpr = program.getComponent().evaluate(definitions);
 				definitions.put(name, cexpr);
 			}
 			
 			// Get the instance from the main component.		
 			Expression expr = definitions.get(name);		
-			if (expr instanceof ComponentValue<?>) {				
-				ComponentValue<T> main = (ComponentValue<T>)expr;
+			if (expr instanceof ReoSystemValue<?>) {				
+				ReoSystemValue<T> main = (ReoSystemValue<T>)expr;
 				ExpressionList values = new ExpressionList();
 				for (String x : params) values.add(new StringValue(x));
 				SignatureConcrete sign = main.getSignature().evaluate(values, null);
 				
-				Program<T> main_p = main.instantiate(values, null);
+				Assembly<T> main_p = main.instantiate(values, null);
 				
-				InstanceList<T> instances = main_p.getInstances();
+				ComponentList<T> instances = main_p.getInstances();
 				
 				instances.insertNodes(true, false);
 				
-				return new Assembly<T>(instances.getComponents(), name.getName(), sign.keySet());
+				return new FlatAssembly<T>(instances.getComponents(), name.getName(), sign.keySet());
 			}
 		} catch (IOException e) {
 			System.out.print(e.getMessage());
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (CompilationException e) {
+			System.out.println(new Message(MessageType.ERROR, e.getToken(), e.getMessage()));
 		}		
 
 		return null;

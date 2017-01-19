@@ -2,10 +2,12 @@ package nl.cwi.reo.interpret.integers;
 
 import java.util.Map;
 
+import org.antlr.v4.runtime.Token;
+
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
-
 
 public final class IntegerValue implements IntegerExpression {
 	
@@ -36,7 +38,7 @@ public final class IntegerValue implements IntegerExpression {
 	 * @param params		 	parameter assignment
 	 * @return Integer evaluation with respect to parameter assignment.
 	 */
-	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		return new IntegerValue(this.n);
 	}
 	
@@ -52,15 +54,15 @@ public final class IntegerValue implements IntegerExpression {
 		return new IntegerValue(v1.n * v2.n);
 	}
 	
-	public static IntegerValue division(IntegerValue v1, IntegerValue v2) throws Exception {
+	public static IntegerValue division(IntegerValue v1, IntegerValue v2, Token operator) throws CompilationException {
 		if (v2.n == 0) 
-			throw new Exception("Cannot divide by zero.");
+			throw new CompilationException(operator, "Cannot divide by zero.");
 		return new IntegerValue(v1.n / v2.n);
 	}
 	
-	public static IntegerValue remainder(IntegerValue v1, IntegerValue v2) throws Exception {
+	public static IntegerValue remainder(IntegerValue v1, IntegerValue v2, Token operator) throws CompilationException {
 		if (v2.n == 0) 
-			throw new Exception("Modulus cannot be zero.");
+			throw new CompilationException(operator, "Modulus cannot be zero.");
 		return new IntegerValue(v1.n % v2.n);
 	}
 	

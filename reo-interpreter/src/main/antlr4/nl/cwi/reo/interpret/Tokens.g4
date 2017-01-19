@@ -19,6 +19,8 @@ DIV     : '/' ;
 MOD     : '%' ;
 ADD     : '+' ;
 MIN     : '-' ;
+SCL     : ';' ;
+AMP     : '&' ;
 NAT     : ('0'|[1-9][0-9]*) ;
 BOOL    : 'true'|'false' ;
 ID      : [a-zA-Z_][a-zA-Z0-9_]*;

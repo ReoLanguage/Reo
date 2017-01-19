@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
@@ -14,12 +15,17 @@ import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.PortType;
 import nl.cwi.reo.semantics.Semantics;
 
-public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>> implements Evaluable<InstanceList<T>> {
+public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T>> implements Evaluable<ComponentList<T>> {
 	
 	/**
 	 * Serial version ID.
 	 */
 	private static final long serialVersionUID = -4691832430455957713L;
+	
+	/**
+	 * Type of composition
+	 */
+	private final String operator;
 	
 	/**
 	 * Counter for generating fresh port names.
@@ -29,30 +35,53 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 	/**
 	 * Constructs and empty list of instances.
 	 */
-	public InstanceList() { }
+	public ComponentList() { 
+		this.operator = "";
+	}
 	
 	/**
 	 * Constructs a singleton list with 
 	 * @param atom
 	 */
-	public InstanceList(T atom) {
+	public ComponentList(T atom) {
 		if (atom == null)
 			throw new NullPointerException();
-		super.add(new Instance<T>(atom));
+		super.add(new Component<T>(atom));
+		this.operator = "";
 	}
 	
 	/**
 	 * Copy constructor.
 	 * @param instances
 	 */
-	public InstanceList(List<Instance<T>> instances) {
+	public ComponentList(ComponentList<T> instances) {
 		if (instances == null)
 			throw new NullPointerException();
-		for (Instance<T> inst : instances) {
+		for (Component<T> inst : instances) {
 			if (inst == null)
 				throw new NullPointerException();
-			super.add(new Instance<T>(inst));
+			super.add(new Component<T>(inst));
 		}
+		this.operator = instances.operator;
+	}
+	
+	/**
+	 * Copy constructor.
+	 * @param instances
+	 */
+	public ComponentList(List<Component<T>> instances, String operator) {
+		if (instances == null)
+			throw new NullPointerException();
+		for (Component<T> inst : instances) {
+			if (inst == null)
+				throw new NullPointerException();
+			super.add(new Component<T>(inst));
+		}
+		this.operator = operator;
+	}
+	
+	public String getOperator() {
+		return operator;
 	}
 	
 	/**
@@ -68,7 +97,7 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 		// Count the number of incoming and outgoing channel ends at each node.
 		Map<Port, Integer> outs = new HashMap<Port, Integer>();
 		Map<Port, Integer> ins = new HashMap<Port, Integer>();
-		for (Instance<T> inst : this) {
+		for (Component<T> inst : this) {
 			for (Map.Entry<Port, Port> link : inst.entrySet()) {
 				Port p = link.getValue();
 				Integer out = outs.get(p);
@@ -89,7 +118,7 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 		// Split shared ports in every atom in main, and insert a node
 		Map<Port, SortedSet<Port>> nodes = new HashMap<Port, SortedSet<Port>>();
 		
-		for (Instance<T> inst : this) {	
+		for (Component<T> inst : this) {	
 							
 			Map<Port, Port> links = new HashMap<Port, Port>();
 
@@ -140,12 +169,12 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 		T unit = this.get(0).getAtom();
 		for (Map.Entry<Port, SortedSet<Port>> node : nodes.entrySet()) 
 			if (node.getValue().size() > 1)
-				this.add(new Instance<T>(unit.getNode(node.getValue())));
+				this.add(new Component<T>(unit.getNode(node.getValue())));
 	}
 	
 	public List<T> getComponents() {
 		List<T> list = new ArrayList<T>();
-		for (Instance<T> inst : this)
+		for (Component<T> inst : this)
 			list.add(inst.getAtom().rename(inst));
 		return list;
 	}
@@ -155,7 +184,7 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 	 * renames all hidden ports to avoid sharing of internal ports.
 	 * @param list 		other list of instances
 	 */
-	public void compose(InstanceList<T> list) {
+	public void compose(ComponentList<T> list) {
 		i = this.renameHidden(i);
 		list.renameHidden(i);
 		this.addAll(list);
@@ -169,7 +198,7 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 	 */
 	private int renameHidden(int i) {
 		Map<Port, Port> links = new HashMap<Port, Port>();
-		for (Instance<T> comp : this) {
+		for (Component<T> comp : this) {
 			for (Map.Entry<Port, Port> link : comp.entrySet()) {
 				Port x = link.getValue();
 				if (!links.containsKey(x)) {
@@ -186,9 +215,9 @@ public class InstanceList<T extends Semantics<T>> extends ArrayList<Instance<T>>
 	}
 
 	@Override
-	public InstanceList<T> evaluate(Map<VariableName, Expression> params) throws Exception {
-		InstanceList<T> _instances = new InstanceList<T>(this); 
-		for (Instance<T> comp : _instances)
+	public ComponentList<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+		ComponentList<T> _instances = new ComponentList<T>(this); 
+		for (Component<T> comp : _instances)
 			comp.evaluate(params);
 		return _instances;
 	}

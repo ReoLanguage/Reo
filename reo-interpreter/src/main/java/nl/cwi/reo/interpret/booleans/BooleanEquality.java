@@ -2,11 +2,11 @@ package nl.cwi.reo.interpret.booleans;
 
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
-
 
 public final class BooleanEquality implements BooleanExpression {
 
@@ -22,7 +22,7 @@ public final class BooleanEquality implements BooleanExpression {
 	}
 
 	@Override
-	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		IntegerExpression x1 = e1.evaluate(params);
 		IntegerExpression x2 = e2.evaluate(params);
 		if (x1 instanceof IntegerValue && x2 instanceof IntegerValue)

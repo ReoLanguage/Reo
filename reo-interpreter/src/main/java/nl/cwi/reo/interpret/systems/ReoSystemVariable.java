@@ -1,9 +1,10 @@
-package nl.cwi.reo.interpret.components;
+package nl.cwi.reo.interpret.systems;
 
 import java.util.Map;
 
 import nl.cwi.reo.interpret.ranges.Range;
-import nl.cwi.reo.interpret.blocks.Statement;
+import nl.cwi.reo.errors.CompilationException;
+import nl.cwi.reo.interpret.blocks.ReoBlock;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.variables.Variable;
@@ -11,29 +12,29 @@ import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.semantics.Semantics;
 
-public class ComponentVariable<T extends Semantics<T>> implements ComponentExpression<T> {
+public class ReoSystemVariable<T extends Semantics<T>> implements ReoSystem<T> {
 	
 	private Variable var;
 	
-	public ComponentVariable(Variable var) {
+	public ReoSystemVariable(Variable var) {
 		if (var == null)
 			throw new NullPointerException();
 		this.var = var;
 	}
 
 	@Override
-	public Statement<T> instantiate(ExpressionList values, VariableNameList iface) throws Exception {
+	public ReoBlock<T> instantiate(ExpressionList values, VariableNameList iface) throws CompilationException {
 		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public ComponentExpression<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public ReoSystem<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		Range e = var.evaluate(params);
-		if (e instanceof ComponentExpression) {
-			return (ComponentExpression<T>)e;
+		if (e instanceof ReoSystem) {
+			return (ReoSystem<T>)e;
 		} else if (e instanceof Variable) {
-			return new ComponentVariable<T>((Variable)e);
+			return new ReoSystemVariable<T>((Variable)e);
 		} 
 		return this;	
 	}

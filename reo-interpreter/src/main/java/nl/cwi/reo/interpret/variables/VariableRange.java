@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.antlr.v4.runtime.Token;
+
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.integers.IntegerVariable;
@@ -33,10 +36,15 @@ public final class VariableRange implements Variable {
 	private final boolean isList;
 	
 	/**
+	 * Token
+	 */
+	private final Token token;
+	
+	/**
 	 * Constructs a variable list.
 	 * @param name		name of the node
 	 */
-	public VariableRange(String name, List<List<IntegerExpression>> indices) {
+	public VariableRange(String name, List<List<IntegerExpression>> indices, Token token) {
 		if (name == null || indices == null)
 			throw new NullPointerException();
 		this.name = name;
@@ -48,6 +56,12 @@ public final class VariableRange implements Variable {
 		}
 		this.indices = Collections.unmodifiableList(unmod_indices);	
 		this.isList = isList;
+		this.token = token;
+	}
+
+	@Override
+	public Token getToken() {
+		return token;
 	}
 	
 	/**
@@ -97,7 +111,7 @@ public final class VariableRange implements Variable {
 	}
 	
 	@Override
-	public Variable evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Variable evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		
 		boolean boundsAreKnown = true;
 		List<List<IntegerExpression>> indices_p = new ArrayList<List<IntegerExpression>>();
@@ -138,16 +152,16 @@ public final class VariableRange implements Variable {
 			
 			List<VariableName> vars = new ArrayList<VariableName>();
 			for (String x : variables) 
-				vars.add(new VariableName(x));
+				vars.add(new VariableName(x, token));
 
 			if (isList)
-				return new VariableNameList(vars);
+				return new VariableNameList(vars, token);
 			else
 				return vars.get(0);
 			
 		}
 		
-		return new VariableRange(this.name, indices_p);
+		return new VariableRange(this.name, indices_p, token);
 	}
 	
 	@Override

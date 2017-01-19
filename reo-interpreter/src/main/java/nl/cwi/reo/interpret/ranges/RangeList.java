@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.variables.VariableName;
 
 public class RangeList extends ArrayList<Range> implements Range {
@@ -28,7 +29,7 @@ public class RangeList extends ArrayList<Range> implements Range {
 
 	@Override
 	public Range evaluate(Map<VariableName, Expression> params)
-			throws Exception {
+			throws CompilationException {
 		boolean isExpressionRange = true;
 		List<Range> entries = new ArrayList<Range>();
 		List<Expression> expressions = new ArrayList<Expression>();

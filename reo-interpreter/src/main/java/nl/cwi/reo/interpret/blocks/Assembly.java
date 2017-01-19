@@ -5,15 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
-import nl.cwi.reo.interpret.semantics.Instance;
-import nl.cwi.reo.interpret.semantics.InstanceList;
+import nl.cwi.reo.interpret.semantics.Component;
+import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.Semantics;
 
-public final class Program<T extends Semantics<T>> implements Statement<T> {
+public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 	
 	/**
 	 * Definitions.
@@ -23,14 +24,14 @@ public final class Program<T extends Semantics<T>> implements Statement<T> {
 	/**
 	 * Instances.
 	 */
-	private final InstanceList<T> instances;
+	private final ComponentList<T> components;
 
 	/**
 	 * Constructs an empty body of components and definitions.
 	 */
-	public Program() {
+	public Assembly() {
 		this.definitions = new Definitions();
-		this.instances = new InstanceList<T>();
+		this.components = new ComponentList<T>();
 	}
 	
 	/**
@@ -38,11 +39,23 @@ public final class Program<T extends Semantics<T>> implements Statement<T> {
 	 * @param definitions
 	 * @param instances
 	 */
-	public Program(Definitions definitions, InstanceList<T> instances) {
+	public Assembly(Definitions definitions, ComponentList<T> instances) {
 		if (definitions == null || instances == null)
 			throw new NullPointerException();
 		this.definitions = new Definitions(definitions);
-		this.instances = new InstanceList<T>(instances);
+		this.components = new ComponentList<T>(instances);
+	}
+	
+	/**
+	 * Constructs a program consisting of a set of definitions and an instance list.
+	 * @param definitions
+	 * @param instances
+	 */
+	public Assembly(Definitions definitions, ComponentList<T> instances, String operator) {
+		if (definitions == null || instances == null)
+			throw new NullPointerException();
+		this.definitions = new Definitions(definitions);
+		this.components = new ComponentList<T>(instances, operator);
 	}
 	
 	/**
@@ -65,28 +78,28 @@ public final class Program<T extends Semantics<T>> implements Statement<T> {
 	 * Gets the component instances.
 	 * @return set of component instances.
 	 */
-	public InstanceList<T> getInstances() {
-		return new InstanceList<T>(Collections.unmodifiableList(instances));
+	public ComponentList<T> getInstances() {
+		return new ComponentList<T>(Collections.unmodifiableList(components), components.getOperator());
 	}
 	
-	public Program<T> remove(VariableName x) {
+	public Assembly<T> remove(VariableName x) {
 		Definitions _definitions = new Definitions(definitions);
 		_definitions.remove(x);
-		return new Program<T>(_definitions, instances);
+		return new Assembly<T>(definitions, components);
 	}
 	
 	/**
 	 * Composes a set of programs into a single program.
 	 * @param progs		set of component instances
 	 */
-	public Program<T> compose(List<Program<T>> bodies) {
+	public Assembly<T> compose(List<Assembly<T>> bodies) {
 		Definitions _definitions = new Definitions(definitions);
-		InstanceList<T> _instances = new InstanceList<T>(instances);
-		for (Program<T> body : bodies) {
+		ComponentList<T> _instances = new ComponentList<T>(components);
+		for (Assembly<T> body : bodies) {
 			_definitions.putAll(body.definitions);
-			_instances.compose(body.instances);
+			_instances.compose(body.components);
 		}
-		return new Program<T>(_definitions, _instances);
+		return new Assembly<T>(_definitions, _instances);
 	}
 	
 	/**
@@ -96,9 +109,9 @@ public final class Program<T extends Semantics<T>> implements Statement<T> {
 	 * all internal ports)
 	 * @return an instantiate ProgramValue.
 	 */
-	public Program<T> instantiate(Map<Port, Port> iface) {
+	public Assembly<T> instantiate(Map<Port, Port> iface) {
 		Definitions _definitions = new Definitions();
-		InstanceList<T> _instances = new InstanceList<T>(instances);
+		ComponentList<T> _instances = new ComponentList<T>(components);
 		Map<Port, Port> _iface = new HashMap<Port, Port>(iface);		
 		
 		// Collect all necessary unifications, and rename the variables in these definitions.
@@ -112,8 +125,8 @@ public final class Program<T extends Semantics<T>> implements Statement<T> {
 				
 				if (a_new != null) {
 					if (b_new != null) {
-						VariableName x = new VariableName(a_new.getName());
-						VariableName y = new VariableName(b_new.getName());
+						VariableName x = new VariableName(a_new.getName(), null);
+						VariableName y = new VariableName(b_new.getName(), null);
 						_definitions.put(x, y);
 					} else {
 						_iface.put(new Port(b), a_new);
@@ -131,22 +144,22 @@ public final class Program<T extends Semantics<T>> implements Statement<T> {
 		}
 
 		// Instantiate  
-		for (Instance<T> inst : _instances)			
+		for (Component<T> inst : _instances)			
 			inst.joinAndHide(_iface);
 		
-		return new Program<T>(_definitions, _instances);
+		return new Assembly<T>(_definitions, _instances);
 	}
 
 	@Override
-	public Program<T> evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Assembly<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		Definitions definitions_p = definitions.evaluate(params);
 		// TODO Possibly local variables in this definition get instantiated by variables from the context.
 		// TODO Add code to evaluate semantics too.
-		return new Program<T>(definitions_p, instances);
+		return new Assembly<T>(definitions_p, components);
 	}
 	
 	@Override
 	public String toString() {
-		return "" + definitions + instances;
+		return "" + definitions + components;
 	}
 }

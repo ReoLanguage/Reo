@@ -5,7 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.antlr.v4.runtime.Token;
+
 import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
@@ -19,21 +22,27 @@ public final class InterfaceExpression extends ArrayList<Variable> implements Ra
 	private static final long serialVersionUID = -4878686718124263911L;
 	
 	/**
+	 * Token
+	 */
+	private final Token token;
+	
+	/**
 	 * Constructs an interface out of a list of variables.
 	 * @param vars	list of variables (each referring to a node or node range)
 	 */
-	public InterfaceExpression(List<Variable> vars) {
-		if (vars == null)
+	public InterfaceExpression(List<Variable> vars, Token token) {
+		if (vars == null || token == null)
 			throw new NullPointerException();
 		for (Variable x : vars) {
 			if (x == null)
 				throw new NullPointerException();
 			super.add(x);
 		}
+		this.token = token;
 	}
 
 	@Override
-	public Range evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Range evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		List<VariableName> list_p = new ArrayList<VariableName>();
 		for (Variable x : this) {
 			Range r = x.evaluate(params);	
@@ -45,10 +54,10 @@ public final class InterfaceExpression extends ArrayList<Variable> implements Ra
 			} else if (r instanceof Variable) {
 				return this;
 			} else {
-				throw new Exception("Node variable " + x + " cannot be assigned to " + r);
+				throw new CompilationException(x.getToken(), "Node variable " + x + " cannot be assigned to " + r);
 			}
 		}
-		return new VariableNameList(list_p);
+		return new VariableNameList(list_p, token);
 	}
 	
 	@Override

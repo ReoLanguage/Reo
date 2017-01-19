@@ -3,10 +3,10 @@ package nl.cwi.reo.interpret.integers;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
-
 
 public class IntegerVariable implements IntegerExpression {
 	
@@ -35,7 +35,7 @@ public class IntegerVariable implements IntegerExpression {
 	 * @return Integer evaluation with respect to parameter assignment.
 	 */
 	@Override
-	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		Range e = var.evaluate(params);
 		if (e instanceof IntegerExpression) {
 			return (IntegerExpression)e;

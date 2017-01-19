@@ -2,9 +2,9 @@ package nl.cwi.reo.interpret.booleans;
 
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
-
 
 public final class BooleanConjunction implements BooleanExpression {
 	
@@ -18,7 +18,7 @@ public final class BooleanConjunction implements BooleanExpression {
 		this.e2 = e2;
 	}
 	
-	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		BooleanExpression x1 = e1.evaluate(params);
 		BooleanExpression x2 = e2.evaluate(params);
 		if (x1 instanceof BooleanValue && x2 instanceof BooleanValue)

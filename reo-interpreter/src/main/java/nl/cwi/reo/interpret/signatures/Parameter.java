@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.signatures;
 
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.interpret.ranges.Expression;
@@ -33,7 +34,7 @@ public final class Parameter implements Evaluable<Parameter> {
 	}
 
 	@Override
-	public Parameter evaluate(Map<VariableName, Expression> params) throws Exception {
+	public Parameter evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		Range e = var.evaluate(params);
 		if (!(e instanceof Variable))
 			e = var;

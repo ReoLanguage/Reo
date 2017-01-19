@@ -2,9 +2,9 @@ package nl.cwi.reo.interpret.integers;
 
 import java.util.Map;
 
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
-
 
 public final class IntegerSubstraction implements IntegerExpression {
 
@@ -20,7 +20,7 @@ public final class IntegerSubstraction implements IntegerExpression {
 	}
 
 	@Override
-	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws Exception {
+	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		IntegerExpression x1 = e1.evaluate(params);
 		IntegerExpression x2 = e2.evaluate(params);
 		if (x1 instanceof IntegerValue && x2 instanceof IntegerValue)

@@ -9,7 +9,7 @@ import java.util.Set;
 import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.Semantics;
 
-public class Assembly<T extends Semantics<T>> extends ArrayList<T> {
+public class FlatAssembly<T extends Semantics<T>> extends ArrayList<T> {
 
 	/**
 	 * Serial version ID.
@@ -20,7 +20,7 @@ public class Assembly<T extends Semantics<T>> extends ArrayList<T> {
 	
 	private Set<Port> iface;
 	
-	public Assembly(Collection<T> components, String name, Set<Port> iface) {
+	public FlatAssembly(Collection<T> components, String name, Set<Port> iface) {
 		if (components == null || name == null || iface == null)
 			throw new NullPointerException();
 		for (T x : components) {

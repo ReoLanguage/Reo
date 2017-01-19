@@ -10,7 +10,7 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.interpret.Interpreter;
 import nl.cwi.reo.interpret.InterpreterPA;
-import nl.cwi.reo.interpret.semantics.Assembly;
+import nl.cwi.reo.interpret.semantics.FlatAssembly;
 import nl.cwi.reo.portautomata.PortAutomaton;
 
 /**
@@ -61,7 +61,7 @@ public class Compiler {
 
 		Interpreter<PortAutomaton> interpreter = new InterpreterPA(directories, params);
 
-		Assembly<PortAutomaton> program = interpreter.interpret(files);
+		FlatAssembly<PortAutomaton> program = interpreter.interpret(files);
 		
 		for (PortAutomaton X : program) System.out.println(X);
 		

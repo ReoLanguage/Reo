@@ -3,6 +3,7 @@ package nl.cwi.reo.interpret.semantics;
 import java.util.HashMap;
 import java.util.Map;
 
+import jdk.nashorn.internal.codegen.CompilationException;
 import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
@@ -10,7 +11,7 @@ import nl.cwi.reo.semantics.Port;
 import nl.cwi.reo.semantics.Semantics;
 
 
-public final class Instance<T extends Semantics<T>> extends HashMap<Port, Port> implements Evaluable<Instance<T>> {
+public final class Component<T extends Semantics<T>> extends HashMap<Port, Port> implements Evaluable<Component<T>> {
 	
 	/**
 	 * Serial version ID.
@@ -25,14 +26,14 @@ public final class Instance<T extends Semantics<T>> extends HashMap<Port, Port> 
 	 * Constructs a new instance from an atom.
 	 * @param atom		semantics object
 	 */
-	public Instance(T atom) {
+	public Component(T atom) {
 		this.atom = atom;
 		this.source = new SourceCode();
 		for (Port a : atom.getInterface()) 
 			super.put(a, a);
 	}
 	
-	public Instance(T atom, Map<Port, Port> links, SourceCode source) {
+	public Component(T atom, Map<Port, Port> links, SourceCode source) {
 		this.atom = atom;
 		this.source = source;
 		super.putAll(links);
@@ -42,7 +43,7 @@ public final class Instance<T extends Semantics<T>> extends HashMap<Port, Port> 
 	 * Copy constructor.
 	 * @param instance
 	 */
-	public Instance(Instance<T> instance) {
+	public Component(Component<T> instance) {
 		if (instance == null)
 			throw new NullPointerException();
 		this.atom = instance.atom;
@@ -72,8 +73,7 @@ public final class Instance<T extends Semantics<T>> extends HashMap<Port, Port> 
 	}
 
 	@Override
-	public Instance<T> evaluate(Map<VariableName, Expression> params)
-			throws Exception {
+	public Component<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		return this;
 	}
 }
