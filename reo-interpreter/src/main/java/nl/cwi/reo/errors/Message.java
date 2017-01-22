@@ -1,5 +1,7 @@
 package nl.cwi.reo.errors;
 
+import java.io.File;
+
 import org.antlr.v4.runtime.Token;
 
 public final class Message {
@@ -24,14 +26,24 @@ public final class Message {
 	
 	public Message(MessageType type, Token token,  String msg) {
 		this.type = type;
-		this.source = token.getInputStream().getSourceName();
+		this.source = new File(token.getInputStream().getSourceName()).getName();
 		this.line = token.getLine();
 		this.column = token.getCharPositionInLine();
 		this.msg = msg;
 	}
 	
+	public Message(MessageType type, String msg) {
+		this.type = type;
+		this.source = null;
+		this.line = 0;
+		this.column = 0;
+		this.msg = msg;
+	}
+	
 	@Override
 	public String toString() {
-		return type.name() + " in " + source + " at line " + line + ":" + column + ": " + msg; 
+		if (source != null)
+			return type + " (" + source + ":" + line + "." + column + ") " + msg; 
+		return type + " " + msg; 		
 	}
 }

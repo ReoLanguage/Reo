@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.errors.Message;
 import nl.cwi.reo.errors.MessageType;
+import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.ranges.Expression;
@@ -94,7 +95,7 @@ public class Interpreter<T extends Semantics<T>> {
 					parsed.add(program.getName());
 					components.addAll(program.getImports());
 				} else {
-					System.out.println("[error] File " + file + " could not be parsed.");
+					System.err.println("[error] Cannot parse " + new File(file).getName() + ".");
 				}
 			}		
 			
@@ -109,7 +110,7 @@ public class Interpreter<T extends Semantics<T>> {
 						newComponents.removeAll(parsed);
 						components.addAll(newComponents);
 					} else {
-						System.out.println("[error] Component " + comp + " cannot be found.");
+						System.err.println("[error] Component " + comp + " cannot be found.");
 					}
 
 				}
@@ -235,10 +236,14 @@ public class Interpreter<T extends Semantics<T>> {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		
 		ReoParser parser = new ReoParser(tokens);
+		MyErrorListener errListener = new MyErrorListener();
 		parser.removeErrorListeners();
-		parser.addErrorListener(new ErrorListener());
+		parser.addErrorListener(errListener);
 		
 		ParseTree tree = parser.file();
+		if (errListener.hasError)
+			return null;
+		
 		ParseTreeWalker walker = new ParseTreeWalker();
 		walker.walk(listener, tree);
 		return listener.getMain();

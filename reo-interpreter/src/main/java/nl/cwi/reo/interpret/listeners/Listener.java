@@ -1,7 +1,9 @@
 package nl.cwi.reo.interpret.listeners;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import nl.cwi.reo.errors.Message;
 import nl.cwi.reo.errors.MessageType;
@@ -16,6 +18,7 @@ import nl.cwi.reo.interpret.ReoParser.Bool_disjunctionContext;
 import nl.cwi.reo.interpret.ReoParser.Bool_negationContext;
 import nl.cwi.reo.interpret.ReoParser.Bool_relationContext;
 import nl.cwi.reo.interpret.ReoParser.Bool_variableContext;
+import nl.cwi.reo.interpret.ReoParser.Comp_compositionContext;
 import nl.cwi.reo.interpret.ReoParser.BlockContext;
 import nl.cwi.reo.interpret.ReoParser.Rsys_atomicContext;
 import nl.cwi.reo.interpret.ReoParser.Rsys_compositeContext;
@@ -51,6 +54,7 @@ import nl.cwi.reo.interpret.ReoParser.RangeContext;
 import nl.cwi.reo.interpret.ReoParser.Range_exprContext;
 import nl.cwi.reo.interpret.ReoParser.Range_listContext;
 import nl.cwi.reo.interpret.ReoParser.Range_variableContext;
+import nl.cwi.reo.interpret.ReoParser.RnodeContext;
 import nl.cwi.reo.interpret.ReoParser.SignContext;
 import nl.cwi.reo.interpret.ReoParser.StmtContext;
 import nl.cwi.reo.interpret.ReoParser.Stmt_blockContext;
@@ -98,6 +102,8 @@ import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.InterfaceExpression;
+import nl.cwi.reo.interpret.signatures.InterfaceNode;
+import nl.cwi.reo.interpret.signatures.PrioType;
 import nl.cwi.reo.interpret.signatures.Node;
 import nl.cwi.reo.interpret.signatures.NodeList;
 import nl.cwi.reo.interpret.signatures.NodeType;
@@ -125,6 +131,11 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
  * Returns a {@link nl.cwi.reo.interpret.p}.
  */
 public class Listener<T extends Semantics<T>> extends ReoBaseListener {
+	
+	// Symbol table
+	private ParseTreeProperty<Map<String, String>> symbols = new ParseTreeProperty<Map<String, String>>();
+	
+	public boolean hasErrors = false;
 	
 	// File structure
 	private ReoFile<T> program;
@@ -162,6 +173,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	// Interface instantiation
 	private ParseTreeProperty<InterfaceExpression> ifaces = new ParseTreeProperty<InterfaceExpression>();
+	private ParseTreeProperty<InterfaceNode> rnodes = new ParseTreeProperty<InterfaceNode>();
 	       
 	// Variables
 	private ParseTreeProperty<Variable> variables = new ParseTreeProperty<Variable>();	
@@ -184,7 +196,14 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	/**
 	 * File structure
 	 */
-
+	
+	@Override
+	public void enterFile(FileContext ctx) {
+		Map<String, String> s = new HashMap<String, String>();
+		s.put(ctx.ID().getText(), "component");
+		symbols.put(ctx.rsys(), s);
+	}
+	
 	@Override
 	public void exitFile(FileContext ctx) {
 		program = new ReoFile<T>(section, imports, ctx.ID().getText(), systems.get(ctx.rsys()));
@@ -201,7 +220,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Component expressions
+	 * Reo Systems.
 	 */
 
 	@Override
@@ -219,8 +238,15 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitRsys_atomic(Rsys_atomicContext ctx) {
 		T atom = atoms.get(ctx.atom());
-//		if (atom == null) throw new Exception();
-		Assembly<T> prog = new Assembly<T>(new Definitions(), new ComponentList<T>(atom));
+		ComponentList<T> comps = null;
+		if (atom == null) {
+			comps = new ComponentList<T>();
+			hasErrors = true;
+			System.err.println(new Message(MessageType.ERROR, ctx.start, "Undefined semantics."));
+		} else {
+			comps = new ComponentList<T>(atom);
+		}
+		Assembly<T> prog = new Assembly<T>(new Definitions(), comps);
 		systems.put(ctx, new ReoSystemValue<T>(signatureExpressions.get(ctx.sign()), prog));
 	}
 
@@ -229,7 +255,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitRsys_composite(Rsys_compositeContext ctx) {
-		systems.put(ctx, new ReoSystemComposite<T>(signatureExpressions.get(ctx.sign()), blocks.get(ctx.block())));		
+		systems.put(ctx, new ReoSystemComposite<T>(signatureExpressions.get(ctx.sign()), bodies.get(ctx.block())));		
 	}
 	
 	/**
@@ -253,9 +279,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		} else if (x instanceof Variable) {
 			blocks.put(ctx, new Definition<T>((Variable)y, x));
 		} else {
-			blocks.put(ctx, new Assembly<T>());			
-			System.out.println(new Message(MessageType.WARNING, ctx.start, ctx.getText() + " is not a valid definition and will be ignored. "
-					+ "Either the left-hand-side or the right-hand-side of an equation must be a variable."));
+			blocks.put(ctx, new Assembly<T>());
+			System.err.println(new Message(MessageType.WARNING, ctx.start, "Ignoring assertion " + ctx.getText() + "."));
 		}
 	}
 
@@ -279,7 +304,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		VariableName p = new VariableName(ctx.ID().getText(), ctx.start);
 		IntegerExpression a = intrs.get(ctx.intr(0));
 		IntegerExpression b = intrs.get(ctx.intr(1));
-		ReoBlock<T> B = blocks.get(ctx.block());
+		ReoBlock<T> B = bodies.get(ctx.block());
 		blocks.put(ctx, new ForLoop<T>(p, a, b, B));
 	}
 
@@ -290,7 +315,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (BoolContext Bool_ctx : ctx.bool())
 			guards.add(bools.get(Bool_ctx));
 		for (BlockContext block_ctx : ctx.block())
-			branches.add(blocks.get(block_ctx));
+			branches.add(bodies.get(block_ctx));
 		if (guards.size() == branches.size()) {
 			guards.add(new BooleanValue(true));
 			branches.add(new Assembly<T>());
@@ -307,6 +332,15 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		if (list == null) list = new RangeList();
 		InterfaceExpression iface = ifaces.get(ctx.iface());
 		blocks.put(ctx, new InstanceReference<T>(cexpr, list, iface));
+	}
+	
+	@Override
+	public void exitComp_composition(Comp_compositionContext ctx) {
+//		List<ReoBlock<T>> list = new ArrayList<ReoBlock<T>>();
+//		list.add(new Definition<T>(new VariableName("*", ctx.mul.start), new StringValue("product")));
+//		list.add(stmts.get(ctx.comp(0)));
+//		list.add(stmts.get(ctx.comp(1)));
+//		stmts.put(ctx, new Body<T>(list));
 	}
 	
 	@Override
@@ -552,10 +586,18 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitIface(IfaceContext ctx) {
-		List<Variable> list = new ArrayList<Variable>();
-		for (VarContext node_ctx : ctx.var())
-			list.add(variables.get(node_ctx));
+		List<InterfaceNode> list = new ArrayList<InterfaceNode>();
+		for (RnodeContext node_ctx : ctx.rnode())
+			list.add(rnodes.get(node_ctx));
 		ifaces.put(ctx, new InterfaceExpression(list, ctx.start));
+	}
+
+	@Override
+	public void exitRnode(RnodeContext ctx) {
+		PrioType prio = PrioType.NONE;
+		if (ctx.prio != null)
+			prio = ctx.prio.getType() == ReoParser.AMP ? PrioType.AMPERSANT : PrioType.PLUS ;
+		rnodes.put(ctx, new InterfaceNode(variables.get(ctx.var()), prio));
 	}
      
 	/**

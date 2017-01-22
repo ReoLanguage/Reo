@@ -14,7 +14,7 @@ import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 
-public final class InterfaceExpression extends ArrayList<Variable> implements Range {
+public final class InterfaceExpression extends ArrayList<InterfaceNode> implements Range {
 	
 	/**
 	 * Serial version ID.
@@ -30,10 +30,10 @@ public final class InterfaceExpression extends ArrayList<Variable> implements Ra
 	 * Constructs an interface out of a list of variables.
 	 * @param vars	list of variables (each referring to a node or node range)
 	 */
-	public InterfaceExpression(List<Variable> vars, Token token) {
+	public InterfaceExpression(List<InterfaceNode> vars, Token token) {
 		if (vars == null || token == null)
 			throw new NullPointerException();
-		for (Variable x : vars) {
+		for (InterfaceNode x : vars) {
 			if (x == null)
 				throw new NullPointerException();
 			super.add(x);
@@ -44,8 +44,8 @@ public final class InterfaceExpression extends ArrayList<Variable> implements Ra
 	@Override
 	public Range evaluate(Map<VariableName, Expression> params) throws CompilationException {
 		List<VariableName> list_p = new ArrayList<VariableName>();
-		for (Variable x : this) {
-			Range r = x.evaluate(params);	
+		for (InterfaceNode x : this) {
+			Range r = x.getVariable().evaluate(params);	
 			if (r instanceof VariableNameList) {
 				for (VariableName v : ((VariableNameList)r).getList())
 					list_p.add(v);
@@ -54,7 +54,7 @@ public final class InterfaceExpression extends ArrayList<Variable> implements Ra
 			} else if (r instanceof Variable) {
 				return this;
 			} else {
-				throw new CompilationException(x.getToken(), "Node variable " + x + " cannot be assigned to " + r);
+				throw new CompilationException(x.getVariable().getToken(), "Node variable " + x + " cannot be assigned to " + r);
 			}
 		}
 		return new VariableNameList(list_p, token);
@@ -63,9 +63,9 @@ public final class InterfaceExpression extends ArrayList<Variable> implements Ra
 	@Override
 	public String toString() {
 		String s = "(";
-		Iterator<Variable> var = this.iterator();
-		while (var.hasNext())
-			s += var.next() + (var.hasNext() ? "," : "");
+		Iterator<InterfaceNode> ifnode = this.iterator();
+		while (ifnode.hasNext())
+			s += ifnode.next() + (ifnode.hasNext() ? "," : "");
 		return s + ")";
 	}
 }

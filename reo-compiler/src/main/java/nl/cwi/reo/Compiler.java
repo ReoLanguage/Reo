@@ -63,17 +63,18 @@ public class Compiler {
 
 		FlatAssembly<PortAutomaton> program = interpreter.interpret(files);
 		
-		for (PortAutomaton X : program) System.out.println(X);
-		
-		if (!program.isEmpty()) {
-			PortAutomaton product = program.get(0).compose(program.subList(1, program.size()));
-			PortAutomaton hide = product.restrict(program.getInterface());
+		if (program != null) {
+			for (PortAutomaton X : program) System.out.println(X);
 			
-			System.out.println("Product automaton : \n");
-			System.out.println(hide);
-//			System.out.println("Product automaton : \n\n" + hide);
+			if (!program.isEmpty()) {
+				PortAutomaton product = program.get(0).compose(program.subList(1, program.size()));
+				PortAutomaton hide = product.restrict(program.getInterface());
+				
+				System.out.println("Product automaton : \n");
+				System.out.println(hide);
+	//			System.out.println("Product automaton : \n\n" + hide);
+			}
 		}
-		System.out.println("------");
 //		// Generate the classes.
 //		JavaCompiler JC = new JavaCompiler(name, "");
 //		JC.compile(program);

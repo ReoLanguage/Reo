@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret.semantics;
 import java.util.HashMap;
 import java.util.Map;
 
-import jdk.nashorn.internal.codegen.CompilationException;
+import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;

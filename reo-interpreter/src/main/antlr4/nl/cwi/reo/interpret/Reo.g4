@@ -3,7 +3,7 @@ grammar Reo;
 import Tokens, PA, WA, CAM, SA;
 
 // File structure
-file    : secn? imps* ID '='? rsys ;
+file    : secn? imps* ID '='? rsys EOF;
 secn    : 'section' name ';';
 imps    : 'import' name ';';
 
@@ -18,13 +18,13 @@ target  : 'Java' ;
       //| 'URL' ;
 
 // Blocks
-block   : '{' stmt* '}' ;
+block   : ID? '{' stmt* '}' ;
 stmt    : range '=' range                                        # stmt_equation
         | var rsys                                               # stmt_compdefn
         | comp                                                   # stmt_instance
         | block                                                  # stmt_block
         | 'for' ID '=' intr '..' intr block                      # stmt_iteration
-        | 'if' bool block (('else' bool block)* 'else' block)?   # stmt_condition ;
+        | 'if' bool block ('else' bool block)* ('else' block)?   # stmt_condition ;
         
 // Components
 comp    : rsys list? iface                                       # comp_instance
@@ -60,7 +60,7 @@ bool    : BOOL                                                   # bool_boolean
 // Signatures
 sign    : params? nodes ;
 params  : '<' '>' | '<' param (',' param)* '>' ;
-param   : var? ptype | var ;
+param   : var? ptype ;
 ptype   : ':' type                                               # ptype_typetag
         | sign                                                   # ptype_signature ;
 nodes   : '(' ')' | '(' node (',' node)* ')' ;
@@ -71,7 +71,7 @@ type    : ID | ID ('*' type) | '(' type ')' | <assoc=right> type ':' type ;
 
 // Interface instantiation
 iface   : '(' ')' | '(' rnode (',' rnode)* ')' ;
-rnode   : prio=(ADD | AMP) var ;
+rnode   : prio=(ADD | AMP)? var ;
         
 // Variables (and ranges of variables)
 var     : name indices* ;
