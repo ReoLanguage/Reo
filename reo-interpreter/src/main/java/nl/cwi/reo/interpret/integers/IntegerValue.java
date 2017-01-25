@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.Token;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
 import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.variables.VariableName;
 
 public final class IntegerValue implements IntegerExpression {
 	
@@ -38,7 +37,7 @@ public final class IntegerValue implements IntegerExpression {
 	 * @param params		 	parameter assignment
 	 * @return Integer evaluation with respect to parameter assignment.
 	 */
-	public IntegerExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public IntegerExpression evaluate(Map<String, Expression> params) throws CompilationException {
 		return new IntegerValue(this.n);
 	}
 	

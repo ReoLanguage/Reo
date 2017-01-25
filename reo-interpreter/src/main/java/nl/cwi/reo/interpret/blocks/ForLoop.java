@@ -10,7 +10,7 @@ import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
@@ -60,7 +60,7 @@ public class ForLoop<T extends Semantics<T>> implements ReoBlock<T> {
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
 	@Override
-	public ReoBlock<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public ReoBlock<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		
 		if (params.get(parameter) != null)
 			throw new CompilationException(parameter.getToken(), "Parameter " + parameter + " is already used.");
@@ -80,7 +80,7 @@ public class ForLoop<T extends Semantics<T>> implements ReoBlock<T> {
 			List<ReoBlock<T>> bodies = new ArrayList<ReoBlock<T>>();
 			List<Assembly<T>> progs = new ArrayList<Assembly<T>>();
 			for (int i = a; i <= b; i++) {
-				defns.put(parameter, new IntegerValue(Integer.valueOf(i)));
+				defns.put(parameter.getName(), new IntegerValue(Integer.valueOf(i)));
 				ReoBlock<T> e = reoBlock.evaluate(defns);
 				bodies.add(e);
 				if (e instanceof Assembly) {

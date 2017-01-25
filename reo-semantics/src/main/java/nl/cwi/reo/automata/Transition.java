@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 /**
  * A transition, labeled with a generic label of type L, that is used in a {@link nl.cwi.reo.automata.Automaton}.

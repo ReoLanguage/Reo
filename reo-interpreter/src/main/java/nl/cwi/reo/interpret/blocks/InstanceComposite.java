@@ -5,8 +5,7 @@ import java.util.Map;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.strings.StringExpression;
-import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public class InstanceComposite<T extends Semantics<T>> implements Instance<T> {
 	
@@ -23,7 +22,7 @@ public class InstanceComposite<T extends Semantics<T>> implements Instance<T> {
 	}
 	
 	@Override
-	public ReoBlock<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public ReoBlock<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		StringExpression _op = op.evaluate(params);
 		ReoBlock<T> _e1 = e1.evaluate(params);
 		ReoBlock<T> _e2 = e2.evaluate(params);

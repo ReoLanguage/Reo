@@ -4,12 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Port;
-import nl.cwi.reo.semantics.Semantics;
-
+import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.Semantics;
+import nl.cwi.reo.semantics.api.SourceCode;
 
 public final class Component<T extends Semantics<T>> extends HashMap<Port, Port> implements Evaluable<Component<T>> {
 	
@@ -73,7 +72,7 @@ public final class Component<T extends Semantics<T>> extends HashMap<Port, Port>
 	}
 
 	@Override
-	public Component<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public Component<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		return this;
 	}
 }

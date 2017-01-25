@@ -48,6 +48,10 @@ strg    : STRING                                                 # strg_string
         | var                                                    # strg_variable
         | strg '+' strg                                          # strg_concatenation;
 
+// Floating point expressions
+fltp    : DEC                                                    # fltp_natural
+        | var                                                    # fltp_variable ;
+
 // Boolean expressions
 bool    : BOOL                                                   # bool_boolean
         | var                                                    # bool_variable

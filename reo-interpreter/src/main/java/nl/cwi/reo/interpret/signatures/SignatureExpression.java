@@ -13,7 +13,7 @@ import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.interpret.variables.VariableRange;
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 public final class SignatureExpression implements ParameterType {
 	
@@ -83,7 +83,7 @@ public final class SignatureExpression implements ParameterType {
 			if (!(x.getVariable() instanceof VariableName)) 
 				throw new CompilationException(x.getVariable().getToken(), x + " is not a valid parameter name.");
 			
-			definitions.put((VariableName)x.getVariable(), v);
+			definitions.put(((VariableName)x.getVariable()).getName(), v);
 		}
 		
 		// Find the links of the interface. 

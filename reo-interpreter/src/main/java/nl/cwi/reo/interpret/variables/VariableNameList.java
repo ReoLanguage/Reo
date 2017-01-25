@@ -36,7 +36,7 @@ public final class VariableNameList implements Variable, Range {
 	}
 
 	@Override
-	public VariableNameList evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public VariableNameList evaluate(Map<String, Expression> params) throws CompilationException {
 		return this;
 	}
 	

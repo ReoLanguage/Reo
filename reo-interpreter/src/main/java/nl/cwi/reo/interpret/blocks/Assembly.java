@@ -11,8 +11,8 @@ import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Port;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 	
@@ -62,7 +62,7 @@ public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 	 * Gets the component instances.
 	 * @return set of component instances.
 	 */
-	public Map<VariableName, Expression> getDefinitions() {
+	public Map<String, Expression> getDefinitions() {
 		return Collections.unmodifiableMap(definitions);
 	}
 
@@ -70,7 +70,7 @@ public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 	 * Gets the component instances.
 	 * @return set of component instances.
 	 */
-	public Map<VariableName, Expression> getUnifications() {
+	public Map<String, Expression> getUnifications() {
 		return Collections.unmodifiableMap(definitions.getUnifications());
 	}
 	
@@ -115,9 +115,9 @@ public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 		Map<Port, Port> _iface = new HashMap<Port, Port>(iface);		
 		
 		// Collect all necessary unifications, and rename the variables in these definitions.
-		for (Map.Entry<VariableName, Expression> defn : definitions.entrySet()) {
+		for (Map.Entry<String, Expression> defn : definitions.entrySet()) {
 			if (defn.getValue() instanceof VariableName) {
-				String a = defn.getKey().getName();
+				String a = defn.getKey();
 				String b = ((VariableName)defn.getValue()).getName();
 				
 				Port a_new = iface.get(new Port(a));
@@ -125,7 +125,7 @@ public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 				
 				if (a_new != null) {
 					if (b_new != null) {
-						VariableName x = new VariableName(a_new.getName(), null);
+						String x = a_new.getName();
 						VariableName y = new VariableName(b_new.getName(), null);
 						_definitions.put(x, y);
 					} else {
@@ -151,7 +151,7 @@ public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 	}
 
 	@Override
-	public Assembly<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public Assembly<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		Definitions definitions_p = definitions.evaluate(params);
 		// TODO Possibly local variables in this definition get instantiated by variables from the context.
 		// TODO Add code to evaluate semantics too.

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 /**
  * Iterates over the Cartesian product of a non-empty list of local transitions. 

@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret;
 import java.util.List;
 
 import nl.cwi.reo.interpret.listeners.ListenerWA;
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.api.SemanticsType;
 import nl.cwi.reo.workautomata.WorkAutomaton;
 
 public class InterpreterWA extends Interpreter<WorkAutomaton> {

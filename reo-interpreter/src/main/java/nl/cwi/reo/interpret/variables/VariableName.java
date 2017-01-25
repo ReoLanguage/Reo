@@ -38,7 +38,7 @@ public final class VariableName implements Variable, Expression {
 	}
 
 	@Override
-	public Expression evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public Expression evaluate(Map<String, Expression> params) throws CompilationException {
 		Expression e = params.get(this);
 		if (e != null) return e;
 		return this;

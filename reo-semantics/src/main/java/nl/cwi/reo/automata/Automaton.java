@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 import java.util.HashMap;
 import java.util.HashSet;

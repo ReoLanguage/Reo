@@ -10,8 +10,8 @@ import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.systems.ReoSystem;
-import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public final class ReoFile<T extends Semantics<T>> implements Evaluable<Assembly<T>> {
 	
@@ -57,9 +57,9 @@ public final class ReoFile<T extends Semantics<T>> implements Evaluable<Assembly
 	}
 
 	@Override
-	public Assembly<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
-		Map<VariableName, Expression> definitions = new HashMap<VariableName, Expression>();
-		definitions.put(new VariableName(getName(), null), cexpr.evaluate(params));
+	public Assembly<T> evaluate(Map<String, Expression> params) throws CompilationException {
+		Map<String, Expression> definitions = new HashMap<String, Expression>();
+		definitions.put(getName(), cexpr.evaluate(params));
 		return new Assembly<T>(new Definitions(definitions), new ComponentList<T>());
 	}
 	

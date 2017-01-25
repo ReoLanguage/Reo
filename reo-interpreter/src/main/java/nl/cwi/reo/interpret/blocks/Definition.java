@@ -12,7 +12,7 @@ import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public final class Definition<T extends Semantics<T>> implements ReoBlock<T> {
 
@@ -28,7 +28,7 @@ public final class Definition<T extends Semantics<T>> implements ReoBlock<T> {
 	}
 
 	@Override
-	public ReoBlock<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public ReoBlock<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		
 		ReoBlock<T> prog = null;
 
@@ -41,7 +41,7 @@ public final class Definition<T extends Semantics<T>> implements ReoBlock<T> {
 		if (var_p instanceof VariableName) {
 			if (val_p instanceof Expression) {
 				Definitions definitions = new Definitions();
-				definitions.put((VariableName)var_p, (Expression)val_p);
+				definitions.put(((VariableName)var_p).getName(), (Expression)val_p);
 				prog = new Assembly<T>(definitions, new ComponentList<T>());
 			} else if (val_p instanceof ExpressionList) {
 				throw new CompilationException(var.getToken(), "Value " + val_p + " must be of type expression.");	
@@ -51,7 +51,7 @@ public final class Definition<T extends Semantics<T>> implements ReoBlock<T> {
 				Definitions definitions = new Definitions();
 				Iterator<VariableName> var = ((VariableNameList) var_p).getList().iterator();
 				Iterator<Expression> exp = ((ExpressionList)val_p).iterator();				
-				while (var.hasNext() && exp.hasNext()) definitions.put(var.next(), exp.next());
+				while (var.hasNext() && exp.hasNext()) definitions.put(var.next().getName(), exp.next());
 				prog = new Assembly<T>(definitions, new ComponentList<T>());
 				
 			} else if (val_p instanceof Expression) {

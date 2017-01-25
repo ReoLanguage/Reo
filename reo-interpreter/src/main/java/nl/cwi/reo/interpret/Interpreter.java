@@ -35,9 +35,8 @@ import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.strings.StringValue;
 import nl.cwi.reo.interpret.systems.ReoSystemValue;
-import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.api.Semantics;
+import nl.cwi.reo.semantics.api.SemanticsType;
 
 public class Interpreter<T extends Semantics<T>> {
 	
@@ -118,10 +117,10 @@ public class Interpreter<T extends Semantics<T>> {
 
 			// Evaluate these component expressions.
 			Definitions definitions = new Definitions();
-			VariableName name = null;		
+			String name = null;		
 			while (!stack.isEmpty()) {
 				ReoFile<T> program = stack.pop();
-				name = new VariableName(program.getName(), null);
+				name = program.getName();
 				Expression cexpr = program.getComponent().evaluate(definitions);
 				definitions.put(name, cexpr);
 			}
@@ -140,7 +139,7 @@ public class Interpreter<T extends Semantics<T>> {
 				
 				instances.insertNodes(true, false);
 				
-				return new FlatAssembly<T>(instances.getComponents(), name.getName(), sign.keySet());
+				return new FlatAssembly<T>(instances.getComponents(), name, sign.keySet());
 			}
 		} catch (IOException e) {
 			System.out.print(e.getMessage());

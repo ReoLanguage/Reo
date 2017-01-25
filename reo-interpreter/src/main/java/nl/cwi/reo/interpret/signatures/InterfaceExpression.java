@@ -42,7 +42,7 @@ public final class InterfaceExpression extends ArrayList<InterfaceNode> implemen
 	}
 
 	@Override
-	public Range evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public Range evaluate(Map<String, Expression> params) throws CompilationException {
 		List<VariableName> list_p = new ArrayList<VariableName>();
 		for (InterfaceNode x : this) {
 			Range r = x.getVariable().evaluate(params);	

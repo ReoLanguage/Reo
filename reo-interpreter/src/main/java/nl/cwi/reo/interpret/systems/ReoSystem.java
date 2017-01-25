@@ -6,9 +6,8 @@ import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.blocks.ReoBlock;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
-import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public interface ReoSystem<T extends Semantics<T>> extends Expression {
 
@@ -27,5 +26,5 @@ public interface ReoSystem<T extends Semantics<T>> extends Expression {
 	 * @return Component expression whose body is evaluated using known assignments.
 	 * @throws Exception 
 	 */
-	public ReoSystem<T> evaluate(Map<VariableName, Expression> params) throws CompilationException;
+	public ReoSystem<T> evaluate(Map<String, Expression> params) throws CompilationException;
 }

@@ -103,7 +103,6 @@ import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.InterfaceExpression;
 import nl.cwi.reo.interpret.signatures.InterfaceNode;
-import nl.cwi.reo.interpret.signatures.PrioType;
 import nl.cwi.reo.interpret.signatures.Node;
 import nl.cwi.reo.interpret.signatures.NodeList;
 import nl.cwi.reo.interpret.signatures.NodeType;
@@ -122,7 +121,8 @@ import nl.cwi.reo.interpret.systems.ReoSystemVariable;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableRange;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.PrioType;
+import nl.cwi.reo.semantics.api.Semantics;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 

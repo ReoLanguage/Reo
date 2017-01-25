@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.signatures;
+package nl.cwi.reo.semantics.api;
 
 public enum PrioType {
 	AMPERSANT, PLUS, NONE;

@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 /**
  * Iterates over the Cartesian product of a non-empty list of local transitions. 

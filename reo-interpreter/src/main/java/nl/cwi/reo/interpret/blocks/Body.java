@@ -12,8 +12,7 @@ import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.strings.StringValue;
 import nl.cwi.reo.interpret.systems.ReoSystemValue;
-import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public class Body<T extends Semantics<T>> implements ReoBlock<T> {
 	
@@ -42,7 +41,7 @@ public class Body<T extends Semantics<T>> implements ReoBlock<T> {
 	 * @return Concrete instance of this body.
 	 * @throws Exception if not all required parameters are provided.
 	 */
-	public ReoBlock<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {	
+	public ReoBlock<T> evaluate(Map<String, Expression> params) throws CompilationException {	
 		
 //		System.out.println("[info] Evaluating " + this);
 
@@ -69,8 +68,8 @@ public class Body<T extends Semantics<T>> implements ReoBlock<T> {
 				
 				if (s_p instanceof Assembly) {
 					progs.add((Assembly<T>)s_p);
-					Map<VariableName, Expression> progDefs = ((Assembly<T>)s_p).getDefinitions();
-					for (Map.Entry<VariableName, Expression> def : progDefs.entrySet()) {
+					Map<String, Expression> progDefs = ((Assembly<T>)s_p).getDefinitions();
+					for (Map.Entry<String, Expression> def : progDefs.entrySet()) {
 						if (!definitions.containsKey(def.getKey())) {
 							// If redefined evaluates to false: throw an error.
 							definitions.put(def.getKey(), def.getValue());

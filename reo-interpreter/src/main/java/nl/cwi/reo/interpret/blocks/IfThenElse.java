@@ -9,8 +9,7 @@ import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.booleans.BooleanExpression;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
 import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 /**
  * A parameterized for loop of a set {link java.util.Set}&lt;{link nl.cwi.reo.parse.Component}&gt; of parameterized components.
@@ -46,7 +45,7 @@ public class IfThenElse<T extends Semantics<T>> implements ReoBlock<T> {
 	 * @return Program instance {link nl.cwi.reo.ProgramInstance} for this parameterized component
 	 * @throws Exception if the provided parameters do not match the signature of this program.
 	 */
-	public ReoBlock<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public ReoBlock<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		boolean canEvaluate = true;
 		List<BooleanExpression> conditions_p = new ArrayList<BooleanExpression>();
 		List<ReoBlock<T>> branches_p = new ArrayList<ReoBlock<T>>();		

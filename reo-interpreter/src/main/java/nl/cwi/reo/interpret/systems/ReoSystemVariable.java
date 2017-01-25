@@ -8,9 +8,8 @@ import nl.cwi.reo.interpret.blocks.ReoBlock;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.variables.Variable;
-import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public class ReoSystemVariable<T extends Semantics<T>> implements ReoSystem<T> {
 	
@@ -29,7 +28,7 @@ public class ReoSystemVariable<T extends Semantics<T>> implements ReoSystem<T> {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public ReoSystem<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public ReoSystem<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		Range e = var.evaluate(params);
 		if (e instanceof ReoSystem) {
 			return (ReoSystem<T>)e;

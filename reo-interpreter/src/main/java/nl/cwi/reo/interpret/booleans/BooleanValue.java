@@ -4,7 +4,6 @@ import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.variables.VariableName;
 
 public final class BooleanValue implements BooleanExpression {
 	
@@ -19,7 +18,7 @@ public final class BooleanValue implements BooleanExpression {
 	}
 
 	@Override
-	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public BooleanExpression evaluate(Map<String, Expression> params) throws CompilationException {
 		return this;
 	}
 	

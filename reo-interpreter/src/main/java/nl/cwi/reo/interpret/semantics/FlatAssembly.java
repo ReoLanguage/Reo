@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.cwi.reo.semantics.Port;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public class FlatAssembly<T extends Semantics<T>> extends ArrayList<T> {
 

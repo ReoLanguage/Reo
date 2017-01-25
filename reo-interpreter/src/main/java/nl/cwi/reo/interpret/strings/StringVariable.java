@@ -6,7 +6,6 @@ import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
-import nl.cwi.reo.interpret.variables.VariableName;
 
 public class StringVariable implements StringExpression {
 
@@ -31,7 +30,7 @@ public class StringVariable implements StringExpression {
 	 * @return Integer evaluation with respect to parameter assignment.
 	 */
 	@Override
-	public StringExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public StringExpression evaluate(Map<String, Expression> params) throws CompilationException {
 		Range e = var.evaluate(params);
 		if (e instanceof StringExpression) {
 			return (StringExpression)e;

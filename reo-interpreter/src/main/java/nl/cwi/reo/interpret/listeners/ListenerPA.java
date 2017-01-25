@@ -19,7 +19,7 @@ import nl.cwi.reo.interpret.ReoParser.Pa_trContext;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.portautomata.NullLabel;
 import nl.cwi.reo.portautomata.PortAutomaton;
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 /**
  * Listens to events triggered by a {@link org.antlr.v4.runtime.tree.ParseTreeWalker}.

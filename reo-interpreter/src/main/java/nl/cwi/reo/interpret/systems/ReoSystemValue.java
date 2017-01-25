@@ -9,9 +9,8 @@ import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
-import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public final class ReoSystemValue<T extends Semantics<T>> implements ReoSystem<T> {
 	
@@ -46,7 +45,7 @@ public final class ReoSystemValue<T extends Semantics<T>> implements ReoSystem<T
 	}
 
 	@Override
-	public ReoSystemValue<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public ReoSystemValue<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		return new ReoSystemValue<T>(sign, prog.evaluate(params));
 	}
 

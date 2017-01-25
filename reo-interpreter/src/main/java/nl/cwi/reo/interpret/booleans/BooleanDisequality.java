@@ -6,7 +6,6 @@ import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.variables.VariableName;
 
 public final class BooleanDisequality implements BooleanExpression {
 
@@ -21,7 +20,7 @@ public final class BooleanDisequality implements BooleanExpression {
 		this.e2 = e2;
 	}
 
-	public BooleanExpression evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public BooleanExpression evaluate(Map<String, Expression> params) throws CompilationException {
 		IntegerExpression x1 = e1.evaluate(params);
 		IntegerExpression x2 = e2.evaluate(params);
 		if (x1 instanceof IntegerValue && x2 instanceof IntegerValue)

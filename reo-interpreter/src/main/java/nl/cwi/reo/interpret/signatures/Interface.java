@@ -32,7 +32,7 @@ public final class Interface extends ArrayList<VariableName> implements Range {
 	}
 
 	@Override
-	public Interface evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public Interface evaluate(Map<String, Expression> params) throws CompilationException {
 		return this;
 	}
 	

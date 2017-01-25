@@ -2,7 +2,7 @@ package nl.cwi.reo.errors;
 
 import org.antlr.v4.runtime.Token;
 
-public class CompilationException extends RuntimeException {
+public class CompilationException extends Error {
 	
 	/**
 	 * Serial version ID.

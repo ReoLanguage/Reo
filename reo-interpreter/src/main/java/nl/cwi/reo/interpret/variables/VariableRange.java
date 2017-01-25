@@ -84,7 +84,7 @@ public final class VariableRange implements Variable {
 						IntegerVariable k = (IntegerVariable)bounds.get(1);						
 						if (k.getVariable() instanceof VariableName) {
 							VariableName name = (VariableName)k.getVariable();
-							params.put(name, new IntegerValue(lower + size - 1));
+							params.put(name.getName(), new IntegerValue(lower + size - 1));
 						} else {
 							return null;
 						}
@@ -97,7 +97,7 @@ public final class VariableRange implements Variable {
 						IntegerVariable k = (IntegerVariable)bounds.get(1);						
 						if (k.getVariable() instanceof VariableName) {
 							VariableName name = (VariableName)k.getVariable();
-							params.put(name, new IntegerValue(upper - size + 1));
+							params.put(name.getName(), new IntegerValue(upper - size + 1));
 						}
 					} else {
 						return null;
@@ -111,7 +111,7 @@ public final class VariableRange implements Variable {
 	}
 	
 	@Override
-	public Variable evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public Variable evaluate(Map<String, Expression> params) throws CompilationException {
 		
 		boolean boundsAreKnown = true;
 		List<List<IntegerExpression>> indices_p = new ArrayList<List<IntegerExpression>>();

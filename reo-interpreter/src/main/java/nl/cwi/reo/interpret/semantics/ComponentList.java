@@ -8,12 +8,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Port;
-import nl.cwi.reo.semantics.PortType;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.PortType;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T>> implements Evaluable<ComponentList<T>> {
 	
@@ -138,16 +137,18 @@ public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T
 				switch (p.getType()) {
 				case OUT:
 					if (mergers && outs.get(p) > 1) {
+						if (ins.get(p) == 0) 
+							A.add(p);
 						pi = p.rename(p.getName() + "." + A.size());
-						if (ins.get(p) == 0) A.add(new Port(p.getName(), PortType.IN, p.getTypeTag(), p.isHidden()));
 					} else {
 						pi = p;
 					}
 					break;
 				case IN:
 					if (replicators && ins.get(p) > 1) {
+						if (outs.get(p) == 0) 
+							A.add(p);
 						pi = p.rename(p.getName() + "." + A.size());
-						if (outs.get(p) == 0) A.add(new Port(p.getName(), PortType.OUT, p.getTypeTag(), p.isHidden()));
 					} else {
 						pi = p;
 					}
@@ -215,7 +216,7 @@ public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T
 	}
 
 	@Override
-	public ComponentList<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public ComponentList<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		ComponentList<T> _instances = new ComponentList<T>(this); 
 		for (Component<T> comp : _instances)
 			comp.evaluate(params);

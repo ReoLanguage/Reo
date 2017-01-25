@@ -14,11 +14,12 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.HashMap;
 
-import nl.cwi.reo.semantics.Port;
-import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.Semantics;
+import nl.cwi.reo.semantics.api.SemanticsType;
+
+import java.util.HashMap;
 
 /**
  * A work automaton.

@@ -3,7 +3,6 @@ package nl.cwi.reo.interpret.strings;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.variables.VariableName;
 
 
 public class StringValue implements StringExpression {
@@ -16,7 +15,7 @@ public class StringValue implements StringExpression {
 		this.str = str;
 	}
 	
-	public StringValue evaluate(Map<VariableName, Expression> params) {
+	public StringValue evaluate(Map<String, Expression> params) {
 		return this;
 	}
 	

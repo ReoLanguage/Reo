@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics;
+package nl.cwi.reo.semantics.api;
 
 import java.util.Objects;
 
@@ -7,6 +7,8 @@ public class Port implements Comparable<Port> {
 	private final String name;
 
 	private final PortType type;
+	
+	private final PrioType prio;
 
 	private final String tag;
 	
@@ -17,22 +19,25 @@ public class Port implements Comparable<Port> {
 			throw new NullPointerException();
 		this.name = name;
 		this.type = PortType.UNKNOWN;
+		this.prio = PrioType.NONE;
 		this.tag = "";
 		this.hidden = false;
 	}
 	
-	public Port(String name, PortType type, String tag, boolean hidden) {
-		if (name == null || type == null || tag == null)
+	public Port(String name, PortType type, PrioType prio, String tag, boolean hidden) {
+		if (name == null || type == null || prio == null || tag == null)
 			throw new NullPointerException();
 		this.name = name;
 		this.type = type;
+		this.prio = prio;
 		this.tag = tag;
 		this.hidden = hidden;
 	}
 	
 	/**
 	 * Joins this port to port x by inheriting, if necessary, 
-	 * the type, tag and visibility of port x.
+	 * the type, tag and visibility of port x. This method is used 
+	 * when ports in a block are instantiated via a signature. 
 	 * @param x		port
 	 * @returns a copy of this port, with possibly its type, 
 	 * tag and visibility inherited from port x.
@@ -43,7 +48,7 @@ public class Port implements Comparable<Port> {
 		PortType _type = type == PortType.UNKNOWN ? x.type : type;
 		String _tag = tag.equals("") ? x.tag : tag;
 		boolean _hidden = hidden || x.hidden;
-		return new Port(name, _type, _tag, _hidden);
+		return new Port(name, _type, PrioType.NONE, _tag, _hidden);
 	}
 
 	public String getName() {
@@ -52,6 +57,10 @@ public class Port implements Comparable<Port> {
 	
 	public PortType getType() {
 		return type;
+	}
+	
+	public PrioType getPrioType() {
+		return prio;
 	}
 	
 	public String getTypeTag() {
@@ -63,23 +72,16 @@ public class Port implements Comparable<Port> {
 	}
 	
 	public Port rename(String name) {
-		return new Port(name, type, tag, hidden);		
+		return new Port(name, type, prio, tag, hidden);		
 	}
 	
 	public Port hide() {
-		return new Port(name, type, tag, true);
+		return new Port(name, type, prio, tag, true);
 	}
 	
 	@Override
 	public String toString() {
-		switch (type) {
-		case IN: 
-			return (hidden ? "*" : "") + name + "?" + tag;
-		case OUT: 
-			return (hidden ? "*" : "") + name + "!" + tag;
-		default: 
-			return (hidden ? "*" : "") + name + ":" + tag;
-		}
+		return (hidden ? "*" : "") + prio + name + type + tag;
 	}
 	
 	@Override

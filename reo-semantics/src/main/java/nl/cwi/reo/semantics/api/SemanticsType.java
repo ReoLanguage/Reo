@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics;
+package nl.cwi.reo.semantics.api;
 
 public enum SemanticsType {
 	PA, CAM, WA, SA;

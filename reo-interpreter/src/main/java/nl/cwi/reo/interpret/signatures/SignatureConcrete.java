@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 public class SignatureConcrete extends HashMap<Port, Port> {
 	
@@ -14,16 +13,16 @@ public class SignatureConcrete extends HashMap<Port, Port> {
 	 */
 	private static final long serialVersionUID = -3243867819411595599L;
 	
-	private Map<VariableName, Expression> defs;
+	private Map<String, Expression> defs;
 	
-	public SignatureConcrete(Map<VariableName, Expression> defs, Map<Port, Port> links) {
+	public SignatureConcrete(Map<String, Expression> defs, Map<Port, Port> links) {
 		if (defs == null || links == null)
 			throw new NullPointerException();
 		this.defs = defs;
 		super.putAll(links);
 	}
 	
-	public Map<VariableName, Expression> getDefinitions() {
+	public Map<String, Expression> getDefinitions() {
 		return this.defs;
 	}
 

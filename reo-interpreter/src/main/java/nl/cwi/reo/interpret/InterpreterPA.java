@@ -4,7 +4,7 @@ import java.util.List;
 
 import nl.cwi.reo.interpret.listeners.ListenerPA;
 import nl.cwi.reo.portautomata.PortAutomaton;
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.api.SemanticsType;
 
 public class InterpreterPA extends Interpreter<PortAutomaton> {
 	

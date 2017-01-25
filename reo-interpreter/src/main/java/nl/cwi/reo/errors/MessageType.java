@@ -6,9 +6,9 @@ public enum MessageType {
 	@Override
 	public String toString() {
 		switch(this) {
-		case INFO: return "[info]";
-		case WARNING: return "[warning]";
-		case ERROR: return "[error]";
+		case INFO: return "[INFO]";
+		case WARNING: return "[WARNING]";
+		case ERROR: return "[ERROR]";
 		default: return null;
 		}
 	}

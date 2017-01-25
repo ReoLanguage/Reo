@@ -7,9 +7,8 @@ import nl.cwi.reo.interpret.systems.ReoSystem;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.ranges.ExpressionList;
-import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.api.Semantics;
 
 public final class InstanceReference<T extends Semantics<T>> implements ReoBlock<T> {
 
@@ -28,7 +27,7 @@ public final class InstanceReference<T extends Semantics<T>> implements ReoBlock
 	}
 	
 	@Override
-	public ReoBlock<T> evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public ReoBlock<T> evaluate(Map<String, Expression> params) throws CompilationException {
 		ReoSystem<T> cexpr_p = cexpr.evaluate(params);
 		Range plist_p = plist.evaluate(params); 
 		Range iface_p = iface.evaluate(params); 

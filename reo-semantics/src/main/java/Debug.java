@@ -11,7 +11,7 @@ import nl.cwi.reo.automata.Automaton;
 import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.portautomata.NullLabel;
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 /**
  * Test class for debugging.

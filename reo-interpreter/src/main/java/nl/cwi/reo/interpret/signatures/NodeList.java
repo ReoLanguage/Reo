@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
+import nl.cwi.reo.semantics.api.Evaluable;
 
 public class NodeList extends ArrayList<Node> implements Evaluable<NodeList> {
 	
@@ -31,7 +31,7 @@ public class NodeList extends ArrayList<Node> implements Evaluable<NodeList> {
 	}
 
 	@Override
-	public NodeList evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public NodeList evaluate(Map<String, Expression> params) throws CompilationException {
 		List<Node> list_p = new ArrayList<Node>();
 		for (Node x : this) {
 			Node x_p = x.evaluate(params);	

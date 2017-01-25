@@ -3,13 +3,14 @@ package nl.cwi.reo.interpret.signatures;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
-import nl.cwi.reo.semantics.Port;
-import nl.cwi.reo.semantics.PortType;
+import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.PortType;
+import nl.cwi.reo.semantics.api.PrioType;
 
 /**
  * An immutable node implementation.
@@ -48,13 +49,13 @@ public final class Node implements Evaluable<Node> {
 			VariableName vname = (VariableName)var;
 			switch (type) {
 			case SOURCE:
-				p = new Port(vname.getName(), PortType.IN, tag.name(), false);
+				p = new Port(vname.getName(), PortType.IN, PrioType.NONE, tag.name(), false);
 				break;
 			case SINK:
-				p = new Port(vname.getName(), PortType.OUT, tag.name(), false);
+				p = new Port(vname.getName(), PortType.OUT, PrioType.NONE, tag.name(), false);
 				break;
 			default: 
-				p = new Port(vname.getName(), PortType.UNKNOWN, tag.name(), false);
+				p = new Port(vname.getName(), PortType.UNKNOWN, PrioType.NONE, tag.name(), false);
 				break;
 			}
 		}
@@ -66,7 +67,7 @@ public final class Node implements Evaluable<Node> {
 	}
 
 	@Override
-	public Node evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public Node evaluate(Map<String, Expression> params) throws CompilationException {
 		Range e = var.evaluate(params);
 		if (!(e instanceof Variable))
 			throw new CompilationException(var.getToken(), "Node variable " + var + " cannot be assigned to " + e);

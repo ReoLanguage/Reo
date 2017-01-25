@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics;
+package nl.cwi.reo.semantics.api;
 
 import java.io.File;
 

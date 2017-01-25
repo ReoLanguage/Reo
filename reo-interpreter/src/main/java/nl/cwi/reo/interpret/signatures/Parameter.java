@@ -3,11 +3,10 @@ package nl.cwi.reo.interpret.signatures;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.Evaluable;
 import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
-import nl.cwi.reo.interpret.variables.VariableName;
+import nl.cwi.reo.semantics.api.Evaluable;
 
 /**
  * An immutable parameter implementation.
@@ -34,7 +33,7 @@ public final class Parameter implements Evaluable<Parameter> {
 	}
 
 	@Override
-	public Parameter evaluate(Map<VariableName, Expression> params) throws CompilationException {
+	public Parameter evaluate(Map<String, Expression> params) throws CompilationException {
 		Range e = var.evaluate(params);
 		if (!(e instanceof Variable))
 			e = var;
