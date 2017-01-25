@@ -34,7 +34,7 @@ public interface Block<T extends Semantics<T>> extends Evaluable<Block<T>> {
 	 * associative product operator.
 	 * @return List of all blocks contained in this block.
 	 */
-	public List<Block<T>> flatten();
+	public List<Component<T>> flatten();
 	
 	/**
 	 * Inserts, if necessary, a merger and/or replicator at every node in this instance list. 
