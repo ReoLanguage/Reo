@@ -1,0 +1,31 @@
+
+include("Npb.pr")
+
+MASTER = nl.cwi.pr.runtime.examples.thesis.npb.is.Workers.Master
+SLAVE = nl.cwi.pr.runtime.examples.thesis.npb.is.Workers.Slave
+
+N_SLAVES = 3
+
+main =
+		MasterSlavesInteractionB(
+			MasterInit,
+			MasterDo,
+			SlavesDone[1..N_SLAVES]
+		;
+			SlavesInit[1..N_SLAVES],
+			SlavesDo[1..N_SLAVES],
+			MasterDone
+		)
+
+	among
+	
+		MASTER(
+			N_SLAVES, '"s"', '"b"',
+			MasterInit,
+			MasterDo,
+			MasterDone
+		)
+			
+		and forall i:1..N_SLAVES {
+			SLAVE(SlavesInit[i], SlavesDo[i], SlavesDone[i])
+		}

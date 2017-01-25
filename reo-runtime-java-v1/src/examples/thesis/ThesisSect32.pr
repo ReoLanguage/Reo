@@ -1,0 +1,172 @@
+
+include("ThesisSect31.pr")
+
+//
+// Figure 3.27
+//
+
+Replicator(in;out[]) =
+		let k = #out
+			if (k == 1)
+				Sync(in;out[1])
+			else if (k == 2)
+				Replicator2(in;out[1],out[2])
+			else if (k == 3)
+				Replicator2(in;out[1],P) mult Replicator2(P;out[2],out[3])
+			else 
+				Replicator2(P[2];out[1],out[2])
+					mult { prod i:3..k-1 { Replicator2(P[i];P[i-1],out[i]) } }
+						mult Replicator2(in;P[k-1],out[k])
+
+ADD = 'nl.cwi.pr.runtime.examples.thesis.basic.Functions.add'
+ODD = 'nl.cwi.pr.runtime.examples.thesis.basic.Relations.Odd'
+
+OddFibonacciPart(a,c;f,h) =
+		Fifo(a;B)
+		mult Sync(c;D)
+			mult BinOp<ADD>(B,D;E)
+				mult Replicator2(E;f,G)
+					mult Filter<ODD>(G;h)
+
+
+OddFibonacci(in;out[]) =
+		OddFibonacciPart(A,C;F,H)
+			mult Fifo(F;P1)
+				mult FifoFull<'1'>(P1;P2)
+						mult Replicator2(P2;C,P3)
+							mult Replicator2(P3;P4,P5)
+								mult SyncDrain(P4,in;)
+								mult Sync(P5;P6)
+									mult FifoFull<'0'>(P6;A)
+			mult Replicator(H;P7[1..#out])
+				mult { prod i:1..#out { Sync(P7[i];out[i]) } }
+
+//
+// Figure 3.30
+//
+
+CONCATENATE	= 'nl.cwi.pr.runtime.examples.thesis.chess.Functions.concatenate'
+PARSE		= 'nl.cwi.pr.runtime.examples.thesis.chess.Functions.parse'
+MAJORITY	= 'nl.cwi.pr.runtime.examples.thesis.chess.Functions.majority'
+
+MOVE		= 'nl.cwi.pr.runtime.examples.thesis.chess.Relations.Move'
+
+Concatenator(in[];out) =
+		if (#in == 1) 
+			Sync(in[1];out)
+		else
+			Sync(in[1];P[1])
+				mult { prod i:1..#in-1 { BinOp<CONCATENATE>(in[i+1],P[i];P[i+1]) } }
+					mult Sync(P[#in];out)
+
+Team(in,best[];hist[],move,out) =
+		Replicator2(in;P1,P5)
+			mult Fifo(P1;P2)
+				mult Replicator2(P2;P3,P4)
+			mult Replicator(P5;hist[1..#hist])
+		mult { prod i:1..#best { Transformer<PARSE>(best[i];P6[i]) } }
+			mult Concatenator(P6[1..#best];P7)
+				mult Transformer<MAJORITY>(P7;P8)
+					mult Replicator2(P8;P9,P10)
+						mult SyncDrain(P3,P9;)
+							mult Filter<MOVE>(P10;P11)
+								mult Replicator2(P11;P12,P13)
+									mult Sync(P12;move)
+										mult BinOp<CONCATENATE>(P4,P13;out)
+
+Chess(white_best[],black_best;white_hist[],black_hist,white_move,black_move) =
+		Team(white_in,white_best[1..#white_best];white_hist[1..#white_hist],white_move,white_out)
+			mult Fifo(white_out;black_in)
+				mult Team(black_in,[black_best];[black_hist],black_move,black_out)
+					mult FifoFull<'""'>(black_out;white_in)
+
+//
+// Figure 3.37
+//
+
+MasterToSlavesA(in;out[]) =
+		let n = #out
+			Sync(in;P1)
+				mult Router(P1;P2[1..n])
+					mult { prod i:1..n { Sync(P2[i];P3[i]) } }
+						mult { prod i:1..n { Replicator2(P3[i];P4[i],P5[i]) } }
+							mult Sequencer(P4[1..n];)
+							mult { prod i:1..n { Fifo(P5[i];out[i]) } }
+
+SlavesToMasterA(in[];out) =
+		let n = #in
+			{ prod i:1..n { Fifo(in[i];P1[i]) } }
+				mult { prod i:1..n { Replicator2(P1[i];P2[i],P3[i]) } }
+					mult Sequencer(P2[1..n];)
+					mult { prod i:1..n { Sync(P3[i];P4[i]) } }
+						mult Merger(P4[1..n];P5)
+							mult Sync(P5;out)
+
+MasterSlavesInteractionPatternA(
+		master_in,slaves_in[];
+		slaves_out[],master_out
+	) =
+		MasterToSlavesA(master_in;slaves_out[1..#slaves_out])
+		mult SlavesToMasterA(slaves_in[1..#slaves_in];master_out)
+
+//
+// Figure 3.40
+//
+
+MasterToSlavesB(in;out[]) =
+		let n = #out
+			Sync(in;P1)
+				mult Replicator(P1;P2[1..n])
+					mult { prod i:1..n { Sync(P2[i];P3[i]) } }
+						mult { prod i:1..n { Fifo(P3[i];out[i]) } }
+
+SlavesToMasterB(in[];out) = 
+		EarlyAsyncMerger(in[1..#in];out)
+
+MasterSlavesInteractionPatternB(
+		master_in,slaves_in[];
+		slaves_out[],master_out
+	) =
+		MasterToSlavesB(master_in;slaves_out[1..#slaves_out])
+		mult SlavesToMasterB(slaves_in[1..#slaves_in];master_out)
+
+//
+// Figure 3.43
+//
+
+INCREMENT = 'nl.cwi.pr.runtime.examples.thesis.npb.lu.Functions.increment'
+DECREMENT = 'nl.cwi.pr.runtime.examples.thesis.npb.lu.Functions.decrement'
+
+GREATER_THAN_0 = 'nl.cwi.pr.runtime.examples.thesis.npb.lu.Relations.GreaterThan0'
+
+Semaphore(;acq,rel) =
+		Fifo(P1;P2)
+			mult FifoFull<'0'>(P2;P3)
+				mult Router2(P3;P4,P9)
+					mult Blocker<GREATER_THAN_0>(P4;P5)
+						mult Replicator2(P5;P6,P7)
+							mult Sync(P6;acq)
+							mult Transformer<DECREMENT>(P7;P8)
+					mult Sync(P9;P10)
+						mult Replicator2(P10;P11,P12)
+							mult Sync(P11;rel)
+							mult Transformer<INCREMENT>(P12;P13)
+								mult Merger2(P8,P13;P1)
+
+RelayRaceInteractionPatternA(
+		master_in,last_slaves_in;
+		slaves_out[],master_out,slaves_acq[],slaves_rel[]
+	) =
+		let n = #slaves_out
+			MasterToSlavesA(master_in;slaves_out[1..#slaves_out])
+			mult { prod i:1..n { Semaphore(;slaves_acq[1+(i%n)],slaves_rel[i]) } }
+			mult Fifo(last_slaves_in;master_out)
+
+RelayRaceInteractionPatternB(
+		master_in,last_slaves_in;
+		slaves_out[],master_out,slaves_acq[],slaves_rel[]
+	) =
+		let n = #slaves_out
+			MasterToSlavesB(master_in;slaves_out[1..#slaves_out])
+			mult { prod i:1..n { Semaphore(;slaves_acq[1+(i%n)],slaves_rel[i]) } }
+			mult Fifo(last_slaves_in;master_out)

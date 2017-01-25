@@ -1,0 +1,86 @@
+
+include("Npb.pr")
+
+MASTER = nl.cwi.pr.runtime.examples.thesis.npb.sp.Workers.Master
+SLAVE = nl.cwi.pr.runtime.examples.thesis.npb.sp.Workers.Slave
+
+N_SLAVES = 3
+
+main =
+		MasterSlavesInteractionA(
+			MasterInitRHSAdder,
+			MasterDoRHSAdder,
+			SlavesDoneRHSAdder[1..N_SLAVES]
+		;
+			SlavesInitRHSAdder[1..N_SLAVES],
+			SlavesDoRHSAdder[1..N_SLAVES],
+			MasterDoneRHSAdder
+		)
+		
+		and MasterSlavesInteractionA(
+			MasterInitRHSCompute,
+			MasterDoRHSCompute,
+			SlavesDoneRHSCompute[1..N_SLAVES]
+		;
+			SlavesInitRHSCompute[1..N_SLAVES],
+			SlavesDoRHSCompute[1..N_SLAVES],
+			MasterDoneRHSCompute
+		)
+
+		and MasterSlavesInteractionA(
+			MasterInitTXInverse,
+			MasterDoTXInverse,
+			SlavesDoneTXInverse[1..N_SLAVES]
+		;
+			SlavesInitTXInverse[1..N_SLAVES],
+			SlavesDoTXInverse[1..N_SLAVES],
+			MasterDoneTXInverse
+		)
+			
+		and MasterSlavesInteractionA(
+			MasterInitXSolver,
+			MasterDoXSolver,
+			SlavesDoneXSolver[1..N_SLAVES]
+		;
+			SlavesInitXSolver[1..N_SLAVES],
+			SlavesDoXSolver[1..N_SLAVES],
+			MasterDoneXSolver
+		)
+			
+		and MasterSlavesInteractionA(
+			MasterInitYSolver,
+			MasterDoYSolver,
+			SlavesDoneYSolver[1..N_SLAVES]
+		;
+			SlavesInitYSolver[1..N_SLAVES],
+			SlavesDoYSolver[1..N_SLAVES],
+			MasterDoneYSolver
+		)
+			
+		and MasterSlavesInteractionA(
+			MasterInitZSolver,
+			MasterDoZSolver,
+			SlavesDoneZSolver[1..N_SLAVES]
+		;
+			SlavesInitZSolver[1..N_SLAVES],
+			SlavesDoZSolver[1..N_SLAVES],
+			MasterDoneZSolver
+		)
+						
+	among
+	
+		MASTER(
+			N_SLAVES, '"s"', '"a"',
+			MasterInitRHSAdder, MasterInitRHSCompute, MasterInitTXInverse, MasterInitXSolver, MasterInitYSolver, MasterInitZSolver,
+			MasterDoRHSAdder, MasterDoRHSCompute, MasterDoTXInverse, MasterDoXSolver, MasterDoYSolver, MasterDoZSolver,
+			MasterDoneRHSAdder, MasterDoneRHSCompute, MasterDoneTXInverse, MasterDoneXSolver, MasterDoneYSolver, MasterDoneZSolver
+		)
+			
+		and forall i:1..N_SLAVES {
+			SLAVE('"RHSAdder"', SlavesInitRHSAdder[i], SlavesDoRHSAdder[i], SlavesDoneRHSAdder[i])
+			and SLAVE('"RHSCompute"', SlavesInitRHSCompute[i], SlavesDoRHSCompute[i], SlavesDoneRHSCompute[i])
+			and SLAVE('"TXInverse"', SlavesInitTXInverse[i], SlavesDoTXInverse[i], SlavesDoneTXInverse[i])
+			and SLAVE('"XSolver"', SlavesInitXSolver[i], SlavesDoXSolver[i], SlavesDoneXSolver[i])
+			and SLAVE('"YSolver"', SlavesInitYSolver[i], SlavesDoYSolver[i], SlavesDoneYSolver[i])
+			and SLAVE('"ZSolver"', SlavesInitZSolver[i], SlavesDoZSolver[i], SlavesDoneZSolver[i])
+		}

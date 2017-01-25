@@ -1,0 +1,117 @@
+
+//
+// Figure 3.3
+//
+
+LateAsyncMerger2(a,b;c) =
+		Sync(a;P1) mult Sync(b;P2) mult Merger2(P1,P2;P3) mult Fifo(P3;c)
+
+EarlyAsyncMerger2(d,e;f) =
+		Fifo(d;P1) mult Fifo(e;P2) mult Merger2(P1,P2;P3) mult Sync(P3;f)
+
+//
+// Figure 3.11
+//
+
+TRUE = 'nl.cwi.pr.runtime.examples.thesis.basic.Relations.True'
+
+SyncDrain(in1,in2;) = BinRel<TRUE>(in1,in2;)
+
+AsyncDrain(in1,in2;) =
+		Sync(in1;P1)
+		mult Sync(in2;P2)
+			mult Merger2(P1,P2;P3)
+				mult Replicator2(P3;P4,P5)
+					mult SyncDrain(P4,P5;)
+
+Blocker<R>(in;out) =
+		Sync(in;P1)
+			mult Replicator2(P1;P2,P6)
+				mult Filter<R>(P2;P3)
+					mult Replicator2(P3;P4,P5)
+						mult Sync(P4;out)
+						mult SyncDrain(P5,P6;)
+
+Router2(in;out1,out2) =
+		Sync(in;P1)
+			mult Replicator2(P1;P2,P14)
+				mult Replicator2(P2;P3,P8)
+					mult LossySync(P3;P4)
+						mult Replicator2(P4;P5,P6)
+							mult Sync(P5;out1)
+							mult Sync(P6;P7)
+					mult LossySync(P8;P9)
+						mult Replicator2(P9;P10,P11)
+							mult Sync(P10;out2)
+							mult Sync(P11;P12)
+								mult Merger2(P7,P12;P13)
+									mult SyncDrain(P13,P14;)
+
+//
+// Figure 3.12
+//
+
+SyncK[k](in;out) =
+		if (k == 1)
+			Sync(in;out)
+		else if (k == 2)
+			Sync(in;P) mult Sync(P;out)
+		else
+			Sync(in;P[1])
+				mult { prod i:1..k-2 { Sync(P[i];P[i+1]) } }
+					mult Sync(P[k-1];out)
+
+FifoK[k](in;out) =
+		if (k == 1)
+			Fifo(in;out)
+		else if (k == 2)
+			Fifo(in;P) mult Fifo(P;out)
+		else
+			Fifo(in;P[1])
+				mult { prod i:1..k-2 { Fifo(P[i];P[i+1]) } }
+					mult Fifo(P[k-1];out)
+
+
+Merger(in[];out) =
+		let k = #in
+			if (k == 1)
+				Sync(in[1];out)
+			else if (k == 2)
+				Merger2(in[1],in[2];out)
+			else if (k == 3)
+				Merger2(in[1],in[2];P) mult Merger2(P,in[3];out)
+			else
+				Merger2(in[1],in[2];P[2])
+					mult { prod i:3..k-1 { Merger2(P[i-1],in[i];P[i]) } }
+						mult Merger2(P[k-1],in[k];out)
+
+Router(in;out[]) =
+		let k = #out
+			if (k == 1)
+				Sync(in;out[1])
+			else if (k == 2)
+				Router2(in;out[1],out[2])
+			else if (k == 3)
+				Router2(in;out[1],P) mult Router2(P;out[2],out[3])
+			else 
+				Router2(P[2];out[1],out[2])
+					mult { prod i:3..k-1 { Router2(P[i];P[i-1],out[i]) } }
+						mult Router2(in;P[k-1],out[k])
+
+LateAsyncMerger(in[];out) =
+		Merger(in[1..#in];P) mult Fifo(P;out)
+
+EarlyAsyncMerger(in[];out) =
+		let k = #in
+			{ prod i:1..k { Fifo(in[i];P[i]) } } mult Merger(P[1..k];out)
+
+//
+// Figure 3.23
+//
+
+Sequencer(in[];) =
+		FifoFull<'1'>(P1[1];P2[1])
+			mult { prod i:2..#in { Fifo(P1[i];P2[i]) } }
+				mult { prod i:1..#in { Replicator2(P2[i];P1[i+1],P3[i]) } }
+					mult { prod i:1..#in { SyncDrain(in[i],P3[i];) } }
+					mult Sync(P1[#in+1];P1[1])

@@ -1,0 +1,9 @@
+
+include("../Thesis.pr")
+
+PRODUCER = nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer
+CONSUMER = nl.cwi.pr.runtime.examples.thesis.basic.Workers.Consumer
+
+K = 3
+
+main = OddFibonacci(A;B[1..K]) // among PRODUCER(A) and { forall i:1..K { CONSUMER(B[i]) } }

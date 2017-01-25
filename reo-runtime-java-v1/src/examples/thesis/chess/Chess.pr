@@ -1,0 +1,18 @@
+
+include("../Thesis.pr")
+
+ENGINE	= nl.cwi.pr.runtime.examples.thesis.chess.Workers.Engine
+DISPLAY	= nl.cwi.pr.runtime.examples.thesis.chess.Workers.Display
+
+N_WHITE_ENGINES = 3
+
+main =	Chess(
+			WhiteReturn[1..N_WHITE_ENGINES],BlackReturn;
+			WhiteCall[1..N_WHITE_ENGINES],BlackCall,WhiteMove,BlackMove
+		)
+		 
+	among
+		
+		DISPLAY(WhiteMove,BlackMove)
+		and forall i:1..N_WHITE_ENGINES { ENGINE(WhiteCall[i],WhiteReturn[i]) } 
+		and ENGINE(BlackCall,BlackReturn)

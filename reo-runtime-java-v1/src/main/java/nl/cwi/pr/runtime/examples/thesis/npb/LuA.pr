@@ -1,0 +1,88 @@
+
+include("Npb.pr")
+
+MASTER = nl.cwi.pr.runtime.examples.thesis.npb.lu.Workers.Master
+SLAVE1 = nl.cwi.pr.runtime.examples.thesis.npb.lu.Workers.Slave1
+SLAVE2 = nl.cwi.pr.runtime.examples.thesis.npb.lu.Workers.Slave2
+
+N_SLAVES = 3
+
+main =
+		MasterSlavesInteractionA(
+			MasterInitAdder,
+			MasterDoAdder,
+			SlavesDoneAdder[1..N_SLAVES]
+		;
+			SlavesInitAdder[1..N_SLAVES],
+			SlavesDoAdder[1..N_SLAVES],
+			MasterDoneAdder
+		)
+			
+		and MasterSlavesInteractionA(
+			MasterInitRHSCompute,
+			MasterDoRHSCompute,
+			SlavesDoneRHSCompute[1..N_SLAVES]
+		;
+			SlavesInitRHSCompute[1..N_SLAVES],
+			SlavesDoRHSCompute[1..N_SLAVES],
+			MasterDoneRHSCompute
+		)
+			
+		and MasterSlavesInteractionA(
+			MasterInitScale,
+			MasterDoScale,
+			SlavesDoneScale[1..N_SLAVES]
+		;
+			SlavesInitScale[1..N_SLAVES],
+			SlavesDoScale[1..N_SLAVES],
+			MasterDoneScale
+		)
+
+		and MasterSlavesRelayA(
+			MasterInitLowerJac,
+			MasterDoLowerJac,
+			SlavesDoneLowerJac
+		;
+			SlavesInitLowerJac[1..N_SLAVES],
+			SlavesDoLowerJac[1..N_SLAVES],
+			MasterDoneLowerJac,
+			LowerJacAcq[1..N_SLAVES],
+			LowerJacRel[1..N_SLAVES]
+		)
+		
+		and MasterSlavesRelayA(
+			MasterInitUpperJac,
+			MasterDoUpperJac,
+			SlavesDoneUpperJac
+		;
+			SlavesInitUpperJac[1..N_SLAVES],
+			SlavesDoUpperJac[1..N_SLAVES],
+			MasterDoneUpperJac,
+			UpperJacAcq[1..N_SLAVES],
+			UpperJacRel[1..N_SLAVES]
+		)
+	
+	among
+	
+		MASTER(
+			N_SLAVES, '"s"', '"a"',
+			MasterInitAdder, MasterInitLowerJac, MasterInitRHSCompute, MasterInitScale, MasterInitUpperJac,
+			MasterDoAdder, MasterDoLowerJac, MasterDoRHSCompute, MasterDoScale, MasterDoUpperJac,
+			MasterDoneAdder, MasterDoneLowerJac, MasterDoneRHSCompute, MasterDoneScale, MasterDoneUpperJac
+		)
+			
+		and forall i:1..N_SLAVES-1 {
+			SLAVE1('"Adder"', i, SlavesInitAdder[i], SlavesDoAdder[i], SlavesDoneAdder[i])
+			and SLAVE1('"RHSCompute"', i, SlavesInitRHSCompute[i], SlavesDoRHSCompute[i], SlavesDoneRHSCompute[i])
+			and SLAVE1('"Scale"', i, SlavesInitScale[i], SlavesDoScale[i], SlavesDoneScale[i])
+			
+			and SLAVE2('"LowerJac"', i, SlavesInitLowerJac[i], SlavesDoLowerJac[i], 'null', LowerJacAcq[i], LowerJacRel[i])
+			and SLAVE2('"UpperJac"', i, SlavesInitUpperJac[i], SlavesDoUpperJac[i], 'null', UpperJacAcq[i], UpperJacRel[i])
+		}
+		
+		and SLAVE1('"Adder"', N_SLAVES, SlavesInitAdder[N_SLAVES], SlavesDoAdder[N_SLAVES], SlavesDoneAdder[N_SLAVES])
+		and SLAVE1('"RHSCompute"', N_SLAVES, SlavesInitRHSCompute[N_SLAVES], SlavesDoRHSCompute[N_SLAVES], SlavesDoneRHSCompute[N_SLAVES])
+		and SLAVE1('"Scale"', N_SLAVES, SlavesInitScale[N_SLAVES], SlavesDoScale[N_SLAVES], SlavesDoneScale[N_SLAVES])
+		
+		and SLAVE2('"LowerJac"', N_SLAVES, SlavesInitLowerJac[N_SLAVES], SlavesDoLowerJac[N_SLAVES], SlavesDoneLowerJac, LowerJacAcq[N_SLAVES], LowerJacRel[N_SLAVES])
+		and SLAVE2('"UpperJac"', N_SLAVES, SlavesInitUpperJac[N_SLAVES], SlavesDoUpperJac[N_SLAVES], SlavesDoneUpperJac, UpperJacAcq[N_SLAVES], UpperJacRel[N_SLAVES])

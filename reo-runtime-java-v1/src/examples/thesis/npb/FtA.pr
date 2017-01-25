@@ -1,0 +1,41 @@
+
+include("Npb.pr")
+
+MASTER = nl.cwi.pr.runtime.examples.thesis.npb.ft.Workers.Master
+SLAVE = nl.cwi.pr.runtime.examples.thesis.npb.ft.Workers.Slave
+
+N_SLAVES = 3
+
+main =
+		MasterSlavesInteractionA(
+			MasterInitEvolve,
+			MasterDoEvolve,
+			SlavesDoneEvolve[1..N_SLAVES]
+		;
+			SlavesInitEvolve[1..N_SLAVES],
+			SlavesDoEvolve[1..N_SLAVES],
+			MasterDoneEvolve
+		)
+		
+		and MasterSlavesInteractionA(
+			MasterInitFFT,
+			MasterDoFFT,
+			SlavesDoneFFT[1..N_SLAVES]
+		;
+			SlavesInitFFT[1..N_SLAVES],
+			SlavesDoFFT[1..N_SLAVES],
+			MasterDoneFFT
+		)
+
+	among
+	
+		MASTER(
+			N_SLAVES, '"s"', '"a"',
+			MasterInitEvolve, MasterInitFFT,
+			MasterDoEvolve, MasterDoFFT,
+			MasterDoneEvolve, MasterDoneFFT)
+			
+		and forall i:1..N_SLAVES {
+			SLAVE('"Evolve"', SlavesInitEvolve[i], SlavesDoEvolve[i], SlavesDoneEvolve[i])
+			and SLAVE('"FFT"', SlavesInitFFT[i], SlavesDoFFT[i], SlavesDoneFFT[i])
+		}

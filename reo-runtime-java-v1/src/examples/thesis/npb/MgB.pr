@@ -1,0 +1,64 @@
+
+include("Npb.pr")
+
+MASTER = nl.cwi.pr.runtime.examples.thesis.npb.mg.Workers.Master
+SLAVE = nl.cwi.pr.runtime.examples.thesis.npb.mg.Workers.Slave
+
+N_SLAVES = 3
+		
+main =
+		MasterSlavesInteractionB(
+			MasterInitResid,
+			MasterDoResid,
+			SlavesDoneResid[1..N_SLAVES]
+		;
+			SlavesInitResid[1..N_SLAVES],
+			SlavesDoResid[1..N_SLAVES],
+			MasterDoneResid
+		)
+		
+		and MasterSlavesInteractionB(
+			MasterInitPsinv,
+			MasterDoPsinv,
+			SlavesDonePsinv[1..N_SLAVES]
+		;
+			SlavesInitPsinv[1..N_SLAVES],
+			SlavesDoPsinv[1..N_SLAVES],
+			MasterDonePsinv
+		)
+			
+		and MasterSlavesInteractionB(
+			MasterInitInterp,
+			MasterDoInterp,
+			SlavesDoneInterp[1..N_SLAVES]
+		;
+			SlavesInitInterp[1..N_SLAVES],
+			SlavesDoInterp[1..N_SLAVES],
+			MasterDoneInterp
+		)
+			
+		and MasterSlavesInteractionB(
+			MasterInitRprj,
+			MasterDoRprj,
+			SlavesDoneRprj[1..N_SLAVES]
+		;
+			SlavesInitRprj[1..N_SLAVES],
+			SlavesDoRprj[1..N_SLAVES],
+			MasterDoneRprj
+		)
+						
+	among
+	
+		MASTER(
+			N_SLAVES, '"s"', '"b"',
+			MasterInitResid, MasterInitPsinv, MasterInitInterp, MasterInitRprj,
+			MasterDoResid, MasterDoPsinv, MasterDoInterp, MasterDoRprj,
+			MasterDoneResid, MasterDonePsinv, MasterDoneInterp, MasterDoneRprj
+		)
+			
+		and forall i:1..N_SLAVES {
+			SLAVE('"Resid"', SlavesInitResid[i], SlavesDoResid[i], SlavesDoneResid[i])
+			and SLAVE('"Psinv"', SlavesInitPsinv[i], SlavesDoPsinv[i], SlavesDonePsinv[i])
+			and SLAVE('"Interp"', SlavesInitInterp[i], SlavesDoInterp[i], SlavesDoneInterp[i])
+			and SLAVE('"Rprj"', SlavesInitRprj[i], SlavesDoRprj[i], SlavesDoneRprj[i])
+		}
