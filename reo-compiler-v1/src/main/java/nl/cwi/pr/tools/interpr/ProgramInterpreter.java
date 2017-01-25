@@ -298,7 +298,7 @@ public class ProgramInterpreter extends
 /*
  *private static String CORE_SOURCE_FILE_LOCATION = "platform:/plugin/nl.cwi.pr/src/nl/cwi/pr/autom/libr/Core.pr";
  */
-	private static String CORE_SOURCE_FILE_LOCATION = "/home/e-spin/workspace/nl.cwi.pr/src/nl/cwi/pr/autom/libr/Core.pr";
+	private static String CORE_SOURCE_FILE_LOCATION = "/ufs/dokter/workspace/Reo/reo-compiler-v1/src/main/java/nl/cwi/pr/autom/libr/Core.pr";
 
 	//
 	// STATIC - METHODS

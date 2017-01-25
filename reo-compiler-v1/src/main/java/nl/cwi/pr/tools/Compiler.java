@@ -32,8 +32,6 @@ public class Compiler {
 	@Parameter(names = {"-t", "--targetLanguage"},description = "target language")
 	private Language targetLanguage;
 	
-	
-	
 	public Compiler(){
 		this.targetLanguage=Language.JAVA;
 		this.composite=new Composite();
@@ -48,14 +46,21 @@ public class Compiler {
 		compiler.composite.setTargetFileProject(false);
 		compiler.composite.setProject("Compiler");
 		
-		new JCommander(compiler, args);
+
+		compiler.sourceFileLocation="/ufs/dokter/workspace/Reo/reo-runtime-java-v1/src/main/java/nl/cwi/pr/runtime/examples/thesis/chess/Chess.pr";
+//		compiler.STGlocation = "/ufs/dokter/workspace/Reo/reo-compiler-v1/src/main/resources/";
+//		compiler.runTimeLocation = "/ufs/dokter/workspace/Reo/reo-runtime-java-v1/src/main/java/nl/cwi/pr/runtime";
+		
+		//new JCommander(compiler, args);	
+		
         compiler.run();					
 	}
 	
 	public void run() {
 
 		try {
-			
+			STGlocation = "/ufs/dokter/workspace/Reo/reo-compiler-v1/src/main/resources/";
+			runTimeLocation = "/ufs/dokter/workspace/Reo/reo-runtime-java-v1/src/main/java/nl/cwi/pr/runtime";
 			String project = null;
 			
 			/*

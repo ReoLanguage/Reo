@@ -56,7 +56,7 @@ public class JavaWorkerCompiler extends WorkerCompiler<JavaProgramCompiler> {
 		 * 
 		 */
 		
-		STGroupFile templates = new STGroupFile("/home/e-spin/workspace/Compiler/stg/java-worker.stg");
+		STGroupFile templates = new STGroupFile(this.getSettings().getSTGlocation()+"java-worker.stg");
 
 		ST headerTemplate;
 		ST workerClassTemplate;
