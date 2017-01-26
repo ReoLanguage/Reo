@@ -1,6 +1,6 @@
 grammar Reo;
 
-import Tokens, PA, WA, CAM, SA;
+import Tokens, PA, WA, CAM, SA, PR;
 
 // File structure
 file    : secn? imps* ID '='? rsys EOF;
@@ -11,7 +11,8 @@ imps    : 'import' name ';';
 rsys    : var                                                    # rsys_variable
         | sign '{' atom source? '}'                              # rsys_atomic
         | sign block                                             # rsys_composite ;
-atom    : pa | cam | wa | sa ;
+atom    : pa | cam | wa | sa | pr;
+
 source  : target ':' STRING ;
 target  : 'Java' ; 
       //| 'C/C++' 
