@@ -8,10 +8,10 @@ import java.util.Map;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
 import nl.cwi.reo.interpret.integers.IntegerValue;
-import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.strings.StringValue;
 import nl.cwi.reo.interpret.systems.ReoSystemValue;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Semantics;
 
 public class Body<T extends Semantics<T>> implements ReoBlock<T> {
@@ -71,7 +71,7 @@ public class Body<T extends Semantics<T>> implements ReoBlock<T> {
 					Map<String, Expression> progDefs = ((Assembly<T>)s_p).getDefinitions();
 					for (Map.Entry<String, Expression> def : progDefs.entrySet()) {
 						if (!definitions.containsKey(def.getKey())) {
-							// If redefined evaluates to false: throw an error.
+							// TODO If redefined evaluates to false: throw an error.
 							definitions.put(def.getKey(), def.getValue());
 							if (def.getValue() instanceof BooleanValue) loop = true;
 							if (def.getValue() instanceof IntegerValue) loop = true;
@@ -94,8 +94,8 @@ public class Body<T extends Semantics<T>> implements ReoBlock<T> {
 			prog = new Body<T>(stmts_p);
 		}
 		
-//		System.out.println("[info] " + this + " evaluates to ");
-//		System.out.println("       " + prog + " using " + params.keySet());
+		System.out.println("[info] " + this + " evaluates to ");
+		System.out.println("       " + prog + " using " + params.keySet());
 		return prog;
 	}
 	

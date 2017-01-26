@@ -8,7 +8,7 @@ import java.util.Map;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.booleans.BooleanExpression;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
-import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Semantics;
 
 /**

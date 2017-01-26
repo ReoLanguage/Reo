@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Expression;
 
 public class Definitions extends HashMap<String, Expression> implements Evaluable<Definitions> {
 

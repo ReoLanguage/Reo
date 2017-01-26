@@ -2,13 +2,11 @@ package nl.cwi.reo.interpret.systems;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.ranges.Range;
-import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.blocks.ReoBlock;
-import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.ranges.ExpressionList;
+import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableNameList;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Semantics;
 
 public class ReoSystemVariable<T extends Semantics<T>> implements ReoSystem<T> {
@@ -22,19 +20,18 @@ public class ReoSystemVariable<T extends Semantics<T>> implements ReoSystem<T> {
 	}
 
 	@Override
-	public ReoBlock<T> instantiate(ExpressionList values, VariableNameList iface) throws CompilationException {
+	public ReoBlock<T> instantiate(ValueList values, VariableNameList iface) {
 		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public ReoSystem<T> evaluate(Map<String, Expression> params) throws CompilationException {
-		Range e = var.evaluate(params);
-		if (e instanceof ReoSystem) {
+	public ReoSystem<T> evaluate(Map<String, Expression> params) {
+		Expression e = var.evaluate(params);
+		if (e instanceof ReoSystem)
 			return (ReoSystem<T>)e;
-		} else if (e instanceof Variable) {
+		else if (e instanceof Variable)
 			return new ReoSystemVariable<T>((Variable)e);
-		} 
 		return this;	
 	}
 	

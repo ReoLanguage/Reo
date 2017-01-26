@@ -5,7 +5,7 @@ import java.util.Map;
 import org.antlr.v4.runtime.Token;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.semantics.api.Expression;
 
 public final class IntegerRemainder implements IntegerExpression {
 

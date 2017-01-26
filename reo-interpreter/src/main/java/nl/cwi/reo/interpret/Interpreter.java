@@ -26,15 +26,15 @@ import nl.cwi.reo.errors.Message;
 import nl.cwi.reo.errors.MessageType;
 import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.blocks.Assembly;
+import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.listeners.Listener;
-import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.FlatAssembly;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.strings.StringValue;
 import nl.cwi.reo.interpret.systems.ReoSystemValue;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Semantics;
 import nl.cwi.reo.semantics.api.SemanticsType;
 
@@ -129,7 +129,7 @@ public class Interpreter<T extends Semantics<T>> {
 			Expression expr = definitions.get(name);		
 			if (expr instanceof ReoSystemValue<?>) {				
 				ReoSystemValue<T> main = (ReoSystemValue<T>)expr;
-				ExpressionList values = new ExpressionList();
+				ValueList values = new ValueList();
 				for (String x : params) values.add(new StringValue(x));
 				SignatureConcrete sign = main.getSignature().evaluate(values, null);
 				

@@ -3,11 +3,10 @@ package nl.cwi.reo.interpret.signatures;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Range;
-import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.PortType;
 import nl.cwi.reo.semantics.api.PrioType;
@@ -55,7 +54,7 @@ public final class Node implements Evaluable<Node> {
 				p = new Port(vname.getName(), PortType.OUT, PrioType.NONE, tag.name(), false);
 				break;
 			default: 
-				p = new Port(vname.getName(), PortType.UNKNOWN, PrioType.NONE, tag.name(), false);
+				p = new Port(vname.getName(), PortType.NONE, PrioType.NONE, tag.name(), false);
 				break;
 			}
 		}
@@ -68,7 +67,7 @@ public final class Node implements Evaluable<Node> {
 
 	@Override
 	public Node evaluate(Map<String, Expression> params) throws CompilationException {
-		Range e = var.evaluate(params);
+		Expression e = var.evaluate(params);
 		if (!(e instanceof Variable))
 			throw new CompilationException(var.getToken(), "Node variable " + var + " cannot be assigned to " + e);
 		return new Node((Variable)e, type, tag);

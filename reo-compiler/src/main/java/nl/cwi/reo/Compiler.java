@@ -59,8 +59,8 @@ public class Compiler {
 		if (comppath != null)
 			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));
 
+		// Interpret the program
 		Interpreter<PortAutomaton> interpreter = new InterpreterPA(directories, params);
-
 		FlatAssembly<PortAutomaton> program = interpreter.interpret(files);
 		
 		if (program != null) {

@@ -6,14 +6,13 @@ import java.util.Map;
 
 import org.antlr.v4.runtime.Token;
 
-import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.ranges.Range;
+import nl.cwi.reo.interpret.expressions.Expressions;
+import nl.cwi.reo.semantics.api.Expression;
 
 /**
  * An immutable list of variable names.
  */
-public final class VariableNameList implements Variable, Range {
+public final class VariableNameList implements Variable, Expressions {
 	
 	private final List<VariableName> list;
 	
@@ -36,7 +35,7 @@ public final class VariableNameList implements Variable, Range {
 	}
 
 	@Override
-	public VariableNameList evaluate(Map<String, Expression> params) throws CompilationException {
+	public VariableNameList evaluate(Map<String, Expression> params) {
 		return this;
 	}
 	

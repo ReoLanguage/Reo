@@ -5,13 +5,13 @@ import java.util.Objects;
 
 import org.antlr.v4.runtime.Token;
 
-import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.expressions.ValueExpression;
+import nl.cwi.reo.semantics.api.Expression;
 
 /**
  * An immutable implementation of a variable name.
  */
-public final class VariableName implements Variable, Expression {
+public final class VariableName implements Variable, ValueExpression {
 
 	private final String name;
 	
@@ -38,9 +38,10 @@ public final class VariableName implements Variable, Expression {
 	}
 
 	@Override
-	public Expression evaluate(Map<String, Expression> params) throws CompilationException {
-		Expression e = params.get(this);
-		if (e != null) return e;
+	public ValueExpression evaluate(Map<String, Expression> params) {
+		Expression e = params.get(name);
+		if (e instanceof ValueExpression) 
+			return (ValueExpression)e;
 		return this;
 	}
 	

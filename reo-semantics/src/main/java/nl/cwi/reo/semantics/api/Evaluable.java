@@ -3,8 +3,13 @@ package nl.cwi.reo.semantics.api;
 import java.util.Map;
 
 /**
- * A class implementing Evaluable of generi
- * @param <T>
+ * A class implementing this interface can be evaluated in a set of parameters.
+ * Each parameter value is given as a key-value pair containing the name of the 
+ * parameter and the its value, respectively. Parameter values can itself be an 
+ * expression.
+ * 
+ * @param <T> type of returned object after evaluation
+ * @see Expression
  */
 public interface Evaluable<T> {
 	

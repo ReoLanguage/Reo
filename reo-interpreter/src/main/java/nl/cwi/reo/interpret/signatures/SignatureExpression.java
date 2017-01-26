@@ -7,12 +7,13 @@ import java.util.Map;
 import org.antlr.v4.runtime.Token;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.ranges.ExpressionList;
+import nl.cwi.reo.interpret.expressions.ValueExpression;
+import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.interpret.variables.VariableRange;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Port;
 
 public final class SignatureExpression implements ParameterType {
@@ -42,7 +43,7 @@ public final class SignatureExpression implements ParameterType {
 		this.token =  token;
 	}
 	
-	public SignatureConcrete evaluate(ExpressionList values, VariableNameList iface) throws CompilationException {
+	public SignatureConcrete evaluate(ValueList values, VariableNameList iface) {
 		
 		Definitions definitions = new Definitions();		
 
@@ -74,7 +75,7 @@ public final class SignatureExpression implements ParameterType {
 
 		// Find the assignment of parameters.
 		Iterator<Parameter> param = params.evaluate(definitions).iterator();
-		Iterator<Expression> value = values.iterator();	
+		Iterator<ValueExpression> value = values.iterator();	
 		
 		while (param.hasNext() && value.hasNext()) {
 			Parameter x = param.next();

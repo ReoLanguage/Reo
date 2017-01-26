@@ -2,9 +2,8 @@ package nl.cwi.reo.interpret.integers;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
 
 public class IntegerVariable implements IntegerExpression {
@@ -35,7 +34,7 @@ public class IntegerVariable implements IntegerExpression {
 	 */
 	@Override
 	public IntegerExpression evaluate(Map<String, Expression> params) throws CompilationException {
-		Range e = var.evaluate(params);
+		Expression e = var.evaluate(params);
 		if (e instanceof IntegerExpression) {
 			return (IntegerExpression)e;
 		} else if (e instanceof Variable) {

@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.variables.VariableName;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
 

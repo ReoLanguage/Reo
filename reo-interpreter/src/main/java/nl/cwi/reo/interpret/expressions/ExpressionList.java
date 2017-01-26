@@ -1,13 +1,13 @@
-package nl.cwi.reo.interpret.ranges;
+package nl.cwi.reo.interpret.expressions;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import nl.cwi.reo.errors.CompilationException;
+import nl.cwi.reo.semantics.api.Expression;
 
-public class ExpressionList extends ArrayList<Expression> implements Range {
+public class ExpressionList extends ArrayList<Expression> implements Expressions {
 	
 	/**
 	 * Serial version ID.
@@ -27,11 +27,21 @@ public class ExpressionList extends ArrayList<Expression> implements Range {
 	}
 
 	@Override
-	public ExpressionList evaluate(Map<String, Expression> params)
-			throws CompilationException {
+	public Expressions evaluate(Map<String, Expression> params) {
+		boolean isValueList = true;
 		List<Expression> entries = new ArrayList<Expression>();
-		for (Expression e : this)
-			entries.add(e.evaluate(params));
+		List<ValueExpression> values = new ArrayList<ValueExpression>();
+		for (Expression e : this) {
+			Expression e_p = e.evaluate(params);
+			entries.add(e_p);
+			if (e_p instanceof ValueExpression) {
+				values.add((ValueExpression)e_p);
+			} else {
+				isValueList = false;
+			}
+		}
+		if (isValueList) 
+			return new ValueList(values);
 		return new ExpressionList(entries);
 	}
 	

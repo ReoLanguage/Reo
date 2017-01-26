@@ -3,24 +3,23 @@ package nl.cwi.reo.interpret.blocks;
 import java.util.Iterator;
 import java.util.Map;
 
-import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.ranges.ExpressionList;
 import nl.cwi.reo.interpret.semantics.Definitions;
+import nl.cwi.reo.interpret.expressions.ExpressionList;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Semantics;
 
 public final class Definition<T extends Semantics<T>> implements ReoBlock<T> {
 
 	private final Variable var;
 	
-	private final Range val;
+	private final Expression val;
 	
-	public Definition(Variable var, Range val) {
+	public Definition(Variable var, Expression val) {
 		if (var == null || val == null)
 			throw new NullPointerException();
 		this.var = var;
@@ -28,15 +27,15 @@ public final class Definition<T extends Semantics<T>> implements ReoBlock<T> {
 	}
 
 	@Override
-	public ReoBlock<T> evaluate(Map<String, Expression> params) throws CompilationException {
+	public ReoBlock<T> evaluate(Map<String, Expression> params) {
 		
 		ReoBlock<T> prog = null;
 
-		Range e = var.evaluate(params);
+		Expression e = var.evaluate(params);
 		if (!(e instanceof Variable))
 			e = var;
 		Variable var_p = (Variable)e;
-		Range val_p = val.evaluate(params);
+		Expression val_p = val.evaluate(params);
 		
 		if (var_p instanceof VariableName) {
 			if (val_p instanceof Expression) {

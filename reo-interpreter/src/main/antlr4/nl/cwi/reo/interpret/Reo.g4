@@ -19,7 +19,7 @@ target  : 'Java' ;
 
 // Blocks
 block   : ID? '{' stmt* '}' ;
-stmt    : range '=' range                                        # stmt_equation
+stmt    : expr '=' expr                                          # stmt_equation
         | var rsys                                               # stmt_compdefn
         | comp                                                   # stmt_instance
         | block                                                  # stmt_block
@@ -33,15 +33,14 @@ comp    : rsys list? iface                                       # comp_instance
         | comp ADD comp                                          # comp_sum 
         | comp SCL comp                                          # comp_semicolon ;
 
-// Ranges
-range   : var                                                    # range_variable
-        | expr                                                   # range_expr 
-        | list                                                   # range_list ;
-list    : '<' '>' | '<' range (',' range)* '>' ;
-expr    : strg                                                   # expr_string
+// Expressions
+expr    : var                                                    # expr_variable
+        | strg                                                   # expr_string
         | bool                                                   # expr_boolean
         | intr                                                   # expr_integer
-        | rsys                                                   # expr_component ;
+        | rsys                                                   # expr_component
+        | list                                                   # expr_list ;
+list    : '<' '>' | '<' expr (',' expr)* '>' ;
 
 // String expressions    
 strg    : STRING                                                 # strg_string

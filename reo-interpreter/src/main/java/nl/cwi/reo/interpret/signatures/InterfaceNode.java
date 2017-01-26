@@ -3,10 +3,9 @@ package nl.cwi.reo.interpret.signatures;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.PrioType;
 
 public class InterfaceNode implements Evaluable<InterfaceNode> {
@@ -26,7 +25,7 @@ public class InterfaceNode implements Evaluable<InterfaceNode> {
 
 	@Override
 	public InterfaceNode evaluate(Map<String, Expression> params) throws CompilationException {
-		Range rng = var.evaluate(params);
+		Expression rng = var.evaluate(params);
 		if (rng instanceof Variable)
 			return new InterfaceNode((Variable)rng, prio);
 		return this;

@@ -105,8 +105,8 @@ public final class Component<T extends Semantics<T>> implements Block<T> {
 	  * {@inheritDoc}
 	  */
 	@Override
-	public List<Block<T>> flatten() {
-		List<Block<T>> list = new ArrayList<Block<T>>();
+	public List<Component<T>> flatten() {
+		List<Component<T>> list = new ArrayList<Component<T>>();
 		list.add(this);
 		return list;
 	}

@@ -6,11 +6,11 @@ import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.blocks.Assembly;
-import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.systems.ReoSystem;
 import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Semantics;
 
 public final class ReoFile<T extends Semantics<T>> implements Evaluable<Assembly<T>> {

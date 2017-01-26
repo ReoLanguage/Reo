@@ -50,10 +50,9 @@ import nl.cwi.reo.interpret.ReoParser.ParamContext;
 import nl.cwi.reo.interpret.ReoParser.ParamsContext;
 import nl.cwi.reo.interpret.ReoParser.Ptype_signatureContext;
 import nl.cwi.reo.interpret.ReoParser.Ptype_typetagContext;
-import nl.cwi.reo.interpret.ReoParser.RangeContext;
-import nl.cwi.reo.interpret.ReoParser.Range_exprContext;
-import nl.cwi.reo.interpret.ReoParser.Range_listContext;
-import nl.cwi.reo.interpret.ReoParser.Range_variableContext;
+import nl.cwi.reo.interpret.ReoParser.ExprContext;
+import nl.cwi.reo.interpret.ReoParser.Expr_listContext;
+import nl.cwi.reo.interpret.ReoParser.Expr_variableContext;
 import nl.cwi.reo.interpret.ReoParser.RnodeContext;
 import nl.cwi.reo.interpret.ReoParser.SignContext;
 import nl.cwi.reo.interpret.ReoParser.StmtContext;
@@ -74,7 +73,7 @@ import nl.cwi.reo.interpret.blocks.ReoBlock;
 import nl.cwi.reo.interpret.blocks.Definition;
 import nl.cwi.reo.interpret.blocks.ForLoop;
 import nl.cwi.reo.interpret.blocks.IfThenElse;
-import nl.cwi.reo.interpret.blocks.InstanceReference;
+import nl.cwi.reo.interpret.blocks.Instance;
 import nl.cwi.reo.interpret.booleans.BooleanConjunction;
 import nl.cwi.reo.interpret.booleans.BooleanDisequality;
 import nl.cwi.reo.interpret.booleans.BooleanDisjunction;
@@ -86,6 +85,7 @@ import nl.cwi.reo.interpret.booleans.BooleanLessOrEqual;
 import nl.cwi.reo.interpret.booleans.BooleanLessThan;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
 import nl.cwi.reo.interpret.booleans.BooleanVariable;
+import nl.cwi.reo.interpret.expressions.ExpressionList;
 import nl.cwi.reo.interpret.integers.IntegerAddition;
 import nl.cwi.reo.interpret.integers.IntegerDivision;
 import nl.cwi.reo.interpret.integers.IntegerExponentiation;
@@ -96,9 +96,6 @@ import nl.cwi.reo.interpret.integers.IntegerSubstraction;
 import nl.cwi.reo.interpret.integers.IntegerUnaryMinus;
 import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.integers.IntegerVariable;
-import nl.cwi.reo.interpret.ranges.Range;
-import nl.cwi.reo.interpret.ranges.RangeList;
-import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.InterfaceExpression;
@@ -121,6 +118,7 @@ import nl.cwi.reo.interpret.systems.ReoSystemVariable;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableRange;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.PrioType;
 import nl.cwi.reo.semantics.api.Semantics;
 
@@ -150,9 +148,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	private ParseTreeProperty<ReoBlock<T>> blocks = new ParseTreeProperty<ReoBlock<T>>();
 	
 	// Values	
-	private ParseTreeProperty<Range> ranges = new ParseTreeProperty<Range>();	
 	private ParseTreeProperty<Expression> exprs = new ParseTreeProperty<Expression>();
-	private ParseTreeProperty<RangeList> lists = new ParseTreeProperty<RangeList>();
+	private ParseTreeProperty<ExpressionList> lists = new ParseTreeProperty<ExpressionList>();
 	
 	// Boolean expressions
 	private ParseTreeProperty<BooleanExpression> bools = new ParseTreeProperty<BooleanExpression>();
@@ -272,8 +269,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitStmt_equation(Stmt_equationContext ctx) {
-		Range x = ranges.get(ctx.range(0));
-		Range y = ranges.get(ctx.range(1));		
+		Expression x = exprs.get(ctx.expr(0));
+		Expression y = exprs.get(ctx.expr(1));		
 		if (x instanceof Variable) {
 			blocks.put(ctx, new Definition<T>((Variable)x, y));			
 		} else if (x instanceof Variable) {
@@ -328,10 +325,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitComp_instance(Comp_instanceContext ctx) {
 		ReoSystem<T> cexpr = systems.get(ctx.rsys());
-		RangeList list = lists.get(ctx.list());
-		if (list == null) list = new RangeList();
+		ExpressionList list = lists.get(ctx.list());
+		if (list == null) list = new ExpressionList();
 		InterfaceExpression iface = ifaces.get(ctx.iface());
-		blocks.put(ctx, new InstanceReference<T>(cexpr, list, iface));
+		blocks.put(ctx, new Instance<T>(cexpr, list, iface));
 	}
 	
 	@Override
@@ -371,22 +368,17 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 		
 	/**
-	 * Ranges	
+	 * exprs	
 	 */
 
 	@Override
-	public void exitRange_variable(Range_variableContext ctx) {
-		ranges.put(ctx, variables.get(ctx.var()));
+	public void exitExpr_variable(Expr_variableContext ctx) {
+		exprs.put(ctx, variables.get(ctx.var()));
 	}
 	
 	@Override
-	public void exitRange_expr(Range_exprContext ctx) {
-		ranges.put(ctx, exprs.get(ctx.expr()));
-	}
-	
-	@Override
-	public void exitRange_list(Range_listContext ctx) {
-		ranges.put(ctx, lists.get(ctx.list()));
+	public void exitExpr_list(Expr_listContext ctx) {
+		exprs.put(ctx, lists.get(ctx.list()));
 	}
 
 	@Override
@@ -411,10 +403,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitList(ListContext ctx) {
-		List<Range> list = new ArrayList<Range>();
-		for (RangeContext expr_ctx : ctx.range())
-			list.add(ranges.get(expr_ctx));
-		lists.put(ctx, new RangeList(list));
+		List<Expression> list = new ArrayList<Expression>();
+		for (ExprContext expr_ctx : ctx.expr())
+			list.add(exprs.get(expr_ctx));
+		lists.put(ctx, new ExpressionList(list));
 	}
 	
 	/**

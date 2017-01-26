@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.semantics.api.Evaluable;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
 import nl.cwi.reo.semantics.api.SourceCode;

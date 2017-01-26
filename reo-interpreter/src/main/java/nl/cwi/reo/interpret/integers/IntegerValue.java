@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.Token;
 
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
-import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.semantics.api.Expression;
 
 public final class IntegerValue implements IntegerExpression {
 	

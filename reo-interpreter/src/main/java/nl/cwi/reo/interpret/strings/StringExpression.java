@@ -2,11 +2,11 @@ package nl.cwi.reo.interpret.strings;
 
 import java.util.Map;
 
-import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.expressions.ValueExpression;
+import nl.cwi.reo.semantics.api.Expression;
 
-public interface StringExpression extends Expression {
+public interface StringExpression extends ValueExpression {
 
-	public StringExpression evaluate(Map<String, Expression> params) throws CompilationException;
+	public StringExpression evaluate(Map<String, Expression> params);
 	
 }

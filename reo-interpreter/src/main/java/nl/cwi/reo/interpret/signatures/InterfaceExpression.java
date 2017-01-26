@@ -7,14 +7,14 @@ import java.util.Map;
 
 import org.antlr.v4.runtime.Token;
 
-import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.interpret.expressions.Expressions;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
+import nl.cwi.reo.semantics.api.Expression;
 
-public final class InterfaceExpression extends ArrayList<InterfaceNode> implements Range {
+public final class InterfaceExpression extends ArrayList<InterfaceNode> implements Expressions {
 	
 	/**
 	 * Serial version ID.
@@ -42,10 +42,10 @@ public final class InterfaceExpression extends ArrayList<InterfaceNode> implemen
 	}
 
 	@Override
-	public Range evaluate(Map<String, Expression> params) throws CompilationException {
+	public Expressions evaluate(Map<String, Expression> params) {
 		List<VariableName> list_p = new ArrayList<VariableName>();
 		for (InterfaceNode x : this) {
-			Range r = x.getVariable().evaluate(params);	
+			Expression r = x.getVariable().evaluate(params);	
 			if (r instanceof VariableNameList) {
 				for (VariableName v : ((VariableNameList)r).getList())
 					list_p.add(v);

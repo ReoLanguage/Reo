@@ -2,14 +2,14 @@ package nl.cwi.reo.interpret.systems;
 
 import java.util.Map;
 
-import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.blocks.ReoBlock;
-import nl.cwi.reo.interpret.ranges.Expression;
-import nl.cwi.reo.interpret.ranges.ExpressionList;
+import nl.cwi.reo.interpret.expressions.ValueExpression;
+import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.variables.VariableNameList;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.Semantics;
 
-public interface ReoSystem<T extends Semantics<T>> extends Expression {
+public interface ReoSystem<T extends Semantics<T>> extends ValueExpression {
 
 	/**
 	 * 
@@ -18,7 +18,7 @@ public interface ReoSystem<T extends Semantics<T>> extends Expression {
 	 * @return 
 	 * @throws Exception
 	 */
-	public ReoBlock<T> instantiate(ExpressionList values, VariableNameList iface) throws CompilationException;
+	public ReoBlock<T> instantiate(ValueList values, VariableNameList iface);
 
 	/**
 	 * Substitutes (component) variables with (component) expressions.
@@ -26,5 +26,5 @@ public interface ReoSystem<T extends Semantics<T>> extends Expression {
 	 * @return Component expression whose body is evaluated using known assignments.
 	 * @throws Exception 
 	 */
-	public ReoSystem<T> evaluate(Map<String, Expression> params) throws CompilationException;
+	public ReoSystem<T> evaluate(Map<String, Expression> params);
 }

@@ -18,7 +18,7 @@ public class Port implements Comparable<Port> {
 		if (name == null)
 			throw new NullPointerException();
 		this.name = name;
-		this.type = PortType.UNKNOWN;
+		this.type = PortType.NONE;
 		this.prio = PrioType.NONE;
 		this.tag = "";
 		this.hidden = false;
@@ -45,7 +45,7 @@ public class Port implements Comparable<Port> {
 	public Port join(Port x) {
 		if (x == null)
 			throw new NullPointerException();
-		PortType _type = type == PortType.UNKNOWN ? x.type : type;
+		PortType _type = type == PortType.NONE ? x.type : type;
 		String _tag = tag.equals("") ? x.tag : tag;
 		boolean _hidden = hidden || x.hidden;
 		return new Port(name, _type, PrioType.NONE, _tag, _hidden);

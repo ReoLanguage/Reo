@@ -7,11 +7,10 @@ import java.util.Map;
 
 import org.antlr.v4.runtime.Token;
 
-import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.integers.IntegerVariable;
-import nl.cwi.reo.interpret.ranges.Expression;
+import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 
 /**
@@ -111,7 +110,7 @@ public final class VariableRange implements Variable {
 	}
 	
 	@Override
-	public Variable evaluate(Map<String, Expression> params) throws CompilationException {
+	public Variable evaluate(Map<String, Expression> params) {
 		
 		boolean boundsAreKnown = true;
 		List<List<IntegerExpression>> indices_p = new ArrayList<List<IntegerExpression>>();

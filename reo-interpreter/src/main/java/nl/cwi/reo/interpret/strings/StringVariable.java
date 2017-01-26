@@ -2,10 +2,9 @@ package nl.cwi.reo.interpret.strings;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.ranges.Range;
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.interpret.ranges.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
+import nl.cwi.reo.semantics.api.Expression;
 
 public class StringVariable implements StringExpression {
 
@@ -31,7 +30,7 @@ public class StringVariable implements StringExpression {
 	 */
 	@Override
 	public StringExpression evaluate(Map<String, Expression> params) throws CompilationException {
-		Range e = var.evaluate(params);
+		Expression e = var.evaluate(params);
 		if (e instanceof StringExpression) {
 			return (StringExpression)e;
 		} else if (e instanceof Variable) {
