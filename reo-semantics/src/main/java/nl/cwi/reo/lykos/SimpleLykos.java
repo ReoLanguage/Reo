@@ -89,7 +89,9 @@ public class SimpleLykos {
 		settings.put("COUNT_PORTS", false);
 
 		// TODO fill in automaton set from List<T> for some T
-		AutomatonSet automata = null;
+		Automata JavaAutomata = new Automata(settings);
+		JavaAutomata.compile();
+		AutomatonSet automata = JavaAutomata.getAutomata();
 
 		// Get string templates for protocol classes
 		STGroupFile templates = new STGroupFile("src/main/resources/java-protocol.stg");

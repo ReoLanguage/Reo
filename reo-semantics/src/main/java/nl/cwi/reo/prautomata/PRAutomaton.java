@@ -6,6 +6,15 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import nl.cwi.pr.autom.AutomatonFactory;
+import nl.cwi.pr.autom.Extralogical;
+import nl.cwi.pr.misc.MemberSignature;
+import nl.cwi.pr.misc.PortFactory;
+import nl.cwi.pr.misc.PortOrArray;
+import nl.cwi.pr.misc.TypedName;
+import nl.cwi.pr.misc.TypedName.Type;
+import nl.cwi.pr.targ.java.autom.JavaAutomatonFactory;
+import nl.cwi.pr.targ.java.autom.Member;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
 import nl.cwi.reo.semantics.api.SemanticsType;
@@ -27,6 +36,24 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	
 	public SemanticsType getType() {
 		return SemanticsType.PA;
+	}
+
+	public List<Member.Primitive> setPrimitive(){
+		Member m = new Member();
+		TypedName name = new TypedName(this.name,Type.FAMILY);
+		Map<TypedName, Integer> integers = null;
+		Map<TypedName, Extralogical> extralogicals = null;
+		Map<TypedName, PortOrArray> inputPortsOrArrays = null;
+		Map<TypedName, PortOrArray> outputPortsOrArrays = null;
+		
+		AutomatonFactory ja = new JavaAutomatonFactory();
+		PortFactory portFactory = ja.getPortFactory();
+		
+		MemberSignature ms = new MemberSignature(name, integers, extralogicals, inputPortsOrArrays,
+													outputPortsOrArrays, portFactory);
+		m.setSignature(ms);
+		
+		return m.getPrimitives();
 	}
 
 	public String toString(){
