@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.semantics.Port;
-import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.Semantics;
+import nl.cwi.reo.semantics.api.SemanticsType;
 
 public class PRAutomaton implements Semantics<PRAutomaton> {
 		

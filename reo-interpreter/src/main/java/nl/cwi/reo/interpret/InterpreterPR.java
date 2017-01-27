@@ -4,7 +4,7 @@ import java.util.List;
 
 import nl.cwi.reo.interpret.listeners.ListenerPR;
 import nl.cwi.reo.prautomata.PRAutomaton;
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.api.SemanticsType;
 
 public class InterpreterPR extends Interpreter<PRAutomaton> {
 	

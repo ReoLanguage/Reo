@@ -10,12 +10,9 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.interpret.Interpreter;
 import nl.cwi.reo.interpret.InterpreterPA;
-<<<<<<< HEAD
+
 import nl.cwi.reo.interpret.semantics.FlatAssembly;
-=======
 import nl.cwi.reo.interpret.InterpreterPR;
-import nl.cwi.reo.interpret.semantics.Assembly;
->>>>>>> Pr semantic
 import nl.cwi.reo.portautomata.PortAutomaton;
 import nl.cwi.reo.prautomata.PRAutomaton;
 

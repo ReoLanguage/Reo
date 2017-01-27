@@ -1,7 +1,7 @@
 package nl.cwi.reo.interpret.listeners;
 
 import nl.cwi.reo.prautomata.PRAutomaton;
-import nl.cwi.reo.semantics.Port;
+import nl.cwi.reo.semantics.api.Port;
 
 import java.util.ArrayList;
 import java.util.List;
