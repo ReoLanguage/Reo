@@ -7,13 +7,13 @@ import java.util.Map;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
+import nl.cwi.pr.autom.AutomatonFactory.Automaton;
+import nl.cwi.pr.autom.AutomatonFactory.AutomatonSet;
+import nl.cwi.pr.autom.StateFactory.State;
+import nl.cwi.pr.autom.TransitionFactory.Transition;
 import nl.cwi.pr.misc.MemberSignature;
 import nl.cwi.pr.misc.Variable;
 import nl.cwi.pr.misc.PortFactory.Port;
-import nl.cwi.reo.automata.AutomatonFactory.Automaton;
-import nl.cwi.reo.automata.AutomatonFactory.AutomatonSet;
-import nl.cwi.reo.automata.StateFactory.State;
-import nl.cwi.reo.automata.TransitionFactory.Transition;
 
 public class SimpleLykos {
 	
@@ -46,7 +46,7 @@ public class SimpleLykos {
 
 		// TODO fill in main signature and protocol/worker signatures
 		MainSignature signature = new MainSignature(null, null, null, null);
-		Map<String, MemberSignature> protocolSignatures = new HashMap<>();
+		Map<String, MemberSignature> protocolSignatures = new HashMap<>(); // pr.main.Protocol_d20170127_t103917_197_FifoK=FifoK[3](A$1;B$1)
 		Map<String, WorkerSignature> workerSignatures = new HashMap<>();	
 		
 		// Get string templates for main

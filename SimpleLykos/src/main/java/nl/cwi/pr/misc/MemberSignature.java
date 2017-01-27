@@ -5,8 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.cwi.pr.autom.Extralogical;
 import nl.cwi.pr.misc.PortFactory.Port;
-import nl.cwi.reo.automata.Extralogical;
 
 public class MemberSignature {
 
