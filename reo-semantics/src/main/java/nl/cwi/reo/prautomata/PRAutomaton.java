@@ -51,8 +51,6 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		AutomatonFactory ja = new JavaAutomatonFactory();
 		PortFactory portFactory = ja.getPortFactory();
 		
-		
-		
 		MemberSignature ms = new MemberSignature(name, integers, extralogicals, inputPortsOrArrays,
 													outputPortsOrArrays, portFactory);
 		m.setSignature(ms);
