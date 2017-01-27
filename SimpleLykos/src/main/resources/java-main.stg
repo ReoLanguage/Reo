@@ -1,0 +1,180 @@
+group templates;
+
+header(packageName) ::= <<
+package <packageName>;
+
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+import nl.cwi.pr.runtime.*;
+import nl.cwi.pr.runtime.api.*;
+>>
+
+mainClass(signature,protocolSignatures,workerSignatures) ::= <<
+public class Main {
+
+	//
+	// MAIN
+	//
+
+	public static void main(String[] args) {
+		long time = -System.nanoTime();
+		
+<if(signature.mainArguments)>
+<signature.mainArguments:{arg|<!
+!>		String <arg.variableName> = null;<!
+!>};separator="\n">
+
+		for (int i = 0; i \< args.length; i++) {
+			String argument = args[i];
+			int index = argument.indexOf("=");
+			if (index == -1)
+				continue;
+
+			String key = argument.substring(0, index);
+			String value = argument.substring(index + 1);
+
+			if (key.startsWith("--"))
+				key = key.substring(2);
+			else
+				continue;
+
+			switch (key) {
+<signature.mainArguments:{arg|<!
+!>			case "<arg.variableName>":
+				<arg.variableName> = value;
+				break;<!
+!>};separator="\n">
+			default:
+				System.err.println("Warning: unknown argument \"" + key + "\"");
+				continue;
+			}
+		}
+		
+<endif>
+<signature.inputPorts:{p|<!
+!>		OutputPort <p.variableName> = Ports.newOutputPort();<!
+!>};separator="\n">
+<signature.outputPorts:{p|<!
+!>		InputPort <p.variableName> = Ports.newInputPort();<!
+!>};separator="\n">
+
+<protocolSignatures:{str|<!
+!>		new <str>(
+<[protocolSignatures.(str).inputPortsSorted,protocolSignatures.(str).outputPortsSorted]:{p|<!
+!>			<p.variableName><!
+!>};separator=",\n">
+		);<!
+!>};separator="\n\n">
+
+<workerSignatures:{str|<!
+!>		Thread worker<i0> = new <str>(
+<[workerSignatures.(str).inputPorts,workerSignatures.(str).outputPorts,workerSignatures.(str).mainArguments]:{arg|<!
+!>			<arg.variableName><!
+!>};separator=",\n">
+		);<!
+!>};separator="\n\n">
+
+<workerSignatures:{str|<!
+!>		worker<i0>.start();<!
+!>};separator="\n">
+
+		long timeToInitialize = time + System.nanoTime();
+
+		/*
+		 * Run the application as a benchmark 
+		 */
+		
+		if (Benchmark.IS_ENABLED) {
+
+			/*
+			 * Warm up
+			 */
+
+			Benchmark.SEMAPHORE.acquireUninterruptibly(<length(workerSignatures)>);
+			Benchmark.BARRIER = new CyclicBarrier(<length(workerSignatures)> + 1);
+			Benchmark.N_GETS.set(0);
+			Benchmark.N_PUTS.set(0);
+
+			try {
+				Thread.sleep(Benchmark.WARM_UP_TIME * 1000);
+			} catch (InterruptedException e) {
+			}
+			
+<workerSignatures:{str|<!
+!>			worker<i0>.interrupt();<!
+!>};separator="\n">
+
+			//Benchmark.SEMAPHORE.acquireUninterruptibly(<length(workerSignatures)>);
+			try {
+				Benchmark.BARRIER.await();
+			} catch (InterruptedException | BrokenBarrierException exception) {
+				exception.printStackTrace();
+				System.exit(0);
+			}
+
+			/*
+			 * Measure
+			 */
+
+			try {
+				Thread.sleep(Benchmark.MEASURE_TIME * 1000);
+			} catch (InterruptedException e) {
+			}
+			
+<workerSignatures:{str|<!
+!>			worker<i0>.interrupt();<!
+!>};separator="\n">
+			
+			Benchmark.SEMAPHORE.acquireUninterruptibly(<length(workerSignatures)>);
+			long nPuts = Benchmark.N_PUTS.get();
+			long nGets = Benchmark.N_GETS.get();
+
+			System.out
+					.println(new DecimalFormat("0.000")
+							.format(timeToInitialize / 1e9)
+							+ " "
+							+ nPuts
+							+ " "
+							+ nGets);
+		}
+
+		/*
+		 * Run the application normally
+		 */
+		
+		else {
+			final Map\<String, InputPort> freeInputPorts = new HashMap\<>();
+			final Map\<String, OutputPort> freeOutputPorts = new HashMap\<>();
+<signature.freeOutputPorts:{p|<!
+!>			freeInputPorts.put("<p.variableName>", <p.variableName>);<!
+!>};separator="\n">
+<signature.freeInputPorts:{p|<!
+!>			freeOutputPorts.put("<p.variableName>", <p.variableName>);<!
+!>};separator="\n">
+			Thread windowsThread = new Thread() {
+				@Override
+				public void run() {
+					if (!freeInputPorts.isEmpty() || !freeOutputPorts.isEmpty())
+						PortWindows.openThenWait(freeInputPorts, freeOutputPorts);
+				}
+			};
+			
+			windowsThread.start();
+			
+			while (true)
+				try {
+<workerSignatures:{str|<!
+!>					worker<i0>.join();<!
+!>};separator="\n">
+					windowsThread.join();
+					break;
+				} catch (InterruptedException exception) {
+				}
+		}
+
+		System.exit(0);
+	}
+}
+>>

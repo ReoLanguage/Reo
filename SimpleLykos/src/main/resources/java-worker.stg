@@ -1,0 +1,137 @@
+group templates;
+
+header(packageName) ::= <<
+package <packageName>;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import nl.cwi.pr.runtime.*;
+import nl.cwi.pr.runtime.api.*;
+>>
+
+workerClass(signature,simpleClassName) ::= <<
+public class <simpleClassName> extends Thread {
+<signature.inputPorts:{p|<!
+!>	private final OutputPort <p.variableName>;<!
+!>};separator="\n">
+<signature.outputPorts:{p|<!
+!>	private final InputPort <p.variableName>;<!
+!>};separator="\n">
+<signature.mainArguments:{v|<!
+!>	private final String <v.variableName>;<!
+!>};separator="\n">
+
+	public <simpleClassName>(
+<signature.inputPorts:{p|<!
+!>		OutputPort <p.variableName><!
+!>};separator=",\n"><!
+!><if(signature.inputPorts&&signature.outputPorts)>,<\n><endif><!
+!><signature.outputPorts:{p|<!
+!>		InputPort <p.variableName><!
+!>};separator=",\n"><!
+!><if([signature.inputPorts,signature.outputPorts]&&signature.mainArguments)>,<\n><endif><!
+!><signature.mainArguments:{v|<!
+!>		String <v.variableName><!
+!>};separator=",\n">
+	) {
+<signature.inputPorts:{p|<!
+!>		this.<p.variableName> = <p.variableName>;<!
+!>};separator="\n">
+<signature.outputPorts:{p|<!
+!>		this.<p.variableName> = <p.variableName>;<!
+!>};separator="\n">
+<signature.mainArguments:{v|<!
+!>		this.<v.variableName> = <v.variableName>;<!
+!>};separator="\n">
+	}
+	
+	@Override
+	public void run() {
+		List\<Throwable> exceptions = new ArrayList\<>();
+		
+		/* 
+		 * Treat "<signature.name>" as a class of type Runnable
+		 */
+		
+		Runnable runnable = null;
+		try {
+			Class\<?> workerClass = Class.forName("<signature.name>");
+			Object workerInstance = null;
+			for (Constructor\<?> constr : workerClass.getConstructors())
+				try {
+					constr.setAccessible(true);
+					workerInstance = constr.newInstance(
+<signature.variables:{arg|<!
+!>						<if(arg.variableName)><arg.variableName><elseif(arg.code)><arg.code><else><arg><endif><!
+!>};separator=",\n">
+					);
+				} catch (Throwable throwable) {
+					exceptions.add(throwable);
+				}
+
+			if (workerInstance == null)
+				throw new Error(
+						"Class \"<signature.name>\" has no constructor for the provided arguments");
+
+			if (!(workerInstance instanceof Runnable))
+				throw new Error(
+						"Class \"<signature.name>\" does not implement interface Runnable");
+
+			runnable = (Runnable) workerInstance;
+		}
+
+		catch (Throwable throwable) {
+			exceptions.add(throwable);
+		}
+		
+		if (runnable != null) {
+			runnable.run();
+			return;
+		}
+		
+		/*
+		 * Treat "<signature.name>" as a static method
+		 */
+
+		int lastDotIndex = "<signature.name>".lastIndexOf('.');
+		if ("<signature.name>".startsWith(".") || "<signature.name>".endsWith("."))
+			throw new Error("Failed to load worker \"<signature.name>\"");
+		if (lastDotIndex == -1)
+			throw new Error("Failed to load worker \"<signature.name>\"");
+
+		String className = "<signature.name>".substring(0, lastDotIndex);
+		String methodName = "<signature.name>".substring(lastDotIndex + 1);
+
+		boolean hasMethod = false;
+
+		try {
+			Class\<?> workerClass = Class.forName(className);
+			for (Method meth : workerClass.getMethods())
+				if (meth.getName().equals(methodName)) {
+					meth.setAccessible(true);
+					meth.invoke(
+						null, 
+<signature.variables:{arg|<!
+!>						<if(arg.variableName)><arg.variableName><elseif(arg.code)><arg.code><else><arg><endif><!
+!>};separator=",\n">
+					);
+					hasMethod = true;
+				}
+		}
+
+		catch (Throwable throwable) {
+			exceptions.add(throwable);
+		}
+
+		if (!hasMethod) {
+			for (Throwable thr : exceptions)
+				thr.printStackTrace();
+			
+			throw new Error("Failed to load worker \"<signature.name>\" because of the following exceptions: " + exceptions.toString());
+		}
+	}
+}
+>>

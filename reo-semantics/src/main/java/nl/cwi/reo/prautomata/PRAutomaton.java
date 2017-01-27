@@ -6,15 +6,16 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.pr.autom.AutomatonFactory;
-import nl.cwi.pr.autom.Extralogical;
-import nl.cwi.pr.misc.MemberSignature;
-import nl.cwi.pr.misc.PortFactory;
-import nl.cwi.pr.misc.PortOrArray;
-import nl.cwi.pr.misc.TypedName;
-import nl.cwi.pr.misc.TypedName.Type;
-import nl.cwi.pr.targ.java.autom.JavaAutomatonFactory;
-import nl.cwi.pr.targ.java.autom.Member;
+
+import nl.cwi.reo.pr.autom.AutomatonFactory;
+import nl.cwi.reo.pr.autom.Extralogical;
+import nl.cwi.reo.pr.misc.MemberSignature;
+import nl.cwi.reo.pr.misc.PortFactory;
+import nl.cwi.reo.pr.misc.PortOrArray;
+import nl.cwi.reo.pr.misc.TypedName;
+import nl.cwi.reo.pr.misc.TypedName.Type;
+import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
+import nl.cwi.reo.pr.targ.java.autom.Member;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
 import nl.cwi.reo.semantics.api.SemanticsType;
@@ -37,6 +38,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	public SemanticsType getType() {
 		return SemanticsType.PA;
 	}
+	
 
 	public List<Member.Primitive> setPrimitive(){
 		Member m = new Member();
@@ -48,6 +50,8 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		
 		AutomatonFactory ja = new JavaAutomatonFactory();
 		PortFactory portFactory = ja.getPortFactory();
+		
+		
 		
 		MemberSignature ms = new MemberSignature(name, integers, extralogicals, inputPortsOrArrays,
 													outputPortsOrArrays, portFactory);
