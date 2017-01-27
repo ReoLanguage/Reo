@@ -10,8 +10,10 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.interpret.Interpreter;
 import nl.cwi.reo.interpret.InterpreterPA;
+import nl.cwi.reo.interpret.InterpreterPR;
 import nl.cwi.reo.interpret.semantics.FlatAssembly;
 import nl.cwi.reo.portautomata.PortAutomaton;
+import nl.cwi.reo.prautomata.PRAutomaton;
 
 /**
  * A compiler for the coordination language Reo.
@@ -58,15 +60,15 @@ public class Compiler2 {
 		if (comppath != null)
 			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));
 
-		Interpreter<PortAutomaton> interpreter = new InterpreterPA(directories, params);
+		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params);
 
-		FlatAssembly<PortAutomaton> program = interpreter.interpret(files);
+		FlatAssembly<PRAutomaton> program = interpreter.interpret(files);
 		
-		for (PortAutomaton X : program) System.out.println(X);
+		for (PRAutomaton X : program) System.out.println(X);
 		
 		if (!program.isEmpty()) {
-			PortAutomaton product = program.get(0).compose(program.subList(1, program.size()));
-			PortAutomaton hide = product.restrict(program.getInterface());
+			PRAutomaton product = program.get(0).compose(program.subList(1, program.size()));
+			PRAutomaton hide = product.restrict(program.getInterface());
 			
 			System.out.println("Product automaton : \n");
 			System.out.println(hide);
