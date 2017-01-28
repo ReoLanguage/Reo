@@ -14,8 +14,8 @@ Clone the git repository, and change directory into the ``Reo`` folder::
 	cd Reo
 	
 .. note:: 
-	If you are not familiar with Git version control, please consult a tutorial on Git, such as 
-	`this one <https://try.github.io/>`_. 
+	If you are not familiar with Git version control, please consult a 
+	`tutorial on Git <https://try.github.io/>`_. 
 
 Build the project
 -----------------
@@ -23,8 +23,8 @@ Build the project
 This compiler project is build using Apache Maven, a software project management and comprehension tool. 
 
 .. note:: 
-	If you are not familiar with the Maven build tool, please consult a tutorial on Maven, such as 
-	`this one <https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html>`_.
+	If you are not familiar with the Maven build tool, please consult a 
+	`tutorial on Maven <https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html>`_.
 	Maven automatically takes care of all the dependencies of this project (such as the dependency on 
 	ANTLR4 for lexer and parser generation). This tool is therefore essential for smooth development 
 	of this single project by multiple developers, each using his/her own operating system.
