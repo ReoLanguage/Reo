@@ -2,11 +2,15 @@ package nl.cwi.reo.prautomata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import nl.cwi.reo.automata.Automaton;
 import nl.cwi.reo.automata.State;
 import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.pr.autom.AutomatonFactory;
@@ -59,6 +63,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		
 		return m.getPrimitives();
 	}
+
 	
 	public String getSource(){
 		return port.get(0).toString();
@@ -81,7 +86,25 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 
 	public PRAutomaton getNode(SortedSet<Port> node) {
 		
-		return null;
+		List<Port> P = new ArrayList<Port>();
+
+		SortedSet<Port> ins = new TreeSet<Port>();
+		SortedSet<Port> outs = new TreeSet<Port>();
+		for (Port p : node) {
+			P.add(p);
+			switch (p.getType()) {
+			case IN:
+				outs.add(p);
+				break;
+			case OUT: 
+				ins.add(p);
+				break;
+			default:
+				break;
+			}
+		}
+
+		return new PRAutomaton(name,variable,value,P);
 	}
 
 	@Override

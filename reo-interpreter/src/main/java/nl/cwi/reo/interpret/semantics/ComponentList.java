@@ -205,12 +205,10 @@ public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T
 				if (!links.containsKey(x)) {
 					if (x.isHidden()) {
 						links.put(x, new Port("#" + i++));
-					} else {
-						links.put(x, x);
 					}
 				}
 			}
-			comp.joinAndHide(links);
+			comp.connect(links);
 		}
 		return i;
 	}

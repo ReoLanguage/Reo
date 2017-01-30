@@ -1,11 +1,7 @@
-//import reo.testseq;
 import reo.fifo1;
-//import reo.fifofull;
-//import reo.syncdrain;
 
 test(a,b) {
 
-x+1=y+2
 
 	fifo = <k:int>(a?, b!) { 
 	
@@ -35,22 +31,3 @@ x+1=y+2
 	fifo<3>(a,b)
 
 }
-
-	//reo.testseq<2, reo.fifo1, reo.fifofull, reo.syncdrain>(a,b)
-
-
-  //fifo2 = (a?,b!) { fifo1(a,x) fifo1(x,b) }
-	
-	//(a,b) { fifo2(a,y) fifo2(y,b) } (s,t)
-
-	//n = 3
-	
-	//fifo[0] = (a?,b!){ a = b }
-
-	//for k = 1..n {
-	//	fifo[k] = (a?,b!) { fifo1(a,d) fifo[k-1](d,b) }
-	//}
-	
-	//fifo[n](s,t)
-
-

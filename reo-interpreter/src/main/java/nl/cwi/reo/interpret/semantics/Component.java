@@ -70,6 +70,15 @@ public final class Component<T extends Semantics<T>> extends HashMap<Port, Port>
 			link.setValue(y.join(x));
 		}
 	}
+	
+	public void connect(Map<Port, Port> links) {
+		for (Map.Entry<Port, Port> link : this.entrySet()) {
+			Port x = link.getValue();
+			Port y = links.get(x);
+			if (y == null) y = x;
+			link.setValue(y.join(x));
+		}
+	}
 
 	@Override
 	public Component<T> evaluate(Map<String, Expression> params) throws CompilationException {
