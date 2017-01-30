@@ -1,12 +1,14 @@
 package nl.cwi.reo.prautomata;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-
+import nl.cwi.reo.automata.State;
+import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.pr.autom.AutomatonFactory;
 import nl.cwi.reo.pr.autom.Extralogical;
 import nl.cwi.reo.pr.misc.MemberSignature;
@@ -57,9 +59,19 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		
 		return m.getPrimitives();
 	}
+	
+	public String getSource(){
+		return port.get(0).toString();
+	}
+	public String getDest(){
+		return port.get(1).toString();
+	}
 
 	public String toString(){
-		return null;
+		StringBuilder str = new StringBuilder();
+		str.append("main = " + name + "["+ variable + "]("+getSource()+","+getDest()+")");
+	 
+		return str.toString();
 	}
 	
 	public SortedSet<Port> getInterface() {
@@ -75,7 +87,15 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	@Override
 	public PRAutomaton rename(Map<Port, Port> links) {
 		
-		return null;
+		List<Port> P = new ArrayList<Port>();
+		
+		for (Port a : this.port) {
+			Port b = links.get(a);
+			if (b == null) b = a;
+			P.add(b);//P.add(new Port(b.getName()));
+		}
+		
+		return new PRAutomaton(name,variable,value,P);
 	}
 
 	@Override

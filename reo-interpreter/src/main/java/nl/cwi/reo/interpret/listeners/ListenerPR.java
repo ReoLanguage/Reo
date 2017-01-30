@@ -23,7 +23,7 @@ public class ListenerPR extends Listener<PRAutomaton> {
     Integer value;
     
 	public void exitAtom(AtomContext ctx) {
-		atoms.put(ctx, prAutomata.get(ctx.pa()));
+		atoms.put(ctx, prAutomata.get(ctx.pr()));
 	}
     
 	public void enterPr( PrContext ctx){
@@ -31,7 +31,7 @@ public class ListenerPR extends Listener<PRAutomaton> {
 	}
 
 	public void exitPr(PrContext ctx) {
-		parameter.put(ctx, ctx.ID().getText());
+		parameter.put(ctx, ctx.NAT().getText());
 		
 		prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),parameter.get(ctx),value,port.get(ctx.pr_port())));
 	}

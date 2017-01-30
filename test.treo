@@ -32,7 +32,7 @@ x+1=y+2
 	//x=<k>(){for i = 1..k { fifo1(a[i],b) } }
 	//x<2>()
 
-	fifo<1>(a,b)
+	fifo<3>(a,b)
 
 }
 
