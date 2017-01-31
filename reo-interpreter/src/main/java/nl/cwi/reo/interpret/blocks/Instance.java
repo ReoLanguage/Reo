@@ -24,7 +24,10 @@ public final class Instance<T extends Semantics<T>> implements ReoBlock<T> {
 		this.plist = plist;
 		this.iface = iface;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ReoBlock<T> evaluate(Map<String, Expression> params) {
 		ReoSystem<T> cexpr_p = cexpr.evaluate(params);
@@ -39,7 +42,10 @@ public final class Instance<T extends Semantics<T>> implements ReoBlock<T> {
 		}
 		return new Instance<T>(cexpr_p, plist_p, iface_p);
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "" + cexpr + plist + iface;

@@ -203,7 +203,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	
 	@Override
 	public void exitFile(FileContext ctx) {
-		program = new ReoFile<T>(section, imports, ctx.ID().getText(), systems.get(ctx.rsys()));
+		program = new ReoFile<T>(section, imports, ctx.ID().getText(), systems.get(ctx.rsys()), ctx.ID().getSymbol());
 	}
 
 	@Override

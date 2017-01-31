@@ -1,20 +1,13 @@
-//import reo.testseq;
 import reo.fifo1;
-//import reo.fifofull;
-//import reo.syncdrain;
 
-test(a,b) {
-
-x+1=y+2
-
+test(a,d) {
+/*
 	fifo = <k:int>(a?, b!) { 
-	
 		if (k <= 0) { 
 			a = b 
 		} else {
 			fifo[k](a,b)
 		}
-	
 		for i = 0..k {
 			if (i == 0) {
 				fifo[0] = (a?,b!) {
@@ -28,29 +21,19 @@ x+1=y+2
 			}
 		}
 	}
-
-	//x=<k>(){for i = 1..k { fifo1(a[i],b) } }
-	//x<2>()
-
 	fifo<1>(a,b)
+	fifo<1>(b,c)
+	fifo<1>(c,d)
+*/
+	recursive<k:int>(a?,b!) {
+		if (k==0) {
+			a=b 
+		} else {
+			recursive<k-1>(a,x) 
+			fifo1(x,b)		
+		}
+	}
+	
+	recursive<2>(a,d)
 
 }
-
-	//reo.testseq<2, reo.fifo1, reo.fifofull, reo.syncdrain>(a,b)
-
-
-  //fifo2 = (a?,b!) { fifo1(a,x) fifo1(x,b) }
-	
-	//(a,b) { fifo2(a,y) fifo2(y,b) } (s,t)
-
-	//n = 3
-	
-	//fifo[0] = (a?,b!){ a = b }
-
-	//for k = 1..n {
-	//	fifo[k] = (a?,b!) { fifo1(a,d) fifo[k-1](d,b) }
-	//}
-	
-	//fifo[n](s,t)
-
-

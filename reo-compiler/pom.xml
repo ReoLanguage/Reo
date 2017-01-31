@@ -62,8 +62,6 @@
           </descriptorRefs>
           <finalName>reo</finalName>
           <appendAssemblyId>false</appendAssemblyId>
-          <attach>false</attach>
-          <outputDirectory>${project.parent.basedir}/bin</outputDirectory>
         </configuration>
         <executions>
           <execution>

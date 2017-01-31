@@ -28,7 +28,7 @@ import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.listeners.Listener;
-import nl.cwi.reo.interpret.semantics.FlatAssembly;
+import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
@@ -80,7 +80,7 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @return list of work automata.
 	 */
 	@SuppressWarnings("unchecked")
-	public FlatAssembly<T> interpret(List<String> srcfiles) {
+	public FlatConnector<T> interpret(List<String> srcfiles) {
 		try {			
 			// Find all available component expressions.
 			Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();	
@@ -88,8 +88,11 @@ public class Interpreter<T extends Semantics<T>> {
 			Queue<String> components = new LinkedList<String>();
 			
 			for (String file : srcfiles) {
+				String filename = new File(file).getName().replaceFirst("[.][^.]+$", "");
 				ReoFile<T> program = parse(new ANTLRFileStream(file));
 				if (program != null) {
+					if (!program.getName().endsWith(filename))
+						throw new CompilationException(program.getToken(), "Component must have name " + filename + ".");
 					stack.push(program);
 					parsed.add(program.getName());
 					components.addAll(program.getImports());
@@ -102,8 +105,10 @@ public class Interpreter<T extends Semantics<T>> {
 				String comp = components.poll();
 				if (!parsed.contains(comp)) {
 					parsed.add(comp);
-					ReoFile<T> program = parseComponent(comp);
+					ReoFile<T> program = findComponent(comp);
 					if (program != null) {
+						if (!program.getName().equals(comp))
+							throw new CompilationException(program.getToken(), "Component must have name " + comp.substring(comp.lastIndexOf(".") + 1) + ".");
 						stack.push(program);
 						List<String> newComponents = program.getImports();
 						newComponents.removeAll(parsed);
@@ -139,7 +144,7 @@ public class Interpreter<T extends Semantics<T>> {
 				
 				instances.insertNodes(true, false);
 				
-				return new FlatAssembly<T>(instances.getComponents(), name, sign.keySet());
+				return new FlatConnector<T>(instances.getComponents(), name, sign.keySet());
 			}
 		} catch (IOException e) {
 			System.out.print(e.getMessage());
@@ -158,7 +163,7 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	private ReoFile<T> parseComponent(String component) throws IOException {
+	private ReoFile<T> findComponent(String component) throws IOException {
 		
 		ReoFile<T> prog = null;
 		

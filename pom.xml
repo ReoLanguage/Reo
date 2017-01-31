@@ -40,6 +40,14 @@ Application designers can use Reo as a "glue code" language for compositional co
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <pluginManagement>
       <plugins>

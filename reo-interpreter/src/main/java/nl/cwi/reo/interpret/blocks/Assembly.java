@@ -116,6 +116,7 @@ public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 		
 		// Collect all necessary unifications, and rename the variables in these definitions.
 		for (Map.Entry<String, Expression> defn : definitions.entrySet()) {
+			// if defn is a unification:
 			if (defn.getValue() instanceof VariableName) {
 				String a = defn.getKey();
 				String b = ((VariableName)defn.getValue()).getName();
@@ -145,7 +146,7 @@ public final class Assembly<T extends Semantics<T>> implements ReoBlock<T> {
 
 		// Instantiate  
 		for (Component<T> inst : _instances)			
-			inst.joinAndHide(_iface);
+			inst.connect(_iface);
 		
 		return new Assembly<T>(_definitions, _instances);
 	}

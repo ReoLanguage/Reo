@@ -1,5 +1,6 @@
 package nl.cwi.reo.interpret.semantics;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +63,7 @@ public final class Component<T extends Semantics<T>> extends HashMap<Port, Port>
 	 * Renames the external ports, and hides all internal ports
 	 * @param links		maps external ports to new ports.
 	 */
+	@Deprecated
 	public void joinAndHide(Map<Port, Port> links) {
 		for (Map.Entry<Port, Port> link : this.entrySet()) {
 			Port x = link.getValue();
@@ -69,6 +71,21 @@ public final class Component<T extends Semantics<T>> extends HashMap<Port, Port>
 			if (y == null) y = x.hide();
 			link.setValue(y.join(x));
 		}
+	}
+	
+	public void connect(Map<Port, Port> links) {
+		for (Map.Entry<Port, Port> link : this.entrySet()) {
+			Port x = link.getValue();
+			Port y = links.get(x);
+			if (y == null) y = x;
+			link.setValue(y.join(x));
+		}
+	}
+	
+	public void restrict(Collection<? extends Port> iface) {
+		for (Map.Entry<Port, Port> link : this.entrySet()) 
+			if (!iface.contains(link.getValue()))
+				link.setValue(link.getValue().hide());
 	}
 
 	@Override

@@ -35,19 +35,19 @@ public class Port implements Comparable<Port> {
 	}
 	
 	/**
-	 * Joins this port to port x by inheriting, if necessary, 
-	 * the type, tag and visibility of port x. This method is used 
+	 * Joins this port to port origin by inheriting, if necessary, 
+	 * the type, tag and visibility of port origin. This method is used 
 	 * when ports in a block are instantiated via a signature. 
-	 * @param x		port
+	 * @param origin		port
 	 * @returns a copy of this port, with possibly its type, 
-	 * tag and visibility inherited from port x.
+	 * tag and visibility inherited from port origin.
 	 */
-	public Port join(Port x) {
-		if (x == null)
+	public Port join(Port origin) {
+		if (origin == null)
 			throw new NullPointerException();
-		PortType _type = type == PortType.NONE ? x.type : type;
-		String _tag = tag.equals("") ? x.tag : tag;
-		boolean _hidden = hidden || x.hidden;
+		PortType _type = origin.type == PortType.NONE ? type : origin.type;
+		String _tag = origin.tag.equals("") ? tag : origin.tag;
+		boolean _hidden = hidden || origin.hidden;
 		return new Port(name, _type, PrioType.NONE, _tag, _hidden);
 	}
 

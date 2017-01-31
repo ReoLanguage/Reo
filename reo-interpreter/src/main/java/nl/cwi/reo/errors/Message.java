@@ -24,7 +24,7 @@ public final class Message {
 		this.msg = msg;
 	}
 	
-	public Message(MessageType type, Token token,  String msg) {
+	public Message(MessageType type, Token token, String msg) {
 		this.type = type;
 		this.source = new File(token.getInputStream().getSourceName()).getName();
 		this.line = token.getLine();

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.antlr.v4.runtime.Token;
+
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.semantics.Definitions;
@@ -31,17 +33,23 @@ public final class ReoFile<T extends Semantics<T>> implements Evaluable<Assembly
 	private final String name;
 	
 	/**
+	 * Token of the main component name.
+	 */
+	private final Token token;
+	
+	/**
 	 * Main component.
 	 */
 	private final ReoSystem<T> cexpr;
 	
-	public ReoFile(String section, List<String> imports, String name, ReoSystem<T> cexpr) {
-		if (section == null || imports == null || name == null || cexpr == null)
+	public ReoFile(String section, List<String> imports, String name, ReoSystem<T> cexpr, Token token) {
+		if (section == null || imports == null || name == null || cexpr == null || token == null)
 			throw new NullPointerException();
 		this.section = section;
 		this.imports = imports;
 		this.name = name;
 		this.cexpr = cexpr;
+		this.token = token;
 	}
 
 	public List<String> getImports() {
@@ -54,6 +62,10 @@ public final class ReoFile<T extends Semantics<T>> implements Evaluable<Assembly
 	
 	public ReoSystem<T> getComponent() {
 		return cexpr;
+	}
+	
+	public Token getToken() {
+		return token;
 	}
 
 	@Override

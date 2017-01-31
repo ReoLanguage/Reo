@@ -19,11 +19,17 @@ public class ReoSystemVariable<T extends Semantics<T>> implements ReoSystem<T> {
 		this.var = var;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ReoBlock<T> instantiate(ValueList values, VariableNameList iface) {
 		return null;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public ReoSystem<T> evaluate(Map<String, Expression> params) {
@@ -34,7 +40,10 @@ public class ReoSystemVariable<T extends Semantics<T>> implements ReoSystem<T> {
 			return new ReoSystemVariable<T>((Variable)e);
 		return this;	
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "" + var;

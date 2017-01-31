@@ -1,8 +1,8 @@
 package nl.cwi.reo.interpret.booleans;
 
 import java.util.Map;
+import java.util.Objects;
 
-import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.semantics.api.Expression;
 
 public final class BooleanValue implements BooleanExpression {
@@ -18,7 +18,7 @@ public final class BooleanValue implements BooleanExpression {
 	}
 
 	@Override
-	public BooleanExpression evaluate(Map<String, Expression> params) throws CompilationException {
+	public BooleanExpression evaluate(Map<String, Expression> params) {
 		return this;
 	}
 	
@@ -32,6 +32,20 @@ public final class BooleanValue implements BooleanExpression {
 
 	public static BooleanValue negation(BooleanValue v) {
 		return new BooleanValue(!v.bool);
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof BooleanValue)) return false;
+	    BooleanValue p = (BooleanValue)other;
+	   	return Objects.equals(this.bool, p.bool);
+	}
+	
+	@Override
+	public int hashCode() {
+	    return Objects.hash(this.bool);
 	}
 	
 	@Override

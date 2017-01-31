@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret.strings;
 
 import java.util.Map;
+import java.util.Objects;
 
 import nl.cwi.reo.semantics.api.Expression;
 
@@ -20,6 +21,20 @@ public class StringValue implements StringExpression {
 	
 	public static StringValue concatenate(StringValue v1, StringValue v2) {
 		return new StringValue(v1.str + v2.str);
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof StringValue)) return false;
+	    StringValue p = (StringValue)other;
+	   	return Objects.equals(this.str, p.str);
+	}
+	
+	@Override
+	public int hashCode() {
+	    return Objects.hash(this.str);
 	}
 	
 	@Override

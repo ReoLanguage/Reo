@@ -71,13 +71,16 @@ public class Body<T extends Semantics<T>> implements ReoBlock<T> {
 					Map<String, Expression> progDefs = ((Assembly<T>)s_p).getDefinitions();
 					for (Map.Entry<String, Expression> def : progDefs.entrySet()) {
 						if (!definitions.containsKey(def.getKey())) {
-							// TODO If redefined evaluates to false: throw an error.
 							definitions.put(def.getKey(), def.getValue());
 							if (def.getValue() instanceof BooleanValue) loop = true;
 							if (def.getValue() instanceof IntegerValue) loop = true;
 							if (def.getValue() instanceof StringValue) loop = true;
 							if (def.getValue() instanceof ReoSystemValue) loop = true;
-						}	
+						} else {
+							if (def.getValue().equals(definitions.get(def.getKey())))
+								throw new CompilationException(null, null);
+							// TODO If redefined evaluates to false: throw an error.
+						}
 					}
 				} else {
 					isProgramValue = false;

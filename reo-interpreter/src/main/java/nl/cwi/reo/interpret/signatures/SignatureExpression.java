@@ -43,11 +43,18 @@ public final class SignatureExpression implements ParameterType {
 		this.token =  token;
 	}
 	
+	/**
+	 * Constructs a set of definitions that define the value of each parameter, 
+	 * together with a set of links that defines a new interface.
+	 * @param values	parameter values
+	 * @param iface		node in the interface
+	 * @return Concrete signature containing parameter values and interface.
+	 */
 	public SignatureConcrete evaluate(ValueList values, VariableNameList iface) {
 		
 		Definitions definitions = new Definitions();		
 
-		// Try to find the parameter value for a correct number of nodes
+		// Try to find the parameter value for a correct number of parameters
 		int k_params = 0;
 		VariableRange rng_params = null;
 		for (Parameter param : params) {
@@ -56,7 +63,7 @@ public final class SignatureExpression implements ParameterType {
 			} else if (param.getVariable() instanceof VariableRange) {
 				rng_params = (VariableRange)param.getVariable();
 			} else {
-				throw new CompilationException(token, "Parameter " + param.getVariable() + " is not a valid parameter name.");
+				throw new CompilationException(token, "Invalid type of parameter " + param.getVariable() + ".");
 			}
 		}
 		int size_params = values.size() - k_params;
@@ -90,24 +97,17 @@ public final class SignatureExpression implements ParameterType {
 		// Find the links of the interface. 
 		Map<Port, Port> links = new HashMap<Port, Port>();	
 		
-		Iterator<Node> node = nodes.evaluate(definitions).iterator();
-		
 		if (iface == null) {
-
-			// Create a the default set of links for this interface
+			// Create a the default set of links for this interface			
+			Iterator<Node> node = nodes.evaluate(definitions).iterator();
 			while (node.hasNext()) {
-				Node x = node.next();
-				
-				Port p = x.toPort();
-				
+				Node x = node.next();				
+				Port p = x.toPort();				
 				if (p == null)
 					throw new CompilationException(x.getVariable().getToken(), x + " is not a valid node name.");
-				
 				links.put(p, p);
-			}
-			
+			}			
 		} else {
-
 			// Try to find the parameter value for a correct number of nodes
 			int k_nodes = 0;
 			VariableRange rng_nodes = null;
@@ -133,7 +133,8 @@ public final class SignatureExpression implements ParameterType {
 				if (size_nodes != 0)
 					throw new CompilationException(token, "Wrong number of nodes.");
 			}
-
+			
+			Iterator<Node> node = nodes.evaluate(definitions).iterator();
 			Iterator<VariableName> var = iface.getList().iterator();
 			
 			while (node.hasNext() && var.hasNext()) {

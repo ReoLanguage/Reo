@@ -1,3 +1,5 @@
+package nl.cwi.reo.automata;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,27 +9,16 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.automata.Automaton;
-import nl.cwi.reo.automata.State;
-import nl.cwi.reo.automata.Transition;
+//import static org.junit.Assert.*;
+import org.junit.Test;
+
 import nl.cwi.reo.portautomata.NullLabel;
 import nl.cwi.reo.semantics.api.Port;
 
-/**
- * Test class for debugging.
- */
-public class Debug {
+public class AutomatonTest {
 
-	public static void main(String[] args) {			
-			//testAutomata();
-			
-			//testWorkAutomata();
-	}
-	
-	/**
-	 * Just a function to test my generic automata implementation
-	 */
-	public static void testAutomata() {
+	@Test
+	public void compose() {
 		
 		SortedSet<State> Q = new TreeSet<State>();
 		SortedSet<Port> P = new TreeSet<Port>();
@@ -52,15 +43,14 @@ public class Debug {
 		T.put(q1, out1);
 		
 		Automaton<NullLabel> A = new Automaton<NullLabel>(Q, P, T, q0, new NullLabel());
-
-		System.out.println(A);
 		
 		Map<Port, Port> links = new HashMap<Port, Port>();
 		links.put(new Port("a"), new Port("c"));
 		links.put(new Port("b"), new Port("d"));
 		Automaton<NullLabel> B = A.rename(links);
-		
-		System.out.println(B);
+
+//		new HashSet();
+//		assertTrue(B.out.get(q0).iterator().next().getSyncConstraint(), );
 		
 		List<Automaton<NullLabel>> lst = new ArrayList<Automaton<NullLabel>>();
 		lst.add(B);
@@ -74,10 +64,8 @@ public class Debug {
 		// dot -Tps A.dot -o A.ps
 	}
 	
-//	/**
-//	 * Just a function to test my WorkAutomata implementation
-//	 */
-//	public static void testWorkAutomata() {
+
+//	public void GameGraph() {
 //		
 //		WorkAutomaton A = new WorkAutomaton();
 //		A.addTransition("0; 1; ; x==2");
@@ -118,5 +106,5 @@ public class Debug {
 //		WorkAutomaton product = WorkAutomaton.product(X, Y, Z);
 //		WorkAutomaton.outputDOT(product, "product");
 //	}
-}
 
+}

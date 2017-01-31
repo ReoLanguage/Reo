@@ -2,12 +2,9 @@ package nl.cwi.reo.interpret.systems;
 
 import java.util.Map;
 
-import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.blocks.ReoBlock;
 import nl.cwi.reo.interpret.expressions.ValueList;
-import nl.cwi.reo.interpret.semantics.Definitions;
-import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.interpret.variables.VariableNameList;
@@ -27,25 +24,28 @@ public class ReoSystemComposite<T extends Semantics<T>> implements ReoSystem<T> 
 		this.reoBlock = body;
 	}
 	
-	public ReoSystem<T> evaluate(Map<String, Expression> params) throws CompilationException {
+	public ReoSystem<T> evaluate(Map<String, Expression> params) {
 		ReoBlock<T> prog = reoBlock.evaluate(params);
 		if (prog instanceof Assembly)
 			return new ReoSystemValue<T>(sign, (Assembly<T>)prog);
 		return new ReoSystemComposite<T>(sign, prog);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public ReoBlock<T> instantiate(ValueList values, VariableNameList iface) throws CompilationException {
+	public ReoBlock<T> instantiate(ValueList values, VariableNameList iface) {
 		SignatureConcrete v = sign.evaluate(values, iface);
 		ReoBlock<T> _body = reoBlock.evaluate(v.getDefinitions());
-		if (_body instanceof Assembly) {
-			Definitions _definitions = new Definitions(((Assembly<T>)_body).getUnifications());
-			ComponentList<T> _instances = new ComponentList<T>(((Assembly<T>)_body).getInstances());
-			return new Assembly<T>(_definitions, _instances);
-		}
+		if (_body instanceof Assembly)
+			return ((Assembly<T>)_body).instantiate(v);
 		return _body;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "" + sign + reoBlock;

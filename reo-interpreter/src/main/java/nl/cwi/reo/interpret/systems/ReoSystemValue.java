@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret.systems;
 
 import java.util.Map;
+import java.util.Objects;
 
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.expressions.ValueList;
@@ -43,11 +44,17 @@ public final class ReoSystemValue<T extends Semantics<T>> implements ReoSystem<T
 		return prog.getInstances();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ReoSystemValue<T> evaluate(Map<String, Expression> params) {
 		return new ReoSystemValue<T>(sign, prog.evaluate(params));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Assembly<T> instantiate(ValueList values, VariableNameList iface) {
 		SignatureConcrete links = sign.evaluate(values, iface);
@@ -55,6 +62,30 @@ public final class ReoSystemValue<T extends Semantics<T>> implements ReoSystem<T
 		return _prog;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof ReoSystemValue<?>)) return false;
+	    ReoSystemValue<?> p = (ReoSystemValue<?>)other;
+	   	return Objects.equals(this.sign, p.sign) && 
+	   			Objects.equals(this.prog, p.prog);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+	    return Objects.hash(this.sign, this.prog);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return sign + "{" + prog + "}";
