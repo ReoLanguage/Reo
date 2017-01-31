@@ -77,8 +77,8 @@ public class Body<T extends Semantics<T>> implements ReoBlock<T> {
 							if (def.getValue() instanceof StringValue) loop = true;
 							if (def.getValue() instanceof ReoSystemValue) loop = true;
 						} else {
-							if (def.getValue().equals(definitions.get(def.getKey())))
-								throw new CompilationException(null, null);
+//							if (def.getValue().equals(definitions.get(def.getKey())))
+//								throw new CompilationException(null, null);
 							// TODO If redefined evaluates to false: throw an error.
 						}
 					}

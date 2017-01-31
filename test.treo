@@ -1,7 +1,7 @@
 import reo.fifo1;
 
 test(a,d) {
-/*
+
 	fifo = <k:int>(a?, b!) { 
 		if (k <= 0) { 
 			a = b 
@@ -21,10 +21,9 @@ test(a,d) {
 			}
 		}
 	}
-	fifo<1>(a,b)
-	fifo<1>(b,c)
-	fifo<1>(c,d)
-*/
+	fifo<1>(a,d)
+}
+/*
 	recursive<k:int>(a?,b!) {
 		if (k==0) {
 			a=b 
@@ -35,5 +34,5 @@ test(a,d) {
 	}
 	
 	recursive<2>(a,d)
+*/
 
-}
