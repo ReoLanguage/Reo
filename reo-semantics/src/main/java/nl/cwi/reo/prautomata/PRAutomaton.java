@@ -2,26 +2,22 @@ package nl.cwi.reo.prautomata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.automata.Automaton;
-import nl.cwi.reo.automata.State;
-import nl.cwi.reo.automata.Transition;
-import nl.cwi.reo.pr.autom.AutomatonFactory;
 import nl.cwi.reo.pr.autom.Extralogical;
 import nl.cwi.reo.pr.misc.MemberSignature;
-import nl.cwi.reo.pr.misc.PortFactory;
 import nl.cwi.reo.pr.misc.PortOrArray;
+import nl.cwi.reo.pr.misc.PortSpec;
 import nl.cwi.reo.pr.misc.TypedName;
 import nl.cwi.reo.pr.misc.TypedName.Type;
 import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
-import nl.cwi.reo.pr.targ.java.autom.Member;
+import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory;
+import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
+import nl.cwi.reo.pr.targ.java.autom.Member.Primitive;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
 import nl.cwi.reo.semantics.api.SemanticsType;
@@ -32,6 +28,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	private String variable;
 	private Integer value; 
 	private List<Port> port;
+	private MemberSignature signature;
 	
 
 	public PRAutomaton(String name, String variable, Integer value, List<Port> port){
@@ -39,13 +36,73 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		this.value=value;
 		this.variable=variable;
 		this.port=port;
+//		List<Port> inputPorts = new ArrayList<>();
+//		List<Port> outputPorts = new ArrayList<>();
+
+		Map<TypedName, Extralogical> extralogicals = new LinkedHashMap<>();
+		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
+		Map<TypedName, Integer> integers = new LinkedHashMap<>();
+		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
+		
+		JavaAutomatonFactory automatonFactory = new JavaAutomatonFactory();
+		JavaPortFactory portFactory = (JavaPortFactory) automatonFactory.getPortFactory();
+//		mainArgumentFactory = new JavaMainArgumentFactory(
+//				((JavaAutomatonFactory) automatonFactory)
+//						.getJavaNames());
+		 
+		PortSpec p = new PortSpec(port.get(0).getName()+"$"+"1");
+		JavaPort jp = (JavaPort) portFactory.newOrGet(p);		
+		inputPortsOrArrays.put(new TypedName("in",Type.PORT),jp);
+		
+		p = new PortSpec(port.get(1).getName()+"$"+"1");
+		jp = (JavaPort) portFactory.newOrGet(p);		
+		outputPortsOrArrays.put(new TypedName("out",Type.PORT),jp);
+		
+		TypedName typedName = new TypedName(name,Type.FAMILY);
+		
+		
+		signature = new MemberSignature(typedName, integers,extralogicals, inputPortsOrArrays, outputPortsOrArrays, portFactory);
 	}
+	
+//	public class JavaPort extends Port implements JavaVariable {
+//		private String variableName;
+//
+		//
+		// CONSTRUCTORS
+		//
+
+//		protected JavaPort(int id, PortSpec spec) {
+//			new IdObjectFactory(id, spec);
+//		}
+
+		//
+		// METHODS - PUBLIC
+		//
+
+//		@Override
+//		public String getVariableName() {
+//			if (variableName == null)
+//				variableName = javaNames.getFreshName(getName()
+//						.replaceAll("\\[", "\\$").replaceAll("\\]", "\\$")
+//						.replaceAll("\\$\\$", "\\$"));
+//
+//			return variableName;
+//		}
+//	}
 	
 	public SemanticsType getType() {
 		return SemanticsType.PA;
 	}
 	
-
+	public Primitive getPrimitive(){
+		Primitive pr = new Primitive("root_file","class/path");
+		pr.setSignature(signature);
+		return pr;
+		
+	}
+		
+	
+/*
 	public List<Member.Primitive> setPrimitive(){
 		Member m = new Member();
 		TypedName name = new TypedName(this.name,Type.FAMILY);
@@ -61,9 +118,9 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 													outputPortsOrArrays, portFactory);
 		m.setSignature(ms);
 		
-		return m.getPrimitives();
+		return getPrimitives();
 	}
-
+*/
 	
 	public String getSource(){
 		return port.get(0).toString();

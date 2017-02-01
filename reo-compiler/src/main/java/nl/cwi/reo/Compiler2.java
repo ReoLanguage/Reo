@@ -12,7 +12,9 @@ import nl.cwi.reo.interpret.Interpreter;
 import nl.cwi.reo.interpret.InterpreterPA;
 import nl.cwi.reo.interpret.InterpreterPR;
 import nl.cwi.reo.interpret.semantics.FlatAssembly;
+import nl.cwi.reo.lykos.SimpleLykos;
 import nl.cwi.reo.portautomata.PortAutomaton;
+import nl.cwi.reo.pr.targ.java.autom.Member.Primitive;
 import nl.cwi.reo.prautomata.PRAutomaton;
 
 /**
@@ -54,6 +56,39 @@ public class Compiler2 {
 	        compiler.run();			
 		}
 	}
+	
+	/*
+
+Fifo(A$1;P$11$1)
+
+{}
+[A$1]
+{in:port=A$1}
+{}
+Fifo:family
+[P$11$1]
+{out:port=P$11$1}
+nl.cwi.pr.targ.java.autom.JavaPortFactory@433defed
+	{1=a$1, 2=x$1}
+	nl.cwi.reo.pr.targ.java.JavaNames@52525845
+	3
+	{x$1=x$1, a$1=a$1}
+	
+
+Fifo(A$1;P$11$1)
+ 
+	signature	MemberSignature  (id=64)	
+	extralogicals	LinkedHashMap<K,V>  (id=69)	
+	inputPorts	ArrayList<E>  (id=74)	
+	inputPortsOrArrays	LinkedHashMap<K,V>  (id=75)	
+	integers	LinkedHashMap<K,V>  (id=76)	
+	name	TypedName  (id=77)	
+	outputPorts	ArrayList<E>  (id=79)	
+	outputPortsOrArrays	LinkedHashMap<K,V>  (id=80)	
+	portFactory	JavaPortFactory  (id=81)	
+	string	"FifoK(a$1;x$1)" (id=68)	
+
+	 */
     public void run() {
 		directories.add(".");
 		String comppath = System.getenv("COMPATH");
@@ -64,7 +99,18 @@ public class Compiler2 {
 
 		FlatAssembly<PRAutomaton> program = interpreter.interpret(files);
 		
-		for (PRAutomaton X : program) System.out.println(X);
+		List<Primitive> listPrimitive = new ArrayList<Primitive>();
+		
+		for (PRAutomaton X : program) {
+			listPrimitive.add(X.getPrimitive());
+			
+			System.out.println(X);
+		}
+		
+		SimpleLykos sL = new SimpleLykos();
+		
+		sL.compile("program",listPrimitive);
+		
 		
 		if (!program.isEmpty()) {
 			PRAutomaton product = program.get(0).compose(program.subList(1, program.size()));

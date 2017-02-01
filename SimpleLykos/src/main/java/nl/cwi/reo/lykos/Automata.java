@@ -28,13 +28,15 @@ public class Automata {
 	private final AutomatonSet automata;
 	private final AutomatonFactory automatonFactory;
 	private final CompilerSettings settings;
+	private final List<Primitive> ls;
 
+	public Automata(CompilerSettings settings,List<Primitive> ls) {
 
-	public Automata(CompilerSettings settings) {
 
 		this.automatonFactory = new JavaAutomatonFactory();
 		this.automata = automatonFactory.newSet();
 		this.settings=settings;
+		this.ls=ls;
 	}
 
 	
@@ -64,7 +66,46 @@ public class Automata {
 
 		if (settings.partition())
 			try {
+/*
 
+constraintFactory	JavaConstraintFactory  (id=106)	
+ids	HashMap<K,V>  (id=110)	
+javaNames	JavaNames  (id=112)	
+literalFactory	JavaLiteralFactory  (id=114)	
+memoryCellFactory	JavaMemoryCellFactory  (id=117)	
+nextId	13	
+nStatesMax	2048	
+nTransitionsMax	2048	
+portFactory	JavaPortFactory  (id=120)	
+specs	HashMap<K,V>  (id=122)	
+termFactory	JavaTermFactory  (id=126)
+	
+nl.cwi.reo.pr.targ.java.autom.JavaConstraintFactory@1c93084c
+{2=/Sync(a$1;$ina$1) :: q1, <q1,[],a$1==$ina$1,q1>, 3=/Sync($outx$1;x$1) :: q1, <q1,[],$outx$1==x$1,q1>, 4=FifoK(a$1;x$1) :: null, , 6=/Sync(x$1;$inx$1) :: q1, <q1,[],x$1==$inx$1,q1>, 7=/Sync($outy$1;y$1) :: q1, <q1,[],$outy$1==y$1,q1>, 8=FifoK(x$1;y$1) :: null, , 10=/Sync(y$1;$iny$1) :: q1, <q1,[],y$1==$iny$1,q1>, 11=/Sync($outb$1;b$1) :: q1, <q1,[],$outb$1==b$1,q1>, 12=FifoK(y$1;b$1) :: null, }
+nl.cwi.reo.pr.targ.java.JavaNames@6ef888f6
+nl.cwi.reo.pr.targ.java.autom.JavaLiteralFactory@10e92f8f
+nl.cwi.reo.pr.targ.java.autom.JavaMemoryCellFactory@78b66d36
+13
+2048
+2048
+nl.cwi.reo.pr.targ.java.autom.JavaPortFactory@5223e5ee
+{FifoK(a$1;x$1)=FifoK(a$1;x$1) :: null, , /Sync($outy$1;y$1)=/Sync($outy$1;y$1) :: q1, <q1,[],$outy$1==y$1,q1>, /Sync(x$1;$inx$1)=/Sync(x$1;$inx$1) :: q1, <q1,[],x$1==$inx$1,q1>, FifoK(x$1;y$1)=FifoK(x$1;y$1) :: null, , /Sync(a$1;$ina$1)=/Sync(a$1;$ina$1) :: q1, <q1,[],a$1==$ina$1,q1>, /Sync(y$1;$iny$1)=/Sync(y$1;$iny$1) :: q1, <q1,[],y$1==$iny$1,q1>, /Sync($outb$1;b$1)=/Sync($outb$1;b$1) :: q1, <q1,[],$outb$1==b$1,q1>, /Sync($outx$1;x$1)=/Sync($outx$1;x$1) :: q1, <q1,[],$outx$1==x$1,q1>, FifoK(y$1;b$1)=FifoK(y$1;b$1) :: null, }
+nl.cwi.reo.pr.targ.java.autom.JavaTermFactory@7ce3cb8e
+
+
+nl.cwi.pr.targ.java.autom.JavaConstraintFactory@2f67a4d3
+{2=/Sync(A$1;$inA$1) :: q1, <q1,[$inA$1,A$1],A$1==$inA$1,q1>, 3=/Sync($outB$1;B$1) :: q1, <q1,[$outB$1,B$1],$outB$1==B$1,q1>, 4=Fifo(A$1;B$1) :: q1, <q1,[$inA$1],$inA$1==mem2*,q2>, <q2,[$outB$1],$outB$1==*mem2,q1>}
+nl.cwi.pr.targ.java.JavaNames@5e3f861
+nl.cwi.pr.targ.java.autom.JavaLiteralFactory@2fb0623e
+nl.cwi.pr.targ.java.autom.JavaMemoryCellFactory@49b2a47d
+5
+2048
+2048
+nl.cwi.pr.targ.java.autom.JavaPortFactory@5be1d0a4
+{/Sync(A$1;$inA$1)=/Sync(A$1;$inA$1) :: q1, <q1,[$inA$1,A$1],A$1==$inA$1,q1>, Fifo(A$1;B$1)=Fifo(A$1;B$1) :: q1, <q1,[$inA$1],$inA$1==mem2*,q2>, <q2,[$outB$1],$outB$1==*mem2,q1>, /Sync($outB$1;B$1)=/Sync($outB$1;B$1) :: q1, <q1,[$outB$1,B$1],$outB$1==B$1,q1>}
+nl.cwi.pr.targ.java.autom.JavaTermFactory@415b0b49
+
+*/
 
 				for (AutomatonSet s : partition) {
 					Automaton mediumAutomaton = automatonFactory.multiplyAll(s,
@@ -144,11 +185,6 @@ public class Automata {
 	 * Private methods
 	 */
 	
-	private List<Primitive> getPrimitives(){
-		
-		
-		return new ArrayList<Primitive>();
-	}
 	
 	
 	
@@ -156,7 +192,7 @@ public class Automata {
 		
 		AutomatonSet automata = automatonFactory.newSet();
 		
-		for (Primitive pr : getPrimitives()) {
+		for (Primitive pr : ls) {
 			MemberSignature signature = pr.getSignature();
 			String className = pr.getClassName();
 			String rootDirectoryLocation = pr.getRootLocation();

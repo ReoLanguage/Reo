@@ -1,4 +1,4 @@
- package nl.cwi.reo.pr.autom;
+package nl.cwi.reo.pr.autom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +30,8 @@ import nl.cwi.reo.pr.misc.IdObjectFactory;
 import nl.cwi.reo.pr.misc.PortFactory;
 import nl.cwi.reo.pr.misc.PortFactory.Port;
 import nl.cwi.reo.pr.misc.PortFactory.PortSet;
+import nl.cwi.reo.pr.comp.Cancellation;
+import nl.cwi.reo.pr.comp.CompilerProgressMonitor;
 
 public abstract class AutomatonFactory extends
 		IdObjectFactory<Automaton, AutomatonSet, AutomatonSpec> {
@@ -347,10 +349,17 @@ public abstract class AutomatonFactory extends
 
 		if (automaton.countTransitions() > nTransitionsMax) {
 			dispose(automaton);
+			throw new Cancellation(
+					"Too many transitions in a product automaton ("
+							+ automaton.countTransitions() + ", while max="
+							+ nTransitionsMax + ")");
 		}
 
 		if (automaton.countStates() > nStatesMax) {
 			dispose(automaton);
+			throw new Cancellation("Too many states in a product automaton ("
+					+ automaton.countStates() + ", while max=" + nStatesMax
+					+ ")");
 		}
 
 		return automaton;

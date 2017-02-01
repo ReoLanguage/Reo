@@ -2,6 +2,8 @@ package nl.cwi.reo.lykos;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.stringtemplate.v4.ST;
@@ -13,6 +15,7 @@ import nl.cwi.reo.pr.autom.StateFactory.State;
 import nl.cwi.reo.pr.autom.TransitionFactory.Transition;
 import nl.cwi.reo.pr.misc.MemberSignature;
 import nl.cwi.reo.pr.misc.Variable;
+import nl.cwi.reo.pr.targ.java.autom.Member.Primitive;
 import nl.cwi.reo.pr.misc.PortFactory.Port;
 
 public class SimpleLykos {
@@ -23,16 +26,19 @@ public class SimpleLykos {
 	private final String protocolClassName = "Protocol_SimpleName";	
 	private final String workerPackageName = "com.example.myapp";	
 	private final String workerClassName = "Worker_SimpleName";
-
-	public void compile(String file) 
+	
+	public SimpleLykos(){
+	}
+	
+	public void compile(String file,List<Primitive> ls) 
 	{ 
 		// Map assigning content to each file name
 		Map<String, String> files = new HashMap<String, String>();
 		
-		files.putAll(generateMain());
-		files.putAll(generateProtocols());
+		files.putAll(generateMain(ls));
+		files.putAll(generateProtocols(ls));
 		files.putAll(generateWorkers());
-
+//		new JavaProtocolCompiler()
 		// Output all files
 	}
 
@@ -40,12 +46,12 @@ public class SimpleLykos {
 	 * Generates the main class.
 	 * @return Map assigning Java code to a file name
 	 */
-	private Map<String, String> generateMain() 
+	private Map<String, String> generateMain(List<Primitive> lp) 
 	{
 		Map<String, String> files = new HashMap<String, String>();
 
 		// TODO fill in main signature and protocol/worker signatures
-		MainSignature signature = new MainSignature(null, null, null, null);
+		MainSignature signature = BuildMainSignature(lp);
 		Map<String, MemberSignature> protocolSignatures = new HashMap<>(); // pr.main.Protocol_d20170127_t103917_197_FifoK=FifoK[3](A$1;B$1)
 		Map<String, WorkerSignature> workerSignatures = new HashMap<>();	
 		
@@ -70,12 +76,30 @@ public class SimpleLykos {
 		
 		return files;
 	}
+	
+	private MainSignature BuildMainSignature(List<Primitive> lp){
+
+		List<Port> inputPorts = new ArrayList<Port>();
+		List<Port> outputPorts = new ArrayList<Port>();
+		List<Port> freeInputPorts = new ArrayList<Port>();
+		List<Port> freeOutputPorts = new ArrayList<Port>();
+		
+		for (Iterator<Primitive> iterator = lp.iterator(); iterator.hasNext();) {
+			Primitive p = iterator.next();
+			inputPorts.addAll(p.getSignature().getInputPorts());
+			freeInputPorts.addAll(p.getSignature().getInputPorts());
+			outputPorts.addAll(p.getSignature().getOutputPorts());
+			freeOutputPorts.addAll(p.getSignature().getOutputPorts());
+			
+		}
+		return new MainSignature(inputPorts,outputPorts,freeInputPorts,freeOutputPorts);
+	}
 
 	/**
 	 * Generates the protocol classes.
 	 * @return Map assigning Java code to a file name
 	 */
-	private Map<String, String> generateProtocols() 
+	private Map<String, String> generateProtocols(List<Primitive> ls) 
 	{
 		Map<String, String> files = new HashMap<String, String>();
 		
@@ -89,7 +113,7 @@ public class SimpleLykos {
 		settings.put("COUNT_PORTS", false);
 
 		// TODO fill in automaton set from List<T> for some T
-		Automata JavaAutomata = new Automata(settings);
+		Automata JavaAutomata = new Automata(settings,ls);
 		JavaAutomata.compile();
 		AutomatonSet automata = JavaAutomata.getAutomata();
 
