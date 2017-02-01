@@ -1,22 +1,24 @@
-package nl.cwi.pr.targ.java.comp;
+package nl.cwi.reo.pr.java.comp;
 
 import java.util.List;
 
-import nl.cwi.pr.Platform;
-import nl.cwi.pr.autom.AutomatonFactory;
-import nl.cwi.pr.tools.CompiledGeneratee;
-import nl.cwi.pr.tools.CompiledProgram;
-import nl.cwi.pr.tools.CompilerSettings;
-import nl.cwi.pr.tools.InterpretedMain;
-import nl.cwi.pr.tools.InterpretedProgram;
-import nl.cwi.pr.tools.InterpretedProtocol;
-import nl.cwi.pr.tools.InterpretedWorker;
-import nl.cwi.pr.tools.comp.MainCompiler;
-import nl.cwi.pr.tools.comp.ProgramCompiler;
-import nl.cwi.pr.tools.comp.ProtocolCompiler;
-import nl.cwi.pr.tools.comp.WorkerCompiler;
-import nl.cwi.pr.util.Timestamps;
-
+import nl.cwi.reo.pr.autom.AutomatonFactory;
+import nl.cwi.reo.pr.java.comp.JavaCompiledProgram;
+import nl.cwi.reo.pr.java.comp.JavaMainCompiler;
+import nl.cwi.reo.pr.java.comp.JavaProtocolCompiler;
+import nl.cwi.reo.pr.java.comp.JavaWorkerCompiler;
+import nl.cwi.reo.pr.comp.CompiledGeneratee;
+import nl.cwi.reo.pr.comp.CompiledProgram;
+import nl.cwi.reo.pr.comp.CompilerSettings;
+import nl.cwi.reo.pr.comp.InterpretedMain;
+import nl.cwi.reo.pr.comp.InterpretedProgram;
+import nl.cwi.reo.pr.comp.InterpretedProtocol;
+import nl.cwi.reo.pr.comp.InterpretedWorker;
+import nl.cwi.reo.pr.comp.MainCompiler;
+import nl.cwi.reo.pr.comp.ProgramCompiler;
+import nl.cwi.reo.pr.comp.ProtocolCompiler;
+import nl.cwi.reo.pr.comp.WorkerCompiler;
+import nl.cwi.reo.pr.util.Timestamps;
 
 public class JavaProgramCompiler extends ProgramCompiler {
 	private final String programPackageName;
@@ -30,6 +32,8 @@ public class JavaProgramCompiler extends ProgramCompiler {
 
 		super(settings, program, automatonFactory);
 		this.programPackageName = "pr." + Timestamps.getNext();
+//		this.programPackageName = "pr.main";
+
 	}
 
 	//
@@ -93,10 +97,10 @@ public class JavaProgramCompiler extends ProgramCompiler {
 	 */
 	@Override
 	protected String getSourceRunTimeDirectoryLocation() {
-//		if (!Platform.hasFileInBundle("nl.cwi.pr.runtime.java", "src"))
+//		if (!Platform.hasFileInBundle("nl.cwi.reo.pr.runtime.java", "src"))
 //			addError("Access failure on run-time library", true);
 
-		return this.getSettings().getRunTimeLocation() ;
-				//Platform.getFileInBundle("nl.cwi.pr.runtime.java", "src")	.getAbsolutePath();
+		return "/home/e-spin/workspace/nl/cwi/pr/runtime/java/src" ;
+				//Platform.getFileInBundle("nl.cwi.reo.pr.runtime.java", "src")	.getAbsolutePath();
 	}
 }

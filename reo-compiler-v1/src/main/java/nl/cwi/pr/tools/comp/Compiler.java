@@ -6,6 +6,7 @@ import nl.cwi.pr.tools.CompilerSettings;
 import nl.cwi.pr.tools.ToolError;
 import nl.cwi.pr.tools.ToolErrorAccumulator;
 
+
 public abstract class Compiler<Obj> extends ToolErrorAccumulator {
 
 	//

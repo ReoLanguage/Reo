@@ -1,24 +1,24 @@
-package nl.cwi.pr.targ.java.comp;
+package nl.cwi.reo.pr.java.comp;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.cwi.pr.Platform;
-import nl.cwi.pr.autom.AutomatonFactory;
-import nl.cwi.pr.autom.AutomatonFactory.Automaton;
-import nl.cwi.pr.autom.AutomatonFactory.AutomatonSet;
-import nl.cwi.pr.autom.StateFactory.State;
-import nl.cwi.pr.autom.TransitionFactory.Transition;
-import nl.cwi.pr.misc.PortFactory.Port;
-import nl.cwi.pr.tools.CompilerSettings;
-import nl.cwi.pr.tools.InterpretedProtocol;
-import nl.cwi.pr.tools.comp.ProtocolCompiler;
-import nl.cwi.pr.util.Timestamps;
+import nl.cwi.reo.pr.autom.AutomatonFactory;
+import nl.cwi.reo.pr.autom.AutomatonFactory.Automaton;
+import nl.cwi.reo.pr.autom.AutomatonFactory.AutomatonSet;
+import nl.cwi.reo.pr.autom.StateFactory.State;
+import nl.cwi.reo.pr.autom.TransitionFactory.Transition;
+import nl.cwi.reo.pr.misc.PortFactory.Port;
+import nl.cwi.reo.pr.java.comp.JavaMainCompiler;
+import nl.cwi.reo.pr.java.comp.JavaProgramCompiler;
+import nl.cwi.reo.pr.comp.CompilerSettings;
+import nl.cwi.reo.pr.comp.InterpretedProtocol;
+import nl.cwi.reo.pr.comp.ProtocolCompiler;
+import nl.cwi.reo.pr.util.Timestamps;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
-
 
 public class JavaProtocolCompiler extends
 		ProtocolCompiler<JavaProgramCompiler> {
@@ -68,7 +68,7 @@ public class JavaProtocolCompiler extends
 		 * Change the pathname to load template
 		 */
 		
-		STGroupFile templates = new STGroupFile(this.getSettings().getSTGlocation()+"java-protocol.stg");
+		STGroupFile templates = new STGroupFile("/home/e-spin/workspace/Compiler/stg/java-protocol.stg");
 
 		ST headerTemplate;
 		ST protocolClassTemplate;

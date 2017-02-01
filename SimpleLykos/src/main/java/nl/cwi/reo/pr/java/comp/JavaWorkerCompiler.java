@@ -1,18 +1,18 @@
-package nl.cwi.pr.targ.java.comp;
+package nl.cwi.reo.pr.java.comp;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.cwi.pr.Platform;
-import nl.cwi.pr.tools.InterpretedWorker;
-import nl.cwi.pr.tools.comp.WorkerCompiler;
-import nl.cwi.pr.tools.interpr.WorkerSignature;
-import nl.cwi.pr.util.Timestamps;
+import nl.cwi.reo.pr.java.comp.JavaMainCompiler;
+import nl.cwi.reo.pr.java.comp.JavaProgramCompiler;
+import nl.cwi.reo.pr.comp.InterpretedWorker;
+import nl.cwi.reo.pr.comp.WorkerCompiler;
+import nl.cwi.reo.lykos.WorkerSignature;
+import nl.cwi.reo.pr.util.Timestamps;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
-
 
 public class JavaWorkerCompiler extends WorkerCompiler<JavaProgramCompiler> {
 
@@ -57,7 +57,7 @@ public class JavaWorkerCompiler extends WorkerCompiler<JavaProgramCompiler> {
 		 * 
 		 */
 		
-		STGroupFile templates = new STGroupFile(this.getSettings().getSTGlocation()+"java-worker.stg");
+		STGroupFile templates = new STGroupFile("/home/e-spin/workspace/Compiler/stg/java-worker.stg");
 
 		ST headerTemplate;
 		ST workerClassTemplate;

@@ -1,21 +1,19 @@
-package nl.cwi.pr.targ.java.comp;
+package nl.cwi.reo.pr.java.comp;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.cwi.pr.Platform;
-import nl.cwi.pr.misc.MemberSignature;
-import nl.cwi.pr.tools.InterpretedMain;
-import nl.cwi.pr.tools.InterpretedProtocol;
-import nl.cwi.pr.tools.InterpretedWorker;
-import nl.cwi.pr.tools.comp.MainCompiler;
-import nl.cwi.pr.tools.interpr.MainSignature;
-import nl.cwi.pr.tools.interpr.WorkerSignature;
+import nl.cwi.reo.pr.misc.MemberSignature;
+import nl.cwi.reo.pr.comp.InterpretedMain;
+import nl.cwi.reo.pr.comp.InterpretedProtocol;
+import nl.cwi.reo.pr.comp.InterpretedWorker;
+import nl.cwi.reo.pr.comp.MainCompiler;
+import nl.cwi.reo.lykos.MainSignature;
+import nl.cwi.reo.lykos.WorkerSignature;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
-
 
 public class JavaMainCompiler extends MainCompiler<JavaProgramCompiler> {
 
@@ -56,7 +54,7 @@ public class JavaMainCompiler extends MainCompiler<JavaProgramCompiler> {
 		String mainClassName = mainPackageName + ".Main";
 
 		
-		STGroupFile templates = new STGroupFile(this.getSettings().getSTGlocation()+"java-main.stg");
+		STGroupFile templates = new STGroupFile("/home/e-spin/workspace/Compiler/stg/java-main.stg");
 
 		ST headerTemplate;
 		ST mainClassTemplate;

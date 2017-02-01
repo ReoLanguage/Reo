@@ -2,5 +2,5 @@ section reo;
 
 fifo1(a?, b!) {
 	#PR
-	FifoK[1](a;b)
+	Fifo[1](a;b)
 }

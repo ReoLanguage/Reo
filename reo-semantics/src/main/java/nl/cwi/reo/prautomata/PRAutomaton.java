@@ -8,16 +8,9 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.pr.autom.Extralogical;
+
 import nl.cwi.reo.pr.misc.MemberSignature;
-import nl.cwi.reo.pr.misc.PortOrArray;
-import nl.cwi.reo.pr.misc.PortSpec;
-import nl.cwi.reo.pr.misc.TypedName;
-import nl.cwi.reo.pr.misc.TypedName.Type;
-import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
-import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory;
-import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
-import nl.cwi.reo.pr.targ.java.autom.Member.Primitive;
+import nl.cwi.reo.pr.misc.Member.Primitive;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
 import nl.cwi.reo.semantics.api.SemanticsType;
@@ -36,102 +29,33 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		this.value=value;
 		this.variable=variable;
 		this.port=port;
-//		List<Port> inputPorts = new ArrayList<>();
-//		List<Port> outputPorts = new ArrayList<>();
-
-		Map<TypedName, Extralogical> extralogicals = new LinkedHashMap<>();
-		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
-		Map<TypedName, Integer> integers = new LinkedHashMap<>();
-		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
 		
-		JavaAutomatonFactory automatonFactory = new JavaAutomatonFactory();
-		JavaPortFactory portFactory = (JavaPortFactory) automatonFactory.getPortFactory();
-//		mainArgumentFactory = new JavaMainArgumentFactory(
-//				((JavaAutomatonFactory) automatonFactory)
-//						.getJavaNames());
-		 
-		PortSpec p = new PortSpec(port.get(0).getName()+"$"+"1");
-		JavaPort jp = (JavaPort) portFactory.newOrGet(p);		
-		inputPortsOrArrays.put(new TypedName("in",Type.PORT),jp);
-		
-		p = new PortSpec(port.get(1).getName()+"$"+"1");
-		jp = (JavaPort) portFactory.newOrGet(p);		
-		outputPortsOrArrays.put(new TypedName("out",Type.PORT),jp);
-		
-		TypedName typedName = new TypedName(name,Type.FAMILY);
-		
-		
-		signature = new MemberSignature(typedName, integers,extralogicals, inputPortsOrArrays, outputPortsOrArrays, portFactory);
 	}
-	
-//	public class JavaPort extends Port implements JavaVariable {
-//		private String variableName;
-//
-		//
-		// CONSTRUCTORS
-		//
-
-//		protected JavaPort(int id, PortSpec spec) {
-//			new IdObjectFactory(id, spec);
-//		}
-
-		//
-		// METHODS - PUBLIC
-		//
-
-//		@Override
-//		public String getVariableName() {
-//			if (variableName == null)
-//				variableName = javaNames.getFreshName(getName()
-//						.replaceAll("\\[", "\\$").replaceAll("\\]", "\\$")
-//						.replaceAll("\\$\\$", "\\$"));
-//
-//			return variableName;
-//		}
-//	}
 	
 	public SemanticsType getType() {
 		return SemanticsType.PA;
 	}
+
 	
-	public Primitive getPrimitive(){
-		Primitive pr = new Primitive("root_file","class/path");
-		pr.setSignature(signature);
-		return pr;
+	public List<Port> getPort(){
+		return this.port;
 		
 	}
 		
-	
-/*
-	public List<Member.Primitive> setPrimitive(){
-		Member m = new Member();
-		TypedName name = new TypedName(this.name,Type.FAMILY);
-		Map<TypedName, Integer> integers = null;
-		Map<TypedName, Extralogical> extralogicals = null;
-		Map<TypedName, PortOrArray> inputPortsOrArrays = null;
-		Map<TypedName, PortOrArray> outputPortsOrArrays = null;
-		
-		AutomatonFactory ja = new JavaAutomatonFactory();
-		PortFactory portFactory = ja.getPortFactory();
-		
-		MemberSignature ms = new MemberSignature(name, integers, extralogicals, inputPortsOrArrays,
-													outputPortsOrArrays, portFactory);
-		m.setSignature(ms);
-		
-		return getPrimitives();
+	public String getName(){
+		return name;
 	}
-*/
-	
-	public String getSource(){
-		return port.get(0).toString();
+
+	public Port getSource(){
+		return port.get(0);
 	}
-	public String getDest(){
-		return port.get(1).toString();
+	public Port getDest(){
+		return port.get(1);
 	}
 
 	public String toString(){
 		StringBuilder str = new StringBuilder();
-		str.append("main = " + name + "["+ variable + "]("+getSource()+","+getDest()+")");
+		str.append(name + "["+ variable + "]("+getSource()+","+getDest()+")");
 	 
 		return str.toString();
 	}

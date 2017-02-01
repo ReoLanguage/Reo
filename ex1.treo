@@ -1,7 +1,7 @@
 import reo.fifo1;
 
-ex1(a,b) {
+ex1(a,c) {
 
-	fifo1(a,b)
+	fifo1(a,b)fifo1(b,c)
 
 }

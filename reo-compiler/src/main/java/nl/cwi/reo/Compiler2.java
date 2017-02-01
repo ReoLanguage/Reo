@@ -3,7 +3,9 @@ package nl.cwi.reo;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -14,7 +16,29 @@ import nl.cwi.reo.interpret.InterpreterPR;
 import nl.cwi.reo.interpret.semantics.FlatAssembly;
 import nl.cwi.reo.lykos.SimpleLykos;
 import nl.cwi.reo.portautomata.PortAutomaton;
-import nl.cwi.reo.pr.targ.java.autom.Member.Primitive;
+import nl.cwi.reo.pr.autom.AutomatonFactory;
+import nl.cwi.reo.pr.autom.Extralogical;
+import nl.cwi.reo.pr.comp.CompilerSettings;
+import nl.cwi.reo.pr.comp.InterpretedMain;
+import nl.cwi.reo.pr.comp.InterpretedProgram;
+import nl.cwi.reo.pr.comp.InterpretedProtocol;
+import nl.cwi.reo.pr.comp.InterpretedWorker;
+import nl.cwi.reo.pr.comp.Language;
+import nl.cwi.reo.pr.comp.ProgramCompiler;
+import nl.cwi.reo.pr.java.comp.JavaProgramCompiler;
+import nl.cwi.reo.pr.misc.Definitions;
+import nl.cwi.reo.pr.misc.MainArgumentFactory;
+import nl.cwi.reo.pr.misc.Member;
+import nl.cwi.reo.pr.misc.MemberSignature;
+import nl.cwi.reo.pr.misc.PortFactory;
+import nl.cwi.reo.pr.misc.PortOrArray;
+import nl.cwi.reo.pr.misc.PortSpec;
+import nl.cwi.reo.pr.misc.TypedName;
+import nl.cwi.reo.pr.misc.TypedName.Type;
+import nl.cwi.reo.pr.misc.Member.Composite;
+import nl.cwi.reo.pr.misc.Member.Primitive;
+import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
+import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
 import nl.cwi.reo.prautomata.PRAutomaton;
 
 /**
@@ -99,31 +123,87 @@ Fifo(A$1;P$11$1)
 
 		FlatAssembly<PRAutomaton> program = interpreter.interpret(files);
 		
+		/*
+		 * Automaton and Port Factory to build members list :
+		 * 
+		 */
+		
+
+		CompilerSettings settings = new CompilerSettings("ex1.treo",Language.JAVA,false);
+		settings.ignoreInput(false);
+		settings.ignoreData(false);
+		settings.partition(true);
+		settings.subtractSyntactically(true);
+		settings.commandify(true);
+		settings.inferQueues(true);
+		settings.put("COUNT_PORTS", false);
+		
+		/*
+		 * Map current interpreted program on Lykos interpreted program
+		 */
+		AutomatonFactory automatonFactory = null;
+		PortFactory portFactory = null;
+		MainArgumentFactory mainArgumentFactory = null;
+		
+		Language targetLanguage = Language.JAVA;
+		switch (targetLanguage) {
+		case JAVA:
+			automatonFactory = new JavaAutomatonFactory();
+			portFactory = automatonFactory.getPortFactory();			
+			break;
+
+		case C11:
+
+			break;
+		}
+		List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
+		List<InterpretedWorker> interpretedWorker= new ArrayList<InterpretedWorker>();
+		
+		
 		List<Primitive> listPrimitive = new ArrayList<Primitive>();
+		List<Member> listMember = new ArrayList<Member>();
+		
+		Composite c = new Composite();
 		
 		for (PRAutomaton X : program) {
-			listPrimitive.add(X.getPrimitive());
+			Map<TypedName, Extralogical> extralogicals = new LinkedHashMap<>();
+			Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
+			Map<TypedName, Integer> integers = new LinkedHashMap<>();
+			Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
 			
-			System.out.println(X);
+			PortSpec p = new PortSpec(X.getSource().getName()+"$"+"1");
+			JavaPort jp = (JavaPort) portFactory.newOrGet(p);		
+			inputPortsOrArrays.put(new TypedName("in",Type.PORT),jp);
+			
+			p = new PortSpec(X.getDest().getName()+"$"+"1");
+			jp = (JavaPort) portFactory.newOrGet(p);		
+			outputPortsOrArrays.put(new TypedName("out",Type.PORT),jp);
+			
+			TypedName typedName = new TypedName(X.getName(),Type.FAMILY);
+			
+			MemberSignature signature = new MemberSignature(typedName,integers,extralogicals,inputPortsOrArrays,outputPortsOrArrays,portFactory);
+			
+			Primitive pr = new Primitive("nl.cwi.reo.pr.autom.libr."+X.getName(),"/home/e-spin/workspace/Reo/SimpleLykos/src/main/java");
+			pr.setSignature(signature);
+			
+			c.addChild(pr);
+			c.setSignature(signature);
+//			System.out.println(X);
 		}
+		InterpretedProtocol interpretedP = new InterpretedProtocol(c);
+		interpretedProtocol.add(interpretedP);
+		
+		InterpretedMain interpretedMain = new InterpretedMain(interpretedProtocol,interpretedWorker);
+		
+		Definitions defs = new Definitions();
+		List<String> notes = new ArrayList<String>();
+		InterpretedProgram interpretedProgram = new InterpretedProgram(settings.getSourceFileLocation(),defs,notes, interpretedMain);
+		
+		ProgramCompiler	programCompiler = new JavaProgramCompiler(settings,
+				interpretedProgram, automatonFactory);
 		
 		SimpleLykos sL = new SimpleLykos();
-		
-		sL.compile("program",listPrimitive);
-		
-		
-		if (!program.isEmpty()) {
-			PRAutomaton product = program.get(0).compose(program.subList(1, program.size()));
-			PRAutomaton hide = product.restrict(program.getInterface());
-			
-			System.out.println("Product automaton : \n");
-			System.out.println(hide);
-//			System.out.println("Product automaton : \n\n" + hide);
-		}
-		System.out.println("------");
-//		// Generate the classes.
-//		JavaCompiler JC = new JavaCompiler(name, "");
-//		JC.compile(program);
+		sL.compile("program",listPrimitive,programCompiler);
 }
 }
 
