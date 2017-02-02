@@ -54,7 +54,7 @@ public class SimpleLykos {
 	public SimpleLykos(){
 	}
 	
-	public void compile(String file,List<Primitive> ls,ProgramCompiler	programCompiler) 
+	public void compile(String file,ProgramCompiler	programCompiler) 
 	{ 
 		CompiledProgram compiledProgram = programCompiler.compile();
 		if (programCompiler.hasErrors())

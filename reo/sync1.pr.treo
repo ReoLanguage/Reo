@@ -1,0 +1,6 @@
+section reo;
+
+sync1(a?, b!) {
+	#PR
+	Sync[1](a;b)
+}
