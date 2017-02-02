@@ -1,0 +1,21 @@
+import reo.fifo1;
+
+fifok(a,b) {
+
+fifo = <k:int>(a?, b!) { 
+
+	for i = 0..k {
+		if (i == 0) {
+			fifo[0] = (a?,b!) {
+				a = b
+			}
+		} else (i > 0) {
+			fifo[i] = (a?,b!) {
+				fifo1(a,x) 
+				fifo[i-1](x,b)
+			}
+		}
+	}
+}
+fifo<3>(a,b)
+}

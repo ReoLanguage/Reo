@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import nl.cwi.pr.misc.Code;
-import nl.cwi.pr.misc.Variable;
-import nl.cwi.pr.misc.MainArgumentFactory.MainArgument;
-import nl.cwi.pr.misc.PortFactory.Port;
-import nl.cwi.pr.misc.PortFactory.PortType;
+import nl.cwi.reo.pr.misc.Code;
+import nl.cwi.reo.pr.misc.Variable;
+import nl.cwi.reo.pr.misc.MainArgumentFactory.MainArgument;
+import nl.cwi.reo.pr.misc.PortFactory.Port;
+import nl.cwi.reo.pr.misc.PortFactory.PortType;
 
 public class WorkerSignature {
 	private final List<Variable> variables;

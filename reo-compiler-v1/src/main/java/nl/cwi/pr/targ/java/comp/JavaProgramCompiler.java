@@ -17,6 +17,7 @@ import nl.cwi.pr.tools.comp.ProtocolCompiler;
 import nl.cwi.pr.tools.comp.WorkerCompiler;
 import nl.cwi.pr.util.Timestamps;
 
+
 public class JavaProgramCompiler extends ProgramCompiler {
 	private final String programPackageName;
 

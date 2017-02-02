@@ -1,0 +1,14 @@
+
+BinOp<f>(in1,in2;out)		= primitive("../../../../..:nl.cwi.pr.autom.libr.BinOp")
+BinRel<R>(in1,in2;)			= primitive("../../../../..:nl.cwi.pr.autom.libr.BinRel")
+Fifo(in;out)				= primitive("../../../../..:nl.cwi.pr.autom.libr.Fifo")
+Filter<R>(in;out)			= primitive("../../../../..:nl.cwi.pr.autom.libr.Filter")
+LossySync(in;out)			= primitive("../../../../..:nl.cwi.pr.autom.libr.LossySync")
+Merger2(in1,in2;out)		= primitive("../../../../..:nl.cwi.pr.autom.libr.Merger")
+Replicator2(in;out1,out2)	= primitive("../../../../..:nl.cwi.pr.autom.libr.Replicator")
+Sync(in;out)				= primitive("../../../../..:nl.cwi.pr.autom.libr.Sync")
+Transformer<f>(in;out)		= primitive("../../../../..:nl.cwi.pr.autom.libr.Transformer")
+
+FifoFull<d>(in;out)			= primitive("../../../../..:nl.cwi.pr.autom.libr.FifoFull")
+Node(in[];out[])			= primitive("../../../../..:nl.cwi.pr.autom.libr.Node")
+XNode(in[];out[])			= primitive("../../../../..:nl.cwi.pr.autom.libr.XNode")

@@ -10,8 +10,12 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.interpret.Interpreter;
 import nl.cwi.reo.interpret.InterpreterPA;
+
+
 import nl.cwi.reo.interpret.semantics.FlatConnector;
+import nl.cwi.reo.interpret.InterpreterPR;
 import nl.cwi.reo.portautomata.PortAutomaton;
+import nl.cwi.reo.prautomata.PRAutomaton;
 
 /**
  * A compiler for the coordination language Reo.
@@ -65,6 +69,7 @@ public class Compiler {
 		
 		if (program != null) {
 			for (PortAutomaton X : program) System.out.println(X);
+
 			
 			if (!program.isEmpty()) {
 				PortAutomaton product = program.get(0).compose(program.subList(1, program.size()));

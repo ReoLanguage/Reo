@@ -15,6 +15,7 @@ import nl.cwi.pr.tools.InterpretedWorker;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+
 public abstract class ProgramCompiler extends Compiler<CompiledProgram> {
 	private final MainCompiler<?> mainCompiler;
 	private final List<ProtocolCompiler<?>> protocolCompilers;

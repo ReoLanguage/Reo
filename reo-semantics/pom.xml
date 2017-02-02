@@ -15,4 +15,12 @@
 
   <name>Reo semantics</name>
 
+  <dependencies>
+    <dependency>
+      <groupId>nl.cwi.reo</groupId>
+      <artifactId>SimpleLykos</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+
 </project>

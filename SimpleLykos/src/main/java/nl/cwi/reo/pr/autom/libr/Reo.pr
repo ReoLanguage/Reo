@@ -1,0 +1,3 @@
+
+ExclDrain(in,out;)			= primitive("../../../../..:nl.cwi.pr.autom.libr.ExclDrain")
+SyncDrain(in1,in2;)			= primitive("../../../../..:nl.cwi.pr.autom.libr.SyncDrain")

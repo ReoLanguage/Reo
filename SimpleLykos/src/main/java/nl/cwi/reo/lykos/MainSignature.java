@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import nl.cwi.pr.misc.Variable;
-import nl.cwi.pr.misc.MainArgumentFactory.MainArgument;
-import nl.cwi.pr.misc.PortFactory.Port;
+import nl.cwi.reo.pr.misc.Variable;
+import nl.cwi.reo.pr.misc.MainArgumentFactory.MainArgument;
+import nl.cwi.reo.pr.misc.PortFactory.Port;
 
 public class MainSignature {
 	private final List<Variable> variables;

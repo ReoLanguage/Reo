@@ -1,19 +1,44 @@
 package nl.cwi.reo.lykos;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroupFile;
 
-import nl.cwi.pr.misc.MemberSignature;
-import nl.cwi.pr.misc.Variable;
-import nl.cwi.pr.misc.PortFactory.Port;
-import nl.cwi.reo.automata.AutomatonFactory.Automaton;
-import nl.cwi.reo.automata.AutomatonFactory.AutomatonSet;
-import nl.cwi.reo.automata.StateFactory.State;
-import nl.cwi.reo.automata.TransitionFactory.Transition;
+import nl.cwi.reo.pr.java.comp.JavaProgramCompiler;
+import nl.cwi.reo.pr.comp.CompiledProgram;
+import nl.cwi.reo.pr.comp.CompilerError;
+import nl.cwi.reo.pr.comp.CompilerSettings;
+import nl.cwi.reo.pr.comp.InterpretedMain;
+import nl.cwi.reo.pr.comp.ProgramCompiler;
+import nl.cwi.reo.pr.autom.AutomatonFactory;
+import nl.cwi.reo.pr.misc.Definitions;
+import nl.cwi.reo.pr.misc.MainArgumentFactory;
+import nl.cwi.reo.pr.misc.Member;
+import nl.cwi.reo.pr.misc.PortFactory;
+import nl.cwi.reo.pr.misc.PortSpec;
+import nl.cwi.reo.pr.misc.TypedName;
+import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
+import nl.cwi.reo.pr.targ.java.autom.JavaMainArgumentFactory;
+import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
+import nl.cwi.reo.pr.comp.InterpretedProgram;
+import nl.cwi.reo.pr.comp.InterpretedProtocol;
+import nl.cwi.reo.pr.comp.InterpretedWorker;
+import nl.cwi.reo.pr.autom.AutomatonFactory.Automaton;
+import nl.cwi.reo.pr.autom.AutomatonFactory.AutomatonSet;
+import nl.cwi.reo.pr.autom.StateFactory.State;
+import nl.cwi.reo.pr.autom.TransitionFactory.Transition;
+import nl.cwi.reo.pr.comp.Language;
+import nl.cwi.reo.pr.misc.MemberSignature;
+import nl.cwi.reo.pr.misc.Variable;
+import nl.cwi.reo.pr.misc.Member.Primitive;
+import nl.cwi.reo.pr.misc.PortFactory.Port;
+import nl.cwi.reo.pr.misc.TypedName.Type;
 
 public class SimpleLykos {
 	
@@ -23,19 +48,35 @@ public class SimpleLykos {
 	private final String protocolClassName = "Protocol_SimpleName";	
 	private final String workerPackageName = "com.example.myapp";	
 	private final String workerClassName = "Worker_SimpleName";
-
-	public void compile(String file) 
-	{ 
-		// Map assigning content to each file name
-		Map<String, String> files = new HashMap<String, String>();
-		
-		files.putAll(generateMain());
-		files.putAll(generateProtocols());
-		files.putAll(generateWorkers());
-
-		// Output all files
+	private final CompilerSettings settings = new CompilerSettings("./",Language.JAVA,false);
+	
+	
+	public SimpleLykos(){
 	}
-
+	
+	public void compile(String file,ProgramCompiler	programCompiler) 
+	{ 
+		
+		CompiledProgram compiledProgram = programCompiler.compile();
+		
+		if (programCompiler.hasErrors())
+			System.out.println("Errors");
+		
+		try {
+			compiledProgram.writeGeneratees("../reo-runtime-java-v1/src/main/java");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		compiledProgram.writeRunTime(targetRunTimeDirectoryLocation);
+		
+//		Map<String, String> files = new HashMap<String, String>();
+//		
+//		files.putAll(generateMain(ls));
+//		files.putAll(generateProtocols(ls));
+//		files.putAll(generateWorkers());
+	}
+	
 	/**
 	 * Generates the main class.
 	 * @return Map assigning Java code to a file name
@@ -45,8 +86,8 @@ public class SimpleLykos {
 		Map<String, String> files = new HashMap<String, String>();
 
 		// TODO fill in main signature and protocol/worker signatures
-		MainSignature signature = new MainSignature(null, null, null, null);
-		Map<String, MemberSignature> protocolSignatures = new HashMap<>();
+		MainSignature signature = new MainSignature(null,null,null,null);
+		Map<String, MemberSignature> protocolSignatures = new HashMap<>(); // pr.main.Protocol_d20170127_t103917_197_FifoK=FifoK[3](A$1;B$1)
 		Map<String, WorkerSignature> workerSignatures = new HashMap<>();	
 		
 		// Get string templates for main
@@ -70,6 +111,7 @@ public class SimpleLykos {
 		
 		return files;
 	}
+	
 
 	/**
 	 * Generates the protocol classes.
@@ -79,17 +121,12 @@ public class SimpleLykos {
 	{
 		Map<String, String> files = new HashMap<String, String>();
 		
-		CompilerSettings settings = new CompilerSettings();
-		settings.ignoreInput(false);
-		settings.ignoreData(false);
-		settings.partition(true);
-		settings.subtractSyntactically(true);
-		settings.commandify(true);
-		settings.inferQueues(true);
-		settings.put("COUNT_PORTS", false);
+
 
 		// TODO fill in automaton set from List<T> for some T
-		AutomatonSet automata = null;
+		Automata JavaAutomata = new Automata(settings);
+		JavaAutomata.compile();
+		AutomatonSet automata = JavaAutomata.getAutomata();
 
 		// Get string templates for protocol classes
 		STGroupFile templates = new STGroupFile("src/main/resources/java-protocol.stg");
