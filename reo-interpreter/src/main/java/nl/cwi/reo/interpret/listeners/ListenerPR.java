@@ -5,8 +5,11 @@ import nl.cwi.reo.semantics.api.Port;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.PrContext;
@@ -46,9 +49,8 @@ public class ListenerPR extends Listener<PRAutomaton> {
 
 	public void exitPr_port(Pr_portContext ctx){
 		List<Port> p = new ArrayList<Port>();
-		p.add(new Port(ctx.ID(0).getText()));
-		p.add(new Port(ctx.ID(1).getText()));
-		
+		for (TerminalNode id : ctx.ID())
+			p.add(new Port(id.getText()));
 		port.put(ctx, p);
 	};
 

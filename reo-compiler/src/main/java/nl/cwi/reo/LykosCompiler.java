@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 import nl.cwi.reo.interpret.semantics.FlatAssembly;
 import nl.cwi.reo.lykos.SimpleLykos;
@@ -29,6 +31,8 @@ import nl.cwi.reo.pr.misc.TypedName.Type;
 import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
 import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
 import nl.cwi.reo.prautomata.PRAutomaton;
+import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.PortType;
 
 public class LykosCompiler {
 	
@@ -89,13 +93,27 @@ public class LykosCompiler {
 		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
 		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
 		
-		PortSpec p = new PortSpec(program.getInterface().toArray()[0]+"$"+"1");
-		JavaPort jp = (JavaPort) portFactory.newOrGet(p);	
-		inputPortsOrArrays.put(new TypedName("in",Type.PORT),jp);
-
-		p = new PortSpec(program.getInterface().toArray()[1]+"$"+"1");
-		jp = (JavaPort) portFactory.newOrGet(p);	
-		inputPortsOrArrays.put(new TypedName("out",Type.PORT),jp);
+		
+		Set<Port> P = program.getInterface();
+		int numberInPort=1;
+		int numberOutPort=1;
+		for(Port p: P){
+			if(p.getType()==PortType.IN){
+				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
+				inputPortsOrArrays.put(new TypedName("in"+(numberInPort),Type.PORT),jp);
+				numberInPort++;
+			}
+			else if(p.getType()==PortType.OUT){
+				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
+				outputPortsOrArrays.put(new TypedName("out"+(numberOutPort),Type.PORT),jp);
+				numberOutPort++;
+			}
+			else{
+				throw new RuntimeException("Port of a composite should be in or out ports");
+			}
+		}
 		
 		MemberSignature compositeSignature = new MemberSignature(new TypedName("main",Type.FAMILY),new LinkedHashMap<>(),
 				new LinkedHashMap<>(),inputPortsOrArrays,outputPortsOrArrays,portFactory);
@@ -106,7 +124,7 @@ public class LykosCompiler {
 		
 	}
 	
-	public Primitive setPrimitive(PRAutomaton X){
+	public Primitive setPrimitive(PRAutomaton X) {
 		Map<TypedName, Extralogical> extralogicals = new LinkedHashMap<>();
 		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
 		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
@@ -114,14 +132,28 @@ public class LykosCompiler {
 		Map<TypedName, Integer> integers = new LinkedHashMap<>();
 		outputPortsOrArrays = new LinkedHashMap<>();
 		
-		
-		PortSpec p = new PortSpec(X.getSource().getName()+"$"+"1");
-		JavaPort jp = (JavaPort) portFactory.newOrGet(p);		
-		inputPortsOrArrays.put(new TypedName("in",Type.PORT),jp);
-		
-		p = new PortSpec(X.getDest().getName()+"$"+"1");
-		jp = (JavaPort) portFactory.newOrGet(p);		
-		outputPortsOrArrays.put(new TypedName("out",Type.PORT),jp);
+		SortedSet<Port> P = X.getInterface();
+		int numberInPort=1;
+		int numberOutPort=1;
+		for(Port p: P){
+			if(p.getType()==PortType.IN){
+				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
+				inputPortsOrArrays.put(new TypedName("in"+(numberInPort),Type.PORT),jp);
+				numberInPort++;
+				
+			}
+			else if(p.getType()==PortType.OUT){
+				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
+				outputPortsOrArrays.put(new TypedName("out"+(numberOutPort),Type.PORT),jp);
+				numberOutPort++;
+			}
+			else{
+				throw new RuntimeException("Port of atomic component should be in or out ports");
+			}
+		}
+
 		
 		TypedName typedName = new TypedName(X.getName(),Type.FAMILY);
 		

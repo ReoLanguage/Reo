@@ -1,0 +1,6 @@
+section reo;
+
+merger(a?,b?,c!) {
+	#PR
+	Merger[1](a,b;c)
+}

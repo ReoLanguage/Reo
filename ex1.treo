@@ -1,8 +1,10 @@
 import reo.fifo1;
 import reo.sync1;
 
-ex1(a,d) {
+ex1(a?,b?,c?,d!){
 
-	fifo1(a,b)fifo1(b,c)fifo1(c,d)
+//	fifo1(a,b)fifo1(b,c)fifo1(c,d)
+
+	merger(a?,b?,c?,d!)
 
 }

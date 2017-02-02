@@ -56,7 +56,9 @@ public class SimpleLykos {
 	
 	public void compile(String file,ProgramCompiler	programCompiler) 
 	{ 
+		
 		CompiledProgram compiledProgram = programCompiler.compile();
+		
 		if (programCompiler.hasErrors())
 			System.out.println("Errors");
 		
@@ -79,12 +81,12 @@ public class SimpleLykos {
 	 * Generates the main class.
 	 * @return Map assigning Java code to a file name
 	 */
-	private Map<String, String> generateMain(List<Primitive> lp) 
+	private Map<String, String> generateMain() 
 	{
 		Map<String, String> files = new HashMap<String, String>();
 
 		// TODO fill in main signature and protocol/worker signatures
-		MainSignature signature = BuildMainSignature(lp);
+		MainSignature signature = new MainSignature(null,null,null,null);
 		Map<String, MemberSignature> protocolSignatures = new HashMap<>(); // pr.main.Protocol_d20170127_t103917_197_FifoK=FifoK[3](A$1;B$1)
 		Map<String, WorkerSignature> workerSignatures = new HashMap<>();	
 		
@@ -110,36 +112,19 @@ public class SimpleLykos {
 		return files;
 	}
 	
-	private MainSignature BuildMainSignature(List<Primitive> lp){
-
-		List<Port> inputPorts = new ArrayList<Port>();
-		List<Port> outputPorts = new ArrayList<Port>();
-		List<Port> freeInputPorts = new ArrayList<Port>();
-		List<Port> freeOutputPorts = new ArrayList<Port>();
-		
-		for (Iterator<Primitive> iterator = lp.iterator(); iterator.hasNext();) {
-			Primitive p = iterator.next();
-			inputPorts.addAll(p.getSignature().getInputPorts());
-			freeInputPorts.addAll(p.getSignature().getInputPorts());
-			outputPorts.addAll(p.getSignature().getOutputPorts());
-			freeOutputPorts.addAll(p.getSignature().getOutputPorts());
-			
-		}
-		return new MainSignature(inputPorts,outputPorts,freeInputPorts,freeOutputPorts);
-	}
 
 	/**
 	 * Generates the protocol classes.
 	 * @return Map assigning Java code to a file name
 	 */
-	private Map<String, String> generateProtocols(List<Primitive> ls) 
+	private Map<String, String> generateProtocols() 
 	{
 		Map<String, String> files = new HashMap<String, String>();
 		
 
 
 		// TODO fill in automaton set from List<T> for some T
-		Automata JavaAutomata = new Automata(settings,ls);
+		Automata JavaAutomata = new Automata(settings);
 		JavaAutomata.compile();
 		AutomatonSet automata = JavaAutomata.getAutomata();
 

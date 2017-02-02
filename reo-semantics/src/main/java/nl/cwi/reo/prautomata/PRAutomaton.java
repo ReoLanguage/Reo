@@ -2,15 +2,11 @@ package nl.cwi.reo.prautomata;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-
-import nl.cwi.reo.pr.misc.MemberSignature;
-import nl.cwi.reo.pr.misc.Member.Primitive;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
 import nl.cwi.reo.semantics.api.SemanticsType;
@@ -21,7 +17,6 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	private String variable;
 	private Integer value; 
 	private List<Port> port;
-	private MemberSignature signature;
 	
 
 	public PRAutomaton(String name, String variable, Integer value, List<Port> port){
@@ -35,28 +30,21 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	public SemanticsType getType() {
 		return SemanticsType.PA;
 	}
-
-	
-	public List<Port> getPort(){
-		return this.port;
-		
-	}
 		
 	public String getName(){
 		return name;
 	}
 
-	public Port getSource(){
-		return port.get(0);
-	}
+	
 	public Port getDest(){
 		return port.get(1);
 	}
 
 	public String toString(){
 		StringBuilder str = new StringBuilder();
-		str.append(name + "["+ variable + "]("+getSource()+","+getDest()+")");
-	 
+	//	str.append(name + "["+ variable + "]("+getInterface()+")");
+		str.append(name + "("+getInterface()+")");
+		 
 		return str.toString();
 	}
 	

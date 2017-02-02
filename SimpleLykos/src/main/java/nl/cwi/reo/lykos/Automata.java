@@ -19,6 +19,7 @@ import nl.cwi.reo.pr.misc.PortFactory;
 import nl.cwi.reo.pr.misc.PortSpec;
 import nl.cwi.reo.pr.misc.PortFactory.Port;
 import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
+import nl.cwi.reo.pr.misc.Member;
 import nl.cwi.reo.pr.misc.Member.Primitive;
 
 
@@ -29,15 +30,13 @@ public class Automata {
 	private final AutomatonSet automata;
 	private final AutomatonFactory automatonFactory;
 	private final CompilerSettings settings;
-	private final List<Primitive> ls;
 
-	public Automata(CompilerSettings settings,List<Primitive> ls) {
+	public Automata(CompilerSettings settings) {
 
 
 		this.automatonFactory = new JavaAutomatonFactory();
 		this.automata = automatonFactory.newSet();
 		this.settings=settings;
-		this.ls=ls;
 	}
 
 	
@@ -192,8 +191,8 @@ nl.cwi.pr.targ.java.autom.JavaTermFactory@415b0b49
 	private AutomatonSet loadSmallAutomata() {
 		
 		AutomatonSet automata = automatonFactory.newSet();
-		
-		for (Primitive pr : ls) {
+		List<Primitive> P = (List<Primitive>) new Member(); 
+		for (Primitive pr : P) {
 			MemberSignature signature = pr.getSignature();
 			String className = pr.getClassName();
 			String rootDirectoryLocation = pr.getRootLocation();

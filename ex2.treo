@@ -1,0 +1,10 @@
+import reo.fifo1;
+import reo.merger;
+
+ex2(a?,b?,d!){
+
+//	fifo1(a,b)fifo1(b,c)fifo1(c,d)
+
+	fifo1(a,c)merger(c,b,d)
+
+}

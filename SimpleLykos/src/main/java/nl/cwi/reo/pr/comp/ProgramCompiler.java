@@ -73,6 +73,15 @@ public abstract class ProgramCompiler extends Compiler<CompiledProgram> {
 				generatees);
 	}
 
+	public MainCompiler<?> getMainCompiler(){
+		return mainCompiler;
+	}
+	public List<ProtocolCompiler<?>> getProtocolCompiler(){
+		return protocolCompilers;
+	}
+	public List<WorkerCompiler<?>> getWorkerCompiler(){
+		return workerCompilers;
+	}
 	//
 	// METHODS - PROTECTED
 	//
