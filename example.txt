@@ -1,9 +1,0 @@
-What is a semantic in REO ?
-
-"Syntax of Reo" section shows how expressive is REO language. However, none of all those 'fifo', 'sync' or others functions have been defined yet. In this section, you will be able to define your own semantic and link the functions used in REO with your own primitives. 
-
-Few steps are needed to have an executable from a .treo file. Firstly, parsing the file with ANTLR4 and interpret the result with the semantic you defined earlier. Then chose the appropriate environment and compile the interpreted program.
-
-How to design your grammar ?
-
-Your grammar is only specific to your semantic, and then, has to take into account the specification of your primitives (your atoms). 
