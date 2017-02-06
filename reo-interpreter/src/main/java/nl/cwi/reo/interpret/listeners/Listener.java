@@ -118,9 +118,12 @@ import nl.cwi.reo.interpret.systems.ReoSystemVariable;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableRange;
+import nl.cwi.reo.pr.comp.Language;
+import nl.cwi.reo.semantics.api.Component;
 import nl.cwi.reo.semantics.api.Expression;
 import nl.cwi.reo.semantics.api.PrioType;
 import nl.cwi.reo.semantics.api.Semantics;
+import nl.cwi.reo.semantics.api.SourceCode;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
@@ -175,7 +178,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	// Variables
 	private ParseTreeProperty<Variable> variables = new ParseTreeProperty<Variable>();	
 	private ParseTreeProperty<List<IntegerExpression>> bounds = new ParseTreeProperty<List<IntegerExpression>>();	
-
+	private ParseTreeProperty<SourceCode> sourceCode = new ParseTreeProperty<SourceCode>();	
+	
 	// Integer expressions
 	private ParseTreeProperty<IntegerExpression> intrs = new ParseTreeProperty<IntegerExpression>();
 
@@ -236,14 +240,25 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void exitRsys_atomic(Rsys_atomicContext ctx) {
 		T atom = atoms.get(ctx.atom());
 		ComponentList<T> comps = null;
+		SourceCode s;
 		if (atom == null) {
 			comps = new ComponentList<T>();
 			hasErrors = true;
 			System.err.println(new Message(MessageType.ERROR, ctx.start, "Undefined semantics."));
 		} else {
-			comps = new ComponentList<T>(atom);
+			if((ctx.source()!=null)){
+				ctx.source().target().toString().toUpperCase();
+				s=new SourceCode(ctx.source().STRING().toString(),ctx.source().target().toString().toUpperCase());
+				comps = new ComponentList<T>(atom,s);
+				}
+			else
+				comps = new ComponentList<T>(atom);
 		}
 		Assembly<T> prog = new Assembly<T>(new Definitions(), comps);
+//		for(nl.cwi.reo.interpret.semantics.Component<T> c : prog.getInstances()){
+//			if(c.getSourceCode()!=null)
+//				System.out.println(c.getSourceCode().getFile().toString());
+//		}
 		systems.put(ctx, new ReoSystemValue<T>(signatureExpressions.get(ctx.sign()), prog));
 	}
 

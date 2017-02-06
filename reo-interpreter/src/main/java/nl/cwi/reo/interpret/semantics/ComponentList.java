@@ -10,9 +10,11 @@ import java.util.TreeSet;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.semantics.api.Evaluable;
 import nl.cwi.reo.semantics.api.Expression;
+
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.PortType;
 import nl.cwi.reo.semantics.api.Semantics;
+import nl.cwi.reo.semantics.api.SourceCode;
 
 public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T>> implements Evaluable<ComponentList<T>> {
 	
@@ -46,6 +48,18 @@ public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T
 		if (atom == null)
 			throw new NullPointerException();
 		super.add(new Component<T>(atom));
+		this.operator = "";
+	}
+
+	/**
+	 * Constructs a singleton list with 
+	 * @param atom
+	 * @param sourceCode
+	 */
+	public ComponentList(T atom,SourceCode s) {
+		if (atom == null)
+			throw new NullPointerException();
+		super.add(new Component<T>(atom,s));
 		this.operator = "";
 	}
 	

@@ -1,16 +1,22 @@
 package nl.cwi.reo.interpret.systems;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.expressions.ValueList;
+import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.ComponentList;
+import nl.cwi.reo.interpret.signatures.Node;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
+import nl.cwi.reo.semantics.api.SourceCode;
 
 public final class ReoSystemValue<T extends Semantics<T>> implements ReoSystem<T> {
 	
@@ -42,6 +48,28 @@ public final class ReoSystemValue<T extends Semantics<T>> implements ReoSystem<T
 	
 	public ComponentList<T> getInstances() {
 		return prog.getInstances();
+	}
+	
+	public  ComponentList<T>  getWorkers() {
+		ComponentList<T> workers = new ComponentList<T>();
+		Map<String, Expression> def= prog.getDefinitions();
+		for(Map.Entry<String, Expression> e : def.entrySet()){
+			e.getValue();
+			if(e.getValue() instanceof ReoSystemValue<?>){
+				ReoSystemValue<?> r = (ReoSystemValue<?>) e.getValue();
+				for(Component<?>c : r.prog.getInstances()){
+//					Port p = new Port(r.getSignature());
+					if(c.getSourceCode()!=null) {
+						Map<Port,Port> map = new HashMap<Port,Port>();
+						for(Node n : r.getSignature().getNodeList()){
+							map.put(new Port(n.getVariable().toString()),n.toPort());
+						};
+						workers.add(new Component<T>((T)c.getAtom(),map,c.getSourceCode()));
+					}
+				}
+			}
+		}
+		return workers;
 	}
 
 	/**

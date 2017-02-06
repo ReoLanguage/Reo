@@ -68,11 +68,11 @@ public class Compiler {
 		FlatConnector<PortAutomaton> program = interpreter.interpret(files);
 		
 		if (program != null) {
-			for (PortAutomaton X : program) System.out.println(X);
+			for (PortAutomaton X : program.getComponents()) System.out.println(X);
 
 			
 			if (!program.isEmpty()) {
-				PortAutomaton product = program.get(0).compose(program.subList(1, program.size()));
+				PortAutomaton product = program.getComponents().get(0).compose(program.getComponents().subList(1, program.getComponents().size()));
 				PortAutomaton hide = product.restrict(program.getInterface());
 				
 				System.out.println("Product automaton : \n");

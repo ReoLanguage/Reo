@@ -13,6 +13,7 @@ import com.beust.jcommander.Parameter;
 import nl.cwi.reo.interpret.Interpreter;
 import nl.cwi.reo.interpret.InterpreterPA;
 import nl.cwi.reo.interpret.InterpreterPR;
+import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.lykos.SimpleLykos;
 import nl.cwi.reo.portautomata.PortAutomaton;
@@ -88,9 +89,16 @@ public class CompilerL {
 			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));
 
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params);
-
+		
 		FlatConnector<PRAutomaton> program = interpreter.interpret(files);
 		
+		
+		for(Component<PRAutomaton> c: program){
+			if(c.getSourceCode().getFile()!=null)
+				System.out.println(c.getSourceCode().getFile().toString());
+			else
+				System.out.println(c.getAtom());
+		}
 		new LykosCompiler(program).compile();
 		
 		}

@@ -13,7 +13,7 @@ rsys    : var                                                    # rsys_variable
         | sign block                                             # rsys_composite ;
 atom    : pa | cam | wa | sa | pr;
 
-source  : target ':' STRING ;
+source  : target ':' STRING('('ID (',' ID)*')')? ;
 target  : 'Java' ; 
       //| 'C/C++' 
       //| 'URL' ;

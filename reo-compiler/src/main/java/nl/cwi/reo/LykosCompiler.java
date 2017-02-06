@@ -1,14 +1,17 @@
 package nl.cwi.reo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.lykos.SimpleLykos;
+import nl.cwi.reo.lykos.WorkerSignature;
 import nl.cwi.reo.pr.autom.AutomatonFactory;
 import nl.cwi.reo.pr.autom.Extralogical;
 import nl.cwi.reo.pr.comp.CompilerSettings;
@@ -28,6 +31,7 @@ import nl.cwi.reo.pr.misc.TypedName;
 import nl.cwi.reo.pr.misc.Member.Composite;
 import nl.cwi.reo.pr.misc.Member.Primitive;
 import nl.cwi.reo.pr.misc.TypedName.Type;
+import nl.cwi.reo.pr.misc.Variable;
 import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
 import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
 import nl.cwi.reo.prautomata.PRAutomaton;
@@ -165,7 +169,42 @@ public class LykosCompiler {
 		return pr;
 				
 	}
+	public WorkerSignature setWorker(Component<PRAutomaton> X){
+		List<Variable> l =new ArrayList<Variable>();
+		for(Port p:X.getAtom().getInterface()){
+			if(p.getType()==PortType.IN){
+				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);	
+				jp.addAnnotation("portType", PType.INPUT);
+				l.add(jp);
+			}
+			else if(p.getType()==PortType.OUT){
+				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
+				jp.addAnnotation("portType", PType.OUTPUT);
+				l.add(jp);
+			}
+		}
+		WorkerSignature ws = new WorkerSignature(X.getSourceCode().getFile().toString(),l);
+		return ws;
+		
+	}
+	
+	public static enum PType {
+		INPUT, OUTPUT
+	}
+/*
+ * 
+	annotations	java.util.HashMap<K,V>  (id=101)	
+	signature	nl.cwi.pr.tools.interpr.WorkerSignature  (id=104)	
+	$SWITCH_TABLE$nl$cwi$pr$misc$PortFactory$PortType	(id=110)	
+	inputPorts	java.util.Collections$UnmodifiableRandomAccessList<E>  (id=113)	
+	mainArguments	java.util.Collections$UnmodifiableRandomAccessList<E>  (id=115)	
+	name	"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer" (id=116)	
+	outputPorts	java.util.Collections$UnmodifiableRandomAccessList<E>  (id=120)	
+	variables	java.util.Collections$UnmodifiableRandomAccessList<E>  (id=121)	
 
+ */
 	
 	
 	public void compile(){
@@ -175,16 +214,21 @@ public class LykosCompiler {
 	/*
 	 * Set primitives and add them to the main composite
 	 */
-	for (PRAutomaton X : program) {
+	List<InterpretedWorker> interpretedWorker= new ArrayList<InterpretedWorker>();
+	
+	for (Component<PRAutomaton> X : program) {
 		
-		c.addChild(setPrimitive(X));
+		if(X.getAtom().getName().equals("identity"))
+			interpretedWorker.add(new InterpretedWorker(setWorker(X)));
+		else
+			c.addChild(setPrimitive(X.getAtom()));
 
 	}
 	
 	List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
 	interpretedProtocol.add(new InterpretedProtocol(c));
 	
-	List<InterpretedWorker> interpretedWorker= new ArrayList<InterpretedWorker>();
+
 	// interpretedWorker.add(new ...)
 	
 	InterpretedMain interpretedMain = new InterpretedMain(interpretedProtocol,interpretedWorker);

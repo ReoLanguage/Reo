@@ -32,6 +32,12 @@ public final class Component<T extends Semantics<T>> extends HashMap<Port, Port>
 		for (Port a : atom.getInterface()) 
 			super.put(a, a);
 	}
+	public Component(T atom,SourceCode s) {
+		this.atom = atom;
+		this.source = s;
+		for (Port a : atom.getInterface()) 
+			super.put(a, a);
+	}
 	
 	public Component(T atom, Map<Port, Port> links, SourceCode source) {
 		this.atom = atom;

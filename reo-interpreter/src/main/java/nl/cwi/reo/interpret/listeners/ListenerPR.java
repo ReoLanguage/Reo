@@ -34,9 +34,13 @@ public class ListenerPR extends Listener<PRAutomaton> {
 	}
 
 	public void exitPr(PrContext ctx) {
+		System.out.println(name.get(ctx.pr_string()));
+		if(name.get(ctx.pr_string()).equals("identity"))
+			prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),new String(),new Integer(0),port.get(ctx.pr_port())));			
+		else{
 		parameter.put(ctx, ctx.NAT().getText());
-		
 		prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),parameter.get(ctx),value,port.get(ctx.pr_port())));
+		}
 	}
 
 	public void enterPr_string(Pr_stringContext ctx) {

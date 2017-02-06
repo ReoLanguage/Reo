@@ -9,7 +9,7 @@ import java.util.Set;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.Semantics;
 
-public class FlatConnector<T extends Semantics<T>> extends ArrayList<T> {
+public class FlatConnector<T extends Semantics<T>> extends ComponentList<T> {
 
 	/**
 	 * Serial version ID.
@@ -20,10 +20,10 @@ public class FlatConnector<T extends Semantics<T>> extends ArrayList<T> {
 	
 	private Set<Port> iface;
 	
-	public FlatConnector(Collection<T> components, String name, Set<Port> iface) {
+	public FlatConnector(ComponentList<T> components, String name, Set<Port> iface) {
 		if (components == null || name == null || iface == null)
 			throw new NullPointerException();
-		for (T x : components) {
+		for (Component<T> x : components) {
 			if (x == null)
 				throw new NullPointerException();
 			super.add(x);
