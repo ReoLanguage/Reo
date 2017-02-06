@@ -33,7 +33,8 @@ public class Port implements Comparable<Port> {
 		this.tag = tag;
 		this.hidden = hidden;
 	}
-	
+
+
 	/**
 	 * Joins this port to port origin by inheriting, if necessary, 
 	 * the type, tag and visibility of port origin. This method is used 

@@ -22,12 +22,12 @@ test(a?,d!) {
 		}
 	}
 */
-	Producer = (a!){
+	Producer = (a?){
 		#PR
-		identity(a;)
+		identity(;a)
 		Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
 		}
-	Consumer = (b?){
+	Consumer = (b!){
 		#PR
 		identity(b;)
 		Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Consumer"

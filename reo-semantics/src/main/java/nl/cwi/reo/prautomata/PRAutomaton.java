@@ -8,6 +8,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.api.PortType;
 import nl.cwi.reo.semantics.api.Semantics;
 import nl.cwi.reo.semantics.api.SemanticsType;
 
@@ -57,24 +58,29 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		
 		List<Port> P = new ArrayList<Port>();
 
-		SortedSet<Port> ins = new TreeSet<Port>();
-		SortedSet<Port> outs = new TreeSet<Port>();
+		int counterI=0;
+		int counterO=0;
 		for (Port p : node) {
-			P.add(p);
 			switch (p.getType()) {
 			case IN:
-				outs.add(p);
+				counterI++;
+				P.add(new Port(p.getName(),PortType.OUT,p.getPrioType(),p.getTypeTag(), false));
 				break;
 			case OUT: 
-				ins.add(p);
+				counterO++;
+				P.add(new Port(p.getName(),PortType.IN,p.getPrioType(),p.getTypeTag(), false));
 				break;
 			default:
 				break;
 			}
 		}
 
-		return new PRAutomaton(name,variable,value,P);
+		if(counterI>counterO)
+			return new PRAutomaton("Replicator",null,null,P);
+		else
+			return new PRAutomaton("Merger",null,null,P);
 	}
+
 
 	@Override
 	public PRAutomaton rename(Map<Port, Port> links) {

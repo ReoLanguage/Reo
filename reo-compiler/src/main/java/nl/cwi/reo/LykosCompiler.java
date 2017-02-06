@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -167,32 +168,38 @@ public class LykosCompiler {
 		pr.setSignature(signature);
 		
 		return pr;
-				
+			
 	}
+	
 	public WorkerSignature setWorker(Component<PRAutomaton> X){
 		List<Variable> l =new ArrayList<Variable>();
-		for(Port p:X.getAtom().getInterface()){
+		PRAutomaton Y = X.getAtom().rename(X);
+//			for(Port pA : X.getAtom().getInterface()){
+//				if(!(pA.toString()).equals(p.getKey().toString())){
+//					pA.
+//				}		
+//			}
+//		}
+
+		for(Port p:Y.getInterface()){
 			if(p.getType()==PortType.IN){
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);	
-				jp.addAnnotation("portType", PType.INPUT);
+				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.INPUT);
 				l.add(jp);
 			}
 			else if(p.getType()==PortType.OUT){
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
-				jp.addAnnotation("portType", PType.OUTPUT);
+				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.OUTPUT);
 				l.add(jp);
 			}
 		}
-		WorkerSignature ws = new WorkerSignature(X.getSourceCode().getFile().toString(),l);
+		WorkerSignature ws = new WorkerSignature(X.getSourceCode().getFile().toString().substring(1, X.getSourceCode().getFile().toString().length()-1),l);
 		return ws;
 		
 	}
 	
-	public static enum PType {
-		INPUT, OUTPUT
-	}
 /*
  * 
 	annotations	java.util.HashMap<K,V>  (id=101)	

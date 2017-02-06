@@ -187,10 +187,11 @@ public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T
 				this.add(new Component<T>(unit.getNode(node.getValue())));
 	}
 	
-	public List<T> getComponents() {
-		List<T> list = new ArrayList<T>();
+	//Return ComponentList
+	public ComponentList<T> getComponents() {
+		ComponentList<T> list = new ComponentList<T>();
 		for (Component<T> inst : this)
-			list.add(inst.getAtom().rename(inst));
+			list.add(new Component<T>(inst.getAtom().rename(inst),inst.getSourceCode()));
 		return list;
 	}
 	

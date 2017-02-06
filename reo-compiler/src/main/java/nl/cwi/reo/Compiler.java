@@ -10,8 +10,7 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.interpret.Interpreter;
 import nl.cwi.reo.interpret.InterpreterPA;
-
-
+import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.interpret.InterpreterPR;
 import nl.cwi.reo.portautomata.PortAutomaton;
@@ -68,15 +67,15 @@ public class Compiler {
 		FlatConnector<PortAutomaton> program = interpreter.interpret(files);
 		
 		if (program != null) {
-			for (PortAutomaton X : program.getComponents()) System.out.println(X);
+			for (Component<PortAutomaton> X : program.getComponents()) System.out.println(X);
 
 			
 			if (!program.isEmpty()) {
-				PortAutomaton product = program.getComponents().get(0).compose(program.getComponents().subList(1, program.getComponents().size()));
-				PortAutomaton hide = product.restrict(program.getInterface());
+//				PortAutomaton product = program.getComponents().get(0).compose(program.getComponents().subList(1, program.getComponents().size()));
+//				PortAutomaton hide = product.restrict(program.getInterface());
 				
-				System.out.println("Product automaton : \n");
-				System.out.println(hide);
+//				System.out.println("Product automaton : \n");
+//				System.out.println(hide);
 			}
 		}
 //		// Generate the classes.
