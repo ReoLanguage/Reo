@@ -17,7 +17,7 @@ public class CompilerSettings implements Map<String, Object> {
 
 	private final boolean kSemantic;
 	
-	private final String sourceFileLocation;
+	private String sourceFileLocation;
 
 	//
 	// CONSTRUCTORS
@@ -83,6 +83,10 @@ public class CompilerSettings implements Map<String, Object> {
 		return sourceFileLocation;
 	}
 
+	public void setSourceFileLocation(String source) {
+		this.sourceFileLocation=source;
+	}
+	
 	public boolean ignoreData() {
 		return settings.containsKey(FLAG_IGNORE_DATA)
 				&& (boolean) settings.get(FLAG_IGNORE_DATA);

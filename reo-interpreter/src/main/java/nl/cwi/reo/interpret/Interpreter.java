@@ -152,7 +152,7 @@ public class Interpreter<T extends Semantics<T>> {
 				ComponentList<T> instances = main_p.getInstances();
 				this.workers=workers;
 				
-				instances.insertNodes(true, true);
+				instances.insertNodes(false, false);
 				
 				return new FlatConnector<T>(instances.getComponents(), name, sign.keySet());
 			}

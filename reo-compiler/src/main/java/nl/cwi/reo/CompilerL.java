@@ -73,7 +73,8 @@ public class CompilerL {
 			else
 				System.out.println(c.getAtom());
 		}
-		new LykosCompiler(program).compile();
+		String pathLocation="../reo-runtime-java-v1/src/main/java";
+		new LykosCompiler(program).compile(pathLocation);
 		
 		}
 }

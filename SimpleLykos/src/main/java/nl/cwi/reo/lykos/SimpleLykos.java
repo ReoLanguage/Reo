@@ -52,6 +52,7 @@ public class SimpleLykos {
 	
 	
 	public SimpleLykos(){
+	
 	}
 	
 	public void compile(String file,ProgramCompiler	programCompiler) 
@@ -63,18 +64,10 @@ public class SimpleLykos {
 			System.out.println("Errors");
 		
 		try {
-			compiledProgram.writeGeneratees("../reo-runtime-java-v1/src/main/java");
+			compiledProgram.writeGeneratees(file);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		compiledProgram.writeRunTime(targetRunTimeDirectoryLocation);
-		
-//		Map<String, String> files = new HashMap<String, String>();
-//		
-//		files.putAll(generateMain(ls));
-//		files.putAll(generateProtocols(ls));
-//		files.putAll(generateWorkers());
 	}
 	
 	/**

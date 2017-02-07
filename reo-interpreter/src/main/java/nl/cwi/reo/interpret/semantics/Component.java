@@ -62,7 +62,10 @@ public final class Component<T extends Semantics<T>> extends HashMap<Port, Port>
 	}
 	
 	public SourceCode getSourceCode() {
-		return source;
+		if(!source.equals(null))
+			return source;
+		else
+			return null;
 	}
 	
 	/**

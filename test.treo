@@ -1,7 +1,7 @@
 import reo.fifo1;
 
 test(a?,d!) {
-/*
+
 	fifo = <k:int>(a?, b!) { 
 		if (k <= 0) { 
 			a = b 
@@ -21,7 +21,7 @@ test(a?,d!) {
 			}
 		}
 	}
-*/
+
 	Producer = (a?){
 		#PR
 		identity(;a)
@@ -34,7 +34,7 @@ test(a?,d!) {
 		}
 	Producer(a)
 	Consumer(d)
-	fifo1(a,d)
+	fifo<1>(a,d)
 }
 /*
 	recursive<k:int>(a?,b!) {
