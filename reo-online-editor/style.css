@@ -1,0 +1,51 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  text-align: center;
+  background-color:#dde;
+}
+
+#header {
+  background-color: #bbf;
+  text-align: center;
+  padding: 10px;
+}
+
+#container {
+  width: 1300px;
+  margin: auto;
+}
+
+#textdiv {
+  float: left;
+  width: 280px;
+  height: 580px;
+  padding: 10px;
+  background-color:#888;
+}
+
+#canvas {
+  height: 600px;
+  margin-left: 300px;
+  margin-right: 100px;
+  background-color:#fff;
+}
+
+#toolbar {
+  float: right;
+  width: 180px;
+  height: 580px;
+  padding: 10px;
+  background-color:#888;
+}
+
+#text {
+  width: 276px;
+  height: 540px;
+}
+
+#refresh {
+  display: block;
+  margin: auto;
+}
