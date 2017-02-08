@@ -1,6 +1,7 @@
 (function() {
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+  var line, isDown;
 
   function makeCircle(left, top) {
     var c = new fabric.Circle({
@@ -9,102 +10,93 @@
       strokeWidth: 5,
       radius: 12,
       fill: '#fff',
-      stroke: '#000'
+      stroke: '#000',
+      hasBorders: false,
+      hasControls: false
     });
-    c.hasControls = c.hasBorders = false;
 
+    // these are the channels that are connected to this node
     c.linesIn = [];
     c.linesOut = [];
 
     return c;
-  }
+  } //makeCircle
 
   function drawLine(x1, y1, x2, y2) {
-    var l = new fabric.Line([x1, y1, x2, y2], {
+    // create a line...
+    line = new fabric.Line([x1, y1, x2, y2], {
       fill: '#000',
       stroke: '#000',
       strokeWidth: 5,
-      selectable: false,
-      circle1: null,
-      circle2: null
+      selectable: false
     });
     
+    // ...an arrowhead...
     var a = new fabric.Triangle({
-      left: l.get('x2'),
-      top: l.get('y2'),
+      left: line.get('x2'),
+      top: line.get('y2'),
       width: 20,
       height: 20,
       angle: calcArrowAngle(x1,y1,x2,y2),
       fill: '#000',
       hasBorders: false,
-      hasControls: false,
-      line: l
+      hasControls: false
     });
     
+    // ...and two circles
     var c1 = makeCircle(x1,y1);
     var c2 = makeCircle(x2,y2);
     
-    l.set({arrow: a, circle1: c1, circle2: c2});
+    // ...link them all together
+    line.set({'arrow': a, 'circle1': c1, 'circle2': c2});
+    a.set({'line': line});
+    c1.linesOut.push(line);
+    c2.linesIn.push(line);
     
-    var length = Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
-    length = length - 22;//circle2.get('radius') - circle2.get('stroke');
-    var x = Math.atan((y2 - y1)/(x2 - x1));
-    if (x2 > x1) {
-      l.set({'x2': x1 + length * Math.cos(x)});
-    } else {
-      l.set({'x2': x1 - length * Math.cos(x)});
-    }
-    if (y2 > y1) {
-      l.set({'y2': y1 + length * Math.sin(x)});
-    } else {
-      l.set({'y2': y1 - length * Math.sin(x)});
-    }
-    a.set({left: l.get('x2'), top: l.get('y2')});
+    // magic
+    updateLine(line);
     
-    c1.linesOut.push(l);
-    c2.linesIn.push(l);
-    
-    canvas.add(l,a,c1,c2);
-    canvas.sendToBack(l);
+    // draw everything on the canvas
+    canvas.add(line,a,c1,c2);
     canvas.renderAll();
   } //drawLine
-  
-  function diff(a,b) {
-    if (a > b)
-      return a-b;
-    return b-a;
-  }
   
   function updateLine(line) {
     var x1 = line.get('x1'),
         y1 = line.get('y1'),
         x2 = line.get('x2'),
         y2 = line.get('y2');
-        
-    var length = Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
-    length = length - 22;//circle2.get('radius') - circle2.get('stroke');
-    var x = Math.atan(diff(y1,y2)/diff(x1,x2));
-    document.getElementById("x").value = x;
-    if (x2 > x1) {
-      line.set({'x2': x1 + length * Math.cos(x)});
-    } else {
-      line.set({'x2': x1 - length * Math.cos(x)});
+    
+    if (x1 == x2 && y1 == y2) {
+      line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
     }
-    if (y2 > y1) {
-      line.set({'y2': y1 + length * Math.sin(x)});
-    } else {
-      line.set({'y2': y1 - length * Math.sin(x)});
+    else {       
+      var length = Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
+      length = length - 22;//circle2.get('radius') - circle2.get('stroke');
+      var x = Math.atan(Math.abs(y1-y2)/Math.abs(x1-x2));
+      document.getElementById("x").value = x;
+      if (x2 > x1) {
+        line.set({'x2': x1 + length * Math.cos(x)});
+      } else {
+        line.set({'x2': x1 - length * Math.cos(x)});
+      }
+      if (y2 > y1) {
+        line.set({'y2': y1 + length * Math.sin(x)});
+      } else {
+        line.set({'y2': y1 - length * Math.sin(x)});
+      }
+      line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
+      var angle = calcArrowAngle(line.get('x1'), line.get('y1'), line.get('x2'), line.get('y2'));
+      line.arrow.set({'angle': angle});
     }
-    line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
-    var angle = calcArrowAngle(line.get('x1'), line.get('y1'), line.get('x2'), line.get('y2'));
-    line.arrow.set({'angle': angle});
+    
     canvas.renderAll();
     document.getElementById("x1").value = x1;
     document.getElementById("y1").value = y1;
     document.getElementById("x2").value = x2;
     document.getElementById("y2").value = y2;
     document.getElementById("angle").value = angle;
-  }
+  } //updateLine
   
   function calcArrowAngle(x1, y1, x2, y2) {
     var angle = 0, x, y;
@@ -120,9 +112,7 @@
     }
 
     return (angle * 180 / Math.PI) + 90;
-  }
-  
-  drawLine(100,100,200,100);
+  } //calcArrowAngle
 
   canvas.on('object:moving', function(e) {
     var p = e.target;
@@ -149,5 +139,33 @@
       document.getElementById("angle").value = angle;
     }
     canvas.renderAll();
+  }); //object:moving
+  
+  drawLine(100,100,200,100);
+  drawLine(200,100,300,100);
+  
+  /*
+  canvas.on('mouse:down', function(e) {
+    console.log("Mouse down!");
+    isDown = true;
+    if (canvas.getActiveObject())
+      return;
+    var pointer = canvas.getPointer(e.e);
+    var x = pointer.x;
+    var y = pointer.y;
+    drawLine(x,y,x,y);
+  }); //mouse:down
+  
+  canvas.on('mouse:move', function(e){
+    if (!isDown)
+      return;
+    var pointer = canvas.getPointer(e.e);
+    line.set({x2: pointer.x, y2: pointer.y});
+    canvas.renderAll();
   });
+  
+  canvas.on('mouse:up', function(e){
+    isDown = false;
+  });*/
+  
 })();
