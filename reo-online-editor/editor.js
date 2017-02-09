@@ -54,18 +54,23 @@
     c2.linesIn.push(line);
     
     // magic
-    updateLine(line);
+    updateLine(line, 2);
     
     // draw everything on the canvas
     canvas.add(line,a,c1,c2);
     canvas.renderAll();
   } //drawLine
   
-  function updateLine(line) {
+  function updateLine(line, end) {
     var x1 = line.get('x1'),
         y1 = line.get('y1'),
         x2 = line.get('x2'),
         y2 = line.get('y2');
+    
+    if (end == 1) {
+      x2 = line.circle2.get('left');
+      y2 = line.circle2.get('top');
+    }    
     
     if (x1 == x2 && y1 == y2) {
       line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
@@ -75,15 +80,17 @@
       length = length - 22;//circle2.get('radius') - circle2.get('stroke');
       var x = Math.atan(Math.abs(y1-y2)/Math.abs(x1-x2));
       document.getElementById("x").value = x;
-      if (x2 > x1) {
-        line.set({'x2': x1 + length * Math.cos(x)});
-      } else {
-        line.set({'x2': x1 - length * Math.cos(x)});
-      }
-      if (y2 > y1) {
-        line.set({'y2': y1 + length * Math.sin(x)});
-      } else {
-        line.set({'y2': y1 - length * Math.sin(x)});
+      if (end) {
+        if (x2 > x1) {
+          line.set({'x2': x1 + length * Math.cos(x)});
+        } else {
+          line.set({'x2': x1 - length * Math.cos(x)});
+        }
+        if (y2 > y1) {
+          line.set({'y2': y1 + length * Math.sin(x)});
+        } else {
+          line.set({'y2': y1 - length * Math.sin(x)});
+        }
       }
       line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
       var angle = calcArrowAngle(line.get('x1'), line.get('y1'), line.get('x2'), line.get('y2'));
@@ -119,11 +126,11 @@
     if (p.get('type') == "circle") {
       for (i = 0; i < p.linesIn.length; i++) {
         p.linesIn[i].set({ 'x2': p.left, 'y2': p.top });
-        updateLine(p.linesIn[i]);
+        updateLine(p.linesIn[i], 2);
       }
       for (i = 0; i < p.linesOut.length; i++) {
         p.linesOut[i].set({ 'x1': p.left, 'y1': p.top });
-        updateLine(p.linesOut[i]);
+        updateLine(p.linesOut[i], 1);
       }
     }
     if (p.get('type') == "triangle") {
