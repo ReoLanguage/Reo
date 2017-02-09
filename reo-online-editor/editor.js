@@ -28,13 +28,15 @@
       fill: '#000',
       stroke: '#000',
       strokeWidth: 5,
+      hasBorders: false,
+      hasControls: false,
       selectable: false
     });
     
     // ...an arrowhead...
     var a = new fabric.Triangle({
-      left: line.get('x2'),
-      top: line.get('y2'),
+      left: x2,
+      top: y2,
       width: 20,
       height: 20,
       angle: calcArrowAngle(x1,y1,x2,y2),
@@ -67,6 +69,7 @@
         x2 = line.get('x2'),
         y2 = line.get('y2');
     
+    // if we are updating the source end, we first have to reset the sink end coordinates
     if (end == 1) {
       x2 = line.circle2.get('left');
       y2 = line.circle2.get('top');
@@ -123,7 +126,29 @@
 
   canvas.on('object:moving', function(e) {
     var p = e.target;
+    p.setCoords();
+    
     if (p.get('type') == "circle") {
+      canvas.forEachObject(function(obj) {
+        if (obj === p || obj.get('type') !== "circle") return;
+        if (p.intersectsWithObject(obj)) {
+          if(Math.abs(p.left-obj.left) < 5 && Math.abs(p.left-obj.left) < 5) {
+            for (i = 0; i < p.linesIn.length; i++) {
+              p.linesIn[i].set({'circle2': obj, 'x2': obj.left, 'y2': obj.top});
+              obj.linesIn.push(p.linesIn[i]);
+              updateLine(p.linesIn[i], 2);
+            }
+            for (i = 0; i < p.linesOut.length; i++) { 
+              p.linesOut[i].set({'circle1': obj, 'x1': obj.left, 'y1': obj.top});
+              obj.linesOut.push(p.linesOut[i]);
+              updateLine(p.linesOut[i], 1);
+            }
+            canvas.remove(p);
+            canvas.setActiveObject(obj);
+          }
+        }
+      });
+      
       for (i = 0; i < p.linesIn.length; i++) {
         p.linesIn[i].set({ 'x2': p.left, 'y2': p.top });
         updateLine(p.linesIn[i], 2);
@@ -149,10 +174,10 @@
   }); //object:moving
   
   drawLine(100,100,200,100);
-  drawLine(200,100,300,100);
+  drawLine(300,100,400,100);
   
-  /*
-  canvas.on('mouse:down', function(e) {
+  
+  /*canvas.on('mouse:down', function(e) {
     console.log("Mouse down!");
     isDown = true;
     if (canvas.getActiveObject())
@@ -161,6 +186,8 @@
     var x = pointer.x;
     var y = pointer.y;
     drawLine(x,y,x,y);
+    canvas.setActiveObject(line.circle2);
+    updateLine(line,2);
   }); //mouse:down
   
   canvas.on('mouse:move', function(e){
