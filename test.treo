@@ -1,6 +1,6 @@
 import reo.fifo1;
 
-test(a,d) {
+test(a?,d!) {
 
 	fifo = <k:int>(a?, b!) { 
 		if (k <= 0) { 
@@ -21,6 +21,19 @@ test(a,d) {
 			}
 		}
 	}
+
+	Producer = (a?){
+		#PR
+		identity(;a)
+		Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
+		}
+	Consumer = (b!){
+		#PR
+		identity(b;)
+		Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Consumer"
+		}
+	Producer(a)
+	Consumer(d)
 	fifo<1>(a,d)
 }
 /*

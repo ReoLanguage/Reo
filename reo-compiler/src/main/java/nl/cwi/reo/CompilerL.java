@@ -11,34 +11,9 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.interpret.Interpreter;
-import nl.cwi.reo.interpret.InterpreterPA;
 import nl.cwi.reo.interpret.InterpreterPR;
+import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
-import nl.cwi.reo.lykos.SimpleLykos;
-import nl.cwi.reo.portautomata.PortAutomaton;
-import nl.cwi.reo.pr.autom.AutomatonFactory;
-import nl.cwi.reo.pr.autom.Extralogical;
-import nl.cwi.reo.pr.comp.CompilerSettings;
-import nl.cwi.reo.pr.comp.InterpretedMain;
-import nl.cwi.reo.pr.comp.InterpretedProgram;
-import nl.cwi.reo.pr.comp.InterpretedProtocol;
-import nl.cwi.reo.pr.comp.InterpretedWorker;
-import nl.cwi.reo.pr.comp.Language;
-import nl.cwi.reo.pr.comp.ProgramCompiler;
-import nl.cwi.reo.pr.java.comp.JavaProgramCompiler;
-import nl.cwi.reo.pr.misc.Definitions;
-import nl.cwi.reo.pr.misc.MainArgumentFactory;
-import nl.cwi.reo.pr.misc.Member;
-import nl.cwi.reo.pr.misc.MemberSignature;
-import nl.cwi.reo.pr.misc.PortFactory;
-import nl.cwi.reo.pr.misc.PortOrArray;
-import nl.cwi.reo.pr.misc.PortSpec;
-import nl.cwi.reo.pr.misc.TypedName;
-import nl.cwi.reo.pr.misc.TypedName.Type;
-import nl.cwi.reo.pr.misc.Member.Composite;
-import nl.cwi.reo.pr.misc.Member.Primitive;
-import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
-import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
 import nl.cwi.reo.prautomata.PRAutomaton;
 
 /**
@@ -88,10 +63,18 @@ public class CompilerL {
 			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));
 
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params);
-
+		
 		FlatConnector<PRAutomaton> program = interpreter.interpret(files);
 		
-		new LykosCompiler(program).compile();
+		
+		for(Component<PRAutomaton> c: program){
+			if(c.getSourceCode().getFile()!=null)
+				System.out.println(c.getSourceCode().getFile().toString());
+			else
+				System.out.println(c.getAtom());
+		}
+		String pathLocation="../reo-runtime-java-v1/src/main/java";
+		new LykosCompiler(program).compile(pathLocation);
 		
 		}
 }

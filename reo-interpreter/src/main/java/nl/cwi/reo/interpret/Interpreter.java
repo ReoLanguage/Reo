@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
@@ -30,6 +31,7 @@ import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.interpret.semantics.Definitions;
+import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.strings.StringValue;
@@ -59,6 +61,12 @@ public class Interpreter<T extends Semantics<T>> {
 	 * list of parameters to instantiate the main component.
 	 */
 	private final List<String> params;
+	
+	/**
+	 * list of parameters to instantiate the main component.
+	 */
+	private ComponentList<T> workers;
+	
 	
 	/**
 	 * Constructs a Reo interpreter.
@@ -140,9 +148,11 @@ public class Interpreter<T extends Semantics<T>> {
 				
 				Assembly<T> main_p = main.instantiate(values, null);
 				
+				ComponentList<T> workers = main.getWorkers();
 				ComponentList<T> instances = main_p.getInstances();
+				this.workers=workers;
 				
-				instances.insertNodes(true, false);
+				instances.insertNodes(false, false);
 				
 				return new FlatConnector<T>(instances.getComponents(), name, sign.keySet());
 			}
@@ -153,6 +163,10 @@ public class Interpreter<T extends Semantics<T>> {
 		}		
 
 		return null;
+	}
+	
+	public ComponentList<T> getWorkers(){
+		return workers;
 	}
 	
 	/**

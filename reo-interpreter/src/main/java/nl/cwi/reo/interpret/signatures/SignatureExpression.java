@@ -153,6 +153,9 @@ public final class SignatureExpression implements ParameterType {
 		
 		return new SignatureConcrete(definitions, links);
 	}
+	public NodeList getNodeList(){
+		return nodes;
+	}
 
 	@Override
 	public boolean equalType(ParameterType t) {

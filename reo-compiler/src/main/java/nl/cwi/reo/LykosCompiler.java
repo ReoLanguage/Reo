@@ -1,14 +1,18 @@
 package nl.cwi.reo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 
+import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.lykos.SimpleLykos;
+import nl.cwi.reo.lykos.WorkerSignature;
 import nl.cwi.reo.pr.autom.AutomatonFactory;
 import nl.cwi.reo.pr.autom.Extralogical;
 import nl.cwi.reo.pr.comp.CompilerSettings;
@@ -24,26 +28,33 @@ import nl.cwi.reo.pr.misc.MemberSignature;
 import nl.cwi.reo.pr.misc.PortFactory;
 import nl.cwi.reo.pr.misc.PortOrArray;
 import nl.cwi.reo.pr.misc.PortSpec;
+import nl.cwi.reo.pr.misc.ToolError;
+import nl.cwi.reo.pr.misc.ToolErrorAccumulator;
 import nl.cwi.reo.pr.misc.TypedName;
 import nl.cwi.reo.pr.misc.Member.Composite;
 import nl.cwi.reo.pr.misc.Member.Primitive;
 import nl.cwi.reo.pr.misc.TypedName.Type;
+import nl.cwi.reo.pr.misc.Variable;
 import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
 import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
 import nl.cwi.reo.prautomata.PRAutomaton;
 import nl.cwi.reo.semantics.api.Port;
 import nl.cwi.reo.semantics.api.PortType;
 
-public class LykosCompiler {
+public class LykosCompiler extends ToolErrorAccumulator{
 	
 	CompilerSettings settings;
 	PortFactory portFactory = null;
 	AutomatonFactory automatonFactory = null;
 	FlatConnector<PRAutomaton> program;
+	Definitions defs = new Definitions();
+	int counterWorker = 0;
+	
 	
 	
 	public LykosCompiler(FlatConnector<PRAutomaton> program){
-			
+		super("test.treo");
+		
 		/*
 		 * Compiler settings :
 		 */
@@ -56,7 +67,7 @@ public class LykosCompiler {
 		settings.commandify(true);
 		settings.inferQueues(true);
 		settings.put("COUNT_PORTS", false);
-	
+		
 		// Define Language for compilation
 		Language targetLanguage = Language.JAVA;
 		
@@ -83,6 +94,48 @@ public class LykosCompiler {
 		default:
 			break;
 		}
+	}
+	
+	/*
+	 * Take Reo interpreted program and make it understandable for Lykos 
+	 */
+	public void compile(String path){
+		
+		Composite c = setComposite();
+		
+		/*
+		 * Set primitives and add them to the main composite
+		 */
+		
+		List<InterpretedWorker> interpretedWorker= new ArrayList<InterpretedWorker>();
+	
+		for (Component<PRAutomaton> X : program) {
+			
+			if((X.getSourceCode().getFile())!=(null)){
+				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
+			}
+			
+			else
+				c.addChild(setPrimitive(X.getAtom()));
+	
+		}
+	
+		List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
+		interpretedProtocol.add(new InterpretedProtocol(c));
+			
+		InterpretedMain interpretedMain = new InterpretedMain(interpretedProtocol,interpretedWorker);
+		
+	
+		List<String> notes = new ArrayList<String>();
+		InterpretedProgram interpretedProgram = new InterpretedProgram(settings.getSourceFileLocation(),defs,notes, interpretedMain);
+		
+		ProgramCompiler	programCompiler = new JavaProgramCompiler(settings,interpretedProgram, automatonFactory);
+		/*
+		 * Start compiling on simple Lykos project 
+		 */
+		
+		SimpleLykos sL = new SimpleLykos();
+		sL.compile(path, programCompiler,automatonFactory);
 	}
 	
 	/*
@@ -163,42 +216,56 @@ public class LykosCompiler {
 		pr.setSignature(signature);
 		
 		return pr;
-				
-	}
-
-	
-	
-	public void compile(){
-		
-	Composite c = setComposite();
-	
-	/*
-	 * Set primitives and add them to the main composite
-	 */
-	for (PRAutomaton X : program) {
-		
-		c.addChild(setPrimitive(X));
-
+			
 	}
 	
-	List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
-	interpretedProtocol.add(new InterpretedProtocol(c));
+	public WorkerSignature setWorker(Component<PRAutomaton> X){
+		List<Variable> l =new ArrayList<Variable>();
+		PRAutomaton Y = X.getAtom().rename(X);
+//			for(Port pA : X.getAtom().getInterface()){
+//				if(!(pA.toString()).equals(p.getKey().toString())){
+//					pA.
+//				}		
+//			}
+//		}
+		String name="";
+		for(Port p:Y.getInterface()){
+			if(p.getType()==PortType.IN){
+				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);	
+				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.INPUT);
+				l.add(jp);
+				defs.addPort(jp);
+				name=""+counterWorker;
+				counterWorker++;
+			}
+			else if(p.getType()==PortType.OUT){
+				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
+				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.OUTPUT);
+				l.add(jp);
+				defs.addPort(jp);
+				name=""+counterWorker;
+				counterWorker++;
+			}
+		}
+		String nameWorker = X.getSourceCode().getFile().toString().substring(1, X.getSourceCode().getFile().toString().length()-1);
+		WorkerSignature ws = new WorkerSignature(nameWorker,l);
+		defs.putWorkerName(new TypedName(name,Type.WORKER_NAME), nameWorker, this);
+		
+		return ws;
+		
+	}
 	
-	List<InterpretedWorker> interpretedWorker= new ArrayList<InterpretedWorker>();
-	// interpretedWorker.add(new ...)
-	
-	InterpretedMain interpretedMain = new InterpretedMain(interpretedProtocol,interpretedWorker);
-	
-	Definitions defs = new Definitions();
-	List<String> notes = new ArrayList<String>();
-	InterpretedProgram interpretedProgram = new InterpretedProgram(settings.getSourceFileLocation(),defs,notes, interpretedMain);
-	
-	ProgramCompiler	programCompiler = new JavaProgramCompiler(settings,interpretedProgram, automatonFactory);
-	/*
-	 * Start compiling on simple Lykos project 
-	 */
-	
-	SimpleLykos sL = new SimpleLykos();
-	sL.compile("program", programCompiler);
+
+
+	@Override
+	protected ToolError newError(String message) {
+		return null;
+	}
+
+	@Override
+	protected ToolError newError(String message, Throwable cause) {
+		return null;
 	}
 }
