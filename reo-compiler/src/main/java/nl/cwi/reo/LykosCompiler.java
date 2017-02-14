@@ -50,6 +50,8 @@ public class LykosCompiler extends ToolErrorAccumulator{
 	Definitions defs = new Definitions();
 	int counterWorker = 0;
 	
+	
+	
 	public LykosCompiler(FlatConnector<PRAutomaton> program){
 		super("test.treo");
 		
@@ -92,6 +94,48 @@ public class LykosCompiler extends ToolErrorAccumulator{
 		default:
 			break;
 		}
+	}
+	
+	/*
+	 * Take Reo interpreted program and make it understandable for Lykos 
+	 */
+	public void compile(String path){
+		
+		Composite c = setComposite();
+		
+		/*
+		 * Set primitives and add them to the main composite
+		 */
+		
+		List<InterpretedWorker> interpretedWorker= new ArrayList<InterpretedWorker>();
+	
+		for (Component<PRAutomaton> X : program) {
+			
+			if((X.getSourceCode().getFile())!=(null)){
+				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
+			}
+			
+			else
+				c.addChild(setPrimitive(X.getAtom()));
+	
+		}
+	
+		List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
+		interpretedProtocol.add(new InterpretedProtocol(c));
+			
+		InterpretedMain interpretedMain = new InterpretedMain(interpretedProtocol,interpretedWorker);
+		
+	
+		List<String> notes = new ArrayList<String>();
+		InterpretedProgram interpretedProgram = new InterpretedProgram(settings.getSourceFileLocation(),defs,notes, interpretedMain);
+		
+		ProgramCompiler	programCompiler = new JavaProgramCompiler(settings,interpretedProgram, automatonFactory);
+		/*
+		 * Start compiling on simple Lykos project 
+		 */
+		
+		SimpleLykos sL = new SimpleLykos();
+		sL.compile(path, programCompiler,automatonFactory);
 	}
 	
 	/*
@@ -208,61 +252,20 @@ public class LykosCompiler extends ToolErrorAccumulator{
 		String nameWorker = X.getSourceCode().getFile().toString().substring(1, X.getSourceCode().getFile().toString().length()-1);
 		WorkerSignature ws = new WorkerSignature(nameWorker,l);
 		defs.putWorkerName(new TypedName(name,Type.WORKER_NAME), nameWorker, this);
+		
 		return ws;
 		
 	}
 	
-	public void compile(String path){
-		
-	Composite c = setComposite();
-	
-	/*
-	 * Set primitives and add them to the main composite
-	 */
-	
-	List<InterpretedWorker> interpretedWorker= new ArrayList<InterpretedWorker>();
 
-	for (Component<PRAutomaton> X : program) {
-		
-		if((X.getSourceCode().getFile())!=(null)){
-			interpretedWorker.add(new InterpretedWorker(setWorker(X)));
-		}
-		
-		else
-			c.addChild(setPrimitive(X.getAtom()));
-
-	}
-
-	List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
-	interpretedProtocol.add(new InterpretedProtocol(c));
-	
-
-	// interpretedWorker.add(new ...)
-	
-	InterpretedMain interpretedMain = new InterpretedMain(interpretedProtocol,interpretedWorker);
-	
-
-	List<String> notes = new ArrayList<String>();
-	InterpretedProgram interpretedProgram = new InterpretedProgram(settings.getSourceFileLocation(),defs,notes, interpretedMain);
-	
-	ProgramCompiler	programCompiler = new JavaProgramCompiler(settings,interpretedProgram, automatonFactory);
-	/*
-	 * Start compiling on simple Lykos project 
-	 */
-	
-	SimpleLykos sL = new SimpleLykos();
-	sL.compile(path, programCompiler);
-	}
 
 	@Override
 	protected ToolError newError(String message) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	protected ToolError newError(String message, Throwable cause) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }
