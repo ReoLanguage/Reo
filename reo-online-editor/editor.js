@@ -69,11 +69,9 @@
         x2 = line.get('x2'),
         y2 = line.get('y2');
     
-    // if we are updating the source end, we first have to reset the sink end coordinates
-    if (end == 1) {
-      x2 = line.circle2.get('left');
-      y2 = line.circle2.get('top');
-    }    
+    // we first have to reset the sink end coordinates
+    x2 = line.circle2.get('left');
+    y2 = line.circle2.get('top');
     
     if (x1 == x2 && y1 == y2) {
       line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
@@ -132,19 +130,18 @@
       canvas.forEachObject(function(obj) {
         if (obj === p || obj.get('type') !== "circle") return;
         if (p.intersectsWithObject(obj)) {
-          if(Math.abs(p.left-obj.left) < 5 && Math.abs(p.left-obj.left) < 5) {
+          if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+            p.setLeft(obj.getLeft());
+            p.setTop(obj.getTop());
+            p.setCoords();
             for (i = 0; i < p.linesIn.length; i++) {
-              p.linesIn[i].set({'circle2': obj, 'x2': obj.left, 'y2': obj.top});
-              obj.linesIn.push(p.linesIn[i]);
+              p.linesIn[i].set({'x2': obj.left, 'y2': obj.top});
               updateLine(p.linesIn[i], 2);
             }
             for (i = 0; i < p.linesOut.length; i++) { 
-              p.linesOut[i].set({'circle1': obj, 'x1': obj.left, 'y1': obj.top});
-              obj.linesOut.push(p.linesOut[i]);
+              p.linesOut[i].set({'x1': obj.left, 'y1': obj.top});
               updateLine(p.linesOut[i], 1);
             }
-            canvas.remove(p);
-            canvas.setActiveObject(obj);
           }
         }
       });
@@ -177,7 +174,7 @@
   drawLine(300,100,400,100);
   
   
-  /*canvas.on('mouse:down', function(e) {
+  canvas.on('mouse:down', function(e) {
     console.log("Mouse down!");
     isDown = true;
     if (canvas.getActiveObject())
@@ -194,12 +191,14 @@
     if (!isDown)
       return;
     var pointer = canvas.getPointer(e.e);
-    line.set({x2: pointer.x, y2: pointer.y});
+    line = canvas.getActiveObject();
+    line.set({left: pointer.x, top: pointer.y});
+    updateLine(line.linesIn[0],2);
     canvas.renderAll();
   });
   
   canvas.on('mouse:up', function(e){
     isDown = false;
-  });*/
+  });
   
 })();
