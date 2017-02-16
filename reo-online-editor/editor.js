@@ -180,9 +180,7 @@
     if (canvas.getActiveObject())
       return;
     var pointer = canvas.getPointer(e.e);
-    var x = pointer.x;
-    var y = pointer.y;
-    drawLine(x,y,x,y);
+    drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
     canvas.setActiveObject(line.circle2);
     updateLine(line,2);
   }); //mouse:down
@@ -191,11 +189,14 @@
     if (!isDown)
       return;
     var pointer = canvas.getPointer(e.e);
-    line = canvas.getActiveObject();
-    line.set({left: pointer.x, top: pointer.y});
-    updateLine(line.linesIn[0],2);
+    var p = canvas.getActiveObject();
+    p.set({left: pointer.x, top: pointer.y});
+    for (i = 0; i < p.linesIn.length; i++)
+      updateLine(p.linesIn[i], 2);
+    for (i = 0; i < p.linesOut.length; i++)
+      updateLine(p.linesOut[i], 1);
     canvas.renderAll();
-  });
+  }); //mouse:move
   
   canvas.on('mouse:up', function(e){
     isDown = false;
