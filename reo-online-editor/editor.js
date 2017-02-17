@@ -167,6 +167,26 @@
   
   canvas.on('mouse:up', function(e){
     isDown = false;
+    var p = canvas.getActiveObject();
+    console.log(p.type);
+    canvas.forEachObject(function(obj) {
+      if (!obj || obj === p || obj.get('type') !== "circle") return;
+      if (p.intersectsWithObject(obj)) {
+        if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+          for (i = 0; i < p.linesIn.length; i++) {
+            p.linesIn[i].circle2 = obj;
+            obj.linesIn.push(p.linesIn[i]);
+          }
+          for (i = 0; i < p.linesOut.length; i++) {
+            p.linesOut[i].circle1 = obj;
+            obj.linesOut.push(p.linesOut[i]);
+          }
+          canvas.remove(p);
+          obj.bringToFront();
+        }
+      }
+    });
+    
   });
   
 })();
