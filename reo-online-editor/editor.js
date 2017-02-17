@@ -2,6 +2,7 @@
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   var line, isDown;
+  var id = 'a';
 
   function makeCircle(left, top) {
     var c = new fabric.Circle({
@@ -14,6 +15,10 @@
       hasBorders: false,
       hasControls: false
     });
+    
+    // give the node an identifier and increment it for the next node
+    c.id = id;
+    id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g,'a');
 
     // these are the channels that are connected to this node
     c.linesIn = [];
@@ -105,6 +110,7 @@
     document.getElementById("angle").value = angle;
   } //updateLine
   
+  // calculate the correct angle for the arrowhead
   function calcArrowAngle(x1, y1, x2, y2) {
     var angle = 0, x, y;
     x = (x2 - x1);
@@ -120,17 +126,30 @@
 
     return (angle * 180 / Math.PI) + 90;
   } //calcArrowAngle
+  
+  function updateText() {
+    var s = '';
+    canvas.forEachObject(function(obj) {
+      if (obj.type == "line")
+        s += 'sync(' + obj.circle1.id + ',' + obj.circle2.id + ') ';
+    });
+    document.getElementById('text').innerHTML = s;
+  }
 
   canvas.on('object:moving', function(e) {
     var p = e.target;
     p.setCoords();
   }); //object:moving
   
-  drawLine(100,100,200,100);
-  drawLine(300,100,400,100);
+  canvas.on('object:added', function(e) {
+    updateText();
+  }); //object:added
+  
+  canvas.on('object:removed', function(e) {
+    updateText();
+  }); //object:added
   
   canvas.on('mouse:down', function(e) {
-    console.log("Mouse down!");
     isDown = true;
     if (canvas.getActiveObject())
       return;
@@ -168,7 +187,6 @@
   canvas.on('mouse:up', function(e){
     isDown = false;
     var p = canvas.getActiveObject();
-    console.log(p.type);
     canvas.forEachObject(function(obj) {
       if (!obj || obj === p || obj.get('type') !== "circle") return;
       if (p.intersectsWithObject(obj)) {
@@ -186,7 +204,9 @@
         }
       }
     });
-    
   });
+  
+  drawLine(100,100,200,100);
+  drawLine(300,100,400,100);
   
 })();
