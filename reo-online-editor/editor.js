@@ -125,26 +125,6 @@
   canvas.on('object:moving', function(e) {
     var p = e.target;
     p.setCoords();
-    
-    if (p.get('type') == "circle") {
-      canvas.forEachObject(function(obj) {
-        if (obj === p || obj.get('type') !== "circle") return;
-        if (p.intersectsWithObject(obj)) {
-          if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-            p.setLeft(obj.getLeft());
-            p.setTop(obj.getTop());
-            p.setCoords();
-            for (i = 0; i < p.linesIn.length; i++) {
-              p.linesIn[i].set({'x2': obj.left, 'y2': obj.top});
-              updateLine(p.linesIn[i], 2);
-            }
-            for (i = 0; i < p.linesOut.length; i++) { 
-              p.linesOut[i].set({'x1': obj.left, 'y1': obj.top});
-              updateLine(p.linesOut[i], 1);
-            }
-          }
-        }
-      });
       
       for (i = 0; i < p.linesIn.length; i++) {
         p.linesIn[i].set({ 'x2': p.left, 'y2': p.top });
@@ -191,6 +171,18 @@
     var pointer = canvas.getPointer(e.e);
     var p = canvas.getActiveObject();
     p.set({left: pointer.x, top: pointer.y});
+    
+    canvas.forEachObject(function(obj) {
+      if (obj === p || obj.get('type') !== "circle") return;
+      if (p.intersectsWithObject(obj)) {
+        if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+          p.setLeft(obj.getLeft());
+          p.setTop(obj.getTop());
+          p.setCoords();
+        }
+      }
+    });
+    
     for (i = 0; i < p.linesIn.length; i++)
       updateLine(p.linesIn[i], 2);
     for (i = 0; i < p.linesOut.length; i++)

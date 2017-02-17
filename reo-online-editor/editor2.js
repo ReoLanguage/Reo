@@ -42,7 +42,8 @@
       angle: calcArrowAngle(x1,y1,x2,y2),
       fill: '#000',
       hasBorders: false,
-      hasControls: false
+      hasControls: false,
+      selectable: false
     });
     
     // ...and two circles
@@ -64,19 +65,19 @@
   } //drawLine
   
   function updateLine(line, end) {
-    var x1 = line.get('x1'),
-        y1 = line.get('y1'),
-        x2 = line.get('x2'),
-        y2 = line.get('y2');
     
-    // we first have to reset the sink end coordinates
-    x2 = line.circle2.get('left');
-    y2 = line.circle2.get('top');
+    // we first have update the end coordinates
+    var x1 = line.circle1.get('left');
+    var y1 = line.circle1.get('top');
+    var x2 = line.circle2.get('left');
+    var y2 = line.circle2.get('top');
+    line.set({'x1':x1, 'y1':y1, 'x2':x2, 'y2':y2});
     
     if (x1 == x2 && y1 == y2) {
-      line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
+      line.arrow.set({'left': x2, 'top': y2});
     }
-    else {       
+    else {
+      // calculate the position of the arrow
       var length = Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
       length = length - 22;//circle2.get('radius') - circle2.get('stroke');
       var x = Math.atan(Math.abs(y1-y2)/Math.abs(x1-x2));
@@ -134,45 +135,19 @@
             p.setLeft(obj.getLeft());
             p.setTop(obj.getTop());
             p.setCoords();
-            for (i = 0; i < p.linesIn.length; i++) {
-              p.linesIn[i].set({'x2': obj.left, 'y2': obj.top});
-              updateLine(p.linesIn[i], 2);
-            }
-            for (i = 0; i < p.linesOut.length; i++) { 
-              p.linesOut[i].set({'x1': obj.left, 'y1': obj.top});
-              updateLine(p.linesOut[i], 1);
-            }
           }
         }
       });
-      
-      for (i = 0; i < p.linesIn.length; i++) {
-        p.linesIn[i].set({ 'x2': p.left, 'y2': p.top });
+      for (i = 0; i < p.linesIn.length; i++)
         updateLine(p.linesIn[i], 2);
-      }
-      for (i = 0; i < p.linesOut.length; i++) {
-        p.linesOut[i].set({ 'x1': p.left, 'y1': p.top });
+      for (i = 0; i < p.linesOut.length; i++)
         updateLine(p.linesOut[i], 1);
-      }
-    }
-    if (p.get('type') == "triangle") {
-      p.line.set({ 'x2': p.left, 'y2': p.top });
-      var angle = calcArrowAngle(p.line.get('x1'), p.line.get('y1'), p.line.get('x2'), p.line.get('y2'));
-      p.set({'angle':angle});
-      document.getElementById("angle").value = angle;
-    }
-    if (p.get('type') == "line") {
-      p.arrow.set({ 'left': p.x2, 'top': p.y2 });
-      var angle = calcArrowAngle(p.get('x1'), p.get('y1'), p.get('x2'), p.get('y2'))
-      p.arrow.set({'angle':angle});
-      document.getElementById("angle").value = angle;
     }
     canvas.renderAll();
   }); //object:moving
   
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
-  
   
   /*canvas.on('mouse:down', function(e) {
     console.log("Mouse down!");
