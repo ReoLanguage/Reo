@@ -4,13 +4,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.interpret.oldstuff.Port;
-import nl.cwi.reo.interpret.oldstuff.PortType;
-import nl.cwi.reo.interpret.oldstuff.Semantics;
-import nl.cwi.reo.interpret.oldstuff.SemanticsType;
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.interpret.connectors.SemanticsType;
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.values.IntegerValue;
+import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.util.Monitor;
 
 public class PRAutomaton implements Semantics<PRAutomaton> {
 		
@@ -97,15 +103,19 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	}
 
 	@Override
-	public PRAutomaton evaluate(Map<String, String> params) {
-		String s = params.get(variable);
-		Integer newValue=null;
+	public PRAutomaton evaluate(Scope s, Monitor m) {
+		Value v = s.get(variable);
+		Integer newValue = null;
 		
-		try {
-			newValue =Integer.parseInt(s);
-		}
-		catch(NumberFormatException e){
-			
+		if (v instanceof IntegerValue) {
+			newValue = ((IntegerValue)v).getValue();
+		} else if (v instanceof StringValue) {
+			try {
+				newValue =Integer.parseInt(((StringValue)v).getValue());
+			}
+			catch(NumberFormatException e){
+				
+			}
 		}
 		
 		return new PRAutomaton(name,variable,newValue,port);
@@ -119,6 +129,12 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 
 	@Override
 	public PRAutomaton restrict(Collection<? extends Port> intface) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PRAutomaton getNode(Set<Port> node) {
 		// TODO Auto-generated method stub
 		return null;
 	}

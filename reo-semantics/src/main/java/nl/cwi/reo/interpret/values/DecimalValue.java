@@ -17,6 +17,14 @@ public final class DecimalValue implements Value {
 	public DecimalValue(double x) {
 		this.x = x;
 	}
+	
+	/**
+	 * Gets the value of this decimal.
+	 * @return gets the value
+	 */
+	public double getValue() {
+		return x;
+	}
 
 	public static DecimalValue add(DecimalValue a, DecimalValue b) {
 		return new DecimalValue(a.x + b.x);

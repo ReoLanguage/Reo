@@ -8,14 +8,22 @@ public final class StringValue implements Value {
 	/**
 	 * Value.
 	 */
-	private int x; 
+	private String x; 
 	
 	/**
 	 * Constructs a new integer value.
 	 * @param x		value
 	 */
-	public StringValue(int x) {
+	public StringValue(String x) {
 		this.x = x;
+	}
+	
+	/**
+	 * Gets the value of this string.
+	 * @return gets the value
+	 */
+	public String getValue() {
+		return x;
 	}
 
 	public static StringValue concat(StringValue a, StringValue b) {

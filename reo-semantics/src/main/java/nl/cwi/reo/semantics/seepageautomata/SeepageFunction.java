@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.List;
 import java.util.Set;
 
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.automata.Label;
+import nl.cwi.reo.util.Monitor;
 
 public class SeepageFunction implements Label<SeepageFunction> {
 	
@@ -49,7 +51,7 @@ public class SeepageFunction implements Label<SeepageFunction> {
 	}
 
 	@Override
-	public SeepageFunction evaluate(Map<String, String> params) {
+	public SeepageFunction evaluate(Scope s, Monitor m) {
 		return null;
 	}
 }

@@ -14,7 +14,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.util.Monitor;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -369,12 +371,12 @@ public class Automaton<L extends Label<L>> {
 		return new Automaton<L>(Q, P, T, q0, lbl);
 	}
 
-	public Automaton<L> evaluate(Map<String, String> params) {
+	public Automaton<L> evaluate(Scope s, Monitor m) {
 		Map<State, Set<Transition<L>>> out = new HashMap<State, Set<Transition<L>>>();
 		for (Map.Entry<State, Set<Transition<L>>> entry : this.out.entrySet()) {
 			Set<Transition<L>> outq =  new HashSet<Transition<L>>();
 			for (Transition<L> t : entry.getValue())
-				outq.add(t.evaluate(params));
+				outq.add(t.evaluate(s, m));
 			out.put(entry.getKey(), outq);		
 		}
 		return new Automaton<L>(states, iface, out, initial, lbl);

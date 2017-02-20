@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.ports.Port;
 
 /**
  * A work automaton transition that is used in a {@link nl.cwi.reo.semantics.workautomata.WorkAutomaton}.
