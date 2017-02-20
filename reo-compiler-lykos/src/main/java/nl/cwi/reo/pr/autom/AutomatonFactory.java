@@ -31,7 +31,6 @@ import nl.cwi.reo.pr.misc.PortFactory;
 import nl.cwi.reo.pr.misc.PortFactory.Port;
 import nl.cwi.reo.pr.misc.PortFactory.PortSet;
 import nl.cwi.reo.pr.comp.Cancellation;
-import nl.cwi.reo.pr.comp.CompilerProgressMonitor;
 
 public abstract class AutomatonFactory extends
 		IdObjectFactory<Automaton, AutomatonSet, AutomatonSpec> {
@@ -320,9 +319,7 @@ public abstract class AutomatonFactory extends
 
 		Automaton automaton = null;
 		PortSet internalPorts = portFactory.newSet();
-		int i = 1;
 		for (Automaton aut : automata) {
-
 
 			if (automaton == null)
 				automaton = aut;

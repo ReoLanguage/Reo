@@ -1,7 +1,6 @@
 package nl.cwi.reo.interpret.systems;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -10,7 +9,6 @@ import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.oldstuff.Expression;
 import nl.cwi.reo.interpret.oldstuff.Port;
 import nl.cwi.reo.interpret.oldstuff.Semantics;
-import nl.cwi.reo.interpret.oldstuff.SourceCode;
 import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.Node;

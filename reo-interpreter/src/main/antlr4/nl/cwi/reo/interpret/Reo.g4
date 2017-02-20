@@ -58,7 +58,7 @@ term      : NAT                                                   # term_natural
           | term op=(MUL | DIV | MOD | ADD | MIN) term            # term_operation ;
 
 // Lists
-list      : '<' '>' | '<' term (',' term)* '>' ;
+list      : '<' '>' | '<' range (',' range)* '>' ;
 
 // Signatures
 sign      : params? nodes ;
@@ -79,7 +79,7 @@ ports     : '(' ')' | '(' port (',' port)* ')' ;
 port      : prio=(ADD | AND)? var ;
 
 // Variables
-var       : name indices* ;
+var       : name ('[' range ']')* ;
 name      : (ID '.')* ID ;
-indices   : '[' term ']' | '[' term '..' term ']' ;
+range     : term | term '..' term ;
 

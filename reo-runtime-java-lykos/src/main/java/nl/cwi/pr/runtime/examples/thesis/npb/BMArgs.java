@@ -41,9 +41,9 @@
 */
 package nl.cwi.pr.runtime.examples.thesis.npb;
 import java.io.*;
-import java.text.*;
 
 public class BMArgs implements Serializable{
+  private static final long serialVersionUID = -6811390342312086995L;
   public static char CLASS='U';
   public static int num_threads=4;
   public static boolean serial = true;

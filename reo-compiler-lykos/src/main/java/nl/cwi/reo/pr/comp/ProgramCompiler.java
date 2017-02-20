@@ -6,14 +6,11 @@ import java.util.List;
 import nl.cwi.reo.pr.autom.AutomatonFactory;
 import nl.cwi.reo.pr.comp.CompiledGeneratee;
 import nl.cwi.reo.pr.comp.CompiledProgram;
-import nl.cwi.reo.pr.comp.CompilerProgressMonitor;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.pr.comp.InterpretedMain;
 import nl.cwi.reo.pr.comp.InterpretedProgram;
 import nl.cwi.reo.pr.comp.InterpretedProtocol;
 import nl.cwi.reo.pr.comp.InterpretedWorker;
-
-import org.eclipse.core.runtime.NullProgressMonitor;
 
 public abstract class ProgramCompiler extends Compiler<CompiledProgram> {
 	private final MainCompiler<?> mainCompiler;
