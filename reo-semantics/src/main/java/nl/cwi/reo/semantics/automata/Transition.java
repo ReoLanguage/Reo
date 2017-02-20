@@ -9,7 +9,9 @@ import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.util.Monitor;
 
 /**
  * A transition, labeled with a generic label of type L, that is used in a {@link nl.cwi.reo.semantics.automata.Automaton}.
@@ -149,8 +151,8 @@ public final class Transition<L extends Label<L>> {
 	 * @param params	parameters
 	 * @return Evaluated label.
 	 */
-	public Transition<L> evaluate(Map<String, String> params) {
-		return new Transition<L>(q1, q2, N, lbl.evaluate(params));
+	public Transition<L> evaluate(Scope s, Monitor m) {
+		return new Transition<L>(q1, q2, N, lbl.evaluate(s, m));
 	}
 	
 	@Override 

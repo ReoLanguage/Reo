@@ -17,6 +17,14 @@ public final class StringValue implements Value {
 	public StringValue(String x) {
 		this.x = x;
 	}
+	
+	/**
+	 * Gets the value of this string.
+	 * @return gets the value
+	 */
+	public String getValue() {
+		return x;
+	}
 
 	public static StringValue concat(StringValue a, StringValue b) {
 		return new StringValue(a.x + b.x);

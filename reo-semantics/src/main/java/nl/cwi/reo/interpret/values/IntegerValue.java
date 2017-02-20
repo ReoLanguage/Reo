@@ -17,6 +17,14 @@ public final class IntegerValue implements Value {
 	public IntegerValue(int x) {
 		this.x = x;
 	}
+	
+	/**
+	 * Gets the value of this integer.
+	 * @return gets the value
+	 */
+	public int getValue() {
+		return x;
+	}
 
 	public static IntegerValue add(IntegerValue a, IntegerValue b) {
 		return new IntegerValue(a.x + b.x);

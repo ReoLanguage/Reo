@@ -17,6 +17,14 @@ public final class BooleanValue implements Value {
 	public BooleanValue(boolean x) {
 		this.x = x;
 	}
+	
+	/**
+	 * Gets the value of this boolean.
+	 * @return gets the value
+	 */
+	public boolean getValue() {
+		return x;
+	}
 
 	public static BooleanValue and(BooleanValue a, BooleanValue b) {
 		return new BooleanValue(a.x && b.x);

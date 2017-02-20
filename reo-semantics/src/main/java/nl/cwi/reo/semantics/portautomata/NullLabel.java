@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.automata.Label;
+import nl.cwi.reo.util.Monitor;
 
 public class NullLabel implements Label<NullLabel> {
 
@@ -31,7 +33,7 @@ public class NullLabel implements Label<NullLabel> {
 	}
 
 	@Override
-	public NullLabel evaluate(Map<String, String> params) {
+	public NullLabel evaluate(Scope s, Monitor m) {
 		return new NullLabel();
 	}
 

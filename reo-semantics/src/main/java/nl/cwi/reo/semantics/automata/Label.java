@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.util.Monitor;
 
 /**
  * A label is an object that decorates a transition of an automaton.
@@ -50,8 +52,9 @@ public interface Label<L> {
 	
 	/**
 	 * Evaluates this label using specified parameters.
-	 * @param params	parameters
+	 * @param s			parameter assignment
+	 * @param m			message container
 	 * @return Evaluated label.
 	 */
-	public L evaluate(Map<String, String> params);
+	public L evaluate(Scope s, Monitor m);
 }

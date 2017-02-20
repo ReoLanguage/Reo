@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.ports.Port;
 
 /**
  * Implements a {@link nl.cwi.reo.graphgames.Vertex} used in the scheduling game. 
