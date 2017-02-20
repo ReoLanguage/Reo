@@ -18,17 +18,17 @@ public class VariableExpression<I extends Identifier> implements Expression<Iden
 	/**
 	 * Fully qualified name.
 	 */
-	private final String name;
+	protected final String name;
 	
 	/**
 	 * Indices of this variable.
 	 */
-	private final List<List<Term>> indices;
+	protected final List<List<Term>> indices;
 	
 	/**
 	 * Location of this variable in Reo source file.
 	 */
-	private final Location location;
+	protected final Location location;
 	
 	/**
 	 * Constructs a variable list.
@@ -49,6 +49,15 @@ public class VariableExpression<I extends Identifier> implements Expression<Iden
 	public Location getLocation() {
 		return location;
 	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public List<List<Term>> getIndices() {
+		return indices;
+	}
+	
 	
 	/**
 	 * Finds values of all parameters in the indices, given that the size

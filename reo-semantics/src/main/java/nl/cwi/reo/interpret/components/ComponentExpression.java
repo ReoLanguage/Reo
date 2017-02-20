@@ -7,6 +7,6 @@ import nl.cwi.reo.interpret.connectors.Semantics;
  * Interpretation of a component definition.
  * @param <T> Reo semantics type
  */
-public interface ComponentExpression<T extends Semantics<T>> extends Expression<Component<T>> {
+public interface ComponentExpression<T extends Semantics<T>> extends Expression<ComponentDefinition<T>> {
 
 }

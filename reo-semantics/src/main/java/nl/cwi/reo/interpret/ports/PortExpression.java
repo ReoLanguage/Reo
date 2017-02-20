@@ -22,17 +22,18 @@ public final class PortExpression extends VariableExpression<Port> {
 	 */
 	private final PrioType prio;
 
+	
 	/**
+	 * 
 	 * Constructs a new port expression.
-	 * @param prio		priority type
-	 * @param name		port name
-	 * @param indices   port indices
-	 * @param location  location in source
+	 * @param prio	priority type of port
+	 * @param var 	variable defining port 
 	 */
-	public PortExpression(PrioType prio, String name, List<List<Term>> indices, Location location) {
-		super(name, indices, location);
+	public PortExpression(PrioType prio, VariableExpression<Port> var) {
+		super(var.getName(), var.getIndices(), var.getLocation());
 		this.prio = prio;
 	}
+	
 	
 	/**
 	 * {@inheritDoc}

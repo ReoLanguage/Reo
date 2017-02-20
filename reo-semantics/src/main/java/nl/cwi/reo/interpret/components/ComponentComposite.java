@@ -2,6 +2,8 @@ package nl.cwi.reo.interpret.components;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.interpret.instances.Set;
+import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -10,12 +12,18 @@ import nl.cwi.reo.util.Monitor;
  */
 public final class ComponentComposite<T extends Semantics<T>> implements ComponentExpression<T> {
 
-	public ComponentComposite() {
-		// TODO Auto-generated constructor stub
+	private final SignatureExpression sign;	
+	
+	private final Set<T> set;
+	
+	
+	public ComponentComposite(SignatureExpression sign, Set<T> set) {
+		this.sign=sign;
+		this.set=set;
 	}
 
 	@Override
-	public Component<T> evaluate(Scope s, Monitor m) {
+	public ComponentDefinition<T> evaluate(Scope s, Monitor m) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -29,7 +29,7 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Component<T> evaluate(Scope s, Monitor m) {
+	public ComponentDefinition<T> evaluate(Scope s, Monitor m) {
 		// TODO Auto-generated method stub
 		return null;
 	}
