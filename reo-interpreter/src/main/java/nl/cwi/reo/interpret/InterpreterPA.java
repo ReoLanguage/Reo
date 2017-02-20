@@ -3,8 +3,8 @@ package nl.cwi.reo.interpret;
 import java.util.List;
 
 import nl.cwi.reo.interpret.listeners.ListenerPA;
-import nl.cwi.reo.portautomata.PortAutomaton;
-import nl.cwi.reo.semantics.api.SemanticsType;
+import nl.cwi.reo.interpret.oldstuff.SemanticsType;
+import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 
 public class InterpreterPA extends Interpreter<PortAutomaton> {
 	

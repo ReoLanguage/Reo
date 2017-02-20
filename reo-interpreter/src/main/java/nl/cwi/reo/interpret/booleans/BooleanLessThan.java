@@ -5,7 +5,7 @@ import java.util.Map;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 
 public final class BooleanLessThan implements BooleanExpression {
 

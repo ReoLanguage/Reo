@@ -8,11 +8,11 @@ import java.util.Map;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.booleans.BooleanValue;
 import nl.cwi.reo.interpret.integers.IntegerValue;
+import nl.cwi.reo.interpret.oldstuff.Expression;
+import nl.cwi.reo.interpret.oldstuff.Semantics;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.strings.StringValue;
 import nl.cwi.reo.interpret.systems.ReoSystemValue;
-import nl.cwi.reo.semantics.api.Expression;
-import nl.cwi.reo.semantics.api.Semantics;
 
 public class Body<T extends Semantics<T>> implements ReoBlock<T> {
 	

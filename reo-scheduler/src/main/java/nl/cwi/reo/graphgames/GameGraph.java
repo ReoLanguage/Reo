@@ -12,9 +12,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import nl.cwi.reo.semantics.api.Port;
-import nl.cwi.reo.workautomata.Transition;
-import nl.cwi.reo.workautomata.WorkAutomaton;
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.semantics.workautomata.Transition;
+import nl.cwi.reo.semantics.workautomata.WorkAutomaton;
 
 /**
  * Implements a bipartite directed graph whose edges are labeled by two integers.

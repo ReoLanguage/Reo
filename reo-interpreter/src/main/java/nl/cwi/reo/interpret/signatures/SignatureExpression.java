@@ -9,12 +9,12 @@ import org.antlr.v4.runtime.Token;
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.expressions.ValueExpression;
 import nl.cwi.reo.interpret.expressions.ValueList;
+import nl.cwi.reo.interpret.oldstuff.Expression;
+import nl.cwi.reo.interpret.oldstuff.Port;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.interpret.variables.VariableRange;
-import nl.cwi.reo.semantics.api.Expression;
-import nl.cwi.reo.semantics.api.Port;
 
 public final class SignatureExpression implements ParameterType {
 	

@@ -3,6 +3,10 @@ package nl.cwi.reo.semantics.api;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.oldstuff.PortType;
+import nl.cwi.reo.interpret.oldstuff.PrioType;
+
 public class PortTest {
 	
 	@Test

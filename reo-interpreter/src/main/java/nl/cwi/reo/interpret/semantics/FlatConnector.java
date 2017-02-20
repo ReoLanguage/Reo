@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import nl.cwi.reo.semantics.api.Port;
-import nl.cwi.reo.semantics.api.Semantics;
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.oldstuff.Semantics;
 
 public class FlatConnector<T extends Semantics<T>> extends ComponentList<T> {
 

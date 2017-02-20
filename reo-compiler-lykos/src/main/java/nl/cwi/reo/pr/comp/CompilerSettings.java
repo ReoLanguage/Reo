@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import nl.cwi.reo.interpret.connectors.Language;
+
 public class CompilerSettings implements Map<String, Object> {
 
 	//

@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
+import nl.cwi.reo.interpret.oldstuff.Evaluable;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.api.Evaluable;
-import nl.cwi.reo.semantics.api.Expression;
 
 public class ParameterList extends ArrayList<Parameter> implements Evaluable<ParameterList> {
 	

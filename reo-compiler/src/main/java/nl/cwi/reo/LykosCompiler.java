@@ -9,6 +9,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 
+import nl.cwi.reo.interpret.connectors.Language;
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.oldstuff.PortType;
 import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.lykos.SimpleLykos;
@@ -20,7 +23,6 @@ import nl.cwi.reo.pr.comp.InterpretedMain;
 import nl.cwi.reo.pr.comp.InterpretedProgram;
 import nl.cwi.reo.pr.comp.InterpretedProtocol;
 import nl.cwi.reo.pr.comp.InterpretedWorker;
-import nl.cwi.reo.pr.comp.Language;
 import nl.cwi.reo.pr.comp.ProgramCompiler;
 import nl.cwi.reo.pr.java.comp.JavaProgramCompiler;
 import nl.cwi.reo.pr.misc.Definitions;
@@ -37,9 +39,7 @@ import nl.cwi.reo.pr.misc.TypedName.Type;
 import nl.cwi.reo.pr.misc.Variable;
 import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
 import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
-import nl.cwi.reo.prautomata.PRAutomaton;
-import nl.cwi.reo.semantics.api.Port;
-import nl.cwi.reo.semantics.api.PortType;
+import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
 public class LykosCompiler extends ToolErrorAccumulator{
 	

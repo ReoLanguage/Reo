@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret.strings;
 import java.util.Map;
 import java.util.Objects;
 
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 
 public class StringValue implements StringExpression {
 	

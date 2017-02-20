@@ -3,10 +3,10 @@ package nl.cwi.reo.interpret.signatures;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
+import nl.cwi.reo.interpret.oldstuff.Evaluable;
+import nl.cwi.reo.interpret.oldstuff.Expression;
+import nl.cwi.reo.interpret.oldstuff.PrioType;
 import nl.cwi.reo.interpret.variables.Variable;
-import nl.cwi.reo.semantics.api.Evaluable;
-import nl.cwi.reo.semantics.api.Expression;
-import nl.cwi.reo.semantics.api.PrioType;
 
 public class InterfaceNode implements Evaluable<InterfaceNode> {
 	

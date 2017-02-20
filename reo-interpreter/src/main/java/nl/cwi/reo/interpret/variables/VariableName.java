@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.antlr.v4.runtime.Token;
 
 import nl.cwi.reo.interpret.expressions.ValueExpression;
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 
 /**
  * An immutable implementation of a variable name.

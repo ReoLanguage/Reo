@@ -17,13 +17,13 @@ import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.integers.IntegerVariable;
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.oldstuff.PortType;
+import nl.cwi.reo.interpret.oldstuff.PrioType;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
 import nl.cwi.reo.interpret.variables.VariableRange;
-import nl.cwi.reo.semantics.api.Port;
-import nl.cwi.reo.semantics.api.PortType;
-import nl.cwi.reo.semantics.api.PrioType;
 
 public class SignatureExpressionTest {
 

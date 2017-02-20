@@ -13,8 +13,8 @@ import nl.cwi.reo.interpret.InterpreterPA;
 import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.interpret.InterpreterPR;
-import nl.cwi.reo.portautomata.PortAutomaton;
-import nl.cwi.reo.prautomata.PRAutomaton;
+import nl.cwi.reo.semantics.portautomata.PortAutomaton;
+import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
 /**
  * A compiler for the coordination language Reo.

@@ -29,6 +29,9 @@ import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.expressions.ValueList;
 import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.oldstuff.Expression;
+import nl.cwi.reo.interpret.oldstuff.Semantics;
+import nl.cwi.reo.interpret.oldstuff.SemanticsType;
 import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.interpret.semantics.Definitions;
 import nl.cwi.reo.interpret.semantics.Component;
@@ -36,9 +39,6 @@ import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.strings.StringValue;
 import nl.cwi.reo.interpret.systems.ReoSystemValue;
-import nl.cwi.reo.semantics.api.Expression;
-import nl.cwi.reo.semantics.api.Semantics;
-import nl.cwi.reo.semantics.api.SemanticsType;
 
 public class Interpreter<T extends Semantics<T>> {
 	

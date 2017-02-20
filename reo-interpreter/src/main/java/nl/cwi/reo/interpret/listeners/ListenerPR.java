@@ -1,8 +1,5 @@
 package nl.cwi.reo.interpret.listeners;
 
-import nl.cwi.reo.prautomata.PRAutomaton;
-import nl.cwi.reo.semantics.api.Port;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
@@ -16,6 +13,8 @@ import nl.cwi.reo.interpret.ReoParser.PrContext;
 import nl.cwi.reo.interpret.ReoParser.Pr_portContext;
 import nl.cwi.reo.interpret.ReoParser.Pr_stringContext;
 import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
 public class ListenerPR extends Listener<PRAutomaton> {
 

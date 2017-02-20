@@ -10,16 +10,16 @@ import java.util.TreeSet;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import nl.cwi.reo.automata.State;
-import nl.cwi.reo.automata.Transition;
 import nl.cwi.reo.interpret.ReoParser.PaContext;
 import nl.cwi.reo.interpret.ReoParser.Pa_initContext;
 import nl.cwi.reo.interpret.ReoParser.Pa_scContext;
 import nl.cwi.reo.interpret.ReoParser.Pa_trContext;
+import nl.cwi.reo.interpret.oldstuff.Port;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
-import nl.cwi.reo.portautomata.NullLabel;
-import nl.cwi.reo.portautomata.PortAutomaton;
-import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.semantics.automata.State;
+import nl.cwi.reo.semantics.automata.Transition;
+import nl.cwi.reo.semantics.portautomata.NullLabel;
+import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 
 /**
  * Listens to events triggered by a {@link org.antlr.v4.runtime.tree.ParseTreeWalker}.

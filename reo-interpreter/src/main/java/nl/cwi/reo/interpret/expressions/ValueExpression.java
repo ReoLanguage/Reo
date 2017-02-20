@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret.expressions;
 
 import java.util.Map;
 
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 
 /**
  * A ValueExpression is an expression that cannot evaluate to a list of expressions.

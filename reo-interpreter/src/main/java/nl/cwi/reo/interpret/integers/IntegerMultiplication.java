@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret.integers;
 import java.util.Map;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 
 public final class IntegerMultiplication implements IntegerExpression {
 

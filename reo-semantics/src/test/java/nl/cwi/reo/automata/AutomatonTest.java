@@ -12,8 +12,11 @@ import java.util.TreeSet;
 //import static org.junit.Assert.*;
 import org.junit.Test;
 
-import nl.cwi.reo.portautomata.NullLabel;
-import nl.cwi.reo.semantics.api.Port;
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.semantics.automata.Automaton;
+import nl.cwi.reo.semantics.automata.State;
+import nl.cwi.reo.semantics.automata.Transition;
+import nl.cwi.reo.semantics.portautomata.NullLabel;
 
 public class AutomatonTest {
 

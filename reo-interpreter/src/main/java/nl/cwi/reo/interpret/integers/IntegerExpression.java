@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret.integers;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.expressions.ValueExpression;
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 
 public interface IntegerExpression extends ValueExpression {
 	

@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.Token;
 import nl.cwi.reo.interpret.integers.IntegerExpression;
 import nl.cwi.reo.interpret.integers.IntegerValue;
 import nl.cwi.reo.interpret.integers.IntegerVariable;
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 import nl.cwi.reo.interpret.semantics.Definitions;
 
 /**

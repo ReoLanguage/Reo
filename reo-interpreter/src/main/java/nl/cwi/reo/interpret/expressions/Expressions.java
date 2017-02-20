@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret.expressions;
 
 import java.util.Map;
 
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 
 /**
  * An ordered list of expressions.

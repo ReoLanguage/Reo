@@ -8,13 +8,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.semantics.api.Evaluable;
-import nl.cwi.reo.semantics.api.Expression;
-
-import nl.cwi.reo.semantics.api.Port;
-import nl.cwi.reo.semantics.api.PortType;
-import nl.cwi.reo.semantics.api.Semantics;
-import nl.cwi.reo.semantics.api.SourceCode;
+import nl.cwi.reo.interpret.oldstuff.Evaluable;
+import nl.cwi.reo.interpret.oldstuff.Expression;
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.oldstuff.PortType;
+import nl.cwi.reo.interpret.oldstuff.Semantics;
+import nl.cwi.reo.interpret.oldstuff.SourceCode;
 
 public class ComponentList<T extends Semantics<T>> extends ArrayList<Component<T>> implements Evaluable<ComponentList<T>> {
 	

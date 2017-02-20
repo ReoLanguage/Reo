@@ -5,7 +5,7 @@ import java.util.Map;
 import org.antlr.v4.runtime.Token;
 
 import nl.cwi.reo.errors.CompilationException;
-import nl.cwi.reo.semantics.api.Expression;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 
 public final class IntegerDivision implements IntegerExpression {
 

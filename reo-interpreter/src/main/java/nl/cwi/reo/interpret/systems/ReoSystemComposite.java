@@ -5,11 +5,11 @@ import java.util.Map;
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.blocks.ReoBlock;
 import nl.cwi.reo.interpret.expressions.ValueList;
+import nl.cwi.reo.interpret.oldstuff.Expression;
+import nl.cwi.reo.interpret.oldstuff.Semantics;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.api.Expression;
-import nl.cwi.reo.semantics.api.Semantics;
 
 public class ReoSystemComposite<T extends Semantics<T>> implements ReoSystem<T> {
 	

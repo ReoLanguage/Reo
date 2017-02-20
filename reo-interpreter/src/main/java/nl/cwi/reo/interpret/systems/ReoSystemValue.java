@@ -7,16 +7,16 @@ import java.util.Objects;
 
 import nl.cwi.reo.interpret.blocks.Assembly;
 import nl.cwi.reo.interpret.expressions.ValueList;
+import nl.cwi.reo.interpret.oldstuff.Expression;
+import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.oldstuff.Semantics;
+import nl.cwi.reo.interpret.oldstuff.SourceCode;
 import nl.cwi.reo.interpret.semantics.Component;
 import nl.cwi.reo.interpret.semantics.ComponentList;
 import nl.cwi.reo.interpret.signatures.Node;
 import nl.cwi.reo.interpret.signatures.SignatureConcrete;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.api.Expression;
-import nl.cwi.reo.semantics.api.Port;
-import nl.cwi.reo.semantics.api.Semantics;
-import nl.cwi.reo.semantics.api.SourceCode;
 
 public final class ReoSystemValue<T extends Semantics<T>> implements ReoSystem<T> {
 	

@@ -5,9 +5,9 @@ import java.util.Map;
 import nl.cwi.reo.interpret.blocks.ReoBlock;
 import nl.cwi.reo.interpret.expressions.ValueExpression;
 import nl.cwi.reo.interpret.expressions.ValueList;
+import nl.cwi.reo.interpret.oldstuff.Expression;
+import nl.cwi.reo.interpret.oldstuff.Semantics;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.api.Expression;
-import nl.cwi.reo.semantics.api.Semantics;
 
 public interface ReoSystem<T extends Semantics<T>> extends ValueExpression {
 

@@ -9,10 +9,10 @@ import org.antlr.v4.runtime.Token;
 
 import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.interpret.expressions.Expressions;
+import nl.cwi.reo.interpret.oldstuff.Expression;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableName;
 import nl.cwi.reo.interpret.variables.VariableNameList;
-import nl.cwi.reo.semantics.api.Expression;
 
 public final class InterfaceExpression extends ArrayList<InterfaceNode> implements Expressions {
 	
