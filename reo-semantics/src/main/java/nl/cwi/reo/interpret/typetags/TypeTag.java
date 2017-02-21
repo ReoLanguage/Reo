@@ -1,5 +1,10 @@
 package nl.cwi.reo.interpret.typetags;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import nl.cwi.reo.interpret.parameters.ParameterType;
 
 public final class TypeTag implements ParameterType {
@@ -7,7 +12,10 @@ public final class TypeTag implements ParameterType {
 	private final String tag;
 	
 	public TypeTag() {
-		this.tag = "";
+//		this.tag = new HashMap<String,String>();
+//		this.tag.put("0", "0");
+//		this.tag = new ArrayList<String>();
+		this.tag = " ";
 	}
 	
 	public TypeTag(String tag) {
@@ -29,6 +37,6 @@ public final class TypeTag implements ParameterType {
 	
 	@Override
 	public String toString() {
-		return tag;
+		return tag.toString();
 	}	
 }

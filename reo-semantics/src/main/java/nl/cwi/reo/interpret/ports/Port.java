@@ -40,7 +40,8 @@ public final class Port extends Identifier {
 		super(name);
 		this.type = PortType.NONE;
 		this.prio = PrioType.NONE;
-		this.tag = new TypeTag("");
+//		this.tag = new TypeTag("");
+		this.tag = null;
 		this.visible = true;
 	}
 	

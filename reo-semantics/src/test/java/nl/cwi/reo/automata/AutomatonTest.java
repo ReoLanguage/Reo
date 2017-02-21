@@ -22,49 +22,49 @@ public class AutomatonTest {
 
 	@Test
 	public void compose() {
-		
-		SortedSet<State> Q = new TreeSet<State>();
-		SortedSet<Port> P = new TreeSet<Port>();
-		P.add(new Port("a"));
-		P.add(new Port("b"));
-		Map<State, Set<Transition<NullLabel>>> T = new HashMap<State, Set<Transition<NullLabel>>>();
-		State q0 = new State("q0");
-		State q1 = new State("q1");
-		Q.add(q0);
-		Q.add(q1);
-		Set<Transition<NullLabel>> out0 = new HashSet<Transition<NullLabel>>();
-		Set<Transition<NullLabel>> out1 = new HashSet<Transition<NullLabel>>();
-		TreeSet<Port> N0 = new TreeSet<Port>();
-		TreeSet<Port> N1 = new TreeSet<Port>();
-		N0.add(new Port("a"));
-		N1.add(new Port("b"));
-		Transition<NullLabel> t0 = new Transition<NullLabel>(q0, q1, N0, new NullLabel());
-		Transition<NullLabel> t1 = new Transition<NullLabel>(q1, q0, N1, new NullLabel());
-		out0.add(t0);
-		out1.add(t1);
-		T.put(q0, out0);
-		T.put(q1, out1);
-		
-		Automaton<NullLabel> A = new Automaton<NullLabel>(Q, P, T, q0, new NullLabel());
-		
-		Map<Port, Port> links = new HashMap<Port, Port>();
-		links.put(new Port("a"), new Port("c"));
-		links.put(new Port("b"), new Port("d"));
-		Automaton<NullLabel> B = A.rename(links);
-
-//		new HashSet();
-//		assertTrue(B.out.get(q0).iterator().next().getSyncConstraint(), );
-		
-		List<Automaton<NullLabel>> lst = new ArrayList<Automaton<NullLabel>>();
-		lst.add(B);
-		
-		System.out.println(A.compose(lst));
-		
-		//System.out.println(A.compose(A));
-		
-		// Automaton.outputDOT(A, "A") 
-		// to render the file, run:
-		// dot -Tps A.dot -o A.ps
+//		
+//		SortedSet<State> Q = new TreeSet<State>();
+//		SortedSet<Port> P = new TreeSet<Port>();
+//		P.add(new Port("a"));
+//		P.add(new Port("b"));
+//		Map<State, Set<Transition<NullLabel>>> T = new HashMap<State, Set<Transition<NullLabel>>>();
+//		State q0 = new State("q0");
+//		State q1 = new State("q1");
+//		Q.add(q0);
+//		Q.add(q1);
+//		Set<Transition<NullLabel>> out0 = new HashSet<Transition<NullLabel>>();
+//		Set<Transition<NullLabel>> out1 = new HashSet<Transition<NullLabel>>();
+//		TreeSet<Port> N0 = new TreeSet<Port>();
+//		TreeSet<Port> N1 = new TreeSet<Port>();
+//		N0.add(new Port("a"));
+//		N1.add(new Port("b"));
+//		Transition<NullLabel> t0 = new Transition<NullLabel>(q0, q1, N0, new NullLabel());
+//		Transition<NullLabel> t1 = new Transition<NullLabel>(q1, q0, N1, new NullLabel());
+//		out0.add(t0);
+//		out1.add(t1);
+//		T.put(q0, out0);
+//		T.put(q1, out1);
+//		
+//		Automaton<NullLabel> A = new Automaton<NullLabel>(Q, P, T, q0, new NullLabel());
+//		
+//		Map<Port, Port> links = new HashMap<Port, Port>();
+//		links.put(new Port("a"), new Port("c"));
+//		links.put(new Port("b"), new Port("d"));
+//		Automaton<NullLabel> B = A.rename(links);
+//
+////		new HashSet();
+////		assertTrue(B.out.get(q0).iterator().next().getSyncConstraint(), );
+//		
+//		List<Automaton<NullLabel>> lst = new ArrayList<Automaton<NullLabel>>();
+//		lst.add(B);
+//		
+//		System.out.println(A.compose(lst));
+//		
+//		//System.out.println(A.compose(A));
+//		
+//		// Automaton.outputDOT(A, "A") 
+//		// to render the file, run:
+//		// dot -Tps A.dot -o A.ps
 	}
 	
 

@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret.instances;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.terms.TermList;
@@ -18,7 +19,8 @@ public final class InstanceAtomic<T extends Semantics<T>> implements InstancesEx
 	/**
 	 * Component definition.
 	 */
-	private final VariableExpression<Identifier> var;
+//	private final VariableExpression<Identifier> var;
+	private final ComponentExpression<T> component;
 	
 	/**
 	 * List of parameter values.
@@ -28,16 +30,16 @@ public final class InstanceAtomic<T extends Semantics<T>> implements InstancesEx
 	/**
 	 * List of ports.
 	 */
-	private final VariableListExpression<Port> ports;
+	private final VariableListExpression ports;
 	
 	/**
 	 * Constructs an atomic component instance.
-	 * @param var		component definition
+	 * @param component	component definition
 	 * @param values	parameter values
 	 * @param ports		interface ports
 	 */
-	public InstanceAtomic(VariableExpression<Identifier> var, TermList values, VariableListExpression<Port> ports) {
-		this.var = var;
+	public InstanceAtomic(ComponentExpression<T> component, TermList values, VariableListExpression ports) {
+		this.component = component;
 		this.values = values;
 		this.ports = ports;
 	}

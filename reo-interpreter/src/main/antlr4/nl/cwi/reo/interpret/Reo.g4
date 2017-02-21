@@ -55,10 +55,10 @@ term      : NAT                                                   # term_natural
           | '(' term ')'                                          # term_brackets
           | <assoc=right> term POW term                           # term_exponent
           | MIN term                                              # term_unarymin
-          | term op=(MUL | DIV | MOD | ADD | MIN) term            # term_operation ;
+          | term op=(MUL | DIV | MOD | ADD | MIN | LIST) term     # term_operation ;
 
 // Lists
-list      : '<' '>' | '<' range (',' range)* '>' ;
+list      : '<' '>' | '<' term (',' term)* '>' ;
 
 // Signatures
 sign      : params? nodes ;
@@ -79,7 +79,6 @@ ports     : '(' ')' | '(' port (',' port)* ')' ;
 port      : prio=(ADD | AND)? var ;
 
 // Variables
-var       : name ('[' range ']')* ;
+var       : name ('[' term ']')* ;
 name      : (ID '.')* ID ;
-range     : term | term '..' term ;
 

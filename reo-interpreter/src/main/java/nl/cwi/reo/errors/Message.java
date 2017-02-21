@@ -15,7 +15,7 @@ public final class Message {
 	private final int column;
 	
 	private final String msg;
-	
+
 	public Message(MessageType type, String source, int line, int column, String msg) {
 		this.type = type;
 		this.source = source;

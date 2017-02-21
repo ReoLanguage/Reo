@@ -6,6 +6,8 @@ import java.util.List;
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.terms.TermsExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
@@ -13,7 +15,7 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a variable expression.
  * @param <I> type of identifier
  */
-public class VariableExpression<I extends Identifier> implements Expression<IdentifierList<I>>, Term {
+public class VariableExpression implements Expression<Variable> {
 	
 	/**
 	 * Fully qualified name.
@@ -23,7 +25,7 @@ public class VariableExpression<I extends Identifier> implements Expression<Iden
 	/**
 	 * Indices of this variable.
 	 */
-	protected final List<List<Term>> indices;
+	protected final List<TermsExpression> indices;
 	
 	/**
 	 * Location of this variable in Reo source file.
@@ -34,7 +36,7 @@ public class VariableExpression<I extends Identifier> implements Expression<Iden
 	 * Constructs a variable list.
 	 * @param name		name of the node
 	 */
-	public VariableExpression(String name, List<List<Term>> indices, Location location) {
+	public VariableExpression(String name, List<TermsExpression> indices, Location location) {
 		if (name == null || indices == null)
 			throw new NullPointerException();
 		this.name = name;
@@ -54,7 +56,7 @@ public class VariableExpression<I extends Identifier> implements Expression<Iden
 		return name;
 	}
 	
-	public List<List<Term>> getIndices() {
+	public List<TermsExpression> getIndices() {
 		return indices;
 	}
 	
@@ -115,7 +117,10 @@ public class VariableExpression<I extends Identifier> implements Expression<Iden
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IdentifierList<I> evaluate(Scope s, Monitor m) {
+	public Variable evaluate(Scope s, Monitor m) {
+		
+		return null;
+	}
 //		boolean boundsAreKnown = true;
 //		List<List<Term>> indices_p = new ArrayList<List<Term>>();
 //
@@ -167,8 +172,8 @@ public class VariableExpression<I extends Identifier> implements Expression<Iden
 //		List<List<Term>> indices_t = new ArrayList<List<Term>>();
 //		
 //		return new Variable(this.name, indices_t, token);
-		return null;
-	}
+//		return null;
+//	}
 	
 	/**
 	 * {@inheritDoc}
@@ -176,14 +181,18 @@ public class VariableExpression<I extends Identifier> implements Expression<Iden
 	@Override
 	public String toString() {
 		String s = name;	
-		for (List<Term> bounds : this.indices) {			
-			if (bounds.size() == 1) {
-				s += "[" + bounds.get(0) + "]";
-			} else if (bounds.size() == 2) {
-				s += "[" + bounds.get(0)  + ".." + bounds.get(1) + "]";
-			}			
+		for (TermsExpression bounds : this.indices) {			
+			if (bounds instanceof TermList){
+				TermList t = (TermList) bounds;
+				if(t.getList().size() == 1) {
+					s += "[" + t.getList().get(0) + "]";
+				} else if (t.getList().size() == 2) {
+	//				s += "[" + t.getList().get(0)  + ".." + bounds.get(1) + "]";
+				}			
+		}
 		}	
 		return s;
 	}
+
 
 }

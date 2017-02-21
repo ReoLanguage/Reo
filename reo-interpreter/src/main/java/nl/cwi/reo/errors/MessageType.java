@@ -2,7 +2,7 @@ package nl.cwi.reo.errors;
 
 public enum MessageType {
 	INFO, WARNING, ERROR;
-
+	
 	@Override
 	public String toString() {
 		switch(this) {

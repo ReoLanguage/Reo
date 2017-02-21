@@ -1,8 +1,6 @@
 package nl.cwi.reo.interpret.signatures;
 
-import nl.cwi.reo.interpret.parameters.Parameter;
 import nl.cwi.reo.interpret.parameters.ParameterType;
-import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.terms.TermList;
 import nl.cwi.reo.interpret.variables.VariableListExpression;
 import nl.cwi.reo.util.Location;
@@ -15,12 +13,12 @@ public final class SignatureExpression implements ParameterType {
 	/**
 	 * List of parameters.
 	 */
-	private final VariableListExpression<Parameter> params;
+	private final VariableListExpression params;
 	
 	/**
 	 * List of nodes.
 	 */
-	private final VariableListExpression<Port> nodes;
+	private final VariableListExpression nodes;
 	
 	/**
 	 * Location of this signature in Reo source file.
@@ -33,7 +31,7 @@ public final class SignatureExpression implements ParameterType {
 	 * @param nodes			list of nodes
 	 * @param location		location of signature in Reo source file.
 	 */
-	public SignatureExpression(VariableListExpression<Parameter> params, VariableListExpression<Port> nodes, Location location) {
+	public SignatureExpression(VariableListExpression params, VariableListExpression nodes, Location location) {
 		this.params = params;
 		this.nodes = nodes;
 		this.location = location;
@@ -46,7 +44,7 @@ public final class SignatureExpression implements ParameterType {
 	 * @param ports			list of ports
 	 * @return signature that contains interface renaming and parameter assignments.
 	 */
-	public Signature evaluate(TermList values, VariableListExpression<Port> ports) {
+	public Signature evaluate(TermList values, VariableListExpression ports) {
 		// TODO Auto-generated method stub
 		return null;
 	}

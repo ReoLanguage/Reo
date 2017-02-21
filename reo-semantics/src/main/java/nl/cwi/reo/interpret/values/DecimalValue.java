@@ -1,9 +1,16 @@
 package nl.cwi.reo.interpret.values;
 
+import java.util.Arrays;
+
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.terms.Terms;
+import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.util.Monitor;
+
 /**
  * Interpretation of decimal value.
  */
-public final class DecimalValue implements Value {
+public final class DecimalValue implements Value, TermsExpression {
 	
 	/**
 	 * Value.
@@ -48,5 +55,10 @@ public final class DecimalValue implements Value {
 
 	public static DecimalValue exp(DecimalValue a, DecimalValue b) {
 		return new DecimalValue(Math.pow(a.x, b.x));
+	}
+
+	@Override
+	public Terms evaluate(Scope s, Monitor m) {
+		return new Terms(Arrays.asList(this));
 	}
 }

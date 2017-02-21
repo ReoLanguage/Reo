@@ -9,6 +9,6 @@ import nl.cwi.reo.interpret.variables.VariableListExpression;
 
 public interface ComponentDefinition<T extends Semantics<T>> extends Value {
 
-	public Set<T> instantiate(TermList values, VariableListExpression<Port> ports);
+	public Set<T> instantiate(TermList values, VariableListExpression ports);
 	
 }

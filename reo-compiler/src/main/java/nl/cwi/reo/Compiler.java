@@ -8,10 +8,9 @@ import java.util.List;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
-import nl.cwi.reo.interpret.Interpreter;
-import nl.cwi.reo.interpret.InterpreterPA;
-import nl.cwi.reo.interpret.semantics.Component;
-import nl.cwi.reo.interpret.semantics.FlatConnector;
+import nl.cwi.reo.interpret.connectors.SemanticsType;
+import nl.cwi.reo.interpret.interpreters.Interpreter;
+import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 
 /**
@@ -53,7 +52,7 @@ public class Compiler {
 	        compiler.run();			
 		}
 	}
-	
+
     public void run() {
 		directories.add(".");
 		String comppath = System.getenv("COMPATH");
@@ -61,21 +60,21 @@ public class Compiler {
 			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));
 
 		// Interpret the program
-		Interpreter<PortAutomaton> interpreter = new InterpreterPA(directories, params);
-		FlatConnector<PortAutomaton> program = interpreter.interpret(files);
+		Interpreter<PortAutomaton> interpreter = new Interpreter<PortAutomaton>(SemanticsType.PA,new Listener<PortAutomaton>(),directories, params);
+		interpreter.interpret(files);
 		
-		if (program != null) {
-			for (Component<PortAutomaton> X : program.getComponents()) System.out.println(X);
-
-			
-			if (!program.isEmpty()) {
+//		if (program != null) {
+//			for (Component<PortAutomaton> X : program.getComponents()) System.out.println(X);
+//
+//			
+//			if (!program.isEmpty()) {
 //				PortAutomaton product = program.getComponents().get(0).compose(program.getComponents().subList(1, program.getComponents().size()));
 //				PortAutomaton hide = product.restrict(program.getInterface());
 				
 //				System.out.println("Product automaton : \n");
 //				System.out.println(hide);
-			}
-		}
+//			}
+//		}
 //		// Generate the classes.
 //		JavaCompiler JC = new JavaCompiler(name, "");
 //		JC.compile(program);

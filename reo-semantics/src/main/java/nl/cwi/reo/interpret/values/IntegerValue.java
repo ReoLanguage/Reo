@@ -1,9 +1,16 @@
 package nl.cwi.reo.interpret.values;
 
+import java.util.Arrays;
+
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.terms.Terms;
+import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.util.Monitor;
+
 /**
  * Interpretation of integer value.
  */
-public final class IntegerValue implements Value {
+public final class IntegerValue implements Value, TermsExpression {
 
 	/**
 	 * Value.
@@ -52,5 +59,11 @@ public final class IntegerValue implements Value {
 
 	public static IntegerValue exp(IntegerValue a, IntegerValue b) {
 		return new IntegerValue((int)Math.pow(a.x, b.x));
+	}
+
+	@Override
+	public Terms evaluate(Scope s, Monitor m) {
+		// TODO Auto-generated method stub
+		return new Terms(Arrays.asList(this));
 	}
 }

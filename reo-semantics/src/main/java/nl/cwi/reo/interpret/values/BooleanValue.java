@@ -1,9 +1,16 @@
 package nl.cwi.reo.interpret.values;
 
+import java.util.Arrays;
+
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.terms.Terms;
+import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.util.Monitor;
+
 /**
  * Interpretation of boolean value.
  */
-public final class BooleanValue implements Value {
+public final class BooleanValue implements Value,TermsExpression {
 	
 	/**
 	 * Value.
@@ -37,4 +44,10 @@ public final class BooleanValue implements Value {
 	public static BooleanValue not(BooleanValue a) {
 		return new BooleanValue(!a.x);
 	}
+
+	@Override
+	public Terms evaluate(Scope s, Monitor m) {
+		return new Terms(Arrays.asList(this));
+	}
+
 }

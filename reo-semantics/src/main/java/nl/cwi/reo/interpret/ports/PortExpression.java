@@ -7,15 +7,17 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.interpret.variables.IdentifierList;
+import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableExpression;
+import nl.cwi.reo.interpret.variables.VariableList;
+import nl.cwi.reo.interpret.variables.VariableListExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of a port expression.
  */
-public final class PortExpression extends VariableExpression<Port> {
+public final class PortExpression extends VariableExpression {
 	
 	/**
 	 * Priority type: ampersand, plus, none.
@@ -29,7 +31,7 @@ public final class PortExpression extends VariableExpression<Port> {
 	 * @param prio	priority type of port
 	 * @param var 	variable defining port 
 	 */
-	public PortExpression(PrioType prio, VariableExpression<Port> var) {
+	public PortExpression(PrioType prio, VariableExpression var) {
 		super(var.getName(), var.getIndices(), var.getLocation());
 		this.prio = prio;
 	}
@@ -39,10 +41,11 @@ public final class PortExpression extends VariableExpression<Port> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IdentifierList<Port> evaluate(Scope s, Monitor m) {
-		List<Port> ports = new ArrayList<Port>();
-		for (Identifier x : super.evaluate(s, m).getIdentifiers())
-			ports.add(new Port(x.getName(), PortType.NONE, prio, new TypeTag(""), true));
-		return new IdentifierList<Port>(ports);
+	public Port evaluate(Scope s, Monitor m) {
+//		List<Port> ports = new ArrayList<Port>();
+//		for (Variable x : super.evaluate(s, m).getIdentifiers())
+//			ports.add(new Port(x.getName(), PortType.NONE, prio, new TypeTag(""), true));
+//		return new IdentifierList(ports);
+		return new Port(null);
 	}
 }

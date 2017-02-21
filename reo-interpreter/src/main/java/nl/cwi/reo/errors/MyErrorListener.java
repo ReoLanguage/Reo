@@ -15,6 +15,7 @@ public class MyErrorListener extends BaseErrorListener {
 //		System.out.println(new Message(MessageType.ERROR, source, line, charPositionInLine, msg).toString());
 //	}
 	
+	
 	public boolean hasError = false;
 	
 	@Override

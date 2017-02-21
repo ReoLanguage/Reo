@@ -12,7 +12,7 @@ public class CompilationException extends Error {
 	private final Token token;
 	
 	private final String msg;
-	
+
 	public CompilationException(Token token, String msg) {
 		this.token = token;
 		this.msg = msg;

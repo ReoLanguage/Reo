@@ -23,6 +23,10 @@ public final class TermList implements TermsExpression {
 		this.list = list;
 	}
 	
+	public List<TermsExpression> getList(){
+		return list;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

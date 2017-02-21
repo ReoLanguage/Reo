@@ -8,10 +8,10 @@ import java.util.List;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
-import nl.cwi.reo.interpret.Interpreter;
-import nl.cwi.reo.interpret.InterpreterPR;
-import nl.cwi.reo.interpret.semantics.Component;
-import nl.cwi.reo.interpret.semantics.FlatConnector;
+//import nl.cwi.reo.interpret.Interpreter;
+//import nl.cwi.reo.interpret.InterpreterPR;
+//import nl.cwi.reo.interpret.semantics.Component;
+//import nl.cwi.reo.interpret.semantics.FlatConnector;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
 /**

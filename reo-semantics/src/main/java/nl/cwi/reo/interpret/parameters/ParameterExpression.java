@@ -6,7 +6,6 @@ import java.util.List;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.interpret.variables.IdentifierList;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
@@ -14,7 +13,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * Interpretation of a parameter expression.
  */
-public final class ParameterExpression extends VariableExpression<Parameter> {
+public final class ParameterExpression extends VariableExpression {
 
 	/**
 	 * Type of this parameter.
@@ -28,8 +27,8 @@ public final class ParameterExpression extends VariableExpression<Parameter> {
 	 * @param location	location of parameter in Reo source file
 	 * @param type		type of parameter
 	 */
-	public ParameterExpression(String name, List<List<Term>> indices, Location location, ParameterType type) {
-		super(name, indices, location);
+	public ParameterExpression(VariableExpression var, ParameterType type) {
+		super(var.getName(),var.getIndices(),var.getLocation());
 		this.type = type;
 	}
 	
@@ -37,10 +36,11 @@ public final class ParameterExpression extends VariableExpression<Parameter> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IdentifierList<Parameter> evaluate(Scope s, Monitor m) {
-		List<Parameter> params = new ArrayList<Parameter>();
-		for (Identifier x : super.evaluate(s, m).getIdentifiers())
-			params.add(new Parameter(x.getName(), type));
-		return new IdentifierList<Parameter>(params);
+	public Parameter evaluate(Scope s, Monitor m) {
+//		List<Parameter> params = new ArrayList<Parameter>();
+//		for (Identifier x : super.evaluate(s, m).getIdentifiers())
+//			params.add(new Parameter(x.getName(), type));
+//		return new IdentifierList<Parameter>(params);
+		return new Parameter(null,null);
 	}
 }

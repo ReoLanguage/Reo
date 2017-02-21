@@ -4,13 +4,14 @@ import java.util.Map;
 
 import nl.cwi.reo.interpret.connectors.Connector;
 import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.variables.Identifier;
 
 /**
  * A Reo connector with a set of node unifications.
  * @param <T> Reo semantics type
  */
-public final class Instances<T extends Semantics<T>> {
+public final class Instances<T extends Semantics<T>> implements Term{
 
 	/**
 	 * A Reo connector.

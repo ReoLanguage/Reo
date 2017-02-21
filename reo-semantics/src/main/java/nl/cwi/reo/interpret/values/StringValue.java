@@ -1,9 +1,16 @@
 package nl.cwi.reo.interpret.values;
 
+import java.util.Arrays;
+
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.terms.Terms;
+import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.util.Monitor;
+
 /**
  * Interpretation of string value.
  */
-public final class StringValue implements Value {
+public final class StringValue implements Value , TermsExpression {
 
 	/**
 	 * Value.
@@ -28,6 +35,12 @@ public final class StringValue implements Value {
 
 	public static StringValue concat(StringValue a, StringValue b) {
 		return new StringValue(a.x + b.x);
+	}
+
+	@Override
+	public Terms evaluate(Scope s, Monitor m) {
+		// TODO Auto-generated method stub
+		return new Terms(Arrays.asList(this));
 	}
 
 }

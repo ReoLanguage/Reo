@@ -15,13 +15,13 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	/**
 	 * Variable.
 	 */
-	private final VariableExpression<Identifier> var;
+	private final VariableExpression var;
 
 	/**
 	 * Constructs a new component variable.
 	 * @param var	component variable
 	 */
-	public ComponentVariable(VariableExpression<Identifier> var) {
+	public ComponentVariable(VariableExpression var) {
 		this.var = var;
 	}
 	

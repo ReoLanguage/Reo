@@ -6,7 +6,7 @@ import nl.cwi.reo.interpret.terms.Term;
  * A concatenation of a fully qualified name and 
  * a sequence of indices.
  */
-public class Identifier implements Term {
+public class Identifier implements Variable {
 
 	/**
 	 * Name.
