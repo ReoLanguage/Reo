@@ -1,50 +1,30 @@
-import reo.fifo1;
+section com.example;
+import reo.fifo;
+import reo.transformer;
 
-test(a?,d!) {
 
-	fifo = <k:int>(a?, b!) { 
-		if (k <= 0) { 
-			a = b 
-		} else {
-			fifo[k](a,b)
-		}
-		for i = 0..k {
-			if (i == 0) {
-				fifo[0] = (a?,b!) {
-					a = b
-				}
-			} else (i > 0) {
-				fifo[i] = (a?,b!) {
-					fifo1(a,x) 
-					fifo[i-1](x,b)
-				}
-			}
-		}
-	}
+// /**
+//  * Foo is a channel that accepts maps from tuples of strings and intergers
+//  * to double values, and produces double values. It has a parameter F
+//  * that is a map from $a, the type of data that passes through node a, to 
+//  * $b, the type op data that passes through node b.
+//  */
+foo = <k:int, F:($a:$b), cop:string>(a?(string*int:double), b!double) 
+{
+   fifo<2>(a,x[i][j])    // instance of component fifo.
+   transformer<F>(x[i][j],y)
+   bar(y,z)
+//   z=b                  // unification that joins node z and b
+   
+   "lex" {
+      // lexicographical composition
+   }
 
-	Producer = (a?){
-		#PR
-		identity(;a)
-		Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
-		}
-	Consumer = (b!){
-		#PR
-		identity(b;)
-		Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Consumer"
-		}
-	Producer(a)
-	Consumer(d)
-	fifo<1>(a,d)
+   cop { // parametrized composition operator.
+   }
+|
+   bar = <>(p?,q!) { /* ... */ },  // local definition
+   i in <1..k>,         // iteration of this whole set
+   j in <-2..5>,        // iteration of this whole set
+   k > 4                // boolean condition for this set
 }
-/*
-	recursive<k:int>(a?,b!) {
-		if (k==0) {
-			a=b 
-		} else {
-			recursive<k-1>(a,x) 
-			fifo1(x,b)		
-		}
-	}
-	
-	recursive<2>(a,d)
-*/

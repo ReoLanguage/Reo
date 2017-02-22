@@ -1,0 +1,23 @@
+section com.example;
+import reo.fifo;
+//import reo.transformer;
+
+
+foo = <k:int>(a?, b!double) 
+{
+   fifo<2>(a,x[i][j])    // instance of component fifo.
+   transformer<F>(x[i][j],y)
+   bar(y,z)
+//   z=b                  // unification that joins node z and b
+   
+   "lex" {
+      // lexicographical composition
+   }
+
+   cop { // parametrized composition operator.
+   }
+|
+   i in <1..k> &&         // iteration of this whole set
+   j in <-2..5> &&        // iteration of this whole set
+   k > 4                // boolean condition for this set
+}

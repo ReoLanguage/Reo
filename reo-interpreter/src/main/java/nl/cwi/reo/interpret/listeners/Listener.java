@@ -222,9 +222,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
-	public void enterComponent_atomic(Component_atomicContext ctx) { }
-
-	@Override
 	public void exitComponent_atomic(Component_atomicContext ctx) {
 		T atom = atoms.get(ctx.atom());
 		SourceCode s=null;
@@ -263,8 +260,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		List<InstancesExpression<T>> stmtlist = new ArrayList<InstancesExpression<T>>();
 		for (MultisetContext stmt_ctx : ctx.multiset())
 			stmtlist.add(set.get(stmt_ctx));
-
-		set.put(ctx, new Set<T>((Term) terms.get(ctx.term()),stmtlist,formula.get(ctx.formula())));
+		
+		set.put(ctx, new Set<T>( terms.get(ctx.term()),stmtlist,formula.get(ctx.formula())));
 	}
 	
 	@Override

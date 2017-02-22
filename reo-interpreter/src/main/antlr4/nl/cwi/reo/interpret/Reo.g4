@@ -31,12 +31,12 @@ instance  : component list? ports                                 # instance_ato
 
 // Predicates
 formula   : BOOL                                                  # formula_boolean
-          | var                                                   # formula_variable
           | '(' formula ')'                                       # formula_brackets
           | var component                                         # formula_componentdefn
           | 'struct' ID '{' param (',' param)* '}'                # formula_structdefn
           | ID 'in' list                                          # formula_membership
           | term op=(LEQ | LT | GEQ | GT | EQ | NEQ) term         # formula_binaryrelation
+          | var                                                   # formula_variable
           | FORALL ID 'in' list formula                           # formula_universal
           | EXISTS ID 'in' list formula                           # formula_existential
           | '!' formula                                           # formula_negation
