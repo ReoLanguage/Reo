@@ -26,6 +26,7 @@ import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.Listener;
@@ -124,7 +125,7 @@ public class Interpreter<T extends Semantics<T>> {
 			}
 		
 		// Evaluate these component expressions.
-//		Definitions definitions = new Definitions();
+		Scope scope = new Scope();
 //		String name = null;		
 //		while (!stack.isEmpty()) {
 //			ReoFile<T> program = stack.pop();
