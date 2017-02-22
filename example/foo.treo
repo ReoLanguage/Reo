@@ -1,10 +1,11 @@
 section com.example;
-import reo.fifo;
+//import reo.fifo;
 //import reo.transformer;
 
 
 foo = <k:int>(a?, b!double) 
 {
+
    fifo<2>(a,x[i][j])    // instance of component fifo.
    transformer<F>(x[i][j],y)
    bar(y,z)
