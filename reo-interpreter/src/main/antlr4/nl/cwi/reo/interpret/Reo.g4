@@ -34,13 +34,13 @@ formula   : BOOL                                                  # formula_bool
           | '(' formula ')'                                       # formula_brackets
           | var component                                         # formula_componentdefn
           | 'struct' ID '{' param (',' param)* '}'                # formula_structdefn
-          | ID 'in' list                                          # formula_membership
+          | ID ':' list                                           # formula_membership
           | term op=(LEQ | LT | GEQ | GT | EQ | NEQ) term         # formula_binaryrelation
           | var                                                   # formula_variable
-          | FORALL ID 'in' list formula                           # formula_universal
-          | EXISTS ID 'in' list formula                           # formula_existential
+          | FORALL ID ':' list formula                            # formula_universal
+          | EXISTS ID ':' list formula                            # formula_existential
           | '!' formula                                           # formula_negation
-          | formula AND formula                                   # formula_conjunction
+          | formula (AND | ',') formula                           # formula_conjunction
           | formula OR formula                                    # formula_disjunction ;
 
 // Terms
@@ -52,10 +52,19 @@ term      : NAT                                                   # term_natural
           | instance                                              # term_instance
           | var                                                   # term_variable
           | list                                                  # term_list
+          | tuple                                                 # term_tuple
+          | func                                                  # term_function
           | '(' term ')'                                          # term_brackets
+          | <assoc=right> term tuple                              # term_application
           | <assoc=right> term POW term                           # term_exponent
           | MIN term                                              # term_unarymin
           | term op=(MUL | DIV | MOD | ADD | MIN | LIST) term     # term_operation ;
+
+// Functions
+func      : '{' ('[' tuple ',' tuple ']')* '}'
+
+// Tuples
+tuple     : term | '[' ']' | '[' tuple (',' tuple)* ']' ;
 
 // Lists
 list      : '<' '>' | '<' term (',' term)* '>' ;
@@ -72,7 +81,7 @@ nodes     : '(' ')' | '(' node (',' node)* ')' ;
 node      : var | var? io=(IN | OUT | MIX) type? ;
 
 // Type tags
-type      : '$'? ID ('*' type)? | '(' type ':' type ')';
+type      : '$'? ID | '(' type ')' | type '*' type | <assoc=right> type '^' type;
 
 // Ports
 ports     : '(' ')' | '(' port (',' port)* ')' ;

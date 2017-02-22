@@ -135,6 +135,7 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Deprecated
 	public Connector<T> evaluate(Scope s, Monitor m) {
 		List<SubComponent<T>> newcomps = new ArrayList<SubComponent<T>>(); 
 		for (SubComponent<T> comp : components)
