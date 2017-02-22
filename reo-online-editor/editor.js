@@ -129,6 +129,7 @@
   
   function updateText() {
     var s = '';
+    // TODO: traverse id's
     canvas.forEachObject(function(obj) {
       if (obj.type == "line")
         s += 'sync(' + obj.circle1.id + ',' + obj.circle2.id + ') ';
@@ -167,14 +168,14 @@
     p.set({left: pointer.x, top: pointer.y});
     
     canvas.forEachObject(function(obj) {
-      if (obj === p || obj.get('type') !== "circle") return;
-      if (p.intersectsWithObject(obj)) {
+      if (obj !== p && obj.get('type') === "circle" && p.intersectsWithObject(obj)) {
         if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
           p.setLeft(obj.getLeft());
           p.setTop(obj.getTop());
           p.setCoords();
         }
       }
+      
     });
     
     for (i = 0; i < p.linesIn.length; i++)
@@ -188,7 +189,8 @@
     isDown = false;
     var p = canvas.getActiveObject();
     canvas.forEachObject(function(obj) {
-      if (!obj || obj === p || obj.get('type') !== "circle") return;
+      if (!obj || obj === p || obj.get('type') !== "circle")
+        return;
       if (p.intersectsWithObject(obj)) {
         if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
           for (i = 0; i < p.linesIn.length; i++) {
