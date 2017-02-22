@@ -3,8 +3,10 @@ package nl.cwi.reo.interpret.connectors;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.stringtemplate.v4.ST;
 
@@ -18,7 +20,7 @@ import nl.cwi.reo.util.Monitor;
  * 
  * @param <T> Reo semantics type
  */
-public final class Component<T extends Semantics<T>> implements SubComponent<T> {
+public final class AtomicReoConnector<T extends Semantics<T>> implements ReoConnector<T> {
 	
 	/**
 	 * Semantics object.
@@ -39,7 +41,7 @@ public final class Component<T extends Semantics<T>> implements SubComponent<T> 
 	 * Constructs a new atomic component.
 	 * @param atom		semantics
 	 */
-	public Component(T atom) {
+	public AtomicReoConnector(T atom) {
 		this.semantics = atom;
 		this.source = new SourceCode();
 		Map<Port, Port> links = new HashMap<Port, Port>();
@@ -53,7 +55,7 @@ public final class Component<T extends Semantics<T>> implements SubComponent<T> 
 	 * @param semantics		semantics
 	 * @param source	reference to source code
 	 */
-	public Component(T semantics, SourceCode source) {
+	public AtomicReoConnector(T semantics, SourceCode source) {
 		this.semantics = semantics;
 		this.source = source;
 		Map<Port, Port> links = new HashMap<Port, Port>();
@@ -68,7 +70,7 @@ public final class Component<T extends Semantics<T>> implements SubComponent<T> 
 	 * @param source		reference to source code
 	 * @param links			set of links
 	 */
-	public Component(T semantics, SourceCode source, Map<Port, Port> links) {
+	public AtomicReoConnector(T semantics, SourceCode source, Map<Port, Port> links) {
 		this.semantics = semantics;
 		this.source = source;
 		this.links = Collections.unmodifiableMap(links);
@@ -102,32 +104,32 @@ public final class Component<T extends Semantics<T>> implements SubComponent<T> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Component<T> evaluate(Scope s, Monitor m) {
-		return new Component<T>(semantics.evaluate(s, null), source);
+	public AtomicReoConnector<T> evaluate(Scope s, Monitor m) {
+		return new AtomicReoConnector<T>(semantics.evaluate(s, null), source);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SubComponent<T> reconnect(Map<Port, Port> joins) {
-		return new Component<T>(semantics, source, Links.reconnect(links, joins));
+	public ReoConnector<T> reconnect(Map<Port, Port> joins) {
+		return new AtomicReoConnector<T>(semantics, source, Links.reconnect(links, joins));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SubComponent<T> renameHidden(Integer i) {
-		return new Component<T>(semantics, source, Links.renameHidden(links, i));
+	public ReoConnector<T> renameHidden(Integer i) {
+		return new AtomicReoConnector<T>(semantics, source, Links.renameHidden(links, i));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Component<T>> flatten() {
-		List<Component<T>> list = new ArrayList<Component<T>>();
+	public List<AtomicReoConnector<T>> flatten() {
+		List<AtomicReoConnector<T>> list = new ArrayList<AtomicReoConnector<T>>();
 		list.add(this);
 		return list;
 	}
@@ -136,7 +138,7 @@ public final class Component<T extends Semantics<T>> implements SubComponent<T> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SubComponent<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory) {
+	public ReoConnector<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory) {
 		return this;
 	}
 
@@ -159,5 +161,13 @@ public final class Component<T extends Semantics<T>> implements SubComponent<T> 
 		st.add("semantics", semantics);
 		st.add("source", source);
 		return st.render();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Port> getInterface() {
+		return new HashSet<Port>(links.values());
 	}
 }

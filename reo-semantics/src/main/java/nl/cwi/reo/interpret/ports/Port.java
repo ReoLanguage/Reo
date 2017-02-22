@@ -1,7 +1,5 @@
 package nl.cwi.reo.interpret.ports;
 
-import java.util.Objects;
-
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
 
@@ -144,25 +142,5 @@ public final class Port extends Identifier {
 	@Override
 	public String toString() {
 		return (visible ? "" : "*") + prio + name + type + tag;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object other) {
-	    if (other == null) return false;
-	    if (other == this) return true;
-	    if (!(other instanceof Port)) return false;
-	    Port p = (Port)other;
-	   	return Objects.equals(this.name, p.name);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-	    return Objects.hash(this.name);
 	}	
 }

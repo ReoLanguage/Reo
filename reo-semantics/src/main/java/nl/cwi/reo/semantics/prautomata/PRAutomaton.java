@@ -26,6 +26,13 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	private List<Port> port;
 	
 
+	public PRAutomaton() {
+		this.name = "";
+		this.variable = "";
+		this.value = new Integer(0);
+		this.port = new ArrayList<Port>();
+	}
+	
 	public PRAutomaton(String name, String variable, Integer value, List<Port> port){
 		this.name=name;
 		this.value=value;

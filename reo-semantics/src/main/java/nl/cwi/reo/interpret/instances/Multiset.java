@@ -13,7 +13,7 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a set of constraints.
  * @param <T> Reo semantics type
  */
-public final class Set<T extends Semantics<T>> implements InstancesExpression<T> {
+public final class Multiset<T extends Semantics<T>> implements InstancesExpression<T> {
 
 	/**
 	 * Composition operator.
@@ -36,7 +36,7 @@ public final class Set<T extends Semantics<T>> implements InstancesExpression<T>
 	 * @param elements		elements in this set
 	 * @param predicate		predicate of this set
 	 */
-	public Set(TermsExpression operator, List<InstancesExpression<T>> elements, PredicateExpression predicate){
+	public Multiset(TermsExpression operator, List<InstancesExpression<T>> elements, PredicateExpression predicate){
 		this.operator = operator;
 		this.elements = elements;
 		this.predicate = predicate;

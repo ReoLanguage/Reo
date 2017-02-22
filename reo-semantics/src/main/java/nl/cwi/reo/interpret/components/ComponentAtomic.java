@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret.components;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SourceCode;
-import nl.cwi.reo.interpret.instances.Set;
+import nl.cwi.reo.interpret.instances.Multiset;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.util.Monitor;
 

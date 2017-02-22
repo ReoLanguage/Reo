@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret.instances;
 
 import java.util.Map;
 
-import nl.cwi.reo.interpret.connectors.Connector;
+import nl.cwi.reo.interpret.connectors.CompositeReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -16,7 +16,7 @@ public final class Instances<T extends Semantics<T>> implements Term{
 	/**
 	 * A Reo connector.
 	 */
-	private final Connector<T> connector;
+	private final CompositeReoConnector<T> connector;
 	
 	/**
 	 * A set of node unifications.
@@ -28,7 +28,7 @@ public final class Instances<T extends Semantics<T>> implements Term{
 	 * @param connector		Reo connector
 	 * @param unifications	node unifications
 	 */
-	public Instances(Connector<T> connector, Map<Identifier, Identifier> unifications) {
+	public Instances(CompositeReoConnector<T> connector, Map<Identifier, Identifier> unifications) {
 		this.connector = connector;
 		this.unifications = unifications;
 	}

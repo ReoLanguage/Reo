@@ -1,6 +1,8 @@
 package nl.cwi.reo.interpret.variables;
 
-import nl.cwi.reo.interpret.terms.Term;
+import java.util.Objects;
+
+import nl.cwi.reo.interpret.ports.Port;
 
 /**
  * A concatenation of a fully qualified name and 
@@ -22,10 +24,30 @@ public class Identifier implements Variable {
 	}
 	
 	/**
-	 * Gets the name of this identifier.
-	 * @return	identifier name
+	 * {@inheritDoc}
 	 */
-	public String getName() {
+	@Override
+	public String toString() {
 		return name;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof Port)) return false;
+	    Identifier p = (Identifier)other;
+	   	return Objects.equals(this.name, p.name);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+	    return Objects.hash(this.name);
+	}	
 }

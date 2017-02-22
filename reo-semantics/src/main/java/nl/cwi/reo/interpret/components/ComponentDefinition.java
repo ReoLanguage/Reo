@@ -1,14 +1,13 @@
 package nl.cwi.reo.interpret.components;
 
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.instances.Set;
-import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.terms.Terms;
 import nl.cwi.reo.interpret.values.Value;
-import nl.cwi.reo.interpret.variables.VariableListExpression;
+import nl.cwi.reo.interpret.variables.VariableList;
 
 public interface ComponentDefinition<T extends Semantics<T>> extends Value {
 
-	public Set<T> instantiate(TermList values, VariableListExpression ports);
+	public ReoConnector<T> instantiate(Terms values, VariableList ports);
 	
 }

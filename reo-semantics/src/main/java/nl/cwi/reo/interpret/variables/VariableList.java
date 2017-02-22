@@ -2,13 +2,12 @@ package nl.cwi.reo.interpret.variables;
 
 import java.util.List;
 
-
 /**
  * A list of identifiers of generic type, such as 
  * variable names, ports, nodes, and parameters.
  * @param <I> type of identifier
  */
-public final class VariableList implements Variable{
+public final class VariableList implements Variable {
 	
 	/**
 	 * List of identifiers.

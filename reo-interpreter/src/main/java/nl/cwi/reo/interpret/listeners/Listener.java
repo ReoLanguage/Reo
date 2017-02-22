@@ -17,14 +17,14 @@ import nl.cwi.reo.interpret.components.ComponentAtomic;
 import nl.cwi.reo.interpret.components.ComponentComposite;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.components.ComponentVariable;
-import nl.cwi.reo.interpret.connectors.Component;
-import nl.cwi.reo.interpret.connectors.Connector;
+import nl.cwi.reo.interpret.connectors.AtomicReoConnector;
+import nl.cwi.reo.interpret.connectors.CompositeReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SourceCode;
 import nl.cwi.reo.interpret.instances.InstanceAtomic;
 import nl.cwi.reo.interpret.instances.InstanceComposite;
 import nl.cwi.reo.interpret.instances.InstancesExpression;
-import nl.cwi.reo.interpret.instances.Set;
+import nl.cwi.reo.interpret.instances.Multiset;
 import nl.cwi.reo.interpret.nodes.NodeExpression;
 import nl.cwi.reo.interpret.parameters.ParameterExpression;
 import nl.cwi.reo.interpret.ports.Port;
@@ -241,7 +241,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitComponent_composite(Component_compositeContext ctx) {
 		//TODO : check if cast works
-		components.put(ctx, new ComponentComposite<T>(signatureExpressions.get(ctx.sign()), (Set<T>) instances.get(ctx.multiset())));		
+		components.put(ctx, new ComponentComposite<T>(signatureExpressions.get(ctx.sign()), (Multiset<T>) instances.get(ctx.multiset())));		
 	}
 	
 	/**
@@ -251,7 +251,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitMultiset_constraint(Multiset_constraintContext ctx) {
 		InstancesExpression<T> i = instances.get(ctx.instance());
-		set.put(ctx, new Set<T>(null, Arrays.asList(i), null));
+		set.put(ctx, new Multiset<T>(null, Arrays.asList(i), null));
 	}
 	
 	@Override
@@ -261,7 +261,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (MultisetContext stmt_ctx : ctx.multiset())
 			stmtlist.add(set.get(stmt_ctx));
 		
-		set.put(ctx, new Set<T>( terms.get(ctx.term()),stmtlist,formula.get(ctx.formula())));
+		set.put(ctx, new Multiset<T>( terms.get(ctx.term()),stmtlist,formula.get(ctx.formula())));
 	}
 	
 	@Override
@@ -271,7 +271,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		
 		List<InstancesExpression<T>> l = Arrays.asList(m1,m2);
 		
-		set.put(ctx, new Set<T>(new StringValue("+"),l,null));
+		set.put(ctx, new Multiset<T>(new StringValue("+"),l,null));
 	}
 	
 	@Override
@@ -281,7 +281,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		
 		List<InstancesExpression<T>> l = Arrays.asList(m1,m2);
 		
-		set.put(ctx, new Set<T>(new StringValue("-"),l,null));
+		set.put(ctx, new Multiset<T>(new StringValue("-"),l,null));
 	}
 
 	/**

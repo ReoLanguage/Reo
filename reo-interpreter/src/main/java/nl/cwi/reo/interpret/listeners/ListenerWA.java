@@ -20,7 +20,7 @@ import nl.cwi.reo.interpret.ReoParser.Wa_jc_leqContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_jc_orContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_setContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_transitionContext;
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.workautomata.JobConstraint;
 import nl.cwi.reo.semantics.workautomata.Transition;
 import nl.cwi.reo.semantics.workautomata.WorkAutomaton;

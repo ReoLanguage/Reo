@@ -10,7 +10,7 @@ imps      : 'import' name ';' ;
 component : var                                                   # component_variable
           | sign '{' atom ('|' source)? '}'                       # component_atomic
           | sign multiset                                         # component_composite ;
-atom      : pa | cam | wa | sa ;
+atom      : pa | cam | wa | sa | pr ;
 source    : LANG ':' STRING ( '(' ID (',' ID)* ')' )? ;
 
 // Multisets
@@ -61,10 +61,10 @@ term      : NAT                                                   # term_natural
           | term op=(MUL | DIV | MOD | ADD | MIN | LIST) term     # term_operation ;
 
 // Functions
-func      : '{' ('[' tuple ',' tuple ']')* '}'
+func      : '{' ('[' term ',' term ']')* '}' ;
 
 // Tuples
-tuple     : term | '[' ']' | '[' tuple (',' tuple)* ']' ;
+tuple     : '[' ']' | '[' term (',' term)* ']' ;
 
 // Lists
 list      : '<' '>' | '<' term (',' term)* '>' ;

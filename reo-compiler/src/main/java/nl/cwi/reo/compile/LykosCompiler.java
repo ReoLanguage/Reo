@@ -1,4 +1,4 @@
-package nl.cwi.reo;
+package nl.cwi.reo.compile;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import nl.cwi.reo.interpret.connectors.AtomicReoConnector;
 import nl.cwi.reo.interpret.connectors.Language;
-import nl.cwi.reo.interpret.oldstuff.Port;
-import nl.cwi.reo.interpret.oldstuff.PortType;
-import nl.cwi.reo.interpret.semantics.Component;
-import nl.cwi.reo.interpret.semantics.FlatConnector;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.lykos.SimpleLykos;
 import nl.cwi.reo.lykos.WorkerSignature;
 import nl.cwi.reo.pr.autom.AutomatonFactory;
@@ -39,22 +39,20 @@ import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
 import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
-public class LykosCompiler extends ToolErrorAccumulator{
+public class LykosCompiler extends ToolErrorAccumulator {
 	
 	CompilerSettings settings;
 	PortFactory portFactory = null;
 	AutomatonFactory automatonFactory = null;
-	FlatConnector<PRAutomaton> program;
+	ReoConnector<PRAutomaton> program;
 	Definitions defs = new Definitions();
 	int counterWorker = 0;
 	
-	
-	
-	public LykosCompiler(FlatConnector<PRAutomaton> program){
+	public LykosCompiler(ReoConnector<PRAutomaton> program) {
 		super("test.treo");
 		
 		/*
-		 * Compiler settings :
+		 * Compiler settings
 		 */
 			
 		settings = new CompilerSettings("ex1.treo",Language.JAVA,false);
@@ -73,21 +71,17 @@ public class LykosCompiler extends ToolErrorAccumulator{
 		 * Main program to compile with Lykos
 		 */
 		
-		this.program=program;
+		this.program = program;
 		
 		/*
 		 * Creation of different Factories for Lykos compilation
 		 */
-		
-
 		switch (targetLanguage) {
 		case JAVA:
 			this.automatonFactory = new JavaAutomatonFactory();
 			this.portFactory = automatonFactory.getPortFactory();			
 			break;
-	
 		case C11:
-			
 			break;
 		default:
 			break;
@@ -105,17 +99,14 @@ public class LykosCompiler extends ToolErrorAccumulator{
 		 * Set primitives and add them to the main composite
 		 */
 		
-		List<InterpretedWorker> interpretedWorker= new ArrayList<InterpretedWorker>();
-	
-		for (Component<PRAutomaton> X : program) {
-			
-			if((X.getSourceCode().getFile())!=(null)){
+		List<InterpretedWorker> interpretedWorker = new ArrayList<InterpretedWorker>();
+		
+		for (AtomicReoConnector<PRAutomaton> X : program.flatten()) {
+			if((X.getSourceCode().getFile())!=(null)) {
 				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
+			} else {
+				c.addChild(setPrimitive(X.getSemantics()));
 			}
-			
-			else
-				c.addChild(setPrimitive(X.getAtom()));
-	
 		}
 	
 		List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
@@ -128,6 +119,7 @@ public class LykosCompiler extends ToolErrorAccumulator{
 		InterpretedProgram interpretedProgram = new InterpretedProgram(settings.getSourceFileLocation(),defs,notes, interpretedMain);
 		
 		ProgramCompiler	programCompiler = new JavaProgramCompiler(settings,interpretedProgram, automatonFactory);
+		
 		/*
 		 * Start compiling on simple Lykos project 
 		 */
@@ -144,24 +136,22 @@ public class LykosCompiler extends ToolErrorAccumulator{
 		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
 		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
 		
-		
 		Set<Port> P = program.getInterface();
 		int numberInPort=1;
 		int numberOutPort=1;
 		for(Port p: P){
-			if(p.getType()==PortType.IN){
+			if (p.getType()==PortType.IN){
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 				inputPortsOrArrays.put(new TypedName("in"+(numberInPort),Type.PORT),jp);
 				numberInPort++;
 			}
-			else if(p.getType()==PortType.OUT){
+			else if (p.getType()==PortType.OUT){
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
 				outputPortsOrArrays.put(new TypedName("out"+(numberOutPort),Type.PORT),jp);
 				numberOutPort++;
-			}
-			else{
+			} else {
 				throw new RuntimeException("Port of a composite should be in or out ports");
 			}
 		}
@@ -184,23 +174,20 @@ public class LykosCompiler extends ToolErrorAccumulator{
 		outputPortsOrArrays = new LinkedHashMap<>();
 		
 		SortedSet<Port> P = X.getInterface();
-		int numberInPort=1;
-		int numberOutPort=1;
-		for(Port p: P){
-			if(p.getType()==PortType.IN){
+		int numberInPort = 1;
+		int numberOutPort = 1;
+		for (Port p : P) {
+			if (p.getType() == PortType.IN) {
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
 				inputPortsOrArrays.put(new TypedName("in"+(numberInPort),Type.PORT),jp);
 				numberInPort++;
-				
-			}
-			else if(p.getType()==PortType.OUT){
+			} else if (p.getType() == PortType.OUT) {
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
 				outputPortsOrArrays.put(new TypedName("out"+(numberOutPort),Type.PORT),jp);
 				numberOutPort++;
-			}
-			else{
+			} else {
 				throw new RuntimeException("Port of atomic component should be in or out ports");
 			}
 		}
@@ -217,18 +204,13 @@ public class LykosCompiler extends ToolErrorAccumulator{
 			
 	}
 	
-	public WorkerSignature setWorker(Component<PRAutomaton> X){
-		List<Variable> l =new ArrayList<Variable>();
-		PRAutomaton Y = X.getAtom().rename(X);
-//			for(Port pA : X.getAtom().getInterface()){
-//				if(!(pA.toString()).equals(p.getKey().toString())){
-//					pA.
-//				}		
-//			}
-//		}
-		String name="";
-		for(Port p:Y.getInterface()){
-			if(p.getType()==PortType.IN){
+	public WorkerSignature setWorker(AtomicReoConnector<PRAutomaton> X){
+		List<Variable> l = new ArrayList<Variable>();
+		List<PRAutomaton> lst = X.integrate();
+		PRAutomaton Y = lst.get(0);
+		String name = "";
+		for (Port p : Y.getInterface()) {
+			if (p.getType() == PortType.IN) {
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);	
 				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.INPUT);
@@ -236,8 +218,7 @@ public class LykosCompiler extends ToolErrorAccumulator{
 				defs.addPort(jp);
 				name=""+counterWorker;
 				counterWorker++;
-			}
-			else if(p.getType()==PortType.OUT){
+			} else if (p.getType() == PortType.OUT) {
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
 				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.OUTPUT);
@@ -245,6 +226,8 @@ public class LykosCompiler extends ToolErrorAccumulator{
 				defs.addPort(jp);
 				name=""+counterWorker;
 				counterWorker++;
+			} else {
+				throw new RuntimeException("Port of atomic component should be in or out ports");
 			}
 		}
 		String nameWorker = X.getSourceCode().getFile().toString().substring(1, X.getSourceCode().getFile().toString().length()-1);

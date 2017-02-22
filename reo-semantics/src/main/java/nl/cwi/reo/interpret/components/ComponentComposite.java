@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret.components;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.instances.Set;
+import nl.cwi.reo.interpret.instances.Multiset;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -14,10 +14,10 @@ public final class ComponentComposite<T extends Semantics<T>> implements Compone
 
 	private final SignatureExpression sign;	
 	
-	private final Set<T> set;
+	private final Multiset<T> set;
 	
 	
-	public ComponentComposite(SignatureExpression sign, Set<T> set) {
+	public ComponentComposite(SignatureExpression sign, Multiset<T> set) {
 		this.sign=sign;
 		this.set=set;
 	}

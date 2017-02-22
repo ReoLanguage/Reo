@@ -11,9 +11,11 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import nl.cwi.reo.interpret.PAParser.PaContext;
+import nl.cwi.reo.interpret.PAParser.Pa_initContext;
+import nl.cwi.reo.interpret.PAParser.Pa_scContext;
 import nl.cwi.reo.interpret.PAParser.Pa_trContext;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
-import nl.cwi.reo.interpret.ports.PortExpression;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.automata.State;
 import nl.cwi.reo.semantics.automata.Transition;
 import nl.cwi.reo.semantics.portautomata.NullLabel;
@@ -26,7 +28,7 @@ import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 public class ListenerPA extends Listener<PortAutomaton> {	
 	
 	private ParseTreeProperty<PortAutomaton> automata = new ParseTreeProperty<PortAutomaton>();
-	private ParseTreeProperty<SortedSet<PortExpression>> scs = new ParseTreeProperty<SortedSet<PortExpression>>();
+	private ParseTreeProperty<SortedSet<Port>> scs = new ParseTreeProperty<SortedSet<Port>>();
 	private ParseTreeProperty<Transition<NullLabel>> transitions = new ParseTreeProperty<Transition<NullLabel>>();
 	private ParseTreeProperty<State> initial = new ParseTreeProperty<State>();
 	
@@ -36,7 +38,7 @@ public class ListenerPA extends Listener<PortAutomaton> {
 	
 	public void exitPa(PaContext ctx) {
 		SortedSet<State> Q = new TreeSet<State>();
-		SortedSet<PortExpression> P = new TreeSet<PortExpression>();
+		SortedSet<Port> P = new TreeSet<Port>();
 		Map<State, Set<Transition<NullLabel>>> T = new HashMap<State, Set<Transition<NullLabel>>>();
 		State q0 = initial.get(ctx.pa_init());	
 		for (Pa_trContext pa_tr_ctx : ctx.pa_tr()) {
@@ -44,7 +46,7 @@ public class ListenerPA extends Listener<PortAutomaton> {
 			if (q0 == null) q0 = t.getSource();
 			Q.add(t.getSource());
 			Q.add(t.getTarget());	
-			P.add(t.getSyncConstraint());		
+			P.addAll(t.getSyncConstraint());		
 			T.putIfAbsent(t.getSource(), new HashSet<Transition<NullLabel>>());
 			T.putIfAbsent(t.getTarget(), new HashSet<Transition<NullLabel>>());
 			T.get(t.getSource()).add(t);
