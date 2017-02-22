@@ -1,9 +1,11 @@
 package nl.cwi.reo.interpret.signatures;
 
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.parameters.ParameterType;
 import nl.cwi.reo.interpret.terms.TermList;
 import nl.cwi.reo.interpret.variables.VariableListExpression;
 import nl.cwi.reo.util.Location;
+import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of a component signature.
@@ -40,11 +42,11 @@ public final class SignatureExpression implements ParameterType {
 	/**
 	 * Evaluates this interface for a given list of parameter values
 	 * and a given list of ports.
-	 * @param values		list of parameter values
-	 * @param ports			list of ports
+	 * @param Scope			scope needed for interpretation
+	 * @param Monitor		monitor for messages
 	 * @return signature that contains interface renaming and parameter assignments.
 	 */
-	public Signature evaluate(TermList values, VariableListExpression ports) {
+	public Signature evaluate(Scope s, Monitor m) {
 		// TODO Auto-generated method stub
 		return null;
 	}

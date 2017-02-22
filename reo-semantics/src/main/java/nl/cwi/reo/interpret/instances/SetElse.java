@@ -13,19 +13,19 @@ public final class SetElse<T extends Semantics<T>> implements InstancesExpressio
 	/**
 	 * First set.
 	 */
-	private final Set<T> first;
+	private final SetExpression<T> first;
 
 	/**
 	 * Second set.
 	 */
-	private final Set<T> second;
+	private final SetExpression<T> second;
 	
 	/**
 	 * Short circuit addition of two sets of constraints.
 	 * @param first		first set
 	 * @param second	second set
 	 */
-	public SetElse(Set<T> first, Set<T> second) {
+	public SetElse(SetExpression<T> first, SetExpression<T> second) {
 		this.first = first;
 		this.second = second;
 	}

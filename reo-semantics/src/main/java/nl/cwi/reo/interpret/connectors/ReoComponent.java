@@ -4,16 +4,20 @@ import java.util.List;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.Expression;
+import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.variables.VariableListExpression;
 
 /**
  * A SubComponent is a part of a Connector.
  * 
  * A SubComponent is an immutable object.
  * @param <T> type of semantics objects
- * @see Connector
+ * @see CompositeReoComponent
  */
-public interface SubComponent<T extends Semantics<T>> extends Expression<SubComponent<T>> {
+public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComponent<T>>,Term {
 	
 	/**
 	 * Gets the links from internal ports to external ports.
@@ -21,6 +25,9 @@ public interface SubComponent<T extends Semantics<T>> extends Expression<SubComp
 	 */
 	public Map<Port, Port> getLinks();
 
+	public SetExpression<T> instantiate(TermList values, VariableListExpression ports);
+
+	
 	/**
 	 * Relabels the set of links of this subcomponent by renaming 
 	 * all link targets names according to renaming map, and hiding
@@ -28,7 +35,7 @@ public interface SubComponent<T extends Semantics<T>> extends Expression<SubComp
 	 * @param joins		renaming map
 	 * @return a copy of this block with reconnected links
 	 */
-	public SubComponent<T> reconnect(Map<Port, Port> joins);
+	public ReoComponent<T> reconnect(Map<Port, Port> joins);
 
 	/**
 	 * Renames all hidden ports in this subcomponent to an 
@@ -38,7 +45,7 @@ public interface SubComponent<T extends Semantics<T>> extends Expression<SubComp
 	 * @param i		start value of hidden ports.
 	 * @return Block with renamed hidden ports.
 	 */
-	public SubComponent<T> renameHidden(Integer i);
+	public ReoComponent<T> renameHidden(Integer i);
 	
 	/**
 	 * Flattens the nested block structure of this subcomponent. This 
@@ -46,7 +53,7 @@ public interface SubComponent<T extends Semantics<T>> extends Expression<SubComp
 	 * associative product operator.
 	 * @return List of all components contained in this subcomponent.
 	 */
-	public List<Component<T>> flatten();
+	public List<AtomicReoComponent<T>> flatten();
 	
 	/**
 	 * Inserts, if necessary, a merger and/or replicator at every node in this instance list. 
@@ -55,7 +62,7 @@ public interface SubComponent<T extends Semantics<T>> extends Expression<SubComp
 	 * @param replicators		insert replicators
 	 * @param nodeFactory		instance of semantics object
 	 */
-	public SubComponent<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory);
+	public ReoComponent<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory);
 	
 	/**
 	 * Integrates the links of this subcomponent by renaming the interfaces

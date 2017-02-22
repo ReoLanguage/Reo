@@ -8,24 +8,24 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of short circuit subtraction.
  * @param <T> Reo semantics type
  */
-public final class SetWithout<T extends Semantics<T>> implements InstancesExpression<T> {
+public final class SetWithout<T extends Semantics<T>> implements InstancesExpression {
 	
 	/**
 	 * First set.
 	 */
-	private final Set<T> first;
+	private final SetExpression<T> first;
 
 	/**
 	 * Second set.
 	 */
-	private final Set<T> second;
+	private final SetExpression<T> second;
 	
 	/**
 	 * Short circuit subtraction of two sets of constraints.
 	 * @param first		first set
 	 * @param second	second set
 	 */
-	public SetWithout(Set<T> first, Set<T> second) {
+	public SetWithout(SetExpression<T> first, SetExpression<T> second) {
 		this.first = first;
 		this.second = second;
 	}

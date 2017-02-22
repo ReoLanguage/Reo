@@ -1,9 +1,12 @@
 package nl.cwi.reo.interpret.instances;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import nl.cwi.reo.interpret.connectors.Connector;
+import nl.cwi.reo.interpret.connectors.CompositeReoComponent;
 import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.interpret.connectors.ReoComponent;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.variables.Identifier;
 
@@ -16,21 +19,25 @@ public final class Instances<T extends Semantics<T>> implements Term{
 	/**
 	 * A Reo connector.
 	 */
-	private final Connector<T> connector;
+	private final List<ReoComponent<T>> connectors;
 	
 	/**
 	 * A set of node unifications.
 	 */
-	private final Map<Identifier, Identifier> unifications;
+	private final Set<Set<Identifier>> unifications;
 	
 	/**
 	 * Constructs a new set.
 	 * @param connector		Reo connector
 	 * @param unifications	node unifications
 	 */
-	public Instances(Connector<T> connector, Map<Identifier, Identifier> unifications) {
-		this.connector = connector;
+	public Instances(List<ReoComponent<T>> connectors, Set<Set<Identifier>> unifications) {
+		this.connectors = connectors;
 		this.unifications = unifications;
+	}
+	
+	public List<ReoComponent<T>> getConnector(){
+		return connectors;
 	}
 
 }

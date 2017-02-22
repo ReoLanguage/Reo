@@ -1,8 +1,15 @@
 package nl.cwi.reo.interpret.components;
 
+import java.util.Arrays;
+
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.connectors.AtomicReoComponent;
+import nl.cwi.reo.interpret.connectors.CompositeReoComponent;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.instances.Set;
+import nl.cwi.reo.interpret.connectors.ReoComponent;
+import nl.cwi.reo.interpret.instances.Instances;
+import nl.cwi.reo.interpret.instances.SetExpression;
+import nl.cwi.reo.interpret.signatures.Signature;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -14,17 +21,19 @@ public final class ComponentComposite<T extends Semantics<T>> implements Compone
 
 	private final SignatureExpression sign;	
 	
-	private final Set<T> set;
+	private final SetExpression<T> set;
 	
 	
-	public ComponentComposite(SignatureExpression sign, Set<T> set) {
+	public ComponentComposite(SignatureExpression sign, SetExpression<T> set) {
 		this.sign=sign;
 		this.set=set;
 	}
 
 	@Override
-	public ComponentDefinition<T> evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
+	public ReoComponent<T> evaluate(Scope s, Monitor m) {
+		Signature signature = sign.evaluate(s, m);
+		Instances<T> i = set.evaluate(s, m);
+//		return new CompositeReoComponent<T>(i.ge,Arrays.asList(((Instances<T>) i).getConnector()),signature.getInterface());
 		return null;
 	}
 

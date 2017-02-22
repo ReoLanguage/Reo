@@ -19,7 +19,6 @@ public final class InstanceAtomic<T extends Semantics<T>> implements InstancesEx
 	/**
 	 * Component definition.
 	 */
-//	private final VariableExpression<Identifier> var;
 	private final ComponentExpression<T> component;
 	
 	/**

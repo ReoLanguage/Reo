@@ -11,8 +11,11 @@ import java.util.TreeSet;
 import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.variables.VariableListExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -23,7 +26,7 @@ import nl.cwi.reo.util.Monitor;
  * 
  * @param <T> semantics object type
  */
-public final class Connector<T extends Semantics<T>> implements SubComponent<T> {
+public final class CompositeReoComponent<T extends Semantics<T>> implements ReoComponent<T> {
 		
 	/**
 	 * Type of composition
@@ -33,7 +36,7 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	/**
 	 * List of components
 	 */
-	private final List<SubComponent<T>> components;
+	private final List<ReoComponent<T>> components;
 	
 	/**
 	 * Set of links
@@ -43,9 +46,9 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	/**
 	 * Constructs and empty connector.
 	 */
-	public Connector() { 
+	public CompositeReoComponent() { 
 		this.operator = "";
-		this.components = Collections.unmodifiableList(new ArrayList<SubComponent<T>>());
+		this.components = Collections.unmodifiableList(new ArrayList<ReoComponent<T>>());
 		this.links = Collections.unmodifiableMap(new HashMap<Port, Port>());
 	}
 	
@@ -53,10 +56,10 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	 * Constructs a connector consisting of a single atom. 
 	 * @param atom	atomic component
 	 */
-	public Connector(Component<T> atom) {
+	public CompositeReoComponent(AtomicReoComponent<T> atom) {
 		if (atom == null)
 			throw new NullPointerException();
-		List<SubComponent<T>> components = new ArrayList<SubComponent<T>>();
+		List<ReoComponent<T>> components = new ArrayList<ReoComponent<T>>();
 		components.add(atom);
 		this.operator = "";
 		this.components = Collections.unmodifiableList(components);
@@ -71,11 +74,11 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	 * @param operator		name of product operator
 	 * @param components	list of subcomponents
 	 */
-	public Connector(String operator, List<SubComponent<T>> components) { 
+	public CompositeReoComponent(String operator, List<ReoComponent<T>> components) { 
 		this.operator = operator;
 		this.components = Collections.unmodifiableList(components);
 		Map<Port, Port> links = new HashMap<Port, Port>();
-		for (SubComponent<T> comp : components)
+		for (ReoComponent<T> comp : components)
 			for (Map.Entry<Port, Port> link : comp.getLinks().entrySet()) 
 				links.put(link.getValue(), link.getValue());
 		this.links = Collections.unmodifiableMap(links);
@@ -87,7 +90,7 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	 * @param components	list of subcomponents
 	 * @param links			set of links mapping local ports to global ports
 	 */
-	public Connector(String operator, List<SubComponent<T>> components, Map<Port, Port> links) { 
+	public CompositeReoComponent(String operator, List<ReoComponent<T>> components, Map<Port, Port> links) { 
 		this.operator = operator;
 		this.components = Collections.unmodifiableList(components);
 		this.links = Collections.unmodifiableMap(links);
@@ -105,7 +108,7 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	 * Gets the list of all subcomponents in this connector.
 	 * @return list of subcomponents.
 	 */
-	public List<SubComponent<T>> getComponents() {
+	public List<ReoComponent<T>> getComponents() {
 		return components;
 	}
 
@@ -123,48 +126,48 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	 * @param operator			name of the operator
 	 * @param components 		other list of instances
 	 */
-	public static <T extends Semantics<T>> Connector<T> compose(String operator, List<? extends SubComponent<T>> components) {
-		List<SubComponent<T>> newcomponents = new ArrayList<SubComponent<T>>();
+	public static <T extends Semantics<T>> CompositeReoComponent<T> compose(String operator, List<? extends ReoComponent<T>> components) {
+		List<ReoComponent<T>> newcomponents = new ArrayList<ReoComponent<T>>();
 		Integer i = Integer.valueOf(0);
-		for (SubComponent<T> comp : components)
+		for (ReoComponent<T> comp : components)
 			newcomponents.add(comp.renameHidden(i));
-		return new Connector<T>(operator, newcomponents);
+		return new CompositeReoComponent<T>(operator, newcomponents);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Connector<T> evaluate(Scope s, Monitor m) {
-		List<SubComponent<T>> newcomps = new ArrayList<SubComponent<T>>(); 
-		for (SubComponent<T> comp : components)
+	public CompositeReoComponent<T> evaluate(Scope s, Monitor m) {
+		List<ReoComponent<T>> newcomps = new ArrayList<ReoComponent<T>>(); 
+		for (ReoComponent<T> comp : components)
 			newcomps.add(comp.evaluate(s, null));
-		return new Connector<T>(operator, newcomps);
+		return new CompositeReoComponent<T>(operator, newcomps);
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Connector<T> reconnect(Map<Port, Port> joins) {
-		return new Connector<T>(operator, components, Links.reconnect(links, joins));
+	public CompositeReoComponent<T> reconnect(Map<Port, Port> joins) {
+		return new CompositeReoComponent<T>(operator, components, Links.reconnect(links, joins));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Connector<T> renameHidden(Integer i) {
-		return new Connector<T>(operator, components, Links.renameHidden(links, i));
+	public CompositeReoComponent<T> renameHidden(Integer i) {
+		return new CompositeReoComponent<T>(operator, components, Links.renameHidden(links, i));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Component<T>> flatten() {
-		List<Component<T>> list = new ArrayList<Component<T>>();
-		for (SubComponent<T> comp : components)
+	public List<AtomicReoComponent<T>> flatten() {
+		List<AtomicReoComponent<T>> list = new ArrayList<AtomicReoComponent<T>>();
+		for (ReoComponent<T> comp : components)
 			list.addAll(comp.flatten());
 		return list;
 	}
@@ -173,14 +176,14 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Connector<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory) {
+	public CompositeReoComponent<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory) {
 		
-		List<SubComponent<T>> newcomponents = new ArrayList<SubComponent<T>>();
+		List<ReoComponent<T>> newcomponents = new ArrayList<ReoComponent<T>>();
 
 		// Count the number of incoming and outgoing channel ends at each node.
 		Map<Port, Integer> outs = new HashMap<Port, Integer>();
 		Map<Port, Integer> ins = new HashMap<Port, Integer>();
-		for (SubComponent<T> comp : components) {
+		for (ReoComponent<T> comp : components) {
 			for (Map.Entry<Port, Port> link : comp.getLinks().entrySet()) {
 				Port p = link.getValue();
 				Integer out = outs.get(p);
@@ -201,7 +204,7 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 		// Split shared ports in every atom in main, and insert a node
 		Map<Port, SortedSet<Port>> nodes = new HashMap<Port, SortedSet<Port>>();
 		
-		for (SubComponent<T> comp : components) {	
+		for (ReoComponent<T> comp : components) {	
 							
 			Map<Port, Port> links = new HashMap<Port, Port>();
 
@@ -252,9 +255,9 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 		// Insert new instances of nodes in this list.
 		for (Map.Entry<Port, SortedSet<Port>> node : nodes.entrySet()) 
 			if (node.getValue().size() > 1)
-				newcomponents.add(new Component<T>(nodeFactory.getNode(node.getValue())));
+				newcomponents.add(new AtomicReoComponent<T>(nodeFactory.getNode(node.getValue())));
 		
-		return new Connector<T>(operator, newcomponents);
+		return new CompositeReoComponent<T>(operator, newcomponents);
 	}
 	
 	/**
@@ -263,7 +266,7 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 	@Override
 	public List<T> integrate() {
 		List<T> list = new ArrayList<T>();
-		for (SubComponent<T> comp : components)
+		for (ReoComponent<T> comp : components)
 			list.addAll(comp.integrate());
 		List<T> list2 = new ArrayList<T>();
 		for (T x : list2) 
@@ -280,5 +283,11 @@ public final class Connector<T extends Semantics<T>> implements SubComponent<T> 
 		st.add("operator", operator);
 		st.add("components", components);
 		return st.render();
+	}
+
+	@Override
+	public SetExpression<T> instantiate(TermList values, VariableListExpression ports) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

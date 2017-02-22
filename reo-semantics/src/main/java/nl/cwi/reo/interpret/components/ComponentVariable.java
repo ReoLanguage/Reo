@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.components;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.interpret.connectors.ReoComponent;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
@@ -29,7 +30,7 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ComponentDefinition<T> evaluate(Scope s, Monitor m) {
+	public ReoComponent<T> evaluate(Scope s, Monitor m) {
 		// TODO Auto-generated method stub
 		return null;
 	}

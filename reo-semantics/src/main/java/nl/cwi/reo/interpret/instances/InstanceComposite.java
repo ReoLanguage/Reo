@@ -1,7 +1,12 @@
 package nl.cwi.reo.interpret.instances;
 
+import java.util.Arrays;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.interpret.terms.Terms;
 import nl.cwi.reo.interpret.terms.TermsExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -39,7 +44,11 @@ public final class InstanceComposite<T extends Semantics<T>> implements Instance
 	 */
 	@Override
 	public Instances<T> evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
+		Instances<T> i1 = first.evaluate(s, m);
+		Instances<T> i2 = second.evaluate(s, m);
+		Terms op = operator.evaluate(s, m);
+		
+//		return new Instances<T>(Arrays.asList(new Connector<T>()),);
 		return null;
 	}
 

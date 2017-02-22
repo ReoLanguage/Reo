@@ -27,12 +27,15 @@ import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.components.ComponentDefinition;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ReoFile;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
+import nl.cwi.reo.util.Monitor;
 
 
 public class Interpreter<T extends Semantics<T>> {
@@ -126,13 +129,14 @@ public class Interpreter<T extends Semantics<T>> {
 		
 		// Evaluate these component expressions.
 		Scope scope = new Scope();
-//		String name = null;		
-//		while (!stack.isEmpty()) {
-//			ReoFile<T> program = stack.pop();
-//			name = program.getName();
-//			Expression cexpr = program.getComponent().evaluate(definitions);
-//			definitions.put(name, cexpr);
-//		}
+		Monitor monitor = new Monitor();
+		Identifier name = null;		
+		while (!stack.isEmpty()) {
+			ReoFile<T> program = stack.pop();
+			name = new Identifier(program.getName());
+			ComponentDefinition<T> cexpr = program.getComponent().evaluate(scope,monitor);
+			scope.put(name, cexpr);
+		}
 		
 		// Get the instance from the main component.		
 //		Expression expr = definitions.get(name);		
