@@ -24,6 +24,10 @@ public final class Disjunction implements PredicateExpression {
 	}
 
 	/**
+	 * Return a new Predicate with disjunction of scope
+	 * and empty scope if the Term in one Predicate is not 
+	 * defined in one of the others
+	 *  
 	 * {@inheritDoc}
 	 */
 	@Override

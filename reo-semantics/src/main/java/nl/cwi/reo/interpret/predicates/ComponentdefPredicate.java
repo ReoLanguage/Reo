@@ -1,8 +1,18 @@
 package nl.cwi.reo.interpret.predicates;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.ComponentExpression;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.interpret.instances.Instances;
+import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -11,16 +21,35 @@ public class ComponentdefPredicate<T extends Semantics<T>> implements PredicateE
 	private VariableExpression var;
 	
 	private ComponentExpression<T> component;
+
 	
 	public ComponentdefPredicate(VariableExpression var, ComponentExpression<T> component){
 		this.var=var;
 		this.component=component;
 	}
-
+	
+	/**
+	 * The evaluation of a ComponentdefPredicate is a Predicate 
+	 * where the instance of the component is added to the scope
+	 * 
+	 * @param var
+	 * @param component
+	 */
 	@Override
 	public Predicate evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
-		return null;
+		Variable variable = var.evaluate(s, m);
+		ReoConnector<T> connector = component.evaluate(s, m);
+		
+		List<Scope> scopeList = new ArrayList<Scope>();
+		Scope scope = new Scope();
+		
+		Set<Set<Identifier>> set= new HashSet<Set<Identifier>>();
+		
+		set.add(connector.getIdentifiers());
+		
+		scope.put(new Identifier(variable.toString()), new Instances<T>(Arrays.asList(connector),set));
+		scopeList.add(scope);		
+		return new Predicate(scopeList);
 	}
 
 }

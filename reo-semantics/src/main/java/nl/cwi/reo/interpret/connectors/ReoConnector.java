@@ -8,6 +8,8 @@ import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableListExpression;
 
@@ -74,4 +76,6 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	public List<T> integrate();
 
 	public Set<Port> getInterface();
+	
+	public Set<Identifier> getIdentifiers();
 }

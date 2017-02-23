@@ -17,6 +17,7 @@ import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableListExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -293,6 +294,11 @@ public final class CompositeReoConnector<T extends Semantics<T>> implements ReoC
 		return null;
 	}
 
+	@Override
+	public Set<Identifier> getIdentifiers() {
+		return new HashSet<Identifier>(links.values());
+	}
+	
 	@Override
 	public Set<Port> getInterface() {
 		return new HashSet<Port>(links.values());

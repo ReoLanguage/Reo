@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret.ports;
 
+import java.util.List;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;

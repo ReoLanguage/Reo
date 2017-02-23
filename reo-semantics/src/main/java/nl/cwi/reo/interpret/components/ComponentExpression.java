@@ -9,5 +9,5 @@ import nl.cwi.reo.interpret.connectors.ReoConnector;
  * @param <T> Reo semantics type
  */
 public interface ComponentExpression<T extends Semantics<T>> extends Expression<ReoConnector<T>> {
-
+	public ReoConnector instantiate();
 }

@@ -21,5 +21,9 @@ public final class Predicate {
 	public Predicate(List<Scope> scopes) {
 		this.scopes = scopes;
 	}
+	
+	public List<Scope> getScopes(){
+		return scopes;
+	}
 
 }

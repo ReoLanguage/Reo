@@ -6,13 +6,14 @@ import java.util.Set;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 
 /**
  * A Reo connector with a set of node unifications.
  * @param <T> Reo semantics type
  */
-public final class Instances<T extends Semantics<T>> implements Term{
+public final class Instances<T extends Semantics<T>> implements Value{
 
 	/**
 	 * A Reo connector.
