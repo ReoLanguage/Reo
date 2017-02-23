@@ -11,6 +11,7 @@ import nl.cwi.reo.interpret.instances.Instances;
 import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.signatures.Signature;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
+import nl.cwi.reo.interpret.terms.Terms;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -33,8 +34,8 @@ public final class ComponentComposite<T extends Semantics<T>> implements Compone
 	public ReoComponent<T> evaluate(Scope s, Monitor m) {
 		Signature signature = sign.evaluate(s, m);
 		Instances<T> i = set.evaluate(s, m);
-//		return new CompositeReoComponent<T>(i.ge,Arrays.asList(((Instances<T>) i).getConnector()),signature.getInterface());
-		return null;
+		Terms operator = set.getOperator(s, m);
+		return new CompositeReoComponent<T>(operator.toString(),i.getConnector(),signature.getInterface());
 	}
 
 }

@@ -41,11 +41,11 @@ public final class PortExpression extends VariableExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Port evaluate(Scope s, Monitor m) {
-//		List<Port> ports = new ArrayList<Port>();
-//		for (Variable x : super.evaluate(s, m).getIdentifiers())
-//			ports.add(new Port(x.getName(), PortType.NONE, prio, new TypeTag(""), true));
-//		return new IdentifierList(ports);
+	public PortList evaluate(Scope s, Monitor m) {
+		List<Port> ports = new ArrayList<Port>();
+		for (Variable x : super.evaluate(s, m).getIdentifiers())
+			ports.add(new Port(x.getName(), PortType.NONE, prio, new TypeTag(""), true));
+		return new IdentifierList(ports);
 		return new Port(null);
 	}
 }

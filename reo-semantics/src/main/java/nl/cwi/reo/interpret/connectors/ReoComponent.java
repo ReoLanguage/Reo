@@ -6,8 +6,8 @@ import java.util.Map;
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableListExpression;
 
 /**
@@ -17,7 +17,7 @@ import nl.cwi.reo.interpret.variables.VariableListExpression;
  * @param <T> type of semantics objects
  * @see CompositeReoComponent
  */
-public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComponent<T>>,Term {
+public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComponent<T>>,Variable {
 	
 	/**
 	 * Gets the links from internal ports to external ports.

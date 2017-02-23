@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
+
 public class MyErrorListener extends BaseErrorListener {
 //	@Override
 //	public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, 
@@ -14,7 +15,7 @@ public class MyErrorListener extends BaseErrorListener {
 //		System.err.println("test");
 //		System.out.println(new Message(MessageType.ERROR, source, line, charPositionInLine, msg).toString());
 //	}
-	
+
 	
 	public boolean hasError = false;
 	

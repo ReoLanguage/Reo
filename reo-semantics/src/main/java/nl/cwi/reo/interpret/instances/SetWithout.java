@@ -35,8 +35,14 @@ public final class SetWithout<T extends Semantics<T>> implements InstancesExpres
 	 */
 	@Override
 	public Instances<T> evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
-		return null;
+		Instances<T> i1 = first.evaluate(s, m);
+		Instances<T> i2 = second.evaluate(s, m);
+		// TODO : without set builder
+		if(!i1.getConnector().isEmpty()){
+			return i1;	
+		}
+		else
+			return i2;	
 	}
 
 }

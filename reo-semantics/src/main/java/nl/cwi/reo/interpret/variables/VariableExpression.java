@@ -5,7 +5,6 @@ import java.util.List;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermList;
 import nl.cwi.reo.interpret.terms.TermsExpression;
 import nl.cwi.reo.util.Location;

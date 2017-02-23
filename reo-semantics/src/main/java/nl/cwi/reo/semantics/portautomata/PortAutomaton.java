@@ -16,7 +16,7 @@ import nl.cwi.reo.semantics.automata.Transition;
 import nl.cwi.reo.util.Monitor;
 
 public class PortAutomaton extends Automaton<NullLabel> implements Semantics<PortAutomaton> {
-	
+
 	private static NullLabel label = new NullLabel();
 	
 

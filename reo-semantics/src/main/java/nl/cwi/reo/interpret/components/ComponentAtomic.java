@@ -3,7 +3,9 @@ package nl.cwi.reo.interpret.components;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SourceCode;
+import nl.cwi.reo.interpret.connectors.AtomicReoComponent;
 import nl.cwi.reo.interpret.connectors.ReoComponent;
+import nl.cwi.reo.interpret.signatures.Signature;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -27,8 +29,8 @@ public final class ComponentAtomic<T extends Semantics<T>> implements ComponentE
 
 	@Override
 	public ReoComponent<T> evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
-		return null;
+		Signature signature = sign.evaluate(s, m);
+		return new AtomicReoComponent<T>(atom, source, signature.getInterface());
 	}
 
 }

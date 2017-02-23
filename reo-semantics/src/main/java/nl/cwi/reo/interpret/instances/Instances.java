@@ -39,5 +39,8 @@ public final class Instances<T extends Semantics<T>> implements Term{
 	public List<ReoComponent<T>> getConnector(){
 		return connectors;
 	}
+	public Set<Set<Identifier>> getUnifications(){
+		return unifications;
+	}
 
 }

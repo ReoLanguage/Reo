@@ -1,10 +1,8 @@
 package nl.cwi.reo.interpret.listeners;
 
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,13 +10,10 @@ import java.util.Map;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
-import nl.cwi.reo.interpret.components.ComponentDefinition;
 import nl.cwi.reo.interpret.components.ComponentAtomic;
 import nl.cwi.reo.interpret.components.ComponentComposite;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.components.ComponentVariable;
-import nl.cwi.reo.interpret.connectors.AtomicReoComponent;
-import nl.cwi.reo.interpret.connectors.CompositeReoComponent;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SourceCode;
 import nl.cwi.reo.interpret.instances.InstanceAtomic;
@@ -27,7 +22,6 @@ import nl.cwi.reo.interpret.instances.InstancesExpression;
 import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.nodes.NodeExpression;
 import nl.cwi.reo.interpret.parameters.ParameterExpression;
-import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortExpression;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
@@ -73,11 +67,9 @@ import nl.cwi.reo.interpret.ReoParser.Formula_booleanContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_componentdefnContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_conjunctionContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_disjunctionContext;
-import nl.cwi.reo.interpret.ReoParser.Formula_existentialContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_membershipContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_negationContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_structdefnContext;
-import nl.cwi.reo.interpret.ReoParser.Formula_universalContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_variableContext;
 import nl.cwi.reo.interpret.ReoParser.ImpsContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_atomicContext;
@@ -106,7 +98,6 @@ import nl.cwi.reo.interpret.ReoParser.Term_componentdefnContext;
 import nl.cwi.reo.interpret.ReoParser.Term_decimalContext;
 import nl.cwi.reo.interpret.ReoParser.Term_exponentContext;
 import nl.cwi.reo.interpret.ReoParser.Term_instanceContext;
-import nl.cwi.reo.interpret.ReoParser.Term_listContext;
 import nl.cwi.reo.interpret.ReoParser.Term_naturalContext;
 import nl.cwi.reo.interpret.ReoParser.Term_operationContext;
 import nl.cwi.reo.interpret.ReoParser.Term_stringContext;

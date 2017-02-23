@@ -37,10 +37,6 @@ public final class ParameterExpression extends VariableExpression {
 	 */
 	@Override
 	public Parameter evaluate(Scope s, Monitor m) {
-//		List<Parameter> params = new ArrayList<Parameter>();
-//		for (Identifier x : super.evaluate(s, m).getIdentifiers())
-//			params.add(new Parameter(x.getName(), type));
-//		return new IdentifierList<Parameter>(params);
-		return new Parameter(null,null);
+		return new Parameter(this.name,type);
 	}
 }

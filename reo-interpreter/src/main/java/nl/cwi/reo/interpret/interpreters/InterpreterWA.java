@@ -2,9 +2,9 @@ package nl.cwi.reo.interpret.interpreters;
 
 import java.util.List;
 
+import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.ListenerWA;
-import nl.cwi.reo.semantics.api.SemanticsType;
-import nl.cwi.reo.workautomata.WorkAutomaton;
+import nl.cwi.reo.semantics.workautomata.WorkAutomaton;
 
 public class InterpreterWA extends Interpreter<WorkAutomaton> {
 	

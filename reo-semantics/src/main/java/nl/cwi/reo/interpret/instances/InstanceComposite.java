@@ -1,13 +1,18 @@
 package nl.cwi.reo.interpret.instances;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.connectors.CompositeReoComponent;
+import nl.cwi.reo.interpret.connectors.ReoComponent;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.terms.Terms;
 import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 public final class InstanceComposite<T extends Semantics<T>> implements InstancesExpression<T> {
@@ -48,8 +53,15 @@ public final class InstanceComposite<T extends Semantics<T>> implements Instance
 		Instances<T> i2 = second.evaluate(s, m);
 		Terms op = operator.evaluate(s, m);
 		
-//		return new Instances<T>(Arrays.asList(new Connector<T>()),);
-		return null;
+		List<ReoComponent<T>> list = new ArrayList<ReoComponent<T>>(i1.getConnector());
+		list.addAll(i2.getConnector());
+		CompositeReoComponent<T> c = new CompositeReoComponent<T>(op.toString(),list);
+		
+		Set<Set<Identifier>> set = i1.getUnifications();
+		for(Set<Identifier> setId : i2.getUnifications())
+			set.add(setId);
+		
+		return new Instances<T>(Arrays.asList(c),set);
 	}
 
 }

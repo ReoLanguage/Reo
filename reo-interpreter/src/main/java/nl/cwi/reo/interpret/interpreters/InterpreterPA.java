@@ -2,9 +2,9 @@ package nl.cwi.reo.interpret.interpreters;
 
 import java.util.List;
 
+import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.ListenerPA;
-import nl.cwi.reo.portautomata.PortAutomaton;
-import nl.cwi.reo.semantics.api.SemanticsType;
+import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 
 public class InterpreterPA extends Interpreter<PortAutomaton> {
 	
@@ -14,5 +14,6 @@ public class InterpreterPA extends Interpreter<PortAutomaton> {
 	 */
 	public InterpreterPA(List<String> dirs, List<String> params) {
 		super(SemanticsType.PA, new ListenerPA(), dirs, params);	
-	}	
+	}
+	
 }

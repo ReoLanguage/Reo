@@ -45,13 +45,16 @@ public final class SetExpression<T extends Semantics<T>> implements InstancesExp
 		this.elements = elements;
 		this.predicate = predicate;
 	}
+	
+	public Terms getOperator(Scope s, Monitor m){
+		return operator.evaluate(s, m);
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Instances<T> evaluate(Scope s, Monitor m) {
-		Terms op = operator.evaluate(s, m);
 		Predicate p = predicate.evaluate(s, m);
 
 		List<ReoComponent<T>> instances = new ArrayList<ReoComponent<T>>();

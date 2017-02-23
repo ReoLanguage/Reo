@@ -27,7 +27,7 @@ import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.components.ComponentDefinition;
+import nl.cwi.reo.interpret.connectors.ReoComponent;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.Listener;
@@ -134,7 +134,7 @@ public class Interpreter<T extends Semantics<T>> {
 		while (!stack.isEmpty()) {
 			ReoFile<T> program = stack.pop();
 			name = new Identifier(program.getName());
-			ComponentDefinition<T> cexpr = program.getComponent().evaluate(scope,monitor);
+			ReoComponent<T> cexpr = program.getComponent().evaluate(scope,monitor);
 			scope.put(name, cexpr);
 		}
 		
