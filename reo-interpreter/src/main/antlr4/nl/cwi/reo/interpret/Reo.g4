@@ -52,7 +52,7 @@ term      : NAT                                                   # term_natural
           | instance                                              # term_instance
           | var                                                   # term_variable
           | list                                                  # term_list
- //         | tuple                                                 # term_tuple
+          | tuple                                                 # term_tuple
           | func                                                  # term_function
           | '(' term ')'                                          # term_brackets
           | <assoc=right> term tuple                              # term_application
@@ -61,11 +61,8 @@ term      : NAT                                                   # term_natural
           | term op=(MUL | DIV | MOD | ADD | MIN | LIST) term     # term_operation ;
 
 // Functions
-<<<<<<< HEAD
-func      : '{' ('[' tuple ',' tuple ']')* '}';
-=======
+
 func      : '{' ('[' term ',' term ']')* '}' ;
->>>>>>> a3763465c7f1fc56971758e545f26c67abe92fa9
 
 // Tuples
 tuple     : '[' ']' | '[' term (',' term)* ']' ;
