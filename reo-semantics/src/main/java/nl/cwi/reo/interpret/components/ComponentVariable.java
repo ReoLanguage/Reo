@@ -2,7 +2,7 @@ package nl.cwi.reo.interpret.components;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.connectors.ReoComponent;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableExpression;
@@ -31,10 +31,10 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoComponent<T> evaluate(Scope s, Monitor m) {
+	public ReoConnector<T> evaluate(Scope s, Monitor m) {
 		Variable v = var.evaluate(s, m);
-		if(v instanceof ReoComponent<?>)
-			return ((ReoComponent<T>) v);
+		if(v instanceof ReoConnector<?>)
+			return ((ReoConnector<T>) v);
 		else
 			return null;
 	}

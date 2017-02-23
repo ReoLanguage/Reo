@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.CompositeReoComponent;
-import nl.cwi.reo.interpret.connectors.ReoComponent;
+import nl.cwi.reo.interpret.connectors.CompositeReoConnector;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.terms.Terms;
 import nl.cwi.reo.interpret.terms.TermsExpression;
@@ -53,9 +53,9 @@ public final class InstanceComposite<T extends Semantics<T>> implements Instance
 		Instances<T> i2 = second.evaluate(s, m);
 		Terms op = operator.evaluate(s, m);
 		
-		List<ReoComponent<T>> list = new ArrayList<ReoComponent<T>>(i1.getConnector());
+		List<ReoConnector<T>> list = new ArrayList<ReoConnector<T>>(i1.getConnector());
 		list.addAll(i2.getConnector());
-		CompositeReoComponent<T> c = new CompositeReoComponent<T>(op.toString(),list);
+		CompositeReoConnector<T> c = new CompositeReoConnector<T>(op.toString(),list);
 		
 		Set<Set<Identifier>> set = i1.getUnifications();
 		for(Set<Identifier> setId : i2.getUnifications())

@@ -9,7 +9,7 @@ import nl.cwi.reo.util.Monitor;
  * @param <T> Reo semantics type
  */
 public final class SetWithout<T extends Semantics<T>> implements InstancesExpression {
-	
+
 	/**
 	 * First set.
 	 */

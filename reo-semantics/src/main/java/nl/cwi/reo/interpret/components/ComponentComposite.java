@@ -3,10 +3,11 @@ package nl.cwi.reo.interpret.components;
 import java.util.Arrays;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.AtomicReoComponent;
-import nl.cwi.reo.interpret.connectors.CompositeReoComponent;
+import nl.cwi.reo.interpret.connectors.AtomicReoConnector;
+import nl.cwi.reo.interpret.connectors.CompositeReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.connectors.ReoComponent;
+
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.instances.Instances;
 import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.signatures.Signature;
@@ -31,11 +32,11 @@ public final class ComponentComposite<T extends Semantics<T>> implements Compone
 	}
 
 	@Override
-	public ReoComponent<T> evaluate(Scope s, Monitor m) {
+	public ReoConnector<T> evaluate(Scope s, Monitor m) {
 		Signature signature = sign.evaluate(s, m);
 		Instances<T> i = set.evaluate(s, m);
 		Terms operator = set.getOperator(s, m);
-		return new CompositeReoComponent<T>(operator.toString(),i.getConnector(),signature.getInterface());
+		return new CompositeReoConnector<T>(operator.toString(),i.getConnector(),signature.getInterface());
 	}
 
 }

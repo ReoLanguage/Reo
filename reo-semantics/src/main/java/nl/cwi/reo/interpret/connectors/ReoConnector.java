@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.connectors;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.instances.SetExpression;
@@ -15,9 +16,9 @@ import nl.cwi.reo.interpret.variables.VariableListExpression;
  * 
  * A SubComponent is an immutable object.
  * @param <T> type of semantics objects
- * @see CompositeReoComponent
+ * @see CompositeReoConnector
  */
-public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComponent<T>>,Variable {
+public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConnector<T>>,Variable {
 	
 	/**
 	 * Gets the links from internal ports to external ports.
@@ -35,7 +36,7 @@ public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComp
 	 * @param joins		renaming map
 	 * @return a copy of this block with reconnected links
 	 */
-	public ReoComponent<T> reconnect(Map<Port, Port> joins);
+	public ReoConnector<T> reconnect(Map<Port, Port> joins);
 
 	/**
 	 * Renames all hidden ports in this subcomponent to an 
@@ -45,7 +46,7 @@ public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComp
 	 * @param i		start value of hidden ports.
 	 * @return Block with renamed hidden ports.
 	 */
-	public ReoComponent<T> renameHidden(Integer i);
+	public ReoConnector<T> renameHidden(Integer i);
 	
 	/**
 	 * Flattens the nested block structure of this subcomponent. This 
@@ -53,7 +54,7 @@ public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComp
 	 * associative product operator.
 	 * @return List of all components contained in this subcomponent.
 	 */
-	public List<AtomicReoComponent<T>> flatten();
+	public List<AtomicReoConnector<T>> flatten();
 	
 	/**
 	 * Inserts, if necessary, a merger and/or replicator at every node in this instance list. 
@@ -62,7 +63,7 @@ public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComp
 	 * @param replicators		insert replicators
 	 * @param nodeFactory		instance of semantics object
 	 */
-	public ReoComponent<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory);
+	public ReoConnector<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory);
 	
 	/**
 	 * Integrates the links of this subcomponent by renaming the interfaces
@@ -71,4 +72,6 @@ public interface ReoComponent<T extends Semantics<T>> extends Expression<ReoComp
 	 * @return the semantics object with renamed ports
 	 */
 	public List<T> integrate();
+
+	public Set<Port> getInterface();
 }

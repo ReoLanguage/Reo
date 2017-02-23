@@ -10,7 +10,7 @@ import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.PrContext;
 import nl.cwi.reo.interpret.ReoParser.Pr_portContext;
 import nl.cwi.reo.interpret.ReoParser.Pr_stringContext;
-import nl.cwi.reo.interpret.oldstuff.Port;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
 public class ListenerPR extends Listener<PRAutomaton> {

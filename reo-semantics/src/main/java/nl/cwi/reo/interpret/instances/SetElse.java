@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.CompositeReoComponent;
-import nl.cwi.reo.interpret.connectors.ReoComponent;
+import nl.cwi.reo.interpret.connectors.CompositeReoConnector;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
@@ -27,7 +27,7 @@ public final class SetElse<T extends Semantics<T>> implements InstancesExpressio
 	 * Second set.
 	 */
 	private final SetExpression<T> second;
-	
+
 	/**
 	 * Short circuit addition of two sets of constraints.
 	 * @param first		first set

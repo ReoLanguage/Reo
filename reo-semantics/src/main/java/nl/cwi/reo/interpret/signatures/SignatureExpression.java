@@ -2,7 +2,8 @@ package nl.cwi.reo.interpret.signatures;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.parameters.ParameterType;
-import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.terms.Terms;
+import nl.cwi.reo.interpret.variables.VariableList;
 import nl.cwi.reo.interpret.variables.VariableListExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;

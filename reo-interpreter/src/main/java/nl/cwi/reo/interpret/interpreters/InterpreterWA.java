@@ -5,14 +5,17 @@ import java.util.List;
 import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.ListenerWA;
 import nl.cwi.reo.semantics.workautomata.WorkAutomaton;
+import nl.cwi.reo.util.Monitor;
 
 public class InterpreterWA extends Interpreter<WorkAutomaton> {
 	
 	/**
 	 * Constructs a Reo interpreter for Work Automaton semantics.
 	 * @param dirs		list of directories of Reo components
+	 * @param params	parameter values of main component
+	 * @param monitor	message container
 	 */
-	public InterpreterWA(List<String> dirs, List<String> params) {
-		super(SemanticsType.WA, new ListenerWA(), params, dirs);	
+	public InterpreterWA(List<String> dirs, List<String> params, Monitor monitor) {
+		super(SemanticsType.WA, new ListenerWA(), params, dirs, monitor);	
 	}	
 }

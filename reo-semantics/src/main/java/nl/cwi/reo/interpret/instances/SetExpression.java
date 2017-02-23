@@ -1,10 +1,11 @@
 package nl.cwi.reo.interpret.instances;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.ReoComponent;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.predicates.Predicate;
 import nl.cwi.reo.interpret.predicates.PredicateExpression;
@@ -57,7 +58,7 @@ public final class SetExpression<T extends Semantics<T>> implements InstancesExp
 	public Instances<T> evaluate(Scope s, Monitor m) {
 		Predicate p = predicate.evaluate(s, m);
 
-		List<ReoComponent<T>> instances = new ArrayList<ReoComponent<T>>();
+		List<ReoConnector<T>> instances = new ArrayList<ReoConnector<T>>();
 		for(InstancesExpression<T> i : elements){
 			instances.addAll(i.evaluate(s, m).getConnector());
 			

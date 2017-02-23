@@ -14,6 +14,7 @@ import nl.cwi.reo.interpret.components.ComponentAtomic;
 import nl.cwi.reo.interpret.components.ComponentComposite;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.components.ComponentVariable;
+
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SourceCode;
 import nl.cwi.reo.interpret.instances.InstanceAtomic;
@@ -233,6 +234,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void exitComponent_composite(Component_compositeContext ctx) {
 		//TODO : check if cast works
 		components.put(ctx, new ComponentComposite<T>(signatureExpressions.get(ctx.sign()), (SetExpression<T>) instances.get(ctx.multiset())));		
+
 	}
 	
 	/**

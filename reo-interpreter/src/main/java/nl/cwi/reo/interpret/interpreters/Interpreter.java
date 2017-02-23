@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
@@ -27,20 +26,27 @@ import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.ReoComponent;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ReoFile;
+import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.terms.Terms;
+import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
 
 
+/**
+ * Interpreter of Reo source files, for given generic semantics.
+ * @param <T> Reo semantics type
+ */
 public class Interpreter<T extends Semantics<T>> {
 	
-
 	/**
 	 * Type of semantics.
 	 */
@@ -57,27 +63,27 @@ public class Interpreter<T extends Semantics<T>> {
 	private final List<String> dirs;
 	
 	/**
-	 * list of parameters to instantiate the main component.
+	 * List of parameters to instantiate the main component.
 	 */
-	private final List<String> params;
+	private final List<String> params;	
 	
 	/**
-	 * list of parameters to instantiate the main component.
+	 * Container for messages.
 	 */
-//	private ComponentList<T> workers;
-	
+	private final Monitor monitor;
 	
 	/**
 	 * Constructs a Reo interpreter.
 	 * @param dirs		list of directories of Reo components
 	 */
-	public Interpreter(SemanticsType semantics, Listener<T> listener, List<String> dirs, List<String> params) {
+	public Interpreter(SemanticsType semantics, Listener<T> listener, List<String> dirs, List<String> params, Monitor monitor) {
 		if (semantics == null || listener == null || dirs == null || params == null)
 			throw new NullPointerException();
 		this.semantics = semantics;
 		this.listener = listener;
 		this.dirs = Collections.unmodifiableList(dirs);	
 		this.params = Collections.unmodifiableList(params);	
+		this.monitor = monitor;
 	}
 
 	/**
@@ -87,7 +93,7 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @return list of work automata.
 	 */
 	@SuppressWarnings("unchecked")
-	public void interpret(List<String> srcfiles) {
+	public ReoConnector<T> interpret(List<String> srcfiles) {
 		try {			
 			// Find all available component expressions.
 			Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();	
@@ -127,47 +133,29 @@ public class Interpreter<T extends Semantics<T>> {
 				}
 			}
 		
-		// Evaluate these component expressions.
-		Scope scope = new Scope();
-		Monitor monitor = new Monitor();
-		Identifier name = null;		
-		while (!stack.isEmpty()) {
-			ReoFile<T> program = stack.pop();
-			name = new Identifier(program.getName());
-			ReoComponent<T> cexpr = program.getComponent().evaluate(scope,monitor);
-			scope.put(name, cexpr);
+
+			// Evaluate these component expressions.
+			Scope scope = new Scope();
+			Value main = null;		
+			while (!stack.isEmpty()) {
+				ReoFile<T> program = stack.pop();
+//				main = program.getComponent().evaluate(scope, monitor);
+				scope.put(new Identifier(program.getName()), main);
+			}
+//			
+//			List<Term> values = new ArrayList<Term>();
+//			for (String x : params) 
+//				values.add(new StringValue(x));
+//			
+//			return main.instantiate(new Terms(values), null);			
+		} catch (IOException e) {
+			System.out.print(e.getMessage());
+		} catch (CompilationException e) {
+			System.out.println("error"); //new Message(MessageType.ERROR, e.getToken(), e.getMessage()));
 		}
 		
-		// Get the instance from the main component.		
-//		Expression expr = definitions.get(name);		
-//		if (expr instanceof ReoSystemValue<?>) {				
-//			ReoSystemValue<T> main = (ReoSystemValue<T>)expr;
-//			ValueList values = new ValueList();
-//			for (String x : params) values.add(new StringValue(x));
-//			SignatureConcrete sign = main.getSignature().evaluate(values, null);
-//			
-//			Assembly<T> main_p = main.instantiate(values, null);
-//			
-//			ComponentList<T> workers = main.getWorkers();
-//			ComponentList<T> instances = main_p.getInstances();
-//			this.workers=workers;
-//			
-//			instances.insertNodes(false, false);
-//			
-//			return new FlatConnector<T>(instances.getComponents(), name, sign.keySet());
-//		}
-	} catch (IOException e) {
-		System.out.print(e.getMessage());
-	} catch (CompilationException e) {
-		System.out.println("error"); //new Message(MessageType.ERROR, e.getToken(), e.getMessage()));
-	}		
-	
+		return null;
 	}
-	
-	
-//	public ComponentList<T> getWorkers(){
-//		return workers;
-//	}
 	
 	/**
 	 * Locates the source file that contains the definition of a component.
