@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
-import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -36,7 +34,10 @@ public final class ParameterExpression extends VariableExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Parameter evaluate(Scope s, Monitor m) {
-		return new Parameter(this.name,type);
+	public List<Parameter> evaluate(Scope s, Monitor m) {
+		List<Parameter> params = new ArrayList<Parameter>();
+		for (Identifier x : super.evaluate(s, m))
+			params.add(new Parameter(x.toString(), type));
+		return params;
 	}
 }

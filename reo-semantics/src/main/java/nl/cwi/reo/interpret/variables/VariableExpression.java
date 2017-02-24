@@ -5,16 +5,14 @@ import java.util.List;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.terms.TermList;
-import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of a variable expression.
- * @param <I> type of identifier
  */
-public class VariableExpression implements Expression<Variable> {
+public class VariableExpression implements Expression<List<? extends Identifier>> {
 	
 	/**
 	 * Fully qualified name.
@@ -24,7 +22,7 @@ public class VariableExpression implements Expression<Variable> {
 	/**
 	 * Indices of this variable.
 	 */
-	protected final List<TermsExpression> indices;
+	protected final List<TermExpression> indices;
 	
 	/**
 	 * Location of this variable in Reo source file.
@@ -35,7 +33,7 @@ public class VariableExpression implements Expression<Variable> {
 	 * Constructs a variable list.
 	 * @param name		name of the node
 	 */
-	public VariableExpression(String name, List<TermsExpression> indices, Location location) {
+	public VariableExpression(String name, List<TermExpression> indices, Location location) {
 		if (name == null || indices == null)
 			throw new NullPointerException();
 		this.name = name;
@@ -55,7 +53,7 @@ public class VariableExpression implements Expression<Variable> {
 		return name;
 	}
 	
-	public List<TermsExpression> getIndices() {
+	public List<TermExpression> getIndices() {
 		return indices;
 	}
 	
@@ -116,7 +114,7 @@ public class VariableExpression implements Expression<Variable> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Variable evaluate(Scope s, Monitor m) {
+	public List<? extends Identifier> evaluate(Scope s, Monitor m) {
 		
 		return null;
 	}
@@ -180,16 +178,8 @@ public class VariableExpression implements Expression<Variable> {
 	@Override
 	public String toString() {
 		String s = name;	
-		for (TermsExpression bounds : this.indices) {			
-			if (bounds instanceof TermList){
-				TermList t = (TermList) bounds;
-				if(t.getList().size() == 1) {
-					s += "[" + t.getList().get(0) + "]";
-				} else if (t.getList().size() == 2) {
-	//				s += "[" + t.getList().get(0)  + ".." + bounds.get(1) + "]";
-				}			
-		}
-		}	
+		for (TermExpression x : this.indices) 
+			s += "[" + x + "]";
 		return s;
 	}
 

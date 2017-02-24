@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret.predicates;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
@@ -20,7 +20,7 @@ public final class Relation implements PredicateExpression {
 	/**
 	 * List of arguments of this relation.
 	 */
-	private final List<TermsExpression> arguments;
+	private final List<TermExpression> arguments;
 	
 	/**
 	 * Location of this function application in the Reo source file.
@@ -33,7 +33,7 @@ public final class Relation implements PredicateExpression {
 	 * @param arguments		list of arguments
 	 * @param token			location in source
 	 */
-	public Relation(RelationSymbol symbol, List<TermsExpression> arguments, Location location) {
+	public Relation(RelationSymbol symbol, List<TermExpression> arguments, Location location) {
 		this.symbol = symbol;
 		this.arguments = arguments;
 		this.location = location;

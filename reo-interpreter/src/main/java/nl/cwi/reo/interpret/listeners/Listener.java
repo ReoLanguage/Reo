@@ -10,8 +10,7 @@ import java.util.Map;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
-import nl.cwi.reo.interpret.components.ComponentAtomic;
-import nl.cwi.reo.interpret.components.ComponentComposite;
+import nl.cwi.reo.interpret.components.ComponentDefinition;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.components.ComponentVariable;
 
@@ -20,10 +19,12 @@ import nl.cwi.reo.interpret.connectors.SourceCode;
 import nl.cwi.reo.interpret.instances.InstanceAtomic;
 import nl.cwi.reo.interpret.instances.InstanceComposite;
 import nl.cwi.reo.interpret.instances.InstancesExpression;
-import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.nodes.NodeExpression;
+import nl.cwi.reo.interpret.nodes.NodeListExpression;
 import nl.cwi.reo.interpret.parameters.ParameterExpression;
+import nl.cwi.reo.interpret.parameters.ParameterListExpression;
 import nl.cwi.reo.interpret.ports.PortExpression;
+import nl.cwi.reo.interpret.ports.PortListExpression;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.predicates.BooleanPredicate;
@@ -37,15 +38,17 @@ import nl.cwi.reo.interpret.predicates.Relation;
 import nl.cwi.reo.interpret.predicates.RelationSymbol;
 import nl.cwi.reo.interpret.predicates.StructdefnPredicate;
 import nl.cwi.reo.interpret.predicates.VariablePredicate;
+import nl.cwi.reo.interpret.sets.SetAtom;
+import nl.cwi.reo.interpret.sets.SetComposite;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
-import nl.cwi.reo.interpret.terms.Function;
+import nl.cwi.reo.interpret.terms.FunctionExpression;
 import nl.cwi.reo.interpret.terms.FunctionSymbol;
 import nl.cwi.reo.interpret.terms.Term;
-import nl.cwi.reo.interpret.terms.TermComponent;
-import nl.cwi.reo.interpret.terms.TermInstance;
-import nl.cwi.reo.interpret.terms.TermList;
-import nl.cwi.reo.interpret.terms.TermVariable;
-import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.interpret.terms.ComponentTermExpression;
+import nl.cwi.reo.interpret.terms.InstanceTermExpression;
+import nl.cwi.reo.interpret.terms.ListExpression;
+import nl.cwi.reo.interpret.terms.VariableTermExpression;
+import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.values.BooleanValue;
 import nl.cwi.reo.interpret.values.DecimalValue;
@@ -53,7 +56,6 @@ import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
-import nl.cwi.reo.interpret.variables.VariableListExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
@@ -161,10 +163,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	private ParseTreeProperty<VariableExpression> variables = new ParseTreeProperty<VariableExpression>();	
 	
 	// Term Expression
-	private ParseTreeProperty<TermsExpression> terms = new ParseTreeProperty<TermsExpression>();
+	private ParseTreeProperty<TermExpression> terms = new ParseTreeProperty<TermExpression>();
 
 	// Terms Expression list :
-	private ParseTreeProperty<List<TermsExpression>> termsList = new ParseTreeProperty<List<TermsExpression>>();
+	private ParseTreeProperty<List<TermExpression>> termsList = new ParseTreeProperty<List<TermExpression>>();
 
 	// Semantics
 	protected ParseTreeProperty<T> atoms = new ParseTreeProperty<T>();
@@ -227,13 +229,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 				s=new SourceCode(ctx.source().STRING().toString(),ctx.source().LANG().toString().toUpperCase());
 				}
 		}
-		components.put(ctx, new ComponentAtomic<T>(signatureExpressions.get(ctx.sign()), atom, s));
+		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()), new SetAtom<T>(atom, s)));
 	}
 
 	@Override
 	public void exitComponent_composite(Component_compositeContext ctx) {
 		//TODO : check if cast works
-		components.put(ctx, new ComponentComposite<T>(signatureExpressions.get(ctx.sign()), (SetExpression<T>) instances.get(ctx.multiset())));		
+		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()), (SetComposite<T>) instances.get(ctx.multiset())));		
 
 	}
 	
@@ -244,7 +246,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitMultiset_constraint(Multiset_constraintContext ctx) {
 		InstancesExpression<T> i = instances.get(ctx.instance());
-		set.put(ctx, new SetExpression<T>(null, Arrays.asList(i), null));
+		set.put(ctx, new SetComposite<T>(null, Arrays.asList(i), null));
 	}
 	
 	@Override
@@ -254,7 +256,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (MultisetContext stmt_ctx : ctx.multiset())
 			stmtlist.add(set.get(stmt_ctx));
 		
-		set.put(ctx, new SetExpression<T>( terms.get(ctx.term()),stmtlist,formula.get(ctx.formula())));
+		set.put(ctx, new SetComposite<T>( terms.get(ctx.term()),stmtlist,formula.get(ctx.formula())));
 	}
 	
 	@Override
@@ -264,7 +266,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		
 		List<InstancesExpression<T>> l = Arrays.asList(m1,m2);
 		
-		set.put(ctx, new SetExpression<T>(new StringValue("+"),l,null));
+		set.put(ctx, new SetComposite<T>(new StringValue("+"),l,null));
 	}
 	
 	@Override
@@ -274,7 +276,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		
 		List<InstancesExpression<T>> l = Arrays.asList(m1,m2);
 		
-		set.put(ctx, new SetExpression<T>(new StringValue("-"),l,null));
+		set.put(ctx, new SetComposite<T>(new StringValue("-"),l,null));
 	}
 
 	/**
@@ -284,24 +286,24 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitInstance_atomic(Instance_atomicContext ctx) {
 		ComponentExpression<T> cexpr = components.get(ctx.component());
-		List<TermsExpression> list = termsList.get(ctx.list());
-		if (list == null) list = new ArrayList<TermsExpression>();
+		List<TermExpression> list = termsList.get(ctx.list());
+		if (list == null) list = new ArrayList<TermExpression>();
 		
-		List<VariableExpression> v = new ArrayList<VariableExpression>();
+		List<PortExpression> v = new ArrayList<PortExpression>();
 		
 		for(PortExpression p : interfaces.get(ctx.ports())){
 			v.add(p);
 		}
-		VariableListExpression var = new VariableListExpression(v);
-		instances.put(ctx, new InstanceAtomic<T>(cexpr, new TermList(list),var));
+		PortListExpression var = new PortListExpression(v);
+		instances.put(ctx, new InstanceAtomic<T>(cexpr, new ListExpression(list),var));
 	}
 	
 	@Override
 	public void exitInstance_composition(Instance_compositionContext ctx) {
 		InstancesExpression<T> i1 = instances.get(ctx.instance(0));
 		InstancesExpression<T> i2 = instances.get(ctx.instance(1));
-		TermsExpression term = terms.get(ctx.term());
-		instances.put(ctx, new InstanceComposite<T>(term,i1,i2));
+		TermExpression term = terms.get(ctx.term());
+		instances.put(ctx, new InstanceComposite<T>(term, i1, i2, new Location(ctx.start)));
 	}
 	
 	@Override
@@ -309,7 +311,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		InstancesExpression<T> i1 = instances.get(ctx.instance(0));
 		InstancesExpression<T> i2 = instances.get(ctx.instance(1));
 		StringValue s = new StringValue("*");
-		instances.put(ctx, new InstanceComposite<T>(s,i1,i2));
+		instances.put(ctx, new InstanceComposite<T>(s, i1, i2, new Location(ctx.start)));
 	}
 
 	@Override
@@ -317,14 +319,15 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		InstancesExpression<T> i1 = instances.get(ctx.instance(0));
 		InstancesExpression<T> i2 = instances.get(ctx.instance(1));
 		StringValue s = new StringValue("+");
-		instances.put(ctx, new InstanceComposite<T>(s,i1,i2));
+		instances.put(ctx, new InstanceComposite<T>(s, i1, i2, new Location(ctx.start)));
 	}
+	
 	@Override
 	public void exitInstance_semicolon(Instance_semicolonContext ctx) {
 		InstancesExpression<T> i1 = instances.get(ctx.instance(0));
 		InstancesExpression<T> i2 = instances.get(ctx.instance(1));
 		StringValue s = new StringValue(";");
-		instances.put(ctx, new InstanceComposite<T>(s,i1,i2));
+		instances.put(ctx, new InstanceComposite<T>(s, i1, i2, new Location(ctx.start)));
 	}
 	
 	/**
@@ -355,7 +358,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	
 	@Override
 	public void exitFormula_membership(Formula_membershipContext ctx) {
-		Membership p = new Membership(new Identifier(ctx.ID().toString()),new TermList(termsList.get(ctx.list())));
+		Membership p = new Membership(new Identifier(ctx.ID().toString()),new ListExpression(termsList.get(ctx.list())));
 		formula.put(ctx, p);
 	}
 	
@@ -367,7 +370,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	
 	@Override
 	public void exitFormula_binaryrelation(Formula_binaryrelationContext ctx) {
-		List<TermsExpression> l = Arrays.asList(terms.get(ctx.term(0)),terms.get(ctx.term(0)));
+		List<TermExpression> l = Arrays.asList(terms.get(ctx.term(0)),terms.get(ctx.term(0)));
 		switch(ctx.op.getType()){
 		case ReoParser.LEQ:
 			formula.put(ctx, new Relation(RelationSymbol.LEQ,l, new Location(ctx.start)));
@@ -428,14 +431,14 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitSign(SignContext ctx) {
 
-		List<VariableExpression> nodes = new ArrayList<VariableExpression>();
+		List<NodeExpression> nodes = new ArrayList<NodeExpression>();
 		for(NodeExpression n : nodelists.get(ctx.nodes()))
 			nodes.add(n);
-		List<VariableExpression> parameters = new ArrayList<VariableExpression>();
+		List<ParameterExpression> parameters = new ArrayList<ParameterExpression>();
 		for(ParameterExpression p : parameterlists.get(ctx.params()))
 			parameters.add(p);
 
-		signatureExpressions.put(ctx, new SignatureExpression(new VariableListExpression(parameters), new VariableListExpression(nodes), new Location(ctx.start)));
+		signatureExpressions.put(ctx, new SignatureExpression(new ParameterListExpression(parameters), new NodeListExpression(nodes), new Location(ctx.start)));
 	}
 
 	@Override
@@ -515,7 +518,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		List<PortExpression> list = new ArrayList<PortExpression>();
 		for (PortContext port : ctx.port())
 			list.add(portList.get(port));
-		interfaces.put(ctx,list);
+		interfaces.put(ctx, list);
 	}
 
 	@Override
@@ -539,7 +542,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 				break;
 			}
 		}		
-		List<TermsExpression> list = new ArrayList<TermsExpression>();		
+		List<TermExpression> list = new ArrayList<TermExpression>();		
 		for (TermContext indices_ctx : ctx.term())
 			list.add(terms.get(indices_ctx));
 		if (list.isEmpty()) {
@@ -579,53 +582,53 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	
 	@Override
 	public void exitTerm_componentdefn(Term_componentdefnContext ctx) {
-		terms.put(ctx, new TermComponent<T>(components.get(ctx.component())));			
+		terms.put(ctx, new ComponentTermExpression<T>(components.get(ctx.component())));			
 	}
 	
 	@Override
 	public void exitTerm_variable(Term_variableContext ctx) {
-		terms.put(ctx, new TermVariable(variables.get(ctx.var())));
+		terms.put(ctx, new VariableTermExpression(variables.get(ctx.var())));
 	}
 	
 	@Override
 	public void exitTerm_instance(Term_instanceContext ctx) {
-		terms.put(ctx, new TermInstance<T>(instances.get(ctx.instance())));
+		terms.put(ctx, new InstanceTermExpression<T>(instances.get(ctx.instance())));
 	}
 
 	@Override
 	public void exitTerm_operation(Term_operationContext ctx) {
-		TermsExpression e1 = terms.get(ctx.term(0));
-		TermsExpression e2 = terms.get(ctx.term(1));		
-		List<TermsExpression> l = Arrays.asList(e1,e2);
+		TermExpression e1 = terms.get(ctx.term(0));
+		TermExpression e2 = terms.get(ctx.term(1));		
+		List<TermExpression> l = Arrays.asList(e1,e2);
 		switch(ctx.op.getType()){
 		case ReoParser.DIV:
-			terms.put(ctx, new Function(FunctionSymbol.DIV,l,new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.DIV,l,new Location(ctx.start)));
 		case ReoParser.MUL:
-			terms.put(ctx, new Function(FunctionSymbol.MUL,l,new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.MUL,l,new Location(ctx.start)));
 		case ReoParser.MOD:
-			terms.put(ctx, new Function(FunctionSymbol.MOD,l,new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.MOD,l,new Location(ctx.start)));
 		case ReoParser.ADD:
-			terms.put(ctx, new Function(FunctionSymbol.ADD,l,new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.ADD,l,new Location(ctx.start)));
 		case ReoParser.MIN:
-			terms.put(ctx, new Function(FunctionSymbol.MIN,l,new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.MIN,l,new Location(ctx.start)));
 		case ReoParser.LIST:
-			terms.put(ctx, new Function(FunctionSymbol.LIST,l,new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.LIST,l,new Location(ctx.start)));
 		} 
 	}
 	
 	@Override
 	public void exitTerm_exponent(Term_exponentContext ctx) {
-		TermsExpression e1 = terms.get(ctx.term(0));
-		TermsExpression e2 = terms.get(ctx.term(1));
-		List<TermsExpression> l = Arrays.asList(e1,e2);
-		terms.put(ctx, new Function(FunctionSymbol.POW,l,new Location(ctx.start)));
+		TermExpression e1 = terms.get(ctx.term(0));
+		TermExpression e2 = terms.get(ctx.term(1));
+		List<TermExpression> l = Arrays.asList(e1,e2);
+		terms.put(ctx, new FunctionExpression(FunctionSymbol.POW,l,new Location(ctx.start)));
 	}
 
 	@Override
 	public void exitTerm_unarymin(Term_unaryminContext ctx) {
-		TermsExpression e = terms.get(ctx.term());
-		List<TermsExpression> l = Arrays.asList(e);
-		terms.put(ctx, new Function(FunctionSymbol.MIN,l,new Location(ctx.start)));
+		TermExpression e = terms.get(ctx.term());
+		List<TermExpression> l = Arrays.asList(e);
+		terms.put(ctx, new FunctionExpression(FunctionSymbol.MIN,l,new Location(ctx.start)));
 	}
 
 	@Override
@@ -639,7 +642,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitList(ListContext ctx) {
-		List<TermsExpression> list = new ArrayList<TermsExpression>();
+		List<TermExpression> list = new ArrayList<TermExpression>();
 		for (TermContext expr_ctx : ctx.term())
 			list.add(terms.get(expr_ctx));
 		termsList.put(ctx, list);

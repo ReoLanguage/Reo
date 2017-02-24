@@ -1,16 +1,17 @@
 package nl.cwi.reo.interpret.values;
 
 import java.util.Arrays;
+import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.terms.Terms;
-import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of decimal value.
  */
-public final class DecimalValue implements Value, TermsExpression {
+public final class DecimalValue implements Value, TermExpression {
 	
 	/**
 	 * Value.
@@ -57,8 +58,11 @@ public final class DecimalValue implements Value, TermsExpression {
 		return new DecimalValue(Math.pow(a.x, b.x));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Terms evaluate(Scope s, Monitor m) {
-		return new Terms(Arrays.asList(this));
+	public List<Term> evaluate(Scope s, Monitor m) {
+		return Arrays.asList(this);
 	}
 }

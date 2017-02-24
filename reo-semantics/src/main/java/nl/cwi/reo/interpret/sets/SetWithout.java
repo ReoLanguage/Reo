@@ -1,7 +1,9 @@
-package nl.cwi.reo.interpret.instances;
+package nl.cwi.reo.interpret.sets;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.interpret.instances.Instances;
+import nl.cwi.reo.interpret.instances.InstancesExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -13,19 +15,19 @@ public final class SetWithout<T extends Semantics<T>> implements InstancesExpres
 	/**
 	 * First set.
 	 */
-	private final SetExpression<T> first;
+	private final SetComposite<T> first;
 
 	/**
 	 * Second set.
 	 */
-	private final SetExpression<T> second;
+	private final SetComposite<T> second;
 	
 	/**
 	 * Short circuit subtraction of two sets of constraints.
 	 * @param first		first set
 	 * @param second	second set
 	 */
-	public SetWithout(SetExpression<T> first, SetExpression<T> second) {
+	public SetWithout(SetComposite<T> first, SetComposite<T> second) {
 		this.first = first;
 		this.second = second;
 	}

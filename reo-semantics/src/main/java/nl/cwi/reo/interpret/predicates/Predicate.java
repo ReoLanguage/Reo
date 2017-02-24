@@ -1,5 +1,6 @@
 package nl.cwi.reo.interpret.predicates;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
@@ -13,6 +14,13 @@ public final class Predicate {
 	 * List of scopes.
 	 */
 	private final List<Scope> scopes; 
+	
+	/**
+	 * Constructs an empty list of scopes.
+	 */
+	public Predicate() {
+		this.scopes = new ArrayList<Scope>();
+	}
 
 	/**
 	 * Constructs a new list of scopes.
@@ -22,7 +30,11 @@ public final class Predicate {
 		this.scopes = scopes;
 	}
 	
-	public List<Scope> getScopes(){
+	/**
+	 * Gets the list of scopes.
+	 * @return list of scopes
+	 */
+	public List<Scope> getScopes() {
 		return scopes;
 	}
 

@@ -1,7 +1,7 @@
 package nl.cwi.reo.interpret.predicates;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.terms.ListExpression;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -18,7 +18,7 @@ public final class Existential implements PredicateExpression {
 	/**
 	 * Domain of the quantified variable.
 	 */
-	private final TermList list; 
+	private final ListExpression list; 
 	
 	/**
 	 * Quantified predicate.
@@ -31,7 +31,7 @@ public final class Existential implements PredicateExpression {
 	 * @param list		domain of quantification
 	 * @param predicate	quantified predicate
 	 */
-	public Existential(VariableExpression var, TermList list, PredicateExpression predicate) {
+	public Existential(VariableExpression var, ListExpression list, PredicateExpression predicate) {
 		this.var = var;
 		this.list = list;
 		this.predicate = predicate;

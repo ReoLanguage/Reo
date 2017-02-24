@@ -1,15 +1,9 @@
-package nl.cwi.reo.interpret.instances;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+package nl.cwi.reo.interpret.sets;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.CompositeReoConnector;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.interpret.instances.Instances;
+import nl.cwi.reo.interpret.instances.InstancesExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -21,19 +15,19 @@ public final class SetElse<T extends Semantics<T>> implements InstancesExpressio
 	/**
 	 * First set.
 	 */
-	private final SetExpression<T> first;
+	private final SetComposite<T> first;
 
 	/**
 	 * Second set.
 	 */
-	private final SetExpression<T> second;
+	private final SetComposite<T> second;
 
 	/**
 	 * Short circuit addition of two sets of constraints.
 	 * @param first		first set
 	 * @param second	second set
 	 */
-	public SetElse(SetExpression<T> first, SetExpression<T> second) {
+	public SetElse(SetComposite<T> first, SetComposite<T> second) {
 		this.first = first;
 		this.second = second;
 	}
@@ -43,14 +37,10 @@ public final class SetElse<T extends Semantics<T>> implements InstancesExpressio
 	 */
 	@Override
 	public Instances<T> evaluate(Scope s, Monitor m) {
-		Instances<T> i1 = first.evaluate(s, m);
-		Instances<T> i2 = second.evaluate(s, m);
-
-		if(!i1.getConnector().isEmpty()){
-			return i1;	
-		}
-		else
-			return i2;		
+		Instances<T> insts = first.evaluate(s, m);
+		if (insts.getConnector().isEmpty())
+			return second.evaluate(s, m);
+		return insts;		
 	}
 
 }

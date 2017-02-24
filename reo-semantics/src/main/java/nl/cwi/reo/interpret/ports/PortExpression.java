@@ -1,8 +1,11 @@
 package nl.cwi.reo.interpret.ports;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -30,12 +33,10 @@ public final class PortExpression extends VariableExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public PortList evaluate(Scope s, Monitor m) {
-//		List<Port> ports = new ArrayList<Port>();
-//		for (Variable x : super.evaluate(s, m).getIdentifiers())
-//			ports.add(new Port(x.getName(), PortType.NONE, prio, new TypeTag(""), true));
-//		return new IdentifierList(ports);
-//		return new Port(null);
-		return null;
+	public List<Port> evaluate(Scope s, Monitor m) {
+		List<Port> ports = new ArrayList<Port>();
+		for (Identifier x : super.evaluate(s, m))
+			ports.add(new Port(x.toString(), PortType.NONE, prio, new TypeTag(""), true));
+		return ports;
 	}
 }

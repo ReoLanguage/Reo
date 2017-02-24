@@ -1,7 +1,7 @@
 package nl.cwi.reo.interpret.predicates;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.terms.TermList;
+import nl.cwi.reo.interpret.terms.ListExpression;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
@@ -18,14 +18,14 @@ public final class Membership implements PredicateExpression {
 	/**
 	 * List of terms.
 	 */
-	private final TermList list;
+	private final ListExpression list;
 	
 	/**
 	 * Constructs a new membership predicate.
 	 * @param x		variable
 	 * @param list	list of terms
 	 */
-	public Membership(Identifier x, TermList list) {
+	public Membership(Identifier x, ListExpression list) {
 		this.x = x;
 		this.list = list;
 	}

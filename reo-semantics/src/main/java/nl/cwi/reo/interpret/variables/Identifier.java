@@ -3,12 +3,13 @@ package nl.cwi.reo.interpret.variables;
 import java.util.Objects;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.terms.Term;
 
 /**
  * A concatenation of a fully qualified name and 
  * a sequence of indices.
  */
-public class Identifier implements Variable {
+public class Identifier implements Term {
 
 	/**
 	 * Name.

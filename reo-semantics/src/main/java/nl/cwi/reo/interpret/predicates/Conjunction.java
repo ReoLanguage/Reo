@@ -34,28 +34,29 @@ public final class Conjunction implements PredicateExpression {
 	@Override
 	public Predicate evaluate(Scope s, Monitor m) {
 		
-		Stack<Scope> scope = new Stack<Scope>();
-		scope.push(s);
-		Predicate p1;
-		Predicate p2;
-//		List<Scope> scopeListReference = Arrays.asList(s);
-//		List<Scope> scopeList = new ArrayList<Scope>();
-		
-//		while(!scopeListReference.equals(scopeList) && ){
-//			scopeList=scopeListReference;
-
-		while(!scope.isEmpty()){
-			Scope p = scope.pop();
-			
-			for(PredicateExpression predExpr : predicates){
-				if((p1 = predExpr.evaluate(p, m))!=null){
-					scopeList.addAll(p1.getScopes());						
-				}
-			}
-		}
-		
-		
-		return new Predicate(scopeList);
+//		Stack<Scope> scope = new Stack<Scope>();
+//		scope.push(s);
+//		Predicate p1;
+//		Predicate p2;
+////		List<Scope> scopeListReference = Arrays.asList(s);
+////		List<Scope> scopeList = new ArrayList<Scope>();
+//		
+////		while(!scopeListReference.equals(scopeList) && ){
+////			scopeList=scopeListReference;
+//
+//		while(!scope.isEmpty()){
+//			Scope p = scope.pop();
+//			
+//			for(PredicateExpression predExpr : predicates){
+//				if((p1 = predExpr.evaluate(p, m))!=null){
+//					scopeList.addAll(p1.getScopes());						
+//				}
+//			}
+//		}
+//		
+//		
+//		return new Predicate(scopeList);
+		return null;
 	}
 
 }

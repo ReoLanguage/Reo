@@ -1,18 +1,17 @@
 package nl.cwi.reo.interpret.instances;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.CompositeReoConnector;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.terms.Terms;
-import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.terms.TermExpression;
+import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
 public final class InstanceComposite<T extends Semantics<T>> implements InstancesExpression<T> {
@@ -20,7 +19,7 @@ public final class InstanceComposite<T extends Semantics<T>> implements Instance
 	/**
 	 * Composition operator name.
 	 */
-	private final TermsExpression operator;
+	private final TermExpression operator;
 	
 	/**
 	 * First instance.
@@ -31,6 +30,11 @@ public final class InstanceComposite<T extends Semantics<T>> implements Instance
 	 * Second instance.
 	 */
 	private final InstancesExpression<T> second;
+	
+	/**
+	 * Location of this instance in Reo source file.
+	 */
+	private final Location location;
 		
 	/**
 	 * Constructs a new composition of instances.
@@ -38,10 +42,11 @@ public final class InstanceComposite<T extends Semantics<T>> implements Instance
 	 * @param first		first instance
 	 * @param second	second instance
 	 */
-	public InstanceComposite(TermsExpression operator, InstancesExpression<T> first, InstancesExpression<T> second) {
+	public InstanceComposite(TermExpression operator, InstancesExpression<T> first, InstancesExpression<T> second, Location location) {
 		this.operator = operator;
 		this.first = first;
 		this.second = second;
+		this.location = location;
 	}
 
 	/**
@@ -51,17 +56,23 @@ public final class InstanceComposite<T extends Semantics<T>> implements Instance
 	public Instances<T> evaluate(Scope s, Monitor m) {
 		Instances<T> i1 = first.evaluate(s, m);
 		Instances<T> i2 = second.evaluate(s, m);
-		Terms op = operator.evaluate(s, m);
+		List<Term> op = operator.evaluate(s, m);
 		
-		List<ReoConnector<T>> list = new ArrayList<ReoConnector<T>>(i1.getConnector());
-		list.addAll(i2.getConnector());
-		CompositeReoConnector<T> c = new CompositeReoConnector<T>(op.toString(),list);
+		if (op.get(0) instanceof StringValue) {
+			String co = ((StringValue)op.get(0)).getValue();
 		
-		Set<Set<Identifier>> set = i1.getUnifications();
-		for(Set<Identifier> setId : i2.getUnifications())
-			set.add(setId);
+			CompositeReoConnector<T> R = new CompositeReoConnector<T>(co, Arrays.asList(i1.getConnector(), i2.getConnector()));
+			
+			// TODO before adding setId to set, check if setId intersects with existing element of set.
+			Set<Set<Identifier>> set = i1.getUnifications();
+			for(Set<Identifier> setId : i2.getUnifications())
+				set.add(setId);
+			
+			return new Instances<T>(R, set);
+		}
 		
-		return new Instances<T>(Arrays.asList(c),set);
+		m.add(location, "Composition operator " + operator + " must be of type string.");
+		return null;
 	}
 
 }

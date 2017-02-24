@@ -1,29 +1,25 @@
-package nl.cwi.reo.interpret.instances;
+package nl.cwi.reo.interpret.sets;
 
-
-import java.util.ArrayList;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.predicates.Predicate;
+import nl.cwi.reo.interpret.instances.Instances;
+import nl.cwi.reo.interpret.instances.InstancesExpression;
 import nl.cwi.reo.interpret.predicates.PredicateExpression;
-import nl.cwi.reo.interpret.terms.Term;
-import nl.cwi.reo.interpret.terms.Terms;
-import nl.cwi.reo.interpret.terms.TermsExpression;
+import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of a set of constraints.
  * @param <T> Reo semantics type
  */
-public final class SetExpression<T extends Semantics<T>> implements InstancesExpression<T> {
+public final class SetComposite<T extends Semantics<T>> implements SetExpression<T> {
 
 	/**
 	 * Composition operator.
 	 */
-	private TermsExpression operator;
+	private TermExpression operator;
 	
 	/**
 	 * Elements of this set.
@@ -41,14 +37,10 @@ public final class SetExpression<T extends Semantics<T>> implements InstancesExp
 	 * @param elements		elements in this set
 	 * @param predicate		predicate of this set
 	 */
-	public SetExpression(TermsExpression operator, List<InstancesExpression<T>> elements, PredicateExpression predicate){
+	public SetComposite(TermExpression operator, List<InstancesExpression<T>> elements, PredicateExpression predicate){
 		this.operator = operator;
 		this.elements = elements;
 		this.predicate = predicate;
-	}
-	
-	public Terms getOperator(Scope s, Monitor m){
-		return operator.evaluate(s, m);
 	}
 
 	/**
@@ -56,13 +48,13 @@ public final class SetExpression<T extends Semantics<T>> implements InstancesExp
 	 */
 	@Override
 	public Instances<T> evaluate(Scope s, Monitor m) {
-		Predicate p = predicate.evaluate(s, m);
-
-		List<ReoConnector<T>> instances = new ArrayList<ReoConnector<T>>();
-		for(InstancesExpression<T> i : elements){
-			instances.addAll(i.evaluate(s, m).getConnector());
-			
-		}
+//		Predicate p = predicate.evaluate(s, m);
+//
+//		List<ReoConnector<T>> instances = new ArrayList<ReoConnector<T>>();
+//		for(InstancesExpression<T> i : elements){
+//			instances.addAll(i.evaluate(s, m).getConnector());
+//			
+//		}
 //		Instances<T> i = new Instances<T>();		
 		return null;
 	}

@@ -14,7 +14,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * An application of a function symbol to a list of arguments.
  */
-public final class Function implements TermsExpression {
+public final class FunctionExpression implements TermExpression {
 
 	/**
 	 * Name of the function.
@@ -24,7 +24,7 @@ public final class Function implements TermsExpression {
 	/**
 	 * List of arguments of this function.
 	 */
-	private final List<TermsExpression> arguments;
+	private final List<TermExpression> arguments;
 	
 	/**
 	 * Location of this function application in the Reo source file.
@@ -37,7 +37,7 @@ public final class Function implements TermsExpression {
 	 * @param arguments		list of arguments
 	 * @param location		location of this function in Reo source file
 	 */
-	public Function(FunctionSymbol symbol, List<TermsExpression> arguments, Location location) {
+	public FunctionExpression(FunctionSymbol symbol, List<TermExpression> arguments, Location location) {
 		this.symbol = symbol;
 		this.arguments = arguments;
 		this.location = location;
@@ -47,13 +47,13 @@ public final class Function implements TermsExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Terms evaluate(Scope s, Monitor m) {
+	public List<Term> evaluate(Scope s, Monitor m) {
 		
 		List<Term> list = new ArrayList<Term>();
 		
 		List<Iterator<Term>> iters = new ArrayList<Iterator<Term>>();
-		for (TermsExpression arg : arguments) 
-			iters.add(arg.evaluate(s, null).getList().iterator());
+		for (TermExpression arg : arguments) 
+			iters.add(arg.evaluate(s, null).iterator());
 		
 		while (hasNext(iters)) {
 			List<Term> args = next(iters);
@@ -168,7 +168,7 @@ public final class Function implements TermsExpression {
 			}
 		}
 		
-		return new Terms(list);
+		return list;
 	}
 	
 	/**

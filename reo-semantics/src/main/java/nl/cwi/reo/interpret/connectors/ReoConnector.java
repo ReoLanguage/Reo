@@ -5,14 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.Expression;
-import nl.cwi.reo.interpret.instances.SetExpression;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.terms.TermList;
-import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.interpret.variables.Variable;
-import nl.cwi.reo.interpret.variables.VariableListExpression;
-
 /**
  * A SubComponent is a part of a Connector.
  * 
@@ -20,7 +14,14 @@ import nl.cwi.reo.interpret.variables.VariableListExpression;
  * @param <T> type of semantics objects
  * @see CompositeReoConnector
  */
-public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConnector<T>>,Variable {
+public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConnector<T>> {
+	
+	/**
+	 * Checks if this connector is empty.
+	 * @return true if this connectors is a composite Reo consisting 
+	 * of an empty list of subconnectors, and false otherwise.
+	 */
+	public boolean isEmpty();
 	
 	/**
 	 * Gets the links from internal ports to external ports.
@@ -28,8 +29,7 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	 */
 	public Map<Port, Port> getLinks();
 
-	public SetExpression<T> instantiate(TermList values, VariableListExpression ports);
-
+//	public SetExpression<T> instantiate(ListExpression values, VariableListExpression ports);
 	
 	/**
 	 * Relabels the set of links of this subcomponent by renaming 

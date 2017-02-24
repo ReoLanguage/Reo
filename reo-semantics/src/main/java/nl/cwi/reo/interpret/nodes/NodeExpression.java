@@ -4,17 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.ports.PortList;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
-import nl.cwi.reo.interpret.terms.Term;
-import nl.cwi.reo.interpret.terms.TermList;
-import nl.cwi.reo.interpret.terms.Terms;
-import nl.cwi.reo.interpret.terms.TermsExpression;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.interpret.variables.Variable;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
 
@@ -58,13 +52,11 @@ public final class NodeExpression extends VariableExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Variable evaluate(Scope s, Monitor m) {
-		List<Port> listPort = new ArrayList<Port>();
-		for(TermsExpression termExpr : super.indices){
-			listPort.add(new Port(termExpr.toString(),type, prio, tag, true));
-		}
-				
-		return new PortList(listPort);
+	public List<Port> evaluate(Scope s, Monitor m) {
+		List<Port> ports = new ArrayList<Port>();
+		for (Identifier x : super.evaluate(s, m))
+			ports.add(new Port(x.toString(), type, prio, tag, true));				
+		return ports;
 	}
 
 }

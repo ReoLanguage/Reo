@@ -31,13 +31,8 @@ import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ReoFile;
-import nl.cwi.reo.interpret.terms.Term;
-import nl.cwi.reo.interpret.terms.Terms;
-import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.util.Message;
-import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
 
 
@@ -237,7 +232,7 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @return an interpreted source file, or null in case of an error.
 	 * @throws IOException 
 	 */
-	private ReoFile<T> parse(CharStream c) throws IOException  {
+	private ReoFile<T> parse(CharStream c) throws IOException {
 		ReoLexer lexer = new ReoLexer(c); 
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		
