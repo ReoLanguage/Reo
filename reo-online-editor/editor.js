@@ -59,6 +59,8 @@
     a.set({'line': line});
     c1.linesOut.push(line);
     c2.linesIn.push(line);
+    updateNode(c1);
+    updateNode(c2);
     
     // magic
     updateLine(line, 2);
@@ -67,6 +69,17 @@
     canvas.add(line,a,c1,c2);
     canvas.renderAll();
   } //drawLine
+  
+  function updateNode(node) {
+    if (node.linesIn.length) {
+      if (node.linesOut.length)
+        node.set({'nodetype':'mixed','fill':'#ff5'});
+      else
+        node.set({'nodetype':'drain','fill':'#f55'});
+    }
+    else
+      node.set({'nodetype':'source','fill':'#55f'});
+  }
   
   function updateLine(line, end) {
     // we first have update the end coordinates
@@ -126,6 +139,14 @@
 
     return (angle * 180 / Math.PI) + 90;
   } //calcArrowAngle
+  
+  function enumerate() {
+    document.getElementById('text').innerHTML = "";
+    canvas.forEachObject(function(obj) {
+      if (obj.type == 'circle')
+        document.getElementById('text').innerHTML += obj.id + " ";
+    });
+  }
   
   function updateText() {
     var s = '';
@@ -189,7 +210,7 @@
     isDown = false;
     var p = canvas.getActiveObject();
     canvas.forEachObject(function(obj) {
-      if (!obj || obj === p || obj.get('type') !== "circle")
+      if (!obj || obj.id === p.id || obj.get('type') !== "circle")
         return;
       if (p.intersectsWithObject(obj)) {
         if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
@@ -202,13 +223,26 @@
             obj.linesOut.push(p.linesOut[i]);
           }
           canvas.remove(p);
+          updateNode(obj);
           obj.bringToFront();
+          canvas.renderAll();
         }
       }
     });
   });
   
+  function downloadsvg() {
+    var a = document.getElementById("download");
+    a.href = 'data:image/svg+xml;base64,' + window.btoa(canvas.toSVG());
+    a.click();
+  }
+  
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
-  
+
+
 })();
+
+
+
+

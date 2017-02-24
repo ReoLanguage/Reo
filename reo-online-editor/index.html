@@ -12,15 +12,43 @@
     <div id="container">
       <div id="textdiv">
         <textarea id="text" rows="25" cols="20"></textarea>
-        <input id="refresh" type="button" value="Refresh" />
+        <input id="refresh" type="button" value="Refresh"/>
       </div>
       <div id="toolbar">
-        x1&nbsp;<input type="text" id="x1" size="5" /><br />
-        y1&nbsp;<input type="text" id="y1" size="5" /><br />
-        x2&nbsp;<input type="text" id="x2" size="5" /><br />
-        y2&nbsp;<input type="text" id="y2" size="5" /><br />
-        x&nbsp;<input type="text" id="x" size="5" /><br />
-        angle&nbsp;<input type="text" id="angle" size="5" /><br />
+        <table>
+          <tr>
+            <td>x1</td>
+            <td><input type="text" id="x1" size="5" /></td>
+          </tr>
+          <tr>
+            <td>y1</td>
+            <td><input type="text" id="y1" size="5" /></td>
+          </tr>
+          <tr>
+            <td>x2</td>
+            <td><input type="text" id="x2" size="5" /></td>
+          </tr>
+          <tr>
+            <td>y2</td>
+            <td><input type="text" id="y2" size="5" /></td>
+          </tr>
+          <tr>
+            <td>x</td>
+            <td><input type="text" id="x" size="5" /></td>
+          </tr>
+          <tr>
+            <td>angle</td>
+            <td><input type="text" id="angle" size="5" /></td>
+          </tr>
+          <tr>
+            <td><a id="download" download="reo"></a></td>
+            <td><input type="button" value="Download SVG" onclick="downloadsvg()"></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><input type="button" value="Download PNG" onclick="downloadpng()"></td>
+          </tr>
+        </table>
       </div>
       <div id="canvas">
         <canvas id="c" width="800" height="600"></canvas>
