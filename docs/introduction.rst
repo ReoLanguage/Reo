@@ -145,7 +145,6 @@ Reo Consumer :
 Reo Protocol :
 
 .. code-block::
-	:linenos:
 
 	main = ProducerConsumer(a,b,c){
 		alternator(a,b,c){
