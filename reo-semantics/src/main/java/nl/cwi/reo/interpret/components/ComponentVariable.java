@@ -37,6 +37,6 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 		List<? extends Identifier> ids = var.evaluate(s, m);
 		if (ids == null || ids.isEmpty()) return null;
 		Value v = s.get(ids.get(0));
-		return v instanceof Component<?> ? (Component<T>)v : null;
+		return (v instanceof Component<?> ? (Component<T>)v : null);
 	}
 }

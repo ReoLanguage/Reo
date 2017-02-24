@@ -21,17 +21,18 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import nl.cwi.reo.errors.CompilationException;
 import nl.cwi.reo.errors.MyErrorListener;
+import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.Listener;
-import nl.cwi.reo.interpret.listeners.ReoFile;
-import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
@@ -60,7 +61,7 @@ public class Interpreter<T extends Semantics<T>> {
 	/**
 	 * List of parameters to instantiate the main component.
 	 */
-	private final List<String> params;	
+	private final List<Term> values;	
 	
 	/**
 	 * Container for messages.
@@ -77,7 +78,10 @@ public class Interpreter<T extends Semantics<T>> {
 		this.semantics = semantics;
 		this.listener = listener;
 		this.dirs = Collections.unmodifiableList(dirs);	
-		this.params = Collections.unmodifiableList(params);	
+    	List<Term> values = new ArrayList<Term>();
+    	for (String s : params)
+    		values.add(new StringValue(s));
+		this.values = Collections.unmodifiableList(values);	
 		this.monitor = monitor;
 	}
 
@@ -89,26 +93,32 @@ public class Interpreter<T extends Semantics<T>> {
 	 */
 	@SuppressWarnings("unchecked")
 	public ReoConnector<T> interpret(List<String> srcfiles) {
-		try {			
-			// Find all available component expressions.
+		try {
+			// Stack of all parsed Reo source files.
 			Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();	
-			List<String> parsed = new ArrayList<String>();
-			Queue<String> components = new LinkedList<String>();
 			
+			// List of fully qualified names of already parsed component definitions.
+			List<String> parsed = new ArrayList<String>();
+			
+			// List of fully qualified names of unparsed imported component definitions.
+			Queue<String> components = new LinkedList<String>();
+
+			// Parse all provided source files.
 			for (String file : srcfiles) {
 				String filename = new File(file).getName().replaceFirst("[.][^.]+$", "");
 				ReoFile<T> program = parse(new ANTLRFileStream(file));
 				if (program != null) {
 					if (!program.getName().endsWith(filename))
-						throw new CompilationException(program.getToken(), "Component must have name " + filename + ".");
+						monitor.add(program.getMainLocation(), "Component must have name " + filename + ".");
 					stack.push(program);
 					parsed.add(program.getName());
 					components.addAll(program.getImports());
 				} else {
-					System.err.println("[error] Cannot parse " + new File(file).getName() + ".");
+					monitor.add("Cannot parse " + new File(file).getName() + ".");
 				}
 			}		
 			
+			// Find and parse all imported component definitions.
 			while (!components.isEmpty()) {
 				String comp = components.poll();
 				if (!parsed.contains(comp)) {
@@ -116,38 +126,33 @@ public class Interpreter<T extends Semantics<T>> {
 					ReoFile<T> program = findComponent(comp);
 					if (program != null) {
 						if (!program.getName().equals(comp))
-							throw new CompilationException(program.getToken(), "Component must have name " + comp.substring(comp.lastIndexOf(".") + 1) + ".");
+							monitor.add(program.getMainLocation(), "Component must have name " + comp.substring(comp.lastIndexOf(".") + 1) + ".");
 						stack.push(program);
 						List<String> newComponents = program.getImports();
 						newComponents.removeAll(parsed);
 						components.addAll(newComponents);
 					} else {
-						System.err.println("[error] Component " + comp + " cannot be found.");
+						monitor.add("Component " + comp + " cannot be found.");
 					}
 
 				}
 			}
 		
-
-			// Evaluate these component expressions.
+			// Evaluate all component expressions.
 			Scope scope = new Scope();
-			Value main = null;		
+			Component<T> main = null;		
 			while (!stack.isEmpty()) {
 				ReoFile<T> program = stack.pop();
-//				main = program.getComponent().evaluate(scope, monitor);
+				main = program.getComponent().evaluate(scope, monitor);
 				scope.put(new Identifier(program.getName()), main);
 			}
-//			
-//			List<Term> values = new ArrayList<Term>();
-//			for (String x : params) 
-//				values.add(new StringValue(x));
-//			
-//			return main.instantiate(new Terms(values), null);			
+			
+			// Instantiate the main component
+			return main.instantiate(values, null, monitor).getConnector();	
+			
 		} catch (IOException e) {
-			System.out.print(e.getMessage());
-		} catch (CompilationException e) {
-			System.out.println("error"); //new Message(MessageType.ERROR, e.getToken(), e.getMessage()));
-		}
+			monitor.add(e.getMessage());
+		} 
 		
 		return null;
 	}

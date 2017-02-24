@@ -24,7 +24,7 @@ public final class Predicate {
 
 	/**
 	 * Constructs a new list of scopes.
-	 * @param scopes	list pf scopes
+	 * @param scopes	list of scopes
 	 */
 	public Predicate(List<Scope> scopes) {
 		this.scopes = scopes;

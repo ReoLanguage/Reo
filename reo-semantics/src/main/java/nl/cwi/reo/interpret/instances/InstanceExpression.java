@@ -7,6 +7,6 @@ import nl.cwi.reo.interpret.connectors.Semantics;
  * Interpretation of a (set of) instances.
  * @param <T> Reo semantics type
  */
-public interface InstancesExpression<T extends Semantics<T>> extends Expression<Instances<T>> {
+public interface InstanceExpression<T extends Semantics<T>> extends Expression<Instance<T>> {
 
 }

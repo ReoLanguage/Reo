@@ -39,7 +39,7 @@ public class Identifier implements Term {
 	public boolean equals(Object other) {
 	    if (other == null) return false;
 	    if (other == this) return true;
-	    if (!(other instanceof Port)) return false;
+	    if (!(other instanceof Identifier)) return false;
 	    Identifier p = (Identifier)other;
 	   	return Objects.equals(this.name, p.name);
 	}

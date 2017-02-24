@@ -2,11 +2,11 @@ package nl.cwi.reo.interpret.predicates;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
+import java.util.Queue;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -34,28 +34,39 @@ public final class Conjunction implements PredicateExpression {
 	@Override
 	public Predicate evaluate(Scope s, Monitor m) {
 		
-//		Stack<Scope> scope = new Stack<Scope>();
-//		scope.push(s);
-//		Predicate p1;
-//		Predicate p2;
-////		List<Scope> scopeListReference = Arrays.asList(s);
-////		List<Scope> scopeList = new ArrayList<Scope>();
-//		
-////		while(!scopeListReference.equals(scopeList) && ){
-////			scopeList=scopeListReference;
-//
-//		while(!scope.isEmpty()){
-//			Scope p = scope.pop();
-//			
-//			for(PredicateExpression predExpr : predicates){
-//				if((p1 = predExpr.evaluate(p, m))!=null){
-//					scopeList.addAll(p1.getScopes());						
-//				}
-//			}
-//		}
-//		
-//		
-//		return new Predicate(scopeList);
+		List<Scope> scopes = Arrays.asList(s);
+		
+		if (predicates.isEmpty())
+			return new Predicate(scopes);
+		
+		// Non-empty queue of unevaluated predicates.
+		Queue<PredicateExpression> q = new LinkedList<PredicateExpression>(predicates);
+		
+		boolean go = true;
+		while (go) {
+			go = false;
+			
+			PredicateExpression P = q.poll();
+			List<Scope> newscopes = extend(scopes, P, m);
+			if (newscopes == null) {
+				q.add(P);
+			} else {
+				if (newscopes.equals(scopes))
+				scopes = newscopes;
+			}
+			
+			// if scopes 
+		}
+		return new Predicate(scopes);
+	}
+	
+	private List<Scope> extend(List<Scope> scopes, PredicateExpression P, Monitor m) {
+		List<Scope> newscopes = new ArrayList<Scope>();
+		for (Scope s : scopes) {
+			Predicate list = P.evaluate(s, m);
+			
+//			s.extend();
+		}
 		return null;
 	}
 

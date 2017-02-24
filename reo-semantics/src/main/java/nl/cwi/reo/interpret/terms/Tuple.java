@@ -1,31 +1,51 @@
 package nl.cwi.reo.interpret.terms;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import nl.cwi.reo.interpret.values.Value;
 
 /**
  * A list of terms, which is a term in itself.
  */
-public final class Tuple implements Term {
+public final class Tuple extends ArrayList<List<Term>> implements Value {
 	
 	/**
-	 * List of terms.
+	 * Serial version ID.
 	 */
-	private final List<Term> list;
-
+	private static final long serialVersionUID = 886556264207970624L;
+	
 	/**
 	 * Constructs a new tuple
 	 * @param list	list of terms
 	 */
-	public Tuple(List<Term> list) {
-		this.list = list;
+	public Tuple(List<List<Term>> list) {
+		super.addAll(list);
+	}
+
+	/**
+	 * Checks if all iterators in a list have a next term.
+	 * @param iters		list of term iterators.
+	 * @return true, if all iterators have a next term, and false otherwise.
+	 */
+	public static boolean hasNext(List<Iterator<Term>> iters) {
+		boolean haveNext = true;		
+		for (Iterator<Term> it : iters)
+			haveNext &= it.hasNext();
+		return haveNext;
 	}
 	
 	/**
-	 * Gets the list of terms.
-	 * @return list of terms
+	 * Checks if all iterators in a list have a next term.
+	 * @param iters		list of term iterators.
+	 * @return true, if all iterators have a next term, and false otherwise.
 	 */
-	public List<Term> getList() {
+	public static List<Term> next(List<Iterator<Term>> iters) {
+		List<Term> list = new ArrayList<Term>();		
+		for (Iterator<Term> it : iters)
+			list.add(it.next());
 		return list;
 	}
-
+	
 }

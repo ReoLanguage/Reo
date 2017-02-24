@@ -313,7 +313,7 @@ public class BMResults implements Serializable{
         }
       }
     }catch(Exception e){
-      System.err.println("BMResults.getFromFile: "+e.toString());   
+      System.err.println("BMResults.getFromFile: "+e.toString());  
       return 0;
     }
 //    print();

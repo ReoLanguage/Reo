@@ -30,9 +30,9 @@ public final class TupleExpression implements TermExpression {
 	 */
 	@Override
 	public List<Term> evaluate(Scope s, Monitor m) {
-		List<Term> terms = new ArrayList<Term>();
+		List<List<Term>> terms = new ArrayList<List<Term>>();
 		for (TermExpression t : list)
-			terms.addAll(t.evaluate(s, m));
+			terms.add(t.evaluate(s, m));
 		return Arrays.asList(new Tuple(terms));
 	}
 

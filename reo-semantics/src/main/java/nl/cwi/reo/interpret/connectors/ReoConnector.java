@@ -12,7 +12,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
  * 
  * A SubComponent is an immutable object.
  * @param <T> type of semantics objects
- * @see CompositeReoConnector
+ * @see ReoConnectorComposite
  */
 public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConnector<T>> {
 	
@@ -56,7 +56,7 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	 * associative product operator.
 	 * @return List of all components contained in this subcomponent.
 	 */
-	public List<AtomicReoConnector<T>> flatten();
+	public List<ReoConnectorAtom<T>> flatten();
 	
 	/**
 	 * Inserts, if necessary, a merger and/or replicator at every node in this instance list. 

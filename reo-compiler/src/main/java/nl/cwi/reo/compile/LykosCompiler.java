@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
-import nl.cwi.reo.interpret.connectors.AtomicReoConnector;
+import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.ports.Port;
@@ -101,7 +101,7 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		
 		List<InterpretedWorker> interpretedWorker = new ArrayList<InterpretedWorker>();
 		
-		for (AtomicReoConnector<PRAutomaton> X : program.flatten()) {
+		for (ReoConnectorAtom<PRAutomaton> X : program.flatten()) {
 			if((X.getSourceCode().getFile())!=(null)) {
 				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
 			} else {
@@ -204,7 +204,7 @@ public class LykosCompiler extends ToolErrorAccumulator {
 			
 	}
 	
-	public WorkerSignature setWorker(AtomicReoConnector<PRAutomaton> X){
+	public WorkerSignature setWorker(ReoConnectorAtom<PRAutomaton> X){
 		List<Variable> l = new ArrayList<Variable>();
 		List<PRAutomaton> lst = X.integrate();
 		PRAutomaton Y = lst.get(0);

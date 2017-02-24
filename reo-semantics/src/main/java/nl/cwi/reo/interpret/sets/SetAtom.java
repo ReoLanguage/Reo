@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.AtomicReoConnector;
+import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SourceCode;
-import nl.cwi.reo.interpret.instances.Instances;
+import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
@@ -41,8 +41,8 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 * Evaluates this atomic set to an instance containing an atomic Reo connector.
 	 */
 	@Override
-	public Instances<T> evaluate(Scope s, Monitor m) {
-		return new Instances<T>(new AtomicReoConnector<T>(atom.evaluate(s, m), source), new HashSet<Set<Identifier>>());
+	public Instance<T> evaluate(Scope s, Monitor m) {
+		return new Instance<T>(new ReoConnectorAtom<T>(atom.evaluate(s, m), source), new HashSet<Set<Identifier>>());
 	}
 
 }

@@ -32,7 +32,8 @@ public final class Disjunction implements PredicateExpression {
 	 */
 	@Override
 	public Predicate evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
+
+		
 		return null;
 	}
 

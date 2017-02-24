@@ -5,7 +5,7 @@ import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.instances.InstancesExpression;
+import nl.cwi.reo.interpret.instances.InstanceExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -17,13 +17,13 @@ public class InstanceTermExpression<T extends Semantics<T>> implements TermExpre
 	/**
 	 * Component instance.
 	 */
-	private InstancesExpression<T> instance;
+	private InstanceExpression<T> instance;
 	
 	/**
 	 * Constructs a new component instance term.
 	 * @param instance		component instance
 	 */
-	public InstanceTermExpression(InstancesExpression<T> instance) {
+	public InstanceTermExpression(InstanceExpression<T> instance) {
 		this.instance = instance;
 	}
 	

@@ -21,7 +21,7 @@ import nl.cwi.reo.util.Monitor;
  * 
  * @param <T> Reo semantics type
  */
-public final class AtomicReoConnector<T extends Semantics<T>> implements ReoConnector<T> {
+public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnector<T> {
 	
 	/**
 	 * Semantics object.
@@ -42,7 +42,7 @@ public final class AtomicReoConnector<T extends Semantics<T>> implements ReoConn
 	 * Constructs a new atomic component.
 	 * @param atom		semantics
 	 */
-	public AtomicReoConnector(T atom) {
+	public ReoConnectorAtom(T atom) {
 		this.semantics = atom;
 		this.source = new SourceCode();
 		Map<Port, Port> links = new HashMap<Port, Port>();
@@ -56,7 +56,7 @@ public final class AtomicReoConnector<T extends Semantics<T>> implements ReoConn
 	 * @param semantics		semantics
 	 * @param source	reference to source code
 	 */
-	public AtomicReoConnector(T semantics, SourceCode source) {
+	public ReoConnectorAtom(T semantics, SourceCode source) {
 		this.semantics = semantics;
 		this.source = source;
 		Map<Port, Port> links = new HashMap<Port, Port>();
@@ -71,7 +71,7 @@ public final class AtomicReoConnector<T extends Semantics<T>> implements ReoConn
 	 * @param source		reference to source code
 	 * @param links			set of links
 	 */
-	public AtomicReoConnector(T semantics, SourceCode source, Map<Port, Port> links) {
+	public ReoConnectorAtom(T semantics, SourceCode source, Map<Port, Port> links) {
 		this.semantics = semantics;
 		this.source = source;
 		this.links = Collections.unmodifiableMap(links);
@@ -105,8 +105,8 @@ public final class AtomicReoConnector<T extends Semantics<T>> implements ReoConn
 	 * {@inheritDoc}
 	 */
 	@Override
-	public AtomicReoConnector<T> evaluate(Scope s, Monitor m) {
-		return new AtomicReoConnector<T>(semantics.evaluate(s, null), source);
+	public ReoConnectorAtom<T> evaluate(Scope s, Monitor m) {
+		return new ReoConnectorAtom<T>(semantics.evaluate(s, null), source);
 	}
 
 	/**
@@ -114,7 +114,7 @@ public final class AtomicReoConnector<T extends Semantics<T>> implements ReoConn
 	 */
 	@Override
 	public ReoConnector<T> reconnect(Map<Port, Port> joins) {
-		return new AtomicReoConnector<T>(semantics, source, Links.reconnect(links, joins));
+		return new ReoConnectorAtom<T>(semantics, source, Links.reconnect(links, joins));
 	}
 
 	/**
@@ -122,15 +122,15 @@ public final class AtomicReoConnector<T extends Semantics<T>> implements ReoConn
 	 */
 	@Override
 	public ReoConnector<T> renameHidden(Integer i) {
-		return new AtomicReoConnector<T>(semantics, source, Links.renameHidden(links, i));
+		return new ReoConnectorAtom<T>(semantics, source, Links.renameHidden(links, i));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<AtomicReoConnector<T>> flatten() {
-		List<AtomicReoConnector<T>> list = new ArrayList<AtomicReoConnector<T>>();
+	public List<ReoConnectorAtom<T>> flatten() {
+		List<ReoConnectorAtom<T>> list = new ArrayList<ReoConnectorAtom<T>>();
 		list.add(this);
 		return list;
 	}

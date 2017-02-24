@@ -32,6 +32,8 @@ public class Vertex implements Comparable<Vertex> {
 
 	@Override
 	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
 		if (!(other instanceof Vertex)) return false;
 		Vertex v = (Vertex)other;
 		return v.name.equals(this.name);

@@ -2,15 +2,15 @@ package nl.cwi.reo.interpret.sets;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.instances.Instances;
-import nl.cwi.reo.interpret.instances.InstancesExpression;
+import nl.cwi.reo.interpret.instances.Instance;
+import nl.cwi.reo.interpret.instances.InstanceExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of short circuit addition.
  * @param <T> Reo semantics type
  */
-public final class SetElse<T extends Semantics<T>> implements InstancesExpression<T> {
+public final class SetElse<T extends Semantics<T>> implements InstanceExpression<T> {
 	
 	/**
 	 * First set.
@@ -36,8 +36,8 @@ public final class SetElse<T extends Semantics<T>> implements InstancesExpressio
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Instances<T> evaluate(Scope s, Monitor m) {
-		Instances<T> insts = first.evaluate(s, m);
+	public Instance<T> evaluate(Scope s, Monitor m) {
+		Instance<T> insts = first.evaluate(s, m);
 		if (insts.getConnector().isEmpty())
 			return second.evaluate(s, m);
 		return insts;		

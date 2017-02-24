@@ -55,8 +55,8 @@ public final class FunctionExpression implements TermExpression {
 		for (TermExpression arg : arguments) 
 			iters.add(arg.evaluate(s, null).iterator());
 		
-		while (hasNext(iters)) {
-			List<Term> args = next(iters);
+		while (Tuple.hasNext(iters)) {
+			List<Term> args = Tuple.next(iters);
 			switch (symbol) {
 			case ADD:
 				if (arguments.size() == 2) {						
@@ -100,7 +100,7 @@ public final class FunctionExpression implements TermExpression {
 				}
 			case MIN:
 				if (arguments.size() == 1) {	
-					if (args.get(0) instanceof IntegerValue ) {
+					if (args.get(0) instanceof IntegerValue) {
 						list.add(IntegerValue.min((IntegerValue)args.get(0)));
 					} else if (args.get(0) instanceof DecimalValue) {
 						list.add(DecimalValue.min((DecimalValue)args.get(0)));
@@ -168,30 +168,6 @@ public final class FunctionExpression implements TermExpression {
 			}
 		}
 		
-		return list;
-	}
-	
-	/**
-	 * Checks if all iterators in a list have a next term.
-	 * @param iters		list of term iterators.
-	 * @return true, if all iterators have a next term, and false otherwise.
-	 */
-	private boolean hasNext(List<Iterator<Term>> iters) {
-		boolean haveNext = true;		
-		for (Iterator<Term> it : iters)
-			haveNext &= it.hasNext();
-		return haveNext;
-	}
-	
-	/**
-	 * Checks if all iterators in a list have a next term.
-	 * @param iters		list of term iterators.
-	 * @return true, if all iterators have a next term, and false otherwise.
-	 */
-	private List<Term> next(List<Iterator<Term>> iters) {
-		List<Term> list = new ArrayList<Term>();		
-		for (Iterator<Term> it : iters)
-			list.add(it.next());
 		return list;
 	}
 

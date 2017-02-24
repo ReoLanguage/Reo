@@ -23,10 +23,18 @@ public final class Monitor {
 	/**
 	 * Add a new message to this monitor.
 	 * @param location		Location 
-	 * @param msg
+	 * @param msg			message
 	 */
 	public void add(Location location, String msg) {
 		messages.add(new Message(MessageType.ERROR, location, msg));
+	}
+	
+	/**
+	 * Add a new message to this monitor.
+	 * @param msg		message
+	 */
+	public void add(String msg) {
+		messages.add(new Message(MessageType.ERROR, msg));
 	}
 	
 	/**

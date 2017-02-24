@@ -50,6 +50,8 @@ public class Edge implements Comparable<Edge> {
 
 	@Override
 	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
 		if (!(other instanceof Edge)) return false;
 		Edge e = (Edge)other;
 		return e.source.equals(this.source) && e.target.equals(this.target);

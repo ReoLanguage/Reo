@@ -13,10 +13,10 @@ public class InterpreterPR extends Interpreter<PRAutomaton> {
 	/**
 	 * Constructs a Reo interpreter for Port Automaton semantics.
 	 * @param dirs		list of directories of Reo components
-	 * @param params	parameter values of main component
+	 * @param values	parameter values of main component
 	 * @param monitor	message container
 	 */
-	public InterpreterPR(List<String> dirs, List<String> params, Monitor monitor) {
-		super(SemanticsType.PR, new ListenerPR(), dirs, params, monitor);	
+	public InterpreterPR(List<String> dirs, List<String> values, Monitor monitor) {
+		super(SemanticsType.PR, new ListenerPR(), dirs, values, monitor);	
 	}	
 }

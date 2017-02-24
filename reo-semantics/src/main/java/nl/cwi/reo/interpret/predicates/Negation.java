@@ -1,5 +1,8 @@
 package nl.cwi.reo.interpret.predicates;
 
+import java.util.Arrays;
+import java.util.List;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.util.Monitor;
 
@@ -26,7 +29,11 @@ public final class Negation implements PredicateExpression {
 	 */
 	@Override
 	public Predicate evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
+		
+//		if (predicate.evaluate(s, m).getScopes().isEmpty())
+		List<Scope> scopes = Arrays.asList(s);
+		
+		
 		return null;
 	}
 

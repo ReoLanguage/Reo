@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.values;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
@@ -45,5 +46,33 @@ public final class StringValue implements Value , TermExpression {
 	public List<Term> evaluate(Scope s, Monitor m) {
 		return Arrays.asList(this);
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return x;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof StringValue)) return false;
+	    StringValue p = (StringValue)other;
+	   	return Objects.equals(this.x, p.x);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+	    return Objects.hash(this.x);
+	}
+	
 }

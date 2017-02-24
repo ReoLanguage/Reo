@@ -14,6 +14,8 @@ import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
 import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.util.Monitor;
@@ -126,7 +128,7 @@ public class Compiler {
 //		JC.compile(program);
     }
 
-    private void compilePR() {
+    private void compilePR() {    	
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
 		
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
