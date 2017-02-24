@@ -100,7 +100,9 @@ How to design Reo protocols
 ---------------------------
 It's possible to design the previous problem with Reo, by following two steps. On the one hand, the user should define the actors, ie in this case, what a Producer and a Consumer are. The user should also came up, on the other hand, with a suitable protocol linking those actors, and describing the desired interaction. The strong advantage of such designing is that the design of actors is completly decoupled from the design of protocol, which lead us to a new paradigm of action/interaction programming. 
 A simple graphical representation of what could be a Reo protocol is given in the following picture :
-https://github.com/kasperdokter/Reo/blob/master/docs/ProdCons.jpg?raw=true
+
+.. image:: https://github.com/kasperdokter/Reo/blob/master/docs/ProdCons.jpg?raw=true
+
 Green and Red boxes are Producer actors, and Blue is a Consumer actor. They all have ports on which they can send and/or receive data. The arrows and boxes in between model the Reo circuit, and implement the desired protocol. In this case, the arrow between Red and Green represent a *synchronised* channel, which means that Red and Green must produce data at the same time. Data produced by Green is sent to Blue, and data produced by Red is sent to a *fifo* channel. This *fifo* channel will store the data for next iteration. During the next iteration, the *fifo* channel is full, and by definition (pointer to corresponding paper that define channel), Red cannot produce. As soon as Green and Red are synchronized, Green cannot produce also. The fifo become empty by sending its data to the consumer Blue.
 As defined, the protocol lets the consumer Blue receive alternatly a Green production and a Red production. The corresponding code for this program is :
 
@@ -144,7 +146,7 @@ Reo Consumer :
 
 Reo Protocol :
 
-.. code-block::
+.. code-block:: text
 
 	main = ProducerConsumer(a,b,c){
 		alternator(a,b,c){
