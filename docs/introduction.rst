@@ -98,5 +98,6 @@ Now, you may be convinced that this Java program  of the alternating producers p
 How to design Reo protocols
 ---------------------------
 
+![My image](https://github.com/kasperdokter/Reo/blob/master/docs/ProdCons.jpg?raw=true)
 The example above indicates how difficult it can be to write *correct* concurrent code.
 
