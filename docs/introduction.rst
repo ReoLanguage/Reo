@@ -107,6 +107,8 @@ As defined, the protocol lets the consumer Blue receive alternatly a Green produ
 Reo Producer :
 
 .. code-block:: java
+	:linenos:
+	
 	public class Producer {		
 		public static void main(String[] args) {
                 	Thread redProducer = new Thread("Red Producer") {
@@ -143,6 +145,8 @@ Reo Consumer :
 Reo Protocol :
 
 .. code-block::
+	:linenos:
+
 	main = ProducerConsumer(a,b,c){
 		alternator(a,b,c){
 			syncdrain(a, b) sync(b, x) fifo(x, c) sync(a, c)
