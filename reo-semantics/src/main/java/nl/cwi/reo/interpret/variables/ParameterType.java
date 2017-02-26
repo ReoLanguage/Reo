@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.parameters;
+package nl.cwi.reo.interpret.variables;
 
 /**
  * Interpretation of a parameter type.

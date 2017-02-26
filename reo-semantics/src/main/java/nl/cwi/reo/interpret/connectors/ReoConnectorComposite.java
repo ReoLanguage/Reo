@@ -15,7 +15,6 @@ import org.stringtemplate.v4.ST;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -285,16 +284,17 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		return st.render();
 	}
 
-	@Override
-	public Set<Identifier> getIdentifiers() {
-		return new HashSet<Identifier>(links.values());
-	}
-	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<Port> getInterface() {
 		return new HashSet<Port>(links.values());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isEmpty() {
 		return components.isEmpty();

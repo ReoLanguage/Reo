@@ -54,7 +54,7 @@ public final class Component<T extends Semantics<T>> implements Value {
 	 * @return a list of instances and unifications.
 	 */
 	public Instance<T> instantiate(List<Term> values, List<Port> ports, Monitor m) {
-		Signature signature = sign.evaluate(values, ports);
+		Signature signature = sign.evaluate(values, ports, m);
 		scope.putAll(signature.getAssignments());
 		return set.evaluate(scope, m).reconnect(signature.getInterface());
 	}

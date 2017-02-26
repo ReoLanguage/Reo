@@ -1,12 +1,4 @@
-package nl.cwi.reo.semantics.api;
-
-import static org.junit.Assert.*;
-import org.junit.Test;
-
-import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.ports.PrioType;
-import nl.cwi.reo.interpret.typetags.TypeTag;
+package nl.cwi.reo.interpret.ports;
 
 public class PortTest {
 	

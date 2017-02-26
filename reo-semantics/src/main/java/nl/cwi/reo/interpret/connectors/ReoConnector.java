@@ -6,7 +6,6 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.variables.Identifier;
 /**
  * A SubComponent is a part of a Connector.
  * 
@@ -28,8 +27,6 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	 * @return map assigning an internal port to an external port.
 	 */
 	public Map<Port, Port> getLinks();
-
-//	public SetExpression<T> instantiate(ListExpression values, VariableListExpression ports);
 	
 	/**
 	 * Relabels the set of links of this subcomponent by renaming 
@@ -77,5 +74,4 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 
 	public Set<Port> getInterface();
 	
-	public Set<Identifier> getIdentifiers();
 }

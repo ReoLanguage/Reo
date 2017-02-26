@@ -29,7 +29,7 @@ instance  : component list? ports                                 # instance_ato
           | instance '+' instance                                 # instance_sum	
           | instance ';' instance                                 # instance_semicolon;
 
-// Predicates
+// Statements
 formula   : BOOL                                                  # formula_boolean
           | '(' formula ')'                                       # formula_brackets
           | var component                                         # formula_componentdefn
@@ -41,7 +41,8 @@ formula   : BOOL                                                  # formula_bool
           | EXISTS ID ':' list formula                            # formula_existential
           | '!' formula                                           # formula_negation
           | formula (AND | ',') formula                           # formula_conjunction
-          | formula OR formula                                    # formula_disjunction ;
+          | formula OR formula                                    # formula_disjunction
+          | formula IMPLIES formula                               # formula_implication ;
 
 // Terms
 term      : NAT                                                   # term_natural
@@ -58,7 +59,8 @@ term      : NAT                                                   # term_natural
           | <assoc=right> term tuple                              # term_application
           | <assoc=right> term POW term                           # term_exponent
           | MIN term                                              # term_unarymin
-          | term op=(MUL | DIV | MOD | ADD | MIN | LIST) term     # term_operation ;
+          | term LIST term                                        # term_range
+          | term op=(MUL | DIV | MOD | ADD | MIN) term            # term_operation ;
 
 // Functions
 

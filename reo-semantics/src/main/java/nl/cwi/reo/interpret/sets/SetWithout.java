@@ -10,24 +10,24 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of short circuit subtraction.
  * @param <T> Reo semantics type
  */
-public final class SetWithout<T extends Semantics<T>> implements InstanceExpression {
+public final class SetWithout<T extends Semantics<T>> implements InstanceExpression<T> {
 
 	/**
 	 * First set.
 	 */
-	private final SetComposite<T> first;
+	private final SetExpression<T> first;
 
 	/**
 	 * Second set.
 	 */
-	private final SetComposite<T> second;
+	private final SetExpression<T> second;
 	
 	/**
 	 * Short circuit subtraction of two sets of constraints.
 	 * @param first		first set
 	 * @param second	second set
 	 */
-	public SetWithout(SetComposite<T> first, SetComposite<T> second) {
+	public SetWithout(SetExpression<T> first, SetExpression<T> second) {
 		this.first = first;
 		this.second = second;
 	}
@@ -39,12 +39,11 @@ public final class SetWithout<T extends Semantics<T>> implements InstanceExpress
 	public Instance<T> evaluate(Scope s, Monitor m) {
 		Instance<T> i1 = first.evaluate(s, m);
 		Instance<T> i2 = second.evaluate(s, m);
+		
 		// TODO : without set builder
-		if(!i1.getConnector().isEmpty()){
+		if(!i1.getConnector().isEmpty())
 			return i1;	
-		}
-		else
-			return i2;	
+		return i2;	
 	}
 
 }

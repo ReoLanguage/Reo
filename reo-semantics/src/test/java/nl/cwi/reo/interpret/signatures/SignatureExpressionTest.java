@@ -1,36 +1,13 @@
 package nl.cwi.reo.interpret.signatures;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.antlr.v4.runtime.CommonToken;
-import org.antlr.v4.runtime.Token;
 import org.junit.Test;
-//
-//import nl.cwi.reo.errors.CompilationException;
-//import nl.cwi.reo.interpret.expressions.ValueList;
-//import nl.cwi.reo.interpret.integers.IntegerExpression;
-//import nl.cwi.reo.interpret.integers.IntegerValue;
-//import nl.cwi.reo.interpret.integers.IntegerVariable;
-//import nl.cwi.reo.interpret.oldstuff.Port;
-//import nl.cwi.reo.interpret.oldstuff.PortType;
-//import nl.cwi.reo.interpret.oldstuff.PrioType;
-//import nl.cwi.reo.interpret.variables.Variable;
-//import nl.cwi.reo.interpret.variables.VariableName;
-//import nl.cwi.reo.interpret.variables.VariableNameList;
-//import nl.cwi.reo.interpret.variables.VariableRange;
 
 public class SignatureExpressionTest {
-//
-//   @Test
-//   public void evaluate_NoParametersAndExplicitNodes() {
-//	   ParameterList params = new ParameterList();
-//	   NodeList nodes = new NodeList();
+
+   @Test
+   public void evaluate_NoParametersAndExplicitNodes() {
+//	   List<Parameter> params = new ArrayList<Parameter>();
+//	   List<Port> nodes = new ArrayList<Port>();
 //	   Token token = new CommonToken(0);
 //	   nodes.add(new Node(new VariableName("a", token), NodeType.SOURCE, new TypeTag("int")));
 //	   nodes.add(new Node(new VariableName("b", token), NodeType.SINK, new TypeTag("bool")));
@@ -58,10 +35,10 @@ public class SignatureExpressionTest {
 //	   } finally {
 //		   assertFalse(hasException);		   
 //	   }
-//   }
-//
-//   @Test
-//   public void evaluate_NoParametersAndNodeRanges() {
+   }
+
+   @Test
+   public void evaluate_NoParametersAndNodeRanges() {
 //	   ParameterList params = new ParameterList();
 //	   NodeList nodes = new NodeList();
 //	   Token token = new CommonToken(0);
@@ -98,5 +75,5 @@ public class SignatureExpressionTest {
 //	   } finally {
 //		   assertFalse(hasException);
 //	   }	  
-   //}   
+   }   
 }

@@ -2,7 +2,6 @@ package nl.cwi.reo.interpret.variables;
 
 import java.util.Objects;
 
-import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.terms.Term;
 
 /**

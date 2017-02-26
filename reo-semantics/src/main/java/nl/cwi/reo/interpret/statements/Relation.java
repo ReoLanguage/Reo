@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.predicates;
+package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +56,7 @@ public final class Relation implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Predicate evaluate(Scope s, Monitor m) {
+	public List<Scope> evaluate(Scope s, Monitor m) {
 		
 		List<Scope> scopes = new ArrayList<Scope>();
 		
@@ -76,102 +76,102 @@ public final class Relation implements PredicateExpression {
 						scopes.add(s.extend((Identifier)args.get(1), (Value)args.get(0)));			
 					} else if (args.get(0) instanceof IntegerValue && args.get(0) instanceof IntegerValue 
 							&& ((IntegerValue)args.get(0)).getValue() == ((IntegerValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof DecimalValue && args.get(0) instanceof DecimalValue 
 							&& ((DecimalValue)args.get(0)).getValue() == ((DecimalValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 				} else {
 					m.add(location, "= takes 2 arguments");					
 				}
-				return new Predicate();
+				return new ArrayList<Scope>();
 			case GEQ:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
 						m.add(location, ">= cannot be used to define a variable.");		
 					else if (args.get(0) instanceof IntegerValue && args.get(0) instanceof IntegerValue 
 							&& ((IntegerValue)args.get(0)).getValue() >= ((IntegerValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof DecimalValue && args.get(0) instanceof DecimalValue 
 							&& ((DecimalValue)args.get(0)).getValue() >= ((DecimalValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 				} else {
 					m.add(location, ">= takes 2 arguments");					
 				}
-				return new Predicate();
+				return new ArrayList<Scope>();
 			case GT:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
 						m.add(location, "> cannot be used to define a variable.");							
 					else if (args.get(0) instanceof IntegerValue && args.get(0) instanceof IntegerValue 
 							&& ((IntegerValue)args.get(0)).getValue() > ((IntegerValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof DecimalValue && args.get(0) instanceof DecimalValue 
 							&& ((DecimalValue)args.get(0)).getValue() > ((DecimalValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 				} else {
 					m.add(location, "> takes 2 arguments");					
 				}
-				return new Predicate();
+				return new ArrayList<Scope>();
 			case LEQ:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
 						m.add(location, "<= cannot be used to define a variable.");		
 					else if (args.get(0) instanceof IntegerValue && args.get(0) instanceof IntegerValue 
 							&& ((IntegerValue)args.get(0)).getValue() <= ((IntegerValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof DecimalValue && args.get(0) instanceof DecimalValue 
 							&& ((DecimalValue)args.get(0)).getValue() <= ((DecimalValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 				} else {
 					m.add(location, "<= takes 2 arguments");					
 				}
-				return new Predicate();
+				return new ArrayList<Scope>();
 			case LT:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
 						m.add(location, "< cannot be used to define a variable.");		
 					else if (args.get(0) instanceof IntegerValue && args.get(0) instanceof IntegerValue 
 							&& ((IntegerValue)args.get(0)).getValue() < ((IntegerValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof DecimalValue && args.get(0) instanceof DecimalValue 
 							&& ((DecimalValue)args.get(0)).getValue() < ((DecimalValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 				} else {
 					m.add(location, "< takes 2 arguments");					
 				}
-				return new Predicate();
+				return new ArrayList<Scope>();
 			case NEQ:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
 						m.add(location, "!= cannot be used to define a variable.");		
 					else if (args.get(0) instanceof BooleanValue && args.get(0) instanceof BooleanValue 
 							&& ((BooleanValue)args.get(0)).getValue() != ((BooleanValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof IntegerValue && args.get(0) instanceof IntegerValue 
 							&& ((IntegerValue)args.get(0)).getValue() != ((IntegerValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof DecimalValue && args.get(0) instanceof DecimalValue 
 							&& ((DecimalValue)args.get(0)).getValue() != ((DecimalValue)args.get(1)).getValue())
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof StringValue && args.get(0) instanceof StringValue 
 							&& !((StringValue)args.get(0)).getValue().equals(((StringValue)args.get(1)).getValue()))
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof Component<?> && args.get(0) instanceof Component<?> 
 							&& !((Component<?>)args.get(0)).equals(((Component<?>)args.get(1))))
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 					else if (args.get(0) instanceof Instance<?> && args.get(0) instanceof Instance<?> 
 							&& !((Instance<?>)args.get(0)).equals(((Instance<?>)args.get(1))))
-						return new Predicate(Arrays.asList(s));
+						return Arrays.asList(s);
 				} else {
 					m.add(location, "!= takes 2 arguments");					
 				}
-				return new Predicate();
+				return new ArrayList<Scope>();
 			default:
 				throw new IllegalArgumentException("Undefined operation " + symbol + ".");
 			}
 		}
 
-		return new Predicate();
+		return new ArrayList<Scope>();
 	}
 
 	/**

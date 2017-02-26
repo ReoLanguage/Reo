@@ -1,22 +1,7 @@
-package nl.cwi.reo.automata;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+package nl.cwi.reo.semantics.automata;
 
 //import static org.junit.Assert.*;
 import org.junit.Test;
-
-import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.automata.Automaton;
-import nl.cwi.reo.semantics.automata.State;
-import nl.cwi.reo.semantics.automata.Transition;
-import nl.cwi.reo.semantics.portautomata.NullLabel;
 
 public class AutomatonTest {
 

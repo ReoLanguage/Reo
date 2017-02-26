@@ -33,12 +33,7 @@ public enum FunctionSymbol {
 	/**
 	 * Exponentiation.
 	 */
-	POW,
-	
-	/**
-	 * List.
-	 */
-	LIST;
+	POW;
 	
 	/**
 	 * {@inheritDoc}
@@ -52,7 +47,6 @@ public enum FunctionSymbol {
 		case ADD: return "+";
 		case MIN: return "-";
 		case POW: return "^";
-		case LIST: return "..";
 		default: throw new IllegalArgumentException();
 		}
 	}

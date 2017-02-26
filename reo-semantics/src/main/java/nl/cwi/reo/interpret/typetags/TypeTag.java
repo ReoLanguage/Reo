@@ -1,6 +1,6 @@
 package nl.cwi.reo.interpret.typetags;
 
-import nl.cwi.reo.interpret.parameters.ParameterType;
+import nl.cwi.reo.interpret.variables.ParameterType;
 
 public final class TypeTag implements ParameterType {
 	

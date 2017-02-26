@@ -1,10 +1,12 @@
 package nl.cwi.reo.interpret.instances;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.terms.Term;
@@ -53,26 +55,24 @@ public final class ProductInstance<T extends Semantics<T>> implements InstanceEx
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Instance<T> evaluate(Scope s, Monitor m) {
+	public Instance<T> evaluate(Scope s, Monitor m) {	
+		
+		List<Term> t = this.operator.evaluate(s, m);
+		if (t.isEmpty() || !(t.get(0) instanceof StringValue)) {
+			m.add(location, "Composition operator " + operator + " must be of type string.");
+			return null;
+		} 
+
+		String operator = ((StringValue)t.get(0)).getValue();
 		Instance<T> i1 = first.evaluate(s, m);
-		Instance<T> i2 = second.evaluate(s, m);
-		List<Term> op = operator.evaluate(s, m);
+		Instance<T> i2 = second.evaluate(s, m);			
+
+		List<ReoConnector<T>> components = Arrays.asList(i1.getConnector(), i2.getConnector());
+		ReoConnector<T> connector = new ReoConnectorComposite<T>(operator, components);
+		Set<Set<Identifier>> unifications = new HashSet<Set<Identifier>>(i1.getUnifications());
+		unifications.addAll(i1.getUnifications());
 		
-		if (op.get(0) instanceof StringValue) {
-			String co = ((StringValue)op.get(0)).getValue();
-		
-			ReoConnectorComposite<T> R = new ReoConnectorComposite<T>(co, Arrays.asList(i1.getConnector(), i2.getConnector()));
-			
-			// TODO before adding setId to set, check if setId intersects with existing element of set.
-			Set<Set<Identifier>> set = i1.getUnifications();
-			for(Set<Identifier> setId : i2.getUnifications())
-				set.add(setId);
-			
-			return new Instance<T>(R, set);
-		}
-		
-		m.add(location, "Composition operator " + operator + " must be of type string.");
-		return null;
+		return new Instance<T>(connector, unifications);
 	}
 
 }

@@ -1,4 +1,4 @@
- package nl.cwi.reo.interpret.nodes;
+ package nl.cwi.reo.interpret.variables;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,8 +8,6 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
-import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**

@@ -1,16 +1,23 @@
 package nl.cwi.reo.interpret.sets;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
+import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.instances.InstanceExpression;
-import nl.cwi.reo.interpret.predicates.BooleanPredicate;
-import nl.cwi.reo.interpret.predicates.PredicateExpression;
+import nl.cwi.reo.interpret.statements.TruthValue;
+import nl.cwi.reo.interpret.statements.PredicateExpression;
+import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -35,12 +42,18 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	private PredicateExpression predicate;
 	
 	/**
+	 * Location of this instance in Reo source file.
+	 */
+	private final Location location;
+	
+	/**
 	 * Constructs an empty set expression.
 	 */
 	public SetComposite() {
 		this.operator = new StringValue("");
 		this.elements = new ArrayList<InstanceExpression<T>>();
-		this.predicate = new BooleanPredicate(true);
+		this.predicate = new TruthValue(true);
+		this.location = null;
 	}
 	
 	/**
@@ -48,11 +61,13 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 * @param operator		composition operator
 	 * @param elements		elements in this set
 	 * @param predicate		predicate of this set
+	 * @param location		location in Reo source file
 	 */
-	public SetComposite(TermExpression operator, List<InstanceExpression<T>> elements, PredicateExpression predicate){
+	public SetComposite(TermExpression operator, List<InstanceExpression<T>> elements, PredicateExpression predicate, Location location){
 		this.operator = operator;
 		this.elements = elements;
 		this.predicate = predicate;
+		this.location = location;
 	}
 
 	/**
@@ -60,15 +75,44 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 */
 	@Override
 	public Instance<T> evaluate(Scope s, Monitor m) {
-//		Predicate p = predicate.evaluate(s, m);
-//
-//		List<ReoConnector<T>> instances = new ArrayList<ReoConnector<T>>();
-//		for(InstancesExpression<T> i : elements){
-//			instances.addAll(i.evaluate(s, m).getConnector());
-//			
-//		}
-//		Instances<T> i = new Instances<T>();		
-		return null;
+		
+		List<Term> t = this.operator.evaluate(s, m);
+		if (t.isEmpty() || !(t.get(0) instanceof StringValue)) {
+			m.add(location, "Composition operator " + operator + " must be of type string.");
+			return null;
+		} 
+
+		String operator = ((StringValue)t.get(0)).getValue();
+		List<ReoConnector<T>> components = new ArrayList<ReoConnector<T>>();
+		Set<Set<Identifier>> unifications = new HashSet<Set<Identifier>>();
+		
+		List<Scope> scopes = predicate.evaluate(s, m);
+		for (Scope si : scopes) {
+			for (InstanceExpression<T> e : elements) {
+				Instance<T> i = e.evaluate(si, m);
+				components.add(i.getConnector());
+				unifications.addAll(i.getUnifications());
+			}
+		}
+		
+		simplify(unifications);
+		
+		return new Instance<T>(new ReoConnectorComposite<T>(operator, components), unifications);
 	}
 
+	/**
+	 * Unifies intersecting subsets.
+	 * @param partition		set of subsets
+	 * @return Returns true, if the set of subsets changed.
+	 */
+	private void simplify(Set<Set<Identifier>> partition) {
+		for (Set<Identifier> x : partition) {
+			for (Set<Identifier> y : partition) {
+				if (y != x && (new HashSet<Identifier>(y)).removeAll(x)) {
+					y.addAll(x);
+					partition.remove(x);
+				}
+			}
+		}
+	}
 }

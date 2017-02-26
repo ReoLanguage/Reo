@@ -1,6 +1,4 @@
-package nl.cwi.reo.interpret.parameters;
-
-import nl.cwi.reo.interpret.variables.Identifier;
+package nl.cwi.reo.interpret.variables;
 
 /**
  * An identifier decorated with a parameter type.

@@ -1,7 +1,12 @@
-package nl.cwi.reo.interpret.predicates;
+package nl.cwi.reo.interpret.statements;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.ListExpression;
+import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
@@ -31,12 +36,22 @@ public final class Membership implements PredicateExpression {
 	}
 	
 	/**
+	 * Gets the variable.
+	 * @return identifier
+	 */
+	public Identifier getVariable() {
+		return x;
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Predicate evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Scope> evaluate(Scope s, Monitor m) {
+		List<Scope> scopes = new ArrayList<Scope>();		
+		for (Term t : list.evaluate(s, m)) 
+			if (t instanceof Value) scopes.add(s.extend(x, (Value)t)); else return null;
+		return scopes;
 	}
 
 }

@@ -21,7 +21,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import nl.cwi.reo.errors.MyErrorListener;
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
@@ -31,6 +30,7 @@ import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.listeners.ErrorListener;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -91,7 +91,6 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @param file		non-empty list of Reo file names.
 	 * @return list of work automata.
 	 */
-	@SuppressWarnings("unchecked")
 	public ReoConnector<T> interpret(List<String> srcfiles) {
 		try {
 			// Stack of all parsed Reo source files.
@@ -242,7 +241,7 @@ public class Interpreter<T extends Semantics<T>> {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		
 		ReoParser parser = new ReoParser(tokens);
-		MyErrorListener errListener = new MyErrorListener();
+		ErrorListener errListener = new ErrorListener();
 		parser.removeErrorListeners();
 		parser.addErrorListener(errListener);
 		

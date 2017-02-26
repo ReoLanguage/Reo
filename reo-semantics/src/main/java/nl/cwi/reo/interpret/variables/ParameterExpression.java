@@ -1,11 +1,9 @@
-package nl.cwi.reo.interpret.parameters;
+package nl.cwi.reo.interpret.variables;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
 
 /**

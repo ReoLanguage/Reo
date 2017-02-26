@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.predicates;
+package nl.cwi.reo.interpret.statements;
 
 /**
  * Enumeration of all possible relation symbols.
