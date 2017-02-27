@@ -76,6 +76,7 @@ public final class SignatureExpression implements ParameterType {
 		int k_params = 0;
 		ParameterExpression rng_params = null;
 		for (ParameterExpression param : params) {
+			if(param.getIndices().isEmpty())k_params++;
 			for (TermExpression t : param.getIndices()) {
 				if (t instanceof Range) {
 					rng_params = param;
@@ -98,10 +99,10 @@ public final class SignatureExpression implements ParameterType {
 				return null;
 			}
 		} else {
-			if (size_params != 0) {
-				m.add(location, "Wrong number of parameter values.");
-				return null;
-			}
+//			if (size_params != 0) {
+//				m.add(location, "Wrong number of parameter values.");
+//				return null;
+//			}
 		}
 
 		// Find the assignment of parameters.

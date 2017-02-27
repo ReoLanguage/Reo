@@ -73,6 +73,7 @@ public final class FunctionExpression implements TermExpression {
 				} else {
 					m.add(location, "Addition + takes 2 arguments.");				
 				}
+				break;
 			case DIV:
 				if (arguments.size() == 2) {						
 					if (args.get(0) instanceof IntegerValue && args.get(1) instanceof IntegerValue) {
@@ -98,6 +99,7 @@ public final class FunctionExpression implements TermExpression {
 				} else {
 					m.add(location, "Division / takes 2 arguments.");				
 				}
+				break;
 			case MIN:
 				if (arguments.size() == 1) {	
 					if (args.get(0) instanceof IntegerValue) {
@@ -120,6 +122,7 @@ public final class FunctionExpression implements TermExpression {
 				} else {
 					m.add(location, "Minus - takes 1 or 2 arguments.");				
 				}
+				break;
 			case MOD:
 				if (arguments.size() == 2) {						
 					if (args.get(0) instanceof IntegerValue && args.get(1) instanceof IntegerValue) {
@@ -137,6 +140,7 @@ public final class FunctionExpression implements TermExpression {
 				} else {
 					m.add(location, "Division / takes 2 arguments.");				
 				}
+				break;
 			case MUL:
 				if (arguments.size() == 2) {						
 					if (args.get(0) instanceof IntegerValue && args.get(1) instanceof IntegerValue) {
@@ -150,6 +154,7 @@ public final class FunctionExpression implements TermExpression {
 				} else {
 					m.add(location, "Multiplication * takes 2 arguments.");				
 				}
+				break;
 			case POW:
 				if (arguments.size() == 2) {						
 					if (args.get(0) instanceof IntegerValue && args.get(1) instanceof IntegerValue) {
@@ -163,6 +168,7 @@ public final class FunctionExpression implements TermExpression {
 				} else {
 					m.add(location, "Exponentiation ^ takes 2 arguments.");				
 				}
+				break;
 			default:
 				throw new IllegalArgumentException("Undefined operation " + symbol + ".");
 			}

@@ -41,8 +41,10 @@ public final class Scope extends HashMap<Identifier, Value> {
 	 */
 	public Scope extend(Identifier key, Value value) {
 		Map<Identifier, Value> s = new HashMap<Identifier, Value>(this);
-		if (s.containsKey(key))
+		if (!s.containsKey(key))
 			s.put(key, value);
+		else
+			return this;
 		return new Scope(s);
 	}
 }
