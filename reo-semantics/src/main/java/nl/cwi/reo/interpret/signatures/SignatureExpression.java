@@ -24,17 +24,17 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a component signature.
  */
 public final class SignatureExpression implements ParameterType {
-	
+
 	/**
 	 * List of parameters.
 	 */
 	private final List<ParameterExpression> params;
-	
+
 	/**
 	 * List of nodes.
 	 */
 	private final List<NodeExpression> nodes;
-	
+
 	/**
 	 * Location of this signature in Reo source file.
 	 */
@@ -42,9 +42,13 @@ public final class SignatureExpression implements ParameterType {
 
 	/**
 	 * Constructs a new signature expression.
-	 * @param params		list of parameters
-	 * @param nodes			list of nodes
-	 * @param location		location of signature in Reo source file.
+	 * 
+	 * @param params
+	 *            list of parameters
+	 * @param nodes
+	 *            list of nodes
+	 * @param location
+	 *            location of signature in Reo source file.
 	 */
 	public SignatureExpression(List<ParameterExpression> params, List<NodeExpression> nodes, Location location) {
 		this.params = params;
@@ -53,15 +57,20 @@ public final class SignatureExpression implements ParameterType {
 	}
 
 	/**
-	 * Evaluates this interface for a given list of parameter values
-	 * and a given list of ports.
-	 * @param values	parameter values
-	 * @param ports		ports in interface
-	 * @param m			message container
-	 * @return signature that contains interface renaming and parameter assignments.
+	 * Evaluates this interface for a given list of parameter values and a given
+	 * list of ports.
+	 * 
+	 * @param values
+	 *            parameter values
+	 * @param ports
+	 *            ports in interface
+	 * @param m
+	 *            message container
+	 * @return signature that contains interface renaming and parameter
+	 *         assignments.
 	 */
 	public Signature evaluate(List<Term> values, List<Port> ports, Monitor m) {
-		Scope s = new Scope();		
+		Scope s = new Scope();
 
 		// Try to find the parameter value for a correct number of parameters
 		int k_params = 0;
@@ -79,7 +88,7 @@ public final class SignatureExpression implements ParameterType {
 			}
 		}
 		int size_params = values.size() - k_params;
-		
+
 		if (rng_params != null) {
 			Scope defs = rng_params.findParamFromSize(size_params);
 			if (defs != null) {
@@ -99,41 +108,41 @@ public final class SignatureExpression implements ParameterType {
 		List<Parameter> parameters = new ArrayList<Parameter>();
 		for (ParameterExpression e : params)
 			parameters.addAll(e.evaluate(s, m));
-		
+
 		Iterator<Parameter> param = parameters.iterator();
-		Iterator<Term> value = values.iterator();	
-		
+		Iterator<Term> value = values.iterator();
+
 		while (param.hasNext() && value.hasNext()) {
 			Parameter x = param.next();
 			Term v = value.next();
-			
+
 			if (v instanceof Value) {
-				s.put(x, (Value)v);
+				s.put(x, (Value) v);
 			} else {
 				m.add(location, "Term " + v + " is undefined.");
 				return null;
 			}
 		}
-		
-		// Find the links of the interface. 
-		Map<Port, Port> links = new HashMap<Port, Port>();	
-		
+
+		// Find the links of the interface.
+		Map<Port, Port> links = new HashMap<Port, Port>();
+
 		if (ports == null) {
-			
-			// Create a the default set of links for this interface	
+
+			// Create a the default set of links for this interface
 			List<Port> nodeslist = new ArrayList<Port>();
 			for (NodeExpression e : nodes)
-				nodeslist.addAll(e.evaluate(s, m));	
-			
+				nodeslist.addAll(e.evaluate(s, m));
+
 			Iterator<Port> node = nodeslist.iterator();
-			
+
 			while (node.hasNext()) {
 				Port p = node.next();
 				links.put(p, p);
 			}
-			
+
 		} else {
-			
+
 			// Try to find the parameter value for a correct number of nodes
 			int k_nodes = 0;
 			NodeExpression rng_nodes = null;
@@ -146,7 +155,8 @@ public final class SignatureExpression implements ParameterType {
 						rng_nodes = node;
 					} else if (t instanceof Value) {
 						k_nodes += 1;
-					} else if (t instanceof VariableTermExpression && ((VariableTermExpression)t).evaluate(s, m) != null) {
+					} else if (t instanceof VariableTermExpression
+							&& ((VariableTermExpression) t).evaluate(s, m) != null) {
 						k_nodes += 1;
 					} else {
 						m.add(location, "Node " + param + " cannot have undefined indices.");
@@ -155,7 +165,7 @@ public final class SignatureExpression implements ParameterType {
 				}
 			}
 			int size_nodes = ports.size() - k_nodes;
-			
+
 			if (rng_nodes != null) {
 				Scope defs = rng_nodes.findParamFromSize(size_nodes);
 				if (defs != null) {
@@ -173,15 +183,15 @@ public final class SignatureExpression implements ParameterType {
 
 			List<Port> nodeslist = new ArrayList<Port>();
 			for (NodeExpression e : nodes)
-				nodeslist.addAll(e.evaluate(s, m));	
-			
+				nodeslist.addAll(e.evaluate(s, m));
+
 			Iterator<Port> node = nodeslist.iterator();
 			Iterator<Port> port = ports.iterator();
-			
-			while (node.hasNext() && port.hasNext())		
+
+			while (node.hasNext() && port.hasNext())
 				links.put(node.next(), port.next());
 		}
-		
+
 		return new Signature(links, s);
 	}
 
@@ -190,7 +200,7 @@ public final class SignatureExpression implements ParameterType {
 	 */
 	@Override
 	public boolean equalType(ParameterType other) {
-		// TODO 
+		// TODO
 		return false;
 	}
 
