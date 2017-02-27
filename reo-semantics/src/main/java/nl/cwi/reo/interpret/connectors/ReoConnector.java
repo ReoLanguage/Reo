@@ -22,7 +22,7 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	/**
 	 * Checks if this connector is empty.
 	 * 
-	 * @return true if this connectors is a composite Reo consisting of an empty
+	 * @return true if this connector is a composite Reo consisting of an empty
 	 *         list of subconnectors, and false otherwise.
 	 */
 	public boolean isEmpty();
@@ -35,9 +35,9 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	public Map<Port, Port> getLinks();
 
 	/**
-	 * Relabels the set of links of this subcomponent by renaming all link
-	 * targets names according to renaming map, and hiding all ports that are
-	 * not renamed.
+	 * Relabels the set of links of this connector by renaming all link targets
+	 * names according to renaming map, and hiding all ports that are not
+	 * renamed.
 	 * 
 	 * @param joins
 	 *            renaming map
@@ -46,24 +46,15 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	public ReoConnector<T> reconnect(Map<Port, Port> joins);
 
 	/**
-	 * Renames all hidden ports in this subcomponent to an integer value,
-	 * starting from a given integer i. Integer i gets incremented to the
-	 * smallest integer greater or equal to i, that not used as a port name.
+	 * Renames all hidden ports in this connector to an integer value, starting
+	 * from a given integer i. Integer i gets incremented to the smallest
+	 * integer greater or equal to i, that not used as a port name.
 	 * 
 	 * @param i
 	 *            start value of hidden ports.
 	 * @return Block with renamed hidden ports.
 	 */
 	public ReoConnector<T> renameHidden(Integer i);
-
-	/**
-	 * Flattens the nested block structure of this subcomponent, and erases any
-	 * used-defined composition operator. This operation is particularly useful
-	 * if this subcomponent uses only a single associative product operator.
-	 * 
-	 * @return List of all components contained in this subcomponent.
-	 */
-	public ReoConnectorComposite<T> flatten();
 
 	/**
 	 * Inserts, if necessary, a merger and/or replicator at every node in this
@@ -80,14 +71,35 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	public ReoConnector<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory);
 
 	/**
-	 * Integrates the links of this subcomponent by renaming the interfaces of
-	 * the semantic objects in this subcomponent. If possible, first flatten the
-	 * block, to avoid repeated renaming operations on semantics objects.
+	 * Flattens the nested block structure of this connector, and erases any
+	 * used-defined composition operator. This operation is particularly useful
+	 * if this connector uses only a single associative product operator.
 	 * 
-	 * @return the semantics object with renamed ports
+	 * @return connector wherein every sub-connector is atomic.
 	 */
-	public List<T> integrate();
+	public ReoConnector<T> flatten();
 
+	/**
+	 * Integrates the links of this connector by renaming the interfaces of the
+	 * semantic objects in this connector.
+	 * 
+	 * @return connector wherein every atomic component has links that map port
+	 *         x to port x.
+	 */
+	public ReoConnector<T> integrate();
+
+	/**
+	 * Gets the interface of this connector.
+	 * 
+	 * @return set of ports in the interface of this connector
+	 */
 	public Set<Port> getInterface();
+
+	/**
+	 * Gets all atomic sub-connectors in this connector.
+	 * 
+	 * @return all atomic sub-connectors in this connector
+	 */
+	public List<ReoConnectorAtom<T>> getAtoms();
 
 }

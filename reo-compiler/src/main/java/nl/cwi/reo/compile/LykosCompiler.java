@@ -101,7 +101,7 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		
 		List<InterpretedWorker> interpretedWorker = new ArrayList<InterpretedWorker>();
 		
-		for (ReoConnectorAtom<PRAutomaton> X : program.flatten()) {
+		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().integrate().getAtoms()) {
 			if((X.getSourceCode().getFile())!=(null)) {
 				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
 			} else {
@@ -206,8 +206,7 @@ public class LykosCompiler extends ToolErrorAccumulator {
 	
 	public WorkerSignature setWorker(ReoConnectorAtom<PRAutomaton> X){
 		List<Variable> l = new ArrayList<Variable>();
-		List<PRAutomaton> lst = X.integrate();
-		PRAutomaton Y = lst.get(0);
+		PRAutomaton Y = X.getSemantics();
 		String name = "";
 		for (Port p : Y.getInterface()) {
 			if (p.getType() == PortType.IN) {
