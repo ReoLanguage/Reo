@@ -10,10 +10,10 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
-import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
 import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.util.Monitor;

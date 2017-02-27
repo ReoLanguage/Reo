@@ -11,8 +11,6 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import nl.cwi.reo.interpret.components.ComponentDefinition;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.components.ComponentVariable;
-
-import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SourceCode;
 import nl.cwi.reo.interpret.instances.ComponentInstance;
 import nl.cwi.reo.interpret.instances.ProductInstance;
@@ -51,6 +49,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.NodeExpression;
 import nl.cwi.reo.interpret.variables.ParameterExpression;
 import nl.cwi.reo.interpret.variables.VariableExpression;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;

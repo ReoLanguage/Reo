@@ -2,9 +2,9 @@ package nl.cwi.reo.interpret.instances;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.ComponentExpression;
-import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.ports.PortListExpression;
 import nl.cwi.reo.interpret.terms.ListExpression;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
 /**

@@ -8,11 +8,11 @@ import java.util.Set;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
-import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 

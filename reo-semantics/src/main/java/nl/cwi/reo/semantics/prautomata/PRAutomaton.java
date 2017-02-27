@@ -9,13 +9,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
 public class PRAutomaton implements Semantics<PRAutomaton> {

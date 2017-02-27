@@ -1,9 +1,9 @@
 package nl.cwi.reo.interpret.components;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.sets.SetExpression;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
 /**

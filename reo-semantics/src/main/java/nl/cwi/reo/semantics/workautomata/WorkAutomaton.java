@@ -16,9 +16,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
 import java.util.HashMap;

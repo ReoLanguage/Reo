@@ -1,7 +1,7 @@
 package nl.cwi.reo.interpret.components;
 
 import nl.cwi.reo.interpret.Expression;
-import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.semantics.Semantics;
 
 /**
  * Interpretation of a component definition.

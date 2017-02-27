@@ -6,6 +6,7 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.Semantics;
 /**
  * A SubComponent is a part of a Connector.
  * 

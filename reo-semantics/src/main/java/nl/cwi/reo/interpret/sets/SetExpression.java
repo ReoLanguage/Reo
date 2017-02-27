@@ -1,7 +1,7 @@
 package nl.cwi.reo.interpret.sets;
 
-import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.instances.InstanceExpression;
+import nl.cwi.reo.semantics.Semantics;
 
 /**
  * Interpretation of an atomic/composite set definition.

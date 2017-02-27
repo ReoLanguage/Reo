@@ -5,10 +5,10 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
-import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.connectors.SourceCode;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
 /**

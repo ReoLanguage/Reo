@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.semantics.Semantics;
 
 /**
  * A Reo connector with a set of node unifications.

@@ -2,8 +2,8 @@ package nl.cwi.reo.interpret.interpreters;
 
 import java.util.List;
 
-import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.ListenerPR;
+import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
 import nl.cwi.reo.util.Monitor;

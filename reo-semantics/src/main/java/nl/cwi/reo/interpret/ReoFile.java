@@ -3,7 +3,7 @@ package nl.cwi.reo.interpret;
 import java.util.List;
 
 import nl.cwi.reo.interpret.components.ComponentExpression;
-import nl.cwi.reo.interpret.connectors.Semantics;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Location;
 
 /**
