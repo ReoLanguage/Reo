@@ -24,7 +24,7 @@ multiset  : instance                                              # multiset_con
 
 // Instances
 instance  : component list? ports                                 # instance_atomic
-          | instance term instance                                # instance_composition
+//          | instance term instance                                # instance_composition
           | instance '*' instance                                 # instance_product
           | instance '+' instance                                 # instance_sum	
           | instance ';' instance                                 # instance_semicolon;

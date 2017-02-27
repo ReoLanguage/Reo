@@ -1,5 +1,5 @@
 section com.example;
-//import reo.fifo;
+import reo.fifo;
 //import reo.transformer;
 
 
@@ -18,7 +18,7 @@ foo = <k:int>(a?, b!double)
    cop { // parametrized composition operator.
    }
 |
-   i in <1..k> &&         // iteration of this whole set
-   j in <-2..5> &&        // iteration of this whole set
+   i : <1..k> &&         // iteration of this whole set
+   j : <-2..5> &&        // iteration of this whole set
    k > 4                // boolean condition for this set
 }

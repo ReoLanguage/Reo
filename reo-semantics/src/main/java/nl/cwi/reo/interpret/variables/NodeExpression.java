@@ -42,7 +42,7 @@ public final class NodeExpression extends VariableExpression {
 	public NodeExpression(VariableExpression var, PortType type, TypeTag tag) {
 		super(var.getName(), var.getIndices(), var.getLocation());
 		this.type = type;
-		this.prio = null;
+		this.prio = PrioType.NONE;
 		this.tag = tag;
 	}
 	
