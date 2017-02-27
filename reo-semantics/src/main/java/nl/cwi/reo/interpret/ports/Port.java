@@ -7,7 +7,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
  * An identifier that is decorated with a port type, a priority type,
  * a type tag, and an indicator for visibility.
  */
-public final class Port extends Identifier {
+public final class Port extends Identifier implements Comparable<Port> {
 
 	/**
 	 * Port type: input, output, none.
@@ -141,5 +141,10 @@ public final class Port extends Identifier {
 	@Override
 	public String toString() {
 		return (visible ? "" : "*") + prio + name + type + tag;
-	}	
+	}
+
+	@Override	
+	public int compareTo(Port other) {
+		return this.name.compareTo(other.name);
+} 
 }

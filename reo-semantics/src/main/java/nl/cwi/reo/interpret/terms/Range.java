@@ -62,8 +62,8 @@ public final class Range implements TermExpression {
 		List<Term> te1 = t1.evaluate(s, m);
 		List<Term> te2 = t2.evaluate(s, m);
 		list.addAll(te1);
-		if (!te1.isEmpty() && !te2.isEmpty() && te1.get(te1.size()-1) instanceof IntegerValue && te1.get(1) instanceof IntegerValue)
-			for (int k = ((IntegerValue)te1.get(te1.size()-1)).getValue() + 1; k < ((IntegerValue)te2.get(0)).getValue() - 1; k++)
+		if (!te1.isEmpty() && !te2.isEmpty() && te1.get(te1.size()-1) instanceof IntegerValue && te2.get(0) instanceof IntegerValue)
+			for (int k = ((IntegerValue)te1.get(te1.size()-1)).getValue() + 1; k < ((IntegerValue)te2.get(0)).getValue(); k++)
 				list.add(new IntegerValue(k));
 		list.addAll(te2);
 		return list;

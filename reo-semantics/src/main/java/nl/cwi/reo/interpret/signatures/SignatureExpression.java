@@ -138,6 +138,9 @@ public final class SignatureExpression implements ParameterType {
 			int k_nodes = 0;
 			NodeExpression rng_nodes = null;
 			for (NodeExpression node : nodes) {
+				if(node.getIndices().isEmpty())
+					k_nodes++;
+					
 				for (TermExpression t : node.getIndices()) {
 					if (t instanceof Range) {
 						rng_nodes = node;

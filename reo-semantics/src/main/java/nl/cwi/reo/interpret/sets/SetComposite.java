@@ -64,9 +64,21 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 * @param location		location in Reo source file
 	 */
 	public SetComposite(TermExpression operator, List<InstanceExpression<T>> elements, PredicateExpression predicate, Location location){
-		this.operator = operator;
+		if(operator==null)
+			this.operator=new StringValue("");
+		else
+			this.operator = operator;
+		if(elements==null)
+			throw new NullPointerException();
+		if(predicate==null)
+			this.predicate=new TruthValue(true);
+		else
+			this.predicate = predicate;
+		if(location==null)
+			throw new NullPointerException();
+		
+
 		this.elements = elements;
-		this.predicate = predicate;
 		this.location = location;
 	}
 
