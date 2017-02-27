@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.automata.Automaton;
 import nl.cwi.reo.semantics.automata.State;
 import nl.cwi.reo.semantics.automata.Transition;

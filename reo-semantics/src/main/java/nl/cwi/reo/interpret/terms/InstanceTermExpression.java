@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.connectors.Semantics;
 import nl.cwi.reo.interpret.instances.InstanceExpression;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
 /**

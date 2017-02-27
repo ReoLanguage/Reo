@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.connectors;
+package nl.cwi.reo.semantics;
 
 /**
  * Enumerates all implemented semantics for Reo.

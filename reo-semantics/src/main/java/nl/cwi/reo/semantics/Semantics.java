@@ -1,4 +1,4 @@
-package nl.cwi.reo.interpret.connectors;
+package nl.cwi.reo.semantics;
 
 import java.util.Collection;
 import java.util.List;

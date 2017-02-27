@@ -27,13 +27,13 @@ import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
-import nl.cwi.reo.interpret.connectors.Semantics;
-import nl.cwi.reo.interpret.connectors.SemanticsType;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
 
