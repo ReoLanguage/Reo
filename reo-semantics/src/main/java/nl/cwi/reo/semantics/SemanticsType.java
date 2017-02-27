@@ -28,7 +28,12 @@ public enum SemanticsType {
 	/**
 	 * Atomic components for Lykos compiler by Sung-Shik Jongmans.
 	 */
-	PR;
+	PR,
+	
+	/**
+	 * Plain semantics.
+	 */
+	PLAIN;
 	
 	/**
 	 * {@inheritDoc}
@@ -41,6 +46,7 @@ public enum SemanticsType {
 		case CAM: return "cam";
 		case WA: return "wa";
 		case SA: return "sa";
+		case PLAIN: return "plain";
 		default: throw new IllegalArgumentException();
 		}
 	}

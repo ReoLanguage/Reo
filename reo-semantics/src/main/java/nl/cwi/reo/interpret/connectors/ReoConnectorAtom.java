@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret.connectors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,31 +17,34 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
 /**
- * An atomic Reo component consisting of its Reo semantics together with an 
+ * An atomic Reo component consisting of its Reo semantics together with an
  * optional reference to source code.
  * 
- * @param <T> Reo semantics type
+ * @param <T>
+ *            Reo semantics type
  */
 public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnector<T> {
-	
+
 	/**
 	 * Semantics object.
 	 */
 	private final T semantics;
-	
+
 	/**
 	 * Reference to source code.
 	 */
 	private final SourceCode source;
-	
+
 	/**
 	 * Set of links.
 	 */
 	private final Map<Port, Port> links;
-	
+
 	/**
 	 * Constructs a new atomic component.
-	 * @param atom		semantics
+	 * 
+	 * @param atom
+	 *            semantics
 	 */
 	public ReoConnectorAtom(T atom) {
 		this.semantics = atom;
@@ -50,11 +54,14 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 			links.put(p, p);
 		this.links = Collections.unmodifiableMap(links);
 	}
-	
+
 	/**
 	 * Constructs a new atomic component.
-	 * @param semantics		semantics
-	 * @param source	reference to source code
+	 * 
+	 * @param semantics
+	 *            semantics
+	 * @param source
+	 *            reference to source code
 	 */
 	public ReoConnectorAtom(T semantics, SourceCode source) {
 		this.semantics = semantics;
@@ -64,29 +71,35 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 			links.put(p, p);
 		this.links = Collections.unmodifiableMap(links);
 	}
-	
+
 	/**
 	 * Constructs a new atomic component.
-	 * @param semantics 	semantics
-	 * @param source		reference to source code
-	 * @param links			set of links
+	 * 
+	 * @param semantics
+	 *            semantics
+	 * @param source
+	 *            reference to source code
+	 * @param links
+	 *            set of links
 	 */
 	public ReoConnectorAtom(T semantics, SourceCode source, Map<Port, Port> links) {
 		this.semantics = semantics;
 		this.source = source;
 		this.links = Collections.unmodifiableMap(links);
 	}
-	
+
 	/**
 	 * Gets the semantics object of this atomic component.
+	 * 
 	 * @return Semantics object
 	 */
 	public T getSemantics() {
 		return semantics;
 	}
-	
+
 	/**
 	 * Gets the source code reference.
+	 * 
 	 * @return source code reference.
 	 */
 	public SourceCode getSourceCode() {
@@ -129,10 +142,8 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<ReoConnectorAtom<T>> flatten() {
-		List<ReoConnectorAtom<T>> list = new ArrayList<ReoConnectorAtom<T>>();
-		list.add(this);
-		return list;
+	public ReoConnectorComposite<T> flatten() {
+		return new ReoConnectorComposite<T>("", Arrays.asList(this));
 	}
 
 	/**
@@ -152,7 +163,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 		list.add(semantics.rename(links));
 		return list;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -95,6 +95,9 @@ public class Compiler {
 		case WA:
 			compileWA();
 			break;
+		case PLAIN:
+			compilePLAIN();
+			break;
 		default:
 			System.out.println("Please specify the used semantics.");
 			break;
@@ -149,6 +152,10 @@ public class Compiler {
     }
 
     private void compileWA() {
+    	// TODO   	
+    }
+
+    private void compilePLAIN() {
     	// TODO   	
     }
 }
