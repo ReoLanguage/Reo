@@ -45,7 +45,7 @@ public final class Range implements TermExpression {
 			if (g1 instanceof Identifier && g2 instanceof IntegerValue) 
 				s.put((Identifier)g1, new IntegerValue(((IntegerValue)g2).getValue() - size + 1));
 			else if (g1 instanceof IntegerValue && g2 instanceof Identifier) 
-				s.put((Identifier)g2, new IntegerValue(((IntegerValue)g2).getValue() + size - 1));
+				s.put((Identifier)g2, new IntegerValue(((IntegerValue)g1).getValue() + size - 1));
 			else
 				return null;
 		}
