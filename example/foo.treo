@@ -20,5 +20,5 @@ foo = <k:int>(a?, b!double)
 |
    i : <1..k> &&         // iteration of this whole set
    j : <-2..5> &&        // iteration of this whole set
-   k > 4                // boolean condition for this set
+   k == 4                // boolean condition for this set
 }

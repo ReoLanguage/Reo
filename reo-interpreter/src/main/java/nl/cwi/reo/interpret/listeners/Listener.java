@@ -74,7 +74,7 @@ import nl.cwi.reo.interpret.ReoParser.Formula_universalContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_variableContext;
 import nl.cwi.reo.interpret.ReoParser.ImpsContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_atomicContext;
-import nl.cwi.reo.interpret.ReoParser.Instance_compositionContext;
+//import nl.cwi.reo.interpret.ReoParser.Instance_compositionContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_productContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_semicolonContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_sumContext;
@@ -306,13 +306,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		instances.put(ctx, new ComponentInstance<T>(cexpr, new ListExpression(list), var));
 	}
 
-	@Override
-	public void exitInstance_composition(Instance_compositionContext ctx) {
-		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
-		InstanceExpression<T> i2 = instances.get(ctx.instance(1));
-		TermExpression term = terms.get(ctx.term());
-		instances.put(ctx, new ProductInstance<T>(term, i1, i2, new Location(ctx.start)));
-	}
+//	@Override
+//	public void exitInstance_composition(Instance_compositionContext ctx) {
+//		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
+//		InstanceExpression<T> i2 = instances.get(ctx.instance(1));
+//		TermExpression term = terms.get(ctx.term());
+//		instances.put(ctx, new ProductInstance<T>(term, i1, i2, new Location(ctx.start)));
+//	}
 
 	@Override
 	public void exitInstance_product(Instance_productContext ctx) {

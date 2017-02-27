@@ -31,8 +31,12 @@ public final class PortListExpression implements Expression<List<Port>> {
 	@Override
 	public List<Port> evaluate(Scope s, Monitor m) {
 		List<Port> concatenation = new ArrayList<Port>();
+		List<Port> listPort;
 		for (PortExpression e : list)
-			concatenation.addAll(e.evaluate(s, null));
+			if((listPort=e.evaluate(s, m))!=null)
+				concatenation.addAll(listPort);
+			else
+				return null;
 		return concatenation;
 	}
 

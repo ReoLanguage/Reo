@@ -6,7 +6,7 @@ GEQ     : '>=' ;
 GT      : '>' ;
 FORALL  : 'A' ;
 EXISTS  : 'E' ;
-EQ      : '==' ;
+EQ      : '=' ;
 NEQ     : '!=' ;
 AND     : '&&' ;
 OR      : '||' ;

@@ -49,9 +49,9 @@ term      : NAT                                                   # term_natural
           | BOOL                                                  # term_boolean
           | STRING                                                # term_string
           | DEC                                                   # term_decimal
-          | component                                             # term_componentdefn
           | instance                                              # term_instance
           | var                                                   # term_variable
+          | component                                             # term_componentdefn
           | list                                                  # term_list
           | tuple                                                 # term_tuple
           | func                                                  # term_function

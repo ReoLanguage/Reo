@@ -35,6 +35,9 @@ public final class PortExpression extends VariableExpression {
 	@Override
 	public List<Port> evaluate(Scope s, Monitor m) {
 		List<Port> ports = new ArrayList<Port>();
+		List<? extends Identifier> list = super.evaluate(s, m);
+		if(list==null)
+			return null;
 		for (Identifier x : super.evaluate(s, m))
 			ports.add(new Port(x.toString(), PortType.NONE, prio, new TypeTag(""), true));
 		return ports;

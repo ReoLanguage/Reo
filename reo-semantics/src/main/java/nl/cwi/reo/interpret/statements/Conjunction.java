@@ -31,7 +31,9 @@ public final class Conjunction implements PredicateExpression {
 	@Override
 	public List<Scope> evaluate(Scope s, Monitor m) {
 
-		List<Scope> scopes = Arrays.asList(s);
+//		List<Scope> scopes = new ArrayList<Scope>();
+//		scopes.add(s);
+		List<Scope> scopes =Arrays.asList(s); 
 		boolean updated = true;
 		boolean[] eval = new boolean[predicates.size()];
 		
@@ -42,7 +44,7 @@ public final class Conjunction implements PredicateExpression {
 				List<Scope> extension = new ArrayList<Scope>();
 				for (Scope si : scopes) {
 					List<Scope> list = predicates.get(i).evaluate(si, m);
-					if (list.isEmpty()) {
+					if (list==null) {
 						extension = null;
 						break;
 					} else {
@@ -60,6 +62,8 @@ public final class Conjunction implements PredicateExpression {
 					}
 				}
 				if (extension != null) {
+//					for(Scope se : extension)
+//						scopes.add(se);
 					scopes = extension;
 					updated = true;
 				}

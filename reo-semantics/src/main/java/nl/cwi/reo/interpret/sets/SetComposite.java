@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
@@ -68,14 +71,11 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 			this.operator=new StringValue("");
 		else
 			this.operator = operator;
-		if(elements==null)
-			throw new NullPointerException();
+
 		if(predicate==null)
 			this.predicate=new TruthValue(true);
 		else
 			this.predicate = predicate;
-		if(location==null)
-			throw new NullPointerException();
 		
 
 		this.elements = elements;
@@ -102,8 +102,10 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 		for (Scope si : scopes) {
 			for (InstanceExpression<T> e : elements) {
 				Instance<T> i = e.evaluate(si, m);
-				components.add(i.getConnector());
-				unifications.addAll(i.getUnifications());
+				if(i!=null){
+					components.add(i.getConnector());
+					unifications.addAll(i.getUnifications());
+				}
 			}
 		}
 		
