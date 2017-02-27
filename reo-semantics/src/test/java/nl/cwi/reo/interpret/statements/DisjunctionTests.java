@@ -19,14 +19,13 @@ import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
-public class ConjunctionTests {
+public class DisjunctionTests {
 
 	@Test
 	public void evaluate_OriginalHasNoTypes() {
 
 		/*
-		 * Tests if x:<1..k> && k=3 evaluates to [{x=1, k=3}, {x=2, k=3}, {x=3,
-		 * k=3}]
+		 * Tests if x:<1..3> || x=4 evaluates to [{x=1}, {x=2}, {x=3}, {x=4}]
 		 */
 
 		Scope s = new Scope();
@@ -35,29 +34,31 @@ public class ConjunctionTests {
 
 		List<TermExpression> indices = new ArrayList<TermExpression>();
 
-		VariableExpression vark = new VariableExpression("k", indices, loc);
+		VariableExpression varx = new VariableExpression("x", indices, loc);
 
 		TermExpression t1 = new IntegerValue(1);
 		TermExpression t3 = new IntegerValue(3);
-		TermExpression k = new VariableTermExpression(vark);
+		TermExpression t4 = new IntegerValue(4);
+		TermExpression tx = new VariableTermExpression(varx);
 
-		Range rng = new Range(t1, k);
+		Range rng = new Range(t1, t3);
 
 		ListExpression list = new ListExpression(Arrays.asList(rng));
 
 		Identifier x = new Identifier("x");
 
 		PredicateExpression P1 = new Membership(x, list);
-		PredicateExpression P2 = new Relation(RelationSymbol.EQ, Arrays.asList(k, t3), loc);
+		PredicateExpression P2 = new Relation(RelationSymbol.EQ, Arrays.asList(tx, t4), loc);
 
 		Conjunction c = new Conjunction(Arrays.asList(P1, P2));
 
 		List<Scope> scopes = c.evaluate(s, m);
 
-		assertEquals(scopes.size(), 3);
+		assertEquals(scopes.size(), 4);
 		assertEquals(scopes.get(0).get(x), new IntegerValue(1));
 		assertEquals(scopes.get(1).get(x), new IntegerValue(2));
 		assertEquals(scopes.get(2).get(x), new IntegerValue(3));
+		assertEquals(scopes.get(3).get(x), new IntegerValue(4));
 	}
 
 }
