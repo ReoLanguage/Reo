@@ -2,6 +2,8 @@ package nl.cwi.reo.interpret.connectors;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
 import nl.cwi.reo.interpret.ports.Port;
 
@@ -18,13 +20,31 @@ public final class Links {
 	public static Map<Port, Port> reconnect(Map<Port, Port> links, Map<Port, Port> joins) {
 		Map<Port, Port> newlinks = new HashMap<Port, Port>();
 		for (Map.Entry<Port, Port> link : links.entrySet()) {
+			
 			Port x = link.getValue();
-			Port y = joins.get(x);
-			if (y == null) 
+			boolean hide = true;
+			for(Map.Entry<Port, Port> join : joins.entrySet()) {
+				Port y = join.getValue();				
+				if(join.getKey().equals(x)){
+					hide = false;
+					newlinks.put(link.getKey(), y.join(join.getKey()));
+				}
+			}
+			
+			Port y;
+			if (hide) 
 				y = x.hide();
-			newlinks.put(link.getKey(), y.join(x));
 		}
 		return newlinks;
+	}
+	
+	public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+	    for (Entry<T, E> entry : map.entrySet()) {
+	        if (Objects.equals(value, entry.getValue())) {
+	            return entry.getKey();
+	        }
+	    }
+	    return null;
 	}
 	
 	/**

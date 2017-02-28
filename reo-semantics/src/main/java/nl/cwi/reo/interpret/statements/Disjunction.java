@@ -2,7 +2,9 @@ package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Stack;
 
 import nl.cwi.reo.interpret.Scope;
@@ -69,14 +71,12 @@ public final class Disjunction implements PredicateExpression {
 //				return new ArrayList<Scope>();
 //		
 		List<Scope> scopes =Arrays.asList(s); 
-		Stack<PredicateExpression> stack = new Stack<PredicateExpression>();
-		for(PredicateExpression p : predicates)
-			stack.add(0,p);
+		Queue<PredicateExpression> queue = new LinkedList<PredicateExpression>(predicates);
 		PredicateExpression P = null;
 		List<Scope> extension = new ArrayList<Scope>();
 		
-		while(!stack.isEmpty()){
-			P = stack.pop();
+		while(!queue.isEmpty()){
+			P = queue.poll();
 			List<Scope> list = P.evaluate(s, m); 
 			if(list == null){
 				new Exception("Erreur in predicate"); 
