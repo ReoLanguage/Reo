@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
@@ -124,7 +125,7 @@ public class Interpreter<T extends Semantics<T>> {
 					parsed.add(comp);
 					ReoFile<T> program = findComponent(comp);
 					if (program != null) {
-						if (!program.getName().equals(comp))
+						if (!Objects.equals(program.getName(), comp))
 							monitor.add(program.getMainLocation(), "Component must have name " + comp.substring(comp.lastIndexOf(".") + 1) + ".");
 						stack.push(program);
 						List<String> newComponents = program.getImports();
