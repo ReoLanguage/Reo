@@ -50,7 +50,7 @@ public class DisjunctionTests {
 		PredicateExpression P1 = new Membership(x, list);
 		PredicateExpression P2 = new Relation(RelationSymbol.EQ, Arrays.asList(tx, t4), loc);
 
-		Conjunction c = new Conjunction(Arrays.asList(P1, P2));
+		Disjunction c = new Disjunction(Arrays.asList(P1, P2));
 
 		List<Scope> scopes = c.evaluate(s, m);
 

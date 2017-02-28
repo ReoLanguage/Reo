@@ -136,7 +136,7 @@ public class Compiler {
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
 
 //		List<ReoConnectorAtom<PRAutomaton>> flatList = program.flatten();
-//		System.out.println(flatList);
+		System.out.println(program.flatten().integrate().getAtoms());
 
 		program.insertNodes(false, false, new PRAutomaton());
 		

@@ -2,7 +2,9 @@ package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Stack;
 
 import nl.cwi.reo.interpret.Scope;
@@ -74,34 +76,38 @@ public final class Conjunction implements PredicateExpression {
 //				return new ArrayList<Scope>();
 //	
 //		
-//		while(updated){
-//			updated = false;
-//			
-//			
-//		}
+
 		
 		List<Scope> scopes =Arrays.asList(s); 
-		Stack<PredicateExpression> stack = new Stack<PredicateExpression>();
-		for(PredicateExpression p : predicates)
-			stack.push(p);
+		Queue<PredicateExpression> stack = new LinkedList<PredicateExpression>(predicates);
 		PredicateExpression P = null;
 		List<Scope> extension = new ArrayList<Scope>();
+		List<Scope> tmpList = new ArrayList<Scope>();
+		int counter=0;
 		
-		while(!stack.isEmpty()){
-			P = stack.pop();
+		while(!stack.isEmpty() && counter<=stack.size()){
+			
+			P = stack.poll();
 			for(Scope si : scopes){
 				List<Scope> list = P.evaluate(si, m); 
 				if(list == null){
-					stack.push(P);
+					counter++;
+					stack.add(P);
 					continue;
 				}
-				else if (list.isEmpty()) continue;
+				else if (list.equals(extension)) continue;
 				else{
-					extension=list;
+					counter=0;
+					tmpList.addAll(list);
 				}
+				
 			}
+			extension=tmpList;
+			tmpList = new ArrayList<Scope>();
+			
 			if (!extension.isEmpty()) {
-				scopes = extension;
+				scopes = new ArrayList<Scope>();
+				scopes.addAll(extension);
 			}
 		}
 		

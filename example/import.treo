@@ -1,0 +1,8 @@
+section com.example;
+import reo.fifo1;
+
+
+foo = <k:int>(a?, b!double) 
+{
+   fifo1(a,b)    // instance of component fifo.
+}

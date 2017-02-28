@@ -433,13 +433,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitFormula_conjunction(Formula_conjunctionContext ctx) {
-		List<PredicateExpression> l = Arrays.asList(formula.get(ctx.formula(0)), formula.get(ctx.formula(0)));
+		List<PredicateExpression> l = Arrays.asList(formula.get(ctx.formula(0)), formula.get(ctx.formula(1)));
 		formula.put(ctx, new Conjunction(l));
 	}
 
 	@Override
 	public void exitFormula_disjunction(Formula_disjunctionContext ctx) {
-		List<PredicateExpression> l = Arrays.asList(formula.get(ctx.formula(0)), formula.get(ctx.formula(0)));
+		List<PredicateExpression> l = Arrays.asList(formula.get(ctx.formula(0)), formula.get(ctx.formula(1)));
 		formula.put(ctx, new Disjunction(l));
 
 	}
