@@ -58,15 +58,17 @@ public class ReoConnectorTests {
 		ReoConnector<Plain> abc = new ReoConnectorComposite<Plain>("prod", Arrays.asList(ab, bc));
 		ReoConnector<Plain> connector = new ReoConnectorComposite<Plain>("", Arrays.asList(abc, cd));
 
-		List<Plain> flat = connector.flatten().integrate();
+		ReoConnector<Plain> flat = connector.flatten().integrate();
+		
+		List<ReoConnectorAtom<Plain>> list = flat.getAtoms();
 
 		Set<Port> ports_ab = new HashSet<Port>(Arrays.asList(a_i, b_o));
 		Set<Port> ports_bc = new HashSet<Port>(Arrays.asList(b_i, c_o));
 		Set<Port> ports_cd = new HashSet<Port>(Arrays.asList(c_i, d_o));
 
-		assertEquals(flat.get(0).getInterface(), ports_ab);
-		assertEquals(flat.get(1).getInterface(), ports_bc);
-		assertEquals(flat.get(2).getInterface(), ports_cd);
+		assertEquals(list.get(0).getInterface(), ports_ab);
+		assertEquals(list.get(1).getInterface(), ports_bc);
+		assertEquals(list.get(2).getInterface(), ports_cd);
 	}
 
 }
