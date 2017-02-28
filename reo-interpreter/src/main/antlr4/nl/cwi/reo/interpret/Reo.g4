@@ -24,7 +24,7 @@ multiset  : instance                                              # multiset_con
 
 // Instances
 instance  : component list? ports                                 # instance_atomic
-          | instance term instance                                # instance_composition
+//          | instance term instance                                # instance_composition
           | instance '*' instance                                 # instance_product
           | instance '+' instance                                 # instance_sum	
           | instance ';' instance                                 # instance_semicolon;
@@ -49,9 +49,9 @@ term      : NAT                                                   # term_natural
           | BOOL                                                  # term_boolean
           | STRING                                                # term_string
           | DEC                                                   # term_decimal
-          | component                                             # term_componentdefn
           | instance                                              # term_instance
           | var                                                   # term_variable
+          | component                                             # term_componentdefn
           | list                                                  # term_list
           | tuple                                                 # term_tuple
           | func                                                  # term_function

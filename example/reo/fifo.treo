@@ -3,6 +3,6 @@ section reo;
 import reo.fifo1;
 
 fifo<k:int>(a[0]?, a[k]!){
-	fifo1(a[i],a[i+1]) | i in <1..k>
+	fifo1(a[i],a[i+1]) | i : <1..k>
 }
 

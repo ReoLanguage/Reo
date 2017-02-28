@@ -1,0 +1,11 @@
+section com.example;
+import reo.fifo1;
+
+
+foo = <k:int>(a?, b!double) 
+{
+   fifo1(a,x[j])    // instance of component fifo.
+|
+//   i : <1..3> &&         // iteration of this whole set
+   j : <0..5>         // iteration of this whole set
+}

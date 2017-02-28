@@ -1,6 +1,5 @@
 package nl.cwi.reo.interpret.connectors;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -158,10 +157,8 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<T> integrate() {
-		List<T> list = new ArrayList<T>();
-		list.add(semantics.rename(links));
-		return list;
+	public ReoConnector<T> integrate() {
+		return new ReoConnectorAtom<T>(semantics.rename(links), source);
 	}
 
 	/**
@@ -189,5 +186,13 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	@Override
 	public boolean isEmpty() {
 		return false;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<ReoConnectorAtom<T>> getAtoms() {
+		return Arrays.asList(this);
 	}
 }

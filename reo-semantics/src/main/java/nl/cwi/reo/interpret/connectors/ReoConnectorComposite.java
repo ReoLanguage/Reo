@@ -119,12 +119,24 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	}
 
 	/**
-	 * Gets the list of all subcomponents in this connector.
+	 * Gets the list of all subconnectors in this connector.
 	 * 
-	 * @return list of subcomponents.
+	 * @return list of subconnectors.
 	 */
 	public List<ReoConnector<T>> getComponents() {
 		return components;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<ReoConnectorAtom<T>> getAtoms() {
+		List<ReoConnectorAtom<T>> atoms = new ArrayList<ReoConnectorAtom<T>>();
+		for (ReoConnector<T> c : components)
+			if (c instanceof ReoConnectorAtom<?>)
+				atoms.add((ReoConnectorAtom<T>) c);
+		return atoms;
 	}
 
 	/**
@@ -186,8 +198,13 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	@Override
 	public ReoConnectorComposite<T> flatten() {
 		List<ReoConnector<T>> list = new ArrayList<ReoConnector<T>>();
-		for (ReoConnector<T> comp : components)
-			list.addAll(comp.flatten().components);
+		for (ReoConnector<T> comp : components) {
+			ReoConnector<T> rc = comp.flatten();
+			if (rc instanceof ReoConnectorComposite<?>)
+				list.addAll(((ReoConnectorComposite<T>)rc).components);
+			else 
+				list.add(rc);
+		}
 		return new ReoConnectorComposite<T>("", list);
 	}
 
@@ -286,14 +303,11 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<T> integrate() {
-		List<T> list = new ArrayList<T>();
+	public ReoConnector<T> integrate() {
+		List<ReoConnector<T>> list = new ArrayList<ReoConnector<T>>();
 		for (ReoConnector<T> comp : components)
-			list.addAll(comp.integrate());
-		List<T> list2 = new ArrayList<T>();
-		for (T x : list2)
-			x.rename(links);
-		return list2;
+			list.add(comp.integrate());
+		return new ReoConnectorComposite<T>(operator, list, links);
 	}
 
 	/**

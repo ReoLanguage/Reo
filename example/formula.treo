@@ -1,0 +1,7 @@
+section com.example;
+import reo.fifo1;
+
+formula = <>(a?, b!double) 
+{
+	fifo1(a,b) | x : <1..5>
+}

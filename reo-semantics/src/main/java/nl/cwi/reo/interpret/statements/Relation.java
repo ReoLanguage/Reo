@@ -83,7 +83,7 @@ public final class Relation implements PredicateExpression {
 				} else {
 					m.add(location, "= takes 2 arguments");					
 				}
-				return new ArrayList<Scope>();
+				return scopes;
 			case GEQ:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
