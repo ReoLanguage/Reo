@@ -251,7 +251,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitMultiset_constraint(Multiset_constraintContext ctx) {
 		InstanceExpression<T> i = instances.get(ctx.instance());
-		instances.put(ctx, new SetComposite<T>(null, Arrays.asList(i), null, new Location(ctx.start)));
+		instances.put(ctx, i);
 	}
 
 	@Override

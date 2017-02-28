@@ -48,7 +48,7 @@ public final class Membership implements PredicateExpression {
 	 */
 	@Override
 	public List<Scope> evaluate(Scope s, Monitor m) {
-		List<Scope> scopes = new ArrayList<Scope>();		
+		List<Scope> scopes = new ArrayList<Scope>();
 		for (Term t : list.evaluate(s, m)) 
 			if (t instanceof Value) scopes.add(s.extend(x, (Value)t)); else return null;
 		return scopes;
