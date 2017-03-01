@@ -1,0 +1,7 @@
+section reo.slides;
+
+red(a!) 
+{
+  #PR
+  // TODO implement red producer
+}

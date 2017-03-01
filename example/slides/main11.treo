@@ -1,0 +1,35 @@
+section reo.slides;
+
+import reo.fifo1;
+import reo.sync;
+import reo.lossy;
+import reo.variable;
+import reo.lossyfifo1;
+import reo.shiftlossyfifo1;
+
+import reo.slides.producer;
+import reo.slides.consumer;
+import reo.slides.seqc;
+
+main11() 
+{
+  { producer(a[i]) | i : <1..n> }
+  consumer(b) 
+  connector11<ileg, sync>(a[1..n], b)
+|
+  ileg[1..n] = <sync, lossy, fifo1, variable, shiftlossyfifo1, lossyfifo1>
+}
+
+connector11<ileg[1..n](?, !), oleg(?, !)>(a[1..n], b) 
+{
+  seqc(x[1..n]) 
+  { ileg[i](a[i], x[i]) sync(x[i], m) | i : <1..n> }
+  oleg(m, b)
+}
+
+
+
+
+
+
+

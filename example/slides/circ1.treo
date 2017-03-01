@@ -1,0 +1,9 @@
+section reo.slides;
+
+import reo.sync;
+
+import reo.slides.regulatorwwr;
+
+circ1(a, b, c, d) {
+ regulatorwwr(a, m, d) sync(b, m) sync(c, m)
+}
