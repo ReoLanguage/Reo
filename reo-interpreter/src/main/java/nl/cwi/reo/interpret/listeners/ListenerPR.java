@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.listeners;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -31,7 +32,7 @@ public class ListenerPR extends Listener<PRAutomaton> {
 
 	public void exitPr(PrContext ctx) {
 		System.out.println(name.get(ctx.pr_string()));
-		if(name.get(ctx.pr_string()).equals("identity"))
+		if(Objects.equals(name.get(ctx.pr_string()),"identity"))
 			prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),new String(),new Integer(0),port.get(ctx.pr_port())));			
 		else{
 		parameter.put(ctx, ctx.NAT().getText());

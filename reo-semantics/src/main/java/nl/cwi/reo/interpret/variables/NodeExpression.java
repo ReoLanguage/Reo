@@ -1,4 +1,4 @@
- package nl.cwi.reo.interpret.variables;
+package nl.cwi.reo.interpret.variables;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +14,17 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a node expression.
  */
 public final class NodeExpression extends VariableExpression {
-	
+
 	/**
 	 * Port type: input, output, none.
 	 */
 	private final PortType type;
-	
+
 	/**
 	 * Priority type: ampersand, plus, none.
 	 */
 	private final PrioType prio;
-	
+
 	/**
 	 * Type tag.
 	 */
@@ -32,12 +32,19 @@ public final class NodeExpression extends VariableExpression {
 
 	/**
 	 * Constructs a new node expression.
-	 * @param type		port type: input/output/none
-	 * @param prio		priority type: ampersand/plus/none
-	 * @param tag		type tag
-	 * @param name		node name
-	 * @param indices	node indices
-	 * @param location	location of node in Reo source file. 
+	 * 
+	 * @param type
+	 *            port type: input/output/none
+	 * @param prio
+	 *            priority type: ampersand/plus/none
+	 * @param tag
+	 *            type tag
+	 * @param name
+	 *            node name
+	 * @param indices
+	 *            node indices
+	 * @param location
+	 *            location of node in Reo source file.
 	 */
 	public NodeExpression(VariableExpression var, PortType type, TypeTag tag) {
 		super(var.getName(), var.getIndices(), var.getLocation());
@@ -45,7 +52,7 @@ public final class NodeExpression extends VariableExpression {
 		this.prio = PrioType.NONE;
 		this.tag = tag;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -53,7 +60,7 @@ public final class NodeExpression extends VariableExpression {
 	public List<Port> evaluate(Scope s, Monitor m) {
 		List<Port> ports = new ArrayList<Port>();
 		for (Identifier x : super.evaluate(s, m))
-			ports.add(new Port(x.toString(), type, prio, tag, true));				
+			ports.add(new Port(x.toString(), type, prio, tag, true));
 		return ports;
 	}
 

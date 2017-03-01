@@ -113,7 +113,8 @@ import nl.cwi.reo.interpret.ReoParser.VarContext;
  * {@link org.antlr.v4.runtime.tree.ParseTreeWalker}. Returns a
  * {@link nl.cwi.reo.interpret.p}.
  * 
- * @param <O>
+ * @param <T>
+ *            Reo semantics type
  */
 public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
@@ -137,9 +138,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	// Instance
 	private ParseTreeProperty<InstanceExpression<T>> instances = new ParseTreeProperty<InstanceExpression<T>>();
-
-	// Multiset
-	private ParseTreeProperty<InstanceExpression<T>> set = new ParseTreeProperty<InstanceExpression<T>>();
 
 	// Boolean expressions
 	// private ParseTreeProperty<BooleanExpression> bools = new
@@ -306,13 +304,14 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		instances.put(ctx, new ComponentInstance<T>(cexpr, new ListExpression(list), var));
 	}
 
-//	@Override
-//	public void exitInstance_composition(Instance_compositionContext ctx) {
-//		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
-//		InstanceExpression<T> i2 = instances.get(ctx.instance(1));
-//		TermExpression term = terms.get(ctx.term());
-//		instances.put(ctx, new ProductInstance<T>(term, i1, i2, new Location(ctx.start)));
-//	}
+	// @Override
+	// public void exitInstance_composition(Instance_compositionContext ctx) {
+	// InstanceExpression<T> i1 = instances.get(ctx.instance(0));
+	// InstanceExpression<T> i2 = instances.get(ctx.instance(1));
+	// TermExpression term = terms.get(ctx.term());
+	// instances.put(ctx, new ProductInstance<T>(term, i1, i2, new
+	// Location(ctx.start)));
+	// }
 
 	@Override
 	public void exitInstance_product(Instance_productContext ctx) {
@@ -464,10 +463,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (NodeExpression n : nodelists.get(ctx.nodes()))
 			nodes.add(n);
 		List<ParameterExpression> parameters = new ArrayList<ParameterExpression>();
-		if(ctx.params()!=null)
+		if (ctx.params() != null)
 			for (ParameterExpression p : parameterlists.get(ctx.params()))
 				parameters.add(p);
-		
+
 		signatureExpressions.put(ctx, new SignatureExpression(parameters, nodes, new Location(ctx.start)));
 	}
 
