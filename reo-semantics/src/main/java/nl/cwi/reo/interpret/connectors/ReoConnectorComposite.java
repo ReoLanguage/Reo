@@ -89,7 +89,14 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		for (ReoConnector<T> comp : components)
 			for (Map.Entry<Port, Port> link : comp.getLinks().entrySet())
 				links.put(link.getValue(), link.getValue());
-		this.links = Collections.unmodifiableMap(links);
+		
+		Map<Port, Port> linksFinal = new HashMap<Port, Port>();
+		linksFinal.putAll(links);
+		for (Map.Entry<Port, Port> link : links.entrySet())
+			if(!link.getKey().getType().equals(link.getValue().getType()))
+				linksFinal.remove(link.getKey());
+	
+		this.links = Collections.unmodifiableMap(linksFinal);
 	}
 
 	/**
@@ -208,6 +215,16 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		return new ReoConnectorComposite<T>("", list);
 	}
 
+
+	public ReoConnectorComposite<T> insertNodes_bis(boolean mergers, boolean replicators, T nodeFactory) {
+
+		List<ReoConnector<T>> newcomponents = new ArrayList<ReoConnector<T>>();
+		
+		
+		
+		return new ReoConnectorComposite<T>(operator, newcomponents);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

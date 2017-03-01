@@ -51,7 +51,7 @@ public class SimpleLykos {
 
 		for(Map<String, String> f : files)
 			try {
-				writeFiles(f,"../reo-runtime-java-v1/src/main/java");
+				writeFiles(f,"../reo-runtime-java-lykos/src/main/java");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

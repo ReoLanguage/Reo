@@ -95,17 +95,18 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		
 		Composite c = setComposite();
 		
+
 		/*
 		 * Set primitives and add them to the main composite
 		 */
 		
 		List<InterpretedWorker> interpretedWorker = new ArrayList<InterpretedWorker>();
 
-		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().integrate().getAtoms()) {
-			if((X.getSourceCode())!=(null)) {
-				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
-			} else {
+		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
+			if((X.getSourceCode())==(null) || X.getSourceCode().getFile()==null) {
 				c.addChild(setPrimitive(X.getSemantics()));
+			} else {
+				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
 			}
 		}
 	

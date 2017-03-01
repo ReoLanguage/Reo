@@ -67,7 +67,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		return new TreeSet<Port>(port);
 	}
 
-	public PRAutomaton getNode(SortedSet<Port> node) {
+	public PRAutomaton getNode(Set<Port> node) {
 		
 		List<Port> P = new ArrayList<Port>();
 
@@ -90,8 +90,8 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 
 		if(counterI>counterO)
 			return new PRAutomaton("Replicator",null,null,P);
-		else
-			return new PRAutomaton("Merger",null,null,P);
+		
+		return new PRAutomaton("Merger",null,null,P);
 	}
 
 
@@ -136,12 +136,6 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 
 	@Override
 	public PRAutomaton restrict(Collection<? extends Port> intface) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public PRAutomaton getNode(Set<Port> node) {
 		// TODO Auto-generated method stub
 		return null;
 	}
