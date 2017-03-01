@@ -32,8 +32,10 @@ public final class Links {
 			}
 			
 			Port y;
-			if (hide) 
+			if (hide){ 
 				y = x.hide();
+				newlinks.put(link.getKey(), y);
+			}
 		}
 		return newlinks;
 	}

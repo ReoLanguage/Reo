@@ -9,22 +9,23 @@ foo = <k:int>(a?, b!double)
    		Producer(a[i])
 	  |
 		i : <1..2>	,
-		Producer(a!){
+		Producer(a?){
 		  #PR
-		  identity(a;)
+		  identity(;a)
 		|
-		  JAVA : "path_to_producer"
+		  JAVA : "nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
+
 		}
 	}
 	{
 		Consumer(b)
 
 	  |
-		Consumer(b?){
+		Consumer(b!){
 		  #PR
-		  identity(;b)
+		  identity(b;)
 		|
-		  JAVA : "path_to_consumer"
+		  JAVA : "nl.cwi.pr.runtime.examples.thesis.basic.Workers.Consumer"
 		}
 	}
 }
