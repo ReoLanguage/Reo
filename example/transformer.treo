@@ -1,0 +1,8 @@
+section com.example;
+import reo.transformer;
+
+
+foo = <k:int>(a?, b!double) 
+{
+   transformer(a,b)    // instance of component fifo.
+}

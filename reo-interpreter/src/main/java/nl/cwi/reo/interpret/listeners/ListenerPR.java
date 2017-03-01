@@ -35,8 +35,9 @@ public class ListenerPR extends Listener<PRAutomaton> {
 		if(Objects.equals(name.get(ctx.pr_string()),"identity"))
 			prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),new String(),new Integer(0),port.get(ctx.pr_port())));			
 		else{
-		parameter.put(ctx, ctx.NAT().getText());
-		prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),parameter.get(ctx),value,port.get(ctx.pr_port())));
+			if(ctx.param()!=null)
+				parameter.put(ctx, ctx.param().getText());
+			prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),parameter.get(ctx),value,port.get(ctx.pr_port())));
 		}
 	}
 

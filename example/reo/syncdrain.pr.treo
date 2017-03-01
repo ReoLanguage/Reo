@@ -1,0 +1,6 @@
+section reo;
+
+syncdrain(a?, b?) {
+	#PR
+	SyncDrain(a,b;)
+}

@@ -1,0 +1,11 @@
+section reo;
+import reo.syncdrain;
+import reo.sync1;
+import reo.fifo1;
+
+foo = (a?, b?, c!){
+	syncdrain(a,b)
+	fifo1(b,c)
+	sync1(a,c)
+}
+
