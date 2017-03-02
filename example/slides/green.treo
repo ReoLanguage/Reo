@@ -1,7 +1,9 @@
 section reo.slides;
 
-green(a!) 
+green(a?) 
 {
   #PR
-  // TODO implement green producer
+ identity(a;)
+ |
+ Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
 }

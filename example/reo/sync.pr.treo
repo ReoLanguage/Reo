@@ -1,6 +1,6 @@
 section reo;
 
-sync1(a?, b!) {
+sync(a?, b!) {
 	#PR
 	Sync[1](a;b)
 }

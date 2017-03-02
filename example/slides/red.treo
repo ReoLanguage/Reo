@@ -1,7 +1,9 @@
 section reo.slides;
 
-red(a!) 
+red(a?) 
 {
   #PR
-  // TODO implement red producer
+  identity(a;)
+  |
+  Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
 }
