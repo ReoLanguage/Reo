@@ -3,6 +3,8 @@ package nl.cwi.reo.interpret.variables;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
@@ -57,9 +59,12 @@ public final class NodeExpression extends VariableExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Port> evaluate(Scope s, Monitor m) {
 		List<Port> ports = new ArrayList<Port>();
-		for (Identifier x : super.evaluate(s, m))
+		List<? extends Identifier> list = super.evaluate(s, m);
+		if (list == null) return null;
+		for (Identifier x : list)
 			ports.add(new Port(x.toString(), type, prio, tag, true));
 		return ports;
 	}

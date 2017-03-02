@@ -3,6 +3,8 @@ package nl.cwi.reo.interpret.statements;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.util.Monitor;
 
@@ -35,9 +37,11 @@ public final class Universal implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
 		List<Scope> scopes = new ArrayList<Scope>();
 		List<Scope> list = membership.evaluate(s, m);
+		if (list == null) return null;
 		for (Scope si : list) {
 			List<Scope> e = predicate.evaluate(si, m);
 			if (e.isEmpty()) {

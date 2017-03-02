@@ -3,6 +3,8 @@ package nl.cwi.reo.interpret.statements;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.ListExpression;
 import nl.cwi.reo.interpret.terms.Term;
@@ -47,9 +49,12 @@ public final class Membership implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
 		List<Scope> scopes = new ArrayList<Scope>();
-		for (Term t : list.evaluate(s, m)) 
+		List<Term> terms = list.evaluate(s, m);
+		if (terms == null) return null;
+		for (Term t : terms) 
 			if (t instanceof Value) scopes.add(s.extend(x, (Value)t)); else return null;
 		return scopes;
 	}

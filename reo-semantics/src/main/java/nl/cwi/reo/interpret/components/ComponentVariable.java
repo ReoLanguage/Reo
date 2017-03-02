@@ -2,6 +2,8 @@ package nl.cwi.reo.interpret.components;
 
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -31,8 +33,9 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") // TODO in case of erroneous input, this may trigger a runtime exception.
 	@Override
+	@Nullable
 	public Component<T> evaluate(Scope s, Monitor m) {
 		List<? extends Identifier> ids = var.evaluate(s, m);
 		if (ids == null || ids.isEmpty()) return null;

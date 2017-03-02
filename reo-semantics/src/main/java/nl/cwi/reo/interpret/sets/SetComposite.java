@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
@@ -86,10 +85,11 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
 		
 		List<Term> t = this.operator.evaluate(s, m);
-		if (t.isEmpty() || !(t.get(0) instanceof StringValue)) {
+		if (t == null || t.isEmpty() || !(t.get(0) instanceof StringValue)) {
 			m.add(location, "Composition operator " + operator + " must be of type string.");
 			return null;
 		} 
@@ -99,6 +99,8 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 		Set<Set<Identifier>> unifications = new HashSet<Set<Identifier>>();
 		
 		List<Scope> scopes = predicate.evaluate(s, m);
+		if (scopes == null) return null;
+		
 		for (Scope si : scopes) {
 			for (InstanceExpression<T> e : elements) {
 				Instance<T> i = e.evaluate(si, m);

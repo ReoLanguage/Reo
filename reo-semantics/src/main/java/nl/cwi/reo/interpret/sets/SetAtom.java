@@ -3,9 +3,11 @@ package nl.cwi.reo.interpret.sets;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
-import nl.cwi.reo.interpret.connectors.SourceCode;
+import nl.cwi.reo.interpret.connectors.Reference;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
@@ -25,14 +27,14 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	/**
 	 * Reference to source code.
 	 */
-	private final SourceCode source;
+	private final Reference source;
 
 	/**
 	 * Constructs a new atomic set.
 	 * @param atom		semantics object
 	 * @param source	reference to source code
 	 */
-	public SetAtom(T atom, SourceCode source) {
+	public SetAtom(T atom, Reference source) {
 		this.atom = atom;
 		this.source = source;
 	}
@@ -41,8 +43,11 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 * Evaluates this atomic set to an instance containing an atomic Reo connector.
 	 */
 	@Override
+	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
-		return new Instance<T>(new ReoConnectorAtom<T>(atom.evaluate(s, m), source), new HashSet<Set<Identifier>>());
+		T semantics = atom.evaluate(s, m);
+		if (semantics == null) return null;
+		return new Instance<T>(new ReoConnectorAtom<T>(semantics, source), new HashSet<Set<Identifier>>());
 	}
 
 }

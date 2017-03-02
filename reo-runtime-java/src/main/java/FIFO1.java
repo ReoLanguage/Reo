@@ -3,6 +3,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import nl.cwi.reo.runtime.java.Component;
 import nl.cwi.reo.runtime.java.Port;
 
+@SuppressWarnings("initialization")
 public class FIFO1<T> implements Component {
 
 	private volatile Port<T> a;

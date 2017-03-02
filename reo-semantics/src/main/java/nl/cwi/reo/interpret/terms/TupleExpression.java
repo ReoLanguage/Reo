@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.util.Monitor;
 
@@ -29,10 +31,14 @@ public final class TupleExpression implements TermExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Term> evaluate(Scope s, Monitor m) {
 		List<List<Term>> terms = new ArrayList<List<Term>>();
-		for (TermExpression t : list)
-			terms.add(t.evaluate(s, m));
+		for (TermExpression t : list) {
+			List<Term> lst = t.evaluate(s, m);
+			if (lst == null) return null;
+			terms.add(lst);
+		}
 		return Arrays.asList(new Tuple(terms));
 	}
 

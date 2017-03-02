@@ -22,6 +22,7 @@ public interface Expression<T> {
 	 *            message container
 	 * @return evaluated expression.
 	 */
-	public @Nullable T evaluate(Scope s, Monitor m);
+	@Nullable
+	public T evaluate(Scope s, Monitor m);
 
 }

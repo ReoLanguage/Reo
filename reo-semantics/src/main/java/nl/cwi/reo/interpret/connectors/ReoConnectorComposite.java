@@ -178,8 +178,11 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	@Override
 	public ReoConnectorComposite<T> evaluate(Scope s, Monitor m) {
 		List<ReoConnector<T>> newcomps = new ArrayList<ReoConnector<T>>();
-		for (ReoConnector<T> comp : components)
-			newcomps.add(comp.evaluate(s, null));
+		for (ReoConnector<T> comp : components) {
+			ReoConnector<T> e = comp.evaluate(s, m);
+			if (e != null)
+				newcomps.add(e);
+		}
 		return new ReoConnectorComposite<T>(operator, newcomps);
 	}
 
@@ -279,18 +282,18 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 				// Find the correct renaming pi of port p.
 				switch (p.getType()) {
 				case OUT:
-					if (mergers && outs.get(p) > 1) {
+					if (mergers && new Integer(1).compareTo(outs.get(p)) > 0) {
 						pi = p.rename(p.getName() + "." + A.size());
-						if (ins.get(p) == 0)
+						if (new Integer(0).equals(ins.get(p)))
 							A.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), p.isHidden()));
 					} else {
 						pi = p;
 					}
 					break;
 				case IN:
-					if (replicators && ins.get(p) > 1) {
+					if (replicators && new Integer(1).compareTo(ins.get(p)) > 0) {
 						pi = p.rename(p.getName() + "." + A.size());
-						if (outs.get(p) == 0)
+						if (new Integer(0).equals(outs.get(p)))
 							A.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), p.isHidden()));
 					} else {
 						pi = p;

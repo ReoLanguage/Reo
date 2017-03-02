@@ -55,6 +55,14 @@ public final class Message {
 	}
 	
 	/**
+	 * Gets the type of this message.
+	 * @return type of this message.
+	 */
+	public MessageType getType() {
+		return type;
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

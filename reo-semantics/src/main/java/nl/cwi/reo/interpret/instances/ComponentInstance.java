@@ -1,9 +1,16 @@
 package nl.cwi.reo.interpret.instances;
 
+import java.util.List;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.components.ComponentExpression;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortListExpression;
 import nl.cwi.reo.interpret.terms.ListExpression;
+import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
@@ -44,8 +51,13 @@ public final class ComponentInstance<T extends Semantics<T>> implements Instance
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
-		return component.evaluate(s, m).instantiate(values.evaluate(s, m), ports.evaluate(s, m), m);
+		List<Term> v = values.evaluate(s, m);
+		List<Port> p = ports.evaluate(s, m);
+		Component<T> c = component.evaluate(s, m);
+		if (v == null || p == null || c == null) return null;
+		return c.instantiate(v, p, m);
 	}
 
 }

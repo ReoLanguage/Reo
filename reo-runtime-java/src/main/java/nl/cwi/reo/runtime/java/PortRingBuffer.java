@@ -1,5 +1,6 @@
 package nl.cwi.reo.runtime.java;
 
+@SuppressWarnings("initialization")
 public class PortRingBuffer<T> implements Port<T> {
 	private Component prod;
 	private Component cons;

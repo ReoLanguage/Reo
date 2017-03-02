@@ -2,6 +2,8 @@ package nl.cwi.reo.interpret.variables;
 
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.terms.Term;
 
 /**
@@ -35,7 +37,7 @@ public class Identifier implements Term {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 	    if (other == null) return false;
 	    if (other == this) return true;
 	    if (!(other instanceof Identifier)) return false;

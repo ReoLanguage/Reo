@@ -10,7 +10,6 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
-import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
 import nl.cwi.reo.interpret.listeners.Listener;
@@ -110,7 +109,7 @@ public class Compiler {
 
     private void compilePA() {
 		// Interpret the program
-		Interpreter<PortAutomaton> interpreter = new Interpreter<PortAutomaton>(SemanticsType.PA, new Listener<PortAutomaton>(), directories, params, monitor);
+		Interpreter<PortAutomaton> interpreter = new Interpreter<PortAutomaton>(SemanticsType.PA, new Listener<PortAutomaton>(monitor), directories, params, monitor);
 		interpreter.interpret(files);
 		
 //		if (program != null) {
@@ -134,8 +133,12 @@ public class Compiler {
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
 		
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
+		
+		if (program == null) {
+			monitor.print();
+			return;
+		}
 
-//		List<ReoConnectorAtom<PRAutomaton>> flatList = program.flatten();
 		System.out.println(program.flatten().integrate().getAtoms());
 		
 		System.out.println(program);

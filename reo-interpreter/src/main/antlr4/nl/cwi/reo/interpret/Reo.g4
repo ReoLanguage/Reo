@@ -2,9 +2,11 @@ grammar Reo;
 
 import Tokens, PA, WA, CAM, SA, PR;
 
-file      : secn? imps* ID '='? component EOF;
+// Reo File
+file      : secn? imps* defn* EOF;
 secn      : 'section' name ';' ;
 imps      : 'import' name ';' ;
+defn      : ID '='? component ;
 
 // Components
 component : var                                                   # component_variable

@@ -1,6 +1,7 @@
 import nl.cwi.reo.runtime.java.Component;
 import nl.cwi.reo.runtime.java.Port;
 
+@SuppressWarnings("initialization")
 public class Producer implements Component {
 
 	private volatile Port<Integer> a;

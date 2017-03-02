@@ -17,6 +17,6 @@ public class InterpreterPR extends Interpreter<PRAutomaton> {
 	 * @param monitor	message container
 	 */
 	public InterpreterPR(List<String> dirs, List<String> values, Monitor monitor) {
-		super(SemanticsType.PR, new ListenerPR(), dirs, values, monitor);	
+		super(SemanticsType.PR, new ListenerPR(monitor), dirs, values, monitor);	
 	}	
 }
