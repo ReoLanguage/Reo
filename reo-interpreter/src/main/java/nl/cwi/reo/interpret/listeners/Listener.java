@@ -209,7 +209,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitFile(FileContext ctx) {
 		// Get the main component from the file name.
-		String main = new File(ctx.getStart().getInputStream().getSourceName()).getName().replaceFirst("[.][^.]+$", "");
+		String main = new File(ctx.getStart().getInputStream().getSourceName()).getName().split("\\.")[0];
 		program = new ReoFile<T>(section, imports, main, definitions, new Location(ctx.start));
 	}
 

@@ -36,6 +36,8 @@ public class SimpleLykos {
 
 	private CompilerSettings settings;
 	private AutomatonFactory automatonFactory;
+	
+	private static final boolean eclipse = false;
 
 	
 	public SimpleLykos(){
@@ -51,7 +53,7 @@ public class SimpleLykos {
 
 		for(Map<String, String> f : files)
 			try {
-				writeFiles(f,"../reo-runtime-java-lykos/src/main/java");
+				writeFiles(f, eclipse ? "../reo-runtime-java-lykos/src/main/java" : ".");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -124,7 +126,7 @@ public class SimpleLykos {
 					w.getSignature());	
 		
 		// Get string templates for main
-		STGroupFile mainTemplates = new STGroupFile("src/main/resources/java-main.stg");
+		STGroupFile mainTemplates = new STGroupFile(eclipse ? "src/main/resources/java-main.stg" : "java-main.stg");
 		ST mainHeaderTemplate = mainTemplates.getInstanceOf("header");
 		ST mainClassTemplate = mainTemplates.getInstanceOf("mainClass");
 
@@ -174,7 +176,7 @@ public class SimpleLykos {
 				protocolClassName);
 		
 		// Get string templates for protocol classes
-		STGroupFile templates = new STGroupFile("src/main/resources/java-protocol.stg");
+		STGroupFile templates = new STGroupFile(eclipse ? "src/main/resources/java-protocol.stg" : "java-protocol.stg");
 		ST headerTemplate = templates.getInstanceOf("header");
 		ST protocolClassTemplate = templates.getInstanceOf("protocolClass");
 		ST automatonClassTemplate = templates.getInstanceOf("automatonClass");
@@ -280,7 +282,7 @@ public class SimpleLykos {
 				+ workerSimpleClassName.substring(1);
 				
 		
-		STGroupFile workerTemplates = new STGroupFile("src/main/resources/java-worker.stg");
+		STGroupFile workerTemplates = new STGroupFile(eclipse ? "src/main/resources/java-worker.stg" : "java-worker.stg");
 		String workerCode = "";
 		
 		w.getGeneratee().addAnnotation("className",	workerClassName);
