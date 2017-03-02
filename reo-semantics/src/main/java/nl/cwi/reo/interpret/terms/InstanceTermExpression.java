@@ -3,7 +3,10 @@ package nl.cwi.reo.interpret.terms;
 import java.util.Arrays;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.instances.InstanceExpression;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
@@ -31,7 +34,10 @@ public class InstanceTermExpression<T extends Semantics<T>> implements TermExpre
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Term> evaluate(Scope s, Monitor m) {
-		return Arrays.asList(this.instance.evaluate(s, m));
+		Instance<T> inst = this.instance.evaluate(s, m);
+		if (inst == null) return null;
+		return Arrays.asList(inst);
 	}
 }

@@ -13,25 +13,33 @@ import nl.cwi.reo.interpret.ReoParser.Pr_portContext;
 import nl.cwi.reo.interpret.ReoParser.Pr_stringContext;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
+import nl.cwi.reo.util.Monitor;
 
 public class ListenerPR extends Listener<PRAutomaton> {
 
-    private ParseTreeProperty<PRAutomaton> prAutomata =  new ParseTreeProperty<PRAutomaton>();
-    private ParseTreeProperty<String> name =  new ParseTreeProperty<String>();
-    private ParseTreeProperty<String> parameter =  new ParseTreeProperty<String>();
-    private ParseTreeProperty<List<Port>> port =  new ParseTreeProperty<List<Port>>();
-    Integer value;
-    
+	private ParseTreeProperty<PRAutomaton> prAutomata = new ParseTreeProperty<PRAutomaton>();
+	private ParseTreeProperty<String> name = new ParseTreeProperty<String>();
+	private ParseTreeProperty<String> parameter = new ParseTreeProperty<String>();
+	private ParseTreeProperty<List<Port>> port = new ParseTreeProperty<List<Port>>();
+	private Integer value = new Integer(0);
+
+	public ListenerPR(Monitor m) {
+		super(m);
+	}
+
 	public void exitAtom(AtomContext ctx) {
 		atoms.put(ctx, prAutomata.get(ctx.pr()));
 	}
-    
-	public void enterPr( PrContext ctx){
-		
+
+	public void enterPr(PrContext ctx) {
+
 	}
 
 	public void exitPr(PrContext ctx) {
+		// If you encounter an error, put a message in the monitor:
+		// m.add("test error message");
 		System.out.println(name.get(ctx.pr_string()));
+
 		if(Objects.equals(name.get(ctx.pr_string()),"identity"))
 			prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),new String(),new Integer(0),port.get(ctx.pr_port())));			
 		else{
@@ -42,22 +50,22 @@ public class ListenerPR extends Listener<PRAutomaton> {
 	}
 
 	public void enterPr_string(Pr_stringContext ctx) {
-		
+
 	}
-	
+
 	public void exitPr_string(Pr_stringContext ctx) {
 		name.put(ctx, ctx.ID().getText());
 	}
 
-	public void exitPr_port(Pr_portContext ctx){
+	public void exitPr_port(Pr_portContext ctx) {
 		List<Port> p = new ArrayList<Port>();
 		for (TerminalNode id : ctx.ID())
 			p.add(new Port(id.getText()));
 		port.put(ctx, p);
 	};
 
-	public void enterPr_port(Pr_portContext ctx){
-		
+	public void enterPr_port(Pr_portContext ctx) {
+
 	};
 
 }

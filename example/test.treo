@@ -1,15 +1,15 @@
 section com.example;
+
 import reo.fifo;
 import reo.transformer;
 
-
-// /**
-//  * Foo is a channel that accepts maps from tuples of strings and intergers
-//  * to double values, and produces double values. It has a parameter F
-//  * that is a map from $a, the type of data that passes through node a, to 
-//  * $b, the type op data that passes through node b.
-//  */
-foo = <k:int, F:($a:$b), cop:string>(a?(string*int:double), b!double) 
+/**
+ * Foo is a channel that accepts maps from tuples of strings and intergers
+ * to double values, and produces double values. It has a parameter F
+ * that is a map from $a, the type of data that passes through node a, to 
+ * $b, the type op data that passes through node b.
+ */
+foo = <k:int, F:$b^$a, cop:string>(a?double^(string*int), b!double) 
 {
    fifo<2>(a,x[i][j])    // instance of component fifo.
    transformer<F>(x[i][j],y)
@@ -24,7 +24,7 @@ foo = <k:int, F:($a:$b), cop:string>(a?(string*int:double), b!double)
    }
 |
    bar = <>(p?,q!) { /* ... */ },  // local definition
-   i in <1..k>,         // iteration of this whole set
-   j in <-2..5>,        // iteration of this whole set
+   i : <1..k>,          // iteration of this whole set
+   j : <-2..5>,         // iteration of this whole set
    k > 4                // boolean condition for this set
 }

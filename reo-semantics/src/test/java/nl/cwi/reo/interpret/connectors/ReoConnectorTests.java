@@ -27,7 +27,7 @@ public class ReoConnectorTests {
 		 */
 
 		Plain fifo = new Plain("fifo", "x", "y");
-		SourceCode s = new SourceCode();
+		Reference s = new Reference();
 
 		Map<Port, Port> links_ab = new HashMap<Port, Port>();
 		Map<Port, Port> links_bc = new HashMap<Port, Port>();

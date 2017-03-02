@@ -3,6 +3,8 @@ package nl.cwi.reo.interpret.ports;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.util.Monitor;
@@ -29,11 +31,12 @@ public final class PortListExpression implements Expression<List<Port>> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Port> evaluate(Scope s, Monitor m) {
 		List<Port> concatenation = new ArrayList<Port>();
 		List<Port> listPort;
 		for (PortExpression e : list)
-			if((listPort=e.evaluate(s, m))!=null)
+			if ((listPort = e.evaluate(s, m)) != null)
 				concatenation.addAll(listPort);
 			else
 				return null;

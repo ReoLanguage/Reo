@@ -3,6 +3,7 @@ import nl.cwi.reo.runtime.java.Port;
 import nl.cwi.reo.runtime.java.PortBusyWait;
 import nl.cwi.reo.runtime.java.PortRingBuffer;
 
+@SuppressWarnings("initialization")
 public class Main {
 
 	public static void main(String[] args) {

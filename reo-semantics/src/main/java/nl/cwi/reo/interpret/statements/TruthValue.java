@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.util.Monitor;
 
@@ -29,6 +31,7 @@ public class TruthValue implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
 		return bool ? Arrays.asList(s) : new ArrayList<Scope>();
 	}

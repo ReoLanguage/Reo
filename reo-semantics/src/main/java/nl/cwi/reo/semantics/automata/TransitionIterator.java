@@ -65,8 +65,13 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 				throw new NullPointerException("Undefined automaton in list of automata.");
 			
 			List<Transition<L>> outA = new ArrayList<Transition<L>>();
-			outA.add(0, new Transition<L>(A.initial, A.initial, new TreeSet<Port>(), A.lbl));			
-			outA.addAll(A.out.get(A.initial));			
+			outA.add(0, new Transition<L>(A.initial, A.initial, new TreeSet<Port>(), A.lbl));
+			Set<Transition<L>> transitions = A.out.get(A.initial);
+			
+			if (transitions == null)
+				throw new NullPointerException("Undefined set outgoing transitions of initial state.");
+			
+			outA.addAll(transitions);			
 			outs.add(outA);			
 			Iterator<Transition<L>> iterA = outA.iterator();			
 			iters.add(iterA);			

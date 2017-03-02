@@ -2,7 +2,7 @@ section reo;
 
 import reo.fifo1;
 
-fifo<k:int>(a[0]?, a[k]!){
+fifo<k:int>(a[1]?, a[k+1]!){
 	fifo1(a[i],a[i+1]) | i : <1..k>
 }
 

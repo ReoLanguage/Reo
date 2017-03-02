@@ -20,17 +20,22 @@ import nl.cwi.reo.semantics.automata.State;
 import nl.cwi.reo.semantics.automata.Transition;
 import nl.cwi.reo.semantics.portautomata.NullLabel;
 import nl.cwi.reo.semantics.portautomata.PortAutomaton;
+import nl.cwi.reo.util.Monitor;
 
 /**
  * Listens to events triggered by a {@link org.antlr.v4.runtime.tree.ParseTreeWalker}.
  * Returns a {@link nl.cwi.reo.interpret.p}.
  */
 public class ListenerPA extends Listener<PortAutomaton> {	
-	
+
 	private ParseTreeProperty<PortAutomaton> automata = new ParseTreeProperty<PortAutomaton>();
 	private ParseTreeProperty<SortedSet<Port>> scs = new ParseTreeProperty<SortedSet<Port>>();
 	private ParseTreeProperty<Transition<NullLabel>> transitions = new ParseTreeProperty<Transition<NullLabel>>();
 	private ParseTreeProperty<State> initial = new ParseTreeProperty<State>();
+	
+	public ListenerPA(Monitor m) {
+		super(m);
+	}
 	
 	public void exitAtom(AtomContext ctx) {
 		atoms.put(ctx, automata.get(ctx.pa()));
@@ -46,10 +51,13 @@ public class ListenerPA extends Listener<PortAutomaton> {
 			if (q0 == null) q0 = t.getSource();
 			Q.add(t.getSource());
 			Q.add(t.getTarget());	
-			P.addAll(t.getSyncConstraint());		
-			T.putIfAbsent(t.getSource(), new HashSet<Transition<NullLabel>>());
+			P.addAll(t.getSyncConstraint());
+			Set<Transition<NullLabel>> outs = T.get(t.getSource());
+			if (outs == null) 
+				outs = new HashSet<Transition<NullLabel>>();
+			outs.add(t);
+			T.put(t.getSource(), outs);
 			T.putIfAbsent(t.getTarget(), new HashSet<Transition<NullLabel>>());
-			T.get(t.getSource()).add(t);
 		}
 		automata.put(ctx, new PortAutomaton(Q, P, T, q0));
 	}

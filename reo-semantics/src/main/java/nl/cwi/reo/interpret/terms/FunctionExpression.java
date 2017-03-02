@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.values.DecimalValue;
 import nl.cwi.reo.interpret.values.IntegerValue;
@@ -47,13 +49,17 @@ public final class FunctionExpression implements TermExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Term> evaluate(Scope s, Monitor m) {
 		
 		List<Term> list = new ArrayList<Term>();
 		
 		List<Iterator<Term>> iters = new ArrayList<Iterator<Term>>();
-		for (TermExpression arg : arguments) 
-			iters.add(arg.evaluate(s, null).iterator());
+		for (TermExpression arg : arguments) {
+			List<Term> terms = arg.evaluate(s, null);
+			if (terms == null) return null;
+			iters.add(terms.iterator());
+		}
 		
 		while (Tuple.hasNext(iters)) {
 			List<Term> args = Tuple.next(iters);

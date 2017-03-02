@@ -1,6 +1,9 @@
 package nl.cwi.reo.interpret;
 
 import java.util.List;
+import java.util.Map;
+
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.semantics.Semantics;
@@ -28,9 +31,9 @@ public final class ReoFile<T extends Semantics<T>> {
 	private final String name;
 	
 	/**
-	 * Main component.
+	 * Component definitions.
 	 */
-	private final ComponentExpression<T> cexpr;
+	private final Map<String, ComponentExpression<T>> definitions;
 	
 	/**
 	 * Location of main component name.
@@ -39,18 +42,18 @@ public final class ReoFile<T extends Semantics<T>> {
 	
 	/**
 	 * Constructs a new Reo source file.
-	 * @param section	section name
-	 * @param imports	list of imported components
-	 * @param name		name of main component
-	 * @param cexpr		main component definition.
+	 * @param section		section name
+	 * @param imports		list of imported components
+	 * @param name			file name without extension
+	 * @param definitions	component definitions
 	 */
-	public ReoFile(String section, List<String> imports, String name, ComponentExpression<T> cexpr, Location location) {
-		if (section == null || imports == null || name == null || cexpr == null)
+	public ReoFile(String section, List<String> imports, String name, Map<String, ComponentExpression<T>> definitions, Location location) {
+		if (section == null || imports == null || name == null || definitions == null)
 			throw new NullPointerException();
 		this.section = section;
 		this.imports = imports;
 		this.name = name;
-		this.cexpr = cexpr;
+		this.definitions = definitions;
 		this.location = location;
 	}
 
@@ -74,8 +77,8 @@ public final class ReoFile<T extends Semantics<T>> {
 	 * Gets the main component definition.
 	 * @return main component definition
 	 */
-	public ComponentExpression<T> getComponent() {
-		return cexpr;
+	public ComponentExpression<T> getMain() {
+		return definitions.get(name);
 	}
 	
 	/**
@@ -91,9 +94,10 @@ public final class ReoFile<T extends Semantics<T>> {
 	 */
 	@Override
 	public String toString() {
-		String imps = "";
-		for (String comp : imports)
-			imps += "import " + comp + ";";
-		return "section " + section + ";" + imps + getName() + "=" + cexpr;
+		ST st = new ST("<section:{ s | section s;\n\n}><imports:{ i | import i;\n }>\n<definitions; separator='\n\n'>");
+		st.add("section", "section " + section);
+		st.add("imports", imports);
+		st.add("definitions", definitions);
+		return st.render();
 	}
 }

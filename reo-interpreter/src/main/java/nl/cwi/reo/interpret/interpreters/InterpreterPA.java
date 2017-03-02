@@ -17,6 +17,6 @@ public class InterpreterPA extends Interpreter<PortAutomaton> {
 	 * @param monitor	message container
 	 */
 	public InterpreterPA(List<String> dirs, List<String> values, Monitor monitor) {
-		super(SemanticsType.PA, new ListenerPA(), dirs, values, monitor);	
+		super(SemanticsType.PA, new ListenerPA(monitor), dirs, values, monitor);	
 	}	
 }

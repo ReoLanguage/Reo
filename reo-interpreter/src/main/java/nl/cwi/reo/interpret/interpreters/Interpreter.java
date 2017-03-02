@@ -1,7 +1,6 @@
 package nl.cwi.reo.interpret.interpreters;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,13 +20,16 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.Component;
+import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
+import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
 import nl.cwi.reo.interpret.terms.Term;
@@ -91,78 +93,91 @@ public class Interpreter<T extends Semantics<T>> {
 	}
 
 	/**
-	 * < Interprets a list of Reo files (the first file is the main file) as a
+	 * Interprets a list of Reo files (the first file is the main file) as a
 	 * list of atomic components.
 	 * 
 	 * @param file
 	 *            non-empty list of Reo file names.
-	 * @return list of work automata.
+	 * @return Reo connector interpretation of the main component in the first
+	 *         file, or null, if the main component could not be interpreted.
 	 */
+	@Nullable
 	public ReoConnector<T> interpret(List<String> srcfiles) {
-		try {
-			// Stack of all parsed Reo source files.
-			Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();
+		
+		// Stack of all parsed Reo source files.
+		Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();
 
-			// List of fully qualified names of already parsed component
-			// definitions.
-			List<String> parsed = new ArrayList<String>();
+		// List of fully qualified names of already parsed component
+		// definitions.
+		List<String> parsed = new ArrayList<String>();
 
-			// List of fully qualified names of unparsed imported component
-			// definitions.
-			Queue<String> components = new LinkedList<String>();
+		// List of fully qualified names of unparsed imported component
+		// definitions.
+		Queue<String> components = new LinkedList<String>();
 
-			// Parse all provided source files.
-			for (String file : srcfiles) {
-				String filename = new File(file).getName().replaceFirst("[.][^.]+$", "");
-				ReoFile<T> program = parse(new ANTLRFileStream(file));
-				if (program != null) {
-					if (!program.getName().endsWith(filename))
-						monitor.add(program.getMainLocation(), "Component must have name " + filename + ".");
-					stack.push(program);
-					parsed.add(program.getName());
-					components.addAll(program.getImports());
-				} else {
-					monitor.add("Cannot parse " + new File(file).getName() + ".");
-				}
+		// Parse all provided source files.
+		for (String file : srcfiles) {
+			String filename = new File(file).getName().replaceFirst("[.][^.]+$", "");
+			ReoFile<T> program = null;
+			try {
+				program = parse(new ANTLRFileStream(file));
+			} catch (IOException e) {
+				monitor.add("Cannot open " + file);
 			}
-
-			// Find and parse all imported component definitions.
-			while (!components.isEmpty()) {
-				String comp = components.poll();
-				if (!parsed.contains(comp)) {
-					parsed.add(comp);
-					ReoFile<T> program = findComponent(comp);
-					if (program != null) {
-						if (!Objects.equals(program.getName(), comp))
-							monitor.add(program.getMainLocation(),
-									"Component must have name " + comp.substring(comp.lastIndexOf(".") + 1) + ".");
-						stack.push(program);
-						List<String> newComponents = program.getImports();
-						newComponents.removeAll(parsed);
-						components.addAll(newComponents);
-					} else {
-						monitor.add("Component " + comp + " cannot be found.");
-					}
-
-				}
+			if (program != null) {
+				if (!program.getName().endsWith(filename))
+					monitor.add(program.getMainLocation(), "Component must have name " + filename + ".");
+				stack.push(program);
+				parsed.add(program.getName());
+				components.addAll(program.getImports());
+			} else {
+				monitor.add("Cannot parse " + new File(file).getName() + ".");
 			}
-
-			// Evaluate all component expressions.
-			Scope scope = new Scope();
-			Component<T> main = null;
-			while (!stack.isEmpty()) {
-				ReoFile<T> program = stack.pop();
-				main = program.getComponent().evaluate(scope, monitor);
-				scope.put(new Identifier(program.getName()), main);
-			}
-
-			// Instantiate the main component
-			return main.instantiate(values, null, monitor).getConnector();
-
-		} catch (IOException e) {
-			monitor.add(e.getMessage());
 		}
 
+		// Find and parse all imported component definitions.
+		while (!components.isEmpty()) {
+			String comp = components.poll();
+			if (comp != null && !parsed.contains(comp)) {
+				parsed.add(comp);
+				ReoFile<T> program = findComponent(comp);
+				if (program != null) {
+					if (!Objects.equals(program.getName(), comp))
+						monitor.add(program.getMainLocation(),
+								"Component must have name " + comp.substring(comp.lastIndexOf(".") + 1) + ".");
+					stack.push(program);
+					List<String> newComponents = program.getImports();
+					newComponents.removeAll(parsed);
+					components.addAll(newComponents);
+				} else {
+					monitor.add("Component " + comp + " cannot be found.");
+				}
+
+			}
+		}
+
+		// Evaluate all component expressions.
+		Scope scope = new Scope();
+		Component<T> main = null;
+		while (!stack.isEmpty()) {
+			ReoFile<T> program = stack.pop();
+			ComponentExpression<T> comp = program.getMain();
+			if (comp != null) {
+				main = comp.evaluate(scope, monitor);
+				if (main != null)
+					scope.put(new Identifier(program.getName()), main);
+			} else {
+				monitor.add("File " + " does not contain a main component.");
+			}
+		}
+
+		// Instantiate the main component
+		if (main != null) {
+			Instance<T> i = main.instantiate(values, null, monitor);
+			if (i != null)
+				return i.getConnector();
+		}
+		monitor.add("Cannot instantiate main component.");
 		return null;
 	}
 
@@ -173,10 +188,9 @@ public class Interpreter<T extends Semantics<T>> {
 	 *            fully qualified name of the requested component.
 	 * @return path string of the file containing this components definition, or
 	 *         null, if this path is not found.
-	 * @throws IOException
-	 * @throws FileNotFoundException
 	 */
-	private ReoFile<T> findComponent(String component) throws IOException {
+	@Nullable
+	private ReoFile<T> findComponent(String component) {
 
 		ReoFile<T> prog = null;
 
@@ -199,27 +213,33 @@ public class Interpreter<T extends Semantics<T>> {
 				};
 
 				File[] files = folder.listFiles(archiveFilter);
-				for (File file : files) {
-					if (!file.isDirectory()) {
-						ZipFile zipFile = null;
-						try {
-							zipFile = new ZipFile(file.getPath());
-							ZipEntry entry1 = zipFile.getEntry(cp1);
-							ZipEntry entry2 = zipFile.getEntry(cp2);
-							if (entry1 != null) {
-								InputStream input = zipFile.getInputStream(entry1);
-								prog = parse(new ANTLRInputStream(input));
-								break search;
-							} else if (entry2 != null) {
-								InputStream input = zipFile.getInputStream(entry2);
-								prog = parse(new ANTLRInputStream(input));
-								break search;
-							}
-						} finally {
+				if (files != null) {
+					for (File file : files) {
+						if (!file.isDirectory()) {
+							ZipFile zipFile = null;
 							try {
-								if (zipFile != null)
-									zipFile.close();
+								zipFile = new ZipFile(file.getPath());
+								ZipEntry entry1 = zipFile.getEntry(cp1);
+								ZipEntry entry2 = zipFile.getEntry(cp2);
+								if (entry1 != null) {
+									InputStream input = zipFile.getInputStream(entry1);
+									assert input != null : "@AssumeAssertion(nullness)";
+									prog = parse(new ANTLRInputStream(input));
+									break search;
+								} else if (entry2 != null) {
+									InputStream input = zipFile.getInputStream(entry2);
+									assert input != null : "@AssumeAssertion(nullness)";
+									prog = parse(new ANTLRInputStream(input));
+									break search;
+								}
 							} catch (IOException e) {
+								monitor.add("Cannot open " + file.toString());
+							} finally {
+								try {
+									if (zipFile != null)
+										zipFile.close();
+								} catch (IOException e) {
+								}
 							}
 						}
 					}
@@ -228,13 +248,21 @@ public class Interpreter<T extends Semantics<T>> {
 
 			File f1 = new File(dir + File.separator + cp1);
 			if (f1.exists() && !f1.isDirectory()) {
-				prog = parse(new ANTLRFileStream(dir + File.separator + cp1));
+				try {
+					prog = parse(new ANTLRFileStream(dir + File.separator + cp1));
+				} catch (IOException e) {
+					monitor.add("Cannot open " + f1.toString());
+				}
 				break search;
 			}
 
 			File f2 = new File(dir + File.separator + cp2);
 			if (f2.exists() && !f2.isDirectory()) {
-				prog = parse(new ANTLRFileStream(dir + File.separator + cp2));
+				try {
+					prog = parse(new ANTLRFileStream(dir + File.separator + cp2));
+				} catch (IOException e) {
+					monitor.add("Cannot open " + f2.toString());
+				}
 				break search;
 			}
 		}
@@ -244,25 +272,25 @@ public class Interpreter<T extends Semantics<T>> {
 
 	/**
 	 * Parses a source file using ANTLR4, and walks over the parse tree to
-	 * interpret this source file as a Java object. By default, ANTLR4 sends any
-	 * error found during parsing to System.err.
+	 * interpret this source file as a Java object.
 	 * 
 	 * @param c
 	 *            input character stream
 	 * @return an interpreted source file, or null in case of an error.
-	 * @throws IOException
 	 */
-	private ReoFile<T> parse(CharStream c) throws IOException {
+	@Nullable
+	private ReoFile<T> parse(CharStream c) {
 		ReoLexer lexer = new ReoLexer(c);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
 		ReoParser parser = new ReoParser(tokens);
-		ErrorListener errListener = new ErrorListener();
+		ErrorListener errListener = new ErrorListener(monitor);
 		parser.removeErrorListeners();
 		parser.addErrorListener(errListener);
 
 		ParseTree tree = parser.file();
-		if (errListener.hasError)
+
+		if (monitor.hasErrors())
 			return null;
 
 		ParseTreeWalker walker = new ParseTreeWalker();

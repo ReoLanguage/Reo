@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.values.Value;
@@ -74,7 +76,7 @@ public final class Instance<T extends Semantics<T>> implements Value {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 	    if (other == null) return false;
 	    if (other == this) return true;
 	    if (!(other instanceof Instance<?>)) return false;

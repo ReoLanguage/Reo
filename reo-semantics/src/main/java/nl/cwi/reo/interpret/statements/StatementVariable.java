@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.VariableTermExpression;
@@ -32,14 +34,13 @@ public class StatementVariable implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
-		
 		List<Term> t = variable.evaluate(s, m);
-		if (t.isEmpty() || !(t.get(0) instanceof BooleanValue)) {
+		if (t == null || t.isEmpty() || !(t.get(0) instanceof BooleanValue)) {
 			m.add("Variable " + variable + " must be of type boolean.");
 			return null;
 		}
-		
 		return ((BooleanValue)t.get(0)).getValue() ? Arrays.asList(s) : new ArrayList<Scope>();
 	}
 

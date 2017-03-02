@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
@@ -32,7 +33,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	/**
 	 * Reference to source code.
 	 */
-	private final SourceCode source;
+	private final Reference source;
 
 	/**
 	 * Set of links.
@@ -47,7 +48,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 */
 	public ReoConnectorAtom(T atom) {
 		this.semantics = atom;
-		this.source = new SourceCode();
+		this.source = new Reference();
 		Map<Port, Port> links = new HashMap<Port, Port>();
 		for (Port p : semantics.getInterface())
 			links.put(p, p);
@@ -62,7 +63,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * @param source
 	 *            reference to source code
 	 */
-	public ReoConnectorAtom(T semantics, SourceCode source) {
+	public ReoConnectorAtom(T semantics, Reference source) {
 		this.semantics = semantics;
 		this.source = source;
 		Map<Port, Port> links = new HashMap<Port, Port>();
@@ -81,7 +82,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * @param links
 	 *            set of links
 	 */
-	public ReoConnectorAtom(T semantics, SourceCode source, Map<Port, Port> links) {
+	public ReoConnectorAtom(T semantics, Reference source, Map<Port, Port> links) {
 		this.semantics = semantics;
 		this.source = source;
 		this.links = Collections.unmodifiableMap(links);
@@ -101,7 +102,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * 
 	 * @return source code reference.
 	 */
-	public SourceCode getSourceCode() {
+	public Reference getSourceCode() {
 		return source;
 	}
 
@@ -117,8 +118,11 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public ReoConnectorAtom<T> evaluate(Scope s, Monitor m) {
-		return new ReoConnectorAtom<T>(semantics.evaluate(s, null), source);
+		T semantics = this.semantics.evaluate(s, m);
+		if (semantics == null) return null;
+		return new ReoConnectorAtom<T>(semantics, source);
 	}
 
 	/**

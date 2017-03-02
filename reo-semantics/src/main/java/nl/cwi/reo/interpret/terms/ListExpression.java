@@ -3,6 +3,8 @@ package nl.cwi.reo.interpret.terms;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.util.Monitor;
 
@@ -28,10 +30,14 @@ public final class ListExpression implements TermExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Term> evaluate(Scope s, Monitor m) {
 		List<Term> terms = new ArrayList<Term>();
-		for (TermExpression t : list)
-			terms.addAll(t.evaluate(s, m));
+		for (TermExpression t : list) {
+			List<Term> lst = t.evaluate(s, m);
+			if (lst == null) return null;
+			terms.addAll(lst);
+		}
 		return terms;
 	}
 

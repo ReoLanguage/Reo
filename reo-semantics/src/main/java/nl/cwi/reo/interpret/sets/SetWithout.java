@@ -1,8 +1,9 @@
 package nl.cwi.reo.interpret.sets;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.instances.Instance;
-import nl.cwi.reo.interpret.instances.InstanceExpression;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
@@ -10,7 +11,7 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of short circuit subtraction.
  * @param <T> Reo semantics type
  */
-public final class SetWithout<T extends Semantics<T>> implements InstanceExpression<T> {
+public final class SetWithout<T extends Semantics<T>> implements SetExpression<T> {
 
 	/**
 	 * First set.
@@ -36,6 +37,7 @@ public final class SetWithout<T extends Semantics<T>> implements InstanceExpress
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
 		Instance<T> i1 = first.evaluate(s, m);
 		Instance<T> i2 = second.evaluate(s, m);

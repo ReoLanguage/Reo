@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Range;
@@ -36,7 +38,9 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 	
 	/**
 	 * Constructs a variable list.
-	 * @param name		name of the node
+	 * @param name			name of the node
+	 * @param indices		list of indices
+	 * @param location		location of variable in Reo source file
 	 */
 	public VariableExpression(String name, List<TermExpression> indices, Location location) {
 		if (name == null || indices == null)
@@ -95,10 +99,14 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<? extends Identifier> evaluate(Scope s, Monitor m) {
 		List<List<Term>> ranges = new ArrayList<List<Term>>();
-		for (TermExpression e : indices)
-			ranges.add(e.evaluate(s, m));
+		for (TermExpression e : indices) {
+			List<Term> terms = e.evaluate(s, m);
+			if (terms == null) return null;
+			ranges.add(terms);
+		}
 		List<Identifier> ids = Arrays.asList(new Identifier(name));
 		List<Identifier> temp;
 		for (List<Term> r : ranges) {

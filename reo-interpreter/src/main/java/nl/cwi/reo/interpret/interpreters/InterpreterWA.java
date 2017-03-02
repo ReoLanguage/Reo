@@ -16,6 +16,6 @@ public class InterpreterWA extends Interpreter<WorkAutomaton> {
 	 * @param monitor	message container
 	 */
 	public InterpreterWA(List<String> dirs, List<String> values, Monitor monitor) {
-		super(SemanticsType.WA, new ListenerWA(), dirs, values, monitor);	
+		super(SemanticsType.WA, new ListenerWA(monitor), dirs, values, monitor);	
 	}	
 }

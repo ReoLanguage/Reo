@@ -3,7 +3,10 @@ package nl.cwi.reo.interpret.terms;
 import java.util.Arrays;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
@@ -31,7 +34,10 @@ public class ComponentTermExpression<T extends Semantics<T>> implements TermExpr
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public List<Term> evaluate(Scope s, Monitor m) {
-		return Arrays.asList(this.component.evaluate(s, m));
+		Component<T> comp = this.component.evaluate(s, m);
+		if (comp == null) return null;
+		return Arrays.asList(comp);
 	}
 }

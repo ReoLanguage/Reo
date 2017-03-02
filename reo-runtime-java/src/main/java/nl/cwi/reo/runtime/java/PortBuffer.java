@@ -6,6 +6,7 @@ import java.util.List;
 /**
  * @deprecated
  */
+@SuppressWarnings("initialization")
 public class PortBuffer<T> implements Port<T> {
 	private Component prod;
 	private Component cons;

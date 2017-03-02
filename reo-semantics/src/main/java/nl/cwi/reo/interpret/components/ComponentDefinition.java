@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret.components;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.sets.SetExpression;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
@@ -36,6 +38,7 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Component<T> evaluate(Scope s, Monitor m) {
 		return new Component<T>(s, sign, set);
 	}

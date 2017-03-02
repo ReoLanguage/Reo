@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
@@ -55,10 +57,11 @@ public final class ProductInstance<T extends Semantics<T>> implements InstanceEx
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {	
 		
 		List<Term> t = this.operator.evaluate(s, m);
-		if (t.isEmpty() || !(t.get(0) instanceof StringValue)) {
+		if (t == null || t.isEmpty() || !(t.get(0) instanceof StringValue)) {
 			m.add(location, "Composition operator " + operator + " must be of type string.");
 			return null;
 		} 
