@@ -34,7 +34,7 @@ The contents of the documentation is as follows:
 	:maxdepth: 2
 
 	introduction
-	getting-started
+	installation
 	syntax
 	contribute
 

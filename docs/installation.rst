@@ -8,9 +8,9 @@ UNIX
 
 	java --version
 
-2. Download the `reo-1.0.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar>`_::
+2. Download the `reo-1.0.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar>`_ via::
 
-  cd /usr/local/lib
+	cd /usr/local/lib
 	wget https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar
 
 3. Add Reo to the class path and create an alias for the compiler::
