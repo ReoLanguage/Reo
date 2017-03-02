@@ -1,11 +1,8 @@
 import reo.fifo;
 import reo.sync;
 import reo.syncdrain;
-//import reo.merger;
 
-ex2(a?,d?,c!){
-
-//	fifo1(a,b)fifo1(b,c)fifo1(c,d)
+alternator(a?,d?,c!){
 
 	fifo(a,c)
         sync(d,c)
