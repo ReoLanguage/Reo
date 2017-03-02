@@ -37,94 +37,90 @@ public class SimpleLykos {
 	private CompilerSettings settings;
 	private AutomatonFactory automatonFactory;
 	
+	private final String outputpath;
+
 	private static final boolean eclipse = false;
 
-	
-	public SimpleLykos(){
+	public SimpleLykos(String outputpath) {
+		this.outputpath = outputpath;
 	}
-	
-	public void compile(String file,ProgramCompiler	programCompiler, AutomatonFactory automaton) 
-	{ 
-		this.automatonFactory=automaton;
-		
-		this.settings=programCompiler.getSettings();		
+
+	public void compile(ProgramCompiler programCompiler, AutomatonFactory automaton) {
+		this.automatonFactory = automaton;
+
+		this.settings = programCompiler.getSettings();
 		List<Map<String, String>> files = new ArrayList<Map<String, String>>();
 		files = getGeneratee(programCompiler);
 
-		for(Map<String, String> f : files)
+		for (Map<String, String> f : files)
 			try {
-				writeFiles(f, eclipse ? "../reo-runtime-java-lykos/src/main/java" : ".");
+				writeFiles(f, outputpath);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		
+
 	}
-	
-	public void writeFiles(Map<String,String> files,String targetDirectoryLocation) throws IOException{
-		
+
+	public void writeFiles(Map<String, String> files, String targetDirectoryLocation) throws IOException {
+
 		if (targetDirectoryLocation == null)
 			throw new NullPointerException();
-		
+
 		for (Entry<String, String> entr : files.entrySet()) {
-			Path parentDirectory = Paths.get(targetDirectoryLocation,
-					entr.getKey()).getParent();
+			Path parentDirectory = Paths.get(targetDirectoryLocation, entr.getKey()).getParent();
 
 			if (parentDirectory != null)
 				Files.createDirectories(parentDirectory);
 
-			Files.write(
-					Paths.get(targetDirectoryLocation, entr.getKey()),
-					Arrays.asList(entr.getValue()), Charset.defaultCharset());
+			Files.write(Paths.get(targetDirectoryLocation, entr.getKey()), Arrays.asList(entr.getValue()),
+					Charset.defaultCharset());
 		}
 	}
 
-	public List<Map<String,String>> getGeneratee(ProgramCompiler	programCompiler){
-		MainCompiler<?> mainCompiler= programCompiler.getMainCompiler();
+	public List<Map<String, String>> getGeneratee(ProgramCompiler programCompiler) {
+		MainCompiler<?> mainCompiler = programCompiler.getMainCompiler();
 		List<ProtocolCompiler<?>> protocolCompilers = programCompiler.getProtocolCompiler();
 		List<WorkerCompiler<?>> workerCompilers = programCompiler.getWorkerCompiler();
-		List<Map<String,String>> generatees = new ArrayList<>();
-		Map<String,String> file;
+		List<Map<String, String>> generatees = new ArrayList<>();
+		Map<String, String> file;
 
 		if (!settings.ignoreInput()) {
 
-			for (ProtocolCompiler<?> c : protocolCompilers){
-				file=generateProtocols(c);
+			for (ProtocolCompiler<?> c : protocolCompilers) {
+				file = generateProtocols(c);
 				generatees.add(file);
 			}
 
-
-			for (WorkerCompiler<?> c : workerCompilers){
-				file=generateWorkers(c);
+			for (WorkerCompiler<?> c : workerCompilers) {
+				file = generateWorkers(c);
 				generatees.add(file);
 			}
 
-			file=generateMain(mainCompiler);
+			file = generateMain(mainCompiler);
 			generatees.add(file);
 		}
 
 		return generatees;
 	}
-	
+
 	/**
 	 * Generates the main class.
+	 * 
 	 * @return Map assigning Java code to a file name
 	 */
-	private Map<String, String> generateMain(MainCompiler<?> mainCompiler) 
-	{
+	private Map<String, String> generateMain(MainCompiler<?> mainCompiler) {
 		Map<String, String> files = new HashMap<String, String>();
-		String mainClassName = "Main";	
-		
+		String mainClassName = "Main";
+
 		MainSignature signature = mainCompiler.getGeneratee().getSignature();
 		Map<String, MemberSignature> protocolSignatures = new HashMap<>();
-		Map<String, WorkerSignature> workerSignatures = new HashMap<>();	
-		
-		for(InterpretedProtocol p : mainCompiler.getGeneratee().getProtocols())
-			protocolSignatures.put((String) p.getAnnotation("className"),
-					p.getSignature()); // pr.main.Protocol_d20170127_t103917_197_FifoK=FifoK[3](A$1;B$1)
-		for(InterpretedWorker w : mainCompiler.getGeneratee().getWorkers())
-			workerSignatures.put((String) w.getAnnotation("className"),
-					w.getSignature());	
-		
+		Map<String, WorkerSignature> workerSignatures = new HashMap<>();
+
+		for (InterpretedProtocol p : mainCompiler.getGeneratee().getProtocols())
+			protocolSignatures.put((String) p.getAnnotation("className"), p.getSignature()); // pr.main.Protocol_d20170127_t103917_197_FifoK=FifoK[3](A$1;B$1)
+		for (InterpretedWorker w : mainCompiler.getGeneratee().getWorkers())
+			workerSignatures.put((String) w.getAnnotation("className"), w.getSignature());
+
 		// Get string templates for main
 		STGroupFile mainTemplates = new STGroupFile(eclipse ? "src/main/resources/java-main.stg" : "java-main.stg");
 		ST mainHeaderTemplate = mainTemplates.getInstanceOf("header");
@@ -133,7 +129,7 @@ public class SimpleLykos {
 		String mainCode = "";
 
 		// Generate header
-//		mainHeaderTemplate.add("packageName", mainPackageName);
+		// mainHeaderTemplate.add("packageName", mainPackageName);
 		mainCode += mainHeaderTemplate.render();
 
 		// Generate body
@@ -143,38 +139,33 @@ public class SimpleLykos {
 		mainCode += "\n\n" + mainClassTemplate.render();
 
 		files.put(mainClassName + ".java", mainCode);
-		
+
 		return files;
 	}
-	
 
 	/**
 	 * Generates the protocol classes.
+	 * 
 	 * @return Map assigning Java code to a file name
 	 */
-	private Map<String, String> generateProtocols(ProtocolCompiler<?> c) 
-	{
+	private Map<String, String> generateProtocols(ProtocolCompiler<?> c) {
 		Map<String, String> files = new HashMap<String, String>();
-		String protocolClassName;		
+		String protocolClassName;
 
-		Automata JavaAutomata = new Automata(settings,c,this.automatonFactory);
+		Automata JavaAutomata = new Automata(settings, c, this.automatonFactory);
 		JavaAutomata.compile();
 		AutomatonSet automata = JavaAutomata.getAutomata();
 
 		/*
 		 * Names
 		 */
-		protocolClassName = c.getGeneratee().getSignature().getName()
-				.getName();
+		protocolClassName = c.getGeneratee().getSignature().getName().getName();
 
-		protocolClassName = "Protocol_" 
-				+ protocolClassName.substring(0, 1).toUpperCase()
+		protocolClassName = "Protocol_" + protocolClassName.substring(0, 1).toUpperCase()
 				+ protocolClassName.substring(1);
 
+		c.getGeneratee().addAnnotation(JavaMainCompiler.ANNOTATION_CLASS_NAME, protocolClassName);
 
-		c.getGeneratee().addAnnotation(JavaMainCompiler.ANNOTATION_CLASS_NAME,
-				protocolClassName);
-		
 		// Get string templates for protocol classes
 		STGroupFile templates = new STGroupFile(eclipse ? "src/main/resources/java-protocol.stg" : "java-protocol.stg");
 		ST headerTemplate = templates.getInstanceOf("header");
@@ -213,14 +204,14 @@ public class SimpleLykos {
 
 				stateClassTemplate = templates.getInstanceOf("stateClass");
 				stateClassTemplate.add("settings", settings);
-				stateClassTemplate.add("protocolSimpleClassName",protocolClassName);
+				stateClassTemplate.add("protocolSimpleClassName", protocolClassName);
 				stateClassTemplate.add("automaton", aut);
 				stateClassTemplate.add("state", st);
 				code.append("\n\n").append(stateClassTemplate.render());
 
 				st.disableCache();
 			}
-			
+
 			// Generate transition classes
 			if (!settings.partition() || aut.isMaster())
 				for (Transition tr : aut.getTransitions().getSorted()) {
@@ -231,8 +222,7 @@ public class SimpleLykos {
 					transitionClassTemplate.add("protocolSimpleClassName", protocolClassName);
 					transitionClassTemplate.add("transition", tr);
 					transitionClassTemplate.add("settings", settings);
-					code.append("\n\n")
-							.append(transitionClassTemplate.render());
+					code.append("\n\n").append(transitionClassTemplate.render());
 
 					tr.disableCache();
 				}
@@ -254,38 +244,36 @@ public class SimpleLykos {
 					queueableHandlerClassTemplate.add("protocolSimpleClassName", protocolClassName);
 					queueableHandlerClassTemplate.add("automaton", aut);
 					queueableHandlerClassTemplate.add("port", p);
-					code.append("\n\n").append(
-							queueableHandlerClassTemplate.render());
+					code.append("\n\n").append(queueableHandlerClassTemplate.render());
 				}
 
 			aut.disableCache();
 		}
 
 		files.put(protocolClassName + ".java", code.toString());
-		
-		return files;		
+
+		return files;
 	}
 
 	/**
 	 * Generates the worker classes.
+	 * 
 	 * @return Map assigning Java code to a file name
 	 */
-	private Map<String, String> generateWorkers(WorkerCompiler<?> w) 
-	{
+	private Map<String, String> generateWorkers(WorkerCompiler<?> w) {
 		Map<String, String> files = new HashMap<String, String>();
-		
-		WorkerSignature workerSignature = w.getGeneratee().getSignature();		
+
+		WorkerSignature workerSignature = w.getGeneratee().getSignature();
 		String[] identifiers = workerSignature.getName().split("\\.");
-		String workerSimpleClassName = identifiers[identifiers.length-1];
-		String workerClassName = "Worker_"
-				+ workerSimpleClassName.substring(0, 1).toUpperCase()
+		String workerSimpleClassName = identifiers[identifiers.length - 1];
+		String workerClassName = "Worker_" + workerSimpleClassName.substring(0, 1).toUpperCase()
 				+ workerSimpleClassName.substring(1);
-				
-		
-		STGroupFile workerTemplates = new STGroupFile(eclipse ? "src/main/resources/java-worker.stg" : "java-worker.stg");
+
+		STGroupFile workerTemplates = new STGroupFile(
+				eclipse ? "src/main/resources/java-worker.stg" : "java-worker.stg");
 		String workerCode = "";
-		
-		w.getGeneratee().addAnnotation("className",	workerClassName);
+
+		w.getGeneratee().addAnnotation("className", workerClassName);
 
 		// Generate header
 		ST workerHeaderTemplate = workerTemplates.getInstanceOf("header");
@@ -298,7 +286,7 @@ public class SimpleLykos {
 		workerCode += "\n\n" + workerClassTemplate.render();
 
 		files.put(workerClassName + ".java", workerCode);
-		
-		return files;		
+
+		return files;
 	}
 }

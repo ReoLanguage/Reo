@@ -38,7 +38,7 @@ public class ListenerPR extends Listener<PRAutomaton> {
 	public void exitPr(PrContext ctx) {
 		// If you encounter an error, put a message in the monitor:
 		// m.add("test error message");
-		System.out.println(name.get(ctx.pr_string()));
+//		System.out.println(name.get(ctx.pr_string()));
 		if (Objects.equals(name.get(ctx.pr_string()), "identity"))
 			prAutomata.put(ctx,
 					new PRAutomaton(name.get(ctx.pr_string()), new String(), new Integer(0), port.get(ctx.pr_port())));

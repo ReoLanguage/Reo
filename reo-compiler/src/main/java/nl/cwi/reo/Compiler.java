@@ -42,7 +42,13 @@ public class Compiler {
     private List<String> directories = new ArrayList<String>();
 
 	/**
-	 * List of of directories that contain all necessary Reo components
+	 * List of provided Reo source files.
+	 */
+	@Parameter(names = {"-o", "--output-dir"}, description = "Output directory.")
+	private String outdir = ".";
+
+	/**
+	 * List of available options.
 	 */
     @Parameter(names = {"-h", "--help"}, description = "shows all available options", help = true)
     private boolean help;
@@ -98,9 +104,12 @@ public class Compiler {
 			compilePLAIN();
 			break;
 		default:
-			System.out.println("Please specify the used semantics.");
+			monitor.add("Please specify the used semantics.");
 			break;
 		}
+
+		// Print all messages.
+		monitor.print();
 	}
     
     private void compileCAM() {
@@ -131,21 +140,13 @@ public class Compiler {
 
     private void compilePR() {    	
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
-		
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
-		
-		if (program == null) {
-			monitor.print();
-			return;
-		}
-
-		System.out.println(program.flatten().integrate().getAtoms());
-		
-		System.out.println(program);
-		
-		LykosCompiler c = new LykosCompiler(program);
-		
-		c.compile("../reo-runtime-java-lykos/src/main/java");
+		if (program == null) return;
+		//System.out.println(program.flatten().integrate().getAtoms());
+		//System.out.println(program);
+	
+		LykosCompiler c = new LykosCompiler(program, outdir);
+		c.compile();
     }
 
     private void compileSA() {

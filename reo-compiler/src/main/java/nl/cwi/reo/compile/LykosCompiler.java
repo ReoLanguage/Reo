@@ -47,9 +47,12 @@ public class LykosCompiler extends ToolErrorAccumulator {
 	ReoConnector<PRAutomaton> program;
 	Definitions defs = new Definitions();
 	int counterWorker = 0;
+	String outputpath;
 	
-	public LykosCompiler(ReoConnector<PRAutomaton> program) {
+	public LykosCompiler(ReoConnector<PRAutomaton> program, String outputpath) {
 		super("test.treo");
+		
+		this.outputpath = outputpath;
 		
 		/*
 		 * Compiler settings
@@ -91,7 +94,7 @@ public class LykosCompiler extends ToolErrorAccumulator {
 	/*
 	 * Take Reo interpreted program and make it understandable for Lykos 
 	 */
-	public void compile(String path){
+	public void compile(){
 		
 		Composite c = setComposite();
 		
@@ -125,8 +128,8 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		 * Start compiling on simple Lykos project 
 		 */
 		
-		SimpleLykos sL = new SimpleLykos();
-		sL.compile(path, programCompiler,automatonFactory);
+		SimpleLykos sL = new SimpleLykos(outputpath);
+		sL.compile(programCompiler,automatonFactory);
 	}
 	
 	/*
