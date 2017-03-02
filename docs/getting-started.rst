@@ -9,7 +9,7 @@ UNIX
 
 1. Install Java (version 1.6 or higher). You can check if the correct java version is already installed via ``java --version``
 
-2. Download the ``reo-1.0.jar`` and put it, for example, in ``~/reo/``.
+2. Download the `reo.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo.jar>`_ and put it, for example, in ``~/reo/``.
 
 3. Create an alias for the compiler via::
 
@@ -26,7 +26,7 @@ WINDOWS
 
 1. Install Java (version 1.6 or higher)
 
-2. Download ``reo-1.0.jar``. 
+2. Download the `reo.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo.jar>`_. 
 Save to your directory for 3rd party Java libraries, say ``C:\Javalib``
 
 3. Create short convenient commands for the Reo compiler, using batch files or doskey commands:
