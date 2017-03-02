@@ -126,7 +126,7 @@ public class Automata {
 
 		for (Automaton aut : automata.getSorted())
 			if (aut.getTransitions().getNonsilentSubset().isEmpty())
-				automata.remove(aut);
+			automata.remove(aut);
 
 		/*
 		 * Return

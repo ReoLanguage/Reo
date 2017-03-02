@@ -137,10 +137,12 @@ public class Compiler {
 //		JavaCompiler JC = new JavaCompiler(name, "");
 //		JC.compile(program);
     }
+    
 
     private void compilePR() {    	
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
+		monitor.print();
 		if (program == null) return;
 		//System.out.println(program.flatten().integrate().getAtoms());
 		//System.out.println(program);

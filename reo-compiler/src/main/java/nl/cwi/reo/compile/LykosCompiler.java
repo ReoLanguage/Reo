@@ -104,7 +104,9 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		 */
 		
 		List<InterpretedWorker> interpretedWorker = new ArrayList<InterpretedWorker>();
-
+		
+		System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms());
+		
 		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
 			if((X.getSourceCode())==(null) || X.getSourceCode().getFile()==null) {
 				c.addChild(setPrimitive(X.getSemantics()));

@@ -142,7 +142,7 @@ public class Interpreter<T extends Semantics<T>> {
 				parsed.add(comp);
 				ReoFile<T> program = findComponent(comp);
 				if (program != null) {
-					if (!Objects.equals(program.getName(), comp))
+					if (!program.getName().equals(comp))
 						monitor.add(program.getMainLocation(),
 								"Component must have name " + comp.substring(comp.lastIndexOf(".") + 1) + ".");
 					stack.push(program);

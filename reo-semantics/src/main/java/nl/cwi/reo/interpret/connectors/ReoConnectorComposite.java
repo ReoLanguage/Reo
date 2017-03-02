@@ -143,6 +143,8 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		for (ReoConnector<T> c : components)
 			if (c instanceof ReoConnectorAtom<?>)
 				atoms.add((ReoConnectorAtom<T>) c);
+			else
+				atoms.addAll(c.getAtoms());
 		return atoms;
 	}
 

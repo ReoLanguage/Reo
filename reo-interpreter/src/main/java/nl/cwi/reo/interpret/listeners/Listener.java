@@ -131,10 +131,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	// File
 	@Nullable
 	private ReoFile<T> program;
-	private String section = "";
+
 	private List<String> imports = new ArrayList<String>();
 	private Map<String, ComponentExpression<T>> definitions = new HashMap<String, ComponentExpression<T>>();
 
+	// Section
+	private ParseTreeProperty<String> section = new ParseTreeProperty<String>();
+	
 	// Components
 	private ParseTreeProperty<ComponentExpression<T>> components = new ParseTreeProperty<ComponentExpression<T>>();
 
@@ -210,12 +213,16 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void exitFile(FileContext ctx) {
 		// Get the main component from the file name.
 		String main = new File(ctx.getStart().getInputStream().getSourceName()).getName().split("\\.")[0];
-		program = new ReoFile<T>(section, imports, main, definitions, new Location(ctx.start));
+		
+		String sec="";
+		if(ctx.secn()!=null)
+			sec=section.get(ctx.secn());
+		program = new ReoFile<T>(sec, imports, main, definitions, new Location(ctx.start));
 	}
 
 	@Override
 	public void exitSecn(SecnContext ctx) {
-		section = ctx.name().getText();
+		section.put(ctx, ctx.name().getText());
 	}
 
 	@Override
