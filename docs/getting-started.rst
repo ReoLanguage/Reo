@@ -1,32 +1,38 @@
-Getting Started
-===============
-
 Installation
-------------
+============
 
 UNIX
-~~~~
+----
 
-1. Install Java (version 1.6 or higher). You can check if the correct java version is already installed via ``java --version``
+1. Install Java (version 1.6 or higher). You can check if the correct java version is already installed via::
 
-2. Download the `reo.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo.jar>`_ and put it, for example, in ``~/reo/``.
+	java --version
 
-3. Create an alias for the compiler via::
+2. Download the `reo-1.0.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar>`_::
 
+  cd /usr/local/lib
+	wget https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar
+
+3. Add Reo to the class path and create an alias for the compiler::
+
+	export CLASSPATH=".:/usr/local/lib/reo.jar:$CLASSPATH"
 	alias reo='java -jar /usr/local/lib/reo-1.0.jar'
 
-.. tip:: add the alias command to your startup script of your terminal (e.g., ``~/.bash_profile``).
+.. tip:: 
+	Add the export and alias commands to your startup script of your terminal (e.g., ``~/.bash_profile``).
+	This way, you don't need to set the class path and the alias for every new terminal window.
 
-4. Test the installation by starting a new terminal and running::
+3. Test the installation by running::
 
 	reo
 
+
 WINDOWS
-~~~~~~~
+-------
 
 1. Install Java (version 1.6 or higher)
 
-2. Download the `reo.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo.jar>`_. 
+2. Download the `reo-1.0.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar>`_. 
 Save to your directory for 3rd party Java libraries, say ``C:\Javalib``
 
 3. Create short convenient commands for the Reo compiler, using batch files or doskey commands:
@@ -39,7 +45,7 @@ Save to your directory for 3rd party Java libraries, say ``C:\Javalib``
 
 	doskey reo=java -jar C:\Javalib\reo-1.0.jar $*
 
-4. Test the installation by starting a new terminal and running::
+4. Test the installation by running::
 
    reo
 
