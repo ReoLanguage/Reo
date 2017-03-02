@@ -290,9 +290,6 @@ public class Interpreter<T extends Semantics<T>> {
 
 		ParseTree tree = parser.file();
 
-		if (monitor.hasErrors())
-			return null;
-
 		ParseTreeWalker walker = new ParseTreeWalker();
 		walker.walk(listener, tree);
 		return listener.getMain();
