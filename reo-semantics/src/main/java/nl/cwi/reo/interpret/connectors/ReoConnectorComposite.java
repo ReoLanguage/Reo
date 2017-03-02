@@ -282,18 +282,22 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 				// Find the correct renaming pi of port p.
 				switch (p.getType()) {
 				case OUT:
-					if (mergers && new Integer(1).compareTo(outs.get(p)) > 0) {
+//					if (mergers && new Integer(1).compareTo(outs.get(p)) > 0) {
+					if (mergers && outs.get(p) > 1) {
 						pi = p.rename(p.getName() + "." + A.size());
-						if (new Integer(0).equals(ins.get(p)))
+						if (ins.get(p) == 0)
+//						if (new Integer(0).equals(ins.get(p)))
 							A.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), p.isHidden()));
 					} else {
 						pi = p;
 					}
 					break;
 				case IN:
-					if (replicators && new Integer(1).compareTo(ins.get(p)) > 0) {
+					if (replicators && ins.get(p) > 1) {
+//					if (replicators && new Integer(1).compareTo(ins.get(p)) > 0) {
 						pi = p.rename(p.getName() + "." + A.size());
-						if (new Integer(0).equals(outs.get(p)))
+						if (outs.get(p) == 0)
+//						if (new Integer(0).equals(outs.get(p)))
 							A.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), p.isHidden()));
 					} else {
 						pi = p;

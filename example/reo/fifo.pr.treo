@@ -1,0 +1,6 @@
+section reo;
+
+fifo(a?, b!) {
+	#PR
+	Fifo[1](a;b)
+}
