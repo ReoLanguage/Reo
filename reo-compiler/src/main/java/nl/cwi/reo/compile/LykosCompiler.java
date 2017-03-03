@@ -158,7 +158,8 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
 		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
 		
-		Set<Port> P = program.flatten().getInterface(); P.clear();
+		Set<Port> P = program.flatten().getInterface(); 
+		P = program.getInterface();
 	//	Set links = new HashMap<Port,Port>();
 //		List<Port> listPort = new ArrayList<Port>();
 		for(ReoConnectorAtom<PRAutomaton> X : program.getAtoms())
