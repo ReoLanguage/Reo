@@ -49,7 +49,7 @@ Unix
 
 3. Test the installation by running::
 
-  reo
+	reo
 
 Windows
 ~~~~~~~
@@ -60,18 +60,18 @@ Windows
 Save to your directory for 3rd party Java libraries, say ``C:\Javalib``
 
 3. Create short convenient commands for the Reo compiler, using batch files or doskey commands:
- - Batch files (in directory in system PATH)::
+	- Batch files (in directory in system PATH)::
 
-	//reo.bat
-	java -jar C:\Javalib\reo-1.0.jar %*
+		//reo.bat
+		java -jar C:\Javalib\reo-1.0.jar %*
+	
+	- Or, use doskey commands::
 
- - Or, use doskey commands::
-
-  doskey reo=java -jar C:\Javalib\reo-1.0.jar $*
+		doskey reo=java -jar C:\Javalib\reo-1.0.jar $*
 
 4. Test the installation by running::
 
-  reo
+	reo
    
 Contribute
 ----------
