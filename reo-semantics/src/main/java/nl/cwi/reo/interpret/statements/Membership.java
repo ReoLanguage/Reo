@@ -59,4 +59,12 @@ public final class Membership implements PredicateExpression {
 		return scopes;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return x + ":" + list;
+	}
+
 }

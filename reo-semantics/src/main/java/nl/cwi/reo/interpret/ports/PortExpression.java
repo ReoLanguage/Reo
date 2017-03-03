@@ -15,7 +15,7 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a port expression.
  */
 public final class PortExpression extends VariableExpression {
-	
+
 	/**
 	 * Priority type: ampersand, plus, none.
 	 */
@@ -23,8 +23,11 @@ public final class PortExpression extends VariableExpression {
 
 	/**
 	 * Constructs a new port expression.
-	 * @param prio	priority type of port
-	 * @param var 	variable defining port 
+	 * 
+	 * @param prio
+	 *            priority type of port
+	 * @param var
+	 *            variable defining port
 	 */
 	public PortExpression(PrioType prio, VariableExpression var) {
 		super(var.getName(), var.getIndices(), var.getLocation());
@@ -39,9 +42,18 @@ public final class PortExpression extends VariableExpression {
 	public List<Port> evaluate(Scope s, Monitor m) {
 		List<Port> ports = new ArrayList<Port>();
 		List<? extends Identifier> list = super.evaluate(s, m);
-		if (list == null) return null;
+		if (list == null)
+			return null;
 		for (Identifier x : list)
 			ports.add(new Port(x.toString(), PortType.NONE, prio, new TypeTag(""), true));
 		return ports;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return prio + super.toString();
 	}
 }

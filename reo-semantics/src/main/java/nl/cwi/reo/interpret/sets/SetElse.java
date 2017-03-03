@@ -9,10 +9,12 @@ import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of short circuit addition.
- * @param <T> Reo semantics type
+ * 
+ * @param <T>
+ *            Reo semantics type
  */
 public final class SetElse<T extends Semantics<T>> implements SetExpression<T> {
-	
+
 	/**
 	 * First set.
 	 */
@@ -25,14 +27,17 @@ public final class SetElse<T extends Semantics<T>> implements SetExpression<T> {
 
 	/**
 	 * Short circuit addition of two sets of constraints.
-	 * @param first		first set
-	 * @param second	second set
+	 * 
+	 * @param first
+	 *            first set
+	 * @param second
+	 *            second set
 	 */
 	public SetElse(SetExpression<T> first, SetExpression<T> second) {
 		this.first = first;
 		this.second = second;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -40,10 +45,19 @@ public final class SetElse<T extends Semantics<T>> implements SetExpression<T> {
 	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
 		Instance<T> insts = first.evaluate(s, m);
-		if (insts == null) return null;
+		if (insts == null)
+			return null;
 		if (insts.getConnector().isEmpty())
 			return second.evaluate(s, m);
-		return insts;		
+		return insts;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return first + " + " + second;
 	}
 
 }

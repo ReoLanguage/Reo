@@ -19,15 +19,17 @@ public class VariableTermExpression implements TermExpression {
 	 * Variable.
 	 */
 	private VariableExpression variable;
-		
+
 	/**
 	 * Constructs a new term variable.
-	 * @param variable		variable
+	 * 
+	 * @param variable
+	 *            variable
 	 */
 	public VariableTermExpression(VariableExpression variable) {
 		this.variable = variable;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -37,9 +39,18 @@ public class VariableTermExpression implements TermExpression {
 		List<Term> terms = new ArrayList<Term>();
 		Term t = null;
 		List<? extends Identifier> list = this.variable.evaluate(s, m);
-		if (list == null) return null;
+		if (list == null)
+			return null;
 		for (Identifier x : list)
 			terms.add((t = s.get(x)) != null ? t : x);
 		return terms;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return variable.toString();
 	}
 }

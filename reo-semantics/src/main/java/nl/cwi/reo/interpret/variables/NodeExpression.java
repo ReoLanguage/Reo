@@ -63,10 +63,18 @@ public final class NodeExpression extends VariableExpression {
 	public List<Port> evaluate(Scope s, Monitor m) {
 		List<Port> ports = new ArrayList<Port>();
 		List<? extends Identifier> list = super.evaluate(s, m);
-		if (list == null) return null;
+		if (list == null)
+			return null;
 		for (Identifier x : list)
 			ports.add(new Port(x.toString(), type, prio, tag, true));
 		return ports;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return prio + super.toString() + type + tag;
+	}
 }

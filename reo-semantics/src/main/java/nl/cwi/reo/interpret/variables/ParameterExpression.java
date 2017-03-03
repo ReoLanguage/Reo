@@ -6,6 +6,7 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -42,5 +43,13 @@ public final class ParameterExpression extends VariableExpression {
 		for (Identifier x : list)
 			params.add(new Parameter(x.toString(), type));
 		return params;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return type instanceof TypeTag ? super.toString() + ":" + type : super.toString();
 	}
 }

@@ -16,20 +16,22 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a predicate variable.
  */
 public class StatementVariable implements PredicateExpression {
-	
+
 	/**
 	 * Variable.
 	 */
 	private VariableTermExpression variable;
-	
+
 	/**
 	 * Constructs a new predicate variable.
-	 * @param variable 		variable
+	 * 
+	 * @param variable
+	 *            variable
 	 */
 	public StatementVariable(VariableTermExpression variable) {
 		this.variable = variable;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -41,7 +43,15 @@ public class StatementVariable implements PredicateExpression {
 			m.add("Variable " + variable + " must be of type boolean.");
 			return null;
 		}
-		return ((BooleanValue)t.get(0)).getValue() ? Arrays.asList(s) : new ArrayList<Scope>();
+		return ((BooleanValue) t.get(0)).getValue() ? Arrays.asList(s) : new ArrayList<Scope>();
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return variable.toString();
+	}
+	
 }

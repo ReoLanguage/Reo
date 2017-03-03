@@ -71,7 +71,8 @@ public final class Relation implements PredicateExpression {
 		List<Iterator<Term>> iters = new ArrayList<Iterator<Term>>();
 		for (TermExpression arg : arguments) {
 			List<Term> terms = arg.evaluate(s, m);
-			if (terms == null) return null;
+			if (terms == null)
+				return null;
 			iters.add(terms.iterator());
 		}
 

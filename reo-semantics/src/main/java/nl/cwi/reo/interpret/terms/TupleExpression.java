@@ -13,7 +13,7 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a list of terms (tuple).
  */
 public final class TupleExpression implements TermExpression {
-	
+
 	/**
 	 * List of term expressions.
 	 */
@@ -21,12 +21,14 @@ public final class TupleExpression implements TermExpression {
 
 	/**
 	 * Constructs a new list of terms.
-	 * @param list		list of terms
+	 * 
+	 * @param list
+	 *            list of terms
 	 */
 	public TupleExpression(List<TermExpression> list) {
 		this.list = list;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -36,10 +38,19 @@ public final class TupleExpression implements TermExpression {
 		List<List<Term>> terms = new ArrayList<List<Term>>();
 		for (TermExpression t : list) {
 			List<Term> lst = t.evaluate(s, m);
-			if (lst == null) return null;
+			if (lst == null)
+				return null;
 			terms.add(lst);
 		}
 		return Arrays.asList(new Tuple(terms));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return list.toString();
 	}
 
 }

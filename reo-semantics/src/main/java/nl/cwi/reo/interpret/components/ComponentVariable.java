@@ -13,10 +13,12 @@ import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of a component variable.
- * @param <T> Reo semantics type
+ * 
+ * @param <T>
+ *            Reo semantics type
  */
 public final class ComponentVariable<T extends Semantics<T>> implements ComponentExpression<T> {
-	
+
 	/**
 	 * Variable.
 	 */
@@ -24,22 +26,34 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 
 	/**
 	 * Constructs a new component variable.
-	 * @param var	component variable
+	 * 
+	 * @param var
+	 *            component variable
 	 */
 	public ComponentVariable(VariableExpression var) {
 		this.var = var;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked") // TODO in case of erroneous input, this may trigger a runtime exception.
+	@SuppressWarnings("unchecked") // TODO in case of erroneous input, this may
+									// trigger a runtime exception.
 	@Override
 	@Nullable
 	public Component<T> evaluate(Scope s, Monitor m) {
 		List<? extends Identifier> ids = var.evaluate(s, m);
-		if (ids == null || ids.isEmpty()) return null;
+		if (ids == null || ids.isEmpty())
+			return null;
 		Value v = s.get(ids.get(0));
-		return (v instanceof Component<?> ? (Component<T>)v : null);
+		return (v instanceof Component<?> ? (Component<T>) v : null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "" + var;
 	}
 }

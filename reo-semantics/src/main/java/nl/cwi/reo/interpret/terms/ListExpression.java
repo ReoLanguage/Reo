@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.util.Monitor;
@@ -12,7 +13,7 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a list of terms.
  */
 public final class ListExpression implements TermExpression {
-	
+
 	/**
 	 * List of term expressions.
 	 */
@@ -20,12 +21,14 @@ public final class ListExpression implements TermExpression {
 
 	/**
 	 * Constructs a new list of terms.
-	 * @param list		list of terms
+	 * 
+	 * @param list
+	 *            list of terms
 	 */
 	public ListExpression(List<TermExpression> list) {
 		this.list = list;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -35,10 +38,20 @@ public final class ListExpression implements TermExpression {
 		List<Term> terms = new ArrayList<Term>();
 		for (TermExpression t : list) {
 			List<Term> lst = t.evaluate(s, m);
-			if (lst == null) return null;
+			if (lst == null)
+				return null;
 			terms.addAll(lst);
 		}
 		return terms;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		ST st = new ST("<{list; separator=\", \"}>", '{', '}');
+		st.add("list", list);
+		return st.render();
+	}
 }

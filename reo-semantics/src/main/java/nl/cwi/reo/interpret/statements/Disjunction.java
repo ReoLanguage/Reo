@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Queue;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.util.Monitor;
@@ -20,10 +21,12 @@ public final class Disjunction implements PredicateExpression {
 	 * List of disjuncts.
 	 */
 	private List<PredicateExpression> predicates;
-	
+
 	/**
 	 * Constructs a new disjunction.
-	 * @param predicates	list of disjuncts
+	 * 
+	 * @param predicates
+	 *            list of disjuncts
 	 */
 	public Disjunction(List<PredicateExpression> predicates) {
 		this.predicates = predicates;
@@ -35,25 +38,37 @@ public final class Disjunction implements PredicateExpression {
 	@Override
 	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
-			
-		List<Scope> scopes = Arrays.asList(s); 
+
+		List<Scope> scopes = Arrays.asList(s);
 		Queue<PredicateExpression> queue = new LinkedList<PredicateExpression>(predicates);
 		PredicateExpression P = null;
 		List<Scope> extension = new ArrayList<Scope>();
-		
-		while(!queue.isEmpty()){
+
+		while (!queue.isEmpty()) {
 			P = queue.poll();
-			List<Scope> list = P.evaluate(s, m); 
-			if (list == null) m.add("error in predicate"); 
-			else if (list.equals(s)) continue;
-			else extension.addAll(list);
-			
+			List<Scope> list = P.evaluate(s, m);
+			if (list == null)
+				m.add("error in predicate");
+			else if (list.equals(s))
+				continue;
+			else
+				extension.addAll(list);
+
 			if (!extension.isEmpty()) {
 				scopes = extension;
 			}
 		}
-		
+
 		return scopes;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		ST st = new ST("<predicates; separator=\" || \">");
+		st.add("predicates", predicates);
+		return st.render();
+	}
 }

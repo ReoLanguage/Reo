@@ -73,7 +73,8 @@ public final class Component<T extends Semantics<T>> implements Value {
 			return null;
 		scope.putAll(signature.getAssignments());
 		Instance<T> i = set.evaluate(scope, m);
-		if (i == null) return null;
+		if (i == null)
+			return null;
 		return i.reconnect(signature.getInterface());
 	}
 
@@ -82,7 +83,7 @@ public final class Component<T extends Semantics<T>> implements Value {
 	 */
 	@Override
 	public String toString() {
-		return scope.toString() + sign.toString() + set.toString();
+		return "" + scope + sign + set;
 	}
 
 	/**

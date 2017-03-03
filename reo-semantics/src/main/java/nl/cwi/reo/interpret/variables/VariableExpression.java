@@ -136,5 +136,4 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 		return s;
 	}
 
-
 }

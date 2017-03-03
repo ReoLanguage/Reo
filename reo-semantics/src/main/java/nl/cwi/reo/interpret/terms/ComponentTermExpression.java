@@ -13,7 +13,9 @@ import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of a component definition expression as a term.
- * @param <T> Reo semantics type
+ * 
+ * @param <T>
+ *            Reo semantics type
  */
 public class ComponentTermExpression<T extends Semantics<T>> implements TermExpression {
 
@@ -21,15 +23,17 @@ public class ComponentTermExpression<T extends Semantics<T>> implements TermExpr
 	 * Component definition.
 	 */
 	private ComponentExpression<T> component;
-	
+
 	/**
 	 * Constructs a new component definition term
-	 * @param component		component definition
+	 * 
+	 * @param component
+	 *            component definition
 	 */
-	public ComponentTermExpression(ComponentExpression<T> component){
-		this.component=component;
+	public ComponentTermExpression(ComponentExpression<T> component) {
+		this.component = component;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -37,7 +41,16 @@ public class ComponentTermExpression<T extends Semantics<T>> implements TermExpr
 	@Nullable
 	public List<Term> evaluate(Scope s, Monitor m) {
 		Component<T> comp = this.component.evaluate(s, m);
-		if (comp == null) return null;
+		if (comp == null)
+			return null;
 		return Arrays.asList(comp);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return component.toString();
 	}
 }

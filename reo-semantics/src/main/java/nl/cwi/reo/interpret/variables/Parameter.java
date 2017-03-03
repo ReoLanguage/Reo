@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret.variables;
 
+import nl.cwi.reo.interpret.typetags.TypeTag;
+
 /**
  * An identifier decorated with a parameter type.
  */
@@ -26,5 +28,13 @@ public final class Parameter extends Identifier {
 	 */
 	public ParameterType getType() {
 		return type;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+	    return type instanceof TypeTag ? name + ":" + type : name;
 	}
 }

@@ -11,14 +11,21 @@ public enum RelationSymbol {
 	 */
 	@Override
 	public String toString() {
-		switch(this) {
-		case LT: return "<";
-		case LEQ: return "<=";
-		case EQ: return "=";
-		case NEQ: return "!=";
-		case GEQ: return ">=";
-		case GT: return ">";
-		default: return null;
+		switch (this) {
+		case LT:
+			return "<";
+		case LEQ:
+			return "<=";
+		case EQ:
+			return "=";
+		case NEQ:
+			return "!=";
+		case GEQ:
+			return ">=";
+		case GT:
+			return ">";
+		default:
+			return null;
 		}
 	}
 }

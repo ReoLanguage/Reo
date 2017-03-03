@@ -3,8 +3,6 @@ package nl.cwi.reo.interpret;
 import java.io.File;
 import java.util.List;
 
-import org.stringtemplate.v4.ST;
-
 import nl.cwi.reo.interpret.statements.Conjunction;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -114,7 +112,7 @@ public final class ReoFile<T extends Semantics<T>> {
 
 			if (mainComp != null) 
 				s.put(new Identifier(getName()), mainComp);
-			else;
+			else
 				m.add(filename + " must define a component " + main + ".");
 		}
 	}

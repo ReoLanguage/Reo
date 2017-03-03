@@ -13,7 +13,9 @@ import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of an instance as a term.
- * @param <T> Reo semantics type
+ * 
+ * @param <T>
+ *            Reo semantics type
  */
 public class InstanceTermExpression<T extends Semantics<T>> implements TermExpression {
 
@@ -21,15 +23,17 @@ public class InstanceTermExpression<T extends Semantics<T>> implements TermExpre
 	 * Component instance.
 	 */
 	private InstanceExpression<T> instance;
-	
+
 	/**
 	 * Constructs a new component instance term.
-	 * @param instance		component instance
+	 * 
+	 * @param instance
+	 *            component instance
 	 */
 	public InstanceTermExpression(InstanceExpression<T> instance) {
 		this.instance = instance;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -37,7 +41,16 @@ public class InstanceTermExpression<T extends Semantics<T>> implements TermExpre
 	@Nullable
 	public List<Term> evaluate(Scope s, Monitor m) {
 		Instance<T> inst = this.instance.evaluate(s, m);
-		if (inst == null) return null;
+		if (inst == null)
+			return null;
 		return Arrays.asList(inst);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return instance.toString();
 	}
 }

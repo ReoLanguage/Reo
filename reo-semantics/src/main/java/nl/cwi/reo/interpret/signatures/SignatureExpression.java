@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
@@ -79,7 +80,7 @@ public final class SignatureExpression implements ParameterType {
 		int k_params = 0;
 		ParameterExpression rng_params = null;
 		for (ParameterExpression param : params) {
-			if (param.getIndices().isEmpty()) 
+			if (param.getIndices().isEmpty())
 				k_params++;
 			for (TermExpression t : param.getIndices()) {
 				if (t instanceof Range) {
@@ -143,7 +144,7 @@ public final class SignatureExpression implements ParameterType {
 				if (nodes != null)
 					nodeslist.addAll(nodes);
 			}
-			
+
 			Iterator<Port> node = nodeslist.iterator();
 
 			while (node.hasNext()) {
@@ -158,7 +159,7 @@ public final class SignatureExpression implements ParameterType {
 			NodeExpression rng_nodes = null;
 			for (NodeExpression node : nodes) {
 				if (node.getIndices().isEmpty())
-					k_nodes++;					
+					k_nodes++;
 				for (TermExpression t : node.getIndices()) {
 					if (t instanceof Range) {
 						rng_nodes = node;
@@ -196,7 +197,7 @@ public final class SignatureExpression implements ParameterType {
 				if (n != null)
 					nodeslist.addAll(n);
 			}
-			
+
 			Iterator<Port> node = nodeslist.iterator();
 			Iterator<Port> port = ports.iterator();
 
@@ -214,6 +215,17 @@ public final class SignatureExpression implements ParameterType {
 	public boolean equalType(ParameterType other) {
 		// TODO
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		ST st = new ST("<{params; separator=\", \"}>({nodes; separator=\", \"})", '{', '}');
+		st.add("params", params);
+		st.add("nodes", nodes);
+		return st.render();
 	}
 
 }

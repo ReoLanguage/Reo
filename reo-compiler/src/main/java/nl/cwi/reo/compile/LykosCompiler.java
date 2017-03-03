@@ -1,7 +1,6 @@
 package nl.cwi.reo.compile;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,21 +107,6 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		 */
 		
 		List<InterpretedWorker> interpretedWorker = new ArrayList<InterpretedWorker>();
-		
-
-		if (verbose) {
-			System.out.println("\nReoConnector:");
-			System.out.println(program);
-			
-			System.out.println("\nFlat ReoConnector:");
-			System.out.println(program.flatten());
-	
-			System.out.println("\nFlat ReoConnector with nodes:");
-			System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()));
-			
-			System.out.println("\nFlat ReoConnector with nodes and inherited port names at atomic components:");
-			System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()).integrate());
-		}
 		
 		List<ReoConnector<PRAutomaton>> protocol = new ArrayList<ReoConnector<PRAutomaton>>();
 		List<ReoConnector<PRAutomaton>> worker = new ArrayList<ReoConnector<PRAutomaton>>();

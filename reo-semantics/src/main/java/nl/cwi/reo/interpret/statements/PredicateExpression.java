@@ -10,12 +10,15 @@ import nl.cwi.reo.util.Monitor;
  * Interpretation of a predicate expression.
  */
 public interface PredicateExpression extends Expression<List<Scope>> {
-	
+
 	/**
-	 * Computes a list of all possible extensions of a given set of parameter 
+	 * Computes a list of all possible extensions of a given set of parameter
 	 * assignments that satisfy this formula.
-	 * @param s		variable assignment
-	 * @param m		message container
+	 * 
+	 * @param s
+	 *            variable assignment
+	 * @param m
+	 *            message container
 	 * @return list of all possible extensions.
 	 */
 	public List<Scope> evaluate(Scope s, Monitor m);

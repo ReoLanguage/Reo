@@ -18,15 +18,17 @@ public class TruthValue implements PredicateExpression {
 	 * Boolean value
 	 */
 	private boolean bool;
-	
+
 	/**
 	 * Constructs a new boolean predicate.
-	 * @param bool	boolean value
+	 * 
+	 * @param bool
+	 *            boolean value
 	 */
 	public TruthValue(boolean bool) {
 		this.bool = bool;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -34,5 +36,13 @@ public class TruthValue implements PredicateExpression {
 	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
 		return bool ? Arrays.asList(s) : new ArrayList<Scope>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return Boolean.toString(bool);
 	}
 }

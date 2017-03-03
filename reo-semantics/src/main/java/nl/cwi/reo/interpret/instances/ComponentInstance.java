@@ -16,7 +16,9 @@ import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of an atomic component instance.
- * @param <T> Reo semantics type
+ * 
+ * @param <T>
+ *            Reo semantics type
  */
 public final class ComponentInstance<T extends Semantics<T>> implements InstanceExpression<T> {
 
@@ -24,22 +26,26 @@ public final class ComponentInstance<T extends Semantics<T>> implements Instance
 	 * Component definition.
 	 */
 	private final ComponentExpression<T> component;
-	
+
 	/**
 	 * List of parameter values.
 	 */
 	private final ListExpression values;
-	
+
 	/**
 	 * List of ports.
 	 */
 	private final PortListExpression ports;
-	
+
 	/**
 	 * Constructs an atomic component instance.
-	 * @param component	component definition
-	 * @param values	parameter values
-	 * @param ports		interface ports
+	 * 
+	 * @param component
+	 *            component definition
+	 * @param values
+	 *            parameter values
+	 * @param ports
+	 *            interface ports
 	 */
 	public ComponentInstance(ComponentExpression<T> component, ListExpression values, PortListExpression ports) {
 		this.component = component;
@@ -56,8 +62,17 @@ public final class ComponentInstance<T extends Semantics<T>> implements Instance
 		List<Term> v = values.evaluate(s, m);
 		List<Port> p = ports.evaluate(s, m);
 		Component<T> c = component.evaluate(s, m);
-		if (v == null || p == null || c == null) return null;
+		if (v == null || p == null || c == null)
+			return null;
 		return c.instantiate(v, p, m);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "" + component + values + ports;
 	}
 
 }

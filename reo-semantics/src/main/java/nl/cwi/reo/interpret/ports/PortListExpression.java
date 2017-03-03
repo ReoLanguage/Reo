@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.Scope;
@@ -21,12 +22,14 @@ public final class PortListExpression implements Expression<List<Port>> {
 
 	/**
 	 * Constructs a new list of variable expressions.
-	 * @param list	list of variable expressions
+	 * 
+	 * @param list
+	 *            list of variable expressions
 	 */
 	public PortListExpression(List<PortExpression> list) {
 		this.list = list;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -41,6 +44,16 @@ public final class PortListExpression implements Expression<List<Port>> {
 			else
 				return null;
 		return concatenation;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		ST st = new ST("({list; separator=\", \"})", '{', '}');
+		st.add("list", list);
+		return st.render();
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
@@ -50,4 +51,14 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 		return new Instance<T>(new ReoConnectorAtom<T>(semantics, source), new HashSet<Set<Identifier>>());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		ST st = new ST("{\n  <atom>\n|\n  <source>\n}");
+		st.add("atom", atom);
+		st.add("source", source);
+		return st.render();
+	}
 }
