@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
+import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.ports.Port;
@@ -109,17 +110,30 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		System.out.println(program.flatten());
 		
 		System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms());
+		List<ReoConnector<PRAutomaton>> protocol = new ArrayList<ReoConnector<PRAutomaton>>();
+		List<ReoConnector<PRAutomaton>> worker = new ArrayList<ReoConnector<PRAutomaton>>();
 		
 		
-		
-		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
+		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().getAtoms()) {
 			if((X.getSourceCode())==(null) || X.getSourceCode().getFile()==null) {
-				c.addChild(setPrimitive(X.getSemantics()));
-			} else {
-				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
+				protocol.add(X);
 			}
+			else
+				worker.add(X);
 		}
-	
+			
+		ReoConnectorComposite<PRAutomaton> progProtocol = new ReoConnectorComposite<PRAutomaton>(" ",protocol);
+		ReoConnectorComposite<PRAutomaton> progWorker = new ReoConnectorComposite<PRAutomaton>(" ",worker);
+				
+				
+		for (ReoConnectorAtom<PRAutomaton> proto : progProtocol.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
+			c.addChild(setPrimitive(proto.getSemantics()));
+		}
+			
+		for (ReoConnectorAtom<PRAutomaton> work : progWorker.flatten().integrate().getAtoms()) {
+			interpretedWorker.add(new InterpretedWorker(setWorker(work)));
+		}
+			
 		List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
 		interpretedProtocol.add(new InterpretedProtocol(c));
 			
