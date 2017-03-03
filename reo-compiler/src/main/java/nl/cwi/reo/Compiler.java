@@ -143,10 +143,7 @@ public class Compiler {
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
 		monitor.print();
-		if (program == null) return;
-	//System.out.println(program.flatten().integrate().getAtoms());
-	//System.out.println(program);
-	
+		if (program == null) return;	
 		LykosCompiler c = new LykosCompiler(program, outdir);
 		c.compile();
     }

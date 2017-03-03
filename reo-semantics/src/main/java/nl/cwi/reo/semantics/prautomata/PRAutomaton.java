@@ -83,11 +83,11 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 			switch (p.getType()) {
 			case IN:
 				counterI++;
-				P.add(new Port(p.getName(),PortType.OUT,p.getPrioType(),p.getTypeTag(), false));
+				P.add(new Port(p.getName(),PortType.OUT,p.getPrioType(),p.getTypeTag(), true));
 				break;
 			case OUT: 
 				counterO++;
-				P.add(new Port(p.getName(),PortType.IN,p.getPrioType(),p.getTypeTag(), false));
+				P.add(new Port(p.getName(),PortType.IN,p.getPrioType(),p.getTypeTag(), true));
 				break;
 			default:
 				break;
