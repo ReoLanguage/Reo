@@ -239,7 +239,9 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		List<PredicateExpression> conjunctions = new ArrayList<PredicateExpression>();
 		for (DefnContext defn_ctx : ctx.defn())
 			conjunctions.add(definitions.get(defn_ctx));
-		program = new ReoFile<T>(sec, imports, filename, new Conjunction(conjunctions), new Location(ctx.start, filename));
+		Conjunction c = new Conjunction(conjunctions);
+		Location l = new Location(ctx.start, filename);
+		program = new ReoFile<T>(sec, imports, filename, c, l);
 	}
 
 	@Override

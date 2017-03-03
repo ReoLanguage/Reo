@@ -125,7 +125,7 @@ public class Compiler {
     private void compilePA() {
 		// Interpret the program
 		Interpreter<PortAutomaton> interpreter = new Interpreter<PortAutomaton>(SemanticsType.PA, new Listener<PortAutomaton>(monitor), directories, params, monitor);
-		interpreter.interpret(files);
+		interpreter.interpret(files.get(0));
 		
 //		if (program != null) {
 //			for (Component<PortAutomaton> X : program.getComponents()) System.out.println(X);
@@ -147,7 +147,7 @@ public class Compiler {
 
     private void compilePR() {    	
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
-		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
+		ReoConnector<PRAutomaton> program = interpreter.interpret(files.get(0));
 		monitor.print();
 		if (program == null) return;	
 		LykosCompiler c = new LykosCompiler(program, outdir, verbose);

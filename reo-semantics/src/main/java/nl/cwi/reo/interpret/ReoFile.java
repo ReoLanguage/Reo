@@ -63,7 +63,7 @@ public final class ReoFile<T extends Semantics<T>> {
 	 *            component definitions
 	 */
 	public ReoFile(String section, List<String> imports, String filename, Conjunction definitions, Location location) {
-		if (section == null || imports == null || filename == null || definitions == null)
+		if (section == null || imports == null || filename == null || definitions == null || location == null)
 			throw new NullPointerException();
 		this.filename = filename;
 		this.section = section;
@@ -114,20 +114,20 @@ public final class ReoFile<T extends Semantics<T>> {
 
 			if (mainComp != null) 
 				s.put(new Identifier(getName()), mainComp);
-			else
-				m.add(filename + " does not contain a main component.");
+			else;
+				m.add(filename + " must define a component " + main + ".");
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		ST st = new ST("<section:{ s | section s;\n\n}><imports:{ i | import i;\n }>\n<definitions; separator='\n\n'>");
-		st.add("section", "section " + section);
-		st.add("imports", imports);
-		st.add("definitions", definitions);
-		return st.render();
-	}
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public String toString() {
+//		ST st = new ST("<section:{ s | section s;\n\n}><imports:{ i | import i;\n }>\n<definitions>");
+//		st.add("section", "section " + section);
+//		st.add("imports", imports);
+//		st.add("definitions", definitions);
+//		return st.render();
+//	}
 }

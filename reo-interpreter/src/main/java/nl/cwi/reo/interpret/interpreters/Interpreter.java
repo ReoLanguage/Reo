@@ -69,7 +69,7 @@ public class Interpreter<T extends Semantics<T>> {
 	/**
 	 * Container for messages.
 	 */
-	private final Monitor monitor;
+	private final Monitor m;
 
 	/**
 	 * Constructs a Reo interpreter.
@@ -88,7 +88,7 @@ public class Interpreter<T extends Semantics<T>> {
 		for (String s : params)
 			values.add(new StringValue(s));
 		this.values = Collections.unmodifiableList(values);
-		this.monitor = monitor;
+		this.m = monitor;
 	}
 
 	/**
@@ -101,80 +101,62 @@ public class Interpreter<T extends Semantics<T>> {
 	 *         file, or null, if the main component could not be interpreted.
 	 */
 	@Nullable
-	public ReoConnector<T> interpret(List<String> srcfiles) {
-		
-		// Name of main component.
-		String name = "";
-		
+	public ReoConnector<T> interpret(String file) {
+
 		// Stack of all parsed Reo source files.
 		Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();
 
-		// List of fully qualified names of already parsed component
-		// definitions.
+		// Name of main component.
+		String name = "";
+
+		// List of parsed component definitions.
 		List<String> parsed = new ArrayList<String>();
 
-		// List of fully qualified names of unparsed imported component
-		// definitions.
-		Queue<String> components = new LinkedList<String>();
+		// List of unparsed imported component definitions.
+		Queue<String> todo = new LinkedList<String>();
 
-		// Parse all provided source files.
-		for (String file : srcfiles) {
-			String filename = new File(file).getName().replaceFirst("[.][^.]+$", "");
-			ReoFile<T> program = null;
-			try {
-				program = parse(new ANTLRFileStream(file), file);
-			} catch (IOException e) {
-				monitor.add("Cannot open " + file);
-			}
-			if (program != null) {
-				if (!program.getName().endsWith(filename))
-					monitor.add(program.getMainLocation(), "Component must have name " + filename + ".");
-				stack.push(program);
-				parsed.add(program.getName());
-				components.addAll(program.getImports());
-				if (name.equals(""))
-					name = program.getName();
-			} else {
-				monitor.add("Cannot parse " + new File(file).getName() + ".");
-			}
+		// Parse the provided source files.
+		ReoFile<T> mainFile = parse(file);
+		if (mainFile != null) {
+			stack.push(mainFile);
+			todo.addAll(mainFile.getImports());
+			name = mainFile.getName();
+			parsed.add(name);
 		}
 
 		// Find and parse all imported component definitions.
-		while (!components.isEmpty()) {
-			String comp = components.poll();
-			if (comp != null && !parsed.contains(comp)) {
-				parsed.add(comp);
-				ReoFile<T> program = findComponent(comp);
-				if (program != null) {
-					if (!program.getName().equals(comp))
-						monitor.add(program.getMainLocation(),
-								"Component must have name " + comp.substring(comp.lastIndexOf(".") + 1) + ".");
-					stack.push(program);
-					List<String> newComponents = program.getImports();
+		String component;
+		while ((component = todo.poll()) != null) {
+			if (!parsed.contains(component)) {
+				parsed.add(component);
+				ReoFile<T> inclFile = findComponent(component);
+				if (inclFile != null) {
+					stack.push(mainFile);
+					List<String> newComponents = mainFile.getImports();
 					newComponents.removeAll(parsed);
-					components.addAll(newComponents);
+					todo.addAll(newComponents);
 				} else {
-					monitor.add("Component " + comp + " cannot be found.");
+					m.add("Component " + component + " cannot be found.");
 				}
 
 			}
 		}
-				
+
 		// Evaluate all component expressions.
 		Scope scope = new Scope();
 		while (!stack.isEmpty())
-			stack.pop().evaluate(scope, monitor);
-		
+			stack.pop().evaluate(scope, m);
+
 		// Instantiate the main component
 		Value main = scope.get(new Identifier(name));
 		if (main instanceof Component<?>) {
 			@SuppressWarnings("unchecked")
-			Instance<T> i = ((Component<T>)main).instantiate(values, null, monitor);
+			Instance<T> i = ((Component<T>) main).instantiate(values, null, m);
 			if (i != null)
 				return i.getConnector();
 		}
-		
-		monitor.add("Cannot instantiate " + name + ".");
+
+		m.add("Cannot instantiate " + name + ".");
 		return null;
 	}
 
@@ -198,24 +180,24 @@ public class Interpreter<T extends Semantics<T>> {
 		String cp2 = directory + name + ".treo";
 
 		search: for (String dir : dirs) {
-			
+
 			// Check if atomic component exists in resources of this jar.
-			InputStream in1 = getClass().getResourceAsStream(File.separator + cp1); 
+			InputStream in1 = getClass().getResourceAsStream(File.separator + cp1);
 			if (in1 != null) {
 				try {
 					prog = parse(new ANTLRInputStream(in1), File.separator + cp1);
 				} catch (IOException e1) {
-					monitor.add("Cannot open " + cp1);
+					m.add("Cannot open " + cp1);
 				}
 			}
 
 			// Check if atomic component exists in resources of this jar.
-			InputStream in2 = getClass().getResourceAsStream(File.separator + cp2); 
+			InputStream in2 = getClass().getResourceAsStream(File.separator + cp2);
 			if (in2 != null) {
 				try {
 					prog = parse(new ANTLRInputStream(in2), File.separator + cp2);
 				} catch (IOException e1) {
-					monitor.add("Cannot open " + cp2);
+					m.add("Cannot open " + cp2);
 				}
 			}
 
@@ -250,7 +232,7 @@ public class Interpreter<T extends Semantics<T>> {
 									break search;
 								}
 							} catch (IOException e) {
-								monitor.add("Cannot open " + file.toString());
+								m.add("Cannot open " + file.toString());
 							} finally {
 								try {
 									if (zipFile != null)
@@ -269,7 +251,7 @@ public class Interpreter<T extends Semantics<T>> {
 				try {
 					prog = parse(new ANTLRFileStream(dir + File.separator + cp1), dir + File.separator + cp1);
 				} catch (IOException e) {
-					monitor.add("Cannot open " + f1.toString());
+					m.add("Cannot open " + f1.toString());
 				}
 				break search;
 			}
@@ -280,7 +262,7 @@ public class Interpreter<T extends Semantics<T>> {
 				try {
 					prog = parse(new ANTLRFileStream(dir + File.separator + cp2), dir + File.separator + cp2);
 				} catch (IOException e) {
-					monitor.add("Cannot open " + f2.toString());
+					m.add("Cannot open " + f2.toString());
 				}
 				break search;
 			}
@@ -293,21 +275,61 @@ public class Interpreter<T extends Semantics<T>> {
 	 * Parses a source file using ANTLR4, and walks over the parse tree to
 	 * interpret this source file as a Java object.
 	 * 
-	 * @param c
-	 *            input character stream
+	 * @param is
+	 *            input stream
+	 * @param path
+	 *            location of the file
 	 * @return an interpreted source file, or null in case of an error.
 	 */
 	@Nullable
-	private ReoFile<T> parse(CharStream c, String filename) {
+	private ReoFile<T> parse(InputStream is, String file) {
+		try {
+			return parse(new ANTLRInputStream(is), file);
+		} catch (IOException e) {
+			m.add("Cannot open " + file + ".");
+		}
+		return null;
+	}
+
+	/**
+	 * Parses a source file using ANTLR4, and walks over the parse tree to
+	 * interpret this source file as a Java object.
+	 * 
+	 * @param path
+	 *            location of the file
+	 * @return an interpreted source file, or null in case of an error.
+	 */
+	@Nullable
+	private ReoFile<T> parse(String path) {
+		try {
+			return parse(new ANTLRFileStream(path), path);
+		} catch (IOException e) {
+			m.add("Cannot open " + path + ".");
+		}
+		return null;
+	}
+
+	/**
+	 * Parses a source file using ANTLR4, and walks over the parse tree to
+	 * interpret this source file as a Java object.
+	 * 
+	 * @param c
+	 *            input character stream
+	 * @param path
+	 *            location of the file
+	 * @return an interpreted source file, or null in case of an error.
+	 */
+	@Nullable
+	private ReoFile<T> parse(CharStream c, String path) {
 		ReoLexer lexer = new ReoLexer(c);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ReoParser parser = new ReoParser(tokens);
-		ErrorListener errListener = new ErrorListener(monitor);
+		ErrorListener errListener = new ErrorListener(m);
 		parser.removeErrorListeners();
 		parser.addErrorListener(errListener);
 		ParseTree tree = parser.file();
 		ParseTreeWalker walker = new ParseTreeWalker();
-		listener.setFileName(filename);
+		listener.setFileName(path);
 		walker.walk(listener, tree);
 		return listener.getMain();
 	}

@@ -1,7 +1,11 @@
 package nl.cwi.reo.interpret;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -68,4 +72,15 @@ public final class Scope {
 	public boolean isEmpty() {
 		return assignments.isEmpty();
 	}
+	
+	@Override
+	public String toString() {
+		List<String> list = new ArrayList<String>();
+		for (Map.Entry<Identifier, Value> assignment : assignments.entrySet())
+			list.add(assignment.getKey() + " = " + assignment.getValue());
+		ST st = new ST("<list; separator=\",\n\">");
+		st.add("list", list);
+		return st.render();
+	}
+	
 }
