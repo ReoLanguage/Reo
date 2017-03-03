@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import nl.cwi.reo.interpret.typetags.TypeTag;
 
-public class PortTests {
+public class PortTest {
 	
 	@Test
 	public void join_OriginalHasNoTypes() {

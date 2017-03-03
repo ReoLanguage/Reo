@@ -17,7 +17,7 @@ import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.plain.Plain;
 
-public class ReoConnectorTests {
+public class ReoConnectorTest {
 
 	@Test
 	public void flatten_CompositeConnector_bla() {
@@ -34,9 +34,9 @@ public class ReoConnectorTests {
 		Map<Port, Port> links_cd = new HashMap<Port, Port>();
 
 		Port a_i = new Port("a", PortType.IN, PrioType.NONE, new TypeTag("int"), true);
-		Port b_o = new Port("b", PortType.OUT, PrioType.NONE, new TypeTag("int"), true);
+		Port b_o = new Port("b", PortType.OUT, PrioType.NONE, new TypeTag("int"), false);
 
-		Port b_i = new Port("b", PortType.IN, PrioType.NONE, new TypeTag("int"), true);
+		Port b_i = new Port("b", PortType.IN, PrioType.NONE, new TypeTag("int"), false);
 		Port c_o = new Port("c", PortType.OUT, PrioType.NONE, new TypeTag("int"), true);
 
 		Port c_i = new Port("c", PortType.IN, PrioType.NONE, new TypeTag("int"), true);

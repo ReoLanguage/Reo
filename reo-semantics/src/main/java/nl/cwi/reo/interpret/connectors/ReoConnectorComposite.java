@@ -89,13 +89,13 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		for (ReoConnector<T> comp : components)
 			for (Map.Entry<Port, Port> link : comp.getLinks().entrySet())
 				links.put(link.getValue(), link.getValue());
-		
+
 		Map<Port, Port> linksFinal = new HashMap<Port, Port>();
 		linksFinal.putAll(links);
 		for (Map.Entry<Port, Port> link : links.entrySet())
-			if(!link.getKey().getType().equals(link.getValue().getType()))
+			if (!link.getKey().getType().equals(link.getValue().getType()))
 				linksFinal.remove(link.getKey());
-	
+
 		this.links = Collections.unmodifiableMap(linksFinal);
 	}
 
@@ -168,7 +168,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	public static <T extends Semantics<T>> ReoConnectorComposite<T> compose(String operator,
 			List<? extends ReoConnector<T>> components) {
 		List<ReoConnector<T>> newcomponents = new ArrayList<ReoConnector<T>>();
-		Integer i = Integer.valueOf(0);
+		Integer i = new Integer(0);
 		for (ReoConnector<T> comp : components)
 			newcomponents.add(comp.renameHidden(i));
 		return new ReoConnectorComposite<T>(operator, newcomponents);
@@ -212,27 +212,25 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		List<ReoConnector<T>> list = new ArrayList<ReoConnector<T>>();
 		Integer i = new Integer(0);
 		for (ReoConnector<T> comp : components) {
-//			ReoConnector<T> rc = comp.renameHidden(i).flatten();
-			ReoConnector<T> rc = comp.reconnect(this.getLinks()).flatten();
-			
+			ReoConnector<T> rc = comp.renameHidden(i);
+			rc = rc.flatten();
+			// ReoConnector<T> rc = comp.reconnect(this.getLinks()).flatten();
+
 			if (rc instanceof ReoConnectorComposite<?>)
-				list.addAll(((ReoConnectorComposite<T>)rc).components);
-			else 
+				list.addAll(((ReoConnectorComposite<T>) rc).components);
+			else
 				list.add(rc);
 		}
 		return new ReoConnectorComposite<T>("", list);
 	}
 
+//	public ReoConnectorComposite<T> insertNodes_bis(boolean mergers, boolean replicators, T nodeFactory) {
+//
+//		List<ReoConnector<T>> newcomponents = new ArrayList<ReoConnector<T>>();
+//
+//		return new ReoConnectorComposite<T>(operator, newcomponents);
+//	}
 
-	public ReoConnectorComposite<T> insertNodes_bis(boolean mergers, boolean replicators, T nodeFactory) {
-
-		List<ReoConnector<T>> newcomponents = new ArrayList<ReoConnector<T>>();
-		
-		
-		
-		return new ReoConnectorComposite<T>(operator, newcomponents);
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -287,11 +285,12 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 				// Find the correct renaming pi of port p.
 				switch (p.getType()) {
 				case OUT:
-//					if (mergers && new Integer(1).compareTo(outs.get(p)) > 0) {
+					// if (mergers && new Integer(1).compareTo(outs.get(p)) > 0)
+					// {
 					if (mergers && outs.get(p) > 1) {
 						pi = p.rename(p.getName() + "." + A.size());
 						if (ins.get(p) == 0)
-//						if (new Integer(0).equals(ins.get(p)))
+							// if (new Integer(0).equals(ins.get(p)))
 							A.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), p.isHidden()));
 					} else {
 						pi = p;
@@ -299,10 +298,11 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 					break;
 				case IN:
 					if (replicators && ins.get(p) > 1) {
-//					if (replicators && new Integer(1).compareTo(ins.get(p)) > 0) {
+						// if (replicators && new
+						// Integer(1).compareTo(ins.get(p)) > 0) {
 						pi = p.rename(p.getName() + "." + A.size());
 						if (outs.get(p) == 0)
-//						if (new Integer(0).equals(outs.get(p)))
+							// if (new Integer(0).equals(outs.get(p)))
 							A.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), p.isHidden()));
 					} else {
 						pi = p;
@@ -344,9 +344,13 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("<operator>{\n  <components; separator=\"\n\">\n}");
+		List<String> renaming = new ArrayList<String>();
+		for (Map.Entry<Port, Port> link : links.entrySet())
+			renaming.add(link.getKey() + "=" + link.getValue());
+		ST st = new ST("<operator>{\n  <components; separator=\"\n\">\n}(<renaming; separator=\", \">)");
 		st.add("operator", operator);
 		st.add("components", components);
+		st.add("renaming", renaming);
 		return st.render();
 	}
 

@@ -7,7 +7,7 @@ public final class TypeTag implements ParameterType {
 	private final String tag;
 	
 	public TypeTag() {
-		this.tag = " ";
+		this.tag = "";
 	}
 	
 	public TypeTag(String tag) {
@@ -29,6 +29,6 @@ public final class TypeTag implements ParameterType {
 	
 	@Override
 	public String toString() {
-		return tag.toString();
+		return tag;
 	}	
 }
