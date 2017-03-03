@@ -2,10 +2,14 @@ Syntax of Reo
 =============
 
 
+.. attention:: 
+	This page is still under construction and the presented language constructs may not be up-to-date.
+	Sorry for the inconvenience.
+
 Components and interfaces
 -------------------------
 
-In Reo, programs consist of *components* that interact via shared *nodes*.
+Reo programs consist of *components* that interact via shared *nodes*.
 Each component has access to a given set of nodes, called an *interface*.
 A component may synchronize with its environment via *puts* and *gets* on nodes in its interface.
 An atomic-component uses each port either as input or as output, but not both.
@@ -18,13 +22,12 @@ The following example shows how we can define a component by referring to Java s
 
 .. code-block:: text
    
-   // producer.treo
-   producer(a!) { 
-      Java : 
-         com.example.Producer(a)
+	// producer.treo
+	producer(a!) { 
+		#PR identity(;a) | Java:"com.example.MyClass.myProducer"
 	}
 
-The producer component is defined by the implementation of the Java class ``Producer`` in package ``com.example``.
+The producer component is defined by the implementation of the Java method ``myProducer`` in class ``com.example.MyClass``.
 The ``Java`` tag indicates that the reference links to a Java class. Components can also be defined by methods 
 written other general purpose languages, such as C/C++
 
@@ -37,26 +40,28 @@ Another possibility is to define a component via a particular semantic model, su
 
 .. code-block:: text
    
-   // buffer.treo 
-   buffer(a?,b!) {
-      CASM :
-         q0 -> q1 : {a}, x' == d(a) 
-         q1 -> q0 : {b}, d(b) == x  
-      C/C++ :
-         example::Buffer(a,b)
-   }
+	// buffer.treo 
+	buffer(a?,b!) {
+		#CASM
+			q0 -> q1 : {a}, x' == d(a) 
+			q1 -> q0 : {b}, d(b) == x  
+	|
+		C/C++:"example::Buffer"
+	}
 
-By now, there are more than thirty semantics for Reo. Therefore, it is possible to provide a second definition of the 
+The above code is pseudo code, because the Reo compiler does not yet support C/C++.
+
+There are more than thirty semantics for Reo. Therefore, allow to provide a second definition of the 
 *same* component, using a *different* semantics. For example, the *work automaton* semantics
 
 .. code-block:: text
 
    // fifo1.wa.treo
 	define fifo1(a?,b!) {
-      WA :
-         q0 : initial
-         q0 -> q1 : {a}, true, {}
-         q1 -> q0 : {b}, true, {}
+      #WA
+				q0 : initial
+				q0 -> q1 : {a}, true, {}
+				q1 -> q0 : {b}, true, {}
 	}
 
 .. note:: 
@@ -72,7 +77,7 @@ Now that we defined the ``fifo1``-channel, we may start using it by *instantiati
 .. code-block:: text
 	
    // main.treo
-   import fifo1;
+   import reo.fifo1;
    
    main() {
 	  fifo1(x,y)
@@ -92,9 +97,10 @@ For example, the following code shows the composition of two ``fifo1``-channels.
 .. code-block:: text
 	:linenos:
 	
-
-	fifo1(a,b) // first
-	fifo1(b,c) // second
+	{
+		fifo1(a,b) // first
+		fifo1(b,c) // second
+	}
 
 The first and second ``fifo1``-channel share the common node b.
 Recall that the first ``fifo1``-channel uses node b as an output node and that
@@ -103,8 +109,6 @@ the second ``fifo1``-channel uses node b as in input channel.
 The two ``fifo1``-channels communicate via shared node A using the **broadcast** mechanism, 
 that is, a *put/send operation* by a **single** component that uses node A as an *output node* 
 synchronizes with a *get/receive operation* by **all** components that use node A as an *input node*.  
-
-Note that the broadcast communication mechanism 
 
 .. note:: 
 	This broadcast communication mechanism should not be confused with broadcast communication
@@ -116,22 +120,19 @@ Iteration
 ---------
 
 The composition of the two ``fifo1``-channel explicitly instantiates each ``fifo1``-channel individually.
-In this case, may could obtain the same construction using only *one* explicit instantiation using a **for loop**
+In this case, may could obtain the same construction using only *one* explicit instantiation using a **predicates**
 
 .. code-block:: text
 	:linenos:
 	
-	for i = 0 ... 1 {
-	  fifo1(a[i],a[i+1])
-	}
+	{ fifo1(a[i],a[i+1]) | i : <0..1> }
 
 This for loop is equivalent to the composition
 
 .. code-block:: text
 	:linenos:
 	
-	fifo1(a[0],a[1])
-	fifo1(a[1],a[2])
+	{ fifo1(a[0],a[1]) fifo1(a[1],a[2]) }
 
 Abstraction
 -----------
@@ -142,9 +143,11 @@ Hence, another component, say ``producer``, may synchronize with node b as follo
 .. code-block:: text
 	:linenos:
 	
-	fifo1(a,b)
-	fifo1(b,c)
-	producer(b) // this component synchronizes on the 'internal' node b
+	main() {
+		fifo1(a,b)
+		fifo1(b,c)
+		producer(b) // this component synchronizes on the 'internal' node b
+	}
 
 The data provided by the producer flows via the **second** ``fifo1``-channel from node b to node c, 
 while leaving the **first** ``fifo1``-channel from node a to node b unused.
@@ -157,13 +160,15 @@ this new component
 .. code-block:: text
 	:linenos:
 
-	define fifo2(a,c) { 
+	fifo2(a,c) { 
 	  fifo1(a,b) 
 	  fifo1(b,c)
 	}
-	
-	fifo2(a,c)
-	producer(b) // node b is different from node b used in the definition of fifo2
+
+	main() {
+		fifo2(a,c)
+		producer(b) // node b is different from node b used in the definition of fifo2
+	}
 
 Since we know for each component in the definition of ``fifo2`` whether a node is used as input, output or both,
 there is no need to make this explicit in the interface.
@@ -179,11 +184,7 @@ In may be useful to allow variable iteration bounds
 .. code-block:: text
 	:linenos:
 	
-	define fifo<k>(a[0], a[1...k-1], a[k]) {
-	  for i = 0 ... k-1  {
-	    fifo1(a[i],a[i+1])
-	  }
-	}
+	fifo<k>(a[0], a[1...k-1], a[k]) { fifo1(a[i],a[i+1]) |	i : <0..k-1 }
 
 The variable used in the upper bound of the iteration is instantiated as a parameter in the surrounding 
 component definition.
@@ -195,7 +196,7 @@ We may also use parameters in the following way
 
 	transformer<f>(a,b) {
 	  #CASM
-	  q -- {a,b}, d(b) == f(d(a)) -> q;
+	  	q -- {a,b}, d(b) == f(d(a)) -> q;
 	}
 
 Or, as follows
