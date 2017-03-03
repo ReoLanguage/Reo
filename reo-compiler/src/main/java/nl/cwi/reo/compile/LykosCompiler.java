@@ -105,7 +105,11 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		
 		List<InterpretedWorker> interpretedWorker = new ArrayList<InterpretedWorker>();
 		
+		System.out.println(program.flatten());
+		
 		System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms());
+		
+		
 		
 		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
 			if((X.getSourceCode())==(null) || X.getSourceCode().getFile()==null) {
@@ -143,6 +147,12 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
 		
 		Set<Port> P = program.getInterface();
+		Map<Port, Port> links=program.getLinks();
+//		Set<Port> P = P1;
+		for(Port p : links.keySet()){
+			if(p.getType()!=links.get(p).getType())
+				P.remove(p);
+		}
 		int numberInPort=1;
 		int numberOutPort=1;
 		for(Port p: P){
