@@ -144,8 +144,14 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	/**
 	 * {@inheritDoc}
 	 */
+	
+	public ReoConnectorComposite<T> flatten(ReoConnectorComposite<T> c) {
+		
+		return new ReoConnectorComposite<T>("", Arrays.asList(c));
+	}
 	@Override
 	public ReoConnectorComposite<T> flatten() {
+		
 		return new ReoConnectorComposite<T>("", Arrays.asList(this));
 	}
 

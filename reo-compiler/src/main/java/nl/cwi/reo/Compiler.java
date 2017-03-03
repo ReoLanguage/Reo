@@ -144,8 +144,8 @@ public class Compiler {
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
 		monitor.print();
 		if (program == null) return;
-		//System.out.println(program.flatten().integrate().getAtoms());
-		//System.out.println(program);
+	//System.out.println(program.flatten().integrate().getAtoms());
+	//System.out.println(program);
 	
 		LykosCompiler c = new LykosCompiler(program, outdir);
 		c.compile();
