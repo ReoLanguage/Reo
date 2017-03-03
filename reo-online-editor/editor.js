@@ -17,7 +17,7 @@
     });
     
     // give the node an identifier and increment it for the next node
-    c.id = id;
+    c.set({'id': id});
     id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g,'a');
 
     // these are the channels that are connected to this node
@@ -82,7 +82,7 @@
   }
   
   function updateLine(line, end) {
-    // we first have update the end coordinates
+    // we first have to reset the end coordinates
     var x1 = line.circle1.get('left');
     var y1 = line.circle1.get('top');
     var x2 = line.circle2.get('left');
@@ -137,7 +137,7 @@
       angle = (x < 0) ? Math.atan(y / x) + Math.PI : (y < 0) ? Math.atan(y / x) + (2 * Math.PI) : Math.atan(y / x);
     }
 
-    return (angle * 180 / Math.PI) + 90;
+    return ((angle * 180 / Math.PI) + 90) % 360;
   } //calcArrowAngle
   
   function enumerate() {
@@ -186,13 +186,12 @@
       return;
     var pointer = canvas.getPointer(e.e);
     var p = canvas.getActiveObject();
-    p.set({left: pointer.x, top: pointer.y});
+    p.set({'left': pointer.x, 'top': pointer.y});
     
     canvas.forEachObject(function(obj) {
       if (obj !== p && obj.get('type') === "circle" && p.intersectsWithObject(obj)) {
         if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-          p.setLeft(obj.getLeft());
-          p.setTop(obj.getTop());
+          p.set({'left': obj.getLeft(), 'top': obj.getTop()});
           p.setCoords();
         }
       }
@@ -210,7 +209,7 @@
     isDown = false;
     var p = canvas.getActiveObject();
     canvas.forEachObject(function(obj) {
-      if (!obj || obj.id === p.id || obj.get('type') !== "circle")
+      if (!obj || obj.get('id') == p.get('id') || obj.get('type') !== "circle")
         return;
       if (p.intersectsWithObject(obj)) {
         if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
@@ -239,7 +238,6 @@
   
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
-
 
 })();
 
