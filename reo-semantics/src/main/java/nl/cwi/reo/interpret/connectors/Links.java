@@ -64,5 +64,26 @@ public final class Links {
 				newlinks.put(link.getKey(), new Port("#" + i++,link.getValue().getType(),link.getValue().getPrioType(),link.getValue().getTypeTag(),true));
 		return newlinks;
 	}
-
+	
+	public static Map<Port, Port> markHidden(Map<Port, Port> links, Map<Port, Port> joins) {
+		Map<Port, Port> newlinks = new HashMap<Port, Port>();
+		for (Map.Entry<Port, Port> link : links.entrySet()) {
+			
+			Port x = link.getValue();
+			boolean hide = true;
+			for(Map.Entry<Port, Port> join : joins.entrySet()) {		
+				if(join.getKey().equals(x)){
+					hide = false;
+					newlinks.put(link.getKey(), link.getValue());
+				}
+			}
+			
+			Port y;
+			if (hide){ 
+				y = x.hide();
+				newlinks.put(link.getKey(), y);
+			}
+		}
+		return newlinks;
+	}
 }

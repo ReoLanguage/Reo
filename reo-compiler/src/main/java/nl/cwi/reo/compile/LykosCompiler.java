@@ -1,6 +1,7 @@
 package nl.cwi.reo.compile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,25 +147,29 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
 		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
 		
-		Set<Port> P = program.getInterface();
-		Map<Port, Port> links=program.getLinks();
+		Set<Port> P = program.flatten().getInterface(); P.clear();
+	//	Set links = new HashMap<Port,Port>();
+//		List<Port> listPort = new ArrayList<Port>();
+		for(ReoConnectorAtom<PRAutomaton> X : program.getAtoms())
+			if(X.getSourceCode()!=null && X.getSourceCode().getFile()!=null)
+				for(Port p : X.getLinks().keySet())
+					P.add(X.getLinks().get(p));
+		//= program.flatten().getLinks();
 //		Set<Port> P = P1;
-		for(Port p : links.keySet()){
-			if(p.getType()!=links.get(p).getType())
-				P.remove(p);
-		}
+//		for(Port p : listPort){
+//			if(p.isHidden())
+//				P.add(p);
+//		}
 		int numberInPort=1;
 		int numberOutPort=1;
 		for(Port p: P){
+			PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 			if (p.getType()==PortType.IN){
-				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
-				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 				inputPortsOrArrays.put(new TypedName("in"+(numberInPort),Type.PORT),jp);
 				numberInPort++;
 			}
-			else if (p.getType()==PortType.OUT){
-				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
-				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
+			else if (p.getType()==PortType.OUT){		
 				outputPortsOrArrays.put(new TypedName("out"+(numberOutPort),Type.PORT),jp);
 				numberOutPort++;
 			} else {

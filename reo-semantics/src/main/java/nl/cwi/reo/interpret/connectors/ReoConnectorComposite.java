@@ -193,9 +193,16 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 */
 	@Override
 	public ReoConnectorComposite<T> reconnect(Map<Port, Port> joins) {
-		return new ReoConnectorComposite<T>(operator, components, Links.reconnect(links, joins));
+		List<ReoConnector<T>> c = new ArrayList<ReoConnector<T>>();
+		for(ReoConnector<T> connector : this.components)
+			c.add(connector.markHidden(joins));
+		return new ReoConnectorComposite<T>(operator, c, Links.reconnect(links, joins));
 	}
 
+	public ReoConnectorComposite<T> markHidden(Map<Port, Port> join) {
+		return new ReoConnectorComposite<T>(operator, components, Links.markHidden(links, join));
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

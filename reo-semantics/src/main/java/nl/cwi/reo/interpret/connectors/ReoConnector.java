@@ -55,6 +55,13 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	 * @return Block with renamed hidden ports.
 	 */
 	public ReoConnector<T> renameHidden(Integer i);
+	
+	/**
+	 * 
+	 * @param i
+	 * @return
+	 */
+	public ReoConnector<T> markHidden(Map<Port, Port> joins);
 
 	/**
 	 * Inserts, if necessary, a merger and/or replicator at every node in this
