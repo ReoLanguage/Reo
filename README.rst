@@ -43,9 +43,8 @@ Unix
 	export CLASSPATH=".:/usr/local/lib/reo-1.0.jar:$CLASSPATH"
 	alias reo='java -jar /usr/local/lib/reo-1.0.jar'
 
-.. tip:: 
-	Add the export and alias commands to your startup script of your terminal (e.g., ``~/.bash_profile``).
-	This way, you don't need to set the class path and the alias for every new terminal window.
+You may want to add the export and alias commands to your startup script of your terminal (e.g., ``~/.bash_profile``).
+This way, you don't need to set the class path and the alias for every new terminal window.
 
 3. Test the installation by running::
 
