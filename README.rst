@@ -53,20 +53,15 @@ This way, you don't need to set the class path and the alias for every new termi
 Windows
 ~~~~~~~
 
-1. Install Java (version 1.6 or higher)
+1. Install Java (version 1.6 or higher).
 
-2. Download the `reo-1.0.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar>`_. 
-Save to your directory for 3rd party Java libraries, say ``C:\Javalib``
+2. Download the `reo-1.0.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar>`_. Save to your directory for 3rd party Java libraries, say ``C:\Javalib``.
 
-3. Create short convenient commands for the Reo compiler, using batch files or doskey commands:
-	- Batch files (in directory in system PATH)::
 
-		//reo.bat
-		java -jar C:\Javalib\reo-1.0.jar %*
-	
-	- Or, use doskey commands::
+3. Create short convenient commands for the Reo compiler, using doskey commands ``doskey reo=java -jar C:\Javalib\reo-1.0.jar $*`` or using batch files (in directory in system PATH)::
 
-		doskey reo=java -jar C:\Javalib\reo-1.0.jar $*
+	//reo.bat
+	java -jar C:\Javalib\reo-1.0.jar %*	
 
 4. Test the installation by running::
 
