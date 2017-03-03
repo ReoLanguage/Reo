@@ -1,0 +1,12 @@
+section reo;
+import reo.sync;
+import reo.syncdrain;
+
+regulatorwwr(a, b, c) {
+  sync(a, m) syncdrain(m, b) sync(m, c)
+}
+
+regulatorTest(a?, b?, c!) {
+  regulatorwwr(a,b,c)
+}
+

@@ -178,7 +178,10 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		inputPortsOrArrays = new LinkedHashMap<>();
 		Map<TypedName, Integer> integers = new LinkedHashMap<>();
 		outputPortsOrArrays = new LinkedHashMap<>();
+//		integers.put(new TypedName("k",TypedName.Type.INTEGER), new Integer(Integer.parseInt(X.getVariable().toString())));
 		
+		if(X.getVariable()!=null)
+			extralogicals.put(new TypedName("d",TypedName.Type.EXTRALOGICAL), new Extralogical(X.getVariable().toString()));
 		SortedSet<Port> P = X.getInterface();
 		int numberInPort = 1;
 		int numberOutPort = 1;

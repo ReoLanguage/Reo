@@ -11,9 +11,12 @@ import java.util.TreeSet;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.values.IntegerValue;
-import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.interpret.variables.Parameter;
+import nl.cwi.reo.interpret.variables.ParameterType;
+import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
@@ -21,24 +24,27 @@ import nl.cwi.reo.util.Monitor;
 public class PRAutomaton implements Semantics<PRAutomaton> {
 		
 	private String name;
-	private String variable;
-	private Integer value; 
+	private Value variable;
+	private Value value;
 	private List<Port> port;
 	
 
 	public PRAutomaton() {
 		this.name = "";
-		this.variable = "";
-		this.value = new Integer(0);
+		this.variable = null;
 		this.port = new ArrayList<Port>();
 	}
 	
-	public PRAutomaton(String name, String variable, Integer value, List<Port> port){
+	public PRAutomaton(String name, Value variable, Value value, List<Port> port){
 		this.name=name;
-		this.value=value;
 		this.variable=variable;
-		this.port=port;
-		
+		this.value=value;
+		this.port=port;	
+	}
+	public PRAutomaton(String name, Value variable, List<Port> port){
+		this.name=name;
+		this.variable=variable;
+		this.port=port;	
 	}
 	
 	public SemanticsType getType() {
@@ -57,7 +63,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	public String toString(){
 		StringBuilder str = new StringBuilder();
 	//	str.append(name + "["+ variable + "]("+getInterface()+")");
-		str.append(name + "("+getInterface()+")");
+		str.append(name +"["+ variable + "]" + "(" +getInterface()+")");
 		 
 		return str.toString();
 	}
@@ -89,9 +95,9 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		}
 
 		if(counterI>counterO)
-			return new PRAutomaton("Replicator",null,null,P);
+			return new PRAutomaton("Replicator",null,P);
 		
-		return new PRAutomaton("Merger",null,null,P);
+		return new PRAutomaton("Merger",null,P);
 	}
 
 
@@ -106,28 +112,26 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 			P.add(b);//P.add(new Port(b.getName()));
 		}
 		
-		return new PRAutomaton(name,variable,value,P);
+		return new PRAutomaton(name,variable,P);
 	}
 
 	@Override
 	public PRAutomaton evaluate(Scope s, Monitor m) {
-		Value v = s.get(variable);
-		Integer newValue = null;
+//		Value v = s.get(variable);
+		Value l = s.get(new Parameter(variable.toString(),new TypeTag("int")));
+//		Identifier i=null;
+		this.value=l;
 		
-		if (v instanceof IntegerValue) {
-			newValue = ((IntegerValue)v).getValue();
-		} else if (v instanceof StringValue) {
-			try {
-				newValue =Integer.parseInt(((StringValue)v).getValue());
-			}
-			catch(NumberFormatException e){
-				
-			}
-		}
-		
-		return new PRAutomaton(name,variable,newValue,port);
+		return new PRAutomaton(name,l,l,port);
 	}
 
+	public Value getValue(){
+		return value;
+	}
+	public Value getVariable(){
+		return variable;
+	}
+	
 	@Override
 	public PRAutomaton compose(List<PRAutomaton> automata) {
 		// TODO Auto-generated method stub
