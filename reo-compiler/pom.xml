@@ -66,7 +66,7 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <finalName>reo</finalName>
+          <finalName>reo-1.0</finalName>
           <appendAssemblyId>false</appendAssemblyId>
         </configuration>
         <executions>
