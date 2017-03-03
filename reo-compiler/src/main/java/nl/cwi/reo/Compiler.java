@@ -148,7 +148,6 @@ public class Compiler {
     private void compilePR() {    	
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files.get(0));
-		monitor.print();
 		if (program == null) return;	
 		LykosCompiler c = new LykosCompiler(program, outdir, verbose);
 		c.compile();

@@ -1,6 +1,7 @@
 package nl.cwi.reo.compile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
+import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.ports.Port;
@@ -122,14 +124,30 @@ public class LykosCompiler extends ToolErrorAccumulator {
 			System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()).integrate());
 		}
 		
-		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
+		List<ReoConnector<PRAutomaton>> protocol = new ArrayList<ReoConnector<PRAutomaton>>();
+		List<ReoConnector<PRAutomaton>> worker = new ArrayList<ReoConnector<PRAutomaton>>();
+		
+		
+		for (ReoConnectorAtom<PRAutomaton> X : program.flatten().getAtoms()) {
 			if((X.getSourceCode())==(null) || X.getSourceCode().getFile()==null) {
-				c.addChild(setPrimitive(X.getSemantics()));
-			} else {
-				interpretedWorker.add(new InterpretedWorker(setWorker(X)));
+				protocol.add(X);
 			}
+			else
+				worker.add(X);
 		}
-	
+			
+		ReoConnectorComposite<PRAutomaton> progProtocol = new ReoConnectorComposite<PRAutomaton>(" ",protocol);
+		ReoConnectorComposite<PRAutomaton> progWorker = new ReoConnectorComposite<PRAutomaton>(" ",worker);
+				
+				
+		for (ReoConnectorAtom<PRAutomaton> proto : progProtocol.flatten().insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
+			c.addChild(setPrimitive(proto.getSemantics()));
+		}
+			
+		for (ReoConnectorAtom<PRAutomaton> work : progWorker.flatten().integrate().getAtoms()) {
+			interpretedWorker.add(new InterpretedWorker(setWorker(work)));
+		}
+			
 		List<InterpretedProtocol> interpretedProtocol= new ArrayList<InterpretedProtocol>();
 		interpretedProtocol.add(new InterpretedProtocol(c));
 			
@@ -157,25 +175,30 @@ public class LykosCompiler extends ToolErrorAccumulator {
 		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
 		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
 		
-		Set<Port> P = program.getInterface();
-		Map<Port, Port> links=program.getLinks();
+		Set<Port> P = program.flatten().getInterface(); 
+		P = program.getInterface();
+	//	Set links = new HashMap<Port,Port>();
+//		List<Port> listPort = new ArrayList<Port>();
+		for(ReoConnectorAtom<PRAutomaton> X : program.getAtoms())
+			if(X.getSourceCode()!=null && X.getSourceCode().getFile()!=null)
+				for(Port p : X.getLinks().keySet())
+					P.add(X.getLinks().get(p));
+		//= program.flatten().getLinks();
 //		Set<Port> P = P1;
-		for(Port p : links.keySet()){
-			if(p.getType()!=links.get(p).getType())
-				P.remove(p);
-		}
+//		for(Port p : listPort){
+//			if(p.isHidden())
+//				P.add(p);
+//		}
 		int numberInPort=1;
 		int numberOutPort=1;
 		for(Port p: P){
+			PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
+			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 			if (p.getType()==PortType.IN){
-				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
-				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 				inputPortsOrArrays.put(new TypedName("in"+(numberInPort),Type.PORT),jp);
 				numberInPort++;
 			}
-			else if (p.getType()==PortType.OUT){
-				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
-				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
+			else if (p.getType()==PortType.OUT){		
 				outputPortsOrArrays.put(new TypedName("out"+(numberOutPort),Type.PORT),jp);
 				numberOutPort++;
 			} else {

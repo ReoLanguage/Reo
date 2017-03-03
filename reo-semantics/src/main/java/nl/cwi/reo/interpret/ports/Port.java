@@ -132,7 +132,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 * @return invisible copy of this port
 	 */
 	public Port hide() {
-		return new Port(name, type, prio, tag, true);
+		return new Port(name, type, prio, tag, false);
 	}
 	
 	/**
