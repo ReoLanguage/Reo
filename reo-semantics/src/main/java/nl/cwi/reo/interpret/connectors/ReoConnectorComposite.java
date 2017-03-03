@@ -213,8 +213,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		Integer i = new Integer(0);
 		for (ReoConnector<T> comp : components) {
 //			ReoConnector<T> rc = comp.renameHidden(i).flatten();
-			ReoConnector<T> rc;
-			rc = comp.reconnect(this.getLinks()).flatten();
+			ReoConnector<T> rc = comp.reconnect(this.getLinks()).flatten();
 			
 			if (rc instanceof ReoConnectorComposite<?>)
 				list.addAll(((ReoConnectorComposite<T>)rc).components);

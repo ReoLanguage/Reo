@@ -1,6 +1,6 @@
 import reo.fifo;
 
-test = () { comp1(a,b) comp2(b,c) }
+test = (a?,b!) { comp1(a,b) comp2(b,c) }
 
 comp1 = (a?,b?) { fifo(a,b) }
 comp2 = (a?,b?) { fifo(a,b) }
