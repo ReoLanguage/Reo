@@ -1,4 +1,4 @@
-section reo.slides;
+section reo;
 
 import reo.fifo1;
 import reo.fifo1full;

@@ -17,7 +17,7 @@ import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.plain.Plain;
 
-public class ReoConnectorTests {
+public class ReoConnectorTest {
 
 	@Test
 	public void flatten_CompositeConnector_bla() {

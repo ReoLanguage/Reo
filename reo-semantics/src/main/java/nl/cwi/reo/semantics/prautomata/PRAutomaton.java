@@ -13,10 +13,7 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.values.Value;
-import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.Parameter;
-import nl.cwi.reo.interpret.variables.ParameterType;
-import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
@@ -83,11 +80,11 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 			switch (p.getType()) {
 			case IN:
 				counterI++;
-				P.add(new Port(p.getName(),PortType.OUT,p.getPrioType(),p.getTypeTag(), false));
+				P.add(new Port(p.getName(),PortType.OUT,p.getPrioType(),p.getTypeTag(), true));
 				break;
 			case OUT: 
 				counterO++;
-				P.add(new Port(p.getName(),PortType.IN,p.getPrioType(),p.getTypeTag(), false));
+				P.add(new Port(p.getName(),PortType.IN,p.getPrioType(),p.getTypeTag(), true));
 				break;
 			default:
 				break;

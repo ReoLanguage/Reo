@@ -1,5 +1,6 @@
 package nl.cwi.reo.interpret.connectors;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -148,15 +149,9 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	/**
 	 * {@inheritDoc}
 	 */
-	
-	public ReoConnectorComposite<T> flatten(ReoConnectorComposite<T> c) {
-		
-		return new ReoConnectorComposite<T>("", Arrays.asList(c));
-	}
 	@Override
-	public ReoConnectorComposite<T> flatten() {
-		
-		return new ReoConnectorComposite<T>("", Arrays.asList(this));
+	public ReoConnector<T> flatten() {
+		return this;
 	}
 
 	/**
@@ -180,9 +175,13 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("{\n  <semantics>\n  <source>\n}");
+		List<String> renaming = new ArrayList<String>();
+		for (Map.Entry<Port, Port> link : links.entrySet())
+			renaming.add(link.getKey() + "=" + link.getValue());
+		ST st = new ST("{\n  <semantics>\n  <source>\n}(<renaming; separator=\", \">)");
 		st.add("semantics", semantics);
 		st.add("source", source);
+		st.add("renaming", renaming);
 		return st.render();
 	}
 

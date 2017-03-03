@@ -44,13 +44,13 @@ public class Compiler {
 	/**
 	 * List of provided Reo source files.
 	 */
-	@Parameter(names = {"-o", "--output-dir"}, description = "Output directory.")
+	@Parameter(names = {"-o", "--output-dir"}, description = "output directory")
 	private String outdir = ".";
 
 	/**
 	 * List of available options.
 	 */
-    @Parameter(names = {"-h", "--help"}, description = "shows all available options", help = true)
+    @Parameter(names = {"-h", "--help"}, description = "show all available options", help = true)
     private boolean help;
    
     /**
@@ -60,6 +60,12 @@ public class Compiler {
     public SemanticsType semantics = SemanticsType.PR; 
     
     /**
+     * Semantics type of Reo connectors.
+     */
+    @Parameter(names = {"-v", "--verbose"}, description = "show verbose output") 
+    public boolean verbose = false; 
+    
+    /**
      * Message container.
      */
     private final Monitor monitor = new Monitor();
@@ -67,7 +73,7 @@ public class Compiler {
 	public static void main(String[] args) {	
 		Compiler compiler = new Compiler();
 		JCommander jc = new JCommander(compiler, args);
-		jc.setProgramName("reoc"); 
+		jc.setProgramName("reo"); 
 		if (compiler.files.size() == 0) {
 			jc.usage();
 		} else {
@@ -143,11 +149,8 @@ public class Compiler {
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
 		monitor.print();
-		if (program == null) return;
-	//System.out.println(program.flatten().integrate().getAtoms());
-	//System.out.println(program);
-	
-		LykosCompiler c = new LykosCompiler(program, outdir);
+		if (program == null) return;	
+		LykosCompiler c = new LykosCompiler(program, outdir, verbose);
 		c.compile();
     }
 

@@ -19,7 +19,7 @@ import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
-public class DisjunctionTests {
+public class DisjunctionTest {
 
 	@Test
 	public void evaluate_OriginalHasNoTypes() {

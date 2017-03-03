@@ -114,7 +114,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 * @return visibility of this port
 	 */
 	public boolean isHidden() {
-		return visible;
+		return !visible;
 	}
 	
 	/**

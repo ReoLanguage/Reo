@@ -25,7 +25,7 @@ import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
-public class SignatureExpressionTests {
+public class SignatureExpressionTest {
 
 	@Test
 	public void evaluate_NoParametersAndExplicitNodes_PortsInheritType() {

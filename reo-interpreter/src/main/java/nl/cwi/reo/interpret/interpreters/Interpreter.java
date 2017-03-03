@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
@@ -28,13 +26,13 @@ import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.Component;
-import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
@@ -105,6 +103,9 @@ public class Interpreter<T extends Semantics<T>> {
 	@Nullable
 	public ReoConnector<T> interpret(List<String> srcfiles) {
 		
+		// Name of main component.
+		String name = "";
+		
 		// Stack of all parsed Reo source files.
 		Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();
 
@@ -121,7 +122,7 @@ public class Interpreter<T extends Semantics<T>> {
 			String filename = new File(file).getName().replaceFirst("[.][^.]+$", "");
 			ReoFile<T> program = null;
 			try {
-				program = parse(new ANTLRFileStream(file));
+				program = parse(new ANTLRFileStream(file), file);
 			} catch (IOException e) {
 				monitor.add("Cannot open " + file);
 			}
@@ -131,6 +132,8 @@ public class Interpreter<T extends Semantics<T>> {
 				stack.push(program);
 				parsed.add(program.getName());
 				components.addAll(program.getImports());
+				if (name.equals(""))
+					name = program.getName();
 			} else {
 				monitor.add("Cannot parse " + new File(file).getName() + ".");
 			}
@@ -156,41 +159,22 @@ public class Interpreter<T extends Semantics<T>> {
 
 			}
 		}
-		
-		Scope scope = new Scope();
-		Component<T> main = null;
-		
-		//Add definitions :
-		Map<String, ComponentExpression<T>> definitions = stack.get(stack.size()-1).getDefinition();
-		for(String s :definitions.keySet()){
-			if(!s.equals(stack.get(stack.size()-1).getName()))
-				main = definitions.get(s).evaluate(scope, monitor);
-			if (main != null)
-				scope.put(new Identifier(s), main);
-		}
-
+				
 		// Evaluate all component expressions.
-
-
-		while (!stack.isEmpty()) {
-			ReoFile<T> program = stack.pop();
-			ComponentExpression<T> comp = program.getMain();
-			if (comp != null) {
-				main = comp.evaluate(scope, monitor);
-				if (main != null)
-					scope.put(new Identifier(program.getName()), main);
-			} else {
-				monitor.add("File " + " does not contain a main component.");
-			}
-		}
-
+		Scope scope = new Scope();
+		while (!stack.isEmpty())
+			stack.pop().evaluate(scope, monitor);
+		
 		// Instantiate the main component
-		if (main != null) {
-			Instance<T> i = main.instantiate(values, null, monitor);
+		Value main = scope.get(new Identifier(name));
+		if (main instanceof Component<?>) {
+			@SuppressWarnings("unchecked")
+			Instance<T> i = ((Component<T>)main).instantiate(values, null, monitor);
 			if (i != null)
 				return i.getConnector();
 		}
-		monitor.add("Cannot instantiate main component.");
+		
+		monitor.add("Cannot instantiate " + name + ".");
 		return null;
 	}
 
@@ -214,6 +198,26 @@ public class Interpreter<T extends Semantics<T>> {
 		String cp2 = directory + name + ".treo";
 
 		search: for (String dir : dirs) {
+			
+			// Check if atomic component exists in resources of this jar.
+			InputStream in1 = getClass().getResourceAsStream(File.separator + cp1); 
+			if (in1 != null) {
+				try {
+					prog = parse(new ANTLRInputStream(in1), File.separator + cp1);
+				} catch (IOException e1) {
+					monitor.add("Cannot open " + cp1);
+				}
+			}
+
+			// Check if atomic component exists in resources of this jar.
+			InputStream in2 = getClass().getResourceAsStream(File.separator + cp2); 
+			if (in2 != null) {
+				try {
+					prog = parse(new ANTLRInputStream(in2), File.separator + cp2);
+				} catch (IOException e1) {
+					monitor.add("Cannot open " + cp2);
+				}
+			}
 
 			// Check if this directory contains a .zip file.
 			File folder = new File(dir);
@@ -237,12 +241,12 @@ public class Interpreter<T extends Semantics<T>> {
 								if (entry1 != null) {
 									InputStream input = zipFile.getInputStream(entry1);
 									assert input != null : "@AssumeAssertion(nullness)";
-									prog = parse(new ANTLRInputStream(input));
+									prog = parse(new ANTLRInputStream(input), cp1);
 									break search;
 								} else if (entry2 != null) {
 									InputStream input = zipFile.getInputStream(entry2);
 									assert input != null : "@AssumeAssertion(nullness)";
-									prog = parse(new ANTLRInputStream(input));
+									prog = parse(new ANTLRInputStream(input), cp2);
 									break search;
 								}
 							} catch (IOException e) {
@@ -259,20 +263,22 @@ public class Interpreter<T extends Semantics<T>> {
 				}
 			}
 
+			// Check if composite component exists in file system.
 			File f1 = new File(dir + File.separator + cp1);
 			if (f1.exists() && !f1.isDirectory()) {
 				try {
-					prog = parse(new ANTLRFileStream(dir + File.separator + cp1));
+					prog = parse(new ANTLRFileStream(dir + File.separator + cp1), dir + File.separator + cp1);
 				} catch (IOException e) {
 					monitor.add("Cannot open " + f1.toString());
 				}
 				break search;
 			}
 
+			// Check if composite component exists in file system.
 			File f2 = new File(dir + File.separator + cp2);
 			if (f2.exists() && !f2.isDirectory()) {
 				try {
-					prog = parse(new ANTLRFileStream(dir + File.separator + cp2));
+					prog = parse(new ANTLRFileStream(dir + File.separator + cp2), dir + File.separator + cp2);
 				} catch (IOException e) {
 					monitor.add("Cannot open " + f2.toString());
 				}
@@ -292,18 +298,16 @@ public class Interpreter<T extends Semantics<T>> {
 	 * @return an interpreted source file, or null in case of an error.
 	 */
 	@Nullable
-	private ReoFile<T> parse(CharStream c) {
+	private ReoFile<T> parse(CharStream c, String filename) {
 		ReoLexer lexer = new ReoLexer(c);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
-
 		ReoParser parser = new ReoParser(tokens);
 		ErrorListener errListener = new ErrorListener(monitor);
 		parser.removeErrorListeners();
 		parser.addErrorListener(errListener);
-
 		ParseTree tree = parser.file();
-
 		ParseTreeWalker walker = new ParseTreeWalker();
+		listener.setFileName(filename);
 		walker.walk(listener, tree);
 		return listener.getMain();
 	}
