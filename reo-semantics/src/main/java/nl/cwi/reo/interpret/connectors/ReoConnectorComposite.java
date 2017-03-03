@@ -210,8 +210,9 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	@Override
 	public ReoConnectorComposite<T> flatten() {
 		List<ReoConnector<T>> list = new ArrayList<ReoConnector<T>>();
+		Integer i = new Integer(0);
 		for (ReoConnector<T> comp : components) {
-			ReoConnector<T> rc = comp.flatten();
+			ReoConnector<T> rc = comp.renameHidden(i).flatten();
 			if (rc instanceof ReoConnectorComposite<?>)
 				list.addAll(((ReoConnectorComposite<T>)rc).components);
 			else 
