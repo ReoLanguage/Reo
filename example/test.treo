@@ -1,16 +1,6 @@
-section reo;
+import reo.fifo;
 
-import reo.fifo1;
-import reo.sync;
-import reo.syncdrain;
+test = () { comp1(a,b) comp2(b,c) }
 
-test(p[1..3]?, x[1]!) 
-{
-  sync(p[1], x[1])
-  {
-    syncdrain(p[i-1], p[i]) 
-    sync(p[i], x[i]) fifo1(x[i], x[i-1])
-  |
-    i : <2..3>  
-  }
-}
+comp1 = (a?,b?) { fifo(a,b) }
+comp2 = (a?,b?) { fifo(a,b) }

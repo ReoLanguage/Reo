@@ -32,10 +32,10 @@ public final class Links {
 			}
 			
 			Port y;
-			if (hide){ 
-				y = x.hide();
-				newlinks.put(link.getKey(), y);
-			}
+//			if (hide){ 
+//				y = x.hide();
+//				newlinks.put(link.getKey(), y);
+//			}
 		}
 		return newlinks;
 	}
@@ -60,7 +60,7 @@ public final class Links {
 		Map<Port, Port> newlinks = new HashMap<Port, Port>();
 		for (Map.Entry<Port, Port> link : links.entrySet()) 
 			if (link.getValue().isHidden())
-				newlinks.put(link.getKey(), new Port("#" + i++));
+				newlinks.put(link.getKey(), new Port("#" + i++,link.getValue().getType(),link.getValue().getPrioType(),link.getValue().getTypeTag(),true));
 		return newlinks;
 	}
 

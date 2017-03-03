@@ -1,0 +1,8 @@
+section reo;
+
+import reo.fifofull;
+
+testFifoFull(a?, b!) 
+{
+	fifofull<1>(a,b)
+}

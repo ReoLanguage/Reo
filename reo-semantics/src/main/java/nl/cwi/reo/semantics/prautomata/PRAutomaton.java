@@ -118,11 +118,12 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	@Override
 	public PRAutomaton evaluate(Scope s, Monitor m) {
 //		Value v = s.get(variable);
-		Value l = s.get(new Parameter(variable.toString(),new TypeTag("int")));
-//		Identifier i=null;
-		this.value=l;
-		
-		return new PRAutomaton(name,l,l,port);
+		if(variable!=null){
+			Value l = s.get(new Parameter(variable.toString(),new TypeTag("int")));
+			this.value=l;
+			return new PRAutomaton(name,l,l,port);
+		}
+		return new PRAutomaton(name,null,null,port);
 	}
 
 	public Value getValue(){

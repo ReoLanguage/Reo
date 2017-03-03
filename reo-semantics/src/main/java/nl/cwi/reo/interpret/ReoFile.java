@@ -81,6 +81,10 @@ public final class ReoFile<T extends Semantics<T>> {
 		return definitions.get(name);
 	}
 	
+	public Map<String, ComponentExpression<T>> getDefinition(){
+		return definitions;
+	}
+	
 	/**
 	 * Gets the location of the main component.
 	 * @return location of main component
