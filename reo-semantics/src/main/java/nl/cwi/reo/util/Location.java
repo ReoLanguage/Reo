@@ -40,8 +40,8 @@ public final class Location {
 	 * Constructs a new location from an ANTLR4 token.
 	 * @param token		token
 	 */
-	public Location(Token token) {
-		this.source = new File(token.getInputStream().getSourceName()).getName();
+	public Location(Token token, String filename) {
+		this.source = new File(filename).getName();
 		this.line = token.getLine();
 		this.column = token.getCharPositionInLine();		
 	}

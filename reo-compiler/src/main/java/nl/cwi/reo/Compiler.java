@@ -44,7 +44,7 @@ public class Compiler {
 	/**
 	 * List of provided Reo source files.
 	 */
-	@Parameter(names = {"-o", "--output-dir"}, description = "Output directory.")
+	@Parameter(names = {"-o", "--output-dir"}, description = "output directory")
 	private String outdir = ".";
 
 	/**
@@ -67,7 +67,7 @@ public class Compiler {
 	public static void main(String[] args) {	
 		Compiler compiler = new Compiler();
 		JCommander jc = new JCommander(compiler, args);
-		jc.setProgramName("reoc"); 
+		jc.setProgramName("reo"); 
 		if (compiler.files.size() == 0) {
 			jc.usage();
 		} else {

@@ -1,11 +1,8 @@
 package nl.cwi.reo.interpret.listeners;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -78,7 +75,6 @@ import nl.cwi.reo.interpret.ReoParser.Formula_universalContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_variableContext;
 import nl.cwi.reo.interpret.ReoParser.ImpsContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_atomicContext;
-//import nl.cwi.reo.interpret.ReoParser.Instance_compositionContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_productContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_semicolonContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_sumContext;
@@ -127,13 +123,14 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	// ParseTreeProperty<Map<String, String>>();
 
 	protected final Monitor m;
+	
+	private String filename = "";
 
 	// File
 	@Nullable
 	private ReoFile<T> program;
-
 	private List<String> imports = new ArrayList<String>();
-	private Map<String, ComponentExpression<T>> definitions = new HashMap<String, ComponentExpression<T>>();
+	private ParseTreeProperty<Relation> definitions = new ParseTreeProperty<Relation>();
 
 	// Section
 	private ParseTreeProperty<String> section = new ParseTreeProperty<String>();
@@ -197,6 +194,31 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public ReoFile<T> getMain() {
 		return program;
 	}
+	
+	/**
+	 * Sets the file name, and clears all parse tree properties.
+	 */
+	public void setFileName(String filename) {
+		this.filename = filename;
+		imports.clear();
+		section = new ParseTreeProperty<String>();
+		components = new ParseTreeProperty<ComponentExpression<T>>();
+		formula = new ParseTreeProperty<PredicateExpression>();
+		instances = new ParseTreeProperty<InstanceExpression<T>>();
+		sets = new ParseTreeProperty<SetExpression<T>>();
+		terms = new ParseTreeProperty<TermExpression>();
+		termsList = new ParseTreeProperty<List<TermExpression>>();
+		signatureExpressions = new ParseTreeProperty<SignatureExpression>();
+		parameterlists = new ParseTreeProperty<List<ParameterExpression>>();
+		parameters = new ParseTreeProperty<ParameterExpression>();
+		nodelists = new ParseTreeProperty<List<NodeExpression>>();
+		nodes = new ParseTreeProperty<NodeExpression>();
+		typetags = new ParseTreeProperty<TypeTag>();
+		portlists = new ParseTreeProperty<List<PortExpression>>();
+		ports = new ParseTreeProperty<PortExpression>();
+		variables = new ParseTreeProperty<VariableExpression>();
+		atoms = new ParseTreeProperty<T>();
+	}
 
 	/**
 	 * File structure
@@ -210,14 +232,14 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
-	public void exitFile(FileContext ctx) {
-		// Get the main component from the file name.
-		String main = new File(ctx.getStart().getInputStream().getSourceName()).getName().split("\\.")[0];
-		
+	public void exitFile(FileContext ctx) {		
 		String sec="";
 		if(ctx.secn()!=null)
 			sec=section.get(ctx.secn());
-		program = new ReoFile<T>(sec, imports, main, definitions, new Location(ctx.start));
+		List<PredicateExpression> conjunctions = new ArrayList<PredicateExpression>();
+		for (DefnContext defn_ctx : ctx.defn())
+			conjunctions.add(definitions.get(defn_ctx));
+		program = new ReoFile<T>(sec, imports, filename, new Conjunction(conjunctions), new Location(ctx.start, filename));
 	}
 
 	@Override
@@ -232,7 +254,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitDefn(DefnContext ctx) {
-		definitions.put(ctx.ID().getText(), components.get(ctx.component()));
+		VariableExpression e = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(), new Location(ctx.ID().getSymbol(), filename));
+		TermExpression t1 = new VariableTermExpression(e); 
+		ComponentTermExpression<T> t2 = new ComponentTermExpression<T>(components.get(ctx.component()));
+		definitions.put(ctx, new Relation(RelationSymbol.EQ, Arrays.asList(t1, t2), new Location(ctx.start, filename)));
 	}
 
 	/**
@@ -251,7 +276,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		Reference s = new Reference();
 
 		if (atom == null) {
-			m.add(new Location(ctx.start), "Undefined semantics.");
+			m.add(new Location(ctx.start, filename), "Undefined semantics.");
 		} else if (ctx.source() != null) {
 			ctx.source().LANG().toString().toUpperCase();
 			s = new Reference(ctx.source().STRING().toString(), ctx.source().LANG().toString().toUpperCase());
@@ -263,7 +288,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void exitComponent_composite(Component_compositeContext ctx) {
 		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()),
 				(SetComposite<T>) instances.get(ctx.multiset())));
-
 	}
 
 	/**
@@ -284,7 +308,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 			stmtlist.add(instances.get(stmt_ctx));
 
 		instances.put(ctx, new SetComposite<T>(terms.get(ctx.term()), stmtlist, formula.get(ctx.formula()),
-				new Location(ctx.start)));
+				new Location(ctx.start, filename)));
 	}
 
 	@Override
@@ -326,7 +350,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
 		InstanceExpression<T> i2 = instances.get(ctx.instance(1));
 		StringValue s = new StringValue("*");
-		instances.put(ctx, new ProductInstance<T>(s, i1, i2, new Location(ctx.start)));
+		instances.put(ctx, new ProductInstance<T>(s, i1, i2, new Location(ctx.start, filename)));
 	}
 
 	@Override
@@ -334,7 +358,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
 		InstanceExpression<T> i2 = instances.get(ctx.instance(1));
 		StringValue s = new StringValue("+");
-		instances.put(ctx, new ProductInstance<T>(s, i1, i2, new Location(ctx.start)));
+		instances.put(ctx, new ProductInstance<T>(s, i1, i2, new Location(ctx.start, filename)));
 	}
 
 	@Override
@@ -342,7 +366,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
 		InstanceExpression<T> i2 = instances.get(ctx.instance(1));
 		StringValue s = new StringValue(";");
-		instances.put(ctx, new ProductInstance<T>(s, i1, i2, new Location(ctx.start)));
+		instances.put(ctx, new ProductInstance<T>(s, i1, i2, new Location(ctx.start, filename)));
 	}
 
 	/**
@@ -359,7 +383,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void exitFormula_componentdefn(Formula_componentdefnContext ctx) {
 		List<TermExpression> arguments = Arrays.asList(new VariableTermExpression(variables.get(ctx.var())),
 				new ComponentTermExpression<T>(components.get(ctx.component())));
-		Relation p = new Relation(RelationSymbol.EQ, arguments, new Location(ctx.start));
+		Relation p = new Relation(RelationSymbol.EQ, arguments, new Location(ctx.start, filename));
 		formula.put(ctx, p);
 	}
 
@@ -369,13 +393,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (ParamContext p : ctx.param())
 			params.add(parameters.get(p));
 		SignatureExpression sign = new SignatureExpression(params, new ArrayList<NodeExpression>(),
-				new Location(ctx.start));
+				new Location(ctx.start, filename));
 		SetExpression<T> set = new SetComposite<T>();
 		VariableExpression var = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(),
-				new Location(ctx.ID().getSymbol()));
+				new Location(ctx.ID().getSymbol(), filename));
 		TermExpression te1 = new VariableTermExpression(var);
 		TermExpression te2 = new ComponentTermExpression<T>(new ComponentDefinition<T>(sign, set));
-		formula.put(ctx, new Relation(RelationSymbol.EQ, Arrays.asList(te1, te2), new Location(ctx.start)));
+		formula.put(ctx, new Relation(RelationSymbol.EQ, Arrays.asList(te1, te2), new Location(ctx.start, filename)));
 	}
 
 	@Override
@@ -396,22 +420,22 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		List<TermExpression> l = Arrays.asList(terms.get(ctx.term(0)), terms.get(ctx.term(0)));
 		switch (ctx.op.getType()) {
 		case ReoParser.LEQ:
-			formula.put(ctx, new Relation(RelationSymbol.LEQ, l, new Location(ctx.start)));
+			formula.put(ctx, new Relation(RelationSymbol.LEQ, l, new Location(ctx.start, filename)));
 			break;
 		case ReoParser.LT:
-			formula.put(ctx, new Relation(RelationSymbol.LT, l, new Location(ctx.start)));
+			formula.put(ctx, new Relation(RelationSymbol.LT, l, new Location(ctx.start, filename)));
 			break;
 		case ReoParser.GEQ:
-			formula.put(ctx, new Relation(RelationSymbol.GEQ, l, new Location(ctx.start)));
+			formula.put(ctx, new Relation(RelationSymbol.GEQ, l, new Location(ctx.start, filename)));
 			break;
 		case ReoParser.GT:
-			formula.put(ctx, new Relation(RelationSymbol.GT, l, new Location(ctx.start)));
+			formula.put(ctx, new Relation(RelationSymbol.GT, l, new Location(ctx.start, filename)));
 			break;
 		case ReoParser.EQ:
-			formula.put(ctx, new Relation(RelationSymbol.EQ, l, new Location(ctx.start)));
+			formula.put(ctx, new Relation(RelationSymbol.EQ, l, new Location(ctx.start, filename)));
 			break;
 		case ReoParser.NEQ:
-			formula.put(ctx, new Relation(RelationSymbol.NEQ, l, new Location(ctx.start)));
+			formula.put(ctx, new Relation(RelationSymbol.NEQ, l, new Location(ctx.start, filename)));
 			break;
 		default:
 			break;
@@ -474,7 +498,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 			for (ParameterExpression p : parameterlists.get(ctx.params()))
 				parameters.add(p);
 
-		signatureExpressions.put(ctx, new SignatureExpression(parameters, nodes, new Location(ctx.start)));
+		signatureExpressions.put(ctx, new SignatureExpression(parameters, nodes, new Location(ctx.start, filename)));
 	}
 
 	@Override
@@ -509,7 +533,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void exitNode(NodeContext ctx) {
 		VariableExpression var = variables.get(ctx.var());
 		if (var == null)
-			var = new VariableExpression("", new ArrayList<TermExpression>(), new Location(ctx.start));
+			var = new VariableExpression("", new ArrayList<TermExpression>(), new Location(ctx.start, filename));
 		TypeTag tag = typetags.get(ctx.type());
 		if (tag == null)
 			tag = new TypeTag();
@@ -578,10 +602,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (TermContext indices_ctx : ctx.term())
 			list.add(terms.get(indices_ctx));
 		if (list.isEmpty()) {
-			variables.put(ctx, new VariableExpression(name, list, new Location(ctx.start)));
+			variables.put(ctx, new VariableExpression(name, list, new Location(ctx.start, filename)));
 		} else {
 			// TODO : define the type of indices
-			variables.put(ctx, new VariableExpression(name, list, new Location(ctx.start)));
+			variables.put(ctx, new VariableExpression(name, list, new Location(ctx.start, filename)));
 		}
 	}
 
@@ -631,15 +655,15 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		List<TermExpression> l = Arrays.asList(e1, e2);
 		switch (ctx.op.getType()) {
 		case ReoParser.DIV:
-			terms.put(ctx, new FunctionExpression(FunctionSymbol.DIV, l, new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.DIV, l, new Location(ctx.start, filename)));
 		case ReoParser.MUL:
-			terms.put(ctx, new FunctionExpression(FunctionSymbol.MUL, l, new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.MUL, l, new Location(ctx.start, filename)));
 		case ReoParser.MOD:
-			terms.put(ctx, new FunctionExpression(FunctionSymbol.MOD, l, new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.MOD, l, new Location(ctx.start, filename)));
 		case ReoParser.ADD:
-			terms.put(ctx, new FunctionExpression(FunctionSymbol.ADD, l, new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.ADD, l, new Location(ctx.start, filename)));
 		case ReoParser.MIN:
-			terms.put(ctx, new FunctionExpression(FunctionSymbol.MIN, l, new Location(ctx.start)));
+			terms.put(ctx, new FunctionExpression(FunctionSymbol.MIN, l, new Location(ctx.start, filename)));
 		}
 	}
 
@@ -648,14 +672,14 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		TermExpression e1 = terms.get(ctx.term(0));
 		TermExpression e2 = terms.get(ctx.term(1));
 		List<TermExpression> l = Arrays.asList(e1, e2);
-		terms.put(ctx, new FunctionExpression(FunctionSymbol.POW, l, new Location(ctx.start)));
+		terms.put(ctx, new FunctionExpression(FunctionSymbol.POW, l, new Location(ctx.start, filename)));
 	}
 
 	@Override
 	public void exitTerm_unarymin(Term_unaryminContext ctx) {
 		TermExpression e = terms.get(ctx.term());
 		List<TermExpression> l = Arrays.asList(e);
-		terms.put(ctx, new FunctionExpression(FunctionSymbol.MIN, l, new Location(ctx.start)));
+		terms.put(ctx, new FunctionExpression(FunctionSymbol.MIN, l, new Location(ctx.start, filename)));
 	}
 
 	@Override

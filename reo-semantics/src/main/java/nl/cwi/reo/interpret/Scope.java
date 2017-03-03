@@ -9,17 +9,18 @@ import nl.cwi.reo.interpret.variables.Identifier;
 /**
  * A finite set of assignments.
  */
-public final class Scope extends HashMap<Identifier, Value> {
-
+public final class Scope {
+	
 	/**
-	 * Serial version ID
+	 * Set of assignments.
 	 */
-	private static final long serialVersionUID = 3999038009879620308L;
+	private final Map<Identifier, Value> assignments;
 
 	/**
 	 * Constructs an empty scope.
 	 */
 	public Scope() {
+		this.assignments = new HashMap<Identifier, Value>();
 	}
 	
 	/**
@@ -27,7 +28,7 @@ public final class Scope extends HashMap<Identifier, Value> {
 	 * @param s		set of assignments
 	 */
 	public Scope(Map<Identifier, Value> s) {
-		super.putAll(s);
+		this.assignments = new HashMap<Identifier, Value>(s);
 	}
 
 	/**
@@ -40,11 +41,31 @@ public final class Scope extends HashMap<Identifier, Value> {
 	 * new given key.
 	 */
 	public Scope extend(Identifier key, Value value) {
-		Map<Identifier, Value> s = new HashMap<Identifier, Value>(this);
+		Map<Identifier, Value> s = new HashMap<Identifier, Value>(this.assignments);
 		if (!s.containsKey(key))
 			s.put(key, value);
 		else
 			return this;
 		return new Scope(s);
+	}
+	
+	public Value get(Identifier k) {
+		return assignments.get(k);
+	}
+	
+	public Value remove(Identifier k) {
+		return assignments.remove(k);
+	}
+
+	public Value put(Identifier k, Value v) {
+		return assignments.put(k, v);
+	}
+	
+	public void putAll(Scope s) {
+		assignments.putAll(s.assignments);
+	}
+	
+	public boolean isEmpty() {
+		return assignments.isEmpty();
 	}
 }

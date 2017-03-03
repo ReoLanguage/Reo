@@ -1,7 +1,6 @@
 package nl.cwi.reo.interpret.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,13 +13,10 @@ import nl.cwi.reo.interpret.ReoParser.PrContext;
 import nl.cwi.reo.interpret.ReoParser.Pr_portContext;
 import nl.cwi.reo.interpret.ReoParser.Pr_stringContext;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
-import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
-import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
 public class ListenerPR extends Listener<PRAutomaton> {
