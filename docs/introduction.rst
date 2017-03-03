@@ -1,13 +1,15 @@
 Introduction to Reo
 ===================
 
-Why do you need Reo
--------------------
+A simple concurrent program
+---------------------------
 
-Suppose we ask you to design a small program that consists of three components: two producers that output a string "Hello, " and "world!", respectively, and a consumer that **alternately** 
-prints the produced strings "Hello, " and "world!", starting with "Hello, ". 
+Writing correct concurrent programs is far more difficult than writing correct sequential programs.
+Let us start with very simple program that repeatedly prints "Hello, " and "world!" in alternating order.
+We split this program into three different processes: two producers that output a string "Hello, " and "world!", respectively, 
+and a consumer that **alternately** prints the produced strings "Hello, " and "world!", starting of course with "Hello, ". 
 
-After a couple of minutes, or an hour, or maybe a day, your may come up with the following piece of Java code that starts three threads: 
+If you are asked to write a small program that implements the above informal specification, you may come up with the following Java code:
 
 .. code-block:: java
 	:linenos:
@@ -88,24 +90,81 @@ After a couple of minutes, or an hour, or maybe a day, your may come up with the
 		}
 	}
 
-This code uses some semaphores to make sure that the Red Producer and the Green Producer alternately write their string to the buffer.
+The main method in the above Java code instantiates three different Java `threads <https://docs.oracle.com/javase/tutorial/essential/concurrency/runthread.html>`_, namely a Red and Green producer and a Blue consumer.
+These threads communicate with each other via a shared buffer that is protected by a `semaphore <https://en.wikipedia.org/wiki/Semaphore_(programming)>`_.
+If a thread wants to operate on the buffer, it tries acquire a token from the semaphore that protects the buffer.
+Once acquired, the process can write to the buffer without being disturbed by any other process.
+Finally, the process releases the token, which allows other processes to operate on the buffer.
 
-Now, you may be convinced that this Java program  of the alternating producers problem, let's take a look at the output:
- 
+The same stategy is used to alternate the writes to the buffer. Each producer has its own semaphore. 
+If a producer wants to write to a buffer, it first tries to acquire a token from its semaphore.
+After writing to the buffer, the producer hands over the token to the other producer.
+
+Analysis
+--------
+
+Let us now analyze the Java implementation by answering a few simple questions.
+
+1. Where is the "Hello, " string computed?
+
+On line 15.
+
+2. Where is the text printed?
+
+On line 53.
+
+For the next question, however, it is not possible to point at a single line of code:
+
+3. Where is the protocol?
+
+		a. What determines which producers goes first? 
+
+		This is determined by the initial value of the semaphores on lines 5 and 6, together with the usage of the semaphores on lines 17, 21, 33, and 37.
+
+		b. What takes care of buffer protection? 
+
+		This program establishes buffer protection by the code on lines 18, 20, 34, 36, 51, and 57.
+
+The reason why this third question is much more difficult to answer is because the protocol is **implicit**.
+
+For such a simple program, you may argue that the fact that the protocol is implicit is not big deal.
+However, if you really think this, then you may be surprised by the output:
+
 .. code-block:: text
 
 	Hello, world! Hello, Hello, world! Hello, Hello, Hello, Hello, Hello, 
 
+There is a bug! Can you spot the error?
 
-How to design Reo protocols
----------------------------
-It's possible to design the previous problem with Reo, by following two steps. On the one hand, the user should define the actors, ie in this case, what a Producer and a Consumer are. The user should also came up, on the other hand, with a suitable protocol linking those actors, and describing the desired interaction. The strong advantage of such designing is that the design of actors is completly decoupled from the design of protocol, which lead us to a new paradigm of action/interaction programming. 
-A simple graphical representation of what could be a Reo protocol is given in the following picture :
+Reo protocols
+-------------
+
+The Reo language offers a solution by providing a domain specific language that allow you to declare your protocol explicitly.
+The following diagram shows an example of such an explicit protocol:
 
 .. image:: https://github.com/kasperdokter/Reo/blob/master/docs/ProdCons.jpg?raw=true
 
-Green and Red boxes are Producer actors, and Blue is a Consumer actor. They all have ports on which they can send and/or receive data. The arrows and boxes in between model the Reo circuit, and implement the desired protocol. In this case, the arrow between Red and Green represent a *synchronised* channel, which means that Red and Green must produce data at the same time. Data produced by Green is sent to Blue, and data produced by Red is sent to a *fifo* channel. This *fifo* channel will store the data for next iteration. During the next iteration, the *fifo* channel is full, and by definition (pointer to corresponding paper that define channel), Red cannot produce. As soon as Green and Red are synchronized, Green cannot produce also. The fifo become empty by sending its data to the consumer Blue.
-As defined, the protocol lets the consumer Blue receive alternatly a Green production and a Red production. The corresponding code for this program is :
+Every process is represented as a box together with a set of ports that define the interface of each process. 
+These boxes, called components, are connected via a network of channels and nodes, which constitutes the protocol.
+The components now interact with each other by offering messages to the protocol. 
+The protocol, then, synchonizes components and exchanges the messages.
+
+The channel between Red and Green is a *syncdrain* channel that accepts data from both its input ends simultaneously, and then it looses the data.
+The channel between Red and Blue is a *sync* channel that atomically takes data from its input end and offers this data to its output end.
+The other incoming channel connected to Blue is a *fifo* channel that stores a single data item that it receives at its input end. 
+After the buffer became full, it offers this data to its output end. 
+Suppose Red wants to output some data. Then, Red issues a *put request* at its port. 
+As soon as Green has also issued a *put request*, and Blue issued a *get request*, the protocol synchronously accepts the data produced by Red and Green, offers Greens data to Blue, and stores Reds data in a buffer. 
+Upon the next get request by Blue, Blue receives the data from the buffer, after which the protocol returned to its initial configuration.
+Therefore, this protocol implements the informal specification that prescribes alternation.
+
+Although we may think of such a protocol as `message passing <http://mpi-forum.org/>`_, the code that is generated by the compiler 
+is (depending on the target) based on shared memory. 
+
+It's possible to design the previous problem with Reo, by following two steps. 
+On the one hand, the user should define the actors, ie in this case, what a Producer and a Consumer are. 
+The user should also came up, on the other hand, with a suitable protocol linking those actors, and describing the desired interaction. 
+The strong advantage of such designing is that the design of actors is completly decoupled from the design of protocol, which lead us to a new paradigm of action/interaction programming. 
 
 Red Producer 'ProducerRed.java':
 
@@ -211,4 +270,20 @@ You can now link all classes generated by the compiler to the runtime environmen
 All the link are set, you can now run the Main class with the runtime environment ::
 
 	java -cp .:reo-runtime-java.jar Main
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
 
