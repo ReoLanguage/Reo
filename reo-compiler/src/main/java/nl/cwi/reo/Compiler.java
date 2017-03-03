@@ -50,7 +50,7 @@ public class Compiler {
 	/**
 	 * List of available options.
 	 */
-    @Parameter(names = {"-h", "--help"}, description = "shows all available options", help = true)
+    @Parameter(names = {"-h", "--help"}, description = "show all available options", help = true)
     private boolean help;
    
     /**
@@ -58,6 +58,12 @@ public class Compiler {
      */
     @Parameter(names = {"-s", "--semantics"}, description = "used type of Reo semantics") 
     public SemanticsType semantics = SemanticsType.PR; 
+    
+    /**
+     * Semantics type of Reo connectors.
+     */
+    @Parameter(names = {"-v", "--verbose"}, description = "show verbose output") 
+    public boolean verbose = false; 
     
     /**
      * Message container.
@@ -144,7 +150,7 @@ public class Compiler {
 		ReoConnector<PRAutomaton> program = interpreter.interpret(files);
 		monitor.print();
 		if (program == null) return;	
-		LykosCompiler c = new LykosCompiler(program, outdir);
+		LykosCompiler c = new LykosCompiler(program, outdir, verbose);
 		c.compile();
     }
 
