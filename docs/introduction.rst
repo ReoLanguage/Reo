@@ -166,124 +166,82 @@ On the one hand, the user should define the actors, ie in this case, what a Prod
 The user should also came up, on the other hand, with a suitable protocol linking those actors, and describing the desired interaction. 
 The strong advantage of such designing is that the design of actors is completly decoupled from the design of protocol, which lead us to a new paradigm of action/interaction programming. 
 
-Red Producer 'ProducerRed.java':
-
-.. code-block:: java
-	:linenos:
-	
-	
-	public class Producer {	
-		private Port output;
-		public static void main(String[] args) {
-                	Thread redProducer = new Thread("Red Producer") {
-                        	public void run() {
-                                	while (true) {
-                                        	sleep(5000);
-						producerText= "Red" ;
-						put(output,producerText);
-                                        	} catch (InterruptedException e) { }
-					}
-                                }
-                        }
-                };
-
-Green Producer 'ProducerGreen.java':
-
-.. code-block:: java
-	:linenos:
-	
-	public class Producer {		
-		private Port output;
-		public static void main(String[] args) {
-                	Thread redProducer = new Thread("Green Producer") {
-                        	public void run() {
-                                	while (true) {
-                                        	sleep(5000);
-						producerText= "Green" ;
-						put(output,producerText);
-                                        	} catch (InterruptedException e) { }
-					}
-                                }
-                        }
-                };
-
-Blue Consumer 'Consumer.java':
+The first step consist of isolating the computation that is done in each process.
+To this end, we create a Java class in ``Processes.java`` that contains the a method for each original process:
 
 .. code-block:: java
 	:linenos:
 
-	public class Consumer {
-		private Port input;
-		public static void main(String[] args) {
-                	Thread redProducer = new Thread("Consumer") {
-                        	public void run() {
-                                	while (true) {
-                                        	sleep(4000);
-						get(input,displayText);
-						print(displayText);
-                                        	} catch (InterruptedException e) { }
-                                	}
-                        	}
+	import nl.cwi.pr.runtime.api.InputPort;
+	import nl.cwi.pr.runtime.api.OutputPort;
+
+	public class Processes {
+
+		public static void Red(OutputPort port) {
+			while (true) {
+				for (int i = 0; i < 30000000; ++i);
+				Object datum = "Hello, ";
+				port.putUninterruptibly(datum);
 			}
-                };
+		}
 
-Let's remark that the first Java program is now separated into three classes : Green Producer, Red Producer and Blue Consumer. This represents all the user will have to hard code in Java. The remaining part deals with the protocol, and is written in Reo (which then, is compiled to Java or other languages).
+		public static void Green(OutputPort port) {
+			while (true) {
+				for (int i = 0; i < 50000000; ++i);
+				Object datum = "world!";
+				port.putUninterruptibly(datum);
+			}
+		}
 
+		public static void Blue(InputPort port) {
+			for (int k = 0; k < 10; ++k) {
+		    for (int i = 0; i < 40000000; ++i);
+				Object datum = port.getUninterruptibly();
+				System.out.println(datum);
+			}
+		}
+	}
 
-Reo Protocol 'main.treo' :
+Note that the code of each Java method is completely independent of any other method, since no variables are explicitly shared.
+Synchronization and data transfer is delegated to put and get calls to output ports and input ports, respectively.
+
+In the next step, we declare the protocol by means of the Reo file called ``main.treo``:
 
 .. code-block:: text
 
-	main = ProducerConsumer(a,b,c){
-		alternator(a,b,c){
-			syncdrain(a, b) sync(b, x) fifo(x, c) sync(a, c)
-		}
-		producerRed(k){
-			Java: ProducerRed.java
-		}
-		producerGreen(k){
-			Java: ProducerGreen.java
-		}
-		consumer(k){
-			Java: Consumer.java 
-		}
-		
-		producer<red>(a) producer<green>(b) consumer(c) alternator(a,b,c)
-	}
+	import reo.syncdrain;
+	import reo.sync;
+	import reo.fifo1;
 
-One thing to notify from the precedent program is the presence of input and output port in the definition of a Producer and Consumer. A port is the point where external exchanges are processed according to the protocol we defined. 
-	
-Few little steps more before being able to run our program : generate the Main, and run it in a suitable runtime environment. You can provide your own runtime environment or use the own by default.
+	main = (){ red(a) green(b) blue(c) alternator(a, b, c) }
 
-Compile and link to the runtime
--------------------------------
+	red = (a!){ #PR identity(a;) | Java:"Processes.Red" }
 
-The 'reo.jar' archive is what you need to run the interpreter and the compiler. Expecting that you defined your circuit in a file with the '.treo' extension, you can now run  ::
+	green = (a!){ #PR identity(a;) | Java:"Processes.Green" }
 
-	java -jar reo.jar test.treo -cp ./
+	blue = (a?){ #PR identity(;a) | Java:"Processes.Blue" }
 
-The command will generate all the class in the direcory specified by '-cp' option.
-You can now link all classes generated by the compiler to the runtime environment (where ProducerRed.java ProducerGreen.java and Consumer.java are defined) ::
+	alternator = (a,b,c){ syncdrain(a, b) sync(b, x) fifo1(x, c) sync(a, c) }
 
-	javac -cp reo-runtime-java.jar *.java
+This Reo file defines the main component, which is a set containing an instance of the Red, Green, and Blue process, and an instance of the alternator protocol.
+The definition Red, Green, and Blue processes just refers to the Java source code from ``Processes.java``.
+The definition of the alternator protocol is expressed using primitive Reo channels, which are imported from the standard library.
 
-All the link are set, you can now run the Main class with the runtime environment ::
+Before we can compile this Reo file into Java code, please first follow the instructions in :ref:`installation` to install the Reo compiler.
+Next, change directory to where ``main.treo`` and ``Processes.java`` are located, and execute::
 
-	java -cp .:reo-runtime-java.jar Main
+	reo main.treo
+	javac Main.java
+	java Main
 
+These commands respectively
 
+	(1) compile Reo code to Java source code (by generating ``Main.java`` and ``Protocol_Main.java``), 
+	(2) compile Java source code to executable Java classes, and 
+	(3) execute the complete program.
 
+Since the alternator protocol defined in ``main.treo`` matches the informal specification, and since the generated code correctly implements the alternator procotol, the output now looks as follows:
 
+.. code-block:: text
 
-
-
-
-
-
-
-
-
-
- 
-
-
+	Hello, world! Hello, world! Hello, world! Hello, world! Hello, world! 
