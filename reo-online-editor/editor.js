@@ -229,6 +229,7 @@
       }
     });
     canvas.deactivateAll();
+    canvas.calcOffset();
   });
   
   document.getElementById("downloadsvg").onclick = function () {
