@@ -89,7 +89,10 @@ public final class ReoFile<T extends Semantics<T>> {
 	 */
 	public String getName() {
 		return section.equals("") ? main : section + "." + main;
+//		return main;
+
 	}
+	
 
 	/**
 	 * Gets the location of the main component.

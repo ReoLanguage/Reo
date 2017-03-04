@@ -189,8 +189,8 @@ public class LykosCompiler extends ToolErrorAccumulator {
 //			if(p.isHidden())
 //				P.add(p);
 //		}
-		int numberInPort=1;
-		int numberOutPort=1;
+		int numberInPort=0;
+		int numberOutPort=0;
 		for(Port p: P){
 			PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
