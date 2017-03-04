@@ -99,6 +99,14 @@ public final class ReoFile<T extends Semantics<T>> {
 	public Location getMainLocation() {
 		return location;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Conjunction getDefinitions() {
+		return definitions;
+	}
 
 	/**
 	 * Evaluates this Reo source file and either adds a new component definition

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
@@ -21,6 +22,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
@@ -159,15 +161,31 @@ public class Interpreter<T extends Semantics<T>> {
 
 			}
 		}
+		
+		Scope scope = new Scope();
+//		Component<T> main = null;
+		
+		//Add definitions :
+//		Map<String, ComponentExpression<T>> definitions = stack.get(stack.size()-1).getDefinition();
+//		Map<String, ComponentExpression<T>> definitions = null;
+//		for(String s :definitions.keySet()){
+//			if(!s.equals(stack.get(stack.size()-1).getName()))
+//				main = definitions.get(s).evaluate(scope, monitor);
+//			if (main != null)
+//				scope.put(new Identifier(s), main);
+//		}
+
+		
 				
 		// Evaluate all component expressions.
-		Scope scope = new Scope();
 		while (!stack.isEmpty())
-			stack.pop().evaluate(scope, monitor);
+			for(Scope s : stack.pop().getDefinitions().evaluate(scope, monitor) )
+				scope.putAll(s);
 		
 		// Instantiate the main component
 		Value main = scope.get(new Identifier(name));
 		if (main instanceof Component<?>) {
+//		if(main != null){
 			@SuppressWarnings("unchecked")
 			Instance<T> i = ((Component<T>)main).instantiate(values, null, monitor);
 			if (i != null)
