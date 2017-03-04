@@ -131,8 +131,8 @@ public class Interpreter<T extends Semantics<T>> {
 				parsed.add(component);
 				ReoFile<T> inclFile = findComponent(component);
 				if (inclFile != null) {
-					stack.push(mainFile);
-					List<String> newComponents = mainFile.getImports();
+					stack.push(inclFile);
+					List<String> newComponents = inclFile.getImports();
 					newComponents.removeAll(parsed);
 					todo.addAll(newComponents);
 				} else {

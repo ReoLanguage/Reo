@@ -191,6 +191,6 @@ public final class Relation implements PredicateExpression {
 	 */
 	@Override
 	public String toString() {
-		return "" + symbol + arguments;
+		return arguments.size() == 2 ? "" + arguments.get(0) + " " + symbol + " " + arguments.get(1) : "" + symbol + arguments;
 	}
 }

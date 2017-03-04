@@ -3,6 +3,8 @@ package nl.cwi.reo.interpret;
 import java.io.File;
 import java.util.List;
 
+import org.stringtemplate.v4.ST;
+
 import nl.cwi.reo.interpret.statements.Conjunction;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -117,15 +119,15 @@ public final class ReoFile<T extends Semantics<T>> {
 		}
 	}
 
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public String toString() {
-//		ST st = new ST("<section:{ s | section s;\n\n}><imports:{ i | import i;\n }>\n<definitions>");
-//		st.add("section", "section " + section);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		ST st = new ST("<section><definitions>");
+		st.add("section", section.equals("") ? "" : "section " + section + ";\n");
 //		st.add("imports", imports);
-//		st.add("definitions", definitions);
-//		return st.render();
-//	}
+		st.add("definitions", definitions);
+		return st.render();
+	}
 }
