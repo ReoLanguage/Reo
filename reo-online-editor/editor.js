@@ -228,13 +228,15 @@
         }
       }
     });
+    canvas.deactivateAll();
   });
   
-  function downloadsvg() {
+  document.getElementById("downloadsvg").onclick = function () {
     var a = document.getElementById("download");
+    a.download = "reo.svg";
     a.href = 'data:image/svg+xml;base64,' + window.btoa(canvas.toSVG());
     a.click();
-  }
+  };
   
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
