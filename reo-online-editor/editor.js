@@ -238,6 +238,13 @@
     a.click();
   };
   
+  document.getElementById("downloadpng").onclick = function () {
+    var a = document.getElementById("download");
+    a.download = "reo.png";
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+  
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
 
