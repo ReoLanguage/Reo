@@ -53,7 +53,7 @@ public final class Instance<T extends Semantics<T>> implements Value {
 	 * @return copy of this instance with renamed interface
 	 */
 	public Instance<T> reconnect(Map<Port, Port> joins) {
-		return new Instance<T>(connector.reconnect(joins), unifications);
+		return new Instance<T>(connector.rename(joins), unifications);
 	}
 
 	/**

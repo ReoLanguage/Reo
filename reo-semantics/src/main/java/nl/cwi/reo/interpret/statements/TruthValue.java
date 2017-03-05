@@ -2,11 +2,14 @@ package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -36,6 +39,14 @@ public class TruthValue implements PredicateExpression {
 	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
 		return bool ? Arrays.asList(s) : new ArrayList<Scope>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		return new HashSet<Identifier>();
 	}
 
 	/**

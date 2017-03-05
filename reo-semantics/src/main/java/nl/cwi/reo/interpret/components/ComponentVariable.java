@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret.components;
 
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -22,7 +23,7 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	/**
 	 * Variable.
 	 */
-	private final VariableExpression var;
+	private final VariableExpression variable;
 
 	/**
 	 * Constructs a new component variable.
@@ -31,7 +32,7 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	 *            component variable
 	 */
 	public ComponentVariable(VariableExpression var) {
-		this.var = var;
+		this.variable = var;
 	}
 
 	/**
@@ -42,7 +43,7 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	@Override
 	@Nullable
 	public Component<T> evaluate(Scope s, Monitor m) {
-		List<? extends Identifier> ids = var.evaluate(s, m);
+		List<? extends Identifier> ids = variable.evaluate(s, m);
 		if (ids == null || ids.isEmpty())
 			return null;
 		Value v = s.get(ids.get(0));
@@ -53,7 +54,15 @@ public final class ComponentVariable<T extends Semantics<T>> implements Componen
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Set<Identifier> getVariables() {
+		return variable.getVariables();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String toString() {
-		return "" + var;
+		return "" + variable;
 	}
 }

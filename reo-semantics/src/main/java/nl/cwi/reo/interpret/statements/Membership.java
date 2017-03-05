@@ -1,7 +1,9 @@
 package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -57,6 +59,17 @@ public final class Membership implements PredicateExpression {
 		for (Term t : terms) 
 			if (t instanceof Value) scopes.add(s.extend(x, (Value)t)); else return null;
 		return scopes;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		vars.add(x);
+		vars.addAll(list.getVariables());
+		return vars;
 	}
 
 	/**

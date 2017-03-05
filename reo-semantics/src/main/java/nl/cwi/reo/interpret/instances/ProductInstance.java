@@ -87,6 +87,16 @@ public final class ProductInstance<T extends Semantics<T>> implements InstanceEx
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> union = first.getVariables();
+		union.addAll(second.getVariables());
+		return union;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String toString() {
 		return "" + first + operator + second;
 	}

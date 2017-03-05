@@ -2,7 +2,9 @@ package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -10,6 +12,7 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.VariableTermExpression;
 import nl.cwi.reo.interpret.values.BooleanValue;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -44,6 +47,16 @@ public class StatementVariable implements PredicateExpression {
 			return null;
 		}
 		return ((BooleanValue) t.get(0)).getValue() ? Arrays.asList(s) : new ArrayList<Scope>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		vars.addAll(variable.getVariables());
+		return vars;
 	}
 	
 	/**

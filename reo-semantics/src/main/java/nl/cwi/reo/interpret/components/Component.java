@@ -51,8 +51,7 @@ public final class Component<T extends Semantics<T>> implements Value {
 	 *            implementation of this component definition
 	 */
 	public Component(Scope scope, SignatureExpression sign, SetExpression<T> set) {
-		this.scope = scope; // TODO instead of saving the whole scope, we need
-							// to save only the dependencies.
+		this.scope = scope;
 		this.sign = sign;
 		this.set = set;
 	}

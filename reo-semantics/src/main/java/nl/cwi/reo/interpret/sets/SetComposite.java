@@ -147,6 +147,18 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		for (InstanceExpression<T> I : elements)
+			vars.addAll(I.getVariables());
+		vars.removeAll(predicate.getVariables());
+		return vars;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String toString() {
 		ST st = new ST("<operator>{\n  <elements>\n|\n  <predicate>\n}");
 		st.add("operator", operator);

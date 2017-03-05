@@ -1,6 +1,8 @@
 package nl.cwi.reo.interpret.instances;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -11,6 +13,7 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortListExpression;
 import nl.cwi.reo.interpret.terms.ListExpression;
 import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
@@ -65,6 +68,17 @@ public final class ComponentInstance<T extends Semantics<T>> implements Instance
 		if (v == null || p == null || c == null)
 			return null;
 		return c.instantiate(v, p, m);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		vars.addAll(component.getVariables());
+		vars.addAll(values.getVariables());
+		return vars;
 	}
 
 	/**

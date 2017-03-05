@@ -162,7 +162,6 @@ public class Interpreter<T extends Semantics<T>> {
 		// Instantiate the main component
 		Value main = scope.get(new Identifier(name));
 		if (main instanceof Component<?>) {
-//		if(main != null){
 			@SuppressWarnings("unchecked")
 			Instance<T> i = ((Component<T>) main).instantiate(values, null, m);
 			if (i != null)

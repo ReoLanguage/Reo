@@ -2,12 +2,14 @@ package nl.cwi.reo.interpret.terms;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.components.ComponentExpression;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
@@ -44,6 +46,14 @@ public class ComponentTermExpression<T extends Semantics<T>> implements TermExpr
 		if (comp == null)
 			return null;
 		return Arrays.asList(comp);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		return component.getVariables();
 	}
 
 	/**

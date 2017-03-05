@@ -1,8 +1,10 @@
 package nl.cwi.reo.interpret.terms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -10,6 +12,7 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.values.DecimalValue;
 import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
@@ -186,6 +189,17 @@ public final class FunctionExpression implements TermExpression {
 		}
 
 		return list;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		for (TermExpression t : arguments)
+			vars.addAll(t.getVariables());
+		return vars;
 	}
 
 	/**

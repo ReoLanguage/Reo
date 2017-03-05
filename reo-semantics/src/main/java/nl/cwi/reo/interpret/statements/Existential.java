@@ -1,11 +1,14 @@
 package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -52,6 +55,17 @@ public final class Existential implements PredicateExpression {
 		for (Scope si : scopes)
 			si.remove(membership.getVariable());
 		return scopes;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		vars.addAll(predicate.getVariables());
+		vars.remove(membership.getVariable());
+		return vars;
 	}
 
 	/**

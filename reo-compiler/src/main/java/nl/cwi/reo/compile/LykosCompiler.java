@@ -249,7 +249,7 @@ public class LykosCompiler extends ToolErrorAccumulator {
 			if (p.getType() == PortType.IN) {
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);	
-				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.INPUT);
+				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.OUTPUT);
 				l.add(jp);
 				defs.addPort(jp);
 				name=""+counterWorker;
@@ -257,7 +257,7 @@ public class LykosCompiler extends ToolErrorAccumulator {
 			} else if (p.getType() == PortType.OUT) {
 				PortSpec pSpec = new PortSpec(p.getName()+"$"+"1");
 				JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);		
-				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.OUTPUT);
+				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.INPUT);
 				l.add(jp);
 				defs.addPort(jp);
 				name=""+counterWorker;

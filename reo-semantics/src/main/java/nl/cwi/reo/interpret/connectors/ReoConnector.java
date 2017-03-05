@@ -39,11 +39,11 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	 * names according to renaming map, and hiding all ports that are not
 	 * renamed.
 	 * 
-	 * @param joins
+	 * @param r
 	 *            renaming map
 	 * @return a copy of this block with reconnected links
 	 */
-	public ReoConnector<T> reconnect(Map<Port, Port> joins);
+	public ReoConnector<T> rename(Map<Port, Port> r);
 
 	/**
 	 * Renames all hidden ports in this connector to an integer value, starting

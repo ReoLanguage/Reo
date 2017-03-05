@@ -130,8 +130,8 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnector<T> reconnect(Map<Port, Port> joins) {
-		return new ReoConnectorAtom<T>(semantics, source, Links.reconnect(links, joins));
+	public ReoConnector<T> rename(Map<Port, Port> joins) {
+		return new ReoConnectorAtom<T>(semantics, source, Links.rename(links, joins));
 	}
 
 	/**

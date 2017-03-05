@@ -1,7 +1,9 @@
 package nl.cwi.reo.interpret.terms;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -56,6 +58,17 @@ public final class Range implements TermExpression {
 		}
 
 		return s;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		vars.addAll(t1.getVariables());
+		vars.addAll(t2.getVariables());
+		return vars;
 	}
 
 	/**

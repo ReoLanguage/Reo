@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.terms;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -44,6 +45,14 @@ public class VariableTermExpression implements TermExpression {
 		for (Identifier x : list)
 			terms.add((t = s.get(x)) != null ? t : x);
 		return terms;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		return variable.getVariables();
 	}
 
 	/**

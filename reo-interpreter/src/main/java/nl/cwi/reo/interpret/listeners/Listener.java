@@ -123,7 +123,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	// ParseTreeProperty<Map<String, String>>();
 
 	protected final Monitor m;
-	
+
 	private String filename = "";
 
 	// File
@@ -134,7 +134,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	// Section
 	private ParseTreeProperty<String> section = new ParseTreeProperty<String>();
-	
+
 	// Components
 	private ParseTreeProperty<ComponentExpression<T>> components = new ParseTreeProperty<ComponentExpression<T>>();
 
@@ -194,7 +194,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public ReoFile<T> getMain() {
 		return program;
 	}
-	
+
 	/**
 	 * Sets the file name, and clears all parse tree properties.
 	 */
@@ -232,10 +232,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
-	public void exitFile(FileContext ctx) {		
-		String sec="";
-		if(ctx.secn()!=null)
-			sec=section.get(ctx.secn());
+	public void exitFile(FileContext ctx) {
+		String sec = "";
+		if (ctx.secn() != null)
+			sec = section.get(ctx.secn());
 		List<PredicateExpression> conjunctions = new ArrayList<PredicateExpression>();
 		for (DefnContext defn_ctx : ctx.defn())
 			conjunctions.add(definitions.get(defn_ctx));
@@ -256,8 +256,9 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitDefn(DefnContext ctx) {
-		VariableExpression e = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(), new Location(ctx.ID().getSymbol(), filename));
-		TermExpression t1 = new VariableTermExpression(e); 
+		VariableExpression e = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(),
+				new Location(ctx.ID().getSymbol(), filename));
+		TermExpression t1 = new VariableTermExpression(e);
 		ComponentTermExpression<T> t2 = new ComponentTermExpression<T>(components.get(ctx.component()));
 		definitions.put(ctx, new Relation(RelationSymbol.EQ, Arrays.asList(t1, t2), new Location(ctx.start, filename)));
 	}
@@ -594,11 +595,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitVar(VarContext ctx) {
 		String name = ctx.name().getText();
-		List<String> parts = new ArrayList<String>();
-		if(parts.isEmpty()) parts.add(name);
+		String[] parts = name.split("\\.");
 		for (String imprt : imports) {
-//			if (imprt.endsWith(name) && name.length()>1) {
-			if(imprt.equals(parts.get(parts.size()-1))){
+			String[] impparts = imprt.split("\\.");
+			if (impparts[impparts.length - 1].equals(parts[parts.length - 1])) {
 				name = imprt;
 				break;
 			}
@@ -606,12 +606,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		List<TermExpression> list = new ArrayList<TermExpression>();
 		for (TermContext indices_ctx : ctx.term())
 			list.add(terms.get(indices_ctx));
-		if (list.isEmpty()) {
-			variables.put(ctx, new VariableExpression(name, list, new Location(ctx.start, filename)));
-		} else {
-			// TODO : define the type of indices
-			variables.put(ctx, new VariableExpression(name, list, new Location(ctx.start, filename)));
-		}
+		variables.put(ctx, new VariableExpression(name, list, new Location(ctx.start, filename)));
 	}
 
 	/**

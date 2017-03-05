@@ -3,10 +3,12 @@ package nl.cwi.reo.interpret.statements;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -36,6 +38,14 @@ public final class Negation implements PredicateExpression {
 	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
 		return predicate.evaluate(s, m).isEmpty() ? Arrays.asList(s) : new ArrayList<Scope>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		return predicate.getVariables();
 	}
 
 	/**

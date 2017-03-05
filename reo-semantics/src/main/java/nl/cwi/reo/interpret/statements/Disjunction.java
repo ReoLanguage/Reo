@@ -2,14 +2,17 @@ package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -60,6 +63,17 @@ public final class Disjunction implements PredicateExpression {
 		}
 
 		return scopes;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		for (PredicateExpression P : predicates)
+			vars.addAll(P.getVariables());
+		return vars;
 	}
 
 	/**

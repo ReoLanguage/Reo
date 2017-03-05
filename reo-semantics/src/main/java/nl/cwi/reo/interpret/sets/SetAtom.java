@@ -50,6 +50,14 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 		if (semantics == null) return null;
 		return new Instance<T>(new ReoConnectorAtom<T>(semantics, source), new HashSet<Set<Identifier>>());
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		return new HashSet<Identifier>();
+	}
 
 	/**
 	 * {@inheritDoc}

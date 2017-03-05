@@ -1,9 +1,12 @@
 package nl.cwi.reo.interpret.sets;
 
+import java.util.Set;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.instances.Instance;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
@@ -50,6 +53,16 @@ public final class SetElse<T extends Semantics<T>> implements SetExpression<T> {
 		if (insts.getConnector().isEmpty())
 			return second.evaluate(s, m);
 		return insts;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getVariables() {
+		Set<Identifier> union = first.getVariables();
+		union.addAll(second.getVariables());
+		return union;
 	}
 
 	/**

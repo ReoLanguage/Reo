@@ -201,8 +201,10 @@ public final class SignatureExpression implements ParameterType {
 			Iterator<Port> node = nodeslist.iterator();
 			Iterator<Port> port = ports.iterator();
 
-			while (node.hasNext() && port.hasNext())
-				links.put(node.next(), port.next());
+			while (node.hasNext() && port.hasNext()) {
+				Port n = node.next();
+				links.put(n, port.next().join(n));
+			}
 		}
 
 		return new Signature(links, s);
