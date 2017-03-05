@@ -35,7 +35,8 @@
       strokeWidth: 5,
       hasBorders: false,
       hasControls: false,
-      selectable: false
+      selectable: false,
+      hoverCursor: 'default'
     });
     
     // ...an arrowhead...
@@ -47,7 +48,9 @@
       angle: calcArrowAngle(x1,y1,x2,y2),
       fill: '#000',
       hasBorders: false,
-      hasControls: false
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default'
     });
     
     // ...and two circles
@@ -97,7 +100,6 @@
       var length = Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
       length = length - 22;//circle2.get('radius') - circle2.get('stroke');
       var x = Math.atan(Math.abs(y1-y2)/Math.abs(x1-x2));
-      document.getElementById("x").value = x;
       if (end) {
         if (x2 > x1) {
           line.set({'x2': x1 + length * Math.cos(x)});
@@ -116,11 +118,6 @@
     }
     
     canvas.renderAll();
-    document.getElementById("x1").value = x1;
-    document.getElementById("y1").value = y1;
-    document.getElementById("x2").value = x2;
-    document.getElementById("y2").value = y2;
-    document.getElementById("angle").value = angle;
   } //updateLine
   
   // calculate the correct angle for the arrowhead

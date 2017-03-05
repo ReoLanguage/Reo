@@ -3,7 +3,7 @@ html, body {
   height: 100%;
   margin: 0;
   text-align: center;
-  background-color:#dde;
+  background-color: #dde;
 }
 
 #header {
@@ -22,14 +22,14 @@ html, body {
   width: 280px;
   height: 580px;
   padding: 10px;
-  background-color:#888;
+  background-color: #888;
 }
 
 #canvas {
   height: 600px;
   margin-left: 300px;
   margin-right: 100px;
-  background-color:#fff;
+  background-color: #fff;
 }
 
 #toolbar {
@@ -37,7 +37,22 @@ html, body {
   width: 180px;
   height: 580px;
   padding: 10px;
-  background-color:#888;
+  background-color: #888;
+}
+
+#toolbar table {
+  border-spacing: 5px;
+  table-layout: fixed;
+}
+
+#toolbar td {
+  background-color: #fff;
+  border-radius: 5px;
+  border-spacing: 5px;
+  width: 64px;
+  height: 64px;
+  padding: 0px;
+  overflow: hidden;
 }
 
 #text {
