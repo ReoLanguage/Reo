@@ -23,8 +23,8 @@ Reo addresses this problem by providing syntax that enables explicit high-level 
 If the protocol is specified explicitly, it becomes easier to write correct protocols that are free of dead-locks, live-locks and data races.
 Moreover, the compiler of the coordination language is able to optimize the actual implementation of the protocol.
 
-Getting started
----------------
+Installation
+------------
 
 Unix
 ~~~~
