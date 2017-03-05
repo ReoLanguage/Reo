@@ -594,8 +594,11 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitVar(VarContext ctx) {
 		String name = ctx.name().getText();
+		List<String> parts = new ArrayList<String>();
+		if(parts.isEmpty()) parts.add(name);
 		for (String imprt : imports) {
-			if (imprt.endsWith(name) && name.length()>1) {
+//			if (imprt.endsWith(name) && name.length()>1) {
+			if(imprt.equals(parts.get(parts.size()-1))){
 				name = imprt;
 				break;
 			}

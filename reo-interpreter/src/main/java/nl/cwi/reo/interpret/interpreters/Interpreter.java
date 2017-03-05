@@ -141,15 +141,28 @@ public class Interpreter<T extends Semantics<T>> {
 
 			}
 		}
+		
+		Scope scope = new Scope();
+//		Component<T> main = null;
+		
+		//Add definitions :
+//		Map<String, ComponentExpression<T>> definitions = stack.get(stack.size()-1).getDefinition();
+//		Map<String, ComponentExpression<T>> definitions = null;
+//		for(String s :definitions.keySet()){
+//			if(!s.equals(stack.get(stack.size()-1).getName()))
+//				main = definitions.get(s).evaluate(scope, monitor);
+//			if (main != null)
+//				scope.put(new Identifier(s), main);
+//		}
 
 		// Evaluate all component expressions.
-		Scope scope = new Scope();
 		while (!stack.isEmpty())
 			stack.pop().evaluate(scope, m);
-
+		
 		// Instantiate the main component
 		Value main = scope.get(new Identifier(name));
 		if (main instanceof Component<?>) {
+//		if(main != null){
 			@SuppressWarnings("unchecked")
 			Instance<T> i = ((Component<T>) main).instantiate(values, null, m);
 			if (i != null)
