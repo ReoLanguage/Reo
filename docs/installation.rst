@@ -3,7 +3,7 @@
 Installation
 ============
 
-UNIX
+Unix
 ----
 
 1. Install Java (version 1.6 or higher). You can check if the correct java version is already installed via::
@@ -29,7 +29,7 @@ UNIX
 	reo
 
 
-WINDOWS
+Windows
 -------
 
 1. Install Java (version 1.6 or higher)
