@@ -13,7 +13,7 @@ public class JavaCompiler {
 	
 	public void compile() {
 		
-		STGroup group = new STGroupFile("resources/Java.stg", '$', '$');
+		STGroup group = new STGroupFile("Java.stg", '$', '$');
         ST component = group.getInstanceOf("component");
 
         component.add("name", "MyComponent");
