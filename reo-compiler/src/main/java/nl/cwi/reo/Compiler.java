@@ -165,7 +165,7 @@ public class Compiler {
 			System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()).integrate());
 		}
 		
-		LykosCompiler c = new LykosCompiler(program, outdir, verbose);
+		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, monitor);
 		c.compile();
     }
 

@@ -136,26 +136,14 @@ public class Interpreter<T extends Semantics<T>> {
 					newComponents.removeAll(parsed);
 					todo.addAll(newComponents);
 				} else {
-					m.add("Component " + component + " cannot be found.");
+					m.add("Component " + component + " is not found.");
 				}
 
 			}
 		}
-		
-		Scope scope = new Scope();
-//		Component<T> main = null;
-		
-		//Add definitions :
-//		Map<String, ComponentExpression<T>> definitions = stack.get(stack.size()-1).getDefinition();
-//		Map<String, ComponentExpression<T>> definitions = null;
-//		for(String s :definitions.keySet()){
-//			if(!s.equals(stack.get(stack.size()-1).getName()))
-//				main = definitions.get(s).evaluate(scope, monitor);
-//			if (main != null)
-//				scope.put(new Identifier(s), main);
-//		}
 
 		// Evaluate all component expressions.
+		Scope scope = new Scope();
 		while (!stack.isEmpty())
 			stack.pop().evaluate(scope, m);
 		
@@ -167,8 +155,7 @@ public class Interpreter<T extends Semantics<T>> {
 			if (i != null)
 				return i.getConnector();
 		}
-
-		m.add("Cannot instantiate " + name + ".");
+		
 		return null;
 	}
 
@@ -203,7 +190,7 @@ public class Interpreter<T extends Semantics<T>> {
 				}
 			}
 
-			// Check if atomic component exists in resources of this jar.
+			// Check if composite component exists in resources of this jar.
 			InputStream in2 = getClass().getResourceAsStream(File.separator + cp2);
 			if (in2 != null) {
 				try {
@@ -211,6 +198,28 @@ public class Interpreter<T extends Semantics<T>> {
 				} catch (IOException e1) {
 					m.add("Cannot open " + cp2);
 				}
+			}
+
+			// Check if atomic component exists in file system.
+			File f1 = new File(dir + File.separator + cp1);
+			if (f1.exists() && !f1.isDirectory()) {
+				try {
+					prog = parse(new ANTLRFileStream(dir + File.separator + cp1), dir + File.separator + cp1);
+				} catch (IOException e) {
+					m.add("Cannot open " + f1.toString());
+				}
+				break search;
+			}
+
+			// Check if composite component exists in file system.
+			File f2 = new File(dir + File.separator + cp2);
+			if (f2.exists() && !f2.isDirectory()) {
+				try {
+					prog = parse(new ANTLRFileStream(dir + File.separator + cp2), dir + File.separator + cp2);
+				} catch (IOException e) {
+					m.add("Cannot open " + f2.toString());
+				}
+				break search;
 			}
 
 			// Check if this directory contains a .zip file.
@@ -255,28 +264,6 @@ public class Interpreter<T extends Semantics<T>> {
 						}
 					}
 				}
-			}
-
-			// Check if composite component exists in file system.
-			File f1 = new File(dir + File.separator + cp1);
-			if (f1.exists() && !f1.isDirectory()) {
-				try {
-					prog = parse(new ANTLRFileStream(dir + File.separator + cp1), dir + File.separator + cp1);
-				} catch (IOException e) {
-					m.add("Cannot open " + f1.toString());
-				}
-				break search;
-			}
-
-			// Check if composite component exists in file system.
-			File f2 = new File(dir + File.separator + cp2);
-			if (f2.exists() && !f2.isDirectory()) {
-				try {
-					prog = parse(new ANTLRFileStream(dir + File.separator + cp2), dir + File.separator + cp2);
-				} catch (IOException e) {
-					m.add("Cannot open " + f2.toString());
-				}
-				break search;
 			}
 		}
 
