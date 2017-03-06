@@ -12,6 +12,7 @@ import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.lykos.SimpleLykos;
 import nl.cwi.reo.lykos.WorkerSignature;
 import nl.cwi.reo.pr.autom.AutomatonFactory;
@@ -76,6 +77,7 @@ public class LykosCompiler {
 		 * Main program to compile with Lykos
 		 */
 
+//		this.program = program.flatten();
 		this.program = program.flatten().insertNodes(true, true, new PRAutomaton()).integrate();
 		/*
 		 * Creation of different Factories for Lykos compilation
@@ -107,18 +109,31 @@ public class LykosCompiler {
 		List<InterpretedWorker> workers = new ArrayList<InterpretedWorker>();
 
 		// Add primitives to the protocol or to the list of workers
+//		for (ReoConnectorAtom<PRAutomaton> atom : program.insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
 		for (ReoConnectorAtom<PRAutomaton> atom : program.getAtoms()) {
 			if ((atom.getSourceCode()) == (null) || atom.getSourceCode().getFile() == null) {
 				PRAutomaton X = atom.getSemantics();
 				Primitive pr = new Primitive("nl.cwi.reo.pr.autom.libr." + X.getName(), "../SimpleLykos/src/main/java");
 				String param = X.getVariable() != null ? X.getVariable().toString() : null;
 				pr.setSignature(getMemberSignature(X.getName(), param, X.getInterface()));
-				c.addChild(pr);
-			} else {
+				c.addChild(pr);				
+			}
+			else{
 				workers.add(new InterpretedWorker(getWorkerSignature(atom)));
-				P.addAll(atom.getInterface());
+				for(Port p: atom.getInterface()){
+					if(p.getType()==PortType.IN)
+						P.add(new Port(p.getName(),PortType.OUT,p.getPrioType(),p.getTypeTag(),true));
+					else
+						P.add(new Port(p.getName(),PortType.IN,p.getPrioType(),p.getTypeTag(),true));
+				}
 			}
 		}
+
+//		for(Map.Entry<Port,Port> p : program.getLinks().entrySet()){
+//			if(p.getValue().getType()==p.getKey().getType())
+//				P.add(p.getValue());
+//		}
+		
 
 		c.setSignature(getMemberSignature("main", null, P));
 
@@ -200,10 +215,10 @@ public class LykosCompiler {
 			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 			
 			switch (p.getType()) {
-			case OUT:
+			case IN:
 				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.OUTPUT);
 				break;
-			case IN:
+			case OUT:
 				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.INPUT);
 				break;
 			default:

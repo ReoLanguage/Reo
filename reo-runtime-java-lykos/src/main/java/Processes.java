@@ -21,7 +21,7 @@ public class Processes {
 
 	public static void Blue(InputPort port) {
 		for (int k = 0; k < 10; ++k) {
-			for (int i = 0; i < 40000000; ++i);
+      for (int i = 0; i < 40000000; ++i);
 			Object datum = port.getUninterruptibly();
 			System.out.println(datum);
 		}
