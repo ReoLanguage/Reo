@@ -31,6 +31,9 @@ public final class Links {
 				v = v.hide();
 			}
 			newlinks.put(link.getKey(), v);
+			
+			
+			
 			// Port x = link.getValue();
 			// boolean hide = true;
 			// for(Map.Entry<Port, Port> join : r.entrySet()) {

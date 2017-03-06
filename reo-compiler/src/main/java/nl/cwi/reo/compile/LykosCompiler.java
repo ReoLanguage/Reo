@@ -116,7 +116,7 @@ public class LykosCompiler {
 				Primitive pr = new Primitive("nl.cwi.reo.pr.autom.libr." + X.getName(), "../SimpleLykos/src/main/java");
 				String param = X.getVariable() != null ? X.getVariable().toString() : null;
 				pr.setSignature(getMemberSignature(X.getName(), param, X.getInterface()));
-				c.addChild(pr);				
+				c.addChild(pr);		
 			}
 			else{
 				workers.add(new InterpretedWorker(getWorkerSignature(atom)));
@@ -128,6 +128,7 @@ public class LykosCompiler {
 				}
 			}
 		}
+		P.addAll(program.getInterface());
 
 //		for(Map.Entry<Port,Port> p : program.getLinks().entrySet()){
 //			if(p.getValue().getType()==p.getKey().getType())
