@@ -118,7 +118,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		this.components = Collections.unmodifiableList(components);
 		this.links = Collections.unmodifiableMap(links);
 	}
-
+	
 	/**
 	 * Gets the name of the product operator that must be used to compose this
 	 * connector.
@@ -295,10 +295,10 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 					// if (mergers && new Integer(1).compareTo(outs.get(p)) > 0)
 					// {
 					if (mergers && outs.get(p) > 1) {
-						pi = p.rename(p.getName() + "." + A.size());
+						pi = p.rename(p.getName() + "." + A.size()).hide();
 						if (ins.get(p) == 0)
 							// if (new Integer(0).equals(ins.get(p)))
-							A.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), p.isHidden()));
+							A.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), !p.isHidden()));
 					} else {
 						pi = p;
 					}
@@ -307,10 +307,10 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 					if (replicators && ins.get(p) > 1) {
 						// if (replicators && new
 						// Integer(1).compareTo(ins.get(p)) > 0) {
-						pi = p.rename(p.getName() + "." + A.size());
+						pi = p.rename(p.getName() + "." + A.size()).hide();
 						if (outs.get(p) == 0)
 							// if (new Integer(0).equals(outs.get(p)))
-							A.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), p.isHidden()));
+							A.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), !p.isHidden()));
 					} else {
 						pi = p;
 					}
@@ -366,7 +366,11 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 */
 	@Override
 	public Set<Port> getInterface() {
-		return new HashSet<Port>(links.values());
+		Set<Port> set = new HashSet<Port>();
+		for(Port p :links.values())
+			if(!p.isHidden())
+				set.add(p);
+		return new HashSet<Port>(set);
 	}
 
 	/**
