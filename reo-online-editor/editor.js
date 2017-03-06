@@ -1,9 +1,41 @@
 (function() {
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
-  var line, isDown;
+  var line, isDown, origX, origY;
   var mode = 'select';
   var id = 'a';
+  
+  document.getElementById("select").onclick = function() {
+    document.getElementById(mode).style.border = '2px solid white';
+    mode = 'select';
+    this.style.border = '2px solid black';
+  };
+  
+  document.getElementById("component").onclick = function() {
+    document.getElementById(mode).style.border = '2px solid white';
+    mode = 'component';
+    this.style.border = '2px solid black';
+  };
+  
+  document.getElementById("sync").onclick = function() {
+    document.getElementById(mode).style.border = '2px solid white';
+    mode = 'sync';
+    this.style.border = '2px solid black';
+  };
+  
+  document.getElementById("downloadsvg").onclick = function () {
+    var a = document.getElementById("download");
+    a.download = "reo.svg";
+    a.href = 'data:image/svg+xml;base64,' + window.btoa(canvas.toSVG());
+    a.click();
+  };
+  
+  document.getElementById("downloadpng").onclick = function () {
+    var a = document.getElementById("download");
+    a.download = "reo.png";
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
 
   function makeCircle(left, top) {
     var c = new fabric.Circle({
@@ -158,24 +190,18 @@
     document.getElementById('text').innerHTML = s;
   }
   
-  function snapToComponent(p) {
-    if (p.class == 'node'){
-      canvas.forEachObject(function(obj) {
-        if (obj.get('type') === "rect") {
-          var diffWidth = obj.width / 2;
-          var diffHeight = obj.height / 2;
-          if (p.left - obj.left > diffWidth) // right side
-            p.set({'left': obj.left + diffWidth});
-          if (obj.left - p.left > diffWidth) // left side
-            p.set({'left': obj.left - diffWidth});
-          if (p.top - obj.top > diffHeight) // bottom side
-            p.set({'top': obj.top + diffHeight});
-          if (obj.top - p.top > diffHeight) // top side
-            p.set({'top': obj.top - diffHeight});
-          p.setCoords();
-        }
-      });
-    }
+  function snapToComponent(node,comp) {
+    var diffWidth = comp.width / 2;
+    var diffHeight = comp.height / 2;
+    if (node.left - comp.left > diffWidth) // right side
+      node.set({'left': comp.left + diffWidth});
+    if (comp.left - node.left > diffWidth) // left side
+      node.set({'left': comp.left - diffWidth});
+    if (node.top - comp.top > diffHeight) // bottom side
+      node.set({'top': comp.top + diffHeight});
+    if (comp.top - node.top > diffHeight) // top side
+      node.set({'top': comp.top - diffHeight});
+    node.setCoords();
   }
 
   canvas.on('object:moving', function(e) {
@@ -196,81 +222,89 @@
     if (canvas.getActiveObject())
       return;
     var pointer = canvas.getPointer(e.e);
-    drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
-    canvas.setActiveObject(line.circle2);
-    updateLine(line,2);
+    if (mode == 'sync') {
+      drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
+      snapToComponent(line.circle1,main);
+      canvas.setActiveObject(line.circle2);
+      updateLine(line,2);
+    }
+    if (mode == 'component') {
+      origX = pointer.x;
+      origY = pointer.y;
+      var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
+      canvas.setActiveObject(comp);
+    }
   }); //mouse:down
   
   canvas.on('mouse:move', function(e){
     if (!isDown)
       return;
-    var pointer = canvas.getPointer(e.e);
     var p = canvas.getActiveObject();
-    p.set({'left': pointer.x, 'top': pointer.y});
-    
-    canvas.forEachObject(function(obj) {
-      if (obj !== p && obj.get('type') === "circle" && p.intersectsWithObject(obj)) {
-        if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-          p.set({'left': obj.getLeft(), 'top': obj.getTop()});
-          p.setCoords();
+    if (!p)
+      return;
+    var pointer = canvas.getPointer(e.e);
+    if (p.class == 'component') {
+      if (origX > pointer.x)
+        p.set({left:pointer.x + (p.width / 2)});
+      if (origY > pointer.y)
+        p.set({top:pointer.y + (p.height / 2)});
+      p.set({width:Math.abs(origX - pointer.x)});
+      p.set({height:Math.abs(origY - pointer.y)});
+      p.setCoords();
+    }
+    if (p.class == 'node') {
+      p.set({'left': pointer.x, 'top': pointer.y});
+      p.setCoords();
+      canvas.forEachObject(function(obj) {
+        if (obj !== p && obj.get('type') === "circle" && p.intersectsWithObject(obj)) {
+          if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+            p.set({'left': obj.getLeft(), 'top': obj.getTop()});
+            p.setCoords();
+          }
         }
-      }
-      
-    });
-    
-    for (i = 0; i < p.linesIn.length; i++)
-      updateLine(p.linesIn[i], 2);
-    for (i = 0; i < p.linesOut.length; i++)
-      updateLine(p.linesOut[i], 1);
-    //canvas.renderAll();
+      });
+      for (i = 0; i < p.linesIn.length; i++)
+        updateLine(p.linesIn[i], 2);
+      for (i = 0; i < p.linesOut.length; i++)
+        updateLine(p.linesOut[i], 1);
+    }
+    canvas.renderAll();
   }); //mouse:move
   
   canvas.on('mouse:up', function(e){
     isDown = false;
     var p = canvas.getActiveObject();
-    p.setCoords();
-    canvas.forEachObject(function(obj) {
-      if (!obj || obj.get('id') == p.get('id') || obj.get('type') !== "circle")
-        return;
-      if (p.intersectsWithObject(obj)) {
-        if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-          for (i = 0; i < p.linesIn.length; i++) {
-            p.linesIn[i].circle2 = obj;
-            obj.linesIn.push(p.linesIn[i]);
+    if (p && p.class == 'node') {
+      p.setCoords();
+      canvas.forEachObject(function(obj) {
+        if (!obj || obj.get('id') == p.get('id') || obj.get('type') !== "circle")
+          return;
+        if (p.intersectsWithObject(obj)) {
+          if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+            for (i = 0; i < p.linesIn.length; i++) {
+              p.linesIn[i].circle2 = obj;
+              obj.linesIn.push(p.linesIn[i]);
+            }
+            for (i = 0; i < p.linesOut.length; i++) {
+              p.linesOut[i].circle1 = obj;
+              obj.linesOut.push(p.linesOut[i]);
+            }
+            canvas.remove(p);
+            updateNode(obj);
+            obj.bringToFront();
+            canvas.renderAll();
           }
-          for (i = 0; i < p.linesOut.length; i++) {
-            p.linesOut[i].circle1 = obj;
-            obj.linesOut.push(p.linesOut[i]);
-          }
-          canvas.remove(p);
-          updateNode(obj);
-          obj.bringToFront();
-          canvas.renderAll();
         }
-      }
-    });
-    snapToComponent(p);
-    for (i = 0; i < p.linesIn.length; i++)
-      updateLine(p.linesIn[i], 2);
-    for (i = 0; i < p.linesOut.length; i++)
-      updateLine(p.linesOut[i], 1);
-    canvas.deactivateAll();
-    canvas.calcOffset();
+      });
+      snapToComponent(p,main);
+      for (i = 0; i < p.linesIn.length; i++)
+        updateLine(p.linesIn[i], 2);
+      for (i = 0; i < p.linesOut.length; i++)
+        updateLine(p.linesOut[i], 1);
+      canvas.deactivateAll();
+      canvas.calcOffset();
+    }
   });
-  
-  document.getElementById("downloadsvg").onclick = function () {
-    var a = document.getElementById("download");
-    a.download = "reo.svg";
-    a.href = 'data:image/svg+xml;base64,' + window.btoa(canvas.toSVG());
-    a.click();
-  };
-  
-  document.getElementById("downloadpng").onclick = function () {
-    var a = document.getElementById("download");
-    a.download = "reo.png";
-    a.href = canvas.toDataURL('image/png');
-    a.click();
-  };
   
   // Double-click event handler
   var doubleClick = function (obj, handler) {
@@ -285,29 +319,33 @@
     };
   };
   
-  function drawComponent(x1,y1,x2,y2) {  
-    var width = x2 - x1;
-    var height = y2 - y1;
-    var left = x1 + width / 2;
-    var top = y1 + height / 2;
+  function drawComponent(x1,y1,x2,y2) {
+    var width = (x2 - x1);
+    var height = (y2 - y1);
+    var left = x1 + (width /2);
+    var top = y1 + (height / 2);
+  
+    var label = new fabric.IText('name', {
+      left: left,
+      top: top - 20
+    });  
   
     var rect = new fabric.Rect({
       left: left,
       top: top,
+      width: width,
+      height, height,
       fill: '#fff',
       stroke: '#000',
       strokeWidth: 1,
-      width: width,
-      height: height,
       hoverCursor: 'default',
-      hasBorders: false,
-      hasControls: false,
-      selectable: false
-    });
-  
-    var label = new fabric.IText('name', {
-      left: left,
-      top: x1 - 20
+      originX: 'center',
+      originY: 'center',
+      label: label,
+      //hasBorders: false,
+      //hasControls: false,
+      //selectable: false,
+      class: component
     });
   
     label.on('mousedown', doubleClick(label, function (obj) {
@@ -315,10 +353,14 @@
       label.selectAll();
     }));  
   
-    canvas.add(rect,label);
+    canvas.add(rect);
+    rect.setCoords();
+    canvas.renderAll();
+    return rect;
   }
   
-  drawComponent(50,50,750,550);
+  var main = drawComponent(50,50,750,550);
+  main.set({hasBorders:false,hasControls:false,selectable:false});
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
 
