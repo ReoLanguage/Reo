@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <title>Fabric.js test for Reo</title>
+    <title>Online Reo editor</title>
   </head>
   <body>
     <div id="header">
@@ -17,23 +17,29 @@
       <div id="toolbar">
         <table>
           <tr>
-            <td><a href=""><img src="img/cursor.png"></a></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
+            <td class="tool"><a href="" title="Select"><img src="img/cursor.png" alt="Select"></a></td>
+            <td class="tool"><a href="" title="New component"><img src="img/component.svg" alt="New component"></a></td>
           </tr>
         </table>
         <a id="download"></a>
         <input type="button" id="downloadsvg" value="Download SVG"><br />
         <input type="button" id="downloadpng" value="Download PNG"><br />
+        <h2>Channels</h2>
+        <input type="button" id="newchannel" value="New channel"><br />
+        <table>
+          <tr>
+            <td class="channel">
+              <a href="" title="New sync channel"><img src="img/sync.svg" alt="New sync channel"></a><br />
+              Sync
+            </td>
+          </tr>
+        </table>
       </div>
       <div id="canvas">
-        <canvas id="c" width="800" height="600"></canvas>
+        <canvas id="c" width="800" height="600">Please use a browser that supports canvas.</canvas>
       </div>
     </div>
     <script src="fabric.js-1.7.3/dist/fabric.min.js"></script>
     <script src="editor.js"></script>
   </body>
-</html> 
+</html>

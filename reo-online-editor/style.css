@@ -43,16 +43,20 @@ html, body {
 #toolbar table {
   border-spacing: 5px;
   table-layout: fixed;
+  width: 100%;
 }
 
 #toolbar td {
   background-color: #fff;
   border-radius: 5px;
   border-spacing: 5px;
+  border: 5px solid white;
+  overflow: hidden;
+}
+
+#toolbar td .tool {
   width: 64px;
   height: 64px;
-  padding: 0px;
-  overflow: hidden;
 }
 
 #text {

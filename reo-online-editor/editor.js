@@ -2,6 +2,7 @@
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   var line, isDown;
+  var mode = 'select';
   var id = 'a';
 
   function makeCircle(left, top) {
@@ -13,7 +14,8 @@
       fill: '#fff',
       stroke: '#000',
       hasBorders: false,
-      hasControls: false
+      hasControls: false,
+      class: 'node'
     });
     
     // give the node an identifier and increment it for the next node
@@ -36,7 +38,8 @@
       hasBorders: false,
       hasControls: false,
       selectable: false,
-      hoverCursor: 'default'
+      hoverCursor: 'default',
+      class: 'line'
     });
     
     // ...an arrowhead...
@@ -140,7 +143,7 @@
   function enumerate() {
     document.getElementById('text').innerHTML = "";
     canvas.forEachObject(function(obj) {
-      if (obj.type == 'circle')
+      if (obj.class == 'node')
         document.getElementById('text').innerHTML += obj.id + " ";
     });
   }
@@ -153,6 +156,26 @@
         s += 'sync(' + obj.circle1.id + ',' + obj.circle2.id + ') ';
     });
     document.getElementById('text').innerHTML = s;
+  }
+  
+  function snapToComponent(p) {
+    if (p.class == 'node'){
+      canvas.forEachObject(function(obj) {
+        if (obj.get('type') === "rect") {
+          var diffWidth = obj.width / 2;
+          var diffHeight = obj.height / 2;
+          if (p.left - obj.left > diffWidth) // right side
+            p.set({'left': obj.left + diffWidth});
+          if (obj.left - p.left > diffWidth) // left side
+            p.set({'left': obj.left - diffWidth});
+          if (p.top - obj.top > diffHeight) // bottom side
+            p.set({'top': obj.top + diffHeight});
+          if (obj.top - p.top > diffHeight) // top side
+            p.set({'top': obj.top - diffHeight});
+          p.setCoords();
+        }
+      });
+    }
   }
 
   canvas.on('object:moving', function(e) {
@@ -205,6 +228,7 @@
   canvas.on('mouse:up', function(e){
     isDown = false;
     var p = canvas.getActiveObject();
+    p.setCoords();
     canvas.forEachObject(function(obj) {
       if (!obj || obj.get('id') == p.get('id') || obj.get('type') !== "circle")
         return;
@@ -225,6 +249,11 @@
         }
       }
     });
+    snapToComponent(p);
+    for (i = 0; i < p.linesIn.length; i++)
+      updateLine(p.linesIn[i], 2);
+    for (i = 0; i < p.linesOut.length; i++)
+      updateLine(p.linesOut[i], 1);
     canvas.deactivateAll();
     canvas.calcOffset();
   });
@@ -243,6 +272,53 @@
     a.click();
   };
   
+  // Double-click event handler
+  var doubleClick = function (obj, handler) {
+    return function () {
+      if (obj.clicked) handler(obj);
+      else {
+        obj.clicked = true;
+        setTimeout(function () {
+          obj.clicked = false;
+        }, 500);
+      }
+    };
+  };
+  
+  function drawComponent(x1,y1,x2,y2) {  
+    var width = x2 - x1;
+    var height = y2 - y1;
+    var left = x1 + width / 2;
+    var top = y1 + height / 2;
+  
+    var rect = new fabric.Rect({
+      left: left,
+      top: top,
+      fill: '#fff',
+      stroke: '#000',
+      strokeWidth: 1,
+      width: width,
+      height: height,
+      hoverCursor: 'default',
+      hasBorders: false,
+      hasControls: false,
+      selectable: false
+    });
+  
+    var label = new fabric.IText('name', {
+      left: left,
+      top: x1 - 20
+    });
+  
+    label.on('mousedown', doubleClick(label, function (obj) {
+      label.enterEditing();
+      label.selectAll();
+    }));  
+  
+    canvas.add(rect,label);
+  }
+  
+  drawComponent(50,50,750,550);
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
 
