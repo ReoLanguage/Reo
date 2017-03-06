@@ -145,7 +145,13 @@ public class GameGraph {
 
 						// Compute p
 						TreeMap<String,Integer> p = new TreeMap<String, Integer>(); 
-						for (String x : A.getJobs()) p.put(x, a.p.get(x) + d.get(x));
+						for (String x : A.getJobs()) {
+							Integer i1 = a.p.get(x);
+							Integer i2 = d.get(x);
+							if (i1 == null || i2 == null)
+								throw new NullPointerException();
+							p.put(x, i1 + i2);
+						}
 
 						// Determine if transition tau fires
 						boolean fires = true;
@@ -214,7 +220,7 @@ public class GameGraph {
 		
 		// Check if p potentially satisfies the job constraint of tau
 		for (Map.Entry<String, Integer> entry : tau.getJobConstraint().getW().entrySet()) 
-			if ( p.get(entry.getKey()) > entry.getValue() )
+			if ( p.get(entry.getKey()).compareTo(entry.getValue()) > 0 )
 				return -1;
 
 		// If no jobs are scheduled then t = 0, if p satisfies w, and t = -1 otherwise
@@ -228,9 +234,14 @@ public class GameGraph {
 
 		// Compute the time to completion of every scheduled job
 		ArrayList<Integer> times = new ArrayList<Integer>();
-		for (String x : s)
-			times.add(tau.getJobConstraint().getW().get(x) - p.get(x));
-
+		for (String x : s) {
+			Integer a = tau.getJobConstraint().getW().get(x);
+			Integer b = p.get(x);
+			if (a == null || b == null) 
+				throw new NullPointerException();
+			times.add(a - b);
+		}
+		
 		// Return the minimal time to completion if its nonzero and -1 otherwise
 		int min = Collections.min(times);
 		return min == 0 ? -1 : min;

@@ -2,6 +2,8 @@ package nl.cwi.reo.graphgames;
 
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * Implements a vertex in a {@link nl.cwi.reo.graphgames.GameGraph}.
  */
@@ -44,7 +46,7 @@ public class Vertex implements Comparable<Vertex> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (other == null)
 			return false;
 		if (other == this)

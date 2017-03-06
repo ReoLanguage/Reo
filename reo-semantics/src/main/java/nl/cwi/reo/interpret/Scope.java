@@ -3,6 +3,8 @@ package nl.cwi.reo.interpret;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 
@@ -54,14 +56,17 @@ public final class Scope {
 		return new Scope(s);
 	}
 
+	@Nullable
 	public Value get(Identifier k) {
 		return assignments.get(k);
 	}
 
+	@Nullable
 	public Value remove(Identifier k) {
 		return assignments.remove(k);
 	}
 
+	@Nullable
 	public Value put(Identifier k, Value v) {
 		return assignments.put(k, v);
 	}
