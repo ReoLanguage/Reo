@@ -1,12 +1,13 @@
 section com.example;
-import reo.fifo;
+
+import reo.fifo1;
 import reo.sync;
 
 
 import = (a?, b!double) 
 {
    sync(a,a[i])
-   fifo(a[i],b)    // instance of component fifo.
+   fifo1(a[i],b)    // instance of component fifo.
 |
    i : <1..2>
 }
