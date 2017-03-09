@@ -26,5 +26,17 @@ public class Processes {
 			System.out.println(datum);
 		}
 	}
+	
+	public static void prod(OutputPort port) {
+		for (int i = 0; i < 1000; i++) {
+			port.putUninterruptibly("data" + i);
+		}
+	}
+
+	public static void cons(InputPort port) {
+		for (int i = 0; i < 1000; i++) {
+			System.out.println(port.getUninterruptibly());
+		}
+	}
 }
 

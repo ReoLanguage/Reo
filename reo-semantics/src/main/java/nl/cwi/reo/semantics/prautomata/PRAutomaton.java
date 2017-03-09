@@ -24,29 +24,29 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	private final String name;
 
 	@Nullable
-	private final Value variable;
+	private final Value parameter;
 
 	private Value value;
 
-	private final List<Port> port;
+	private final List<Port> ports;
 
 	public PRAutomaton() {
 		this.name = "";
-		this.variable = null;
-		this.port = new ArrayList<Port>();
+		this.parameter = null;
+		this.ports = new ArrayList<Port>();
 	}
 
 	public PRAutomaton(String name, @Nullable Value variable, Value value, List<Port> port) {
 		this.name = name;
-		this.variable = variable;
+		this.parameter = variable;
 		this.value = value;
-		this.port = port;
+		this.ports = port;
 	}
 
 	public PRAutomaton(String name, @Nullable Value variable, List<Port> port) {
 		this.name = name;
-		this.variable = variable;
-		this.port = port;
+		this.parameter = variable;
+		this.ports = port;
 	}
 
 	public String getName() {
@@ -58,7 +58,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	}
 
 	public Value getVariable() {
-		return variable;
+		return parameter;
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	 */
 	@Override
 	public String toString() {
-		return name + "[" + variable + "]" + "(" + getInterface() + ")";
+		return name + (parameter != null ? "[" + parameter + "]" : "") + "(" + ports + ")";
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	 */
 	@Override
 	public Set<Port> getInterface() {
-		return new HashSet<Port>(port);
+		return new HashSet<Port>(ports);
 	}
 
 	/**
@@ -124,14 +124,14 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 
 		List<Port> P = new ArrayList<Port>();
 
-		for (Port a : this.port) {
+		for (Port a : this.ports) {
 			Port b = r.get(a);
 			if (b == null)
 				b = a;
 			P.add(b);
 		}
 
-		return new PRAutomaton(name, variable, P);
+		return new PRAutomaton(name, parameter, P);
 	}
 
 	/**
@@ -140,12 +140,12 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	@Override
 	public PRAutomaton evaluate(Scope s, Monitor m) {
 		// Value v = s.get(variable);
-		if (variable != null) {
-			Value l = s.get(new Parameter(variable.toString(), new TypeTag("int")));
+		if (parameter != null) {
+			Value l = s.get(new Parameter(parameter.toString(), new TypeTag("int")));
 			this.value = l;
-			return new PRAutomaton(name, l, l, port);
+			return new PRAutomaton(name, l, l, ports);
 		}
-		return new PRAutomaton(name, null, null, port);
+		return new PRAutomaton(name, null, null, ports);
 	}
 
 	/**

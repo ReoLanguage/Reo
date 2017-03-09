@@ -656,14 +656,21 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		switch (ctx.op.getType()) {
 		case ReoParser.DIV:
 			terms.put(ctx, new FunctionExpression(FunctionSymbol.DIV, l, new Location(ctx.start, filename)));
+			break;
 		case ReoParser.MUL:
 			terms.put(ctx, new FunctionExpression(FunctionSymbol.MUL, l, new Location(ctx.start, filename)));
+			break;
 		case ReoParser.MOD:
 			terms.put(ctx, new FunctionExpression(FunctionSymbol.MOD, l, new Location(ctx.start, filename)));
+			break;
 		case ReoParser.ADD:
 			terms.put(ctx, new FunctionExpression(FunctionSymbol.ADD, l, new Location(ctx.start, filename)));
+			break;
 		case ReoParser.MIN:
 			terms.put(ctx, new FunctionExpression(FunctionSymbol.MIN, l, new Location(ctx.start, filename)));
+			break;
+		default:
+			break;
 		}
 	}
 

@@ -152,16 +152,8 @@ public class Compiler {
 		if (program == null) return;	
 		
 		if (verbose) {
-			System.out.println("\nReoConnector:");
-			System.out.println(program);
-			
-			System.out.println("\nFlat ReoConnector:");
-			System.out.println(program.flatten());
-	
-			System.out.println("\nFlat ReoConnector with nodes:");
 			System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()));
 			
-			System.out.println("\nFlat ReoConnector with nodes and inherited port names at atomic components:");
 			System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()).integrate());
 		}
 		
