@@ -1,5 +1,6 @@
 package nl.cwi.reo.runtime.java;
 
+@SuppressWarnings("initialization")
 public class PortFIFO1<T> implements Port<T> {
 	private Component producer;
 	private Component consumer;

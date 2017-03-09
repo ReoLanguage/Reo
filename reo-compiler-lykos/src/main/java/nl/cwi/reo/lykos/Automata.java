@@ -19,12 +19,7 @@ import nl.cwi.reo.pr.misc.MemberSignature;
 import nl.cwi.reo.pr.misc.PortFactory;
 import nl.cwi.reo.pr.misc.PortSpec;
 import nl.cwi.reo.pr.misc.PortFactory.Port;
-import nl.cwi.reo.pr.targ.java.autom.JavaAutomatonFactory;
-import nl.cwi.reo.pr.misc.Member;
 import nl.cwi.reo.pr.misc.Member.Primitive;
-
-
-
 
 public class Automata {
 	
@@ -131,7 +126,7 @@ public class Automata {
 
 		for (Automaton aut : automata.getSorted())
 			if (aut.getTransitions().getNonsilentSubset().isEmpty())
-				automata.remove(aut);
+			automata.remove(aut);
 
 		/*
 		 * Return

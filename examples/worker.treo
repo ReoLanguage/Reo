@@ -1,0 +1,31 @@
+section com.example;
+import reo.fifo1;
+
+foo = <k:int>(a?, b!double) 
+{
+
+	{   
+		fifo1(a[i],b)    // instance of component fifo.
+   		Producer(a[i])
+	  |
+		i : <1..2>	,
+		Producer(a?){
+		  #PR
+		  identity(;a)
+		|
+		  JAVA : "nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
+
+		}
+	}
+	{
+		Consumer(b)
+
+	  |
+		Consumer(b!){
+		  #PR
+		  identity(b;)
+		|
+		  JAVA : "nl.cwi.pr.runtime.examples.thesis.basic.Workers.Consumer"
+		}
+	}
+}

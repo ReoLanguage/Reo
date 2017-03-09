@@ -1,0 +1,14 @@
+section reo;
+
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+alternator(a?, b?, c!) 
+{
+  sync(a,c)
+  syncdrain(a,b) 
+  sync(b,d)
+  fifo1(d,c)
+
+}

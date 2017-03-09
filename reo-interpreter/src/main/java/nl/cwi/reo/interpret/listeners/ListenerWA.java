@@ -20,10 +20,11 @@ import nl.cwi.reo.interpret.ReoParser.Wa_jc_leqContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_jc_orContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_setContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_transitionContext;
-import nl.cwi.reo.semantics.api.Port;
-import nl.cwi.reo.workautomata.JobConstraint;
-import nl.cwi.reo.workautomata.Transition;
-import nl.cwi.reo.workautomata.WorkAutomaton;
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.workautomata.JobConstraint;
+import nl.cwi.reo.semantics.workautomata.Transition;
+import nl.cwi.reo.semantics.workautomata.WorkAutomaton;
+import nl.cwi.reo.util.Monitor;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -33,13 +34,17 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * Returns a {@link nl.cwi.reo.interpret.p}.
  */
 public class ListenerWA extends Listener<WorkAutomaton> {	
-		
+
 	private ParseTreeProperty<WorkAutomaton> workautomata = new ParseTreeProperty<WorkAutomaton>();
 	private ParseTreeProperty<JobConstraint> wa_jobconstraints = new ParseTreeProperty<JobConstraint>();
 	private ParseTreeProperty<SortedSet<Port>> idsets = new ParseTreeProperty<SortedSet<Port>>();
 //	private ParseTreeProperty<SortedSet<String>> wa_resets = new ParseTreeProperty<SortedSet<String>>();	
 	private ParseTreeProperty<Transition> wa_transitions = new ParseTreeProperty<Transition>();	
 	private ParseTreeProperty<String> wa_states = new ParseTreeProperty<String>();
+
+	public ListenerWA(Monitor m) {
+		super(m);
+	}
 
 	@Override
 	public void exitAtom(AtomContext ctx) {
@@ -58,7 +63,7 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 		Set<String> J = new HashSet<String>();
 		Map<String, JobConstraint> I = new HashMap<String, JobConstraint>();
 		Map<String, Set<Transition>> T = new HashMap<String, Set<Transition>>();
-		String q0 = null;		
+		String q0 = "";		
 		
 		// Iterate over all work automaton statements.
 		for (Wa_exprContext stmt_ctx : ctx.wa_expr()) {
@@ -69,7 +74,7 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 			if ((q = wa_states.get(stmt_ctx)) != null) {
 				
 				// Define the initial state, if necessary.
-				if (q0 == null) 
+				if (q0 == "") 
 					q0 = q;
 				
 				// Add the state, if not yet present
@@ -97,7 +102,7 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 			if ((t = wa_transitions.get(stmt_ctx)) != null) {
 
 				// Define the initial state, if necessary.
-				if (q0 == null) 
+				if (q0 == "") 
 					q0 = t.getSource();
 				
 				// Add the source state, if not yet present.
@@ -111,7 +116,11 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 				Q.add(t.getTarget());
 				
 				// Add the transition, if not yet present
-				if (!T.get(t.getSource()).contains(t)) {
+				Set<Transition> outs = T.get(t.getSource());
+				if (outs == null)
+					outs = new HashSet<Transition>();
+				
+				if (!outs.contains(t)) {
 					
 					// Append the interface with all ports in the synchronization constraint.
 					P.addAll(t.getSyncConstraint());
@@ -120,7 +129,7 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 					J.addAll(t.getJobConstraint().getW().keySet());
 					
 					// Add the transition
-					T.get(t.getSource()).add(t);
+					outs.add(t);
 				}
 			}
 		}

@@ -20,7 +20,6 @@ import nl.cwi.reo.pr.misc.Member.Primitive;
 import nl.cwi.reo.pr.misc.PortFactory.Port;
 import nl.cwi.reo.pr.comp.Cancellation;
 import nl.cwi.reo.pr.comp.CompiledGeneratee;
-import nl.cwi.reo.pr.comp.CompilerProgressMonitor;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.pr.comp.InterpretedProtocol;
 

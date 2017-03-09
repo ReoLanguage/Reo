@@ -1,0 +1,27 @@
+section reo;
+
+import reo.fifo1;
+import reo.fifo1full;
+import reo.sync;
+
+sequencer(p[1..n]?) {
+  {
+    fifo1(x[i], x[i+1])
+    sync(x[i], p[i])
+  | 
+    i : <1..n>
+  }
+  fifo1full<0>(x[1], x[n+1])
+}
+
+
+
+
+
+
+
+
+
+
+
+

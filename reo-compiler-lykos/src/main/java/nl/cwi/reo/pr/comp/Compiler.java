@@ -1,7 +1,6 @@
 package nl.cwi.reo.pr.comp;
 
 import nl.cwi.reo.pr.comp.CompilerError;
-import nl.cwi.reo.pr.comp.CompilerProgressMonitor;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.pr.comp.ToolError;
 import nl.cwi.reo.pr.comp.ToolErrorAccumulator;

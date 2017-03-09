@@ -1,65 +1,62 @@
 package nl.cwi.reo.interpret.listeners;
 
-import nl.cwi.reo.prautomata.PRAutomaton;
-import nl.cwi.reo.semantics.api.Port;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import nl.cwi.reo.interpret.ReoParser.Pr_paramContext;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.PrContext;
-import nl.cwi.reo.interpret.ReoParser.Pr_portContext;
-import nl.cwi.reo.interpret.ReoParser.Pr_stringContext;
-import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.values.IntegerValue;
+import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.semantics.prautomata.PRAutomaton;
+import nl.cwi.reo.util.Monitor;
 
 public class ListenerPR extends Listener<PRAutomaton> {
 
-    private ParseTreeProperty<PRAutomaton> prAutomata =  new ParseTreeProperty<PRAutomaton>();
-    private ParseTreeProperty<String> name =  new ParseTreeProperty<String>();
-    private ParseTreeProperty<String> parameter =  new ParseTreeProperty<String>();
-    private ParseTreeProperty<List<Port>> port =  new ParseTreeProperty<List<Port>>();
-    Integer value;
-    
-	public void exitAtom(AtomContext ctx) {
-		atoms.put(ctx, prAutomata.get(ctx.pr()));
+	private ParseTreeProperty<PRAutomaton> primitives = new ParseTreeProperty<PRAutomaton>();
+	private ParseTreeProperty<Value> params = new ParseTreeProperty<Value>();
+
+	public ListenerPR(Monitor m) {
+		super(m);
 	}
-    
-	public void enterPr( PrContext ctx){
-		
+
+	public void exitAtom(AtomContext ctx) {
+		atoms.put(ctx, primitives.get(ctx.pr()));
+	}
+
+	public void enterPr(PrContext ctx) {
+
 	}
 
 	public void exitPr(PrContext ctx) {
-		System.out.println(name.get(ctx.pr_string()));
-		if(name.get(ctx.pr_string()).equals("identity"))
-			prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),new String(),new Integer(0),port.get(ctx.pr_port())));			
-		else{
-		parameter.put(ctx, ctx.NAT().getText());
-		prAutomata.put(ctx, new PRAutomaton(name.get(ctx.pr_string()),parameter.get(ctx),value,port.get(ctx.pr_port())));
+		String name = ctx.pr_string().ID().getText();
+
+		List<Port> ports = new ArrayList<Port>();
+		for (TerminalNode id : ctx.pr_port().ID())
+			ports.add(new Port(id.getText()));
+		
+		if (name.equals("identity")) {
+			primitives.put(ctx, new PRAutomaton(name, null, ports));			
+		} else if (ctx.pr_param() != null) {
+			primitives.put(ctx, new PRAutomaton(name, params.get(ctx.pr_param()), ports));
+		} else {
+			primitives.put(ctx, new PRAutomaton(name, null, ports));
 		}
 	}
 
-	public void enterPr_string(Pr_stringContext ctx) {
+	public void exitPr_param(Pr_paramContext ctx) {
+		if(ctx.ID()!=null){
+			params.put(ctx, new StringValue(ctx.ID().toString()));			
+		}
+		if(ctx.NAT()!=null){
+			params.put(ctx, new IntegerValue(Integer.parseInt(ctx.NAT().toString())));			
+		}
 		
 	}
-	
-	public void exitPr_string(Pr_stringContext ctx) {
-		name.put(ctx, ctx.ID().getText());
-	}
-
-	public void exitPr_port(Pr_portContext ctx){
-		List<Port> p = new ArrayList<Port>();
-		for (TerminalNode id : ctx.ID())
-			p.add(new Port(id.getText()));
-		port.put(ctx, p);
-	};
-
-	public void enterPr_port(Pr_portContext ctx){
-		
-	};
 
 }

@@ -1,0 +1,6 @@
+section reo;
+
+transformer<k:int>(a?, b!) {
+	#PR
+	Transformer<k>(a;b)
+}

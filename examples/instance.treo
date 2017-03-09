@@ -1,0 +1,14 @@
+section com.example;
+import reo.fifo1;
+
+
+
+
+instance = <k:int>(a?, b!double) 
+{
+	fifo <k>(a[0]?, a[k]!){
+		fifo1(a[i],a[i+1]) | i : <1..k>
+	}
+
+	fifo<2>(a,b)
+}

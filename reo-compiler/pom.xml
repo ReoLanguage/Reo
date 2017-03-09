@@ -29,6 +29,12 @@
 
     <dependency>
       <groupId>nl.cwi.reo</groupId>
+      <artifactId>reo-runtime-java-lykos</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>nl.cwi.reo</groupId>
       <artifactId>reo-semantics</artifactId>
       <version>1.0</version>
     </dependency>
@@ -43,12 +49,6 @@
       <groupId>nl.cwi.reo</groupId>
       <artifactId>reo-compiler-lykos</artifactId>
       <version>1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>ST4</artifactId>
-      <version>4.0.8</version>
     </dependency>
   </dependencies>
 

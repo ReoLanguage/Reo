@@ -1,8 +1,0 @@
-section reo;
-
-import reo.fifo1;
-
-fifo=<k>(a[0]?, a[k]!){
-	for i = 0 .. k-1 { fifo1(a[i],a[i+1]) }
-}
-

@@ -1,0 +1,9 @@
+section reo.slides;
+
+green(a?) 
+{
+  #PR
+ identity(a;)
+ |
+ Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
+}

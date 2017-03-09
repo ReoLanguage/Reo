@@ -1,0 +1,8 @@
+package reo;
+
+import reo.fifo1;
+import reo.lossy;
+
+lossyfifo1(a, b) {
+  lossy(a, m) fifo1(m, b)
+}

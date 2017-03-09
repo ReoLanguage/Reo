@@ -7,7 +7,7 @@ import java.util.List;
 public abstract class ToolErrorAccumulator {
 	private final List<ToolErrorAccumulator> children = new ArrayList<>();
 	private final List<ToolError> errors = new ArrayList<>();
-	private final String sourceFileLocation;;
+	private final String sourceFileLocation;
 
 	//
 	// CONSTRUCTORS
