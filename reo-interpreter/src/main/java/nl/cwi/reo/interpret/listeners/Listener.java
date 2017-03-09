@@ -420,7 +420,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitFormula_binaryrelation(Formula_binaryrelationContext ctx) {
-		List<TermExpression> l = Arrays.asList(terms.get(ctx.term(0)), terms.get(ctx.term(0)));
+		List<TermExpression> l = Arrays.asList(terms.get(ctx.term(0)), terms.get(ctx.term(1)));
 		switch (ctx.op.getType()) {
 		case ReoParser.LEQ:
 			formula.put(ctx, new Relation(RelationSymbol.LEQ, l, new Location(ctx.start, filename)));
