@@ -1,5 +1,5 @@
 component(name, originalfile, types, ports, states) ::= 
-<<// Generated from $originalfile$ by Lykos 1.0
+<<// Generated from $originalfile$ by Reo 1.0
 package nl.cwi.reo.runtime;
 
 public class $name$$if(types)$<$types; separator=", "$>$endif$ implements Component {
