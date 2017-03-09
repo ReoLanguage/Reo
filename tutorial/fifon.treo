@@ -16,11 +16,11 @@ fifon() {
 prod(a!) {
   #PR identity(a;)
 |
-  Java:"Processes.prod"
+  Java:"nl.cwi.reo.templates.Processes.prod"
 }
 
 cons(a?) {
   #PR identity(;a)
 |
-  Java:"Processes.cons"
+  Java:"nl.cwi.reo.templates.Processes.cons"
 }

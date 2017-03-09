@@ -8,7 +8,23 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		system2();
+		Port<Integer> a = new PortRingBuffer<Integer>(50);
+		
+		Component Producer = new Producer(a);
+		Component Consumer = new Consumer(a);
+
+		Thread thread_Producer = new Thread(Producer);
+		Thread thread_Consumer = new Thread(Consumer);
+
+		thread_Producer.start();
+		thread_Consumer.start();
+
+		try {
+			thread_Producer.join();
+			thread_Consumer.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}	
 		
 		System.exit(0);
 	}
