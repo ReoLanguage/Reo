@@ -48,7 +48,7 @@ public interface Label<L> {
 	 * @param N		synchronization constraint
 	 * @return default label of N.
 	 */
-	public  L getLabel(Set<Port> N);
+	public L getLabel(Set<Port> N);
 	
 	/**
 	 * Evaluates this label using specified parameters.
