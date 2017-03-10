@@ -3,17 +3,24 @@
  */
 package nl.cwi.reo.compile.targetcode;
 
+import java.util.List;
+
+import nl.cwi.reo.interpret.ports.Port;
+
 /**
  * A target language independent template for an executable Reo component.
  */
-public final class Component {
+public interface Component {
 
-	public final String name;
+	public String getName();
 	
-	public final Behavior type;
+	public List<Port> getInterface();
 	
-	public Component(String name, Behavior type) {
-		this.name = name;
-		this.type = type;
-	}
+	public String getRun();
+	
+	public String getActivate();
+	
+	public Behavior getBehavior();
+	
+	public String getReoFile();
 }
