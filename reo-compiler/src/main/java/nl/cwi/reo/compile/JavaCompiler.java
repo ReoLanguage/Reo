@@ -1,39 +1,40 @@
 package nl.cwi.reo.compile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.ports.PrioType;
+import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.semantics.automata.State;
+import nl.cwi.reo.semantics.automata.Transition;
+import nl.cwi.reo.semantics.portautomata.NullLabel;
+
 public class JavaCompiler {
 	
-	public void compile() {
+	public static void compile() {
 		
-		STGroup group = new STGroupFile("Java.stg", '$', '$');
-        ST component = group.getInstanceOf("component");
+		STGroup group = new STGroupFile("Automaton.stg");
+        ST temp = group.getInstanceOf("transition");
 
-        component.add("name", "MyComponent");
+        State q0 = new State("q0");
+        State q1 = new State("q1");
+        SortedSet<Port> N = new TreeSet<Port>();
         
-        component.add("originalfile", "MyReoApp");
+        N.add(new Port("a", PortType.IN, PrioType.NONE, new TypeTag("Integer"), true));
+        N.add(new Port("b", PortType.OUT, PrioType.NONE, new TypeTag("Boolean"), true));
+        N.add(new Port("c", PortType.IN, PrioType.NONE, new TypeTag("Integer"), true));
+
+        Transition<NullLabel> t = new Transition<NullLabel>(q0, q1, N, new NullLabel());
+         
+        temp.add("t", t);
         
-        List<Map<String, String>> ports = new ArrayList<Map<String, String>>();
-        Map<String, String> port = new HashMap<String, String>();
-        port.put("name", "a");
-        port.put("type", "String");
-        port.put("inpt", "");
-        ports.add(port);
-        Map<String, String> port2 = new HashMap<String, String>();
-        port2.put("name", "b");
-        port2.put("type", "String");
-        ports.add(port2);
-        
-        component.add("ports", ports);
-        
-        System.out.println(component.render());
+        System.out.println(temp.render());
 		//outputClass(name, st.render());		
 	}
 	

@@ -152,6 +152,14 @@ public final class Port extends Identifier implements Comparable<Port> {
 	public Port hide() {
 		return new Port(name, type, prio, tag, false);
 	}
+	
+	/**
+	 * Determines whether this port in an input port.
+	 * @return true if this port is an input, and false otherwise.
+	 */
+	public boolean isInput() {
+		return type == PortType.IN;
+	}
 
 	/**
 	 * {@inheritDoc}

@@ -8,6 +8,7 @@ import java.util.List;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
+import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
@@ -123,9 +124,11 @@ public class Compiler {
     }
 
     private void compilePA() {
+    	JavaCompiler.compile();
+    	
 		// Interpret the program
-		Interpreter<PortAutomaton> interpreter = new Interpreter<PortAutomaton>(SemanticsType.PA, new Listener<PortAutomaton>(monitor), directories, params, monitor);
-		interpreter.interpret(files.get(0));
+//		Interpreter<PortAutomaton> interpreter = new Interpreter<PortAutomaton>(SemanticsType.PA, new Listener<PortAutomaton>(monitor), directories, params, monitor);
+//		interpreter.interpret(files.get(0));
 		
 //		if (program != null) {
 //			for (Component<PortAutomaton> X : program.getComponents()) System.out.println(X);
