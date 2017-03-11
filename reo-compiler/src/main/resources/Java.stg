@@ -1,49 +1,121 @@
-component(name, originalfile, types, ports, states) ::= 
-<<// Generated from $originalfile$ by Reo 1.0
-package nl.cwi.reo.runtime;
+main(S) ::= <<
+/**
+ * Generated from <S.file> by Reo 1.0.
+ */
+package <S.package>;
 
-public class $name$$if(types)$<$types; separator=", "$>$endif$ implements Component {
+import nl.cwi.reo.runtime.java.Component;
+import nl.cwi.reo.runtime.java.Port;
+import nl.cwi.reo.runtime.java.PortBusyWait;
 
-	$ports:{a | private volatile Port<$a.type$> $a.name$;}; separator="\n"$
-	private String state;
-			
-	public $name$($ports:{a | Port<$a.type$> $a.name$}; separator=", "$) {
-		$ports:{a | $a.name$.$if(a.inpt)$setConsumer(this);$else$setProducer(this);$endif$}; separator="\n"$
-		$ports:{a | this.$a.name$ = $a.name$;}; separator="\n"$
-	}
+public class <S.name> {
+
+  public static void main(String[] args) {
+    
+    <S.ports:newPort(); separator="\n">
+    
+	<S.instances:newInstance(); separator="\n">
 	
-	public synchronized void hit() {
-		notify();	
-	}
+	<S.instances:newThread(); separator="\n">
+
+	<S.instances:{c|<c.name>.start();}; separator="\n">
 	
-	public void run() {
-		while (true) {
+    try {
+      <A.proactives:{c | <c.name>.join();}; separator="\n">
+    } catch (InterruptedException e1) {
+      e1.printStackTrace();
+    }	
+
+    System.exit(0);
+
+  }
+
+  <S.definitions:component(); separator="\n\n">
+  
+}
+>>
+
+newPort(p) ::= <<
+Port\<<p.typeTag>\> <p.name> = new PortBusyWait\<<p.typeTag>\>();
+>>
+
+newInstance(I) ::= <<
+Component <I.name> = new <I.definition>(<I.ports:{p|<p.name>}; separator=", ">);
+>>
+
+newThread(I) ::= <<
+<if(I.name)>Thread thread_<I.name> = <endif>new Thread(<I.name>);
+>>
+
+component(A) ::= <<
+private class <A.name> implements Component {
+
+  <A.interface:port(); separator="\n\n">
+  
+  private volatile T m = null;
+  
+  private volatile int q = 0;
 			
-			if () {
-				synchronized (this) {
-					while () {
-						try { wait(); } 
-						catch (InterruptedException e) { }	
-					}
-				}
-			}
-			
-			switch (state) {
-			$states:state(); separator="\n"$
-			}
-		}		
-	}
-}>>
+  public <A.name>(<A.interface:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
+    <A.interface:{a | <a.name>.<if(a.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
+    <A.interface:{a | this.<a.name> = <a.name>;}; separator="\n">
+  }
 
-state(q) ::= <<case $q.id$:
-	$transition(q.transitions); separator="\n"$
-	break;>>
+  public synchronized void hit() {
+    notify();	
+  }
+
+  public void run() {
+    <run(A)>	
+  }
+}
+>>
+
+port(p) ::= <<
+/**
+ * <if(p.input)>Input<else>Output<endif> port <p.name>.
+ */
+private volatile Port\<<p.typeTag>\> <p.name>;
+>>
+
+run(A) ::= <<
+while (true) {
+  switch (q) {
+  <A.transitions.keys:{k | <outs(k, A.transitions)>}; separator="\n">
+  }
+  if (!a.hasPut() || (!b.hasGet() && !c.hasGet())) 
+    try { wait(); } catch (InterruptedException e) { }	
+}
+>>
+
+outs(q, out) ::= <<
+case <q>:
+  <out.(q):transition()>
+>>
+
+transition(t) ::= <<
+if (<guard(t)>) {
+  <action(t)>
+  continue;
+}
+>>
+
+action(t) ::= <<
+<t.SyncConstraint:{p | <if(p.input)><p.typeTag> d_<p.name> = <p.name>.get();
+<endif>}; separator=""><t.action.keys:{k | <k>.put(<t.action.(k)>);}; separator="\n">
+q = <t.target>;
+>>
+
+doSync(p) ::= <<
+<p.name>.<if(p.input)>canGet()<else>canPut()<endif>
+>>
+
+guard(t) ::= <<
+<t.SyncConstraint:canSync(); separator=" && ">
+>>
+
+canSync(p) ::= <<
+<p.name>.<if(p.input)>canGet()<else>canPut()<endif>
+>>
 
 
-transition(t) ::= <<if (false) {
-	$t.gets:{p | $p.type$ d_$p.name$ = $p.name$.get();}; separator="\n"$
-	$t.puts:{x | $x.name$.setPut(d_$x.term$);}; separator="\n"$
-}>>
-
-
-guard(t) ::= <<$t.gets:{p | $p.name$.canGet(); separator=" && "}$$if(t.puts)$ && $endif$$t.puts:{p | $p.name$.canPut(); separator=" && "}$$if(t.guard)$ && $endif$$t.guard$>>

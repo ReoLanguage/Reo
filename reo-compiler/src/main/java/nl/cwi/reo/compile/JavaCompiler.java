@@ -26,7 +26,7 @@ public class JavaCompiler {
 
 	public static void compile() {
 
-		STGroup group = new STGroupFile("Automaton.stg");
+		STGroup group = new STGroupFile("Java.stg");
 		ST temp = group.getInstanceOf("component");
 
 		Port a = new Port("a", PortType.IN, PrioType.NONE, new TypeTag("Integer"), true);

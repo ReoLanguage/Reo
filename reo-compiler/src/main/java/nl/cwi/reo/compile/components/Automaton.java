@@ -19,7 +19,7 @@ import nl.cwi.reo.interpret.ports.Port;
 /**
  *
  */
-public final class Automaton implements Component {
+public final class Automaton implements Definition {
 
 	private final String name;
 
