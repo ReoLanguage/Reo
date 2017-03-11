@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.cwi.reo.compile.targetcode;
+package nl.cwi.reo.compile.components;
 
 /**
  * Behavour type of an executable Reo component.

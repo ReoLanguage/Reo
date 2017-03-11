@@ -1,16 +1,69 @@
+
+component(A) ::= <<
+/**
+ * Generated from <A.file> by Reo 1.0.
+ */
+package <A.package>;
+
+import nl.cwi.reo.runtime.java.Component;
+import nl.cwi.reo.runtime.java.Port;
+
+public class <A.name> implements Component {
+
+  <A.interface:port(); separator="\n\n">
+  
+  private volatile T m = null;
+  
+  private volatile int q = 0;
+			
+  public <A.name>(<A.interface:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
+    <A.interface:{a | <a.name>.<if(a.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
+    <A.interface:{a | this.<a.name> = <a.name>;}; separator="\n">
+  }
+
+  public synchronized void hit() {
+    notify();	
+  }
+
+  public void run() {
+    <run(A)>	
+  }
+}
+>>
+
+port(p) ::= <<
+/**
+ * <if(p.input)>Input<else>Output<endif> port <p.name>.
+ */
+private volatile <if(p.input)>Input<else>Output<endif>Port\<<p.typeTag>\> <p.name>;
+>>
+
 run(A) ::= <<
+while (true) {
+  switch (q) {
+  <A.transitions.keys:{k | <outs(k, A.transitions)>}; separator="\n">
+  }
+  if (!a.hasPut() || (!b.hasGet() && !c.hasGet())) 
+    try { wait(); } catch (InterruptedException e) { }	
+}
+>>
 
-
+outs(q, out) ::= <<
+case <q>:
+  <out.(q):transition()>
 >>
 
 transition(t) ::= <<
 if (<guard(t)>) {
-  bla
+  <action(t)>
+  continue;
 }
 >>
 
 action(t) ::= <<
-
+<t.SyncConstraint:{p | <if(p.input)><p.typeTag> d_<p.name> = <p.name>.get();
+<endif>}; separator=""><t.action.keys:{k | <k>.put(<t.action.(k)>);}; separator="\n">
+q = <t.target>;
 >>
 
 doSync(p) ::= <<
@@ -18,7 +71,7 @@ doSync(p) ::= <<
 >>
 
 guard(t) ::= <<
-<t.SyncConstraint: canSync(); separator=" && ">
+<t.SyncConstraint:canSync(); separator=" && ">
 >>
 
 canSync(p) ::= <<
