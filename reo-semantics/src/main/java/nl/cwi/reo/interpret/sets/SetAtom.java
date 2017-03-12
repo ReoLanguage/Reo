@@ -16,15 +16,17 @@ import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of an atomic set definition.
- * @param <T> Reo semantics type
+ * 
+ * @param <T>
+ *            Reo semantics type
  */
 public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
-	
+
 	/**
 	 * Reo semantics object.
 	 */
 	private final T atom;
-	
+
 	/**
 	 * Reference to source code.
 	 */
@@ -32,8 +34,11 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 
 	/**
 	 * Constructs a new atomic set.
-	 * @param atom		semantics object
-	 * @param source	reference to source code
+	 * 
+	 * @param atom
+	 *            semantics object
+	 * @param source
+	 *            reference to source code
 	 */
 	public SetAtom(T atom, Reference source) {
 		this.atom = atom;
@@ -41,16 +46,18 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	}
 
 	/**
-	 * Evaluates this atomic set to an instance containing an atomic Reo connector.
+	 * Evaluates this atomic set to an instance containing an atomic Reo
+	 * connector.
 	 */
 	@Override
 	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
 		T semantics = atom.evaluate(s, m);
-		if (semantics == null) return null;
+		if (semantics == null)
+			return null;
 		return new Instance<T>(new ReoConnectorAtom<T>(semantics, source), new HashSet<Set<Identifier>>());
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

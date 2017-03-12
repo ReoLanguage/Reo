@@ -21,6 +21,4 @@ public interface Definition {
 	public String getActivate();
 	
 	public Behavior getBehavior();
-	
-	public String getReoFile();
 }

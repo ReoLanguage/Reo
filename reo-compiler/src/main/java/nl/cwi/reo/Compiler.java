@@ -10,10 +10,13 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.compile.LykosCompiler;
+import nl.cwi.reo.compile.components.MainTemplate;
+import nl.cwi.reo.interpret.ReoProgram;
+import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
+import nl.cwi.reo.interpret.interpreters.InterpreterPA;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
-import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
@@ -48,6 +51,12 @@ public class Compiler {
 	@Parameter(names = {"-o", "--output-dir"}, description = "output directory")
 	private String outdir = ".";
 
+	/**
+	 * Package
+	 */
+	@Parameter(names = {"-pkg", "--package"}, description = "target code package")
+	private String packagename = "";
+	
 	/**
 	 * List of available options.
 	 */
@@ -124,33 +133,56 @@ public class Compiler {
     }
 
     private void compilePA() {
-    	JavaCompiler.compile();
     	
-		// Interpret the program
-//		Interpreter<PortAutomaton> interpreter = new Interpreter<PortAutomaton>(SemanticsType.PA, new Listener<PortAutomaton>(monitor), directories, params, monitor);
-//		interpreter.interpret(files.get(0));
+
+		Interpreter<PortAutomaton> interpreter = new InterpreterPA(directories, params, monitor);
 		
-//		if (program != null) {
-//			for (Component<PortAutomaton> X : program.getComponents()) System.out.println(X);
+		ReoProgram<PortAutomaton> program = interpreter.interpret(files.get(0));	
+		
+		MainTemplate template = JavaCompiler.compile(program, packagename, new PortAutomaton());
+
+		System.out.println(template.render(Language.JAVA));
+		
+//		STGroup group = new STGroupFile("Java.stg");
+//		ST temp = group.getInstanceOf("component");
 //
-//			
-//			if (!program.isEmpty()) {
-//				PortAutomaton product = program.getComponents().get(0).compose(program.getComponents().subList(1, program.getComponents().size()));
-//				PortAutomaton hide = product.restrict(program.getInterface());
-				
-//				System.out.println("Product automaton : \n");
-//				System.out.println(hide);
-//			}
-//		}
-//		// Generate the classes.
-//		JavaCompiler JC = new JavaCompiler(name, "");
-//		JC.compile(program);
+//		Port a = new Port("a", PortType.IN, PrioType.NONE, new TypeTag("Integer"), true);
+//		Port b = new Port("b", PortType.OUT, PrioType.NONE, new TypeTag("Boolean"), true);
+//		Port c = new Port("c", PortType.IN, PrioType.NONE, new TypeTag("Double"), true);
+//
+//		SortedSet<Port> N = new TreeSet<Port>();
+//
+//		N.add(a);
+//		N.add(b);
+//		N.add(c);
+//
+//		Map<String, String> ac = new HashMap<String, String>();
+//		ac.put("b", "d_a");
+//		ac.put("d", "m");
+//
+//		Transition t = new Transition("q0", "q1", N, ac);
+//
+//		List<Port> P = new ArrayList<Port>();
+//		P.add(a);
+//		P.add(b);
+//		P.add(c);
+//
+//		Map<String, Set<Transition>> out = new HashMap<String, Set<Transition>>();
+//		out.put("q0", new HashSet<Transition>(Arrays.asList(t)));
+//
+//		Automaton A = new Automaton("MyAutomaton", P, Behavior.PROACTIVE, "main.treo", out, "q0",
+//				"nl.cwi.reo.runtime.java");
+//
+//		temp.add("A", A);
+//
+//		System.out.println(temp.render());
+		// outputClass(name, st.render());
     }
     
 
     private void compilePR() {    	
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
-		ReoConnector<PRAutomaton> program = interpreter.interpret(files.get(0));	
+		ReoConnector<PRAutomaton> program = interpreter.interpret(files.get(0)).getConnector();	
 		
 		if (program == null) return;	
 		

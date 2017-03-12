@@ -73,7 +73,7 @@ private class <A.name> implements Component {
 
 port(p) ::= <<
 /**
- * <if(p.input)>Input<else>Output<endif> port <p.name>.
+ * <if(p.input)>Input<else>Output<endif> port <p.name> of this component.
  */
 private volatile Port\<<p.typeTag>\> <p.name>;
 >>

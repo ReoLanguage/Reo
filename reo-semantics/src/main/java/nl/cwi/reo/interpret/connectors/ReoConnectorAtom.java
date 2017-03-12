@@ -122,7 +122,8 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	@Nullable
 	public ReoConnectorAtom<T> evaluate(Scope s, Monitor m) {
 		T semantics = this.semantics.evaluate(s, m);
-		if (semantics == null) return null;
+		if (semantics == null)
+			return null;
 		return new ReoConnectorAtom<T>(semantics, source);
 	}
 
@@ -145,7 +146,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	public ReoConnector<T> markHidden(Map<Port, Port> join) {
 		return new ReoConnectorAtom<T>(semantics, source, Links.markHidden(links, join));
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -200,7 +201,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	public boolean isEmpty() {
 		return false;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -208,4 +209,5 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	public List<ReoConnectorAtom<T>> getAtoms() {
 		return Arrays.asList(this);
 	}
+
 }

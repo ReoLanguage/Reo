@@ -56,25 +56,6 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	}
 
 	/**
-	 * Constructs a connector consisting of a single atom.
-	 * 
-	 * @param atom
-	 *            atomic component
-	 */
-	public ReoConnectorComposite(ReoConnectorAtom<T> atom) {
-		if (atom == null)
-			throw new NullPointerException();
-		List<ReoConnector<T>> components = new ArrayList<ReoConnector<T>>();
-		components.add(atom);
-		this.operator = "";
-		this.components = Collections.unmodifiableList(components);
-		Map<Port, Port> links = new HashMap<Port, Port>();
-		for (Map.Entry<Port, Port> link : atom.getLinks().entrySet())
-			links.put(link.getValue(), link.getValue());
-		this.links = Collections.unmodifiableMap(links);
-	}
-
-	/**
 	 * Constructs a new connector with a default set of links.
 	 * 
 	 * @param operator
@@ -89,13 +70,6 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		for (ReoConnector<T> comp : components)
 			for (Map.Entry<Port, Port> link : comp.getLinks().entrySet())
 				links.put(link.getValue(), link.getValue());
-
-//		Map<Port, Port> linksFinal = new HashMap<Port, Port>();
-//		linksFinal.putAll(links);
-//		for (Map.Entry<Port, Port> link : links.entrySet())
-//			if (!link.getKey().getType().equals(link.getValue().getType()))
-//				linksFinal.remove(link.getKey());
-
 		this.links = Collections.unmodifiableMap(links);
 	}
 
@@ -118,7 +92,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		this.components = Collections.unmodifiableList(components);
 		this.links = Collections.unmodifiableMap(links);
 	}
-	
+
 	/**
 	 * Gets the name of the product operator that must be used to compose this
 	 * connector.
@@ -161,24 +135,6 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	}
 
 	/**
-	 * Composes this list of instances with another list of instances, and
-	 * renames all hidden ports to avoid sharing of internal ports.
-	 * 
-	 * @param operator
-	 *            name of the operator
-	 * @param components
-	 *            other list of instances
-	 */
-	public static <T extends Semantics<T>> ReoConnectorComposite<T> compose(String operator,
-			List<? extends ReoConnector<T>> components) {
-		List<ReoConnector<T>> newcomponents = new ArrayList<ReoConnector<T>>();
-		Integer i = new Integer(0);
-		for (ReoConnector<T> comp : components)
-			newcomponents.add(comp.renameHidden(i));
-		return new ReoConnectorComposite<T>(operator, newcomponents);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -198,7 +154,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	@Override
 	public ReoConnectorComposite<T> rename(Map<Port, Port> joins) {
 		List<ReoConnector<T>> c = new ArrayList<ReoConnector<T>>();
-		for(ReoConnector<T> connector : this.components)
+		for (ReoConnector<T> connector : this.components)
 			c.add(connector.markHidden(joins));
 		return new ReoConnectorComposite<T>(operator, c, Links.rename(links, joins));
 	}
@@ -206,7 +162,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	public ReoConnectorComposite<T> markHidden(Map<Port, Port> join) {
 		return new ReoConnectorComposite<T>(operator, components, Links.markHidden(links, join));
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -231,12 +187,13 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		return new ReoConnectorComposite<T>("", list);
 	}
 
-//	public ReoConnectorComposite<T> insertNodes_bis(boolean mergers, boolean replicators, T nodeFactory) {
-//
-//		List<ReoConnector<T>> newcomponents = new ArrayList<ReoConnector<T>>();
-//
-//		return new ReoConnectorComposite<T>(operator, newcomponents);
-//	}
+	// public ReoConnectorComposite<T> insertNodes_bis(boolean mergers, boolean
+	// replicators, T nodeFactory) {
+	//
+	// List<ReoConnector<T>> newcomponents = new ArrayList<ReoConnector<T>>();
+	//
+	// return new ReoConnectorComposite<T>(operator, newcomponents);
+	// }
 
 	/**
 	 * {@inheritDoc}
@@ -367,8 +324,8 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> set = new HashSet<Port>();
-		for(Port p :links.values())
-			if(!p.isHidden())
+		for (Port p : links.values())
+			if (!p.isHidden())
 				set.add(p);
 		return new HashSet<Port>(set);
 	}

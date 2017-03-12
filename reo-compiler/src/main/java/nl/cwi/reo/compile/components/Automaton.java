@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -23,8 +22,6 @@ public final class Automaton implements Definition {
 
 	private final String name;
 
-	private final String reofile;
-
 	private final String packagename;
 
 	private final List<Port> ports;
@@ -35,12 +32,11 @@ public final class Automaton implements Definition {
 
 	private final String initial;
 
-	public Automaton(String name, List<Port> ports, Behavior behavior, String reofile, Map<String, Set<Transition>> out,
+	public Automaton(String name, List<Port> ports, Behavior behavior, Map<String, Set<Transition>> out,
 			String initial, String packagename) {
 		this.name = name;
 		this.ports = ports;
 		this.behavior = behavior;
-		this.reofile = reofile;
 		this.out = out;
 		this.initial = initial;
 		this.packagename = packagename;
@@ -64,10 +60,6 @@ public final class Automaton implements Definition {
 		return packagename;
 	}
 
-	public String getFile() {
-		return reofile;
-	}
-
 	public String getInitial() {
 		return initial;
 	}
@@ -85,7 +77,7 @@ public final class Automaton implements Definition {
 
 			component.add("name", name);
 
-			component.add("originalfile", reofile);
+			component.add("originalfile", "bla");
 
 			List<Map<String, String>> ports = new ArrayList<Map<String, String>>();
 			Map<String, String> port = new HashMap<String, String>();
@@ -109,10 +101,4 @@ public final class Automaton implements Definition {
 	public Behavior getBehavior() {
 		return behavior;
 	}
-
-	@Override
-	public String getReoFile() {
-		return reofile;
-	}
-
 }

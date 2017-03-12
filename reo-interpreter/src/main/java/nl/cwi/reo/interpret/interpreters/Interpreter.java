@@ -24,9 +24,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
+import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.Component;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
@@ -101,7 +101,7 @@ public class Interpreter<T extends Semantics<T>> {
 	 *         file, or null, if the main component could not be interpreted.
 	 */
 	@Nullable
-	public ReoConnector<T> interpret(String file) {
+	public ReoProgram<T> interpret(String file) {
 
 		// Stack of all parsed Reo source files.
 		Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();
@@ -153,7 +153,7 @@ public class Interpreter<T extends Semantics<T>> {
 			@SuppressWarnings("unchecked")
 			Instance<T> i = ((Component<T>) main).instantiate(values, null, m);
 			if (i != null)
-				return i.getConnector();
+				return new ReoProgram<T>(name, file, i.getConnector());
 		}
 		
 		return null;

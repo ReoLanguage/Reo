@@ -309,8 +309,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		List<InstanceExpression<T>> stmtlist = new ArrayList<InstanceExpression<T>>();
 		for (MultisetContext stmt_ctx : ctx.multiset())
 			stmtlist.add(instances.get(stmt_ctx));
-
-		instances.put(ctx, new SetComposite<T>(terms.get(ctx.term()), stmtlist, formula.get(ctx.formula()),
+		TermExpression operator = terms.get(ctx.term());
+		if (operator == null)
+			operator = new StringValue("");
+		PredicateExpression P = formula.get(ctx.formula());
+		if (P == null)
+			P = new TruthValue(true);
+		instances.put(ctx, new SetComposite<T>(operator, stmtlist, P,
 				new Location(ctx.start, filename)));
 	}
 

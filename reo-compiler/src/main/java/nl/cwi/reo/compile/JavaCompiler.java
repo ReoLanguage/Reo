@@ -16,15 +16,48 @@ import org.stringtemplate.v4.STGroupFile;
 
 import nl.cwi.reo.compile.components.Automaton;
 import nl.cwi.reo.compile.components.Behavior;
+import nl.cwi.reo.compile.components.Definition;
+import nl.cwi.reo.compile.components.Instance;
+import nl.cwi.reo.compile.components.MainTemplate;
 import nl.cwi.reo.compile.components.Transition;
+import nl.cwi.reo.interpret.ReoProgram;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
+import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.semantics.Semantics;
 
 public class JavaCompiler {
 
-	public static void compile() {
+	public static <T extends Semantics<T>> MainTemplate compile(ReoProgram<T> program, String packagename,
+			T nodeFactory) {
+
+		ReoConnector<T> connector = program.getConnector().flatten().insertNodes(true, true, nodeFactory).integrate();
+
+		List<Port> ports = new ArrayList<Port>();
+		List<Instance> instances = new ArrayList<Instance>();
+		List<Definition> definitions = new ArrayList<Definition>();
+
+		int c = 0;
+		int i = 0;
+		for (ReoConnectorAtom<T> atom : connector.getAtoms()) {
+			List<Port> atom_ports = new ArrayList<Port>(atom.getInterface());
+			ports.addAll(atom_ports);
+			Behavior b = Behavior.PROACTIVE;
+			if (atom.getSourceCode().getCall() == null)
+				b = Behavior.REACTIVE;
+			Map<String, Set<Transition>> out = new HashMap<String, Set<Transition>>();
+			String initial = "";
+			Definition defn = new Automaton("Component" + c++, atom_ports, b, out, initial, packagename);
+			instances.add(new Instance("Instance" + i++, defn, atom_ports));
+		}
+
+		return new MainTemplate(program.getFile(), packagename, program.getName(), ports, instances, definitions);
+	}
+
+	public static void compile1() {
 
 		STGroup group = new STGroupFile("Java.stg");
 		ST temp = group.getInstanceOf("component");
@@ -53,8 +86,7 @@ public class JavaCompiler {
 		Map<String, Set<Transition>> out = new HashMap<String, Set<Transition>>();
 		out.put("q0", new HashSet<Transition>(Arrays.asList(t)));
 
-		Automaton A = new Automaton("MyAutomaton", P, Behavior.PROACTIVE, "main.treo", out, "q0",
-				"nl.cwi.reo.runtime.java");
+		Automaton A = new Automaton("MyAutomaton", P, Behavior.PROACTIVE, out, "q0", "nl.cwi.reo.runtime.java");
 
 		temp.add("A", A);
 
