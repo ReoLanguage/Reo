@@ -33,7 +33,10 @@ public class JavaCompiler {
 
 	public static <T extends Semantics<T>> MainTemplate compile(ReoProgram<T> program, String packagename,
 			T nodeFactory) {
-
+		
+		if (program == null)
+			throw new NullPointerException();
+		
 		ReoConnector<T> connector = program.getConnector().flatten().insertNodes(true, true, nodeFactory).integrate();
 
 		List<Port> ports = new ArrayList<Port>();

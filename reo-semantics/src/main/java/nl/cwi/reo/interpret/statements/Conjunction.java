@@ -13,6 +13,7 @@ import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -48,19 +49,22 @@ public final class Conjunction implements PredicateExpression {
 		List<Scope> extension = new ArrayList<Scope>();
 		List<Scope> tmpList = new ArrayList<Scope>();
 		int counter = 0;
+		
+		Monitor localm = new Monitor();
 
-		while (!stack.isEmpty() && counter <= stack.size()) {
+		while (!stack.isEmpty()) {
 
 			P = stack.poll();
 			for (Scope si : scopes) {
-				List<Scope> list = P.evaluate(si, m);
+				localm.clear();
+				List<Scope> list = P.evaluate(si, localm);
 				if (list == null) {
 					counter++;
 					stack.add(P);
 					continue;
-				} else if (list.equals(extension))
+				} else if (list.equals(extension)) {
 					continue;
-				else {
+				} else {
 					counter = 0;
 					tmpList.addAll(list);
 				}
@@ -72,6 +76,12 @@ public final class Conjunction implements PredicateExpression {
 			if (!extension.isEmpty()) {
 				scopes = new ArrayList<Scope>();
 				scopes.addAll(extension);
+			}
+			
+			if (counter > stack.size()) {
+				for (Message msg : localm.getMessages())
+					m.add(msg);
+				break;
 			}
 		}
 

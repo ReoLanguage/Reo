@@ -137,10 +137,13 @@ public class Compiler {
 
 		Interpreter<PortAutomaton> interpreter = new InterpreterPA(directories, params, monitor);
 		
-		ReoProgram<PortAutomaton> program = interpreter.interpret(files.get(0));	
+		ReoProgram<PortAutomaton> program = interpreter.interpret(files.get(0));
+
+		if (program == null)
+			return;
 		
 		MainTemplate template = JavaCompiler.compile(program, packagename, new PortAutomaton());
-
+		
 		System.out.println(template.render(Language.JAVA));
 		
 //		STGroup group = new STGroupFile("Java.stg");
@@ -181,18 +184,20 @@ public class Compiler {
     
 
     private void compilePR() {    	
+    	
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
-		ReoConnector<PRAutomaton> program = interpreter.interpret(files.get(0)).getConnector();	
+		
+		ReoProgram<PRAutomaton> program = interpreter.interpret(files.get(0));	
 		
 		if (program == null) return;	
 		
 		if (verbose) {
-			System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()));
+			System.out.println(program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()));
 			
-			System.out.println(program.flatten().insertNodes(true, true, new PRAutomaton()).integrate());
+			System.out.println(program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate());
 		}
 		
-		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, monitor);
+		LykosCompiler c = new LykosCompiler(program.getConnector(), files.get(0), outdir, monitor);
 		c.compile();
     }
 

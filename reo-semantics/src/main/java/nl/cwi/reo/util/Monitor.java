@@ -87,4 +87,11 @@ public final class Monitor {
 	public boolean hasErrors() {
 		return hasErrors;
 	}
+
+	/**
+	 * Clears all messages in this monitor.
+	 */
+	public void clear() {
+		messages.clear();
+	}
 }
