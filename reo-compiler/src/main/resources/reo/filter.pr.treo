@@ -1,0 +1,7 @@
+section reo;
+
+filter<k:string>(a?, b!) {
+	#PR
+	Filter[k](a;b)
+}
+

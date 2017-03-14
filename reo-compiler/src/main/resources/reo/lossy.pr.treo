@@ -1,0 +1,7 @@
+section reo;
+
+lossy(a?, b!) {
+	#PR
+	LossySync(a;b)
+}
+

@@ -1,0 +1,8 @@
+section reo;
+
+fifo1(a?, b!) {
+	#SCA
+	q0 : initial
+	q0 -> q1 	: {a}
+	q1 -> q0 	: {b}	
+}

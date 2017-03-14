@@ -1,0 +1,7 @@
+section reo;
+
+binop<k:string>(a?, b?, c!) {
+	#PR
+	BinOp[k](a,b;c)
+}
+
