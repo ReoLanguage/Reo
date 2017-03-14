@@ -231,7 +231,7 @@
     if (mode == 'component') {
       origX = pointer.x;
       origY = pointer.y;
-      var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
+      var comp = drawComponent(pointer.x,pointer.y,pointer.x+100,pointer.y+100);
       canvas.setActiveObject(comp);
     }
   }); //mouse:down
@@ -327,7 +327,7 @@
   
     var label = new fabric.IText('name', {
       left: left,
-      top: top - 20
+      top: top - (height/2) - 20
     });  
   
     var rect = new fabric.Rect({
@@ -353,7 +353,7 @@
       label.selectAll();
     }));  
   
-    canvas.add(rect);
+    canvas.add(rect,label);
     rect.setCoords();
     canvas.renderAll();
     return rect;
