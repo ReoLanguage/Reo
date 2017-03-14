@@ -1,7 +1,7 @@
 (function() {
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
-  var line, isDown, origX, origY;
+  var line, isDown, origX, origY, comp;
   var mode = 'select';
   var id = 'a';
   
@@ -231,7 +231,17 @@
     if (mode == 'component') {
       origX = pointer.x;
       origY = pointer.y;
-      var comp = drawComponent(pointer.x,pointer.y,pointer.x+100,pointer.y+100);
+      //var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
+      
+      comp = new fabric.Rect({
+        left: origX,
+        top: origY,
+        fill: 'transparent',
+        stroke: 'red',
+        strokeWidth: 3,
+        class: 'component'
+	   });
+      canvas.add(comp);
       canvas.setActiveObject(comp);
     }
   }); //mouse:down
@@ -245,12 +255,16 @@
     var pointer = canvas.getPointer(e.e);
     if (p.class == 'component') {
       if (origX > pointer.x)
-        p.set({left:pointer.x + (p.width / 2)});
+        comp.set({left:pointer.x + (comp.width / 2)});
+      else
+        comp.set({left:pointer.x - (comp.width / 2)});
       if (origY > pointer.y)
-        p.set({top:pointer.y + (p.height / 2)});
-      p.set({width:Math.abs(origX - pointer.x)});
-      p.set({height:Math.abs(origY - pointer.y)});
-      p.setCoords();
+        comp.set({top:pointer.y + (comp.height / 2)});
+      else
+        comp.set({top:pointer.y - (comp.height / 2)});
+      comp.set({width: Math.abs(origX - pointer.x)});
+      comp.set({height:Math.abs(origY - pointer.y)});
+      
     }
     if (p.class == 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
@@ -335,12 +349,10 @@
       top: top,
       width: width,
       height, height,
-      fill: '#fff',
+      fill: 'transparent',
       stroke: '#000',
       strokeWidth: 1,
       hoverCursor: 'default',
-      originX: 'center',
-      originY: 'center',
       label: label,
       //hasBorders: false,
       //hasControls: false,
