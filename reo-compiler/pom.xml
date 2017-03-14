@@ -29,12 +29,6 @@
 
     <dependency>
       <groupId>nl.cwi.reo</groupId>
-      <artifactId>reo-runtime-java-lykos</artifactId>
-      <version>1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>nl.cwi.reo</groupId>
       <artifactId>reo-semantics</artifactId>
       <version>1.0</version>
     </dependency>
@@ -68,6 +62,8 @@
           </descriptorRefs>
           <finalName>reo-1.0</finalName>
           <appendAssemblyId>false</appendAssemblyId>
+          <attach>false</attach>
+          <outputDirectory>${project.parent.basedir}/bin</outputDirectory>
         </configuration>
         <executions>
           <execution>
