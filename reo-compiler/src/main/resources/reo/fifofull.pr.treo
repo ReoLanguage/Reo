@@ -1,0 +1,6 @@
+section reo;
+
+fifofull<k:int>(a?,b!) {
+	#PR
+	FifoFull[k](a;b)
+}

@@ -56,6 +56,9 @@ public class ListenerPR extends Listener<PRAutomaton> {
 		if(ctx.NAT()!=null){
 			params.put(ctx, new IntegerValue(Integer.parseInt(ctx.NAT().toString())));			
 		}
+		if(ctx.STRING()!=null){
+			params.put(ctx, new StringValue(ctx.STRING().toString().replaceAll("\"", "")));			
+		}
 		
 	}
 

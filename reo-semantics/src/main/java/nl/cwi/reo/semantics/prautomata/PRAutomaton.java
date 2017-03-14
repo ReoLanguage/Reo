@@ -13,6 +13,7 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Parameter;
 import nl.cwi.reo.semantics.Semantics;
@@ -38,7 +39,10 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 
 	public PRAutomaton(String name, @Nullable Value variable, Value value, List<Port> port) {
 		this.name = name;
-		this.parameter = variable;
+		if(variable instanceof StringValue)
+		this.parameter =  new StringValue(variable.toString().replaceAll("\"", ""));
+		else
+			this.parameter = variable;
 		this.value = value;
 		this.ports = port;
 	}

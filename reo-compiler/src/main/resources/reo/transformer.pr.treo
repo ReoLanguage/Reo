@@ -1,6 +1,7 @@
 section reo;
 
-transformer<k:int>(a?, b!) {
+transformer<k:string>(a?, b!) {
 	#PR
-	Transformer<k>(a;b)
+	Transformer[k](a;b)
 }
+

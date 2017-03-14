@@ -1,0 +1,9 @@
+import reo.binop;
+
+binop_test(a?,b?,c!){	
+
+	binop<ADD>(a,b,c)
+|
+
+	ADD = "nl.cwi.reo.templates.Functions.add"
+}
