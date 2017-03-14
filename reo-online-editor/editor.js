@@ -1,7 +1,7 @@
 (function() {
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
-  var line, isDown, origX, origY, comp;
+  var line, isDown, origX, origY;
   var mode = 'select';
   var id = 'a';
   
@@ -231,17 +231,7 @@
     if (mode == 'component') {
       origX = pointer.x;
       origY = pointer.y;
-      //var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
-      
-      comp = new fabric.Rect({
-        left: origX,
-        top: origY,
-        fill: 'transparent',
-        stroke: 'red',
-        strokeWidth: 3,
-        class: 'component'
-	   });
-      canvas.add(comp);
+      var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
       canvas.setActiveObject(comp);
     }
   }); //mouse:down
@@ -255,15 +245,18 @@
     var pointer = canvas.getPointer(e.e);
     if (p.class == 'component') {
       if (origX > pointer.x)
-        comp.set({left:pointer.x + (comp.width / 2)});
+        p.set({left:pointer.x + (p.width / 2)});
       else
-        comp.set({left:pointer.x - (comp.width / 2)});
+        p.set({left:pointer.x - (p.width / 2)});
       if (origY > pointer.y)
-        comp.set({top:pointer.y + (comp.height / 2)});
+        p.set({top:pointer.y + (p.height / 2)});
       else
-        comp.set({top:pointer.y - (comp.height / 2)});
-      comp.set({width: Math.abs(origX - pointer.x)});
-      comp.set({height:Math.abs(origY - pointer.y)});
+        p.set({top:pointer.y - (p.height / 2)});
+      p.set({width:Math.abs(origX - pointer.x)});
+      p.set({height:Math.abs(origY - pointer.y)});
+      p.setCoords();
+      p.label.set({left: p.left, top: p.top - (p.height/2) - 20});
+      
       
     }
     if (p.class == 'node') {
@@ -349,15 +342,17 @@
       top: top,
       width: width,
       height, height,
-      fill: 'transparent',
+      fill: '#fff',
       stroke: '#000',
       strokeWidth: 1,
       hoverCursor: 'default',
+      originX: 'center',
+      originY: 'center',
       label: label,
       //hasBorders: false,
       //hasControls: false,
       //selectable: false,
-      class: component
+      class: 'component'
     });
   
     label.on('mousedown', doubleClick(label, function (obj) {
