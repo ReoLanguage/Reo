@@ -245,17 +245,13 @@
     var pointer = canvas.getPointer(e.e);
     if (p.class == 'component') {
       if (origX > pointer.x)
-        p.set({left:pointer.x + (p.width / 2)});
-      else
-        p.set({left:pointer.x - (p.width / 2)});
+        p.set({left:pointer.x});
       if (origY > pointer.y)
-        p.set({top:pointer.y + (p.height / 2)});
-      else
-        p.set({top:pointer.y - (p.height / 2)});
+        p.set({top:pointer.y});
       p.set({width:Math.abs(origX - pointer.x)});
       p.set({height:Math.abs(origY - pointer.y)});
       p.setCoords();
-      p.label.set({left: p.left, top: p.top - (p.height/2) - 20});
+      p.label.set({left: p.left + (p.width/2), top: p.top - 20});
       
       
     }
@@ -329,12 +325,12 @@
   function drawComponent(x1,y1,x2,y2) {
     var width = (x2 - x1);
     var height = (y2 - y1);
-    var left = x1 + (width /2);
-    var top = y1 + (height / 2);
+    var left = x1;
+    var top = y1;
   
     var label = new fabric.IText('name', {
-      left: left,
-      top: top - (height/2) - 20
+      left: left + (width / 2),
+      top: top - 20
     });  
   
     var rect = new fabric.Rect({
@@ -342,16 +338,16 @@
       top: top,
       width: width,
       height, height,
-      fill: '#fff',
+      fill: 'transparent',
       stroke: '#000',
       strokeWidth: 1,
       hoverCursor: 'default',
-      originX: 'center',
-      originY: 'center',
+      originX: 'left',
+      originY: 'top',
       label: label,
-      //hasBorders: false,
-      //hasControls: false,
-      //selectable: false,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
       class: 'component'
     });
   
