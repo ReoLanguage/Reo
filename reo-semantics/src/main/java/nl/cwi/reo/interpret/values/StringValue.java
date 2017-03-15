@@ -66,8 +66,9 @@ public final class StringValue implements Value, TermExpression {
 	 */
 	@Override
 	public String toString() {
+//		return "\""+x+"\"";
 		return x;
-	}
+		}
 
 	/**
 	 * {@inheritDoc}

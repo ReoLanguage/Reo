@@ -3,6 +3,7 @@ package nl.cwi.reo.semantics.prautomata;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,11 +59,16 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	}
 
 	public Value getValue() {
+		
 		return value;
 	}
 
 	public Value getVariable() {
-		return parameter;
+		if(name.equals("FifoFull")&& parameter instanceof StringValue){
+			return new StringValue("\""+parameter.toString()+"\"");
+		}
+		else
+			return parameter;
 	}
 
 	/**
@@ -86,7 +92,7 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	 */
 	@Override
 	public Set<Port> getInterface() {
-		return new HashSet<Port>(ports);
+		return new LinkedHashSet<Port>(ports);
 	}
 
 	/**
@@ -146,7 +152,8 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		// Value v = s.get(variable);
 		if (parameter != null) {
 			Value l = s.get(new Parameter(parameter.toString(), new TypeTag("int")));
-			this.value = l;
+			this.value=l;
+						
 			return new PRAutomaton(name, l, l, ports);
 		}
 		return new PRAutomaton(name, null, null, ports);
