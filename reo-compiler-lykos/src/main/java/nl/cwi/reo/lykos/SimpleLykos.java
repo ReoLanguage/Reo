@@ -38,7 +38,7 @@ public class SimpleLykos {
 	private AutomatonFactory automatonFactory;
 	
 	private final String outputpath;
-
+	private int counterWorkerName = 0;
 	private static final boolean eclipse = false;
 
 	public SimpleLykos(String outputpath) {
@@ -267,8 +267,11 @@ public class SimpleLykos {
 		String[] identifiers = workerSignature.getName().split("\\.");
 		String workerSimpleClassName = identifiers[identifiers.length - 1];
 		String workerClassName = "Worker_" + workerSimpleClassName.substring(0, 1).toUpperCase()
-				+ workerSimpleClassName.substring(1);
+				+ workerSimpleClassName.substring(1)+"_"+counterWorkerName;
 
+		counterWorkerName++;
+
+		
 		STGroupFile workerTemplates = new STGroupFile(
 				eclipse ? "src/main/resources/java-worker.stg" : "java-worker.stg");
 		String workerCode = "";

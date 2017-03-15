@@ -56,7 +56,7 @@ public final class Conjunction implements PredicateExpression {
 
 			P = stack.poll();
 			for (Scope si : scopes) {
-				localm.clear();
+//				localm.clear();
 				List<Scope> list = P.evaluate(si, localm);
 				if (list == null) {
 					counter++;
@@ -79,8 +79,10 @@ public final class Conjunction implements PredicateExpression {
 			}
 			
 			if (counter > stack.size()) {
-				for (Message msg : localm.getMessages())
+				for (Message msg : localm.getMessages()){
 					m.add(msg);
+				}
+//				m.print();
 				break;
 			}
 		}

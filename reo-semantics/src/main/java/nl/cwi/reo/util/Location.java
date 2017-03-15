@@ -1,8 +1,12 @@
 package nl.cwi.reo.util;
 
 import java.io.File;
+import java.util.Objects;
 
 import org.antlr.v4.runtime.Token;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import nl.cwi.reo.interpret.variables.Identifier;
 
 /**
  * A location in a Reo source file.
@@ -45,6 +49,30 @@ public final class Location {
 		this.line = token.getLine();
 		this.column = token.getCharPositionInLine();		
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Location))
+			return false;
+		Location p = (Location) other;
+		return Objects.equals(this.source, p.source)&&Objects.equals(this.line, p.line)&&Objects.equals(this.column, p.column);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.source,this.line,this.source);
+	}
+
 
 	/**
 	 * {@inheritDoc}

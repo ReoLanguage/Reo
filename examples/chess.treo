@@ -3,41 +3,103 @@ import reo.binop;
 import reo.fifo1;
 import reo.transformer;
 import reo.syncdrain;
+import reo.filter;
+import reo.fifofull;
 
-chess = (whiteB[1..3]?,blackB?,whiteH[1..3]!,blackH!,whiteM!,blackM!){
-	Team(a,whiteB[1..3],whiteH[1..3],whiteM,whiteO)
-}
-
-concatenator(a[1..N]?,b!){
-	{ sync(a[1],b) | N=1}
+//chess = (whiteR[1..3]?,blackR?,whiteH[1..3]!,blackH!,whiteM!,blackM!){
+//chess = (whiteR[1..3]?,blackR?,whiteC[1..3]!,blackC!,whiteM!,blackM!){
+chess = (){
+	TeamW<1,1>(whiteI,whiteR,whiteC,whiteM,whiteO)
+	fifo1(whiteO,blackI)
+	TeamB<1,1>(blackI,blackR,blackC,blackM,blackO)
+	fifofull<"">(blackO,whiteI)
 	
-	{ sync(a[1],P[1])
-		{ binop<CONCATENATE>(a[i+1],P[i],P[i+1])
-		|
-		i:<1..(N-1)>,
-		CONCATENATE = "nl.cwi.reo.templates.Functions.concatenate"
-		}
-
-	  sync(P[N],b)
+	{
+		Engine(whiteC,whiteR) 
+		Engine(blackC,blackR)
 	|
-	  N>1}
+	
+		Engine=(a?,b!){
+			#PR
+			identity(a;b)
+		|
+			Java:"nl.cwi.reo.templates.Workers.Engine"
+		}
+	}
+	
+	{ Display(whiteM,blackM)
+	|
+	  Display(a?,b?){
+		#PR
+		identity(a;b)
+	  |
+		Java:"nl.cwi.reo.templates.Workers.Display"
+
+	  }
+	}
+	
 }
 
-Team(a?,best[1..K]?,hist[1..P]!,move!,out!){
-	fifo1(a,b)
+TeamW<T:int,P:int>(a?,y[1..T]?,hist[1..P]!,move!,out!){
+        fifo1(a,h)
 
-	{ sync(a,hist[i]) | i:<1..P> }
+        { sync(a,hist[i]) | i:<1..P> }
 
-	{ transformer<PARSE>(best[i],P[i]) | i :<1..K>, PARSE = "nl.cwi.reo.templates.Functions.parse"}
+        { transformer<PARSE>(y[j],Q[j]) | j : <1..T>, PARSE = "nl.cwi.reo.templates.Functions.parse"}
 
-	concatenator(P[1..K],c)
-	{transformer<MAJORITY>(c,d) | MAJORITY = "nl.cwi.reo.templates.Functions.majority" }
-	syncdrain(d,b)
-	{ filter<MOVE>(d,e) | MOVE = "nl.cwi.reo.templates.Relations.move" }
-	sync(e,move)
-	{ binop<CONCATENATE>(b,e,out) | CONCATENATE = "nl.cwi.reo.templates.Functions.concatenate" }
+        concatenatorW(Q[1..T],p)
+        {transformer<MAJORITY>(p,d) | MAJORITY = "nl.cwi.reo.templates.Functions.majority" }
+        syncdrain(d,h)
+        { filter<MOVE>(d,e) | MOVE = "nl.cwi.reo.templates.Relations.Move" }
+        sync(e,move)
+        { binop<CONCATENATE>(h,e,out) | CONCATENATE = "nl.cwi.reo.templates.Functions.concatenate" }
 
 }
 
+TeamB<T:int,P:int>(a?,y[1..T]?,hist[1..P]!,move!,out!){
+        fifo1(a,b)
 
+        { sync(a,hist[i]) | i:<1..P> }
+
+        { transformer<PARSE>(y[j],M[j]) | j : <1..T>, PARSE = "nl.cwi.reo.templates.Functions.parse"}
+
+        concatenatorB(M[1..T],c)
+        {transformer<MAJORITY>(c,g) | MAJORITY = "nl.cwi.reo.templates.Functions.majority" }
+        syncdrain(g,b)
+        { filter<MOVE>(g,f) | MOVE = "nl.cwi.reo.templates.Relations.Move" }
+        sync(f,move)
+        { binop<CONCATENATE>(b,f,out) | CONCATENATE = "nl.cwi.reo.templates.Functions.concatenate" }
+
+}
+
+concatenatorB(a[1..N]?,b!){
+        { sync(a[1],b) | N=1}
+
+        { sync(a[1],P[1])
+                { binop<CONCATENATE>(a[i+1],P[i],P[i+1])
+                |
+                i:<1..(N-1)>,
+                CONCATENATE = "nl.cwi.reo.templates.Functions.concatenate"
+                }
+
+          sync(P[N],b)
+        |
+          N>1}
+}
+
+
+concatenatorW(a[1..N]?,b!){
+        { sync(a[1],b) | N=1}
+
+        { sync(a[1],P[1])
+                { binop<CONCATENATE>(a[i+1],P[i],P[i+1])
+                |
+                i:<1..(N-1)>,
+                CONCATENATE = "nl.cwi.reo.templates.Functions.concatenate"
+                }
+
+          sync(P[N],b)
+        |
+          N>1}
+}
 

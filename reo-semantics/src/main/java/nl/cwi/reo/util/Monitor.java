@@ -58,7 +58,8 @@ public final class Monitor {
 	public void add(Message message) {
 		if (message.getType() == MessageType.ERROR)
 			hasErrors = true;
-		messages.add(message);
+		if(!messages.contains(message))
+			messages.add(message);
 	}
 
 	/**

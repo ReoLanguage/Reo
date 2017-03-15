@@ -323,10 +323,13 @@ public class Interpreter<T extends Semantics<T>> {
 		ReoLexer lexer = new ReoLexer(c);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ReoParser parser = new ReoParser(tokens);
+				
 		ErrorListener errListener = new ErrorListener(m);
 		parser.removeErrorListeners();
 		parser.addErrorListener(errListener);
 		ParseTree tree = parser.file();
+		if(errListener.hasError)
+			return null;
 		ParseTreeWalker walker = new ParseTreeWalker();
 		listener.setFileName(path);
 		walker.walk(listener, tree);

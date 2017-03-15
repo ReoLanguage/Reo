@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
+import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.ports.Port;
@@ -49,10 +50,12 @@ public class LykosCompiler {
 	private final ReoConnector<PRAutomaton> program;
 	private final Definitions defs = new Definitions();
 	private int counterWorker = 0;
+
 	private final String outputpath;
 	private final MyToolErrorAccumulator monitor;
+	private final String name;
 
-	public LykosCompiler(ReoConnector<PRAutomaton> program, String filename, String outputpath, Monitor m) {
+	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, Monitor m) {
 
 		this.outputpath = outputpath;
 		this.monitor = new MyToolErrorAccumulator(filename, m);
@@ -78,7 +81,12 @@ public class LykosCompiler {
 		 */
 
 //		this.program = program.flatten();
-		this.program = program.flatten().insertNodes(true, true, new PRAutomaton()).integrate();
+		if(program!=null){
+			this.program = program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate();
+			this.name=program.getName();
+		}
+		else
+			throw new NullPointerException();
 		/*
 		 * Creation of different Factories for Lykos compilation
 		 */
@@ -136,7 +144,7 @@ public class LykosCompiler {
 //		}
 		
 
-		c.setSignature(getMemberSignature("main", null, P));
+		c.setSignature(getMemberSignature(this.name, null, P));
 
 		// TODO Does this line means that we generate only centralized code. We
 		// want the protocol to be multi-threaded.
@@ -233,6 +241,7 @@ public class LykosCompiler {
 
 		String nameWorker = atom.getSourceCode().getFile().toString().substring(1,
 				atom.getSourceCode().getFile().toString().length() - 1);
+		
 
 		defs.putWorkerName(new TypedName(name, Type.WORKER_NAME), nameWorker, monitor);
 
