@@ -1,5 +1,11 @@
 package nl.cwi.reo.util;
 
+import java.util.Objects;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import nl.cwi.reo.interpret.variables.Identifier;
+
 /**
  * A message generated during compilation.
  */
@@ -61,6 +67,30 @@ public final class Message {
 	public MessageType getType() {
 		return type;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Message))
+			return false;
+		Message p = (Message) other;
+		return Objects.equals(this.type, p.type)&&Objects.equals(this.location, p.location)&&Objects.equals(this.message, p.message);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.type,this.location,this.message);
+	}
+
 	
 	/**
 	 * {@inheritDoc}

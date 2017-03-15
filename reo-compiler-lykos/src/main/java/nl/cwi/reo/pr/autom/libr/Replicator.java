@@ -1,11 +1,13 @@
 package nl.cwi.reo.pr.autom.libr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import nl.cwi.reo.pr.autom.UserDefinedAutomaton;
 import nl.cwi.reo.pr.autom.UserDefinedInitializer;
 import nl.cwi.reo.pr.autom.ConstraintFactory.Constraint;
+import nl.cwi.reo.pr.autom.LiteralFactory.Literal;
 import nl.cwi.reo.pr.autom.StateFactory.State;
 import nl.cwi.reo.pr.misc.PortFactory.Port;
 
@@ -32,15 +34,23 @@ public class Replicator extends UserDefinedInitializer {
 
 		State state = automaton.addThenGetState(true);
 
-		List<Port> ports;
+		List<Port> ports = new ArrayList<Port>();
+		List<Literal> literals = new ArrayList<Literal>();
 		Constraint constraint;
-
-		ports = Arrays.asList(inputPorts[0], outputPorts[0], outputPorts[1]);
-		constraint = automaton.newConstraint(Arrays.asList(automaton
-				.newLiteral(true, automaton.newTerm(inputPorts[0]),
-						automaton.newTerm(outputPorts[0])), automaton
-				.newLiteral(true, automaton.newTerm(inputPorts[0]),
-						automaton.newTerm(outputPorts[1]))));
+		ports.add(inputPorts[0]);
+		for(Port p: outputPorts){
+			ports.add(p);
+			literals.add(automaton.newLiteral(true, automaton.newTerm(inputPorts[0]),automaton.newTerm(p)));
+		}
+//		ports = Arrays.asList(inputPorts[0], outputPorts[0], outputPorts[1],outputPorts[2]);
+//		constraint = automaton.newConstraint(Arrays.asList(automaton
+//				.newLiteral(true, automaton.newTerm(inputPorts[0]),
+//						automaton.newTerm(outputPorts[0])), automaton
+//				.newLiteral(true, automaton.newTerm(inputPorts[0]),
+//						automaton.newTerm(outputPorts[1])),automaton
+//				.newLiteral(true, automaton.newTerm(inputPorts[0]),
+//						automaton.newTerm(outputPorts[2]))));
+		constraint = automaton.newConstraint(literals);
 		automaton.addOrKeepTransition(state, state, ports, constraint);
 	}
 }

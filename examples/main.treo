@@ -1,13 +1,15 @@
-import reo.syncdrain;
-import reo.sync;
+//import reo.syncdrain;
+//import reo.sync;
 import reo.fifo1;
 
-main = (){ red(a) green(b) blue(c) alternator(a,b,c) }
+main = (){ fifo1(a,b) c(a[1..6]) }// green(b) blue(c) alternator(a,b,c) }
 
-red = (a?){ #PR identity(a;) | Java:"nl.cwi.pr.runtime.examples.thesis.basic.Processes.Red" }
+c(a[1..T]?,e!){sync(a[T],e)}
 
-green = (a?){ #PR identity(a;) | Java:"nl.cwi.pr.runtime.examples.thesis.basic.Processes.Green" }
+//red = (a?){ #PR identity(a;) | Java:"nl.cwi.pr.runtime.examples.thesis.basic.Processes.Red" }
 
-blue = (a!){ #PR identity(;a) | Java:"nl.cwi.pr.runtime.examples.thesis.basic.Processes.Blue" }
+//green = (a?){ #PR identity(a;) | Java:"nl.cwi.pr.runtime.examples.thesis.basic.Processes.Green" }
 
-alternator = (a,b,c){ syncdrain(a, b) sync(b, x) fifo1(x, c) sync(a, c) }
+//blue = (a!){ #PR identity(;a) | Java:"nl.cwi.pr.runtime.examples.thesis.basic.Processes.Blue" }
+
+//alternator = (a,b,c){ syncdrain(a, b) sync(b, x) fifo1(x, c) sync(a, c) }

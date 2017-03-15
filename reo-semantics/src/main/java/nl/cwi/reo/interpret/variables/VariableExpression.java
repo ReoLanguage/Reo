@@ -125,6 +125,7 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 					if (t instanceof IntegerValue) {
 						temp.add(new Identifier(x.name + "[" + t.toString() + "]"));
 					} else {
+						m.add(location,"Variable " + this.toString() + " cannot be evaluated.");
 						return null;
 					}
 				}

@@ -177,12 +177,17 @@ public final class SignatureExpression implements ParameterType {
 			int size_nodes = ports.size() - k_nodes;
 
 			if (rng_nodes != null) {
+				if(rng_nodes.evaluate(s, new Monitor())!=null){
+					// This if statement evaluate a range with the parameter in the scope
+				}
+				else{
 				Scope defs = rng_nodes.findParamFromSize(size_nodes);
 				if (defs != null) {
 					s.putAll(defs);
 				} else {
 					m.add(location, "Parameters in " + rng_nodes + " cannot be deduced from its length.");
 					return null;
+				}
 				}
 			} else {
 				if (size_nodes != 0) {
