@@ -41,6 +41,8 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 *            reference to source code
 	 */
 	public SetAtom(T atom, Reference source) {
+		if (atom == null || source == null)
+			throw new NullPointerException();
 		this.atom = atom;
 		this.source = source;
 	}

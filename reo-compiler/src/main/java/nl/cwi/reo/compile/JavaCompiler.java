@@ -48,9 +48,9 @@ public class JavaCompiler {
 		for (ReoConnectorAtom<T> atom : connector.getAtoms()) {
 			List<Port> atom_ports = new ArrayList<Port>(atom.getInterface());
 			ports.addAll(atom_ports);
-			Behavior b = Behavior.PROACTIVE;
+			Behavior b = Behavior.REACTIVE;
 			if (atom.getSourceCode().getCall() == null)
-				b = Behavior.REACTIVE;
+				b = Behavior.PROACTIVE;
 			Map<String, Set<Transition>> out = new HashMap<String, Set<Transition>>();
 			String initial = "";
 			Definition defn = new Automaton("Component" + c++, atom_ports, b, out, initial, packagename);

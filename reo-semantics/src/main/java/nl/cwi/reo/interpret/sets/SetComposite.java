@@ -116,7 +116,7 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 
 		simplify(unifications);
 
-		return new Instance<T>(new ReoConnectorComposite<T>(operator, components), unifications);
+		return new Instance<T>(ReoConnectorComposite.compose(operator, components), unifications);
 	}
 
 	/**

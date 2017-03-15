@@ -33,7 +33,7 @@ public class ConstraintAutomaton extends Automaton<CAMLabel> implements Semantic
 
 	@Override
 	public SemanticsType getType() {
-		return SemanticsType.PA;
+		return SemanticsType.CAM;
 	}
 
 	@Override
