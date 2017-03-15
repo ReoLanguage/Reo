@@ -17,7 +17,7 @@ import java.util.TreeSet;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.AutomatonSemantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
@@ -26,7 +26,7 @@ import java.util.HashMap;
 /**
  * A work automaton.
  */
-public final class WorkAutomaton implements Semantics<WorkAutomaton> {
+public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Set of states

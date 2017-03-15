@@ -33,6 +33,8 @@ public class ComponentTermExpression<T extends Semantics<T>> implements TermExpr
 	 *            component definition
 	 */
 	public ComponentTermExpression(ComponentExpression<T> component) {
+		if (component == null)
+			throw new NullPointerException();
 		this.component = component;
 	}
 

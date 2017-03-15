@@ -3,8 +3,8 @@ grammar CAM;
 import Tokens;
 
 cam     : '#CAM' cam_tr* ;
-cam_tr  : ID '*'? '->' ID ':' wa_sc ',' dc ;
-wa_sc  : '{' '}' | '{' ID (',' ID)* '}' ;
+cam_tr  : ID '*'? '->' ID ':' cam_sc ',' dc ;
+cam_sc  : '{' '}' | '{' ID (',' ID)* '}' ;
 dc      : dt                                                  # cam_dc_term 
         | dc POW dt                                           # cam_dc_exponent
         | FORALL ID ':' dc                                    # cam_dc_universal

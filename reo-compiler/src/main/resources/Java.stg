@@ -4,9 +4,7 @@ main(S) ::= <<
  */
 package <S.package>;
 
-import nl.cwi.reo.runtime.java.Component;
-import nl.cwi.reo.runtime.java.Port;
-import nl.cwi.reo.runtime.java.PortBusyWait;
+import nl.cwi.reo.runtime.java.*;
 
 public class <S.name> {
 
@@ -18,19 +16,19 @@ public class <S.name> {
 	
 	<S.instances:newThread(); separator="\n">
 
-	<S.instances:{c|<c.name>.start();}; separator="\n">
+	<S.instances:start(); separator="\n">
 	
     try {
-      <A.proactives:{c | <c.name>.join();}; separator="\n">
-    } catch (InterruptedException e1) {
-      e1.printStackTrace();
+      <S.instances:join(); separator="\n">
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }	
 
     System.exit(0);
 
   }
 
-  <S.definitions:component(); separator="\n\n">
+  <S.definitions:definition(); separator="\n\n">
   
 }
 >>
@@ -43,18 +41,88 @@ newInstance(I) ::= <<
 Component <I.name> = new <I.definition>(<I.ports:{p|<p.name>}; separator=", ">);
 >>
 
-newThread(I) ::= <<
-<if(I.name)>Thread thread_<I.name> = <endif>new Thread(<I.name>);
+start(I) ::= <<
+<I.name>.start();
 >>
 
+join(I) ::= <<
+<if(!I.deamon)><I.name>.join();<endif>
+>>
+
+definition(A) ::= <<
+<if(A.component)><A:component()>
+<elseif(A.automaton)><A:automaton()>
+<endif>
+>>
+
+
+
+
+<! Port fields !>
+
+
+
+
+port(p) ::= <<
+/**
+ * <if(p.input)>Input<else>Output<endif> port <p.name> of this automaton.
+ */
+private volatile Port\<<p.typeTag>\> <p.name>;
+>>
+
+
+
+
+<! Atomic component class !>
+
+
+
+
 component(A) ::= <<
+/**
+ * An active Reo component that runs code of an atomic component.
+ */
+private class <A.name> implements Component {
+
+  <A.interface:port(); separator="\n\n">
+			
+  public <A.name>(<A.interface:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
+    <A.interface:{a | <a.name>.<if(a.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
+    <A.interface:{a | this.<a.name> = <a.name>;}; separator="\n">
+  }
+
+  public synchronized void hit() {
+    notify();
+  }
+
+  public void run() {
+    <A.call>	
+  }
+}
+>>
+
+
+
+
+<! Active automaton class !>
+
+
+
+
+automaton(A) ::= <<
+/**
+ * An active Reo component that is generated from an automaton.
+ */
 private class <A.name> implements Component {
 
   <A.interface:port(); separator="\n\n">
   
-  private volatile T m = null;
+  <A.memory:memorycell(); separator="\n\n">
   
-  private volatile int q = 0;
+  /**
+   * Current state of this automaton.
+   */
+  private int q = 0;
 			
   public <A.name>(<A.interface:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
     <A.interface:{a | <a.name>.<if(a.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
@@ -71,20 +139,24 @@ private class <A.name> implements Component {
 }
 >>
 
-port(p) ::= <<
+memorycell(m) ::= <<
 /**
- * <if(p.input)>Input<else>Output<endif> port <p.name> of this component.
+ * Memory cell <m.name> of this automaton.
  */
-private volatile Port\<<p.typeTag>\> <p.name>;
+private <m.type> <m.name>;
 >>
 
 run(A) ::= <<
+int k = 0;
 while (true) {
+  k++;
   switch (q) {
   <A.transitions.keys:{k | <outs(k, A.transitions)>}; separator="\n">
   }
-  if (!a.hasPut() || (!b.hasGet() && !c.hasGet())) 
+  if (k > 3) {
+    k = 0;
     try { wait(); } catch (InterruptedException e) { }	
+  }
 }
 >>
 
@@ -107,7 +179,9 @@ q = <t.target>;
 >>
 
 doSync(p) ::= <<
-<p.name>.<if(p.input)>canGet()<else>canPut()<endif>
+<if(p.input)><p.name>.canGet()
+<else><p.name>.canPut()
+<endif>
 >>
 
 guard(t) ::= <<
@@ -117,5 +191,4 @@ guard(t) ::= <<
 canSync(p) ::= <<
 <p.name>.<if(p.input)>canGet()<else>canPut()<endif>
 >>
-
 

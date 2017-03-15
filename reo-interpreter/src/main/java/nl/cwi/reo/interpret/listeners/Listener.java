@@ -277,13 +277,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void exitComponent_atomic(Component_atomicContext ctx) {
 		T atom = atoms.get(ctx.atom());
 		Reference s = new Reference();
-
-		if (atom == null) {
-			m.add(new Location(ctx.start, filename), "Undefined semantics.");
-		} else if (ctx.source() != null) {
-			ctx.source().LANG().toString().toUpperCase();
-			s = new Reference(ctx.source().STRING().toString(), ctx.source().LANG().toString().toUpperCase());
-		}
+		if (ctx.source() != null)
+			s = new Reference(ctx.source().STRING().getText(), ctx.source().LANG().getText().toUpperCase());
 		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()), new SetAtom<T>(atom, s)));
 	}
 

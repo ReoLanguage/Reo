@@ -1,6 +1,5 @@
 package nl.cwi.reo.compile.components;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,7 +10,7 @@ import org.stringtemplate.v4.STGroupFile;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.ports.Port;
 
-public final class MainTemplate {
+public final class ReoTemplate {
 
 	private final String reofile;
 
@@ -25,7 +24,7 @@ public final class MainTemplate {
 
 	private final List<Definition> definitions;
 
-	public MainTemplate(String reofile, String packagename, String name, List<Port> ports, List<Instance> instances, List<Definition> definitions) {
+	public ReoTemplate(String reofile, String packagename, String name, List<Port> ports, List<Instance> instances, List<Definition> definitions) {
 		this.reofile = reofile;
 		this.packagename = packagename;
 		this.name = name;
@@ -54,19 +53,11 @@ public final class MainTemplate {
 		return instances;
 	}
 
-	public List<Instance> getProactives() {
-		List<Instance> active = new ArrayList<Instance>();
-		for (Instance I : instances)
-			if (I.getDefinition().getBehavior() == Behavior.PROACTIVE)
-				active.add(I);
-		return active;
-	}
-
 	public List<Definition> getComponents() {
 		return definitions;
 	}
 
-	public String render(Language L) {
+	public String getCode(Language L) {
 		STGroup group = null;
 		switch (L) {
 		case JAVA:

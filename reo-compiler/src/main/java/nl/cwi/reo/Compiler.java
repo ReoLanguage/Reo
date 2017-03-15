@@ -10,16 +10,14 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.compile.LykosCompiler;
-import nl.cwi.reo.compile.components.MainTemplate;
+import nl.cwi.reo.compile.components.ReoTemplate;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
-import nl.cwi.reo.interpret.interpreters.InterpreterPA;
+import nl.cwi.reo.interpret.interpreters.InterpreterCAM;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.constraintautomata.ConstraintAutomaton;
-import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.util.Monitor;
 
@@ -130,16 +128,14 @@ public class Compiler {
 	}
     
     private void compileCAM() {
-//		Interpreter<ConstraintAutomaton> interpreter = new InterpreterCAM(directories, params, monitor);
-//		
-//		ReoProgram<PortAutomaton> program = interpreter.interpret(files.get(0));
-//
-//		if (program == null)
-//			return;
-//		
-//		MainTemplate template = JavaCompiler.compile(program, packagename, new PortAutomaton());
-//		
-//		System.out.println(template.render(Language.JAVA));
+    	
+		Interpreter<ConstraintAutomaton> interpreter = new InterpreterCAM(directories, params, monitor);
+		ReoProgram<ConstraintAutomaton> program = interpreter.interpret(files.get(0));
+		
+		ReoTemplate template = JavaCompiler.compile(program, packagename, new ConstraintAutomaton());
+		
+		if (template != null)
+			System.out.println(template.getCode(Language.JAVA));
     }
 
     private void compilePA() {

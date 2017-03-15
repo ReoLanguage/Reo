@@ -8,14 +8,14 @@ import java.util.SortedSet;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.AutomatonSemantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.automata.Automaton;
 import nl.cwi.reo.semantics.automata.State;
 import nl.cwi.reo.semantics.automata.Transition;
 import nl.cwi.reo.util.Monitor;
 
-public class ConstraintAutomaton extends Automaton<CAMLabel> implements Semantics<ConstraintAutomaton> {
+public class ConstraintAutomaton extends Automaton<CAMLabel> implements AutomatonSemantics<ConstraintAutomaton> {
 	
 	private static CAMLabel label = new CAMLabel();
 	

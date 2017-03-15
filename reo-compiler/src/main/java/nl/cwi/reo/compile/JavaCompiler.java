@@ -1,42 +1,32 @@
 package nl.cwi.reo.compile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
-
-import nl.cwi.reo.compile.components.Automaton;
-import nl.cwi.reo.compile.components.Behavior;
+import nl.cwi.reo.compile.components.ActiveAutomaton;
 import nl.cwi.reo.compile.components.Definition;
 import nl.cwi.reo.compile.components.Instance;
-import nl.cwi.reo.compile.components.MainTemplate;
+import nl.cwi.reo.compile.components.ReoTemplate;
 import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.ports.PrioType;
-import nl.cwi.reo.interpret.typetags.TypeTag;
-import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.AutomatonSemantics;
 
 public class JavaCompiler {
 
-	public static <T extends Semantics<T>> MainTemplate compile(ReoProgram<T> program, String packagename,
+	public static <T extends AutomatonSemantics<T>> ReoTemplate compile(ReoProgram<T> program, String packagename,
 			T nodeFactory) {
 		
+		System.out.println("compiling..");
+
 		if (program == null)
-			throw new NullPointerException();
-		
+			return null;
+
 		ReoConnector<T> connector = program.getConnector().flatten().insertNodes(true, true, nodeFactory).integrate();
 
 		List<Port> ports = new ArrayList<Port>();
@@ -48,54 +38,55 @@ public class JavaCompiler {
 		for (ReoConnectorAtom<T> atom : connector.getAtoms()) {
 			List<Port> atom_ports = new ArrayList<Port>(atom.getInterface());
 			ports.addAll(atom_ports);
-			Behavior b = Behavior.REACTIVE;
-			if (atom.getSourceCode().getCall() == null)
-				b = Behavior.PROACTIVE;
-			Map<String, Set<Transition>> out = new HashMap<String, Set<Transition>>();
-			String initial = "";
-			Definition defn = new Automaton("Component" + c++, atom_ports, b, out, initial, packagename);
+			Map<Integer, Set<Transition>> out = new HashMap<Integer, Set<Transition>>();
+			Integer initial = 0;
+			Definition defn = new ActiveAutomaton("Component" + c++, atom_ports, out, initial);
 			instances.add(new Instance("Instance" + i++, defn, atom_ports));
 		}
 
-		return new MainTemplate(program.getFile(), packagename, program.getName(), ports, instances, definitions);
+		return new ReoTemplate(program.getFile(), packagename, program.getName(), ports, instances, definitions);
 	}
-
-	public static void compile1() {
-
-		STGroup group = new STGroupFile("Java.stg");
-		ST temp = group.getInstanceOf("component");
-
-		Port a = new Port("a", PortType.IN, PrioType.NONE, new TypeTag("Integer"), true);
-		Port b = new Port("b", PortType.OUT, PrioType.NONE, new TypeTag("Boolean"), true);
-		Port c = new Port("c", PortType.IN, PrioType.NONE, new TypeTag("Double"), true);
-
-		SortedSet<Port> N = new TreeSet<Port>();
-
-		N.add(a);
-		N.add(b);
-		N.add(c);
-
-		Map<String, String> ac = new HashMap<String, String>();
-		ac.put("b", "d_a");
-		ac.put("d", "m");
-
-		Transition t = new Transition("q0", "q1", N, ac);
-
-		List<Port> P = new ArrayList<Port>();
-		P.add(a);
-		P.add(b);
-		P.add(c);
-
-		Map<String, Set<Transition>> out = new HashMap<String, Set<Transition>>();
-		out.put("q0", new HashSet<Transition>(Arrays.asList(t)));
-
-		Automaton A = new Automaton("MyAutomaton", P, Behavior.PROACTIVE, out, "q0", "nl.cwi.reo.runtime.java");
-
-		temp.add("A", A);
-
-		System.out.println(temp.render());
-		// outputClass(name, st.render());
-	}
+	//
+	// public static void compile1() {
+	//
+	// STGroup group = new STGroupFile("JavaMain.stg");
+	// ST temp = group.getInstanceOf("component");
+	//
+	// Port a = new Port("a", PortType.IN, PrioType.NONE, new
+	// TypeTag("Integer"), true);
+	// Port b = new Port("b", PortType.OUT, PrioType.NONE, new
+	// TypeTag("Boolean"), true);
+	// Port c = new Port("c", PortType.IN, PrioType.NONE, new TypeTag("Double"),
+	// true);
+	//
+	// SortedSet<Port> N = new TreeSet<Port>();
+	//
+	// N.add(a);
+	// N.add(b);
+	// N.add(c);
+	//
+	// Map<String, String> ac = new HashMap<String, String>();
+	// ac.put("b", "d_a");
+	// ac.put("d", "m");
+	//
+	// Transition t = new Transition("q0", "q1", N, ac);
+	//
+	// List<Port> P = new ArrayList<Port>();
+	// P.add(a);
+	// P.add(b);
+	// P.add(c);
+	//
+	// Map<String, Set<Transition>> out = new HashMap<String,
+	// Set<Transition>>();
+	// out.put("q0", new HashSet<Transition>(Arrays.asList(t)));
+	//
+	// ActiveAutomaton A = new ActiveAutomaton("MyAutomaton", P, out, "q0");
+	//
+	// temp.add("A", A);
+	//
+	// System.out.println(temp.render());
+	// // outputClass(name, st.render());
+	// }
 
 	// /**
 	// * Produces java source file containing the game graph;

@@ -2,8 +2,7 @@ package nl.cwi.reo.compile.components;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Objects;
-import java.util.SortedSet;
+import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
 
@@ -12,17 +11,17 @@ public final class Transition {
 	/**
 	 * Source state.
 	 */
-	private final String q1;
+	private final Integer q1;
 
 	/**
 	 * Target state.
 	 */
-	private final String q2;
+	private final Integer q2;
 
 	/**
 	 * Synchronization constraint.
 	 */
-	private final SortedSet<Port> N;
+	private final Set<Port> N;
 
 	/**
 	 * Transition label.
@@ -41,7 +40,7 @@ public final class Transition {
 	 * @param a
 	 *            transition label
 	 */
-	public Transition(String q1, String q2, SortedSet<Port> N, Map<String, String> a) {
+	public Transition(Integer q1, Integer q2, Set<Port> N, Map<String, String> a) {
 		if (q1 == null)
 			throw new IllegalArgumentException("No source state specified.");
 		if (q2 == null)
@@ -52,7 +51,7 @@ public final class Transition {
 			throw new IllegalArgumentException("No transition label specified.");
 		this.q1 = q1;
 		this.q2 = q2;
-		this.N = Collections.unmodifiableSortedSet(N);
+		this.N = Collections.unmodifiableSet(N);
 		this.a = a;
 	}
 
@@ -61,7 +60,7 @@ public final class Transition {
 	 * 
 	 * @return name of source state
 	 */
-	public String getSource() {
+	public Integer getSource() {
 		return this.q1;
 	}
 
@@ -70,7 +69,7 @@ public final class Transition {
 	 * 
 	 * @return name of target state
 	 */
-	public String getTarget() {
+	public Integer getTarget() {
 		return this.q2;
 	}
 
@@ -79,7 +78,7 @@ public final class Transition {
 	 * 
 	 * @return synchronization constraint
 	 */
-	public SortedSet<Port> getSyncConstraint() {
+	public Set<Port> getSyncConstraint() {
 		return this.N;
 	}
 
@@ -90,28 +89,5 @@ public final class Transition {
 	 */
 	public Map<String, String> getAction() {		
 		return this.a;
-	}
-
-	@Override
-	public String toString() {
-		return "(" + q1 + "," + N + "," + a + "," + q2 + ")";
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (other == null)
-			return false;
-		if (other == this)
-			return true;
-		if (!(other instanceof Transition))
-			return false;
-		Transition p = (Transition) other;
-		return Objects.equals(this.q1, p.q1) && Objects.equals(this.q2, p.q2) && Objects.equals(this.N, p.N)
-				&& Objects.equals(this.a, p.a);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.q1, this.q2, this.N, this.a);
 	}
 }
