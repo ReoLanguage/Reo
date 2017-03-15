@@ -135,17 +135,13 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 		return new ReoConnectorAtom<T>(semantics, source, Links.rename(links, joins));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ReoConnector<T> renameHidden(Integer i) {
-		return new ReoConnectorAtom<T>(semantics, source, Links.renameHidden(links, i));
-	}
-
-	public ReoConnector<T> markHidden(Map<Port, Port> join) {
-		return new ReoConnectorAtom<T>(semantics, source, Links.markHidden(links, join));
-	}
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public ReoConnector<T> renameHidden(Integer i) {
+//		return new ReoConnectorAtom<T>(semantics, source, Links.renameHidden(links, i));
+//	}
 
 	/**
 	 * {@inheritDoc}

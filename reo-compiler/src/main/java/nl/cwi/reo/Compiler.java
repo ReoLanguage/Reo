@@ -18,6 +18,7 @@ import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterPA;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
 import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.constraintautomata.ConstraintAutomaton;
 import nl.cwi.reo.semantics.portautomata.PortAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.util.Monitor;
@@ -129,22 +130,19 @@ public class Compiler {
 	}
     
     private void compileCAM() {
-    	// TODO
+//		Interpreter<ConstraintAutomaton> interpreter = new InterpreterCAM(directories, params, monitor);
+//		
+//		ReoProgram<PortAutomaton> program = interpreter.interpret(files.get(0));
+//
+//		if (program == null)
+//			return;
+//		
+//		MainTemplate template = JavaCompiler.compile(program, packagename, new PortAutomaton());
+//		
+//		System.out.println(template.render(Language.JAVA));
     }
 
     private void compilePA() {
-    	
-
-		Interpreter<PortAutomaton> interpreter = new InterpreterPA(directories, params, monitor);
-		
-		ReoProgram<PortAutomaton> program = interpreter.interpret(files.get(0));
-
-		if (program == null)
-			return;
-		
-		MainTemplate template = JavaCompiler.compile(program, packagename, new PortAutomaton());
-		
-		System.out.println(template.render(Language.JAVA));
 		
 //		STGroup group = new STGroupFile("Java.stg");
 //		ST temp = group.getInstanceOf("component");
@@ -192,6 +190,10 @@ public class Compiler {
 		if (program == null) return;	
 		
 		if (verbose) {
+			System.out.println(program.getConnector());
+			
+			System.out.println(program.getConnector().flatten());
+			
 			System.out.println(program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()));
 			
 			System.out.println(program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate());

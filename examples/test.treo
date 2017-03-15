@@ -1,7 +1,6 @@
 import reo.fifo1;
 
-test = (a?,c!) { comp1(a,b) comp2(b,c) }
+test = (x?,z!) { comp(x,y) comp(y,z) }
 
-comp1 = (a?,b!) { fifo1(a,b) }
-comp2 = (a?,b!) { fifo1(a,b) }
+comp = (a?,c!) { fifo1(a,b) fifo1(b,c) }
 
