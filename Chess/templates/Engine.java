@@ -34,15 +34,12 @@ public class Engine {
 		else
 			stockfish = "stockfish-6-linux-64";
 
-		String path = "templates/" +stockfish;
-
-		/*
-		 *  "src/main/java"
+		String path = "src/main/java"
 				+ File.separator
 				+ getClass().getPackage().getName()
 						.replace('.', File.separatorChar) + File.separator
-				+ 
-		 */
+				+ stockfish;
+
 //		String path = "/home/e-spin/workspace/Reo/reo-runtime-java-lykos/src/main/java/nl/cwi/reo/templates/stockfish-6-linux-64";
 		
 		Process process = null;
