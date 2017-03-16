@@ -2,7 +2,9 @@ package nl.cwi.reo.interpret.listeners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -129,7 +131,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	// File
 	@Nullable
 	private ReoFile<T> program;
-	private List<String> imports = new ArrayList<String>();
+	private Set<String> imports = new HashSet<String>();
 	private ParseTreeProperty<Relation> definitions = new ParseTreeProperty<Relation>();
 
 	// Section
