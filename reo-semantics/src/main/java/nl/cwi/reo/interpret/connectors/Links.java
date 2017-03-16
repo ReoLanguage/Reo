@@ -19,6 +19,7 @@ public final class Links {
 	 *            renaming map.
 	 */
 	public static Map<Port, Port> rename(Map<Port, Port> links, Map<Port, Port> r) {
+		int i = 1;
 		Map<Port, Port> newlinks = new HashMap<Port, Port>();
 		for (Map.Entry<Port, Port> link : links.entrySet()) {
 			Port v = link.getValue();
@@ -26,7 +27,7 @@ public final class Links {
 			if (w != null) {
 				v = w.join(v);
 			} else {
-				v = v.hide();
+				v = v.rename("#" + i++).hide();
 			}
 			newlinks.put(link.getKey(), v);
 		}
