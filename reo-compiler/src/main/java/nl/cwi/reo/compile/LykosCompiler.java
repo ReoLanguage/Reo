@@ -146,7 +146,7 @@ public class LykosCompiler {
 //		}
 		
 
-		c.setSignature(getMemberSignature(this.name, null, P));
+		c.setSignature(getMainMemberSignature(this.name, null, P));
 
 		List<InterpretedProtocol> protocols = Arrays.asList(new InterpretedProtocol(c));
 
@@ -188,15 +188,23 @@ public class LykosCompiler {
 
 		int numberInPort = 1;
 		int numberOutPort = 1;
+		int numberOPort = 0;
+		int numberIPort = 0;
+		for (Port p : ports) {
+			if(p.getType()==PortType.IN)
+				numberIPort++;
+			if(p.getType()==PortType.OUT)
+				numberOPort++;
+		}
 		for (Port p : ports) {
 			PortSpec pSpec = new PortSpec("$" + p.getName());
 			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 			switch (p.getType()) {
 			case IN:
-				inputPortsOrArrays.put(new TypedName("in" + numberInPort++, Type.PORT), jp);
+				inputPortsOrArrays.put(new TypedName("in" + ((numberIPort!=1)?(numberInPort++):("")) , Type.PORT), jp);
 				break;
 			case OUT:
-				outputPortsOrArrays.put(new TypedName("out" + numberOutPort++, Type.PORT), jp);
+				outputPortsOrArrays.put(new TypedName("out" + ((numberOPort!=1)?(numberOutPort++):("")), Type.PORT), jp);
 				break;
 			default:
 				throw new RuntimeException("Port of atomic component should be in or out ports");
@@ -207,6 +215,37 @@ public class LykosCompiler {
 				outputPortsOrArrays, portFactory);
 	}
 
+	public MemberSignature getMainMemberSignature(String name, String variable, Set<Port> ports) {
+
+		TypedName typedName = new TypedName(name, Type.FAMILY);
+		Map<TypedName, Extralogical> extralogicals = new LinkedHashMap<>();
+		Map<TypedName, PortOrArray> inputPortsOrArrays = new LinkedHashMap<>();
+		Map<TypedName, PortOrArray> outputPortsOrArrays = new LinkedHashMap<>();
+
+		if (variable != null)
+			extralogicals.put(new TypedName("d", Type.EXTRALOGICAL), new Extralogical(variable));
+
+//		int numberInPort = 1;
+//		int numberOutPort = 1;
+		for (Port p : ports) {
+			PortSpec pSpec = new PortSpec(p.getName());
+			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
+			switch (p.getType()) {
+			case IN:
+				inputPortsOrArrays.put(new TypedName(p.getName(), Type.PORT), jp);
+				break;
+			case OUT:
+				outputPortsOrArrays.put(new TypedName(p.getName(), Type.PORT), jp);
+				break;
+			default:
+				throw new RuntimeException("Port of atomic component should be in or out ports");
+			}
+		}
+
+		return new MemberSignature(typedName, new LinkedHashMap<>(), extralogicals, inputPortsOrArrays,
+				outputPortsOrArrays, portFactory);
+	}
+	
 	/**
 	 * Constructs a new worker signature
 	 * 

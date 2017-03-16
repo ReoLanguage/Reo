@@ -1,4 +1,4 @@
-section reo.slides;
+section slides;
 
 import reo.sync;
 import reo.syncdrain;
