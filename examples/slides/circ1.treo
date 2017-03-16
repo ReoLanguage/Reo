@@ -1,9 +1,12 @@
-section reo.slides;
 
+import slides.regulatorwwr;
+import reo.syncdrain;
 import reo.sync;
 
-import reo.slides.regulatorwwr;
-
-circ1(a, b, c, d) {
- regulatorwwr(a, m, d) sync(b, m) sync(c, m)
+circ1(a?, b?, c?, d!) {
+ regulatorwwr(a, x, d) sync(b, x) sync(c, x)
+//	sync(b,x)
+//	sync(c,x)
+//	syncdrain(m,x)
+//	sync(a,m)
 }

@@ -152,8 +152,10 @@ public class Interpreter<T extends Semantics<T>> {
 		if (main instanceof Component<?>) {
 			@SuppressWarnings("unchecked")
 			Instance<T> i = ((Component<T>) main).instantiate(values, null, m);
+			String[] namesplit = name.split("\\.");
+			int len = name.split(".").length;
 			if (i != null)
-				return new ReoProgram<T>(name, file, i.getConnector());
+				return new ReoProgram<T>(name.split("\\.")[name.split("\\.").length-1], file, i.getConnector());
 		}
 		
 		return null;
