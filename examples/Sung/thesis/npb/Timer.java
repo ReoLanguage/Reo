@@ -9,7 +9,8 @@
 !                                                                         !
 !-------------------------------------------------------------------------!
 !                                                                         !
-!    This benchmark is a serial version of the NPB3_0_JAV  Timer code.    !      !									  !
+!    This benchmark is a serial version of the NPB3_0_JAV  Timer code.    !
+!									  !
 !    Permission to use, copy, distribute and modify this software	  !
 !    for any purpose with or without fee is hereby granted.  We 	  !
 !    request, however, that all derived work reference the NAS  	  !

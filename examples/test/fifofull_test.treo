@@ -1,0 +1,9 @@
+import reo.fifofull;
+
+fifofull_test(a?,b!){	
+
+	fifofull<k>(a,b)
+|
+
+	k :<1..2>
+}

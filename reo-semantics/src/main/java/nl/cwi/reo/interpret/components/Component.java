@@ -11,7 +11,6 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.sets.SetExpression;
 import nl.cwi.reo.interpret.signatures.Signature;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
-import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
@@ -66,7 +65,7 @@ public final class Component<T extends Semantics<T>> implements Value {
 	 * @return a list of instances and unifications.
 	 */
 	@Nullable
-	public Instance<T> instantiate(List<Term> values, @Nullable List<Port> ports, Monitor m) {
+	public Instance<T> instantiate(List<?> values, @Nullable List<Port> ports, Monitor m) {
 		Signature signature = sign.evaluate(values, ports, m);
 		if (signature == null)
 			return null;
