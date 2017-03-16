@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import org.stringtemplate.v4.ST;
 
@@ -31,9 +32,9 @@ public final class ReoFile<T extends Semantics<T>> {
 	private final String section;
 
 	/**
-	 * List of fully qualified names of imported components.
+	 * Set of fully qualified names of imported components.
 	 */
-	private final List<String> imports;
+	private final Set<String> imports;
 
 	/**
 	 * Name of main component.
@@ -62,7 +63,7 @@ public final class ReoFile<T extends Semantics<T>> {
 	 * @param definitions
 	 *            component definitions
 	 */
-	public ReoFile(String section, List<String> imports, String filename, Conjunction definitions, Location location) {
+	public ReoFile(String section, Set<String> imports, String filename, Conjunction definitions, Location location) {
 		if (section == null || imports == null || filename == null || definitions == null || location == null)
 			throw new NullPointerException();
 		this.filename = filename;
@@ -74,11 +75,11 @@ public final class ReoFile<T extends Semantics<T>> {
 	}
 
 	/**
-	 * Gets the list of imported components.
+	 * Gets the set of imported components.
 	 * 
-	 * @return list of imports
+	 * @return set of imports
 	 */
-	public List<String> getImports() {
+	public Set<String> getImports() {
 		return imports;
 	}
 

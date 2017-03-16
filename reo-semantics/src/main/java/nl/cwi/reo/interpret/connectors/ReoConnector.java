@@ -45,17 +45,6 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	 */
 	public ReoConnector<T> rename(Map<Port, Port> r);
 
-//	/**
-//	 * Renames all hidden ports in this connector to an integer value, starting
-//	 * from a given integer i. Integer i gets incremented to the smallest
-//	 * integer greater or equal to i, that not used as a port name.
-//	 * 
-//	 * @param i
-//	 *            start value of hidden ports.
-//	 * @return Block with renamed hidden ports.
-//	 */
-//	public ReoConnector<T> renameHidden(Integer i);
-
 	/**
 	 * Inserts, if necessary, a merger and/or replicator at every node in this
 	 * instance list. This method uses an instance of a semantics object to

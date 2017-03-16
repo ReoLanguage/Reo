@@ -6,9 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -103,50 +108,72 @@ public class Interpreter<T extends Semantics<T>> {
 	@Nullable
 	public ReoProgram<T> interpret(String file) {
 
-		// Stack of all parsed Reo source files.
-		Stack<ReoFile<T>> stack = new Stack<ReoFile<T>>();
+		// Set of parsed Reo source files.
+		Map<String, ReoFile<T>> programs = new HashMap<String, ReoFile<T>>();
+		
+		// Dependency graph of parsed component definitions.
+		Map<String, Set<String>> deps = new HashMap<String, Set<String>>();
 
 		// Name of main component.
 		String name = "";
 
-		// List of parsed component definitions.
-		List<String> parsed = new ArrayList<String>();
-
 		// List of unparsed imported component definitions.
 		Queue<String> todo = new LinkedList<String>();
 
-		// Parse the provided source files.
+		// Parse the provided source file.
 		ReoFile<T> mainFile = parse(file);
 		if (mainFile != null) {
-			stack.push(mainFile);
-			todo.addAll(mainFile.getImports());
+			programs.put(mainFile.getName(), mainFile);
 			name = mainFile.getName();
-			parsed.add(name);
+			Set<String> imports = new HashSet<String>(mainFile.getImports()); 
+			todo.addAll(imports);
+			deps.putIfAbsent(mainFile.getName(), imports);
 		}
 
 		// Find and parse all imported component definitions.
-		String component;
+		String component = null;
 		while ((component = todo.poll()) != null) {
-			if (!parsed.contains(component)) {
-				parsed.add(component);
-				ReoFile<T> inclFile = findComponent(component);
-				if (inclFile != null) {
-					stack.push(inclFile);
-					List<String> newComponents = inclFile.getImports();
-					newComponents.removeAll(parsed);
-					todo.addAll(newComponents);
+			if (!deps.containsKey(component)) {
+				ReoFile<T> reoFile = findComponent(component);
+				if (reoFile != null) {
+					programs.put(reoFile.getName(), reoFile);
+					Set<String> imports = new HashSet<String>(reoFile.getImports()); 
+					todo.addAll(imports);
+					deps.putIfAbsent(reoFile.getName(), imports);
 				} else {
 					m.add("Component " + component + " is not found.");
 				}
-
 			}
 		}
 
+		// Find the correct order to evaluate the parsed programs.
+		List<ReoFile<T>> list = new ArrayList<ReoFile<T>>();
+		while (!deps.isEmpty()) {
+			String prog = null;
+			for (Map.Entry<String, Set<String>> comp : deps.entrySet())
+				if (comp.getValue().isEmpty())
+					prog = comp.getKey();
+			if (prog == null) {
+				m.add("There is a cyclic dependency of imports among " + deps.keySet());
+				return null;
+			} 
+			list.add(programs.get(prog));
+			
+			// Remove the program from the dependency graph.
+			Iterator<Map.Entry<String, Set<String>>> iter = deps.entrySet().iterator();
+			while (iter.hasNext()) {
+			    Map.Entry<String, Set<String>> entry = iter.next();
+			    entry.getValue().remove(prog);
+			    if (entry.getKey().equals(prog))
+			    	iter.remove();
+			}
+		}
+		
 		// Evaluate all component expressions.
 		Scope scope = new Scope();
-		while (!stack.isEmpty())
-			stack.pop().evaluate(scope, m);
-		
+		for (ReoFile<T> f : list)
+			f.evaluate(scope, m);
+
 		// Instantiate the main component
 		Value main = scope.get(new Identifier(name));
 		if (main instanceof Component<?>) {
@@ -157,7 +184,7 @@ public class Interpreter<T extends Semantics<T>> {
 			if (i != null)
 				return new ReoProgram<T>(name.split("\\.")[name.split("\\.").length-1], file, i.getConnector());
 		}
-		
+
 		return null;
 	}
 
@@ -325,12 +352,12 @@ public class Interpreter<T extends Semantics<T>> {
 		ReoLexer lexer = new ReoLexer(c);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ReoParser parser = new ReoParser(tokens);
-				
+
 		ErrorListener errListener = new ErrorListener(m);
 		parser.removeErrorListeners();
 		parser.addErrorListener(errListener);
 		ParseTree tree = parser.file();
-		if(errListener.hasError)
+		if (errListener.hasError)
 			return null;
 		ParseTreeWalker walker = new ParseTreeWalker();
 		listener.setFileName(path);

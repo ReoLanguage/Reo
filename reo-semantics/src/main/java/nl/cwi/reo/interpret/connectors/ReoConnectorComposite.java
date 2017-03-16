@@ -84,7 +84,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 */
 	public static <T extends Semantics<T>> ReoConnectorComposite<T> compose(String operator,
 			List<ReoConnector<T>> components) {
-		int i = 0;
+		int i = 1;
 		List<ReoConnector<T>> comps = new ArrayList<ReoConnector<T>>();
 		for (ReoConnector<T> C : components) {
 			Map<Port, Port> r = new HashMap<Port, Port>();
