@@ -191,16 +191,16 @@
   }
   
   function snapToComponent(node,comp) {
-    var diffWidth = comp.width / 2;
-    var diffHeight = comp.height / 2;
-    if (node.left - comp.left > diffWidth) // right side
-      node.set({'left': comp.left + diffWidth});
-    if (comp.left - node.left > diffWidth) // left side
-      node.set({'left': comp.left - diffWidth});
-    if (node.top - comp.top > diffHeight) // bottom side
-      node.set({'top': comp.top + diffHeight});
-    if (comp.top - node.top > diffHeight) // top side
-      node.set({'top': comp.top - diffHeight});
+    var right = comp.left + comp.width;
+    var bottom = comp.top + comp.height;
+    if (node.left - right > 0) // right side
+      node.set({'left': right});
+    if (node.left - comp.left < 0) // left side
+      node.set({'left': comp.left});
+    if (node.top - bottom > 0) // bottom side
+      node.set({'top': bottom});
+    if (node.top - comp.top < 0) // top side
+      node.set({'top': comp.top});
     node.setCoords();
   }
 
@@ -364,6 +364,7 @@
   
   var main = drawComponent(50,50,750,550);
   main.set({hasBorders:false,hasControls:false,selectable:false});
+  document.getElementById("select").click();
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
 
