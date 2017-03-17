@@ -1,32 +1,25 @@
 package nl.cwi.reo;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
+import nl.cwi.reo.compile.GraphCompiler;
 import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.compile.LykosCompiler;
+import nl.cwi.reo.compile.PRCompiler;
 import nl.cwi.reo.compile.components.ReoTemplate;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
-import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterCAM;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
-import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.values.StringValue;
-import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.constraintautomata.ConstraintAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
@@ -137,6 +130,26 @@ public class Compiler {
 		// Print all messages.
 		monitor.print();
 	}
+
+	/**
+	 * Writes code to a file in the specified output directory.
+	 * 
+	 * @param name
+	 *            file name with extension
+	 * @param code
+	 *            content of the file
+	 * @return <code>true</code> if the files are successfully written.
+	 */
+	public boolean write(String name, String code) {
+		try {
+			FileWriter out = new FileWriter(outdir + File.separator + name);
+			out.write(code);
+			out.close();
+		} catch (IOException e) {
+			return false;
+		}
+		return true;
+	}
     
     private void compileCAM() {
     	
@@ -197,71 +210,12 @@ public class Compiler {
 		if (program == null) return;	
 		
 		if (verbose) {
-//			System.out.println(program.getConnector());
-//			System.out.println(program.getConnector().flatten());
-//			System.out.println(program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()));
-			
-			ReoConnector<PRAutomaton> rc = program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate();
-			
-			System.out.println(rc);
-			
-			// Build a connector
-			Map<String, Object> c = new HashMap<String, Object>();
-			c.put("name", program.getName());
-			
-			// Build a list of instances
-			int i = 0;
-			List<String> defs = new ArrayList<String>();
-			List<Map<String, Object>> instances = new ArrayList<Map<String, Object>>();
-			List<Map<String, Object>> workers = new ArrayList<Map<String, Object>>();
-
-			for (ReoConnectorAtom<PRAutomaton> atom : rc.getAtoms()) {
-
-				List<String> inputs = new ArrayList<String>();
-				List<String> outputs = new ArrayList<String>();
-				for (Port p : atom.getSemantics().getInterface())
-					if (p.isInput())
-						inputs.add(p.getName());
-					else 
-						outputs.add(p.getName());
-				
-				if (atom.getSemantics().getName().equals("identity")) {
-					Map<String, Object> worker = new HashMap<String, Object>();
-					defs.add("WORKER" + ++i + " = " + atom.getSourceCode().getFile().toString().replace("\"", ""));
-					worker.put("ref", "WORKER" + i);
-					worker.put("inputs", inputs);
-					worker.put("outputs", outputs);
-					workers.add(worker);
-					continue;
-				}
-				
-				// Build an instance
-				Map<String, Object> I = new HashMap<String, Object>();
-				I.put("name", atom.getSemantics().getName());
-				I.put("inputs", inputs);
-				I.put("outputs", outputs);
-				
-				Value pv = atom.getSemantics().getVariable();
-				String param = null;
-				if (pv != null)
-					param = pv instanceof StringValue ? "\"" + pv.toString() + "\"" : pv.toString();
-				if (param != null)
-					I.put("params", Arrays.asList(param));
-				
-				instances.add(I);
-			}
-
-			c.put("defs", defs);
-			c.put("instances", instances);
-			c.put("workers", workers);
-
-			
-			STGroup group = new STGroupFile("PR.stg");
-			ST temp = group.getInstanceOf("main");
-			temp.add("c", c);
-			System.out.println(temp.render());
+			System.out.println(program);
+			System.out.println(PRCompiler.toPR(program));
 		}
-		
+		  
+    	GraphCompiler.visualize(program);
+    	
 		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor);
 		c.compile();
     }

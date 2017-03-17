@@ -21,8 +21,6 @@ public class JavaCompiler {
 
 	public static <T extends AutomatonSemantics<T>> ReoTemplate compile(ReoProgram<T> program, String packagename,
 			T nodeFactory) {
-		
-		System.out.println("compiling..");
 
 		if (program == null)
 			return null;
@@ -46,62 +44,4 @@ public class JavaCompiler {
 
 		return new ReoTemplate(program.getFile(), packagename, program.getName(), ports, instances, definitions);
 	}
-	//
-	// public static void compile1() {
-	//
-	// STGroup group = new STGroupFile("JavaMain.stg");
-	// ST temp = group.getInstanceOf("component");
-	//
-	// Port a = new Port("a", PortType.IN, PrioType.NONE, new
-	// TypeTag("Integer"), true);
-	// Port b = new Port("b", PortType.OUT, PrioType.NONE, new
-	// TypeTag("Boolean"), true);
-	// Port c = new Port("c", PortType.IN, PrioType.NONE, new TypeTag("Double"),
-	// true);
-	//
-	// SortedSet<Port> N = new TreeSet<Port>();
-	//
-	// N.add(a);
-	// N.add(b);
-	// N.add(c);
-	//
-	// Map<String, String> ac = new HashMap<String, String>();
-	// ac.put("b", "d_a");
-	// ac.put("d", "m");
-	//
-	// Transition t = new Transition("q0", "q1", N, ac);
-	//
-	// List<Port> P = new ArrayList<Port>();
-	// P.add(a);
-	// P.add(b);
-	// P.add(c);
-	//
-	// Map<String, Set<Transition>> out = new HashMap<String,
-	// Set<Transition>>();
-	// out.put("q0", new HashSet<Transition>(Arrays.asList(t)));
-	//
-	// ActiveAutomaton A = new ActiveAutomaton("MyAutomaton", P, out, "q0");
-	//
-	// temp.add("A", A);
-	//
-	// System.out.println(temp.render());
-	// // outputClass(name, st.render());
-	// }
-
-	// /**
-	// * Produces java source file containing the game graph;
-	// * @param name name of the java class
-	// * @param code implementation of the java class
-	// * @return <code>true</code> if the file is successfully written.
-	// */
-	// private static boolean outputClass(String name, String code) {
-	// try {
-	// FileWriter out = new FileWriter(name + ".java");
-	// out.write(code);
-	// out.close();
-	// } catch (IOException e) {
-	// return false;
-	// }
-	// return true;
-	// }
 }
