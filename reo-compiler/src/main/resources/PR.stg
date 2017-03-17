@@ -1,15 +1,15 @@
 main(c) ::= <<
 <c.defs; separator="\n">
-<c.name> = 
+<c.name><if(c.inputs || c.outputs)>(<c.inputs; separator=",">;<c.outputs; separator=",">)<endif> = 
     <c.instances:instance(); separator=" mult\n" >
   <if(c.workers)>among<endif>
     <c.workers:worker(); separator=" and\n">
 >>
 
 instance(I) ::= <<
-<I.name><if(I.params)>[<I.params; separator=", ">]<endif>(<I.ports; separator=", ">)
+<I.name><if(I.params)>[<I.params; separator=",">]<endif>(<I.inputs; separator=",">;<I.outputs; separator=",">)
 >>
 
 worker(W) ::= <<
-<W.ref>(<W.ports; separator=", ">)
+<W.ref>(<W.inputs; separator=",">)
 >>
