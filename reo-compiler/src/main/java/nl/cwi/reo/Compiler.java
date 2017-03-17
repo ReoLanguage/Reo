@@ -217,15 +217,20 @@ public class Compiler {
 
 			for (ReoConnectorAtom<PRAutomaton> atom : rc.getAtoms()) {
 
-				List<String> ports = new ArrayList<String>();
+				List<String> inputs = new ArrayList<String>();
+				List<String> outputs = new ArrayList<String>();
 				for (Port p : atom.getSemantics().getInterface())
-					ports.add(p.getName());
+					if (p.isInput())
+						inputs.add(p.getName());
+					else 
+						outputs.add(p.getName());
 				
 				if (atom.getSemantics().getName().equals("identity")) {
 					Map<String, Object> worker = new HashMap<String, Object>();
 					defs.add("WORKER" + ++i + " = " + atom.getSourceCode().getFile().toString().replace("\"", ""));
 					worker.put("ref", "WORKER" + i);
-					worker.put("ports", ports);
+					worker.put("inputs", inputs);
+					worker.put("outputs", outputs);
 					workers.add(worker);
 					continue;
 				}
@@ -233,9 +238,10 @@ public class Compiler {
 				// Build an instance
 				Map<String, Object> I = new HashMap<String, Object>();
 				I.put("name", atom.getSemantics().getName());
-				I.put("ports", ports);
+				I.put("inputs", inputs);
+				I.put("outputs", outputs);
 				
-				Value pv = atom.getSemantics().getValue();
+				Value pv = atom.getSemantics().getVariable();
 				String param = null;
 				if (pv != null)
 					param = pv instanceof StringValue ? "\"" + pv.toString() + "\"" : pv.toString();
