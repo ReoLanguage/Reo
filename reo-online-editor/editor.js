@@ -1,9 +1,9 @@
 (function() {
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
-  var active, isDown, origX, origY;
+  var active, isDown, origX, origY, origLeft, origTop, labelOrigLeft, labelOrigTop;
   var mode = 'select';
-  var id = 'a';
+  var id = '0';
   
   document.getElementById("select").onclick = function() {
     document.getElementById(mode).style.border = '2px solid white';
@@ -36,6 +36,11 @@
     a.href = canvas.toDataURL('image/png');
     a.click();
   };
+  
+  function generateId() {
+    id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g,'a');
+    return id;
+  }
 
   function makeCircle(left, top) {
     var c = new fabric.Circle({
@@ -48,12 +53,9 @@
       hasBorders: false,
       hasControls: false,
       class: 'node',
-      component: main
+      component: main,
+      id: generateId()
     });
-    
-    // give the node an identifier and increment it for the next node
-    c.set({'id': id});
-    id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g,'a');
 
     // these are the channels that are connected to this node
     c.linesIn = [];
@@ -242,9 +244,19 @@
   
   canvas.on('mouse:down', function(e) {
     isDown = true;
-    if (canvas.getActiveObject())
-      return;
     var pointer = canvas.getPointer(e.e);
+    origX = pointer.x;
+    origY = pointer.y;
+    var p = canvas.getActiveObject();
+    if (p) {
+      if (p.class == 'component') {
+        origLeft = p.left;
+        origTop = p.top;
+        labelOrigLeft = p.label.left;
+        labelOrigTop = p.label.top;
+      }
+      return;
+    }
     if (mode == 'sync') {
       var line = drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
       snapToComponent(line.circle1,main);
@@ -252,8 +264,6 @@
       updateLine(line,2);
     }
     if (mode == 'component') {
-      origX = pointer.x;
-      origY = pointer.y;
       var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
       canvas.setActiveObject(comp);
     }
@@ -267,15 +277,25 @@
       return;
     var pointer = canvas.getPointer(e.e);
     if (p.class == 'component') {
-      if (origX > pointer.x)
-        p.set({left:pointer.x});
-      if (origY > pointer.y)
-        p.set({top:pointer.y});
-      p.set({width:Math.abs(origX - pointer.x)});
-      p.set({height:Math.abs(origY - pointer.y)});
-      p.setCoords();
-      p.label.set({left: p.left + (p.width/2), top: p.top - 15});
-      p.label.setCoords();
+      if (p.status == 'drawing') {
+        if (origX > pointer.x)
+          p.set({left:pointer.x});
+        if (origY > pointer.y)
+          p.set({top:pointer.y});
+        p.set({width:Math.abs(origX - pointer.x)});
+        p.set({height:Math.abs(origY - pointer.y)});
+        p.setCoords();
+        p.label.set({left: p.left + (p.width/2), top: p.top - 15});
+        p.label.setCoords();
+      }
+      if (p.status == 'design') {
+        p.set({left: origLeft + pointer.x - origX});
+        p.set({top: origTop + pointer.y - origY});
+        p.setCoords();
+        p.label.set({left: labelOrigLeft + pointer.x - origX});
+        p.label.set({top: labelOrigTop + pointer.y - origY});
+        p.label.setCoords();
+      }
     }
     if (p.class == 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
@@ -349,7 +369,8 @@
         canvas.calcOffset();
       }
       if (p.class == 'component') {
-        canvas.sendToBack(p);      
+        canvas.sendToBack(p);
+        p.set({status: 'design'});    
       }
     }
   });
@@ -394,12 +415,10 @@
       label: label,
       hasBorders: false,
       hasControls: false,
-      class: 'component'
+      class: 'component',
+      status: 'drawing',
+      id: generateId()
     });
-    
-    // give the component an identifier and increment it for the next one
-    rect.set({'id': id});
-    id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g,'a');
   
     label.on('mousedown', doubleClick(label, function (obj) {
       label.enterEditing();
@@ -420,7 +439,3 @@
   drawLine(300,100,400,100);
 
 })();
-
-
-
-
