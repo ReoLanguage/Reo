@@ -196,34 +196,34 @@
   function snapToComponent(node,comp) {
     var right = comp.left + comp.width;
     var bottom = comp.top + comp.height;
-    if (node.left - right > 0) // right side
+    if (node.left > right) // right side
       node.set({'left': right});
-    if (node.left - comp.left < 0) // left side
+    if (node.left < comp.left) // left side
       node.set({'left': comp.left});
-    if (node.top - bottom > 0) // bottom side
+    if (node.top > bottom) // bottom side
       node.set({'top': bottom});
-    if (node.top - comp.top < 0) // top side
+    if (node.top < comp.top) // top side
       node.set({'top': comp.top});
     node.setCoords();
+    for (i = 0; i < node.linesIn.length; i++) {
+      updateLine(node.linesIn[i], 2);
+    }
+    for (i = 0; i < node.linesOut.length; i++) {
+      updateLine(node.linesOut[i], 1);
+    }
   }
   
-  function snapOutComponent(node,comp) {
+  function snapOutComponent(node, comp, connectednode) {
     var right = comp.left + comp.width;
     var bottom = comp.top + comp.height;
-    var centerX = comp.left + (comp.width / 2);
-    var centerY = comp.top + (comp.height / 2);
-    if (node.left > comp.left && node.left < right) {
-      if (node.left < centerX)
-        node.left = comp.left;
-      else
-        node.left = right;
-    }
-    else if (node.top > comp.top && node.top < bottom) {
-      if (node.top < centerY)
-        node.top = comp.top;
-      else
-        node.top = bottom;
-    }
+    if (connectednode.left > right) // right side
+      node.set({left: right});
+    if (connectednode.left < comp.left) // left side
+      node.set({left: comp.left});
+    if (connectednode.top > bottom) // bottom side
+      node.set({top: bottom});
+    if (connectednode.top < comp.top)
+      node.set({top: comp.top});
     node.setCoords();
   }
 
@@ -308,7 +308,6 @@
           if (!obj || obj.get('id') == p.get('id') || (obj.get('class') !== 'node' && obj.get('class') !== 'component'))
             return;
           if (p.intersectsWithObject(obj)) {
-            console.log(p.id + " intersects with " + obj.id);
             if (obj.get('class') == 'node') {
               if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
                 for (i = 0; i < p.linesIn.length; i++) {
@@ -333,20 +332,19 @@
           }
         });
         snapToComponent(p,p.component);
-        console.log(p.id + " snaps to component " + p.component.id);
-        for (i = 0; i < p.linesIn.length; i++) {
-          if (p.linesIn[i].circle1.component.size < p.component.size)
-            snapOutComponent(p.linesIn[i].circle1,p.linesIn[i].circle1.component);
-          p.linesIn[i].circle1.component = p.component;
-          snapToComponent(p.linesIn[i].circle1,p.component);
-          updateLine(p.linesIn[i], 2);
+        for (j = 0; j < p.linesIn.length; j++) {
+          if (p.linesIn[j].circle1.component.size < p.component.size)
+            snapOutComponent(p.linesIn[j].circle1,p.linesIn[j].circle1.component,p);
+          p.linesIn[j].circle1.component = p.component;
+          snapToComponent(p.linesIn[j].circle1,p.component);
+          updateLine(p.linesIn[j], 2);
         }
-        for (i = 0; i < p.linesOut.length; i++) {
-          if (p.linesOut[i].circle2.component.size < p.component.size)
-            snapOutComponent(p.linesOut[i].circle2,p.linesOut[i].circle2.component);
-          p.linesOut[i].circle2.component = p.component;
-          snapToComponent(p.linesOut[i].circle2,p.component);
-          updateLine(p.linesOut[i], 1);
+        for (k = 0; k < p.linesOut.length; k++) {
+          if (p.linesOut[k].circle2.component.size < p.component.size)
+            snapOutComponent(p.linesOut[k].circle2,p.linesOut[k].circle2.component,p);
+          p.linesOut[k].circle2.component = p.component;
+          snapToComponent(p.linesOut[k].circle2,p.component);
+          updateLine(p.linesOut[k], 1);
         }
         canvas.deactivateAll();
         canvas.calcOffset();
