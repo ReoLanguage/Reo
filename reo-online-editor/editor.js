@@ -282,32 +282,47 @@
     if (p) {
       if (p.class == 'node') {
         p.setCoords();
+        p.set({component:main});
         canvas.forEachObject(function(obj) {
-          if (!obj || obj.get('id') == p.get('id') || (obj.get('type') !== "circle" && obj.get('class') !== 'component'))
+          if (!obj || obj.get('id') == p.get('id') || (obj.get('class') !== 'node' && obj.get('class') !== 'component'))
             return;
           if (p.intersectsWithObject(obj)) {
             console.log(p.id + " intersects with " + obj.id);
-            if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-              for (i = 0; i < p.linesIn.length; i++) {
-                p.linesIn[i].circle2 = obj;
-                obj.linesIn.push(p.linesIn[i]);
+            if (obj.get('class') == 'node') {
+              if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+                for (i = 0; i < p.linesIn.length; i++) {
+                  p.linesIn[i].circle2 = obj;
+                  obj.linesIn.push(p.linesIn[i]);
+                }
+                for (i = 0; i < p.linesOut.length; i++) {
+                  p.linesOut[i].circle1 = obj;
+                  obj.linesOut.push(p.linesOut[i]);
+                }
+                canvas.remove(p);
+                updateNode(obj);
+                obj.bringToFront();
+                canvas.renderAll();
               }
-              for (i = 0; i < p.linesOut.length; i++) {
-                p.linesOut[i].circle1 = obj;
-                obj.linesOut.push(p.linesOut[i]);
+            }
+            if (obj.get('class') == 'component') {
+              if (obj.size < p.component.size) {
+                p.component = obj;
               }
-              canvas.remove(p);
-              updateNode(obj);
-              obj.bringToFront();
-              canvas.renderAll();
             }
           }
         });
-        snapToComponent(p,main);
-        for (i = 0; i < p.linesIn.length; i++)
+        snapToComponent(p,p.component);
+        console.log(p.id + " snaps to component " + p.component.id);
+        for (i = 0; i < p.linesIn.length; i++) {
+          p.linesIn[i].circle1.component = p.component;
+          snapToComponent(p.linesIn[i].circle1,p.component);
           updateLine(p.linesIn[i], 2);
-        for (i = 0; i < p.linesOut.length; i++)
+        }
+        for (i = 0; i < p.linesOut.length; i++) {
+          p.linesOut[i].circle2.component = p.component;
+          snapToComponent(p.linesOut[i].circle2,p.component);
           updateLine(p.linesOut[i], 1);
+        }
         canvas.deactivateAll();
         canvas.calcOffset();
       }
@@ -376,7 +391,7 @@
   }
   
   var main = drawComponent(50,50,750,550);
-  main.set({hasBorders:false,hasControls:false,selectable:false});
+  main.set({id:'main',hasBorders:false,hasControls:false,selectable:false});
   document.getElementById("select").click();
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
