@@ -1,0 +1,15 @@
+main(c) ::= <<
+<c.defs; separator="\n">
+<c.name> = 
+    <c.instances:instance(); separator=" mult\n" >
+  <if(c.workers)>among<endif>
+    <c.workers:worker(); separator=" and\n">
+>>
+
+instance(I) ::= <<
+<I.name><if(I.params)>[<I.params; separator=", ">]<endif>(<I.ports; separator=", ">)
+>>
+
+worker(W) ::= <<
+<W.ref>(<W.ports; separator=", ">)
+>>
