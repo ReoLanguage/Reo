@@ -1,7 +1,7 @@
 (function() {
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
-  var line, isDown, origX, origY;
+  var active, isDown, origX, origY;
   var mode = 'select';
   var id = 'a';
   
@@ -63,7 +63,7 @@
 
   function drawLine(x1, y1, x2, y2) {
     // create a line...
-    line = new fabric.Line([x1, y1, x2, y2], {
+    var line = new fabric.Line([x1, y1, x2, y2], {
       fill: '#000',
       stroke: '#000',
       strokeWidth: 5,
@@ -106,6 +106,8 @@
     // draw everything on the canvas
     canvas.add(line,a,c1,c2);
     canvas.renderAll();
+    
+    return line;
   } //drawLine
   
   function updateNode(node) {
@@ -223,7 +225,7 @@
       return;
     var pointer = canvas.getPointer(e.e);
     if (mode == 'sync') {
-      drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
+      var line = drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
       snapToComponent(line.circle1,main);
       canvas.setActiveObject(line.circle2);
       updateLine(line,2);
@@ -251,7 +253,7 @@
       p.set({width:Math.abs(origX - pointer.x)});
       p.set({height:Math.abs(origY - pointer.y)});
       p.setCoords();
-      p.label.set({left: p.left + (p.width/2), top: p.top - 20});
+      p.label.set({left: p.left + (p.width/2), top: p.top - 15});
       
       
     }
@@ -277,35 +279,41 @@
   canvas.on('mouse:up', function(e){
     isDown = false;
     var p = canvas.getActiveObject();
-    if (p && p.class == 'node') {
-      p.setCoords();
-      canvas.forEachObject(function(obj) {
-        if (!obj || obj.get('id') == p.get('id') || obj.get('type') !== "circle")
-          return;
-        if (p.intersectsWithObject(obj)) {
-          if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-            for (i = 0; i < p.linesIn.length; i++) {
-              p.linesIn[i].circle2 = obj;
-              obj.linesIn.push(p.linesIn[i]);
+    if (p) {
+      if (p.class == 'node') {
+        p.setCoords();
+        canvas.forEachObject(function(obj) {
+          if (!obj || obj.get('id') == p.get('id') || (obj.get('type') !== "circle" && obj.get('class') !== 'component'))
+            return;
+          if (p.intersectsWithObject(obj)) {
+            console.log(p.id + " intersects with " + obj.id);
+            if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+              for (i = 0; i < p.linesIn.length; i++) {
+                p.linesIn[i].circle2 = obj;
+                obj.linesIn.push(p.linesIn[i]);
+              }
+              for (i = 0; i < p.linesOut.length; i++) {
+                p.linesOut[i].circle1 = obj;
+                obj.linesOut.push(p.linesOut[i]);
+              }
+              canvas.remove(p);
+              updateNode(obj);
+              obj.bringToFront();
+              canvas.renderAll();
             }
-            for (i = 0; i < p.linesOut.length; i++) {
-              p.linesOut[i].circle1 = obj;
-              obj.linesOut.push(p.linesOut[i]);
-            }
-            canvas.remove(p);
-            updateNode(obj);
-            obj.bringToFront();
-            canvas.renderAll();
           }
-        }
-      });
-      snapToComponent(p,main);
-      for (i = 0; i < p.linesIn.length; i++)
-        updateLine(p.linesIn[i], 2);
-      for (i = 0; i < p.linesOut.length; i++)
-        updateLine(p.linesOut[i], 1);
-      canvas.deactivateAll();
-      canvas.calcOffset();
+        });
+        snapToComponent(p,main);
+        for (i = 0; i < p.linesIn.length; i++)
+          updateLine(p.linesIn[i], 2);
+        for (i = 0; i < p.linesOut.length; i++)
+          updateLine(p.linesOut[i], 1);
+        canvas.deactivateAll();
+        canvas.calcOffset();
+      }
+      if (p.class == 'component') {
+        canvas.sendToBack(p);      
+      }
     }
   });
   
@@ -330,7 +338,8 @@
   
     var label = new fabric.IText('name', {
       left: left + (width / 2),
-      top: top - 20
+      top: top - 15,
+      fontSize: 32
     });  
   
     var rect = new fabric.Rect({
@@ -338,6 +347,7 @@
       top: top,
       width: width,
       height, height,
+      size: width * height,
       fill: 'transparent',
       stroke: '#000',
       strokeWidth: 1,
@@ -347,9 +357,12 @@
       label: label,
       hasBorders: false,
       hasControls: false,
-      selectable: false,
       class: 'component'
     });
+    
+    // give the component an identifier and increment it for the next one
+    rect.set({'id': id});
+    id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g,'a');
   
     label.on('mousedown', doubleClick(label, function (obj) {
       label.enterEditing();
