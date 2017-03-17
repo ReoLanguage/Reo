@@ -275,8 +275,7 @@
       p.set({height:Math.abs(origY - pointer.y)});
       p.setCoords();
       p.label.set({left: p.left + (p.width/2), top: p.top - 15});
-      
-      
+      p.label.setCoords();
     }
     if (p.class == 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
@@ -378,7 +377,7 @@
       left: left + (width / 2),
       top: top - 15,
       fontSize: 32
-    });  
+    });
   
     var rect = new fabric.Rect({
       left: left,
@@ -405,7 +404,7 @@
     label.on('mousedown', doubleClick(label, function (obj) {
       label.enterEditing();
       label.selectAll();
-    }));  
+    }));
   
     canvas.add(rect,label);
     rect.setCoords();
@@ -415,6 +414,7 @@
   
   var main = drawComponent(50,50,750,550);
   main.set({id:'main',hasBorders:false,hasControls:false,selectable:false});
+  main.label.set({'text': 'main'});
   document.getElementById("select").click();
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
