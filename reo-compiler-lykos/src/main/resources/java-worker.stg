@@ -1,7 +1,7 @@
 group templates;
 
 header(packageName) ::= <<
-<packageName:{pkg | package pkg;\n}>
+<packageName:{pkg | package <pkg>;</n>}>
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;

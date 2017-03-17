@@ -38,11 +38,13 @@ public class SimpleLykos {
 	private AutomatonFactory automatonFactory;
 	
 	private final String outputpath;
+	private final String packagename;
 	private int counterWorkerName = 0;
 	private static final boolean eclipse = false;
 
-	public SimpleLykos(String outputpath) {
+	public SimpleLykos(String outputpath, String packagename) {
 		this.outputpath = outputpath;
+		this.packagename = packagename;
 	}
 
 	public void compile(ProgramCompiler programCompiler, AutomatonFactory automaton) {
@@ -129,7 +131,8 @@ public class SimpleLykos {
 		String mainCode = "";
 
 		// Generate header
-		// mainHeaderTemplate.add("packageName", mainPackageName);
+		if (!packagename.equals("")) 
+			mainHeaderTemplate.add("packageName", packagename);
 		mainCode += mainHeaderTemplate.render();
 
 		// Generate body
@@ -179,6 +182,8 @@ public class SimpleLykos {
 		StringBuilder code = new StringBuilder();
 
 		// Generate header
+		if (!packagename.equals("")) 
+			headerTemplate.add("packageName", packagename);
 		code.append(headerTemplate.render());
 
 		// Generate protocol class
@@ -280,6 +285,8 @@ public class SimpleLykos {
 
 		// Generate header
 		ST workerHeaderTemplate = workerTemplates.getInstanceOf("header");
+		if (!packagename.equals("")) 
+			workerHeaderTemplate.add("packageName", packagename);
 		workerCode += workerHeaderTemplate.render();
 
 		// Generate body

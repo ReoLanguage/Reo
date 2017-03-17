@@ -12,9 +12,12 @@ import org.stringtemplate.v4.ST;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.terms.Range;
-import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.terms.VariableTermExpression;
+import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.values.DecimalValue;
+import nl.cwi.reo.interpret.values.IntegerValue;
+import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.NodeExpression;
 import nl.cwi.reo.interpret.variables.Parameter;
@@ -73,7 +76,7 @@ public final class SignatureExpression implements ParameterType {
 	 *         assignments.
 	 */
 	@Nullable
-	public Signature evaluate(List<Term> values, @Nullable List<Port> ports, Monitor m) {
+	public Signature evaluate(List<?> values, @Nullable List<Port> ports, Monitor m) {
 		Scope s = new Scope();
 
 		// Try to find the parameter value for a correct number of parameters
@@ -118,16 +121,29 @@ public final class SignatureExpression implements ParameterType {
 				parameters.addAll(p);
 		}
 		Iterator<Parameter> param = parameters.iterator();
-		Iterator<Term> value = values.iterator();
+		Iterator<?> value = values.iterator();
 
 		while (param.hasNext() && value.hasNext()) {
 			Parameter x = param.next();
-			Term v = value.next();
+			Object v = value.next();
 
 			if (v instanceof Value) {
 				s.put(x, (Value) v);
+			} else if (v instanceof String) {
+				String t = "";
+				if (x.getType() instanceof TypeTag)
+					t = ((TypeTag)x.getType()).toString();
+				
+				if (t.equals("int") || t.equals("Integer"))
+					s.put(x, new IntegerValue(Integer.parseInt((String)v)));
+				else if (t.equals("double") || t.equals("Double"))
+					s.put(x, new DecimalValue(Double.parseDouble((String)v)));
+				else if (t.equals("string") || t.equals("String"))
+					s.put(x, new StringValue((String)v));
+				else 
+					m.add(location, "Failed to cast parameter " + s + " to " + t);
 			} else {
-				m.add(location, "Term " + v + " is undefined.");
+				m.add(location, "Term " + v + " has undefined type.");
 				return null;
 			}
 		}

@@ -52,12 +52,14 @@ public class LykosCompiler {
 	private int counterWorker = 0;
 
 	private final String outputpath;
+	private final String packagename;
 	private final MyToolErrorAccumulator monitor;
 	private final String name;
 
-	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, Monitor m) {
+	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, String packagename, Monitor m) {
 
 		this.outputpath = outputpath;
+		this.packagename = packagename;
 		this.monitor = new MyToolErrorAccumulator(filename, m);
 
 		/*
@@ -121,7 +123,7 @@ public class LykosCompiler {
 		for (ReoConnectorAtom<PRAutomaton> atom : program.getAtoms()) {
 			if ((atom.getSourceCode()) == (null) || atom.getSourceCode().getFile() == null) {
 				PRAutomaton X = atom.getSemantics();
-				Primitive pr = new Primitive("nl.cwi.reo.pr.autom.libr." + X.getName(), "../SimpleLykos/src/main/java");
+				Primitive pr = new Primitive("nl.cwi.reo.pr.autom.libr." + X.getName(), "");
 				String param = X.getVariable() != null ? X.getVariable().toString() : null;
 				pr.setSignature(getMemberSignature(X.getName(), param, X.getInterface()));
 				c.addChild(pr);		
@@ -146,8 +148,6 @@ public class LykosCompiler {
 
 		c.setSignature(getMainMemberSignature(this.name, null, P));
 
-		// TODO Does this line means that we generate only centralized code. We
-		// want the protocol to be multi-threaded.
 		List<InterpretedProtocol> protocols = Arrays.asList(new InterpretedProtocol(c));
 
 		InterpretedMain interpretedMain = new InterpretedMain(protocols, workers);
@@ -161,7 +161,7 @@ public class LykosCompiler {
 		 * Start compiling on simple Lykos project
 		 */
 
-		SimpleLykos sL = new SimpleLykos(outputpath);
+		SimpleLykos sL = new SimpleLykos(outputpath, packagename);
 		sL.compile(programCompiler, automatonFactory);
 	}
 
@@ -197,7 +197,7 @@ public class LykosCompiler {
 				numberOPort++;
 		}
 		for (Port p : ports) {
-			PortSpec pSpec = new PortSpec(p.getName());
+			PortSpec pSpec = new PortSpec("$" + p.getName());
 			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 			switch (p.getType()) {
 			case IN:

@@ -1,9 +1,0 @@
-import reo.filter;
-
-filter_test(a?,b!){	
-
-	filter<ODD>(a,b)
-|
-
-	ODD = "nl.cwi.reo.templates.Relations.Odd"
-}

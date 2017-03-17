@@ -33,23 +33,4 @@ public final class Links {
 		}
 		return newlinks;
 	}
-
-//	/**
-//	 * Renames all hidden ports in this list of instances to an integer value,
-//	 * starting from a given integer i.
-//	 * 
-//	 * @param i
-//	 *            start value of hidden ports.
-//	 * @return the smallest integer greater or equal to i, that not used as a
-//	 *         port name.
-//	 */
-//	public static Map<Port, Port> renameHidden(Map<Port, Port> links, Integer i) {
-//		Map<Port, Port> newlinks = new HashMap<Port, Port>();
-//		for (Map.Entry<Port, Port> link : links.entrySet())
-//			if (link.getValue().isHidden())
-//				newlinks.put(link.getKey(), link.getValue().rename("#" + i++));
-//			else
-//				newlinks.put(link.getKey(), link.getValue());
-//		return newlinks;
-//	}
 }

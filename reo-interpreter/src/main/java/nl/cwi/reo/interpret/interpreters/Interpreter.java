@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -35,8 +34,6 @@ import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
-import nl.cwi.reo.interpret.terms.Term;
-import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
@@ -69,7 +66,7 @@ public class Interpreter<T extends Semantics<T>> {
 	/**
 	 * List of parameters to instantiate the main component.
 	 */
-	private final List<Term> values;
+	private final List<String> params;
 
 	/**
 	 * Container for messages.
@@ -89,10 +86,7 @@ public class Interpreter<T extends Semantics<T>> {
 		this.semantics = semantics;
 		this.listener = listener;
 		this.dirs = Collections.unmodifiableList(dirs);
-		List<Term> values = new ArrayList<Term>();
-		for (String s : params)
-			values.add(new StringValue(s));
-		this.values = Collections.unmodifiableList(values);
+		this.params = params;
 		this.m = monitor;
 	}
 
@@ -159,7 +153,7 @@ public class Interpreter<T extends Semantics<T>> {
 			} 
 			list.add(programs.get(prog));
 			
-			// Remove the program from the dependency graph.
+			// Remove the program from the dependency graph. 
 			Iterator<Map.Entry<String, Set<String>>> iter = deps.entrySet().iterator();
 			while (iter.hasNext()) {
 			    Map.Entry<String, Set<String>> entry = iter.next();
@@ -178,11 +172,10 @@ public class Interpreter<T extends Semantics<T>> {
 		Value main = scope.get(new Identifier(name));
 		if (main instanceof Component<?>) {
 			@SuppressWarnings("unchecked")
-			Instance<T> i = ((Component<T>) main).instantiate(values, null, m);
+			Instance<T> i = ((Component<T>)main).instantiate(params, null, m);
 			String[] namesplit = name.split("\\.");
-			int len = name.split(".").length;
 			if (i != null)
-				return new ReoProgram<T>(name.split("\\.")[name.split("\\.").length-1], file, i.getConnector());
+				return new ReoProgram<T>(namesplit[namesplit.length - 1], file, i.getConnector());
 		}
 
 		return null;
