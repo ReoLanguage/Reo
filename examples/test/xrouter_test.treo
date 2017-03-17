@@ -1,0 +1,5 @@
+import slides.xrouter;
+
+xrouter_test(a?,b!,c!){
+	xrouter(a,b,c)
+}

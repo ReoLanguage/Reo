@@ -1,9 +1,0 @@
-import reo.transformer;
-
-transformer_test(a?,b!){	
-
-	transformer<MAJORITY>(a,b)
-|
-
-	MAJORITY = "nl.cwi.reo.templates.Functions.majority"
-}

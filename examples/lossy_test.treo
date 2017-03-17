@@ -1,6 +1,0 @@
-import reo.lossy;
-
-lossy_test(a?,b!){	
-
-	lossy(a,b)
-}

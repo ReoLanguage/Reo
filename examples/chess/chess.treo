@@ -6,16 +6,16 @@ import reo.syncdrain;
 import reo.filter;
 import reo.fifofull;
 
-//chess = (whiteR[1..3]?,blackR?,whiteH[1..3]!,blackH!,whiteM!,blackM!){
-//chess = (whiteR[1..3]?,blackR?,whiteC[1..3]!,blackC!,whiteM!,blackM!){
 chess = (){
-	Team<1,1>(whiteI,whiteR[1..1],whiteC[1..1],whiteM,whiteO)
+
+	{
+	Team<T,T>(whiteI,whiteR[1..T],whiteC[1..T],whiteM,whiteO)
 	fifo1(whiteO,blackI)
 	Team<1,1>(blackI,blackR,blackC,blackM,blackO)
 	fifofull<"">(blackO,whiteI)
 	
 	{
-		{ Engine(whiteC[i],whiteR[i])  | i:<1..1> }
+		{ Engine(whiteC[i],whiteR[i])  | i:<1..T> }
 		Engine(blackC,blackR)
 	|
 	
@@ -23,7 +23,7 @@ chess = (){
 			#PR
 			identity(a;b)
 		|
-			Java:"Workers.Engine"
+			Java:"runtime.chess.Workers.Engine"
 		}
 	}
 	
@@ -33,9 +33,13 @@ chess = (){
 		#PR
 		identity(a;b)
 	  |
-		Java:"Workers.Display"
+		Java:"runtime.chess.Workers.Display"
 
 	  }
+	}
+	|
+
+	T=3
 	}
 	
 }
@@ -45,14 +49,14 @@ Team<T:int,P:int>(a?,y[1..T]?,hist[1..P]!,move!,out!){
 
         { sync(a,hist[i]) | i:<1..P> }
 
-        { transformer<PARSE>(y[j],Q[j]) | j : <1..T>, PARSE = "Functions.parse"}
+        { transformer<PARSE>(y[j],Q[j]) | j : <1..T>, PARSE = "runtime.chess.Functions.parse"}
 
         concatenator(Q[1..T],p)
-        {transformer<MAJORITY>(p,d) | MAJORITY = "Functions.majority" }
+        {transformer<MAJORITY>(p,d) | MAJORITY = "runtime.chess.Functions.majority" }
         syncdrain(d,h)
-        { filter<MOVE>(d,e) | MOVE = "Relations.Move" }
+        { filter<MOVE>(d,e) | MOVE = "runtime.chess.Relations.Move" }
         sync(e,move)
-        { binop<CONCATENATE>(h,e,out) | CONCATENATE = "Functions.concatenate" }
+        { binop<CONCATENATE>(h,e,out) | CONCATENATE = "runtime.chess.Functions.concatenate" }
 
 }
 
@@ -63,7 +67,7 @@ concatenator(a[1..N]?,b!){
                 { binop<CONCATENATE>(a[i+1],P[i],P[i+1])
                 |
                 i:<1..(N-1)>,
-                CONCATENATE = "Functions.concatenate"
+                CONCATENATE = "runtime.chess.Functions.concatenate"
                 }
 
           sync(P[N],b)

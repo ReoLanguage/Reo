@@ -1,6 +1,0 @@
-import reo.fifo;
-
-formula = <>(a?, b!) 
-{
-	fifo(a,b) | x : <1..3>
-}

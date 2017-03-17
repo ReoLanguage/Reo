@@ -56,7 +56,7 @@ public class LykosCompiler {
 	private final MyToolErrorAccumulator monitor;
 	private final String name;
 
-	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, String packagename, Monitor m) {
+	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, String packagename, Monitor m,CompilerSettings settings) {
 
 		this.outputpath = outputpath;
 		this.packagename = packagename;
@@ -66,15 +66,8 @@ public class LykosCompiler {
 		 * Compiler settings
 		 */
 
-		settings = new CompilerSettings(filename, Language.JAVA, false);
-		settings.ignoreInput(false);
-		settings.ignoreData(false);
-		settings.partition(true);
-		settings.subtractSyntactically(true);
-		settings.commandify(true);
-		settings.inferQueues(true);
-		settings.put("COUNT_PORTS", false);
-
+		this.settings=settings;
+		
 		// Define Language for compilation
 		Language targetLanguage = Language.JAVA;
 

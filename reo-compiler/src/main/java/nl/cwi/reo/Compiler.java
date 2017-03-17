@@ -27,6 +27,7 @@ import nl.cwi.reo.interpret.interpreters.InterpreterPR;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.constraintautomata.ConstraintAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
@@ -66,6 +67,13 @@ public class Compiler {
 	 */
 	@Parameter(names = {"-pkg", "--package"}, description = "target code package")
 	private String packagename = "";
+	
+	/**
+	 * Partitioning
+	 */
+	@Parameter(names = {"-pt", "--partitioning"}, description = "partition regarding synchronous and asynchronous sections")
+	private boolean partitioning = true ;
+	
 	
 	/**
 	 * List of available options.
@@ -255,8 +263,21 @@ public class Compiler {
 			temp.add("c", c);
 			System.out.println(temp.render());
 		}
+		/*
+		 * Compiler Settings
+		 */
 		
-		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor);
+		CompilerSettings settings = new CompilerSettings(files.get(0), Language.JAVA, false);
+		settings.ignoreInput(false);
+		settings.ignoreData(false);
+		settings.partition(partitioning);
+		settings.subtractSyntactically(true);
+		settings.commandify(true);
+		settings.inferQueues(true);
+		settings.put("COUNT_PORTS", false);
+		
+		
+		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor,settings);
 		c.compile();
     }
 

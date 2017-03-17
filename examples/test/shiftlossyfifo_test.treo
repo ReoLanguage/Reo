@@ -1,0 +1,5 @@
+import slides.shiftlossyfifo;
+
+shiftlossyfifo_test(a?,b!){
+	shiftlossyfifo(a,b)
+}

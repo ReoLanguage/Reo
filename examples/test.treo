@@ -1,6 +1,0 @@
-import reo.fifo1;
-
-test = (x?,z!) { comp(x,y) comp(y,z) }
-
-comp = (a?,c!) { fifo1(a,b) fifo1(b,c) }
-
