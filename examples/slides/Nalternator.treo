@@ -1,0 +1,21 @@
+
+import reo.syncdrain;
+import reo.sync;
+import reo.fifo1;
+
+Nalternator_test(p[1..3],x[1]){
+	Nalternator<3>(p[1..3],x[1])
+}
+
+Nalternator<N:int>(p[1..N]?,x[1]!){
+	{
+	 syncdrain(p[i-1],p[i]) 
+	 sync(p[i],x[i]) 
+	 fifo1(x[i],x[i-1])
+	|
+	 i:<2..N>
+	}
+
+	sync(p[1],x[1])
+
+}

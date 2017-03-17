@@ -1,7 +1,7 @@
-section reo.slides;
+section slides;
 
 import reo.fifo1;
-import reo.fifo1full;
+import reo.fifofull;
 import reo.sync;
 
 seqp(p[1..n]) {
@@ -9,12 +9,11 @@ seqp(p[1..n]) {
     fifo1(x[i], x[i+1])
     sync(x[i+1], p[i])
   | 
-    i : <1..n>, i != k 
+    i : <2..n>
   }
-  fifo1full<0>(x[k], x[k+1])
+  fifofull<0>(x[1], x[2])
+  sync(x[2],p[1])
   sync(x[n+1], x[1])
-|
-  k = 1
 }
 
 

@@ -5,8 +5,4 @@ import reo.sync;
 
 circ1(a?, b?, c?, d!) {
  regulatorwwr(a, x, d) sync(b, x) sync(c, x)
-//	sync(b,x)
-//	sync(c,x)
-//	syncdrain(m,x)
-//	sync(a,m)
 }

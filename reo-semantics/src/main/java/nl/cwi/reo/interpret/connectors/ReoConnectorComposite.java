@@ -90,7 +90,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 			Map<Port, Port> r = new HashMap<Port, Port>();
 			for (Map.Entry<Port, Port> link : C.getLinks().entrySet()) {
 				Port p = link.getValue();
-				r.put(p, p.isHidden() ? p.rename("#" + i++) : p);
+				r.put(p, p.isHidden() ? p.rename("_" + i++) : p);
 			}
 			comps.add(C.rename(r));
 		}

@@ -331,7 +331,7 @@ public abstract class TransitionFactory extends
 			for (TransitionSet s : getAgreeableTransitionsPerNeighbor()
 					.values())
 
-				if (s.count() != 1)
+				if (s.count() != 1)// && !(s.count()==0))
 					return false;
 
 			return true;

@@ -121,9 +121,9 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		}
 
 		if (counterI > counterO)
-			return new PRAutomaton("Replicator", null, P);
+			return new PRAutomaton("Node", null, P);
 
-		return new PRAutomaton("Merger", null, P);
+		return new PRAutomaton("Node", null, P);
 	}
 
 	/**

@@ -1,9 +1,0 @@
-section reo.slides;
-
-import reo.sync;
-
-import reo.slides.regulatorwwr;
-
-barrier2(a, b, c, d) {
-  regulatorwwr(a, m, c) sync(b,m) sync(m, d)
-}

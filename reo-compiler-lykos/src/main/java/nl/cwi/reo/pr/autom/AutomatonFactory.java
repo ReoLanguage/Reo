@@ -1110,9 +1110,10 @@ public abstract class AutomatonFactory extends
 
 		public boolean hasPredictableNeighbors() {
 			for (Transition tr : transitions)
-				if (!tr.hasPredictableNeighbors())
-					return false;
-
+				if (!tr.hasPredictableNeighbors()){
+					transitions.remove(tr);
+					return true;
+				}
 			return true;
 		}
 

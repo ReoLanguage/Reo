@@ -1,0 +1,7 @@
+section slides;
+
+import slides.seqc;
+
+seqc_test(a?,b?,c?){
+  seqc(a,b,c)  
+}

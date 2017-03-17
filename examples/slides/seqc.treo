@@ -1,8 +1,7 @@
-package reo.slides;
+section slides;
 
 import reo.syncdrain;
-
-import reo.slides.seqp;
+import slides.seqp;
 
 seqc(p[1..n]) {
   seqp(x[1..n]) 
