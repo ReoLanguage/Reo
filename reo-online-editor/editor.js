@@ -47,7 +47,8 @@
       stroke: '#000',
       hasBorders: false,
       hasControls: false,
-      class: 'node'
+      class: 'node',
+      component: main
     });
     
     // give the node an identifier and increment it for the next node
@@ -205,6 +206,26 @@
       node.set({'top': comp.top});
     node.setCoords();
   }
+  
+  function snapOutComponent(node,comp) {
+    var right = comp.left + comp.width;
+    var bottom = comp.top + comp.height;
+    var centerX = comp.left + (comp.width / 2);
+    var centerY = comp.top + (comp.height / 2);
+    if (node.left > comp.left && node.left < right) {
+      if (node.left < centerX)
+        node.left = comp.left;
+      else
+        node.left = right;
+    }
+    else if (node.top > comp.top && node.top < bottom) {
+      if (node.top < centerY)
+        node.top = comp.top;
+      else
+        node.top = bottom;
+    }
+    node.setCoords();
+  }
 
   canvas.on('object:moving', function(e) {
     var p = e.target;
@@ -314,11 +335,15 @@
         snapToComponent(p,p.component);
         console.log(p.id + " snaps to component " + p.component.id);
         for (i = 0; i < p.linesIn.length; i++) {
+          if (p.linesIn[i].circle1.component.size < p.component.size)
+            snapOutComponent(p.linesIn[i].circle1,p.linesIn[i].circle1.component);
           p.linesIn[i].circle1.component = p.component;
           snapToComponent(p.linesIn[i].circle1,p.component);
           updateLine(p.linesIn[i], 2);
         }
         for (i = 0; i < p.linesOut.length; i++) {
+          if (p.linesOut[i].circle2.component.size < p.component.size)
+            snapOutComponent(p.linesOut[i].circle2,p.linesOut[i].circle2.component);
           p.linesOut[i].circle2.component = p.component;
           snapToComponent(p.linesOut[i].circle2,p.component);
           updateLine(p.linesOut[i], 1);
