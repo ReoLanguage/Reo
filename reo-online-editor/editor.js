@@ -50,7 +50,6 @@
       radius: 12,
       fill: '#fff',
       stroke: '#000',
-      hasBorders: false,
       hasControls: false,
       class: 'node',
       component: main,
@@ -60,6 +59,37 @@
     // these are the channels that are connected to this node
     c.linesIn = [];
     c.linesOut = [];
+    
+    var label = new fabric.IText(c.id, {
+      left: left + 20,
+      top: top - 20,
+      fontSize: 20,
+      circle: c
+      //visible: false
+    });
+    
+    c.set({label:label});
+    canvas.add(label);
+  
+    label.on('mousedown', doubleClick(label, function (obj) {
+      label.enterEditing();
+      label.selectAll();
+    }));
+    
+    label.on('editing:exited', function(e) {
+      label.circle.set({id: label.text});
+      updateText();
+    });
+    
+    /*c.on('mouseover', function(e) {
+      c.label.set({visible:true});
+      canvas.renderAll();
+    });
+    
+    c.on('mouseout', function(e) {
+      c.label.set({visible:false});
+      canvas.renderAll();
+    });*/
 
     return c;
   } //makeCircle
@@ -177,14 +207,6 @@
     return ((angle * 180 / Math.PI) + 90) % 360;
   } //calcArrowAngle
   
-  function enumerate() {
-    document.getElementById('text').innerHTML = "";
-    canvas.forEachObject(function(obj) {
-      if (obj.class == 'node')
-        document.getElementById('text').innerHTML += obj.id + " ";
-    });
-  }
-  
   function updateText() {
     var s = '';
     // TODO: traverse id's
@@ -249,12 +271,10 @@
     origY = pointer.y;
     var p = canvas.getActiveObject();
     if (p) {
-      if (p.class == 'component') {
-        origLeft = p.left;
-        origTop = p.top;
-        labelOrigLeft = p.label.left;
-        labelOrigTop = p.label.top;
-      }
+      origLeft = p.left;
+      origTop = p.top;
+      labelOrigLeft = p.label.left;
+      labelOrigTop = p.label.top;
       return;
     }
     if (mode == 'sync') {
@@ -300,6 +320,9 @@
     if (p.class == 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
       p.setCoords();
+      p.label.set({left: labelOrigLeft + pointer.x - origX});
+      p.label.set({top: labelOrigTop + pointer.y - origY});
+      p.label.setCoords();
       canvas.forEachObject(function(obj) {
         if (obj !== p && obj.get('type') === "circle" && p.intersectsWithObject(obj)) {
           if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
@@ -337,7 +360,7 @@
                   p.linesOut[i].circle1 = obj;
                   obj.linesOut.push(p.linesOut[i]);
                 }
-                canvas.remove(p);
+                canvas.remove(p.label, p);
                 updateNode(obj);
                 obj.bringToFront();
                 canvas.renderAll();
@@ -413,8 +436,8 @@
       originX: 'left',
       originY: 'top',
       label: label,
-      hasBorders: false,
-      hasControls: false,
+      //hasBorders: false,
+      //hasControls: false,
       class: 'component',
       status: 'drawing',
       id: generateId()
