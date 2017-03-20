@@ -1,0 +1,30 @@
+package nl.cwi.reo.semantics.rulebasedautomata;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import nl.cwi.reo.interpret.ports.Port;
+
+public final class SyncConstraint {
+
+	private final Set<Port> included;
+
+	private final Set<Port> excluded;
+
+	public SyncConstraint(Set<Port> included, Set<Port> excluded) {
+		this.included = included;
+		this.excluded = excluded;
+	}
+
+	public Set<Port> getIncluded() {
+		return included;
+	}
+
+	public Set<Port> getExcluded() {
+		return excluded;
+	}
+
+	public boolean isSatisfyable() {
+		return !new HashSet<Port>(included).removeAll(excluded);
+	}
+}
