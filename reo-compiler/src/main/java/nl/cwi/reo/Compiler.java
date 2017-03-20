@@ -20,13 +20,11 @@ import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterCAM;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
-<<<<<<< HEAD
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
-=======
->>>>>>> c57f0ae3d7b41f9388eaee3ac7c08c903ecf5143
+
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.constraintautomata.ConstraintAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
@@ -246,7 +244,6 @@ public class Compiler {
 		  
     	GraphCompiler.visualize(program);
     	
-		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor);
 		c.compile();
     }
 
