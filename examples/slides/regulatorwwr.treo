@@ -1,8 +1,0 @@
-section slides;
-
-import reo.sync;
-import reo.syncdrain;
-
-regulatorwwr(a, b, c) {
-  sync(a, m) syncdrain(m, b) sync(m, c)
-}

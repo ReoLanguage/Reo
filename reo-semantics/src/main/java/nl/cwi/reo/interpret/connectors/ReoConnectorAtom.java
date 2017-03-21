@@ -198,4 +198,11 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 		return Arrays.asList(this);
 	}
 
+	@Override
+	public List<ReoConnector<T>> partition() {
+//		List<ReoConnector<T>> partition = new ArrayList<ReoConnector<T>>();
+//		partition.add(this);
+		return Arrays.asList(this);
+	}
+
 }

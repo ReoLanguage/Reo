@@ -1,0 +1,8 @@
+section slides.lossyfifo;
+
+import reo.lossy;
+import reo.fifo1;
+
+lossyfifo1(a,b){
+	lossy(a,m) fifo1(m,b)
+}

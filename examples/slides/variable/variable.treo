@@ -1,0 +1,10 @@
+section slides.variable;
+
+import reo.sync;
+import slides.shiftlossyfifo.shiftlossyfifo;
+
+variable(a, b) {
+  sync(a, x) sync(x, y) shiftlossyfifo(y, z) 
+  sync(z, b) sync(z, t)  shiftlossyfifo(t, y)
+  sync(x, t)
+}

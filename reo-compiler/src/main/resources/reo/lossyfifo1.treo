@@ -1,4 +1,4 @@
-package reo;
+section reo;
 
 import reo.fifo1;
 import reo.lossy;

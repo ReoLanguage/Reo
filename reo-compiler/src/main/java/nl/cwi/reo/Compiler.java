@@ -69,7 +69,7 @@ public class Compiler {
 	 * Partitioning
 	 */
 	@Parameter(names = {"-pt", "--partitioning"}, description = "partition regarding synchronous and asynchronous sections")
-	private boolean partitioning = true ;
+	private boolean partitioning = false ;
 	
 	
 	/**
@@ -219,11 +219,16 @@ public class Compiler {
 		
 		ReoProgram<PRAutomaton> program = interpreter.interpret(files.get(0));	
 		
+//		ReoTemplate template = JavaCompiler.compile(program, packagename, new PRAutomaton());
+		
+		
 		if (program == null) return;	
 		
 		if (verbose) {
 			System.out.println(program);
 			System.out.println(PRCompiler.toPR(program));
+	    	GraphCompiler.visualize(program);
+
 		}
 		/*
 		 * Compiler Settings
@@ -232,7 +237,7 @@ public class Compiler {
 		CompilerSettings settings = new CompilerSettings(files.get(0), Language.JAVA, false);
 		settings.ignoreInput(false);
 		settings.ignoreData(false);
-		settings.partition(partitioning);
+		settings.partition(!partitioning);
 		settings.subtractSyntactically(true);
 		settings.commandify(true);
 		settings.inferQueues(true);
@@ -242,7 +247,6 @@ public class Compiler {
 		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor,settings);
 
 		  
-    	GraphCompiler.visualize(program);
     	
 		c.compile();
     }

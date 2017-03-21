@@ -78,6 +78,15 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	public ReoConnector<T> integrate();
 
 	/**
+	 * Partition this connector into a list of ReoConnector with independent interfaces.
+	 *  
+	 * @return List of ReoConnector<T> where interfaces do not intersect.
+	 * 
+	 */
+	public List<ReoConnector<T>> partition();
+
+	
+	/**
 	 * Gets the interface of this connector.
 	 * 
 	 * @return set of ports in the interface of this connector

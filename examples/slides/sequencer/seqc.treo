@@ -1,0 +1,9 @@
+section slides.sequencer;
+
+import reo.syncdrain;
+import slides.sequencer.seqp;
+
+seqc(p[1..n]) {
+  seqp(x[1..n]) 
+  { syncdrain(x[i], p[i]) | i : <1..n> }
+}

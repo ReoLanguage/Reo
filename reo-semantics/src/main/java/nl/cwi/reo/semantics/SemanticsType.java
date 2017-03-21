@@ -6,6 +6,11 @@ package nl.cwi.reo.semantics;
 public enum SemanticsType {
 	
 	/**
+	 * Rule Base automata.
+	 */
+	RBA, 
+	
+	/**
 	 * Port automata.
 	 */
 	PA, 
