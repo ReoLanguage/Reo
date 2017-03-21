@@ -36,6 +36,11 @@ public enum SemanticsType {
 	PR,
 	
 	/**
+	 * Rule-based automata
+	 */
+	RbA,
+	
+	/**
 	 * Plain semantics.
 	 */
 	PLAIN;
@@ -51,6 +56,7 @@ public enum SemanticsType {
 		case CAM: return "cam";
 		case WA: return "wa";
 		case SA: return "sa";
+		case RbA: return "rba";
 		case PLAIN: return "plain";
 		default: throw new IllegalArgumentException();
 		}

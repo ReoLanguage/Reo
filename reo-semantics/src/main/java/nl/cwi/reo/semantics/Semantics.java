@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.Expression;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.ports.Port;
 
 /**
