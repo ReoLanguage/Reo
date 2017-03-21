@@ -64,7 +64,9 @@
       left: left + 20,
       top: top - 20,
       fontSize: 20,
-      circle: c
+      circle: c,
+      class: 'label',
+      hasControls: false
       //visible: false
     });
     
@@ -273,8 +275,14 @@
     if (p) {
       origLeft = p.left;
       origTop = p.top;
-      labelOrigLeft = p.label.left;
-      labelOrigTop = p.label.top;
+      if (p.class == 'label') {
+        labelOrigLeft = p.left;
+        labelOrigTop = p.top;      
+      }
+      else {
+        labelOrigLeft = p.label.left;
+        labelOrigTop = p.label.top;
+      }
       return;
     }
     if (mode == 'sync') {
@@ -420,7 +428,9 @@
     var label = new fabric.IText('name', {
       left: left + (width / 2),
       top: top - 15,
-      fontSize: 32
+      fontSize: 32,
+      class:'label',
+      hasControls: false
     });
   
     var rect = new fabric.Rect({
