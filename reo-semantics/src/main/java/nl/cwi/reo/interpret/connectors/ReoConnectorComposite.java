@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -16,6 +18,7 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -341,5 +344,29 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	@Override
 	public boolean isEmpty() {
 		return components.isEmpty();
+	}
+
+	@Override
+	public List<ReoConnector<T>> partition() {
+		List<ReoConnector<T>> partition = new ArrayList<ReoConnector<T>>();
+//		this.flatten();
+//		this.flatten().integrate();
+//		for(ReoConnector<T> connectors : this.getComponents()){
+//			
+//		}
+		
+		Queue<ReoConnector<T>> queueConnector = new LinkedList<ReoConnector<T>>(this.getComponents());
+		while(!queueConnector.isEmpty()){
+			ReoConnector<T> connector = queueConnector.poll();
+			if(connector instanceof ReoConnectorAtom<?>){
+				
+			}
+			else{
+				queueConnector.addAll(connector.getAtoms());
+			}
+		};
+			
+		
+		return null;
 	}
 }

@@ -1,0 +1,10 @@
+section slides.alternator;
+
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+alternator(a, b, c) {
+  syncdrain(a, b) sync(b, x) fifo1(x, c)
+  sync(a, c)
+}

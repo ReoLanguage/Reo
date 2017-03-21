@@ -1,0 +1,7 @@
+section slides.regulatorwrr;
+
+import reo.sync;
+
+regulatorwrr(a, b, c) {
+  sync(a, m) sync(m, b) sync(m, c)
+}

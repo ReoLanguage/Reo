@@ -1,0 +1,7 @@
+
+import reo.sync;
+import slides.regulatorwwr.regulatorwwr;
+
+barrier(a, b, c, d) {
+  regulatorwwr(a, m, c) sync(b,m) sync(m, d)
+}

@@ -1,9 +1,0 @@
-section reo.slides;
-
-red(a?) 
-{
-  #PR
-  identity(a;)
-  |
-  Java:"nl.cwi.pr.runtime.examples.thesis.basic.Workers.Producer"
-}
