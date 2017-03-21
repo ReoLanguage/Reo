@@ -38,4 +38,9 @@ public class Conjunction implements DataConstraint {
 		return assignment1;
 	}
 
+	@Override
+	public DataConstraint rename(Map<Port, Port> links) {
+		return new Conjunction(g1.rename(links), g2.rename(links));
+	}
+
 }

@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.rulebasedautomata;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
@@ -26,5 +27,9 @@ public final class SyncConstraint {
 
 	public boolean isSatisfyable() {
 		return !new HashSet<Port>(included).removeAll(excluded);
+	}
+	
+	public SyncConstraint rename (Map<Port, Port> links) {
+		return null;
 	}
 }

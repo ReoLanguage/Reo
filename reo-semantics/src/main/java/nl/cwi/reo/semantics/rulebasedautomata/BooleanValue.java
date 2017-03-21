@@ -27,4 +27,9 @@ public class BooleanValue implements DataConstraint {
 		return new HashMap<Port, DataTerm>();
 	}
 
+	@Override
+	public DataConstraint rename(Map<Port, Port> links) {
+		return this;
+	}
+
 }

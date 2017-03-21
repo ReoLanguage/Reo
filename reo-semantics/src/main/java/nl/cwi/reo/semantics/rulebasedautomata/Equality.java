@@ -42,4 +42,22 @@ public class Equality implements DataConstraint {
 		return null;
 	}
 
+	@Override
+	public DataConstraint rename(Map<Port, Port> links) {
+		DataTerm s1 = t1;
+		if (t1 instanceof PortVariable) {
+			Port b = links.get(((PortVariable) t1).getPort());
+			if (b != null)
+				s1 = new PortVariable(b);
+		}
+
+		DataTerm s2 = t2;
+		if (t1 instanceof PortVariable) {
+			Port b = links.get(((PortVariable) t2).getPort());
+			if (b != null)
+				s2 = new PortVariable(b);
+		}
+		return new Equality(s1, s2);
+	}
+
 }
