@@ -72,15 +72,9 @@
     
     c.set({label:label});
     canvas.add(label);
-  
-    label.on('mousedown', doubleClick(label, function (obj) {
-      label.enterEditing();
-      label.selectAll();
-    }));
     
     label.on('editing:exited', function(e) {
       label.circle.set({id: label.text});
-      updateText();
     });
     
     /*c.on('mouseover', function(e) {
@@ -219,13 +213,13 @@
       canvas.forEachObject(function(obj) {
         if (obj.class == 'node') {
           if (obj.left == main.left || obj.top == main.top || obj.left == main.left + main.width || obj.top == main.top + main.height) {
-            s1 += space1 + obj.id;
+            s1 += space1 + obj.label.text;
             space1 = ', '
             
           }
         }
         if (obj.class == 'channel')
-          s2 += space2 + 'sync(' + obj.circle1.id + ',' + obj.circle2.id + ')';
+          s2 += space2 + 'sync(' + obj.circle1.label.text + ',' + obj.circle2.label.text + ')';
           space2 = ' ';
       });
       
@@ -279,7 +273,11 @@
   
   canvas.on('object:removed', function(e) {
     updateText();
-  }); //object:added
+  }); //object:removed
+  
+  canvas.on('text:changed', function(e) {
+    updateText();
+  }); //text:editing:exited
   
   canvas.on('mouse:down', function(e) {
     isDown = true;
@@ -435,19 +433,6 @@
     }
   });
   
-  // Double-click event handler
-  var doubleClick = function (obj, handler) {
-    return function () {
-      if (obj.clicked) handler(obj);
-      else {
-        obj.clicked = true;
-        setTimeout(function () {
-          obj.clicked = false;
-        }, 500);
-      }
-    };
-  };
-  
   function drawComponent(x1,y1,x2,y2) {
     var width = (x2 - x1);
     var height = (y2 - y1);
@@ -482,11 +467,6 @@
       id: generateId()
     });
   
-    label.on('mousedown', doubleClick(label, function (obj) {
-      label.enterEditing();
-      label.selectAll();
-    }));
-  
     canvas.add(rect,label);
     rect.setCoords();
     canvas.renderAll();
@@ -496,6 +476,7 @@
   var main = drawComponent(50,50,750,550);
   main.set({id:'main',hasBorders:false,hasControls:false,selectable:false});
   main.label.set({'text': 'main'});
+  id = '0';
   document.getElementById("select").click();
   drawLine(100,100,200,100);
   drawLine(300,100,400,100);
