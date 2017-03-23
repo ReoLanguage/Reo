@@ -106,7 +106,8 @@
       hasControls: false,
       selectable: false,
       hoverCursor: 'default',
-      class: 'line'
+      class: 'channel',
+      channel: 'sync'
     });
     
     // ...an arrowhead...
@@ -123,7 +124,7 @@
       hoverCursor: 'default'
     });
     
-    // ...and two circles
+    // ...and two nodes
     var c1 = makeCircle(x1,y1);
     var c2 = makeCircle(x2,y2);
     
@@ -210,13 +211,27 @@
   } //calcArrowAngle
   
   function updateText() {
-    var s = '';
-    // TODO: traverse id's
-    canvas.forEachObject(function(obj) {
-      if (obj.type == "line")
-        s += 'sync(' + obj.circle1.id + ',' + obj.circle2.id + ') ';
-    });
-    document.getElementById('text').innerHTML = s;
+    if (main) {
+      var s1 = main.label.text + '(';
+      var s2 = '';
+      var space1 = space2 = '';
+      
+      canvas.forEachObject(function(obj) {
+        if (obj.class == 'node') {
+          if (obj.left == main.left || obj.top == main.top || obj.left == main.left + main.width || obj.top == main.top + main.height) {
+            s1 += space1 + obj.id;
+            space1 = ', '
+            
+          }
+        }
+        if (obj.class == 'channel')
+          s2 += space2 + 'sync(' + obj.circle1.id + ',' + obj.circle2.id + ')';
+          space2 = ' ';
+      });
+      
+      s1 = s1 + ') {\n  ' + s2 + '\n}';
+      document.getElementById('text').innerHTML = s1;
+    }
   }
   
   function snapToComponent(node,comp) {
@@ -248,7 +263,7 @@
       node.set({left: comp.left});
     if (connectednode.top > bottom) // bottom side
       node.set({top: bottom});
-    if (connectednode.top < comp.top)
+    if (connectednode.top < comp.top) // top side
       node.set({top: comp.top});
     node.setCoords();
   }
@@ -290,6 +305,8 @@
       snapToComponent(line.circle1,main);
       canvas.setActiveObject(line.circle2);
       updateLine(line,2);
+      labelOrigLeft = line.circle2.left + 20;
+      labelOrigTop = line.circle2.top - 20;      
     }
     if (mode == 'component') {
       var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
@@ -339,7 +356,7 @@
               p.setCoords();
             }
           }
-          if (obj.class === 'component') {
+          else if (obj.class === 'component') {
             if (Math.abs(p.left - obj.left) < 10)
               p.set({'left': obj.left});
             if (Math.abs(p.top - obj.top) < 10)
@@ -348,6 +365,7 @@
               p.set({'left': obj.left + obj.width});
             if (Math.abs(p.top - (obj.top + obj.height)) < 10)
               p.set({'top': obj.top + obj.height});
+            p.setCoords();
           }
         }
       });
@@ -408,7 +426,6 @@
           snapToComponent(p.linesOut[k].circle2,p.component);
           updateLine(p.linesOut[k], 1);
         }
-        canvas.deactivateAll();
         canvas.calcOffset();
       }
       if (p.class == 'component') {
