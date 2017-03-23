@@ -5,9 +5,9 @@ import nl.cwi.pr.runtime.api.OutputPort;
 
 public class Consumer {
 
-        public static void cons(InputPort port) {
-                for (int i = 0; i < 1000; i++) {
-                        System.out.println(port.getUninterruptibly());
+        public static void blue(InputPort port) {
+                for (int i = 0; i < 10; i++) {
+                        System.out.print(port.getUninterruptibly());
                 }
         }
 }

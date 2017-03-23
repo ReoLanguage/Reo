@@ -2,10 +2,10 @@ section slides.main;
 
 import slides.alternator.alternator;
 
-import slides.producer.red;
-import slides.producer.green;
-import slides.consumer.blue;
+import slides.main.red;
+import slides.main.green;
+import slides.main.blue;
 
 main1() {
-  green(a) red(b) blue(c) alternator(a, b, c)
+  red(a) green(b) blue(c) alternator(a, b, c)
 }

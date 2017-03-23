@@ -1,17 +1,17 @@
-// Does not compile .. 
+// Does not compile.
 
 section slides.main;
 
 import reo.sync;
 import slides.variable.variable;
 
-import slides.producer.red;
-import slides.producer.green;
-import slides.consumer.blue;
+import slides.main.red;
+import slides.main.green;
+import slides.main.blue;
 import slides.sequencer.seqc;
 
 main8() {
-  green(a) red(b) blue(c) connector8(a, b, c)
+  red(a) green(b) blue(c) connector8(a, b, c)
 }
 
 connector8(a, b, c) {
