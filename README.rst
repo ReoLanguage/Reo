@@ -33,15 +33,14 @@ Unix
 
 	java --version
 
-2. Download the `reo-1.0.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar>`_ via::
+2. Download `Reo.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/Reo.zip>`_ via::
 
-	cd /usr/local/lib
-	sudo wget https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar
+	sudo wget https://raw.githubusercontent.com/kasperdokter/Reo/master/Reo.zip
 
 3. Add Reo to the class path and create an alias for the compiler::
 
-	export CLASSPATH=".:/usr/local/lib/reo-1.0.jar:$CLASSPATH"
-	alias reo='java -jar /usr/local/lib/reo-1.0.jar'
+	export CLASSPATH=".:/path/to/archinve/reo-runtime-1.0.jar:$CLASSPATH"
+	alias reo='java -jar /path/to/archinve/reo-1.0.jar'
 
 You may want to add the export and alias commands to your startup script of your terminal (e.g., ``~/.bash_profile``).
 This way, you don't need to set the class path and the alias for every new terminal window.
@@ -55,15 +54,18 @@ Windows
 
 1. Install Java (version 1.6 or higher).
 
-2. Download the `reo-1.0.jar <https://raw.githubusercontent.com/kasperdokter/Reo/master/bin/reo-1.0.jar>`_. Save to your directory for 3rd party Java libraries, say ``C:\Javalib``.
+2. Download `Reo.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/Reo.zip>`_. Save to your directory for 3rd party Java libraries, say ``C:\Javalib``.
 
+3. Set the class path:
 
-3. Create short convenient commands for the Reo compiler, using doskey commands ``doskey reo=java -jar C:\Javalib\reo-1.0.jar $*`` or using batch files (in directory in system PATH)::
+	set CLASSPATH=".:/path/to/archinve/reo-runtime-1.0.jar:%CLASSPATH%"
+
+4. Create short convenient commands for the Reo compiler, using doskey commands ``doskey reo=java -jar C:\Javalib\reo-1.0.jar $*`` or using batch files (in directory in system PATH)::
 
 	//reo.bat
 	java -jar C:\Javalib\reo-1.0.jar %*	
 
-4. Test the installation by running::
+5. Test the installation by running::
 
 	reo
    
