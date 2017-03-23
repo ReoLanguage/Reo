@@ -332,10 +332,22 @@
       p.label.set({top: labelOrigTop + pointer.y - origY});
       p.label.setCoords();
       canvas.forEachObject(function(obj) {
-        if (obj !== p && obj.get('type') === "circle" && p.intersectsWithObject(obj)) {
-          if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-            p.set({'left': obj.getLeft(), 'top': obj.getTop()});
-            p.setCoords();
+        if (obj !== p && p.intersectsWithObject(obj)) {
+          if (obj.class === 'node') {
+            if (Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+              p.set({'left': obj.left, 'top': obj.top});
+              p.setCoords();
+            }
+          }
+          if (obj.class === 'component') {
+            if (Math.abs(p.left - obj.left) < 10)
+              p.set({'left': obj.left});
+            if (Math.abs(p.top - obj.top) < 10)
+              p.set({'top': obj.top});
+            if (Math.abs(p.left - (obj.left + obj.width)) < 10)
+              p.set({'left': obj.left + obj.width});
+            if (Math.abs(p.top - (obj.top + obj.height)) < 10)
+              p.set({'top': obj.top + obj.height});
           }
         }
       });
