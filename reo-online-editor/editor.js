@@ -64,17 +64,17 @@
       left: left + 20,
       top: top - 20,
       fontSize: 20,
-      circle: c,
+      object: c,
       class: 'label',
       hasControls: false
       //visible: false
     });
     
-    c.set({label:label});
+    c.set({'label': label, labeloffsetX: label.left - c.left, labeloffsetY: label.top - c.top});
     canvas.add(label);
     
     label.on('editing:exited', function(e) {
-      label.circle.set({id: label.text});
+      label.object.set({id: label.text});
     });
     
     /*c.on('mouseover', function(e) {
@@ -231,15 +231,24 @@
   function snapToComponent(node,comp) {
     var right = comp.left + comp.width;
     var bottom = comp.top + comp.height;
-    if (node.left > right) // right side
+    if (node.left > right) { // right side
       node.set({'left': right});
-    if (node.left < comp.left) // left side
+      node.label.set({'left': right + node.labelOffsetX});
+    }
+    if (node.left < comp.left) { // left side
       node.set({'left': comp.left});
-    if (node.top > bottom) // bottom side
+      node.label.set({'left': comp.left + node.labelOffsetX});
+    }
+    if (node.top > bottom) { // bottom side
       node.set({'top': bottom});
-    if (node.top < comp.top) // top side
+      node.label.set({'top': bottom + node.labelOffsetY});
+    }
+    if (node.top < comp.top) { // top side
       node.set({'top': comp.top});
+      node.label.set({'top': comp.top + node.labelOffsetY});
+    }
     node.setCoords();
+    node.label.setCoords();
     for (i = 0; i < node.linesIn.length; i++) {
       updateLine(node.linesIn[i], 2);
     }
@@ -343,9 +352,6 @@
     if (p.class == 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
       p.setCoords();
-      p.label.set({left: labelOrigLeft + pointer.x - origX});
-      p.label.set({top: labelOrigTop + pointer.y - origY});
-      p.label.setCoords();
       canvas.forEachObject(function(obj) {
         if (obj !== p && p.intersectsWithObject(obj)) {
           if (obj.class === 'node') {
@@ -371,6 +377,9 @@
         updateLine(p.linesIn[i], 2);
       for (i = 0; i < p.linesOut.length; i++)
         updateLine(p.linesOut[i], 1);
+      p.label.set({left: labelOrigLeft + pointer.x - origX});
+      p.label.set({top: labelOrigTop + pointer.y - origY});
+      p.label.setCoords();
     }
     canvas.renderAll();
   }); //mouse:move
@@ -381,7 +390,9 @@
     if (p) {
       if (p.class == 'node') {
         p.setCoords();
-        p.set({component:main});
+        p.label.setCoords();
+        p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
+        p.set({'component': main});
         canvas.forEachObject(function(obj) {
           if (!obj || obj.get('id') == p.get('id') || (obj.get('class') !== 'node' && obj.get('class') !== 'component'))
             return;
