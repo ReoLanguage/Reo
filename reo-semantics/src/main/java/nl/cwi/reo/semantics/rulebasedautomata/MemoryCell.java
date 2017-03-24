@@ -8,12 +8,19 @@ public class MemoryCell implements DataTerm {
 	
 	private final int k;
 	
-	public MemoryCell(int k) {
+	private final boolean prime;
+	
+	public MemoryCell(int k, boolean prime) {
 		this.k = k;
+		this.prime = prime;
 	}
 
 	public String getName() {
 		return "q" + k;
+	}
+	
+	public boolean hasPrime() {
+		return prime;
 	}
 
 	@Override
