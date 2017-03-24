@@ -5,10 +5,10 @@ import java.util.List;
 import nl.cwi.reo.interpret.listeners.ListenerRBA;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
-
+import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
 import nl.cwi.reo.util.Monitor;
 
-public class InterpreterRBA extends Interpreter<PRAutomaton> {
+public class InterpreterRBA extends Interpreter<RuleBasedAutomaton> {
 	
 	/**
 	 * Constructs a Reo interpreter for Port Automaton semantics.

@@ -101,6 +101,7 @@ import nl.cwi.reo.interpret.ReoParser.Term_componentdefnContext;
 import nl.cwi.reo.interpret.ReoParser.Term_decimalContext;
 import nl.cwi.reo.interpret.ReoParser.Term_exponentContext;
 import nl.cwi.reo.interpret.ReoParser.Term_instanceContext;
+import nl.cwi.reo.interpret.ReoParser.Term_listContext;
 import nl.cwi.reo.interpret.ReoParser.Term_naturalContext;
 import nl.cwi.reo.interpret.ReoParser.Term_operationContext;
 import nl.cwi.reo.interpret.ReoParser.Term_rangeContext;
@@ -646,6 +647,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
+	public void exitTerm_list(Term_listContext ctx) {
+		terms.put(ctx, new ListExpression(termsList.get(ctx.list())));
+	}
+
+
+
+	@Override
 	public void exitTerm_instance(Term_instanceContext ctx) {
 		terms.put(ctx, new InstanceTermExpression<T>(instances.get(ctx.instance())));
 	}
@@ -711,5 +719,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (TermContext expr_ctx : ctx.term())
 			list.add(terms.get(expr_ctx));
 		termsList.put(ctx, list);
+//		terms.put(ctx, new ListExpression(list));
 	}
 }
