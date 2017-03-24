@@ -1,7 +1,7 @@
 (function() {
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
-  var active, isDown, origX, origY, origLeft, origTop, labelOrigLeft, labelOrigTop;
+  var active, isDown, origX, origY, origLeft, origTop;
   var mode = 'select';
   var id = '0';
   
@@ -70,7 +70,7 @@
       //visible: false
     });
     
-    c.set({'label': label, labeloffsetX: label.left - c.left, labeloffsetY: label.top - c.top});
+    c.set({'label': label, 'labelOffsetX': 20, 'labelOffsetY': -20});
     canvas.add(label);
     
     label.on('editing:exited', function(e) {
@@ -231,23 +231,16 @@
   function snapToComponent(node,comp) {
     var right = comp.left + comp.width;
     var bottom = comp.top + comp.height;
-    if (node.left > right) { // right side
+    if (node.left > right) // right side
       node.set({'left': right});
-      node.label.set({'left': right + node.labelOffsetX});
-    }
-    if (node.left < comp.left) { // left side
+    if (node.left < comp.left) // left side
       node.set({'left': comp.left});
-      node.label.set({'left': comp.left + node.labelOffsetX});
-    }
-    if (node.top > bottom) { // bottom side
+    if (node.top > bottom) // bottom side
       node.set({'top': bottom});
-      node.label.set({'top': bottom + node.labelOffsetY});
-    }
-    if (node.top < comp.top) { // top side
+    if (node.top < comp.top) // top side
       node.set({'top': comp.top});
-      node.label.set({'top': comp.top + node.labelOffsetY});
-    }
     node.setCoords();
+    node.label.set({'left': node.left + node.labelOffsetX, 'top': node.top + node.labelOffsetY});
     node.label.setCoords();
     for (i = 0; i < node.linesIn.length; i++) {
       updateLine(node.linesIn[i], 2);
@@ -269,6 +262,8 @@
     if (connectednode.top < comp.top) // top side
       node.set({top: comp.top});
     node.setCoords();
+    node.label.set({'left': node.left + node.labelOffsetX, 'top': node.top + node.labelOffsetY});
+    node.label.setCoords();
   }
 
   canvas.on('object:moving', function(e) {
@@ -297,23 +292,13 @@
     if (p) {
       origLeft = p.left;
       origTop = p.top;
-      if (p.class == 'label') {
-        labelOrigLeft = p.left;
-        labelOrigTop = p.top;      
-      }
-      else {
-        labelOrigLeft = p.label.left;
-        labelOrigTop = p.label.top;
-      }
       return;
     }
     if (mode == 'sync') {
       var line = drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
       snapToComponent(line.circle1,main);
       canvas.setActiveObject(line.circle2);
-      updateLine(line,2);
-      labelOrigLeft = line.circle2.left + 20;
-      labelOrigTop = line.circle2.top - 20;      
+      updateLine(line,2);      
     }
     if (mode == 'component') {
       var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
@@ -344,8 +329,8 @@
         p.set({left: origLeft + pointer.x - origX});
         p.set({top: origTop + pointer.y - origY});
         p.setCoords();
-        p.label.set({left: labelOrigLeft + pointer.x - origX});
-        p.label.set({top: labelOrigTop + pointer.y - origY});
+        p.label.set({left: p.left + p.labelOffsetX});
+        p.label.set({top: p.top + p.labelOffsetY});
         p.label.setCoords();
       }
     }
@@ -377,8 +362,8 @@
         updateLine(p.linesIn[i], 2);
       for (i = 0; i < p.linesOut.length; i++)
         updateLine(p.linesOut[i], 1);
-      p.label.set({left: labelOrigLeft + pointer.x - origX});
-      p.label.set({top: labelOrigTop + pointer.y - origY});
+      p.label.set({left: p.left + p.labelOffsetX});
+      p.label.set({top: p.top + p.labelOffsetY});
       p.label.setCoords();
     }
     canvas.renderAll();
@@ -388,8 +373,8 @@
     isDown = false;
     var p = canvas.getActiveObject();
     if (p) {
+      p.setCoords();
       if (p.class == 'node') {
-        p.setCoords();
         p.label.setCoords();
         p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
         p.set({'component': main});
@@ -438,8 +423,12 @@
         canvas.calcOffset();
       }
       if (p.class == 'component') {
+        p.label.setCoords();
         canvas.sendToBack(p);
-        p.set({status: 'design'});    
+        p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});    
+      }
+      if (p.class == 'label') {
+        p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});    
       }
     }
   });
@@ -449,14 +438,6 @@
     var height = (y2 - y1);
     var left = x1;
     var top = y1;
-  
-    var label = new fabric.IText('name', {
-      left: left + (width / 2),
-      top: top - 15,
-      fontSize: 32,
-      class:'label',
-      hasControls: false
-    });
   
     var rect = new fabric.Rect({
       left: left,
@@ -470,22 +451,32 @@
       hoverCursor: 'default',
       originX: 'left',
       originY: 'top',
-      label: label,
       //hasBorders: false,
       //hasControls: false,
       class: 'component',
       status: 'drawing',
       id: generateId()
     });
+    
+    var label = new fabric.IText('name', {
+      left: left + (width / 2),
+      top: top - 15,
+      fontSize: 32,
+      class: 'label',
+      object: rect,
+      hasControls: false
+    });
+    
+    rect.set({'label': label, 'labelOffsetX': left + (width / 2), 'labelOffsetY': -15});
   
-    canvas.add(rect,label);
     rect.setCoords();
+    canvas.add(rect,label);
     canvas.renderAll();
     return rect;
   }
   
   var main = drawComponent(50,50,750,550);
-  main.set({id:'main',hasBorders:false,hasControls:false,selectable:false});
+  main.set({id: 'main', hasBorders: false, hasControls: false, selectable: false});
   main.label.set({'text': 'main'});
   id = '0';
   document.getElementById("select").click();
