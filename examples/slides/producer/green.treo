@@ -1,9 +1,0 @@
-section slides.producer;
-
-green(a!) 
-{
-  #PR
- identity(;a)
- |
- Java:"workers.Producer.prod"
-}

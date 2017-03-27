@@ -2,13 +2,13 @@ section reo.slides;
 
 import reo.sync;
 
-import slides.producer.red;
-import slides.producer.green;
-import slides.consumer.blue;
+import slides.main.red;
+import slides.main.green;
+import slides.main.blue;
 import slides.sequencer.seqc;
 
 main10() {
-  green(a[1]) /*...*/ red(a[n]) blue(b) 
+  red(a[1]) /*...*/ green(a[n]) blue(b) 
   connector10<n>(a[1..n], b)
 |
   n = 2
@@ -16,8 +16,10 @@ main10() {
 
 connector10<n:int>(a[1..n], b) {
   seqc(x[1..n]) 
-  sync(a[i], x[i]) sync(x[i], m)
   sync(m, b)
+{
+  sync(a[i], x[i]) sync(x[i], m)
 |
   i : <1..n>
+}
 }

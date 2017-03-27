@@ -7,14 +7,14 @@ import slides.variable.variable;
 import slides.lossyfifo.lossyfifo1;
 import slides.shiftlossyfifo.shiftlossyfifo;
 
-import slides.producer.red;
-import slides.consumer.blue;
+import slides.main.red;
+import slides.main.blue;
 import slides.sequencer.seqc;
 
 main11() 
 {
-  { producer(a[i]) | i : <1..n> }
-  consumer(b) 
+  { red(a[i]) | i : <1..n> }
+  blue(b) 
   connector11<ileg, sync>(a[1..n], b)
 |
   ileg[1..n] = <sync, lossy, fifo1, variable, shiftlossyfifo, lossyfifo1>

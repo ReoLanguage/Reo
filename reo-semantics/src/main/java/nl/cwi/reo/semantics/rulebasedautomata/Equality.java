@@ -19,9 +19,9 @@ public class Equality implements DataConstraint {
 
 	@Override
 	public DataConstraint getGuard() {
-		if (t1 instanceof PortVariable && t2 instanceof PortVariable) {
-			if (((PortVariable) t1).getPort().getType() != PortType.OUT)
-				if (((PortVariable) t2).getPort().getType() != PortType.OUT)
+		if (t1 instanceof Node && t2 instanceof Node) {
+			if (((Node) t1).getPort().getType() != PortType.OUT)
+				if (((Node) t2).getPort().getType() != PortType.OUT)
 					return this;
 		}
 		return new BooleanValue(true);
@@ -30,12 +30,12 @@ public class Equality implements DataConstraint {
 	@Override
 	public Map<Port, DataTerm> getAssignment() {
 		Map<Port, DataTerm> map = new HashMap<Port, DataTerm>();
-		if (t1 instanceof PortVariable && !t2.hadOutputs()) {
-			Port p = ((PortVariable) t1).getPort();
+		if (t1 instanceof Node && !t2.hadOutputs()) {
+			Port p = ((Node) t1).getPort();
 			if (p.getType() != PortType.OUT)
 				map.put(p, t2);
-		} else if (t2 instanceof PortVariable && !t1.hadOutputs()) {
-			Port p = ((PortVariable) t2).getPort();
+		} else if (t2 instanceof Node && !t1.hadOutputs()) {
+			Port p = ((Node) t2).getPort();
 			if (p.getType() != PortType.OUT)
 				map.put(p, t1);
 		}
@@ -45,17 +45,17 @@ public class Equality implements DataConstraint {
 	@Override
 	public DataConstraint rename(Map<Port, Port> links) {
 		DataTerm s1 = t1;
-		if (t1 instanceof PortVariable) {
-			Port b = links.get(((PortVariable) t1).getPort());
+		if (t1 instanceof Node) {
+			Port b = links.get(((Node) t1).getPort());
 			if (b != null)
-				s1 = new PortVariable(b);
+				s1 = new Node(b);
 		}
 
 		DataTerm s2 = t2;
-		if (t1 instanceof PortVariable) {
-			Port b = links.get(((PortVariable) t2).getPort());
+		if (t1 instanceof Node) {
+			Port b = links.get(((Node) t2).getPort());
 			if (b != null)
-				s2 = new PortVariable(b);
+				s2 = new Node(b);
 		}
 		return new Equality(s1, s2);
 	}

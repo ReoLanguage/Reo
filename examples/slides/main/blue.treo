@@ -1,0 +1,9 @@
+section slides.main;
+
+blue(a?) 
+{
+  #PR
+  identity(a;)
+|
+  Java:"workers.Consumer.blue"
+}

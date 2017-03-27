@@ -48,12 +48,6 @@ public class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 		this.initial = initial;
 		if (rules == null)
 			throw new NullPointerException("Undefined set of rules.");
-		for (TransitionRule r : rules) {
-			if (r == null)
-				throw new NullPointerException("Undefined rule.");
-			if (r.getDimension() != initial.length)
-				throw new IllegalArgumentException("Rule " + r + " must be " + initial.length + " dimensional.");
-		}
 		this.rules = rules;
 	}
 
@@ -97,9 +91,6 @@ public class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 
 		Set<TransitionRule> rules = new HashSet<TransitionRule>();
 
-		Constant[] q0 = new Constant[0];
-		DataTerm[] q1 = new DataTerm[0];
-
 		for (Port p : inps) {
 			Set<Port> included = new HashSet<Port>();
 			Set<Port> excluded = new HashSet<Port>();
@@ -113,12 +104,12 @@ public class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 			}
 			for (Port x : outs) {
 				included.add(x);
-				g = new Conjunction(g, new Equality(new PortVariable(p), new PortVariable(x)));
+				g = new Conjunction(g, new Equality(new Node(p), new Node(x)));
 			}
 
 			SyncConstraint N = new SyncConstraint(included, excluded);
 
-			rules.add(new TransitionRule(q0, q1, N, g));
+			rules.add(new TransitionRule(N, g));
 		}
 
 		return new RuleBasedAutomaton(ports, rules, new Object[0]);

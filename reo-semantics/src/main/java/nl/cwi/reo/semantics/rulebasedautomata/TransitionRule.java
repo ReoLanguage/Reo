@@ -1,21 +1,12 @@
 package nl.cwi.reo.semantics.rulebasedautomata;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.ports.Port;
 
 public class TransitionRule {
-
-	/**
-	 * Source state: q[k] = null means that this transition is independent of
-	 * q[k].
-	 */
-	private final Constant[] q0;
-
-	/**
-	 * Target state.
-	 */
-	private final DataTerm[] q1;
 
 	/**
 	 * Synchronization constraint.
@@ -30,50 +21,33 @@ public class TransitionRule {
 	/**
 	 * Constructs a new transition rule.
 	 * 
-	 * @param q0
-	 *            source state
-	 * @param q1
-	 *            target state
 	 * @param N
 	 *            synchronization constraint
 	 * @param g
 	 *            data constraint
 	 */
-	public TransitionRule(Constant[] q0, DataTerm[] q1, SyncConstraint N, DataConstraint g) {
-		if (q0.length != q1.length)
-			throw new IllegalArgumentException();
-		this.q0 = q0;
-		this.q1 = q1;
+	public TransitionRule(SyncConstraint N, DataConstraint g) {
 		this.N = N;
 		this.g = g;
 	}
 
-	public int getDimension() {
-		return q0.length;
-	}
-
-	public Object[] getSource() {
-		return q0;
-	}
-
-	public DataTerm[] getTarget() {
-		return q1;
-	}
-
-	public SyncConstraint getSyncConstraint() {
+	public SyncConstraint getN() {
 		return N;
 	}
 
-	public DataConstraint getDataConstraint() {
+	public DataConstraint getG() {
 		return g;
 	}
 
 	public TransitionRule rename(Map<Port, Port> links) {
+		return new TransitionRule(N.rename(links), g.rename(links));
+	}
 
-		DataTerm[] q1 = new DataTerm[this.q1.length];
-		for (int k = 0; k < this.q1.length; k++)
-			q1[k] = this.q1[k].rename(links);
+	public TransitionRule compose(List<TransitionRule> components) {
+		return null;
+	}
 
-		return new TransitionRule(q0, q1, N.rename(links), g.rename(links));
+	public TransitionRule restrict(Collection<? extends Port> intface) {
+		return null;	
 	}
 }

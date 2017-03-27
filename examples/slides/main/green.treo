@@ -1,0 +1,9 @@
+section slides.main;
+
+green(a!) 
+{
+  #PR
+ identity(;a)
+|
+ Java:"workers.Producer.green"
+}
