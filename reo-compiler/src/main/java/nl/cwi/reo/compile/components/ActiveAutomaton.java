@@ -20,18 +20,18 @@ public final class ActiveAutomaton implements Definition {
 
 	private final List<Port> ports;
 
-	public final Map<Integer, Set<Transition>> out;
+	public final Map<Integer, Set<TransitionRule>> out;
 
 	private final Integer initial;
 
-	public ActiveAutomaton(String name, List<Port> ports, Map<Integer, Set<Transition>> out, int initial) {
+	public ActiveAutomaton(String name, List<Port> ports, Map<Integer, Set<TransitionRule>> out, int initial) {
 		this.name = name;
 		this.ports = ports;
 		this.out = out;
 		this.initial = initial;
 	}
 
-	public Map<Integer, Set<Transition>> getTransitions() {
+	public Map<Integer, Set<TransitionRule>> getTransitions() {
 		return out;
 	}
 
