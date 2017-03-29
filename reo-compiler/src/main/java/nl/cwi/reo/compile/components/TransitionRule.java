@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.symbolicautomata.Term;
+import nl.cwi.reo.semantics.symbolicautomata.Variable;
 
 public final class TransitionRule {
 
@@ -16,7 +18,7 @@ public final class TransitionRule {
 	/**
 	 * Update (assigns value to memory cells and output ports)
 	 */
-	private final Map<String, String> a;
+	private final Map<Port, Term> a;
 
 	/**
 	 * Constructs a new transition.
@@ -30,7 +32,7 @@ public final class TransitionRule {
 	 * @param a
 	 *            transition label
 	 */
-	public TransitionRule(Set<Port> N, Map<String, String> a) {
+	public TransitionRule(Set<Port> N, Map<Port, Term> a) {
 		if (N == null)
 			throw new IllegalArgumentException("No synchronization constraint specified.");
 		if (a == null)
@@ -53,7 +55,7 @@ public final class TransitionRule {
 	 * 
 	 * @return job constraint
 	 */
-	public Map<String, String> getAction() {		
+	public Map<Port, Term> getAction() {		
 		return this.a;
 	}
 }

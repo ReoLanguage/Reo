@@ -51,8 +51,14 @@ public class Existential implements Formula {
 	}
 
 	@Override
-	public Formula DNF() {
+	public Disjunction DNF() {
 		// first get all quantifiers in f to the front and then apply DNF
+		return null;
+	}
+
+	@Override
+	public Formula propNegation(boolean isNegative) {
+		
 		return null;
 	}
 

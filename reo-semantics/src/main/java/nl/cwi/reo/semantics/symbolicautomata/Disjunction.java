@@ -61,7 +61,8 @@ public class Disjunction implements Formula {
 	public Set<Port> getInterface() {
 		Set<Port> P = new HashSet<Port>();
 		for (Formula f : g)
-			P.addAll(f.getInterface());
+			if(f instanceof Disjunction || f instanceof Conjunction)
+				P.addAll(f.getInterface());
 		return P;
 	}
 
@@ -69,11 +70,36 @@ public class Disjunction implements Formula {
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
 		return this;
 	}
+	
+	public String toString(){
+		String s = "[" + g.get(0).toString() +"]";
+		for(int i=1;i<g.size(); i++){
+			s = s + "OR" + "[" + g.get(i).toString() + "]";
+		}
+		return s;
+	}
 
+	public List<Formula> getFormula(){
+		return g;
+	}
+	
 	@Override
-	public Formula DNF() {
+	public Disjunction DNF() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Formula propNegation(boolean isNegative) {
+		List<Formula> h = new ArrayList<Formula>();
+		for (Formula f : g)
+			h.add(f.propNegation(isNegative));
+		if(isNegative){
+			return new Conjunction(h);
+		}
+		else{
+			return new Disjunction(h);			
+		}
 	}
 
 }

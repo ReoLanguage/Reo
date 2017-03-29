@@ -26,7 +26,7 @@ public class SymbolicAutomaton implements Semantics<SymbolicAutomaton> {
 	public @Nullable SymbolicAutomaton evaluate(Scope s, Monitor m) {
 		// TODO In the future, we need to use this function for formulas that
 		// contain parameters, such as a function F on terms.
-		return null;
+		return this;
 	}
 
 	@Override
@@ -108,6 +108,10 @@ public class SymbolicAutomaton implements Semantics<SymbolicAutomaton> {
 		for (SymbolicAutomaton A : components)
 			list.add(A.f);
 		return new SymbolicAutomaton(new Conjunction(list));
+	}
+	
+	public Formula getFormula(){
+		return f;
 	}
 
 	@Override
