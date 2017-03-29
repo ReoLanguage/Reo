@@ -6,9 +6,9 @@ package nl.cwi.reo.semantics;
 public enum SemanticsType {
 	
 	/**
-	 * Rule Base automata.
+	 * Symbolic Automata.
 	 */
-	RBA, 
+	SBA, 
 	
 	/**
 	 * Port automata.
@@ -36,11 +36,6 @@ public enum SemanticsType {
 	PR,
 	
 	/**
-	 * Rule-based automata
-	 */
-	RbA,
-	
-	/**
 	 * Plain semantics.
 	 */
 	PLAIN;
@@ -56,7 +51,7 @@ public enum SemanticsType {
 		case CAM: return "cam";
 		case WA: return "wa";
 		case SA: return "sa";
-		case RbA: return "rba";
+		case SBA: return "sba";
 		case PLAIN: return "plain";
 		default: throw new IllegalArgumentException();
 		}
