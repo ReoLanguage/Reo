@@ -21,6 +21,12 @@ public class Constant implements Term {
 		return false;
 	}
 
+	public String toString(){
+		if(c!=null)
+			return c.toString();
+		return "null";
+	}
+	
 	@Override
 	public Term rename(Map<Port, Port> links) {
 		return this;

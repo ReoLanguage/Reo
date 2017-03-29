@@ -33,6 +33,11 @@ public interface Formula {
 	public Set<Port> getInterface();
 	
 	public Formula rename(Map<Port, Port> links);
+
+	/**
+	 * Get negation at the leaf.
+	 */
+	public Formula propNegation(boolean isNegative);
 	
 	public Formula DNF();
 

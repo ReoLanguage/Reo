@@ -15,11 +15,14 @@ import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.compile.PRCompiler;
 import nl.cwi.reo.compile.components.ReoTemplate;
+import nl.cwi.reo.compile.components.TransitionRule;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
+import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterCAM;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
+import nl.cwi.reo.interpret.interpreters.InterpreterSBA;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
@@ -28,6 +31,10 @@ import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.constraintautomata.ConstraintAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
+import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
+import nl.cwi.reo.semantics.symbolicautomata.Formula;
+import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
+import nl.cwi.reo.semantics.symbolicautomata.SymbolicAutomaton;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -131,6 +138,9 @@ public class Compiler {
 		case WA:
 			compileWA();
 			break;
+		case SBA:
+			compileSBA();
+			break;
 		case PLAIN:
 			compilePLAIN();
 			break;
@@ -212,6 +222,25 @@ public class Compiler {
 		// outputClass(name, st.render());
     }
     
+    private void compileSBA() {    	
+    	
+    	Interpreter<SymbolicAutomaton> interpreterRba = new InterpreterSBA(directories, params, monitor);
+		
+		ReoProgram<SymbolicAutomaton> programRba = interpreterRba.interpret(files.get(0));	
+		
+		List<Formula> components = new ArrayList<Formula>();
+		
+		for(ReoConnectorAtom<SymbolicAutomaton> sba : programRba.getConnector().getAtoms()){
+			components.add(sba.getSemantics().getFormula().rename(sba.getLinks()).propNegation(false));
+			
+			System.out.println(sba.getSemantics().getFormula());
+			System.out.println(sba.getSemantics().getInterface());
+		};
+		Formula automaton;
+		automaton = JavaCompiler.compose(components);
+		JavaCompiler.generateCode(automaton);
+
+    }
 
     private void compilePR() {    	
     	
@@ -225,9 +254,10 @@ public class Compiler {
 		if (program == null) return;	
 		
 		if (verbose) {
-			System.out.println(program);
+			System.out.println(program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate());
 			System.out.println(PRCompiler.toPR(program));
-	    	GraphCompiler.visualize(program);
+			monitor.print();
+//	    	GraphCompiler.visualize(program);
 
 		}
 		/*

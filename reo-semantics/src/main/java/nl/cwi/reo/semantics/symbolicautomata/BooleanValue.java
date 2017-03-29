@@ -53,4 +53,10 @@ public class BooleanValue implements Formula {
 		return this;
 	}
 
+	@Override
+	public Formula propNegation(boolean isNegative) {
+		
+		return new BooleanValue(!isNegative);
+	}
+
 }

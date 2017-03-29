@@ -34,17 +34,97 @@ public class Equality implements Formula {
 
 	@Override
 	public Map<Port, Term> getAssignment() {
+		/*
+		 * MemoryCell 
+		 */
 		Map<Port, Term> map = new HashMap<Port, Term>();
-		if (t1 instanceof Node && !t2.hadOutputs()) {
+//		Port p=(t1 instanceof Node && !t2.hadOutputs())?((Node) t1).getPort():(((t2 instanceof Node && !t1.hadOutputs()))?null:((Node) t2).getPort());
+		Term t = null;
+		if(t1 instanceof Node){
 			Port p = ((Node) t1).getPort();
-			if (p.getType() != PortType.OUT)
-				map.put(p, t2);
-		} else if (t2 instanceof Node && !t1.hadOutputs()) {
-			Port p = ((Node) t2).getPort();
-			if (p.getType() != PortType.OUT)
-				map.put(p, t1);
+			if(p.getType() == PortType.OUT){
+				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime()){
+					//Look into a value that satisfy the formula
+				}
+				if(t2 instanceof MemoryCell && !((MemoryCell) t2).hasPrime()){
+					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
+				}
+				if(t2 instanceof Constant){
+					map.put(p, t2);
+				}
+				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.IN){
+					map.put(p, t2);
+				}
+				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.OUT){
+					//Look into a value that satisfy the formula
+				}
+				return map;
+			}
+			if(p.getType() == PortType.IN){
+				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime()){
+					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
+				}
+				if(t2 instanceof MemoryCell && !((MemoryCell) t2).hasPrime()){	
+					//Look into a value that satisfy the formula
+				}
+				if(t2 instanceof Constant){
+					map.put(p, t2);
+				}
+				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.IN){
+					//Look into a value that satisfy the formula
+				}
+				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.OUT){
+					map.put(p, t2);
+				}
+				return map;
+			}
+			if(p.getType() == PortType.NONE){
+				throw new UnsupportedOperationException();
+			}
+			return map;
 		}
-		return null;
+		else if(t1 instanceof MemoryCell){
+			if(t2 instanceof Node){
+				return (new Equality(t2,t1)).getAssignment();
+			}
+			if(t2 instanceof Constant){
+//				map.put(t1, t2);
+			}
+			return map;
+		}
+		else if(t1 instanceof Constant){
+			if(t2 instanceof Node){
+				return (new Equality(t2,t1)).getAssignment();
+			}
+			return map;
+		}
+		return map;
+		
+//		return new Equality(t2,t1).getAssignment();
+//		if (t1 instanceof Node && !t2.hadOutputs()) {
+//			p = ((Node) t1).getPort();
+//			t = t2;
+//		}
+//		if(t2 instanceof Node && !t1.hadOutputs()) {
+//			p = ((Node) t2).getPort();
+//			t = t1;
+//		}
+//		
+//		if(p!=null && t!=null){
+//			if (p.getType() != PortType.OUT)
+//				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime())
+//					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
+//			else{
+//				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime())
+//					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));	
+//			}
+//		}
+//			if (p.getType() != PortType.OUT)
+//				if(t1 instanceof MemoryCell)
+//					map.put(p, ((MemoryCell) t1).setType(p.getTypeTag().toString()));
+//			if (p.getType() == PortType.OUT)
+//				if(t1 instanceof MemoryCell && ((MemoryCell) t1).hasPrime())
+//					map.put(p, ((MemoryCell) t1).setType(p.getTypeTag().toString()));
 	}
 
 	@Override
@@ -57,7 +137,7 @@ public class Equality implements Formula {
 		}
 
 		Term s2 = t2;
-		if (t1 instanceof Node) {
+		if (t2 instanceof Node) {
 			Port b = links.get(((Node) t2).getPort());
 			if (b != null)
 				s2 = new Node(b);
@@ -70,6 +150,10 @@ public class Equality implements Formula {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public String toString(){
+		return "(" + t1.toString() + "=" + t2.toString() + ")";
+	}
 
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
@@ -79,6 +163,14 @@ public class Equality implements Formula {
 	@Override
 	public Formula DNF() {
 		return this;
+	}
+
+	@Override
+	public Formula propNegation(boolean isNegative) {
+		if(isNegative)
+			return new Negation(this);
+		else
+			return this;
 	}
 
 }

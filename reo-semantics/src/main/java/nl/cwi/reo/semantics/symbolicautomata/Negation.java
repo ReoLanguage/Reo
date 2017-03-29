@@ -1,5 +1,6 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,32 +20,50 @@ public class Negation implements Formula {
 
 	@Override
 	public Formula getGuard() {
-		throw new UnsupportedOperationException();
+//		throw new UnsupportedOperationException();
+		return new Negation(f.getGuard());
 	}
 
 	@Override
 	public Map<Port, Term> getAssignment() {
-		throw new UnsupportedOperationException();
+//		if(f instanceof Synchron)
+//			return new HashMap<Port,Term>();
+//		if(f instanceof Equality)
+//			return ((Equality)f).getAssignment(false);
+		return new HashMap<Port,Term>();
 	}
 
 	@Override
 	public Formula rename(Map<Port, Port> links) {
 		return new Negation(f.rename(links));
 	}
+	
+	public Formula getFormula(){
+		return f;
+	}
 
 	@Override
 	public Set<Port> getInterface() {
-		return f.getInterface();
+		return null;
 	}
 
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
 		return null;
 	}
+	
+	public String toString(){
+		return "!(" + f.toString() + ")";
+	}
 
 	@Override
 	public Formula DNF() {
 		return null;
+	}
+
+	@Override
+	public Formula propNegation(boolean isNegative) {
+		return f.propNegation(!isNegative);
 	}
 
 }

@@ -16,10 +16,18 @@ public class Synchron implements Formula {
 	
 	private final Port p;
 	
+	private final boolean isSync; 
+	
 	public Synchron(Port p) {
 		this.p = p;
+		this.isSync = true;
 	}
 
+	public Synchron(Port p, boolean isSync) {
+		this.p = p;
+		this.isSync = isSync;
+	}
+	
 	public Port getPort() {
 		return p;
 	}
@@ -44,17 +52,34 @@ public class Synchron implements Formula {
 
 	@Override
 	public Set<Port> getInterface() {
-		return new HashSet<Port>(Arrays.asList(p));
+		if(isSync)
+			return new HashSet<Port>(Arrays.asList(p));
+		return new HashSet<Port>();
 	}
 
+	public String toString(){
+		if(isSync)
+			return  p.toString();
+		return "~" + p.toString();
+	}
+	
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
 		return this;
 	}
 
+	public boolean isSync(){
+		return isSync;
+	}
+	
 	@Override
 	public Formula DNF() {
 		return this;
+	}
+
+	@Override
+	public Formula propNegation(boolean isNegative) {
+		return new Synchron(this.p,!isNegative);
 	}
 	
 }

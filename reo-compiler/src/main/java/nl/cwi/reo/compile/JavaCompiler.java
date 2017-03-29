@@ -12,21 +12,29 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 
-//import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
-
 import nl.cwi.reo.compile.components.ActiveAutomaton;
 import nl.cwi.reo.compile.components.Definition;
+import nl.cwi.reo.compile.components.ExtraReoTemplate;
 import nl.cwi.reo.compile.components.Instance;
 import nl.cwi.reo.compile.components.ReoTemplate;
 import nl.cwi.reo.compile.components.TransitionRule;
 import nl.cwi.reo.interpret.ReoProgram;
+import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.pr.autom.AutomatonFactory.AutomatonSet;
+import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.ports.PrioType;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.AutomatonSemantics;
+import nl.cwi.reo.semantics.symbolicautomata.Conjunction;
+import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
 import nl.cwi.reo.semantics.symbolicautomata.Formula;
+import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
+import nl.cwi.reo.semantics.symbolicautomata.Node;
+import nl.cwi.reo.semantics.symbolicautomata.Term;
+import nl.cwi.reo.semantics.symbolicautomata.Variable;
 
 public class JavaCompiler {
 
@@ -148,7 +156,48 @@ public class JavaCompiler {
 	 *         otherwise.
 	 */
 	public static TransitionRule commandify(Formula f) {
-		return null;
+		Map<Port,Term> map = new HashMap<Port,Term>();
+		
+		System.out.println(f);
+		map = f.getAssignment();
+		Set<Port> s = f.getInterface();
+		return 	new TransitionRule(f.getInterface(),f.getAssignment());
 	}
+	
+	public static Formula compose(List<Formula> list){
+		Formula dnf=new Conjunction(list);
+		return dnf.DNF();
+	}
+		
+	public static void generateCode(Formula automaton){
+		List<TransitionRule> transitions = new ArrayList<TransitionRule>();
+		if(automaton instanceof Disjunction)
+			for(Formula f : ((Disjunction) automaton).getFormula())
+				transitions.add(JavaCompiler.commandify(f));
+		Set<MemoryCell> mem = new HashSet<MemoryCell>();
+		for(TransitionRule tr : transitions){
+			for(Term t :tr.getAction().values()){
+				if(t instanceof MemoryCell)
+					mem.add(((MemoryCell) t));
+			}
+		}
+		
+		for(MemoryCell m : mem){
+			for(TransitionRule tr : transitions){
+				for(Port p :tr.getAction().keySet()){
+					if(tr.getAction().get(p).equals(m)){
+						PortType portType = ((m.hasPrime())?PortType.IN:PortType.OUT);
+						tr.getAction().replace(p, new Node(new Port(m.getName(),portType,PrioType.NONE, new TypeTag(m.getType()),true)));
+					}
+				}
+			}
+		}
+		
+		Set<Port> s = new HashSet<Port>();
+		s.addAll(automaton.getInterface());
+		System.out.println(new ExtraReoTemplate("testfile", "packagetest", "test",s, transitions,mem).getCode(Language.JAVA));
+		
+	}
+	
 
 }

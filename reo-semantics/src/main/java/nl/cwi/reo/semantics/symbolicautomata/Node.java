@@ -29,4 +29,7 @@ public class Node implements Variable {
 			return new Node(b);
 		return this;
 	}
+	public String toString(){
+		return p.toString();
+	}
 }
