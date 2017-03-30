@@ -20,22 +20,24 @@ The documentation is available on http://reo.readthedocs.io/en/latest/
 Contribute
 ----------
 
-1. Install Java SDk (version 1.6 or higher). You can check if the correct version is already installed via ``java -version``
+1. Install Git.
 
-2. Install Maven. You can check if the correct version is already installed via ``mvn -version``
+2. Install Java SDK (version 1.6 or higher). You can check if the correct version is already installed via ``java -version``
 
-3. Install Eclipse. Available at https://www.eclipse.org/downloads/
+3. Install Maven.
 
-4. Change directory to eclipse workspace ``cd ../workspace``
+4. Install Eclipse. Available at https://www.eclipse.org/downloads/
 
-5. Clone this repository via ``git clone https://github.com/kasperdokter/Reo.git``
+5. Change directory to eclipse workspace ``cd ../workspace``
 
-6. Change directory ``cd Reo``
+6. Clone this repository via ``git clone https://github.com/kasperdokter/Reo.git``
 
-7. Build the project: ``mvn clean install``. 
+7. Change directory ``cd Reo``
 
-8. Generate Eclipse configuration: ``mvn eclipse:eclipse``
+8. Build the project: ``mvn clean install``. 
 
-9. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
+9. Generate Eclipse configuration: ``mvn eclipse:eclipse``
 
-10. Start coding
+10. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
+
+11. Start coding
