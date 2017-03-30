@@ -69,7 +69,7 @@
           <finalName>reo-1.0</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <attach>false</attach>
-          <outputDirectory>${project.parent.basedir}/bin</outputDirectory>
+          <!--<outputDirectory>${project.parent.basedir}/bin</outputDirectory>-->
         </configuration>
         <executions>
           <execution>
