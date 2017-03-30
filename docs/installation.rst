@@ -37,25 +37,25 @@ Windows
 
 2. Download the `reo-1.0.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-1.0.zip>`_, and save it in, for example, ``C:\Program Files\Reo``
 
-3. Set the ``CLASSPATH`` environment variable to ``.;C:\Program Files\Reo\reo-runtime-1.0.jar;%CLASSPATH%`` either permenantly via:
+3. Set the ``CLASSPATH`` environment variable to ``.;C:\Program Files\Reo\reo-runtime-1.0.jar;%CLASSPATH%`` either permenantly via::
 
 	Control Panel » System » Advanced » Environment Variables
 
-or only for this terminal session via:
+or only for this terminal session via::
 
 	set CLASSPATH=".;C:\Program Files\Reo\reo-runtime-1.0.jar;%CLASSPATH%"
 
 4. Create short convenient commands for the Reo compiler, using batch files or doskey commands:
- - Batch files (in directory in system PATH)::
+	- Batch files (in directory in system PATH)::
 
-	//reo.bat
-	java -jar C:\Program Files\Reo\reo-1.0.jar %*
+		//reo.bat
+		java -jar C:\Program Files\Reo\reo-1.0.jar %*
 
- - Or, use doskey commands::
+	- Or, use doskey commands::
 
-	doskey reo=java -jar C:\Program Files\Reo\reo-1.0.jar $*
+		doskey reo=java -jar C:\Program Files\Reo\reo-1.0.jar $*
 
 5. Test the installation by running::
 
-   reo
+	reo
 
