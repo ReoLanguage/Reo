@@ -166,11 +166,17 @@ public class Equality implements Formula {
 	}
 
 	@Override
-	public Formula propNegation(boolean isNegative) {
+	public Formula NNF(boolean isNegative) {
 		if(isNegative)
 			return new Negation(this);
 		else
 			return this;
+	}
+
+	@Override
+	public Formula QE() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

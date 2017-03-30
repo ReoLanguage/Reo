@@ -3,11 +3,13 @@ import nl.cwi.reo.runtime.java.Output;
 
 public class MyTestComponents {
 	
-	private static int k = 300000;
+	private static int k = 30;
 	
 	public static void produce(Output<Integer> A) {
-		for (int i = 0; i < k; i++)
+		for (int i = 0; i < k; i++) {
 			A.put(i);
+			System.out.println("Consumer finished after " + i + " sec.");
+		}
 	}
 	
 	public static void consume(Input<Integer> A) {

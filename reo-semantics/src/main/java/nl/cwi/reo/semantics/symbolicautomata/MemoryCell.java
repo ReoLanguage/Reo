@@ -32,7 +32,7 @@ public class MemoryCell implements Variable {
 	public String getName() {
 		return "q" + k;
 	}
-	
+
 	public int getIndice(){
 		return k;
 	}

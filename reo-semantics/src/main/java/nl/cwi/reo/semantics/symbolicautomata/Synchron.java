@@ -59,8 +59,8 @@ public class Synchron implements Formula {
 
 	public String toString(){
 		if(isSync)
-			return  p.toString();
-		return "~" + p.toString();
+			return  p.getName();
+		return "~" + p.getName();
 	}
 	
 	@Override
@@ -78,8 +78,14 @@ public class Synchron implements Formula {
 	}
 
 	@Override
-	public Formula propNegation(boolean isNegative) {
+	public Formula NNF(boolean isNegative) {
 		return new Synchron(this.p,!isNegative);
+	}
+
+	@Override
+	public Formula QE() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

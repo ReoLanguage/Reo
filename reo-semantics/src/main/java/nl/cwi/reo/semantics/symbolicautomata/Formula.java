@@ -37,8 +37,10 @@ public interface Formula {
 	/**
 	 * Get negation at the leaf.
 	 */
-	public Formula propNegation(boolean isNegative);
+	public Formula NNF(boolean isNegative);
 	
 	public Formula DNF();
+
+	public Formula QE();
 
 }
