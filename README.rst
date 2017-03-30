@@ -1,4 +1,3 @@
-
 Reo
 ===
 
@@ -20,13 +19,13 @@ The documentation is available on http://reo.readthedocs.io/en/latest/
 Contribute
 ----------
 
-1. Install Git.
+1. Install Git. Available at https://git-scm.com/downloads.
 
-2. Install Java SDK (version 1.6 or higher). You can check if the correct version is already installed via ``java -version``
+2. Install Java SDK 1.6+. Available at http://www.oracle.com/technetwork/java/javase/downloads/index.html. You can check if the correct version is already installed via ``java -version``
 
-3. Install Maven.
+3. Install Maven. Available at https://maven.apache.org/download.cgi.
 
-4. Install Eclipse. Available at https://www.eclipse.org/downloads/
+4. Install Eclipse. Available at https://www.eclipse.org/downloads/.
 
 5. Change directory to eclipse workspace ``cd ../workspace``
 
