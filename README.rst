@@ -1,6 +1,6 @@
 
-Reo compiler
-============
+Reo
+===
 
 Protocols coordinate interaction amongst concurrently executing processes.
 Most general purpose programming languages do not provide syntax for expressing these protocols explicitly.
