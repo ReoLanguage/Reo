@@ -41,17 +41,16 @@ Windows
 
 	Control Panel » System » Advanced » Environment Variables
 
-or only for this terminal session via::
+   or only for this terminal session via::
 
 	set CLASSPATH=".;C:\Program Files\Reo\reo-runtime-1.0.jar;%CLASSPATH%"
 
-4. Create short convenient commands for the Reo compiler, using batch files or doskey commands:
-	- Batch files (in directory in system PATH)::
+4. Create short convenient commands for the Reo compiler, using batch files (in directory in system PATH)::
 
 		//reo.bat
 		java -jar C:\Program Files\Reo\reo-1.0.jar %*
 
-	- Or, use doskey commands::
+   or, use doskey commands::
 
 		doskey reo=java -jar C:\Program Files\Reo\reo-1.0.jar $*
 
