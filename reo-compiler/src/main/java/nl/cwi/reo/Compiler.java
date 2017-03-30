@@ -10,12 +10,10 @@ import java.util.List;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
-import nl.cwi.reo.compile.GraphCompiler;
 import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.compile.PRCompiler;
 import nl.cwi.reo.compile.components.ReoTemplate;
-import nl.cwi.reo.compile.components.TransitionRule;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
@@ -23,17 +21,12 @@ import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterCAM;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
 import nl.cwi.reo.interpret.interpreters.InterpreterSBA;
-import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.values.StringValue;
-import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.constraintautomata.ConstraintAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
-import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
 import nl.cwi.reo.semantics.symbolicautomata.Formula;
-import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
 import nl.cwi.reo.semantics.symbolicautomata.SymbolicAutomaton;
 import nl.cwi.reo.util.Monitor;
 
@@ -227,6 +220,8 @@ public class Compiler {
     	Interpreter<SymbolicAutomaton> interpreterRba = new InterpreterSBA(directories, params, monitor);
 		
 		ReoProgram<SymbolicAutomaton> programRba = interpreterRba.interpret(files.get(0));	
+
+		if (programRba == null) return;	
 		
 		List<Formula> components = new ArrayList<Formula>();
 		
@@ -235,9 +230,9 @@ public class Compiler {
 			
 			System.out.println(sba.getSemantics().getFormula());
 			System.out.println(sba.getSemantics().getInterface());
-		};
-		Formula automaton;
-		automaton = JavaCompiler.compose(components);
+		}
+		
+		Formula automaton = JavaCompiler.compose(components);
 		automaton = automaton.QE();
 		JavaCompiler.generateCode(automaton);
 

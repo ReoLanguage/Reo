@@ -279,6 +279,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitComponent_atomic(Component_atomicContext ctx) {
 		T atom = atoms.get(ctx.atom());
+		if (atom == null)
+			throw new NullPointerException("No semantics object attached to parse tree.");
 		Reference s = new Reference();
 		if (ctx.source() != null)
 			s = new Reference(ctx.source().STRING().getText(), ctx.source().LANG().getText().toUpperCase());
