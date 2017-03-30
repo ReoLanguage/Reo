@@ -2,30 +2,72 @@ main(S) ::= <<
 /**
  * Generated from <S.file> by Reo 1.0.
  */
-package <S.package>;
 
 import nl.cwi.reo.runtime.java.*;
 
 public class <S.name> {
-
-  public static void main(String[] args) {
     
-    <S.ports:newPort(); separator="\n">
-    
-    <S.mem:memorycell(); separator="\n">
-    
-		int k = 0;
-		while (true) {
-			k++;
-			<S.transitions:transition(); separator="\n">
-			if (k > 3) {
-				k = 0;
-				try { wait(); } catch (InterruptedException e) { }	
-			}
-		}
+	public static void main(String[] args) {
+	
+		<S.ports:newPort(); separator="\n">
+	
+		<S.ports:{p | <if(p.input)>Producer producer_<p.name> = new Producer(<p.name>)<else>Consumer consumer_<p.name> = new Consumer(<p.name>)<endif>;}; separator="\n">
+		Component1\<Integer> component1 = new Component1\<Integer>(<S.ports:{p |<p.name>}; separator=",">);
+		
+		<S.ports:{p | <if(p.input)>Thread thread_<p.name> = new Thread(producer_<p.name>)<else>Thread thread_<p.name> = new Thread(consumer_<p.name>)<endif>;}; separator="\n">
+		Thread thread_component1 = new Thread(component1);
+	
+		<S.ports:{p | thread_<p.name>.start();}; separator="\n">
+		thread_component1.start();
+	
+	    try {
+	    	<S.ports:{p | thread_<p.name>.join();}; separator="\n">
+	    } catch (InterruptedException e) {
+	    	e.printStackTrace();
+	    }	
+	
+	    System.exit(0);
+	
 	}
 }
 >>
+
+Component(S)::= <<
+
+	import nl.cwi.reo.runtime.java.*;
+
+	public class Component1\<T> implements Component {
+	
+		<S.ports:newComponentPort(); separator="\n">
+	
+		<S.mem:memorycell(); separator="\n">
+
+		public Component1(<S.ports:{p |Port\<T> <p.name>}; separator=",">){
+			<S.ports:{p |this.<p.name> = <p.name>;}; separator="\n">
+			<S.ports:{p | <p.name>.set<if(p.input)>Consum<else>Produc<endif>er(this);}; separator="\n">
+			activate();
+		}
+		
+		public synchronized void activate() {
+			notify();
+		}
+		public void run(){
+			int k = 0;
+			while (true) {
+				k++;
+				<S.transitions:transition(); separator="\n">
+				if (k > 3) {
+					k = 0;
+					synchronized(this){
+						try { wait(); } catch (InterruptedException e) { }
+					}	
+				}
+			}
+		}
+	}
+	
+>>
+
 
 transition(t) ::= <<
 if (<guard(t)>) {
@@ -39,13 +81,14 @@ memorycell(m) ::= <<
  * Memory cell <m.name> of this automaton.
  */
  
-<m.type> <m.name>;
+private volatile T <m.name> = null;
+
 >>
 
 action(t) ::= <<
-<t.SyncConstraint: {p | <if(p.input)><p.typeTag> d_<p.name> = <p.name>.get();<endif>}; separator="">
-		
-<t.action.keys:{k | <k.name>.put(<t.action.(k)>);}; separator="\n">
+<t.SyncConstraint: {p | <if(p.input)>T d_<p.name> = <p.name>.get();<endif>}; separator="">
+<! <t.action.keys:{k | <k.name>.put(<t.action.(k)>);}; separator="\n"> !>
+<t.action.keys:{k |<if(k.input)><if(t.action.(k).input)><t.action.(k).name>.put(d_<k.name>);<else><if(t.action.(k).prime)><t.action.(k).name> = <k.name>.get();<else><t.action.(k).name>.put(d_<k.name>);<endif><endif><else><k.name>.put(<t.action.(k)>);<endif> }; separator="\n">
 >>
 
 guard(t) ::= <<
@@ -53,9 +96,14 @@ guard(t) ::= <<
 >>
 
 canSync(p) ::= <<
-<p.name>.<if(p.input)>canGet()<else>canPut()<endif>
+<p.name>.<if(p.input)>hasPut()<else>hasGet()<endif>
 >>
 
 newPort(p) ::= <<
 Port\<<p.typeTag>\> <p.name> = new PortBusyWait\<<p.typeTag>\>();
 >>
+
+newComponentPort(p) ::= <<
+private volatile Port\<T> <p.name>;
+>>
+

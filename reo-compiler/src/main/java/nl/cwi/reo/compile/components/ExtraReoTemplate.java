@@ -1,5 +1,10 @@
 package nl.cwi.reo.compile.components;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -76,8 +81,23 @@ public final class ExtraReoTemplate {
 			break;
 		}
 
-		ST temp = group.getInstanceOf("main");
-		temp.add("S", this);
-		return temp.render();
+		ST temp1 = group.getInstanceOf("main");
+		ST temp2 = group.getInstanceOf("Component");
+		temp1.add("S", this);
+		temp2.add("S", this);
+		
+		String path = "/home/e-spin/workspace/Reo/reo-runtime-java/src/main/java";
+		
+		try {
+			Files.write(Paths.get(path, "test.java"), Arrays.asList(temp1.render()),
+					Charset.defaultCharset());
+			Files.write(Paths.get(path, "Component1.java"), Arrays.asList(temp2.render()),
+					Charset.defaultCharset());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		temp1.add("S", this);
+		return temp1.render();
 	}
 }

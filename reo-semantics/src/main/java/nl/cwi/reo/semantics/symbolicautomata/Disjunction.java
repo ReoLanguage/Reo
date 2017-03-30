@@ -61,7 +61,7 @@ public class Disjunction implements Formula {
 	public Set<Port> getInterface() {
 		Set<Port> P = new HashSet<Port>();
 		for (Formula f : g)
-			if(f instanceof Disjunction || f instanceof Conjunction)
+			if(f instanceof Disjunction || f instanceof Conjunction || f instanceof Existential)
 				P.addAll(f.getInterface());
 		return P;
 	}
@@ -79,7 +79,7 @@ public class Disjunction implements Formula {
 		return s;
 	}
 
-	public List<Formula> getFormula(){
+	public List<Formula> getClauses(){
 		return g;
 	}
 	
@@ -90,16 +90,47 @@ public class Disjunction implements Formula {
 	}
 
 	@Override
-	public Formula propNegation(boolean isNegative) {
+	public Formula NNF(boolean isNegative) {
 		List<Formula> h = new ArrayList<Formula>();
 		for (Formula f : g)
-			h.add(f.propNegation(isNegative));
+			h.add(f.NNF(isNegative));
 		if(isNegative){
 			return new Conjunction(h);
 		}
 		else{
 			return new Disjunction(h);			
 		}
+	}
+
+	@Override
+	public Formula QE() {
+		List<Formula> existentialList = new ArrayList<Formula>();
+		for(Formula f : g){
+			Set<Term> variable = new HashSet<Term>();
+			Map<Port,Term> map = f.getAssignment();
+			for(Port p : f.getInterface()){
+				if(p.isHidden() && map.containsKey(p)){
+					Term t = map.get(p);
+					for(Port port : map.keySet()){
+						if(map.get(port) instanceof Node){
+							if(((Node)map.get(port)).getPort().equals(p)){
+							map.replace(port, t);
+							}
+						}
+					}
+					map.remove(p);
+					variable.add(new Node(p));
+				}
+			}
+			List<Formula> formulaList = new ArrayList<Formula>();
+			for(Port p : map.keySet()){
+				formulaList.add(new Equality(new Node(p),map.get(p)));
+				formulaList.add(new Synchron(p));
+			}
+			existentialList.add(new Existential(variable,new Conjunction(formulaList)));
+			
+		}
+		return new Disjunction(existentialList);
 	}
 
 }

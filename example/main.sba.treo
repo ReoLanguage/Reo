@@ -1,0 +1,16 @@
+
+fifo(a?,b!){
+	#SBA
+	[{a,~b},($q1'==a)]
+	[{b,~a},(b==$q1)]
+}
+sync(a?,b!){
+	#SBA
+	[{a,b},(a==b)]
+	[{~a,~b},(null)]
+}
+main(a?,b!){
+	sync(a,c)fifo(c,b)
+}
+
+

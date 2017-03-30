@@ -54,9 +54,15 @@ public class BooleanValue implements Formula {
 	}
 
 	@Override
-	public Formula propNegation(boolean isNegative) {
+	public Formula NNF(boolean isNegative) {
 		
 		return new BooleanValue(!isNegative);
+	}
+
+	@Override
+	public Formula QE() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

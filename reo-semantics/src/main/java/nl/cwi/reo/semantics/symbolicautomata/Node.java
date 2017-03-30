@@ -22,6 +22,10 @@ public class Node implements Variable {
 		return p.getType() == PortType.OUT;
 	}
 
+	public String getName(){
+		return p.getName();
+	}
+	
 	@Override
 	public Term rename(Map<Port, Port> links) {
 		Port b = links.get(p);
@@ -30,6 +34,10 @@ public class Node implements Variable {
 		return this;
 	}
 	public String toString(){
-		return p.toString();
+		return p.getName();
+	}
+
+	public boolean isInput() {
+		return p.isInput();
 	}
 }

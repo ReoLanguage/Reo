@@ -172,7 +172,7 @@ public class JavaCompiler {
 	public static void generateCode(Formula automaton){
 		List<TransitionRule> transitions = new ArrayList<TransitionRule>();
 		if(automaton instanceof Disjunction)
-			for(Formula f : ((Disjunction) automaton).getFormula())
+			for(Formula f : ((Disjunction) automaton).getClauses())
 				transitions.add(JavaCompiler.commandify(f));
 		Set<MemoryCell> mem = new HashSet<MemoryCell>();
 		for(TransitionRule tr : transitions){
@@ -182,17 +182,17 @@ public class JavaCompiler {
 			}
 		}
 		
-		for(MemoryCell m : mem){
-			for(TransitionRule tr : transitions){
-				for(Port p :tr.getAction().keySet()){
-					if(tr.getAction().get(p).equals(m)){
-						PortType portType = ((m.hasPrime())?PortType.IN:PortType.OUT);
-						tr.getAction().replace(p, new Node(new Port(m.getName(),portType,PrioType.NONE, new TypeTag(m.getType()),true)));
-					}
-				}
-			}
-		}
-		
+//		for(MemoryCell m : mem){
+//			for(TransitionRule tr : transitions){
+//				for(Port p :tr.getAction().keySet()){
+//					if(tr.getAction().get(p).equals(m)){
+//						PortType portType = ((m.hasPrime())?PortType.IN:PortType.OUT);
+//						tr.getAction().replace(p, new Node(new Port(m.getName(),portType,PrioType.NONE, new TypeTag(m.getType()),true)));
+//					}
+//				}
+//			}
+//		}
+//		
 		Set<Port> s = new HashSet<Port>();
 		s.addAll(automaton.getInterface());
 		System.out.println(new ExtraReoTemplate("testfile", "packagetest", "test",s, transitions,mem).getCode(Language.JAVA));

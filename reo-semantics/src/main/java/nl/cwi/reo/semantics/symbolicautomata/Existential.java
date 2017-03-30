@@ -1,6 +1,8 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,11 +14,11 @@ import nl.cwi.reo.util.Monitor;
 
 public class Existential implements Formula {
 
-	private final Variable x;
+	private final Set<Term> x;
 	
 	private final Formula f;
 
-	public Existential(Variable x, Formula f) {
+	public Existential(Set<Term> x, Formula f) {
 		this.x = x;
 		this.f = f;
 	}
@@ -28,7 +30,7 @@ public class Existential implements Formula {
 
 	@Override
 	public Map<Port, Term> getAssignment() {
-		throw new UnsupportedOperationException();
+		return f.getAssignment();
 	}
 
 	@Override
@@ -41,10 +43,23 @@ public class Existential implements Formula {
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> P = f.getInterface();
-		P.remove(x); // this is pseudo code
+		for(Term t : x){
+			if(t instanceof Node){
+				P.remove(((Node) t).getPort());
+			}
+		}
 		return P;
 	}
 
+	public String toString(){
+		List<Term> l = new ArrayList<Term>();
+		for(Term t : x){
+			l.add(t);
+			System.out.println(t);
+		}
+		return  "{" + f.toString() + "|" + l.toString() + "}";  
+	}
+	
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
 		return null;
@@ -57,8 +72,14 @@ public class Existential implements Formula {
 	}
 
 	@Override
-	public Formula propNegation(boolean isNegative) {
+	public Formula NNF(boolean isNegative) {
 		
+		return null;
+	}
+
+	@Override
+	public Formula QE() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -20,16 +20,11 @@ public class Negation implements Formula {
 
 	@Override
 	public Formula getGuard() {
-//		throw new UnsupportedOperationException();
 		return new Negation(f.getGuard());
 	}
 
 	@Override
 	public Map<Port, Term> getAssignment() {
-//		if(f instanceof Synchron)
-//			return new HashMap<Port,Term>();
-//		if(f instanceof Equality)
-//			return ((Equality)f).getAssignment(false);
 		return new HashMap<Port,Term>();
 	}
 
@@ -62,8 +57,14 @@ public class Negation implements Formula {
 	}
 
 	@Override
-	public Formula propNegation(boolean isNegative) {
-		return f.propNegation(!isNegative);
+	public Formula NNF(boolean isNegative) {
+		return f.NNF(!isNegative);
+	}
+
+	@Override
+	public Formula QE() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -101,7 +101,7 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 	}
 	
 	public void exitSba_dt_parameter(Sba_dt_parameterContext ctx){
-		term.put(ctx, new Node(new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("double"),true)));
+		term.put(ctx, new Node(new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("Integer"),true)));
 	}
 	
 	public void exitSba_dt_memorycellIn(Sba_dt_memorycellInContext ctx){
@@ -149,10 +149,10 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 	 */
 	
 	public void exitSba_included_port(Sba_included_portContext ctx){
-		incPorts.put(ctx, new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("double"),true));
+		incPorts.put(ctx, new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("Integer"),true));
 	}
 	public void exitSba_excluded_port(Sba_excluded_portContext ctx){
-		excPorts.put(ctx, new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("double"),true));
+		excPorts.put(ctx, new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("Integer"),true));
 	}
 	
 	

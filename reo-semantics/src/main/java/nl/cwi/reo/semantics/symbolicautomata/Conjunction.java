@@ -109,9 +109,9 @@ public class Conjunction implements Formula {
 				List<Formula> disjunctFormula = new ArrayList<Formula>();
 				if(f instanceof Disjunction){
 					// TODO : optimize this part
-					for(Formula formulas : ((Disjunction) dnf).getFormula()){
+					for(Formula formulas : ((Disjunction) dnf).getClauses()){
 						if(formulas instanceof Conjunction){
-							for(Formula form : ((Disjunction) f).getFormula()){
+							for(Formula form : ((Disjunction) f).getClauses()){
 								if(form instanceof Conjunction){
 									List<Formula> c = new ArrayList<Formula>();
 									c.addAll(((Conjunction) formulas).getFormula());
@@ -167,10 +167,10 @@ public class Conjunction implements Formula {
 	}
 
 	@Override
-	public Formula propNegation(boolean isNegative) {
+	public Formula NNF(boolean isNegative) {
 		List<Formula> h = new ArrayList<Formula>();
 		for (Formula f : g)
-			h.add(f.propNegation(isNegative));
+			h.add(f.NNF(isNegative));
 		if(isNegative){
 			return new Disjunction(h);
 		}
@@ -178,6 +178,12 @@ public class Conjunction implements Formula {
 			return new Conjunction(h);			
 		}
 	
+	}
+
+	@Override
+	public Formula QE() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
