@@ -136,6 +136,7 @@ public class Interpreter<T extends Semantics<T>> {
 					deps.putIfAbsent(reoFile.getName(), imports);
 				} else {
 					m.add("Component " + component + " is not found.");
+					return null;
 				}
 			}
 		}
@@ -199,24 +200,29 @@ public class Interpreter<T extends Semantics<T>> {
 		String directory = component.substring(0, k).replace('.', File.separatorChar);
 		String cp1 = directory + name + "." + semantics + ".treo";
 		String cp2 = directory + name + ".treo";
+		String directory1 = component.substring(0, k).replace('.', '/');
+		String r1 =  "/" + directory1 + name + "." + semantics + ".treo";
+		String r2 = "/" + directory1 + name + ".treo";
 
 		search: for (String dir : dirs) {
 
 			// Check if atomic component exists in resources of this jar.
-			InputStream in1 = getClass().getResourceAsStream(File.separator + cp1);
+			InputStream in1 = getClass().getResourceAsStream(r1);
 			if (in1 != null) {
 				try {
 					prog = parse(new ANTLRInputStream(in1), File.separator + cp1);
+					break;
 				} catch (IOException e1) {
 					m.add("Cannot open " + cp1);
 				}
 			}
 
 			// Check if composite component exists in resources of this jar.
-			InputStream in2 = getClass().getResourceAsStream(File.separator + cp2);
+			InputStream in2 = getClass().getResourceAsStream(r2);
 			if (in2 != null) {
 				try {
 					prog = parse(new ANTLRInputStream(in2), File.separator + cp2);
+					break;
 				} catch (IOException e1) {
 					m.add("Cannot open " + cp2);
 				}
@@ -227,6 +233,7 @@ public class Interpreter<T extends Semantics<T>> {
 			if (f1.exists() && !f1.isDirectory()) {
 				try {
 					prog = parse(new ANTLRFileStream(dir + File.separator + cp1), dir + File.separator + cp1);
+					break;
 				} catch (IOException e) {
 					m.add("Cannot open " + f1.toString());
 				}
@@ -238,6 +245,7 @@ public class Interpreter<T extends Semantics<T>> {
 			if (f2.exists() && !f2.isDirectory()) {
 				try {
 					prog = parse(new ANTLRFileStream(dir + File.separator + cp2), dir + File.separator + cp2);
+					break;
 				} catch (IOException e) {
 					m.add("Cannot open " + f2.toString());
 				}
