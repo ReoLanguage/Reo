@@ -12,6 +12,11 @@ import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.util.Monitor;
 
 public class Equality implements Formula {
+	
+	/**
+	 * Flag for string template.
+	 */
+	public static final boolean equality = true;
 
 	private final Term t1;
 

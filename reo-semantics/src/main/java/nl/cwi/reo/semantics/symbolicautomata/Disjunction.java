@@ -15,6 +15,11 @@ import nl.cwi.reo.util.Monitor;
 
 public class Disjunction implements Formula {
 	
+	/**
+	 * Flag for string template.
+	 */
+	public static final boolean disjunction = true;
+	
 	private final List<Formula> g;
 	
 	public Disjunction(List<Formula> g) {

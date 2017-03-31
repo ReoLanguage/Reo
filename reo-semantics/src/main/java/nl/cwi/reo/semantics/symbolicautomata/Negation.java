@@ -12,6 +12,11 @@ import nl.cwi.reo.util.Monitor;
 
 public class Negation implements Formula {
 	
+	/**
+	 * Flag for string template.
+	 */
+	public static final boolean negation = true;
+	
 	private final Formula f;
 
 	public Negation(Formula f) {

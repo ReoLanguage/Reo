@@ -174,7 +174,7 @@ public class Compiler {
 		ReoTemplate template = JavaCompiler.compile(program, packagename, new ConstraintAutomaton());
 		
 		if (template != null)
-			System.out.println(template.getCode(Language.JAVA));
+			System.out.println(template.generateCode(Language.JAVA));
     }
 
     private void compilePA() {
