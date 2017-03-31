@@ -24,8 +24,8 @@ public class Negation implements Formula {
 	}
 
 	@Override
-	public Map<Port, Term> getAssignment() {
-		return new HashMap<Port,Term>();
+	public Map<Variable, Term> getAssignment() {
+		return new HashMap<Variable,Term>();
 	}
 
 	@Override

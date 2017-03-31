@@ -32,10 +32,6 @@ public class PortWindows<T> {
 	private static final int WIDTH = 300;
 
 	
-	public PortWindows(Port<T> a){
-		
-	}
-	
 	public static <T> void openThenWait(Map<String,Port<T>> inputPorts,
 			Map<String, Port<T>> outputPorts) {
 

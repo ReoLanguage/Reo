@@ -33,11 +33,11 @@ public class Equality implements Formula {
 	}
 
 	@Override
-	public Map<Port, Term> getAssignment() {
+	public Map<Variable, Term> getAssignment() {
 		/*
 		 * MemoryCell 
 		 */
-		Map<Port, Term> map = new HashMap<Port, Term>();
+		Map<Variable, Term> map = new HashMap<Variable, Term>();
 //		Port p=(t1 instanceof Node && !t2.hadOutputs())?((Node) t1).getPort():(((t2 instanceof Node && !t1.hadOutputs()))?null:((Node) t2).getPort());
 		Term t = null;
 		if(t1 instanceof Node){
@@ -47,13 +47,13 @@ public class Equality implements Formula {
 					//Look into a value that satisfy the formula
 				}
 				if(t2 instanceof MemoryCell && !((MemoryCell) t2).hasPrime()){
-					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
+					map.put(new Node(p), ((MemoryCell) t2).setType(p.getTypeTag().toString()));
 				}
 				if(t2 instanceof Constant){
-					map.put(p, t2);
+					map.put(new Node(p), t2);
 				}
 				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.IN){
-					map.put(p, t2);
+					map.put(new Node(p), t2);
 				}
 				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.OUT){
 					//Look into a value that satisfy the formula
@@ -62,19 +62,19 @@ public class Equality implements Formula {
 			}
 			if(p.getType() == PortType.IN){
 				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime()){
-					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
+					map.put(((MemoryCell) t2).setType(p.getTypeTag().toString()), new Node(p));
 				}
 				if(t2 instanceof MemoryCell && !((MemoryCell) t2).hasPrime()){	
 					//Look into a value that satisfy the formula
 				}
 				if(t2 instanceof Constant){
-					map.put(p, t2);
+					map.put(new Node(p), t2);
 				}
 				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.IN){
 					//Look into a value that satisfy the formula
 				}
 				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.OUT){
-					map.put(p, t2);
+					map.put((Node)t2, new Node(p));
 				}
 				return map;
 			}

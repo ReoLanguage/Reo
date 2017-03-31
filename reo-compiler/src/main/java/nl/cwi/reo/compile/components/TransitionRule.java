@@ -21,7 +21,7 @@ public final class TransitionRule {
 	/**
 	 * Update (assigns value to memory cells and output ports)
 	 */
-	private final Map<Port, Term> a;
+	private final Map<Variable, Term> a;
 
 	/**
 	 * Constructs a new transition.
@@ -35,7 +35,7 @@ public final class TransitionRule {
 	 * @param a
 	 *            transition label
 	 */
-	public TransitionRule(Set<Port> N, Map<Port, Term> a) {
+	public TransitionRule(Set<Port> N, Map<Variable, Term> a) {
 		if (N == null)
 			throw new IllegalArgumentException("No synchronization constraint specified.");
 		if (a == null)
@@ -79,7 +79,7 @@ public final class TransitionRule {
 	 * 
 	 * @return job constraint
 	 */
-	public Map<Port, Term> getAction() {		
+	public Map<Variable, Term> getAction() {		
 		return this.a;
 	}
 }

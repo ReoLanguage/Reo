@@ -26,7 +26,7 @@ public interface Formula {
 	 * 
 	 * @return Assignment of data terms to output ports.
 	 */
-	public Map<Port, Term> getAssignment();
+	public Map<Variable, Term> getAssignment();
 	
 	public @Nullable Formula evaluate(Scope s, Monitor m);
 

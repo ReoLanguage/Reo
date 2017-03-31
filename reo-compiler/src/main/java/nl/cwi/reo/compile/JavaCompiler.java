@@ -157,7 +157,7 @@ public class JavaCompiler {
 	 *         otherwise.
 	 */
 	public static TransitionRule commandify(Formula f) {
-		Map<Port,Term> map = new HashMap<Port,Term>();
+		Map<Variable,Term> map = new HashMap<Variable,Term>();
 		
 		System.out.println(f);
 		map = f.getAssignment();

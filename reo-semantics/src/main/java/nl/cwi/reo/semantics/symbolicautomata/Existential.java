@@ -29,7 +29,7 @@ public class Existential implements Formula {
 	}
 
 	@Override
-	public Map<Port, Term> getAssignment() {
+	public Map<Variable, Term> getAssignment() {
 		return f.getAssignment();
 	}
 
@@ -55,7 +55,6 @@ public class Existential implements Formula {
 		List<Term> l = new ArrayList<Term>();
 		for(Term t : x){
 			l.add(t);
-			System.out.println(t);
 		}
 		return  "{" + f.toString() + "|" + l.toString() + "}";  
 	}

@@ -36,13 +36,13 @@ public class Disjunction implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<Port, Term> getAssignment() {
-		Map<Port, Term> assignment = new HashMap<Port, Term>();
+	public Map<Variable, Term> getAssignment() {
+		Map<Variable, Term> assignment = new HashMap<Variable, Term>();
 		for (Formula f : g) {
-			Map<Port, Term> assignment1 = f.getAssignment();
+			Map<Variable, Term> assignment1 = f.getAssignment();
 			if (assignment1 == null)
 				return null;
-			for (Map.Entry<Port, Term> pair : assignment1.entrySet())
+			for (Map.Entry<Variable, Term> pair : assignment1.entrySet())
 				if (assignment.put(pair.getKey(), pair.getValue()) != null)
 					return null;
 		}
@@ -107,15 +107,14 @@ public class Disjunction implements Formula {
 		List<Formula> existentialList = new ArrayList<Formula>();
 		for(Formula f : g){
 			Set<Term> variable = new HashSet<Term>();
-			Map<Port,Term> map = f.getAssignment();
+			Map<Variable,Term> map = f.getAssignment();
 			for(Port p : f.getInterface()){
-				if(p.isHidden() && map.containsKey(p)){
-					Term t = map.get(p);
-					for(Port port : map.keySet()){
-						if(map.get(port) instanceof Node){
-							if(((Node)map.get(port)).getPort().equals(p)){
-							map.replace(port, t);
-							}
+				if(p.isHidden() && map.containsKey(new Node(p))){
+					Term t = map.get(new Node(p));
+					map.remove(new Node(p));
+					for(Variable v : map.keySet()){
+						if(map.get(v) instanceof Node && map.get(v).equals(new Node(p))){
+							map.replace(v, t);
 						}
 					}
 					map.remove(p);
@@ -123,9 +122,12 @@ public class Disjunction implements Formula {
 				}
 			}
 			List<Formula> formulaList = new ArrayList<Formula>();
-			for(Port p : map.keySet()){
-				formulaList.add(new Equality(new Node(p),map.get(p)));
-				formulaList.add(new Synchron(p));
+			for(Variable p : map.keySet()){
+				formulaList.add(new Equality(p,map.get(p)));
+				if(p instanceof Node)
+					formulaList.add(new Synchron(((Node) p).getPort()));
+				if(map.get(p) instanceof Node)
+					formulaList.add(new Synchron(((Node) map.get(p)).getPort()));
 			}
 			existentialList.add(new Existential(variable,new Conjunction(formulaList)));
 			

@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
 import java.util.Map;
+import java.util.Objects;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
@@ -35,6 +36,17 @@ public class Node implements Variable {
 	}
 	public String toString(){
 		return p.getName();
+	}
+	
+	public boolean equals(Object o){
+		if(o instanceof Node){
+			return ((Node) o).getPort().equals(p);
+		}
+		return false;
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.p);
 	}
 
 	public boolean isInput() {
