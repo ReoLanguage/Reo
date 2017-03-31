@@ -13,11 +13,11 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 
-import nl.cwi.reo.compile.components.ActiveAutomaton;
-import nl.cwi.reo.compile.components.Definition;
+import nl.cwi.reo.compile.components.Protocol;
+import nl.cwi.reo.compile.components.Component;
 import nl.cwi.reo.compile.components.ExtraReoTemplate;
-import nl.cwi.reo.compile.components.Instance;
 import nl.cwi.reo.compile.components.ReoTemplate;
+import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.compile.components.TransitionRule;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
@@ -48,18 +48,15 @@ public class JavaCompiler {
 		ReoConnector<T> connector = program.getConnector().flatten().insertNodes(true, true, nodeFactory).integrate();
 
 		List<Port> ports = new ArrayList<Port>();
-		List<Instance> instances = new ArrayList<Instance>();
-		List<Definition> definitions = new ArrayList<Definition>();
+		List<Component> components = new ArrayList<Component>();
 
 		int c = 0;
 		int i = 0;
 		for (ReoConnectorAtom<T> atom : connector.getAtoms()) {
-			List<Port> atom_ports = new ArrayList<Port>(atom.getInterface());
-			ports.addAll(atom_ports);
-			Map<Integer, Set<TransitionRule>> out = new HashMap<Integer, Set<TransitionRule>>();
+			ports.addAll(atom.getInterface());
+			Map<Integer, Set<Transition>> out = new HashMap<Integer, Set<Transition>>();
 			Integer initial = 0;
-			Definition defn = new ActiveAutomaton("Component" + c++, atom_ports, out, initial);
-			instances.add(new Instance("Instance" + i++, defn, atom_ports));
+			Component defn = new Protocol("Component" + c++, atom.getInterface(), out, initial);
 		}
 
 		List<ReoConnectorComposite<T>> partitionMedium = new ArrayList<ReoConnectorComposite<T>>();
@@ -85,7 +82,7 @@ public class JavaCompiler {
 			partitionBig.add(getProduct(composite));
 		}
 
-		return new ReoTemplate(program.getFile(), packagename, program.getName(), ports, instances, definitions);
+		return new ReoTemplate(program.getFile(), packagename, program.getName(), components);
 	}
 
 	public static <T extends AutomatonSemantics<T>> ReoConnectorComposite<T> getProduct(
@@ -156,14 +153,15 @@ public class JavaCompiler {
 	 * @return a transition if the formula is a conjunction of literals, or null
 	 *         otherwise.
 	 */
-	public static TransitionRule commandify(Formula f) {
+	public static Transition commandify(Formula f) {
 		Map<Variable,Term> map = new HashMap<Variable,Term>();
 		
 		System.out.println(f);
 		map = f.getAssignment();
 		Set<Port> s = f.getInterface();
 		
-		return 	new TransitionRule(f.getInterface(),f.getAssignment());
+		return null;
+//		return 	new Transition(f.getInterface(),f.getAssignment());
 	}
 	
 	public static Formula compose(List<Formula> list){
@@ -202,17 +200,17 @@ public class JavaCompiler {
 	}
 		
 	public static void generateCode(Formula automaton){
-		List<TransitionRule> transitions = new ArrayList<TransitionRule>();
+		List<Transition> transitions = new ArrayList<Transition>();
 		if(automaton instanceof Disjunction)
 			for(Formula f : ((Disjunction) automaton).getClauses())
 				transitions.add(JavaCompiler.commandify(f));
 		Set<MemoryCell> mem = new HashSet<MemoryCell>();
 		
-		for(TransitionRule tr : transitions){
-			mem.addAll(tr.getMemoryCells());
+		for(Transition tr : transitions){
+//			mem.addAll(tr.getMemory());
 		}
 		
-		Map<Set<Variable>,Set<TransitionRule>> list = partition(transitions);
+//		Map<Set<Variable>,Set<TransitionRule>> list = partition(transitions);
 		
 //		for(MemoryCell m : mem){
 //			for(TransitionRule tr : transitions){

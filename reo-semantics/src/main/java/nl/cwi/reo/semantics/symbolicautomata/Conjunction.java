@@ -1,7 +1,6 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -17,6 +16,11 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
 public class Conjunction implements Formula {
+	
+	/**
+	 * Flag for string template.
+	 */
+	public static final boolean conjunction = true;
 	
 	private final List<Formula> g;
 	
@@ -164,6 +168,10 @@ public class Conjunction implements Formula {
 			return p;
 		else
 			return null;
+	}
+
+	public List<Formula> getClauses(){
+		return g;
 	}
 
 	@Override

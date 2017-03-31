@@ -27,12 +27,12 @@ public final class ExtraReoTemplate {
 
 	private final Set<Port> ports;
 
-	private final List<TransitionRule> transitions;
+	private final List<Transition> transitions;
 
 	private final Set<MemoryCell> mem;
 
 	
-	public ExtraReoTemplate(String reofile, String packagename, String name, Set<Port> ports, List<TransitionRule> transitions, Set<MemoryCell> memoryCells) {
+	public ExtraReoTemplate(String reofile, String packagename, String name, Set<Port> ports, List<Transition> transitions, Set<MemoryCell> memoryCells) {
 		this.reofile = reofile;
 		this.packagename = packagename;
 		this.name = name;
@@ -57,7 +57,7 @@ public final class ExtraReoTemplate {
 	public Set<Port> getPorts() {
 		return ports;
 	}
-	public List<TransitionRule> getTransitions(){
+	public List<Transition> getTransitions(){
 		return transitions;
 	}
 	public Set<MemoryCell> getMem(){
