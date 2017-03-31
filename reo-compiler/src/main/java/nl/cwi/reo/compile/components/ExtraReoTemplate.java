@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +15,7 @@ import org.stringtemplate.v4.STGroupFile;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
+import nl.cwi.reo.semantics.symbolicautomata.Variable;
 
 public final class ExtraReoTemplate {
 

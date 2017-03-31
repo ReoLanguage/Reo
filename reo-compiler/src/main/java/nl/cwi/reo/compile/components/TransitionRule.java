@@ -1,10 +1,13 @@
 package nl.cwi.reo.compile.components;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
+import nl.cwi.reo.semantics.symbolicautomata.Node;
 import nl.cwi.reo.semantics.symbolicautomata.Term;
 import nl.cwi.reo.semantics.symbolicautomata.Variable;
 
@@ -50,6 +53,27 @@ public final class TransitionRule {
 		return this.N;
 	}
 
+	public Set<Variable> getVariable(){
+		Set<Variable> variable = new HashSet<Variable>();
+		
+		for(Port p : N){
+			variable.add(new Node(p));
+		}
+		for(Term t :a.values()){
+			if(t instanceof MemoryCell)
+				variable.add(((MemoryCell) t));
+		}
+		return variable;
+	}
+	
+	public Set<MemoryCell> getMemoryCells() {		
+		Set<MemoryCell> mem = new HashSet<MemoryCell>();
+		for(Term t :a.values()){
+			if(t instanceof MemoryCell)
+				mem.add(((MemoryCell) t));
+		}
+		return mem;
+	}
 	/**
 	 * Retrieves the job constraint of the current transition.
 	 * 

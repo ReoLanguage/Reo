@@ -2,6 +2,7 @@ package nl.cwi.reo.compile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -161,12 +162,43 @@ public class JavaCompiler {
 		System.out.println(f);
 		map = f.getAssignment();
 		Set<Port> s = f.getInterface();
+		
 		return 	new TransitionRule(f.getInterface(),f.getAssignment());
 	}
 	
 	public static Formula compose(List<Formula> list){
 		Formula dnf=new Conjunction(list);
 		return dnf.DNF();
+	}
+	
+	public static Map<Set<Variable>,Set<TransitionRule>> partition(List<TransitionRule> transitions){
+	
+		Map<Set<Variable>,Set<TransitionRule>> map = new HashMap<Set<Variable>,Set<TransitionRule>>();
+		
+		Queue<TransitionRule> queue = new LinkedList<TransitionRule>(transitions);
+
+		TransitionRule tr = queue.poll();
+		map.put(tr.getVariable(), new HashSet<TransitionRule>(Arrays.asList(tr)));
+		
+		while(!queue.isEmpty()){
+			tr = queue.poll();
+			Set<Variable> v = tr.getVariable();
+			for(Set<Variable> s : map.keySet()){
+				if(v.retainAll(s)){
+					Set<TransitionRule> transitionSet = map.get(s);
+					transitionSet.add(tr);
+					map.remove(s);
+					s.addAll(tr.getVariable());
+					map.put(s,transitionSet);
+				}
+				else{
+					map.put(tr.getVariable(), new HashSet<TransitionRule>(Arrays.asList(tr)));
+				}
+			}
+		}
+		
+		
+		return map;
 	}
 		
 	public static void generateCode(Formula automaton){
@@ -175,12 +207,12 @@ public class JavaCompiler {
 			for(Formula f : ((Disjunction) automaton).getClauses())
 				transitions.add(JavaCompiler.commandify(f));
 		Set<MemoryCell> mem = new HashSet<MemoryCell>();
+		
 		for(TransitionRule tr : transitions){
-			for(Term t :tr.getAction().values()){
-				if(t instanceof MemoryCell)
-					mem.add(((MemoryCell) t));
-			}
+			mem.addAll(tr.getMemoryCells());
 		}
+		
+		Map<Set<Variable>,Set<TransitionRule>> list = partition(transitions);
 		
 //		for(MemoryCell m : mem){
 //			for(TransitionRule tr : transitions){
