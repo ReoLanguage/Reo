@@ -1,6 +1,12 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
@@ -39,5 +45,39 @@ public class Node implements Variable {
 
 	public boolean isInput() {
 		return p.isInput();
+	}
+
+	@Override
+	public Term Substitute(Term t, Variable x) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<Variable> getFreeVariables() {
+		return new HashSet<Variable>(Arrays.asList(this));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Node))
+			return false;
+		Node p = (Node) other;
+		return Objects.equals(this.p, p.p);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.p);
 	}
 }

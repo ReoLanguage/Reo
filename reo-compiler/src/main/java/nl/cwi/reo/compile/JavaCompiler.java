@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.SortedSet;
 
 import nl.cwi.reo.compile.components.Protocol;
 import nl.cwi.reo.compile.components.Component;
@@ -23,17 +21,12 @@ import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.ports.PrioType;
-import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.AutomatonSemantics;
 import nl.cwi.reo.semantics.symbolicautomata.Conjunction;
 import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
 import nl.cwi.reo.semantics.symbolicautomata.Formula;
 import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
-import nl.cwi.reo.semantics.symbolicautomata.Node;
 import nl.cwi.reo.semantics.symbolicautomata.Term;
-import nl.cwi.reo.semantics.symbolicautomata.Variable;
 
 public class JavaCompiler {
 
@@ -157,7 +150,7 @@ public class JavaCompiler {
 		System.out.println(f);
 		map = f.getAssignment();
 		Set<Port> s = f.getInterface();
-		return 	new Transition(f.getInterface(),f.getAssignment());
+		return null;//	new Transition(f.getInterface(),f.getAssignment());
 	}
 	
 	public static Formula compose(List<Formula> list){
@@ -172,10 +165,10 @@ public class JavaCompiler {
 				transitions.add(JavaCompiler.commandify(f));
 		Set<MemoryCell> mem = new HashSet<MemoryCell>();
 		for(Transition tr : transitions){
-			for(Term t :tr.getAction().values()){
-				if(t instanceof MemoryCell)
-					mem.add(((MemoryCell) t));
-			}
+//			for(Term t :tr.getAction().values()){
+//				if(t instanceof MemoryCell)
+//					mem.add(((MemoryCell) t));
+//			}
 		}
 		
 //		for(MemoryCell m : mem){

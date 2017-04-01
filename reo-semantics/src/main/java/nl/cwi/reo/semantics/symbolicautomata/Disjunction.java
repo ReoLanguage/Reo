@@ -20,10 +20,10 @@ public class Disjunction implements Formula {
 	 */
 	public static final boolean disjunction = true;
 	
-	private final List<Formula> g;
+	private final List<Formula> clauses;
 	
-	public Disjunction(List<Formula> g) {
-		this.g = g;
+	public Disjunction(List<Formula> clauses) {
+		this.clauses = clauses;
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula getGuard() {
 		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : g)
+		for (Formula f : clauses)
 			h.add(f.getGuard());
 		return new Disjunction(h);
 	}
@@ -43,7 +43,7 @@ public class Disjunction implements Formula {
 	@Override
 	public Map<Port, Term> getAssignment() {
 		Map<Port, Term> assignment = new HashMap<Port, Term>();
-		for (Formula f : g) {
+		for (Formula f : clauses) {
 			Map<Port, Term> assignment1 = f.getAssignment();
 			if (assignment1 == null)
 				return null;
@@ -57,7 +57,7 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula rename(Map<Port, Port> links) {
 		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : g)
+		for (Formula f : clauses)
 			h.add(f.rename(links));
 		return new Disjunction(h);
 	}
@@ -65,7 +65,7 @@ public class Disjunction implements Formula {
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> P = new HashSet<Port>();
-		for (Formula f : g)
+		for (Formula f : clauses)
 			if(f instanceof Disjunction || f instanceof Conjunction || f instanceof Existential)
 				P.addAll(f.getInterface());
 		return P;
@@ -77,65 +77,61 @@ public class Disjunction implements Formula {
 	}
 	
 	public String toString(){
-		String s = "[" + g.get(0).toString() +"]";
-		for(int i=1;i<g.size(); i++){
-			s = s + "OR" + "[" + g.get(i).toString() + "]";
+		String s = "[" + clauses.get(0).toString() +"]";
+		for(int i=1;i<clauses.size(); i++){
+			s = s + "OR" + "[" + clauses.get(i).toString() + "]";
 		}
 		return s;
 	}
 
 	public List<Formula> getClauses(){
-		return g;
+		return clauses;
 	}
 	
 	@Override
 	public Disjunction DNF() {
-		// TODO Auto-generated method stub
-		return null;
+		List<Formula> list = new ArrayList<Formula>();
+		for (Formula f : clauses)
+			list.add(f.DNF());
+		return new Disjunction(list);
 	}
 
 	@Override
-	public Formula NNF(boolean isNegative) {
-		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : g)
-			h.add(f.NNF(isNegative));
-		if(isNegative){
-			return new Conjunction(h);
-		}
-		else{
-			return new Disjunction(h);			
-		}
+	public Formula NNF() {
+		List<Formula> list = new ArrayList<Formula>();
+		for (Formula f : clauses)
+			list.add(f.NNF());
+		return new Disjunction(list);
 	}
 
 	@Override
 	public Formula QE() {
-		List<Formula> existentialList = new ArrayList<Formula>();
-		for(Formula f : g){
-			Set<Term> variable = new HashSet<Term>();
-			Map<Port,Term> map = f.getAssignment();
-			for(Port p : f.getInterface()){
-				if(p.isHidden() && map.containsKey(p)){
-					Term t = map.get(p);
-					for(Port port : map.keySet()){
-						if(map.get(port) instanceof Node){
-							if(((Node)map.get(port)).getPort().equals(p)){
-							map.replace(port, t);
-							}
-						}
-					}
-					map.remove(p);
-					variable.add(new Node(p));
-				}
-			}
-			List<Formula> formulaList = new ArrayList<Formula>();
-			for(Port p : map.keySet()){
-				formulaList.add(new Equality(new Node(p),map.get(p)));
-				formulaList.add(new Synchron(p));
-			}
-			existentialList.add(new Existential(variable,new Conjunction(formulaList)));
-			
-		}
-		return new Disjunction(existentialList);
+		List<Formula> list = new ArrayList<Formula>();
+		for (Formula f : clauses)
+			list.add(f.QE());
+		return new Disjunction(list);
+	}
+
+	@Override
+	public Formula Substitute(Term t, Variable x) {
+		List<Formula> list = new ArrayList<Formula>();
+		for (Formula f : clauses)
+			list.add(f.Substitute(t, x));
+		return new Disjunction(list);
+	}
+
+	@Override
+	public Set<Variable> getFreeVariables() {
+		Set<Variable> vars = new HashSet<Variable>();
+		for (Formula f : clauses)
+			vars.addAll(f.getFreeVariables());
+		return vars;
+	}
+
+	@Override
+	public Map<Variable, Integer> getEvaluation() {
+		// TODO Auto-generated method stub
+		return new HashMap<Variable, Integer>();
 	}
 
 }

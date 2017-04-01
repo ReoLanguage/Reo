@@ -54,15 +54,28 @@ public class BooleanValue implements Formula {
 	}
 
 	@Override
-	public Formula NNF(boolean isNegative) {
-		
-		return new BooleanValue(!isNegative);
+	public Formula NNF() {
+		return this;
 	}
 
 	@Override
 	public Formula QE() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
+	}
+
+	@Override
+	public Formula Substitute(Term t, Variable x) {
+		return this;
+	}
+
+	@Override
+	public Set<Variable> getFreeVariables() {
+		return new HashSet<Variable>();
+	}
+
+	@Override
+	public Map<Variable, Integer> getEvaluation() {
+		return new HashMap<Variable, Integer>();
 	}
 
 }

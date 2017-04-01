@@ -1,8 +1,6 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,13 +10,13 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
-public class Existential implements Formula {
+public class Universal implements Formula {
 
 	private final Variable x;
 	
 	private final Formula f;
 
-	public Existential(Variable x, Formula f) {
+	public Universal(Variable x, Formula f) {
 		this.x = x;
 		this.f = f;
 	}
@@ -41,7 +39,7 @@ public class Existential implements Formula {
 	public Formula rename(Map<Port, Port> links) {
 		Map<Port, Port> newlinks = new HashMap<Port, Port>(links);
 		newlinks.remove(x); // this is pseudo code
-		return new Existential(x, f.rename(newlinks));
+		return new Universal(x, f.rename(newlinks));
 	}
 
 	@Override
@@ -52,8 +50,8 @@ public class Existential implements Formula {
 		return P;
 	}
 
-	public String toString(){
-		return  "\u2203" + x + "(" + f + ")";  
+	public String toString() {
+		return  "\u2200" + x + "(" + f + ")";  
 	}
 	
 	@Override
@@ -68,36 +66,11 @@ public class Existential implements Formula {
 
 	@Override
 	public Formula NNF() {
-		return new Existential(x, f.NNF());
+		return new Universal(x, f.NNF());
 	}
 
 	@Override
 	public Formula QE() {
-		if (f instanceof Existential) {
-			return new Existential(x, f.QE());
-		} else if (f instanceof Disjunction) {
-			List<Formula> list = new ArrayList<Formula>();
-			for (Formula fi : ((Disjunction) f).getClauses())
-				list.add(new Existential(x, fi));
-			return new Disjunction(list).QE();
-		} else if (f instanceof Conjunction) {
-			List<Formula> list = new ArrayList<Formula>();
-			Term t = null;
-			for (Formula fi : ((Conjunction) f).getClauses()) {
-				if (fi instanceof Equality) {
-					Equality e = (Equality) fi;
-					if (e.getLHS().equals(x)) {
-						t = e.getRHS();
-					} else if (e.getRHS().equals(x)) {
-						t =  e.getLHS();
-					} else {
-						list.add(fi);
-					}
-				}
-			}
-			if (t != null)
-				return new Conjunction(list).Substitute(t, x);
-		}
 		return this;
 	}
 
@@ -105,7 +78,7 @@ public class Existential implements Formula {
 	public Formula Substitute(Term t, Variable x) {
 		if (this.x.equals(x))
 			return this;
-		return new Existential(x, f.Substitute(t, x));
+		return new Universal(x, f.Substitute(t, x));
 	}
 
 	@Override

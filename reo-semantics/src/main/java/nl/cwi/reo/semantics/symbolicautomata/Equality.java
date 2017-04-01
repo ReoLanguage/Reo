@@ -26,7 +26,15 @@ public class Equality implements Formula {
 		this.t1 = t1;
 		this.t2 = t2;
 	}
+	
+	public Term getLHS() {
+		return t1;
+	}
 
+	public Term getRHS() {
+		return t2;
+	}
+	
 	@Override
 	public Formula getGuard() {
 		if (t1 instanceof Node && t2 instanceof Node) {
@@ -39,72 +47,73 @@ public class Equality implements Formula {
 
 	@Override
 	public Map<Port, Term> getAssignment() {
-		/*
-		 * MemoryCell 
-		 */
-		Map<Port, Term> map = new HashMap<Port, Term>();
-//		Port p=(t1 instanceof Node && !t2.hadOutputs())?((Node) t1).getPort():(((t2 instanceof Node && !t1.hadOutputs()))?null:((Node) t2).getPort());
-		Term t = null;
-		if(t1 instanceof Node){
-			Port p = ((Node) t1).getPort();
-			if(p.getType() == PortType.OUT){
-				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime()){
-					//Look into a value that satisfy the formula
-				}
-				if(t2 instanceof MemoryCell && !((MemoryCell) t2).hasPrime()){
-					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
-				}
-				if(t2 instanceof Constant){
-					map.put(p, t2);
-				}
-				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.IN){
-					map.put(p, t2);
-				}
-				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.OUT){
-					//Look into a value that satisfy the formula
-				}
-				return map;
-			}
-			if(p.getType() == PortType.IN){
-				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime()){
-					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
-				}
-				if(t2 instanceof MemoryCell && !((MemoryCell) t2).hasPrime()){	
-					//Look into a value that satisfy the formula
-				}
-				if(t2 instanceof Constant){
-					map.put(p, t2);
-				}
-				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.IN){
-					//Look into a value that satisfy the formula
-				}
-				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.OUT){
-					map.put(p, t2);
-				}
-				return map;
-			}
-			if(p.getType() == PortType.NONE){
-				throw new UnsupportedOperationException();
-			}
-			return map;
-		}
-		else if(t1 instanceof MemoryCell){
-			if(t2 instanceof Node){
-				return (new Equality(t2,t1)).getAssignment();
-			}
-			if(t2 instanceof Constant){
-//				map.put(t1, t2);
-			}
-			return map;
-		}
-		else if(t1 instanceof Constant){
-			if(t2 instanceof Node){
-				return (new Equality(t2,t1)).getAssignment();
-			}
-			return map;
-		}
-		return map;
+//		/*
+//		 * MemoryCell 
+//		 */
+//		Map<Port, Term> map = new HashMap<Port, Term>();
+////		Port p=(t1 instanceof Node && !t2.hadOutputs())?((Node) t1).getPort():(((t2 instanceof Node && !t1.hadOutputs()))?null:((Node) t2).getPort());
+//		Term t = null;
+//		if(t1 instanceof Node){
+//			Port p = ((Node) t1).getPort();
+//			if(p.getType() == PortType.OUT){
+//				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime()){
+//					//Look into a value that satisfy the formula
+//				}
+//				if(t2 instanceof MemoryCell && !((MemoryCell) t2).hasPrime()){
+//					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
+//				}
+//				if(t2 instanceof Constant){
+//					map.put(p, t2);
+//				}
+//				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.IN){
+//					map.put(p, t2);
+//				}
+//				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.OUT){
+//					//Look into a value that satisfy the formula
+//				}
+//				return map;
+//			}
+//			if(p.getType() == PortType.IN){
+//				if(t2 instanceof MemoryCell && ((MemoryCell) t2).hasPrime()){
+//					map.put(p, ((MemoryCell) t2).setType(p.getTypeTag().toString()));
+//				}
+//				if(t2 instanceof MemoryCell && !((MemoryCell) t2).hasPrime()){	
+//					//Look into a value that satisfy the formula
+//				}
+//				if(t2 instanceof Constant){
+//					map.put(p, t2);
+//				}
+//				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.IN){
+//					//Look into a value that satisfy the formula
+//				}
+//				if(t2 instanceof Node && ((Node) t2).getPort().getType() == PortType.OUT){
+//					map.put(p, t2);
+//				}
+//				return map;
+//			}
+//			if(p.getType() == PortType.NONE){
+//				throw new UnsupportedOperationException();
+//			}
+//			return map;
+//		}
+//		else if(t1 instanceof MemoryCell){
+//			if(t2 instanceof Node){
+//				return (new Equality(t2,t1)).getAssignment();
+//			}
+//			if(t2 instanceof Constant){
+////				map.put(t1, t2);
+//			}
+//			return map;
+//		}
+//		else if(t1 instanceof Constant){
+//			if(t2 instanceof Node){
+//				return (new Equality(t2,t1)).getAssignment();
+//			}
+//			return map;
+//		}
+//		return map;
 		
+		return null;
 //		return new Equality(t2,t1).getAssignment();
 //		if (t1 instanceof Node && !t2.hadOutputs()) {
 //			p = ((Node) t1).getPort();
@@ -157,7 +166,7 @@ public class Equality implements Formula {
 	}
 	
 	public String toString(){
-		return "(" + t1.toString() + "=" + t2.toString() + ")";
+		return t1 + " = " + t2;
 	}
 
 	@Override
@@ -171,17 +180,36 @@ public class Equality implements Formula {
 	}
 
 	@Override
-	public Formula NNF(boolean isNegative) {
-		if(isNegative)
-			return new Negation(this);
-		else
-			return this;
+	public Formula NNF() {
+		return this;
 	}
 
 	@Override
 	public Formula QE() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
+	}
+
+	@Override
+	public Formula Substitute(Term t, Variable x) {
+		return new Equality(t1.Substitute(t, x), t2.Substitute(t, x));
+	}
+
+	@Override
+	public Set<Variable> getFreeVariables() {
+		Set<Variable> vars = t1.getFreeVariables();
+		vars.addAll(t2.getFreeVariables());
+		return vars;
+	}
+
+	@Override
+	public Map<Variable, Integer> getEvaluation() {
+		Map<Variable, Integer> map = new HashMap<Variable, Integer>();
+		if (t1 instanceof Function && ((Function<?>) t1).getId() == null && t2 instanceof Variable) {
+			map.put((Variable) t2, 1);
+		} else if (t2 instanceof Function && ((Function<?>) t2).getId() == null && t1 instanceof Variable) {
+			map.put((Variable) t1, 1);
+		}
+		return map;
 	}
 
 }

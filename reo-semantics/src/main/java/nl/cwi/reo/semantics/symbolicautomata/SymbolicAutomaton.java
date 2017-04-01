@@ -116,7 +116,7 @@ public class SymbolicAutomaton implements Semantics<SymbolicAutomaton> {
 
 	@Override
 	public SymbolicAutomaton restrict(Collection<? extends Port> intface) {
-		Set<Port> P = f.getInterface();
+//		Set<Port> P = f.getInterface();
 //		P.removeAll(o);
 		return null;
 	}

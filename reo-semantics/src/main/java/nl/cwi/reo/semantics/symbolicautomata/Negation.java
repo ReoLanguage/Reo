@@ -1,6 +1,8 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,19 +59,60 @@ public class Negation implements Formula {
 	}
 
 	@Override
-	public Formula DNF() {
-		return null;
+	public Formula NNF() {
+		if (f instanceof Negation) {
+			return f.NNF();
+		} else if (f instanceof BooleanValue) {
+			return new BooleanValue(!((BooleanValue) f).getValue());
+		} else if (f instanceof Conjunction) {
+			List<Formula> list = new ArrayList<Formula>();
+			for (Formula fi : ((Conjunction) f).getClauses())
+				list.add(new Negation(fi));
+			return new Disjunction(list).NNF();
+		} else if (f instanceof Disjunction) {
+			List<Formula> list = new ArrayList<Formula>();
+			for (Formula fi : ((Disjunction) f).getClauses())
+				list.add(new Negation(fi));
+			return new Conjunction(list).NNF();
+		} else if (f instanceof Existential) {
+			Variable x = ((Existential) f).getVariable();
+			return new Universal(x, f).NNF();
+		} else if (f instanceof Universal) {
+			Variable x = ((Universal) f).getVariable();
+			return new Existential(x, f).NNF();
+		}
+		return f.NNF();
 	}
 
 	@Override
-	public Formula NNF(boolean isNegative) {
-		return f.NNF(!isNegative);
+	public Formula DNF() {
+		return this;
 	}
 
 	@Override
 	public Formula QE() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Negation(f.QE());
 	}
 
+	@Override
+	public Formula Substitute(Term t, Variable x) {
+		return new Negation(f.Substitute(t, x));
+	}
+
+	@Override
+	public Set<Variable> getFreeVariables() {
+		return f.getFreeVariables();
+	}
+
+	@Override
+	public Map<Variable, Integer> getEvaluation() {
+		Map<Variable, Integer> map = new HashMap<Variable, Integer>();
+		for (Map.Entry<Variable, Integer> entry : f.getEvaluation().entrySet()) {
+			if (entry.getValue().intValue() == 0)
+				map.put(entry.getKey(), 1);
+			if (entry.getValue().intValue() == 1)
+				map.put(entry.getKey(), 0);
+		}
+		return map;
+	}
 }

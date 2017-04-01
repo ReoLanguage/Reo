@@ -30,15 +30,14 @@ import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.symbolicautomata.Conjunction;
-import nl.cwi.reo.semantics.symbolicautomata.Constant;
 import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
 import nl.cwi.reo.semantics.symbolicautomata.Equality;
 import nl.cwi.reo.semantics.symbolicautomata.Formula;
+import nl.cwi.reo.semantics.symbolicautomata.Function;
 import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
 import nl.cwi.reo.semantics.symbolicautomata.Negation;
 import nl.cwi.reo.semantics.symbolicautomata.Node;
 import nl.cwi.reo.semantics.symbolicautomata.SymbolicAutomaton;
-import nl.cwi.reo.semantics.symbolicautomata.Synchron;
 import nl.cwi.reo.semantics.symbolicautomata.Term;
 import nl.cwi.reo.util.Monitor;
 
@@ -51,6 +50,8 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 //	private ParseTreeProperty<DataConstraint> dataConstraint = new ParseTreeProperty<DataConstraint>();	
 	private ParseTreeProperty<Port> incPorts = new ParseTreeProperty<Port>();	
 	private ParseTreeProperty<Port> excPorts = new ParseTreeProperty<Port>();	
+	
+	private final Term asterix = new Function<>(null, new ArrayList<Term>());
 	
 	public ListenerSBA(Monitor m) {
 		super(m);
@@ -85,19 +86,19 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 	 * Data Terms:
 	 */
 	public void exitSba_nat(Sba_natContext ctx){
-		term.put(ctx, new Constant(Integer.parseInt(ctx.NAT().toString())));
+		term.put(ctx, new Function<Integer>(Integer.parseInt(ctx.NAT().toString()), new ArrayList<Term>()));
 	}
 	
 	public void exitSba_bool(Sba_boolContext ctx){
-		term.put(ctx, new Constant(Boolean.parseBoolean(ctx.BOOL().toString())));		
+		term.put(ctx, new Function<Boolean>(Boolean.parseBoolean(ctx.BOOL().toString()), new ArrayList<Term>()));		
 	}
 
 	public void exitSba_string(Sba_stringContext ctx){
-		term.put(ctx, new Constant(ctx.STRING().toString()));		
+		term.put(ctx, new Function<String>(ctx.STRING().toString(), new ArrayList<Term>()));		
 	}
 
 	public void exitSba_decimal(Sba_decimalContext ctx){
-		term.put(ctx, new Constant(Double.parseDouble(ctx.DEC().toString())));
+		term.put(ctx, new Function<Double>(Double.parseDouble(ctx.DEC().toString()), new ArrayList<Term>()));
 	}
 	
 	public void exitSba_dt_parameter(Sba_dt_parameterContext ctx){
@@ -121,7 +122,7 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 //	}
 	
 	public void exitSba_dt_null(Sba_dt_nullContext ctx){
-		term.put(ctx, new Constant(null));
+		term.put(ctx, asterix);
 	}
 	
 	/*
@@ -134,10 +135,10 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 		
 		for(Sba_portContext ctx_port : ctx.sba_port()){
 			if(incPorts.get(ctx_port)!=null){
-				formulaList.add(new Synchron(incPorts.get(ctx_port)));
+				formulaList.add(new Negation(new Equality(new Node(incPorts.get(ctx_port)), asterix)));
 			}
 			if(excPorts.get(ctx_port)!=null){
-				formulaList.add(new Negation(new Synchron(excPorts.get(ctx_port))));
+				formulaList.add(new Equality(new Node(excPorts.get(ctx_port)), asterix));
 			}
 		}
 		sba_formula.put(ctx, new Conjunction(formulaList));
@@ -160,7 +161,7 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 	 * Data Constraint :
 	 */
 	public void exitSba_term(Sba_termContext ctx){
-		sba_formula.put(ctx, new Equality(term.get(ctx.sba_dt()),new Constant(true)));
+		sba_formula.put(ctx, new Equality(term.get(ctx.sba_dt()), new Function<Boolean>(true, new ArrayList<Term>())));
 
 	}
 	public void exitSba_def(Sba_defContext ctx){

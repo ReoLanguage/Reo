@@ -1,7 +1,12 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
 
@@ -45,19 +50,6 @@ public class MemoryCell implements Variable {
 		return prime;
 	}
 	
-	@Override 
-	public boolean equals(Object m){
-		if(m instanceof MemoryCell){
-			if(k==((MemoryCell) m).getIndice()&&type.equals(((MemoryCell) m).getType()))
-				return true;
-		}
-		return false;
-	}
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.k);
-	}
-	
 	@Override
 	public boolean hadOutputs() {
 		return false;
@@ -70,5 +62,40 @@ public class MemoryCell implements Variable {
 	@Override
 	public Term rename(Map<Port, Port> links) {
 		return this;
+	}
+
+	@Override
+	public Term Substitute(Term t, Variable x) {
+		if (this.equals(x))
+			return t;
+		return this;
+	}
+
+	@Override
+	public Set<Variable> getFreeVariables() {
+		return new HashSet<Variable>(Arrays.asList(this));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof MemoryCell))
+			return false;
+		MemoryCell p = (MemoryCell) other;
+		return Objects.equals(this.getName(), p.getName()) && Objects.equals(this.prime, p.prime);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getName(), this.prime);
 	}
 }

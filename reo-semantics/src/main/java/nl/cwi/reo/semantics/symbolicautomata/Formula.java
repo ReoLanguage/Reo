@@ -27,20 +27,53 @@ public interface Formula {
 	 * @return Assignment of data terms to output ports.
 	 */
 	public Map<Port, Term> getAssignment();
-	
+
 	public @Nullable Formula evaluate(Scope s, Monitor m);
 
 	public Set<Port> getInterface();
-	
+
 	public Formula rename(Map<Port, Port> links);
 
 	/**
-	 * Get negation at the leaf.
+	 * Transforms the formula in negation normal form.
+	 * 
+	 * @return equivalent formula in negation normal form.
 	 */
-	public Formula NNF(boolean isNegative);
-	
+	public Formula NNF();
+
+	/**
+	 * Transforms the formula into disjunctive normal form.
+	 * 
+	 * @return equivalent formula in disjunctive normal form.
+	 */
 	public Formula DNF();
 
+	/**
+	 * Tries to eliminate quantifiers via substitution.
+	 * 
+	 * @return equivalent formula, possibly without any quantifiers.
+	 */
 	public Formula QE();
+
+	/**
+	 * Substitutes a term t for every free occurrence of a variable x in this
+	 * formula.
+	 * 
+	 * @param t
+	 *            substituted term
+	 * @param x
+	 *            free variable
+	 * @return substituted formula.
+	 */
+	public Formula Substitute(Term t, Variable x);
+
+	/**
+	 * Gets the set of all free variables in this formula.
+	 * 
+	 * @return set of all free variables.
+	 */
+	public Set<Variable> getFreeVariables();
+
+	public Map<Variable, Integer> getEvaluation();
 
 }

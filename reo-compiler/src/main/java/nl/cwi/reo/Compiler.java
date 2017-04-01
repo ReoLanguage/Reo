@@ -226,7 +226,7 @@ public class Compiler {
 		List<Formula> components = new ArrayList<Formula>();
 		
 		for(ReoConnectorAtom<SymbolicAutomaton> sba : programRba.getConnector().flatten().getAtoms()){
-			components.add(sba.getSemantics().getFormula().rename(sba.getLinks()).NNF(false));
+			components.add(sba.getSemantics().getFormula().rename(sba.getLinks()).NNF());
 			
 			System.out.println(sba.getSemantics().getFormula());
 			System.out.println(sba.getSemantics().getInterface());

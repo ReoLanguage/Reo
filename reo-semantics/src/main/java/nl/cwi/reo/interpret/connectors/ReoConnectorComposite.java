@@ -18,7 +18,6 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.util.Monitor;
 
 /**
