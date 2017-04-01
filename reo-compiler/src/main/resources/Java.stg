@@ -2,7 +2,7 @@ main(S) ::= <<
 /**
  * Generated from <S.file> by Reo 1.0.
  */
-<S.package:package();>;
+<S.package:package()>;
 import nl.cwi.reo.runtime.java.*;
 
 public class <S.name> {
@@ -55,7 +55,7 @@ private class <c.name> implements Component {
 
 	<c.ports:port(); separator="\n\n">
 	
-	<c.memory:memorycell(); separator="\n\n">
+	<c.mem:memorycell(); separator="\n\n">
 	
 	<c:constructor()>
 	
@@ -120,8 +120,7 @@ if (<guard(t); wrap, anchor>) {
 >>
 
 guard(t) ::= <<
-<t.f:formula()>
-<if(t.output.keys)> && <t.output.keys:{p | <p.name>.hasGet()}; separator=" && "><endif>
+<t.guard:formula()>
 >>
 
 formula(f) ::= <<
@@ -135,7 +134,7 @@ formula(f) ::= <<
 
 term(t) ::= <<
 <if(t.function)><t.name>(<t.args:term(t); separator="\n">)
-<elseif(t.absent)>null
+<elseif(t.constant)>null
 <elseif(t.port)><t.port.name>.poll()
 <else><t.name>
 <endif>

@@ -168,6 +168,13 @@ public class Equality implements Formula {
 		return this;
 	}
 
+	public Term getT1(){
+		return t1;
+	}
+	public Term getT2(){
+		return t2;
+	}
+	
 	@Override
 	public Formula DNF() {
 		return this;

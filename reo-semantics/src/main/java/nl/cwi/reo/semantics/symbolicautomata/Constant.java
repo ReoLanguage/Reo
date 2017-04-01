@@ -6,6 +6,8 @@ import nl.cwi.reo.interpret.ports.Port;
 
 public class Constant implements Term {
 	
+	public static final boolean constant = true;
+	
 	private final Object c;
 	
 	public Constant(Object c) {

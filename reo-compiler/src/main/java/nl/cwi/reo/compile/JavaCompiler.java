@@ -267,6 +267,7 @@ public class JavaCompiler {
 		Set<Transition> transitions = new HashSet<Transition>();
 		Map<Integer,Set<Transition>> compTransition = new HashMap<Integer,Set<Transition>>();
 		Set<Port> set = new HashSet<Port>();
+		Set<MemoryCell> mem = new HashSet<MemoryCell>();
 		
 		if(automaton instanceof Disjunction)
 			for(Formula f : ((Disjunction) automaton).getClauses()){
@@ -277,10 +278,13 @@ public class JavaCompiler {
 				for(Node n : transition.getOutput().keySet()){
 					set.add(n.getPort());
 				}
+				for(MemoryCell m: transition.getMemory().keySet()){
+					mem.add(m);
+				}
 			}
 		compTransition.put(new Integer(0), transitions); 
 		
-		Protocol p = new Protocol("protocol",set,  compTransition, new Integer(0));
+		Protocol p = new Protocol("protocol",set, compTransition, mem, new Integer(0));
 		
 		ReoTemplate reo = new ReoTemplate("testfile","packagetest", "main", Arrays.asList(p));
 		System.out.println(reo.generateCode(Language.JAVA));
