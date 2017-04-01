@@ -11,21 +11,21 @@ public class <S.name> {
     
     <S.ports:newPort(); separator="\n">
     
-    <S.component:newComponent(); separator="\n">
+    <S.components:newComponent(); separator="\n">
 	
-	<S.component:newThread(); separator="\n">
+	<S.components:newThread(); separator="\n">
 
-	<S.component:start(); separator="\n">
+	<S.components:start(); separator="\n">
 	
     try {
-      <S.component:join(); separator="\n">
+      <S.components:join(); separator="\n">
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
     
   }
 
-  <S.component:component(); separator="\n\n">
+  <S.components:component(); separator="\n\n">
   
 }
 >>
@@ -83,7 +83,7 @@ public void run() {
 	int k = 0;
 	while (true) {
 		k++;
-		<c.transitions:transition(); separator="\n">
+		<c.transitions.keys:{k | <c.transitions.(k):transition()>}; separator="\n">
 		if (k > A.k) {
 			k = 0;
 			synchronized (this) {

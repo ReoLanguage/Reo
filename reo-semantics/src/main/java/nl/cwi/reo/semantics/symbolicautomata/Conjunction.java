@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.symbolicautomata;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,9 +39,22 @@ public class Conjunction implements Formula {
 	@Override
 	public Formula getGuard() {
 		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : g)
-			h.add(f.getGuard());
-		return new Conjunction(h);
+		boolean value = true;
+		for (Formula f : g){
+			if(f.getGuard() instanceof BooleanValue && value){
+				if(!((BooleanValue) f.getGuard()).getValue())
+					value=false;
+			}
+			else
+				h.add(f.getGuard());
+		}
+		if(value && h.isEmpty())
+			return new BooleanValue(true);
+		else{
+			if(h.size()==1)
+				return h.get(0);
+			return new Conjunction(h);
+		}
 	}
 
 	/**
@@ -189,9 +203,51 @@ public class Conjunction implements Formula {
 	}
 
 	@Override
-	public Formula QE() {
-		// TODO Auto-generated method stub
-		return null;
+	public Formula QE(Set<Term> quantifiers) {
+		List<Formula> formulaList = new ArrayList<Formula>(Arrays.asList(this.getGuard()));
+		Set<Term> variable = new HashSet<Term>();
+		Map<Variable,Term> map = this.getAssignment();
+		
+		for(Port p : this.getInterface()){
+			if(quantifiers.contains(new Node(p))){
+				if(map.containsKey(new Node(p))){
+					Term t = map.get(new Node(p));
+					map.remove(new Node(p));
+					for(Variable v : map.keySet()){
+						if(map.get(v) instanceof Node && map.get(v).equals(new Node(p))){
+							map.replace(v, t);
+						}
+					}
+					map.remove(p);
+					variable.add(new Node(p));
+				}
+				if(map.containsValue(new Node(p))){
+					Set<Variable> variableToRemove = new HashSet<Variable>();
+					for(Variable v :map.keySet()){
+						if(map.get(v).equals(new Node(p))){
+							variableToRemove.add(v);
+							variable.add(new Node(p));
+						}
+					}
+					for(Variable v : variableToRemove){
+						map.remove(v);
+					}
+				}
+			}
+		}
+
+		for(Variable p : map.keySet()){
+			formulaList.add(new Equality(p,map.get(p)));
+			if(p instanceof Node)
+				formulaList.add(new Synchron(((Node) p).getPort()));
+			if(map.get(p) instanceof Node)
+				formulaList.add(new Synchron(((Node) map.get(p)).getPort()));
+		}
+
+		if(formulaList.size()==1)
+			return formulaList.get(0);
+		return new Conjunction(formulaList);
+		
 	}
 
 }

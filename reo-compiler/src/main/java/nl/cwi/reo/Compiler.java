@@ -233,7 +233,6 @@ public class Compiler {
 		}
 		
 		Formula automaton = JavaCompiler.compose(components);
-		automaton = automaton.QE();
 		JavaCompiler.generateCode(automaton);
 
     }

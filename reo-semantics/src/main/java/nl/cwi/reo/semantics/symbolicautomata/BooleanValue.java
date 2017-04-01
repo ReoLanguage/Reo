@@ -60,7 +60,7 @@ public class BooleanValue implements Formula {
 	}
 
 	@Override
-	public Formula QE() {
+	public Formula QE(Set<Term> quantifiers) {
 		// TODO Auto-generated method stub
 		return null;
 	}

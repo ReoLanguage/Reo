@@ -25,7 +25,10 @@ public class Negation implements Formula {
 
 	@Override
 	public Formula getGuard() {
-		return new Negation(f.getGuard());
+		if(f.getGuard()!=null)
+			return new Negation(f.getGuard());
+		else 
+			return new BooleanValue(true);
 	}
 
 	@Override
@@ -67,7 +70,7 @@ public class Negation implements Formula {
 	}
 
 	@Override
-	public Formula QE() {
+	public Formula QE(Set<Term> quantifiers) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -32,8 +32,17 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula getGuard() {
 		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : g)
-			h.add(f.getGuard());
+		for (Formula f : g){
+			if(f.getGuard() instanceof BooleanValue)
+				if(((BooleanValue) f.getGuard()).getValue()){
+					return new BooleanValue(true);
+				}
+//					return new BooleanValue(true);
+			else
+				h.add(f.getGuard());
+		}
+		if(h.size()==1)
+			return h.get(0);
 		return new Disjunction(h);
 	}
 
@@ -108,36 +117,13 @@ public class Disjunction implements Formula {
 	}
 
 	@Override
-	public Formula QE() {
+	public Formula QE(Set<Term> quantifiers) {
 		List<Formula> existentialList = new ArrayList<Formula>();
 		for(Formula f : g){
-			Set<Term> variable = new HashSet<Term>();
-			Map<Variable,Term> map = f.getAssignment();
-			for(Port p : f.getInterface()){
-				if(p.isHidden() && map.containsKey(new Node(p))){
-					Term t = map.get(new Node(p));
-					map.remove(new Node(p));
-					for(Variable v : map.keySet()){
-						if(map.get(v) instanceof Node && map.get(v).equals(new Node(p))){
-							map.replace(v, t);
-						}
-					}
-					map.remove(p);
-					variable.add(new Node(p));
-				}
-			}
-			List<Formula> formulaList = new ArrayList<Formula>();
-			for(Variable p : map.keySet()){
-				formulaList.add(new Equality(p,map.get(p)));
-				if(p instanceof Node)
-					formulaList.add(new Synchron(((Node) p).getPort()));
-				if(map.get(p) instanceof Node)
-					formulaList.add(new Synchron(((Node) map.get(p)).getPort()));
-			}
-			existentialList.add(new Existential(variable,new Conjunction(formulaList)));
-			
+			existentialList.add(f.QE(quantifiers));
 		}
 		return new Disjunction(existentialList);
+		
 	}
 
 }

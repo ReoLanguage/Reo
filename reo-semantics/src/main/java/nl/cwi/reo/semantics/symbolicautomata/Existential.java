@@ -2,6 +2,7 @@ package nl.cwi.reo.semantics.symbolicautomata;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,8 +78,8 @@ public class Existential implements Formula {
 	}
 
 	@Override
-	public Formula QE() {
-		// TODO Auto-generated method stub
+	public Formula QE(Set<Term> quantifiers) {
+
 		return null;
 	}
 

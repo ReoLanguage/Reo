@@ -34,7 +34,7 @@ public class Synchron implements Formula {
 
 	@Override
 	public Formula getGuard() {
-		return this;
+		return new BooleanValue(true);
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class Synchron implements Formula {
 	}
 
 	@Override
-	public Formula QE() {
+	public Formula QE(Set<Term> quantifiers) {
 		// TODO Auto-generated method stub
 		return null;
 	}

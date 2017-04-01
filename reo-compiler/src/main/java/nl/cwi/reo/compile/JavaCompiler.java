@@ -18,7 +18,6 @@ import nl.cwi.reo.compile.components.Component;
 import nl.cwi.reo.compile.components.ExtraReoTemplate;
 import nl.cwi.reo.compile.components.ReoTemplate;
 import nl.cwi.reo.compile.components.Transition;
-import nl.cwi.reo.compile.components.TransitionRule;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
@@ -31,6 +30,7 @@ import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.AutomatonSemantics;
 import nl.cwi.reo.semantics.symbolicautomata.Conjunction;
 import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
+import nl.cwi.reo.semantics.symbolicautomata.Existential;
 import nl.cwi.reo.semantics.symbolicautomata.Formula;
 import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
 import nl.cwi.reo.semantics.symbolicautomata.Node;
@@ -158,10 +158,64 @@ public class JavaCompiler {
 		
 		System.out.println(f);
 		map = f.getAssignment();
-		Set<Port> s = f.getInterface();
 		
-		return null;
-//		return 	new Transition(f.getInterface(),f.getAssignment());
+		Map<MemoryCell,Term> mems = new HashMap<MemoryCell,Term>();
+		Map<Node,Term> ports = new HashMap<Node,Term>();
+		Set<Node> inputs = new HashSet<Node>();
+		Set<Node> quantifiers = new HashSet<Node>();
+		
+		for(Variable v : map.keySet()){
+			if(v instanceof MemoryCell)
+				mems.put((MemoryCell)v,map.get(v));
+			if(v instanceof Node && !((Node) v).isInput()){
+				ports.put((Node)v, map.get(v));
+			}
+			if(map.get(v) instanceof Node && ((Node)map.get(v)).isInput())
+				inputs.add((Node)map.get(v));
+		}
+		quantifiers.addAll(inputs);
+		quantifiers.addAll(ports.keySet());
+		Set<Term> q = new HashSet<Term>();
+		q.addAll(quantifiers);
+		
+		Formula g = f.QE(q);
+		
+		map = substitute(map,q);
+		mems.clear();
+		ports.clear();
+		inputs.clear();
+		
+		for(Variable v : map.keySet()){
+			if(v instanceof MemoryCell)
+				mems.put((MemoryCell)v,map.get(v));
+			if(v instanceof Node && !((Node) v).isInput()){
+				ports.put((Node)v, map.get(v));
+			}
+			if(map.get(v) instanceof Node && ((Node)map.get(v)).isInput())
+				inputs.add((Node)map.get(v));
+		}
+		
+		
+		return 	new Transition(g,ports,mems,inputs);
+	}
+	
+	public static Map<Variable,Term> substitute(Map<Variable,Term> map, Set<Term> q){
+		Map<Variable,Term> mapSubst = new HashMap<Variable,Term>();
+		mapSubst.putAll(map);
+		for(Variable v : map.keySet()){
+			if((v instanceof MemoryCell && !((MemoryCell)v).hasPrime()))
+				mapSubst.remove(v);
+			if(q.contains(v) ){
+				for(Variable var : map.keySet()){
+					if(map.get(var).equals(v)){
+						Term term = map.get(v);
+						mapSubst.remove(v);
+						mapSubst.put(var,term);
+					}	
+				}
+			}
+		}
+		return mapSubst;
 	}
 	
 	public static Formula compose(List<Formula> list){
@@ -169,28 +223,29 @@ public class JavaCompiler {
 		return dnf.DNF();
 	}
 	
-	public static Map<Set<Variable>,Set<TransitionRule>> partition(List<TransitionRule> transitions){
 	
-		Map<Set<Variable>,Set<TransitionRule>> map = new HashMap<Set<Variable>,Set<TransitionRule>>();
+	public static Map<Set<Variable>,Set<Transition>> partition(List<Transition> transitions){
+	
+		Map<Set<Variable>,Set<Transition>> map = new HashMap<Set<Variable>,Set<Transition>>();
 		
-		Queue<TransitionRule> queue = new LinkedList<TransitionRule>(transitions);
+		Queue<Transition> queue = new LinkedList<Transition>(transitions);
 
-		TransitionRule tr = queue.poll();
-		map.put(tr.getVariable(), new HashSet<TransitionRule>(Arrays.asList(tr)));
+		Transition tr = queue.poll();
+		map.put(getVariables(tr), new HashSet<Transition>(Arrays.asList(tr)));
 		
 		while(!queue.isEmpty()){
 			tr = queue.poll();
-			Set<Variable> v = tr.getVariable();
+			Set<Variable> v = getVariables(tr);
 			for(Set<Variable> s : map.keySet()){
 				if(v.retainAll(s)){
-					Set<TransitionRule> transitionSet = map.get(s);
+					Set<Transition> transitionSet = map.get(s);
 					transitionSet.add(tr);
 					map.remove(s);
-					s.addAll(tr.getVariable());
+					s.addAll(getVariables(tr));
 					map.put(s,transitionSet);
 				}
 				else{
-					map.put(tr.getVariable(), new HashSet<TransitionRule>(Arrays.asList(tr)));
+					map.put(getVariables(tr), new HashSet<Transition>(Arrays.asList(tr)));
 				}
 			}
 		}
@@ -198,17 +253,43 @@ public class JavaCompiler {
 		
 		return map;
 	}
+	
+	public static Set<Variable> getVariables(Transition transition){
+		Set<Variable> setVariable = new HashSet<Variable>();
+		setVariable.addAll(transition.getMemory().keySet());
+		setVariable.addAll(transition.getOutput().keySet());
+		setVariable.addAll(transition.getInput());
 		
+		return setVariable;
+	}
+	
 	public static void generateCode(Formula automaton){
-		List<Transition> transitions = new ArrayList<Transition>();
-		if(automaton instanceof Disjunction)
-			for(Formula f : ((Disjunction) automaton).getClauses())
-				transitions.add(JavaCompiler.commandify(f));
-		Set<MemoryCell> mem = new HashSet<MemoryCell>();
+		Set<Transition> transitions = new HashSet<Transition>();
+		Map<Integer,Set<Transition>> compTransition = new HashMap<Integer,Set<Transition>>();
+		Set<Port> set = new HashSet<Port>();
 		
-		for(Transition tr : transitions){
+		if(automaton instanceof Disjunction)
+			for(Formula f : ((Disjunction) automaton).getClauses()){
+				Transition transition = JavaCompiler.commandify(f);
+				transitions.add(transition);
+				for(Node n : transition.getInput() )
+					set.add(n.getPort());
+				for(Node n : transition.getOutput().keySet()){
+					set.add(n.getPort());
+				}
+			}
+		compTransition.put(new Integer(0), transitions); 
+		
+		Protocol p = new Protocol("protocol",set,  compTransition, new Integer(0));
+		
+		ReoTemplate reo = new ReoTemplate("testfile","packagetest", "main", Arrays.asList(p));
+		System.out.println(reo.generateCode(Language.JAVA));
+
+//		Set<MemoryCell> mem = new HashSet<MemoryCell>();
+		
+//		for(Transition tr : transitions){
 //			mem.addAll(tr.getMemory());
-		}
+//		}
 		
 //		Map<Set<Variable>,Set<TransitionRule>> list = partition(transitions);
 		
@@ -223,9 +304,9 @@ public class JavaCompiler {
 //			}
 //		}
 //		
-		Set<Port> s = new HashSet<Port>();
-		s.addAll(automaton.getInterface());
-		System.out.println(new ExtraReoTemplate("testfile", "packagetest", "test",s, transitions,mem).getCode(Language.JAVA));
+//		Set<Port> s = new HashSet<Port>();
+//		s.addAll(automaton.getInterface());
+//		System.out.println(new ExtraReoTemplate("testfile", "packagetest", "test",s, transitions,mem).getCode(Language.JAVA));
 		
 	}
 	

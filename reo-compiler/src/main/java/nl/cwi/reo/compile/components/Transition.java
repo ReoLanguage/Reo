@@ -21,7 +21,7 @@ public final class Transition {
 	/**
 	 * Guard
 	 */
-	private final Set<Port> input;
+	private final Set<Node> input;
 	
 	/**
 	 * Output update
@@ -53,9 +53,21 @@ public final class Transition {
 		this.guard = guard;
 		this.output = Collections.unmodifiableMap(output);
 		this.memory = Collections.unmodifiableMap(memory);
-		Set<Port> I = new HashSet<Port>();
-		// find all ports in the formula and the terms.
+		Set<Node> I = new HashSet<Node>();
+		// find all inputports in the formula and the terms.
 		this.input = I; 
+	}
+	public Transition(Formula guard, Map<Node, Term> output, Map<MemoryCell, Term> memory, Set<Node> input) {
+		if (guard == null)
+			throw new IllegalArgumentException("No guard specified.");
+		if (output == null)
+			throw new IllegalArgumentException("No output values specified.");
+		if (memory == null)
+			throw new IllegalArgumentException("No memory update specified.");
+		this.guard = guard;
+		this.output = Collections.unmodifiableMap(output);
+		this.memory = Collections.unmodifiableMap(memory);
+		this.input = input; 
 	}
 
 	/**
@@ -85,12 +97,13 @@ public final class Transition {
 		return this.memory;
 	}
 
+	
 	/**
 	 * Gets the set of input ports that participate in this transition.
 	 * 
 	 * @return job constraint
 	 */
-	public Set<Port> getInput() {		
+	public Set<Node> getInput() {		
 		return this.input;
 	}
 }
