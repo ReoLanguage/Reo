@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.symbolicautomata;
+package nl.cwi.reo.semantics.predicates;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -204,10 +204,10 @@ public class Equality implements Formula {
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
 		Map<Variable, Integer> map = new HashMap<Variable, Integer>();
-		if (t1 instanceof Function && ((Function<?>) t1).getId() == null && t2 instanceof Variable) {
-			map.put((Variable) t2, 1);
-		} else if (t2 instanceof Function && ((Function<?>) t2).getId() == null && t1 instanceof Variable) {
-			map.put((Variable) t1, 1);
+		if (t1 instanceof Function && ((Function) t1).getValue() == null && t2 instanceof Variable) {
+			map.put((Variable) t2, 0);
+		} else if (t2 instanceof Function && ((Function) t2).getValue() == null && t1 instanceof Variable) {
+			map.put((Variable) t1, 0);
 		}
 		return map;
 	}

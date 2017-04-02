@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.symbolicautomata.Formula;
-import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
-import nl.cwi.reo.semantics.symbolicautomata.Node;
-import nl.cwi.reo.semantics.symbolicautomata.Term;
+import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.MemoryCell;
+import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.Term;
 
 public final class Transition {
 
@@ -22,12 +22,12 @@ public final class Transition {
 	 * Guard
 	 */
 	private final Set<Port> input;
-	
+
 	/**
 	 * Output update
 	 */
 	private final Map<Node, Term> output;
-	
+
 	/**
 	 * Memory update
 	 */
@@ -54,8 +54,8 @@ public final class Transition {
 		this.output = Collections.unmodifiableMap(output);
 		this.memory = Collections.unmodifiableMap(memory);
 		Set<Port> I = new HashSet<Port>();
-		// find all ports in the formula and the terms.
-		this.input = I; 
+		// find all *used* ports in the formula and the terms.
+		this.input = I;
 	}
 
 	/**
@@ -68,29 +68,41 @@ public final class Transition {
 	}
 
 	/**
+	 * Gets the set of input ports that participate in this transition.
+	 * 
+	 * @return set of input ports
+	 */
+	public Set<Port> getInput() {
+		return this.input;
+	}
+
+	/**
 	 * Gets the values assigned to the output ports.
 	 * 
-	 * @return job constraint
+	 * @return assignment of terms to output ports.
 	 */
-	public Map<Node, Term> getOutput() {		
+	public Map<Node, Term> getOutput() {
 		return this.output;
 	}
 
 	/**
 	 * Retrieves the job constraint of the current transition.
 	 * 
-	 * @return job constraint
+	 * @return assignment of terms to memory cells.
 	 */
-	public Map<MemoryCell, Term> getMemory() {		
+	public Map<MemoryCell, Term> getMemory() {
 		return this.memory;
 	}
 
 	/**
-	 * Gets the set of input ports that participate in this transition.
+	 * Gets the set of ports that participate in this transition.
 	 * 
-	 * @return job constraint
+	 * @return set of ports that participate in this transition
 	 */
-	public Set<Port> getInput() {		
-		return this.input;
+	public Set<Port> getInterface() {
+		Set<Port> ports = new HashSet<Port>(input);
+		for (Node x : output.keySet())
+			ports.add(x.getPort());
+		return ports;
 	}
 }

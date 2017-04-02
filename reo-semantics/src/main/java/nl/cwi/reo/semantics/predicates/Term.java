@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.symbolicautomata;
+package nl.cwi.reo.semantics.predicates;
 
 import java.util.Map;
 import java.util.Set;

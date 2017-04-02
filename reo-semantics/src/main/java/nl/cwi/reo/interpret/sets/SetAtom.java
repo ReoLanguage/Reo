@@ -21,6 +21,11 @@ import nl.cwi.reo.util.Monitor;
  *            Reo semantics type
  */
 public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
+	
+	/**
+	 * Component name.
+	 */
+	private final String name;
 
 	/**
 	 * Reo semantics object.
@@ -35,16 +40,27 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	/**
 	 * Constructs a new atomic set.
 	 * 
+	 * @param name
+	 *            component name
 	 * @param atom
 	 *            semantics object
 	 * @param source
 	 *            reference to source code
 	 */
-	public SetAtom(T atom, Reference source) {
+	public SetAtom(String name, T atom, Reference source) {
 		if (atom == null || source == null)
 			throw new NullPointerException();
+		this.name = name;
 		this.atom = atom;
 		this.source = source;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Nullable
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -57,7 +73,7 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 		T semantics = atom.evaluate(s, m);
 		if (semantics == null)
 			return null;
-		return new Instance<T>(new ReoConnectorAtom<T>(semantics, source), new HashSet<Set<Identifier>>());
+		return new Instance<T>(new ReoConnectorAtom<T>(name, semantics, source), new HashSet<Set<Identifier>>());
 	}
 
 	/**

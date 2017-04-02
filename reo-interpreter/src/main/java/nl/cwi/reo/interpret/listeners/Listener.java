@@ -140,6 +140,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	// Components
 	private ParseTreeProperty<ComponentExpression<T>> components = new ParseTreeProperty<ComponentExpression<T>>();
+	private ParseTreeProperty<String> componentnames = new ParseTreeProperty<String>();
 
 	// Formulas
 	private ParseTreeProperty<PredicateExpression> formula = new ParseTreeProperty<PredicateExpression>();
@@ -258,6 +259,11 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
+	public void enterDefn(DefnContext ctx) {
+		componentnames.put(ctx.component(), ctx.ID().getText());
+	}
+	
+	@Override
 	public void exitDefn(DefnContext ctx) {
 		VariableExpression e = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(),
 				new Location(ctx.ID().getSymbol(), filename));
@@ -281,10 +287,19 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		T atom = atoms.get(ctx.atom());
 		if (atom == null)
 			throw new NullPointerException("No semantics object attached to parse tree.");
+		SignatureExpression sign = signatureExpressions.get(ctx.sign());
 		Reference s = new Reference();
 		if (ctx.source() != null)
 			s = new Reference(ctx.source().STRING().getText(), ctx.source().LANG().getText().toUpperCase());
-		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()), new SetAtom<T>(atom, s)));
+		String name = componentnames.get(ctx);
+		components.put(ctx, new ComponentDefinition<T>(sign, new SetAtom<T>(name, atom, s)));
+	}
+	
+	@Override
+	public void enterComponent_composite(Component_compositeContext ctx) {
+		componentnames.put(ctx.multiset(), componentnames.get(ctx));
+		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()),
+				(SetComposite<T>) instances.get(ctx.multiset())));
 	}
 
 	@Override
@@ -305,7 +320,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitMultiset_setbuilder(Multiset_setbuilderContext ctx) {
-
+		String name = componentnames.get(ctx);
 		List<InstanceExpression<T>> stmtlist = new ArrayList<InstanceExpression<T>>();
 		for (MultisetContext stmt_ctx : ctx.multiset())
 			stmtlist.add(instances.get(stmt_ctx));
@@ -315,22 +330,23 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		PredicateExpression P = formula.get(ctx.formula());
 		if (P == null)
 			P = new TruthValue(true);
-		instances.put(ctx, new SetComposite<T>(operator, stmtlist, P,
-				new Location(ctx.start, filename)));
+		instances.put(ctx, new SetComposite<T>(name, operator, stmtlist, P, new Location(ctx.start, filename)));
 	}
 
 	@Override
 	public void exitMultiset_else(Multiset_elseContext ctx) {
+		String name = componentnames.get(ctx);
 		SetExpression<T> m1 = sets.get(ctx.multiset(0));
 		SetExpression<T> m2 = sets.get(ctx.multiset(1));
-		sets.put(ctx, new SetElse<T>(m1, m2));
+		sets.put(ctx, new SetElse<T>(name, m1, m2));
 	}
 
 	@Override
 	public void exitMultiset_without(Multiset_withoutContext ctx) {
+		String name = componentnames.get(ctx);
 		SetExpression<T> m1 = sets.get(ctx.multiset(0));
 		SetExpression<T> m2 = sets.get(ctx.multiset(1));
-		sets.put(ctx, new SetWithout<T>(m1, m2));
+		sets.put(ctx, new SetWithout<T>(name, m1, m2));
 	}
 
 	/**
@@ -653,8 +669,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		terms.put(ctx, new ListExpression(termsList.get(ctx.list())));
 	}
 
-
-
 	@Override
 	public void exitTerm_instance(Term_instanceContext ctx) {
 		terms.put(ctx, new InstanceTermExpression<T>(instances.get(ctx.instance())));
@@ -721,6 +735,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (TermContext expr_ctx : ctx.term())
 			list.add(terms.get(expr_ctx));
 		termsList.put(ctx, list);
-//		terms.put(ctx, new ListExpression(list));
+		// terms.put(ctx, new ListExpression(list));
 	}
 }

@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.symbolicautomata;
+package nl.cwi.reo.semantics.predicates;
 
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +18,7 @@ public interface Formula {
 	 * @return existential quantification of this constraint over all output
 	 *         ports.
 	 */
+	@Deprecated
 	public Formula getGuard();
 
 	/**
@@ -26,6 +27,7 @@ public interface Formula {
 	 * 
 	 * @return Assignment of data terms to output ports.
 	 */
+	@Deprecated
 	public Map<Port, Term> getAssignment();
 
 	public @Nullable Formula evaluate(Scope s, Monitor m);
@@ -74,6 +76,14 @@ public interface Formula {
 	 */
 	public Set<Variable> getFreeVariables();
 
+	/**
+	 * Tries to determine which variables in this formula must evaluate to null
+	 * and which variables must evaluate to a non-null datum.
+	 * 
+	 * @return map that assigns 0 to a variable, if that variable must evaluate
+	 *         to null, or 1, if that variable must evaluate to a non-null
+	 *         datum, or nothing, otherwise.
+	 */
 	public Map<Variable, Integer> getEvaluation();
 
 }

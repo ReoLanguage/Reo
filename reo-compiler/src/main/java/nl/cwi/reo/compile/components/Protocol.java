@@ -19,23 +19,23 @@ public final class Protocol implements Component {
 
 	private final Set<Port> ports;
 
-	public final Map<Integer, Set<Transition>> out;
+	public final Set<Transition> transitions;
 
-	private final Integer initial;
+	private final Map<String, Object> initial;
 
-	public Protocol(String name, Set<Port> ports, Map<Integer, Set<Transition>> out, int initial) {
+	public Protocol(String name, Set<Port> ports, Set<Transition> transitions, Map<String, Object> initial) {
 		this.name = name;
 		this.ports = ports;
-		this.out = out;
+		this.transitions = transitions;
 		this.initial = initial;
 	}
 
-	public Map<Integer, Set<Transition>> getTransitions() {
-		return out;
+	public Set<Transition> getTransitions() {
+		return transitions;
 	}
 
-	public String getInitial() {
-		return initial.toString();
+	public Map<String, Object> getInitial() {
+		return initial;
 	}
 
 	public String getName() {

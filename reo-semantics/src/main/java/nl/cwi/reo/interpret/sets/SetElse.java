@@ -17,6 +17,11 @@ import nl.cwi.reo.util.Monitor;
  *            Reo semantics type
  */
 public final class SetElse<T extends Semantics<T>> implements SetExpression<T> {
+	
+	/**
+	 * Component name.
+	 */
+	private final String name;
 
 	/**
 	 * First set.
@@ -31,14 +36,25 @@ public final class SetElse<T extends Semantics<T>> implements SetExpression<T> {
 	/**
 	 * Short circuit addition of two sets of constraints.
 	 * 
+	 * @param name
+	 *            component name
 	 * @param first
 	 *            first set
 	 * @param second
 	 *            second set
 	 */
-	public SetElse(SetExpression<T> first, SetExpression<T> second) {
+	public SetElse(String name, SetExpression<T> first, SetExpression<T> second) {
+		this.name = name;
 		this.first = first;
 		this.second = second;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Nullable
+	public String getName() {
+		return name;
 	}
 
 	/**

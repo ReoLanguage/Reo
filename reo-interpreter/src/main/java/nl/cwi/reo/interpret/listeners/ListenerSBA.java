@@ -29,21 +29,21 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
-import nl.cwi.reo.semantics.symbolicautomata.Conjunction;
-import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
-import nl.cwi.reo.semantics.symbolicautomata.Equality;
-import nl.cwi.reo.semantics.symbolicautomata.Formula;
-import nl.cwi.reo.semantics.symbolicautomata.Function;
-import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
-import nl.cwi.reo.semantics.symbolicautomata.Negation;
-import nl.cwi.reo.semantics.symbolicautomata.Node;
-import nl.cwi.reo.semantics.symbolicautomata.SymbolicAutomaton;
-import nl.cwi.reo.semantics.symbolicautomata.Term;
+import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Disjunction;
+import nl.cwi.reo.semantics.predicates.Equality;
+import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Function;
+import nl.cwi.reo.semantics.predicates.MemoryCell;
+import nl.cwi.reo.semantics.predicates.Negation;
+import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.Predicate;
+import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.util.Monitor;
 
-public class ListenerSBA extends Listener<SymbolicAutomaton> {
+public class ListenerSBA extends Listener<Predicate> {
 
-	private ParseTreeProperty<SymbolicAutomaton> automaton = new ParseTreeProperty<SymbolicAutomaton>();
+	private ParseTreeProperty<Predicate> automaton = new ParseTreeProperty<Predicate>();
 	private ParseTreeProperty<Formula> sba_formula = new ParseTreeProperty<Formula>();
 	private ParseTreeProperty<Term> term = new ParseTreeProperty<Term>();
 //	private ParseTreeProperty<> syncConstraint = new ParseTreeProperty<SyncConstraint>();
@@ -51,7 +51,7 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 	private ParseTreeProperty<Port> incPorts = new ParseTreeProperty<Port>();	
 	private ParseTreeProperty<Port> excPorts = new ParseTreeProperty<Port>();	
 	
-	private final Term asterix = new Function<>(null, new ArrayList<Term>());
+	private final Term asterix = new Function(null, new ArrayList<Term>());
 	
 	public ListenerSBA(Monitor m) {
 		super(m);
@@ -70,7 +70,7 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 		for(Sba_trContext tr_ctx : ctx.sba_tr()){
 			DNF.add(sba_formula.get(tr_ctx));
 		}
-		automaton.put(ctx, new SymbolicAutomaton(new Disjunction(DNF)));
+		automaton.put(ctx, new Predicate(new Disjunction(DNF)));
 	}
 	
 	/*
@@ -86,19 +86,19 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 	 * Data Terms:
 	 */
 	public void exitSba_nat(Sba_natContext ctx){
-		term.put(ctx, new Function<Integer>(Integer.parseInt(ctx.NAT().toString()), new ArrayList<Term>()));
+		term.put(ctx, new Function("constant", Integer.parseInt(ctx.NAT().toString()), new ArrayList<Term>()));
 	}
 	
 	public void exitSba_bool(Sba_boolContext ctx){
-		term.put(ctx, new Function<Boolean>(Boolean.parseBoolean(ctx.BOOL().toString()), new ArrayList<Term>()));		
+		term.put(ctx, new Function("constant", Boolean.parseBoolean(ctx.BOOL().toString()), new ArrayList<Term>()));		
 	}
 
 	public void exitSba_string(Sba_stringContext ctx){
-		term.put(ctx, new Function<String>(ctx.STRING().toString(), new ArrayList<Term>()));		
+		term.put(ctx, new Function(ctx.STRING().toString(), new ArrayList<Term>()));		
 	}
 
 	public void exitSba_decimal(Sba_decimalContext ctx){
-		term.put(ctx, new Function<Double>(Double.parseDouble(ctx.DEC().toString()), new ArrayList<Term>()));
+		term.put(ctx, new Function("constant", Double.parseDouble(ctx.DEC().toString()), new ArrayList<Term>()));
 	}
 	
 	public void exitSba_dt_parameter(Sba_dt_parameterContext ctx){
@@ -161,7 +161,7 @@ public class ListenerSBA extends Listener<SymbolicAutomaton> {
 	 * Data Constraint :
 	 */
 	public void exitSba_term(Sba_termContext ctx){
-		sba_formula.put(ctx, new Equality(term.get(ctx.sba_dt()), new Function<Boolean>(true, new ArrayList<Term>())));
+		sba_formula.put(ctx, new Equality(term.get(ctx.sba_dt()), new Function("constant", true, new ArrayList<Term>())));
 
 	}
 	public void exitSba_def(Sba_defContext ctx){

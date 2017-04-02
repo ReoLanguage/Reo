@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.symbolicautomata;
+package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,19 +8,31 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
 
-public class Function<T> implements Term {
+public class Function implements Term {
 	
-	private final T id;
+	private final String name;
+	
+	private Object value;
 	
 	private final List<Term> args;
 	
-	public Function(T id, List<Term> args) {
-		this.id = id;
+	public Function(String name, List<Term> args) {
+		this.name = name;
 		this.args = args;
 	}
 	
-	public T getId() {
-		return id;
+	public Function(String name, Object value, List<Term> args) {
+		this.name = name;
+		this.value = value;
+		this.args = args;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public Object getValue() {
+		return value;
 	}
 
 	public List<Term> getArgs() {
@@ -38,7 +50,7 @@ public class Function<T> implements Term {
 		List<Term> list = new ArrayList<Term>();
 		for (Term s : args)
 			list.add(s.rename(links));
-		return new Function<T>(id, list);
+		return new Function(name, value, list);
 	}
 
 	@Override
@@ -46,7 +58,7 @@ public class Function<T> implements Term {
 		List<Term> list = new ArrayList<Term>();
 		for (Term s : args)
 			list.add(s.Substitute(t, x));
-		return new Function<T>(id, list);
+		return new Function(name, value, list);
 	}
 
 	@Override

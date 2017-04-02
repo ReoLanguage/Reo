@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.symbolicautomata;
+package nl.cwi.reo.semantics.predicates;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +11,8 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
+// This class is be replaced by a nullary relation.
+@Deprecated
 public class BooleanValue implements Formula {
 	
 	private final boolean b;

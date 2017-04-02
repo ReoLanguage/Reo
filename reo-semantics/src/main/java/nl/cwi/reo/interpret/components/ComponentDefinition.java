@@ -42,7 +42,7 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 		this.sign = sign;
 		this.set = set;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -55,7 +55,7 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 		for (Identifier x : deps) {
 			if ((v = s.get(x)) != null)
 				scope.put(x, v);
-			else{
+			else {
 				m.add("Variable " + x.toString() + " is not defined.");
 				return null;
 			}
@@ -78,4 +78,5 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 	public String toString() {
 		return "" + sign + set;
 	}
+	
 }
