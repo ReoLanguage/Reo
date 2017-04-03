@@ -56,6 +56,8 @@ public class MemoryCell implements Variable {
 	}
 	
 	public String toString(){
+		if(prime)
+			return getName()+"'";
 		return getName();
 	}
 

@@ -57,6 +57,20 @@ public final class Transition {
 		// find all *used* ports in the formula and the terms.
 		this.input = I;
 	}
+	
+
+	public Transition(Formula guard, Map<Node, Term> output, Map<MemoryCell, Term> memory, Set<Port> input) {
+		if (guard == null)
+			throw new IllegalArgumentException("No guard specified.");
+		if (output == null)
+			throw new IllegalArgumentException("No output values specified.");
+		if (memory == null)
+			throw new IllegalArgumentException("No memory update specified.");
+		this.guard = guard;
+		this.output = Collections.unmodifiableMap(output);
+		this.memory = Collections.unmodifiableMap(memory);
+		this.input = input;
+	}
 
 	/**
 	 * Gets the set of guards.
@@ -94,6 +108,7 @@ public final class Transition {
 		return this.memory;
 	}
 
+	
 	/**
 	 * Gets the set of ports that participate in this transition.
 	 * 

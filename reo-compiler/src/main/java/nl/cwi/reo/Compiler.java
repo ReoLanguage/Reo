@@ -204,6 +204,9 @@ public class Compiler {
 				protocols.add(atom.getSemantics());
 			}
 		}
+		
+//		Formula automaton = JavaCompiler.compose(components);
+//		JavaCompiler.generateCode(automaton);
 
 		// Compose the protocol into a single connector.
 		Predicate circuit = new Predicate().compose(protocols).restrict(intface);
@@ -248,9 +251,12 @@ public class Compiler {
 
 			// TODO For convenience, we should be able to specify the initial
 			// value of each memory cell (particularly handy for fifofull)
-			Map<String, Object> initial = new HashMap<String, Object>();
+			Map<MemoryCell, Object> initial = new HashMap<MemoryCell, Object>();
+			
+			// TODO mem can be seen as the keyset of initial.
+			Set<MemoryCell> mem = new HashSet<MemoryCell>();
 
-			components.add(new Protocol("Protocol" + n_protocol++, ports, T, initial));
+			components.add(new Protocol("Protocol" + n_protocol++, ports, T, mem, initial));
 		}
 
 		// Fill in the template

@@ -32,8 +32,17 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula getGuard() {
 		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : clauses)
-			h.add(f.getGuard());
+		for (Formula f : clauses){
+			if(f.getGuard() instanceof BooleanValue) {
+				if(((BooleanValue) f.getGuard()).getValue()) {
+					return new BooleanValue(true);
+				}
+			} else {
+				h.add(f.getGuard());
+			}
+		}
+		if(h.size()==1)
+			return h.get(0);
 		return new Disjunction(h);
 	}
 
@@ -41,13 +50,13 @@ public class Disjunction implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<Port, Term> getAssignment() {
-		Map<Port, Term> assignment = new HashMap<Port, Term>();
+	public Map<Variable, Term> getAssignment() {
+		Map<Variable, Term> assignment = new HashMap<Variable, Term>();
 		for (Formula f : clauses) {
-			Map<Port, Term> assignment1 = f.getAssignment();
+			Map<Variable, Term> assignment1 = f.getAssignment();
 			if (assignment1 == null)
 				return null;
-			for (Map.Entry<Port, Term> pair : assignment1.entrySet())
+			for (Map.Entry<Variable, Term> pair : assignment1.entrySet())
 				if (assignment.put(pair.getKey(), pair.getValue()) != null)
 					return null;
 		}

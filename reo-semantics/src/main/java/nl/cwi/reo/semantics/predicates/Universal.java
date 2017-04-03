@@ -31,7 +31,7 @@ public class Universal implements Formula {
 	}
 
 	@Override
-	public Map<Port, Term> getAssignment() {
+	public Map<Variable, Term> getAssignment() {
 		return f.getAssignment();
 	}
 

@@ -57,7 +57,7 @@ public class Relation implements Formula {
 	}
 
 	@Override
-	public Map<Port, Term> getAssignment() {
+	public Map<Variable, Term> getAssignment() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -11,6 +11,7 @@ import nl.cwi.reo.interpret.ReoParser.SbaContext;
 import nl.cwi.reo.interpret.ReoParser.Sba_boolContext;
 import nl.cwi.reo.interpret.ReoParser.Sba_dc_conjunctionContext;
 import nl.cwi.reo.interpret.ReoParser.Sba_dc_equalityContext;
+import nl.cwi.reo.interpret.ReoParser.Sba_dc_inequalityContext;
 import nl.cwi.reo.interpret.ReoParser.Sba_decimalContext;
 import nl.cwi.reo.interpret.ReoParser.Sba_defContext;
 import nl.cwi.reo.interpret.ReoParser.Sba_dt_memorycellInContext;
@@ -173,6 +174,10 @@ public class ListenerSBA extends Listener<Predicate> {
 	
 	public void exitSba_dc_equality(Sba_dc_equalityContext ctx){
 		sba_formula.put(ctx, new Equality(term.get(ctx.sba_dt(0)),term.get(ctx.sba_dt(1))));
+	}
+	
+	public void exitSba_dc_inequality(Sba_dc_inequalityContext ctx){
+		sba_formula.put(ctx, new Negation(new Equality(term.get(ctx.sba_dt(0)),term.get(ctx.sba_dt(1)))));
 	}
 	
 	public void exitSba_dc_conjunction(Sba_dc_conjunctionContext ctx){

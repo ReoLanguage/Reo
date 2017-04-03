@@ -1,5 +1,10 @@
 package nl.cwi.reo.compile.components;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -68,6 +73,16 @@ public final class ReoTemplate {
 
 		ST temp = group.getInstanceOf("main");
 		temp.add("S", this);
+		
+		String path = "../reo-runtime-java/src/main/java";
+		
+		try {
+			Files.write(Paths.get(path, "test.java"), Arrays.asList(temp.render()),
+					Charset.defaultCharset());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return temp.render();
 	}
 }

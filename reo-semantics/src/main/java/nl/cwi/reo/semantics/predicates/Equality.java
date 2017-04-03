@@ -46,7 +46,7 @@ public class Equality implements Formula {
 	}
 
 	@Override
-	public Map<Port, Term> getAssignment() {
+	public Map<Variable, Term> getAssignment() {
 //		/*
 //		 * MemoryCell 
 //		 */
