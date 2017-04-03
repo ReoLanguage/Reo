@@ -2,7 +2,7 @@ main(S) ::= <<
 /**
  * Generated from <S.file> by Reo 1.0.
  */
-<S.package:package()>;
+<! <S.package:package(); separator="\n"> !>
 import nl.cwi.reo.runtime.java.*;
 
 public class <S.name> {
@@ -13,7 +13,7 @@ public class <S.name> {
     
     <S.components:newComponent(); separator="\n">
 	
-	<S.components:newThread(); separator="\n">
+ 	<S.components:newThread(); separator="\n"> 
 
 	<S.components:start(); separator="\n">
 	
@@ -31,7 +31,7 @@ public class <S.name> {
 >>
 
 package(p) ::= <<
-<if(p)>pacakge <p>;\n<endif>
+<if(p)>package <p>;<endif>
 >>
 
 newPort(p) ::= <<
@@ -39,15 +39,19 @@ Port\<<p.typeTag>\> <p.name> = new PortBusyWait\<<p.typeTag>\>();
 >>
 
 newComponent(c) ::= <<
-Component <c.name> = new <c.classname>(<c.ports:{p|<p.name>}; separator=", ">);
+Component <c.name> = new <c.name>(<c.ports:{p|<p.name>}; separator=", ">);
 >>
 
+newThread(c) ::= <<
+Thread thread_<c.name> = new Thread(<c.name>);
+>> 
+
 start(c) ::= <<
-<c.name>.start();
+thread_<c.name>.start();
 >>
 
 join(c) ::= <<
-<if(!c.deamon)><c.name>.join();<endif>
+<if(!c.deamon)>thread_<c.name>.join();<endif>
 >>
 
 component(c) ::= <<
@@ -84,7 +88,7 @@ public void run() {
 	while (true) {
 		k++;
 		<c.transitions.keys:{k | <c.transitions.(k):transition()>}; separator="\n">
-		if (k > A.k) {
+		if (k > 3) {
 			k = 0;
 			synchronized (this) {
 				try { 
@@ -97,7 +101,8 @@ public void run() {
 >>
 
 port(p) ::= <<
-private volatile <if(p.input)>Input<else>Output<endif>Port\<<p.typeTag>\> <p.name>;
+<! private volatile <if(p.input)>Input<else>Output<endif>Port\<<p.typeTag>\> <p.name>; !>
+private volatile Port\<<p.typeTag>\> <p.name>;
 >>
 
 memorycell(m) ::= <<
@@ -105,7 +110,7 @@ private <m.type> <m.name>;
 >>
 
 constructor(c) ::= <<
-public <c.name>(<c.interface:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
+public <c.name>(<c.ports:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
 	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
 	<c.ports:{p | this.<p.name> = <p.name>;}; separator="\n">
 	activate();
@@ -121,37 +126,39 @@ if (<guard(t); wrap, anchor>) {
 
 guard(t) ::= <<
 <t.guard:formula()>
+<if(t.output.keys)> && <t.output.keys:{p | <p.name>.hasGet()}; separator=" && "><endif>
+<if(t.input)> && <t.input:{p | <p.name>.hasPut()}; separator=" && "><endif>
 >>
 
 formula(f) ::= <<
 <if(f.negation)>!(<f.formula:guard()>)
-<elseif(t.guard.equality)><t.guard.t1:term()> == <t.guard.t2:term()>
+<elseif(t.guard.equality)>(<t.guard.t1:term()> == <t.guard.t2:term()>)
 <elseif(t.guard.conjunction)>(<t.guard.clauses:guard(); separator=" && ">)
 <elseif(t.guard.disjunction)>(<t.guard.clauses:guard(); separator=" || ">)
 <endif>
-<if(t.output.keys)> && <t.output.keys:{p | <p.name>.hasGet()}; separator=" && "><endif>
 >>
 
 term(t) ::= <<
 <if(t.function)><t.name>(<t.args:term(t); separator="\n">)
-<elseif(t.constant)>null
-<elseif(t.port)><t.port.name>.poll()
+<elseif(t.constant)><t.name>
+<elseif(t.port)><t.port.name>.get()
+<elseif(t.memory)><t.name>
 <else><t.name>
 <endif>
 >>
 
 action(t) ::= <<
-<t.output:output(); separator="\n">
-<t.memory:memory(); separator="\n">
-<t.input:input(); separator="\n">
+<t:output(); separator="\n">
+<t:memory(); separator="\n">
+<! <t.input:input(); separator="\n"> !>
 >>
 
 output(a) ::= <<
-<a.keys:{p | <p.name>.put(<a.(p):term()>);}; separator="\n"> 
+<a.output.keys:{p | <p.name>.put(<a.output.(p):term()>);}; separator="\n"> 
 >>
 
 memory(m) ::= <<
-<a.keys:{p | <p.name> = <a.(p):term()>;}; separator="\n"> 
+<m.memory.keys:{p | <p.name> = <m.memory.(p):term()>;}; separator="\n"> 
 >>
 
 input(p) ::= <<
