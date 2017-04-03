@@ -5,110 +5,123 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
-import nl.cwi.reo.compile.JavaCompiler;
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.compile.PRCompiler;
+import nl.cwi.reo.compile.components.Atomic;
+import nl.cwi.reo.compile.components.Component;
+import nl.cwi.reo.compile.components.Protocol;
 import nl.cwi.reo.compile.components.ReoTemplate;
+import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
-import nl.cwi.reo.interpret.interpreters.InterpreterCAM;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
-import nl.cwi.reo.interpret.interpreters.InterpreterSBA;
+import nl.cwi.reo.interpret.interpreters.InterpreterP;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 
 import nl.cwi.reo.semantics.SemanticsType;
-import nl.cwi.reo.semantics.constraintautomata.ConstraintAutomaton;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
-import nl.cwi.reo.semantics.symbolicautomata.Formula;
-import nl.cwi.reo.semantics.symbolicautomata.SymbolicAutomaton;
+import nl.cwi.reo.semantics.predicates.Disjunction;
+import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.MemoryCell;
+import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.Predicate;
+import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.util.Monitor;
 
 /**
  * A compiler for the coordination language Reo.
  */
 public class Compiler {
-		
+
 	/**
 	 * List of provided Reo source files.
 	 */
 	@Parameter(description = ".treo files")
 	private List<String> files = new ArrayList<String>();
-	
+
 	/**
 	 * List of parameters for the main component.
 	 */
-	@Parameter(names = {"-p", "--params"}, variableArity = true, description = "list of parameters to instantiate the main component")
+	@Parameter(names = { "-p",
+			"--params" }, variableArity = true, description = "list of parameters to instantiate the main component")
 	public List<String> params = new ArrayList<String>();
 
 	/**
 	 * List of of directories that contain all necessary Reo components
 	 */
-    @Parameter(names = {"-cp", "--compath"}, variableArity = true, description = "list of directories that contain all necessary Reo components")
-    private List<String> directories = new ArrayList<String>();
+	@Parameter(names = { "-cp",
+			"--compath" }, variableArity = true, description = "list of directories that contain all necessary Reo components")
+	private List<String> directories = new ArrayList<String>();
 
 	/**
 	 * List of provided Reo source files.
 	 */
-	@Parameter(names = {"-o", "--output-dir"}, description = "output directory")
+	@Parameter(names = { "-o", "--output-dir" }, description = "output directory")
 	private String outdir = ".";
 
 	/**
 	 * Package
 	 */
-	@Parameter(names = {"-pkg", "--package"}, description = "target code package")
+	@Parameter(names = { "-pkg", "--package" }, description = "target code package")
 	private String packagename = "";
-	
+
 	/**
 	 * Partitioning
 	 */
-	@Parameter(names = {"-pt", "--partitioning"}, description = "partition regarding synchronous and asynchronous sections")
-	private boolean partitioning = false ;
-	
-	
+	@Parameter(names = { "-pt",
+			"--partitioning" }, description = "partition regarding synchronous and asynchronous sections")
+	private boolean partitioning = false;
+
 	/**
 	 * List of available options.
 	 */
-    @Parameter(names = {"-h", "--help"}, description = "show all available options", help = true)
-    private boolean help;
-   
-    /**
-     * Semantics type of Reo connectors.
-     */
-    @Parameter(names = {"-s", "--semantics"}, description = "used type of Reo semantics") 
-    public SemanticsType semantics = SemanticsType.PR; 
-    
-    /**
-     * Semantics type of Reo connectors.
-     */
-    @Parameter(names = {"-v", "--verbose"}, description = "show verbose output") 
-    public boolean verbose = false; 
-    
-    /**
-     * Message container.
-     */
-    private final Monitor monitor = new Monitor();
+	@Parameter(names = { "-h", "--help" }, description = "show all available options", help = true)
+	private boolean help;
 
-	public static void main(String[] args) {	
+	/**
+	 * Semantics type of Reo connectors.
+	 */
+	@Parameter(names = { "-s", "--semantics" }, description = "used type of Reo semantics")
+	public SemanticsType semantics = SemanticsType.PR;
+
+	/**
+	 * Semantics type of Reo connectors.
+	 */
+	@Parameter(names = { "-v", "--verbose" }, description = "show verbose output")
+	public boolean verbose = false;
+
+	/**
+	 * Message container.
+	 */
+	private final Monitor monitor = new Monitor();
+
+	public static void main(String[] args) {
 		Compiler compiler = new Compiler();
 		JCommander jc = new JCommander(compiler, args);
-		jc.setProgramName("reo"); 
+		jc.setProgramName("reo");
 		if (compiler.files.size() == 0) {
 			jc.usage();
 		} else {
-	        compiler.run();			
+			compiler.run();
 		}
 	}
 
-    public void run() {
-    	
-    	// Get the root locations of Reo source files and libraries.
+	public void run() {
+
+		// Get the root locations of Reo source files and libraries.
 		directories.add(".");
 		String comppath = System.getenv("COMPATH");
 		if (comppath != null)
@@ -117,25 +130,20 @@ public class Compiler {
 		// Select the correct compiler.
 		switch (semantics) {
 		case CAM:
-			compileCAM();
+			break;
+		case P:
+			compileP();
 			break;
 		case PA:
-			compilePA();
+			break;
+		case PLAIN:
 			break;
 		case PR:
 			compilePR();
 			break;
 		case SA:
-			compileSA();
 			break;
 		case WA:
-			compileWA();
-			break;
-		case SBA:
-			compileSBA();
-			break;
-		case PLAIN:
-			compilePLAIN();
 			break;
 		default:
 			monitor.add("Please specify the used semantics.");
@@ -165,100 +173,121 @@ public class Compiler {
 		}
 		return true;
 	}
-    
-    private void compileCAM() {
-    	
-		Interpreter<ConstraintAutomaton> interpreter = new InterpreterCAM(directories, params, monitor);
-		ReoProgram<ConstraintAutomaton> program = interpreter.interpret(files.get(0));
-		
-		ReoTemplate template = JavaCompiler.compile(program, packagename, new ConstraintAutomaton());
-		
-		if (template != null)
-			System.out.println(template.generateCode(Language.JAVA));
-    }
 
-    private void compilePA() {
-		
-//		STGroup group = new STGroupFile("Java.stg");
-//		ST temp = group.getInstanceOf("component");
-//
-//		Port a = new Port("a", PortType.IN, PrioType.NONE, new TypeTag("Integer"), true);
-//		Port b = new Port("b", PortType.OUT, PrioType.NONE, new TypeTag("Boolean"), true);
-//		Port c = new Port("c", PortType.IN, PrioType.NONE, new TypeTag("Double"), true);
-//
-//		SortedSet<Port> N = new TreeSet<Port>();
-//
-//		N.add(a);
-//		N.add(b);
-//		N.add(c);
-//
-//		Map<String, String> ac = new HashMap<String, String>();
-//		ac.put("b", "d_a");
-//		ac.put("d", "m");
-//
-//		Transition t = new Transition("q0", "q1", N, ac);
-//
-//		List<Port> P = new ArrayList<Port>();
-//		P.add(a);
-//		P.add(b);
-//		P.add(c);
-//
-//		Map<String, Set<Transition>> out = new HashMap<String, Set<Transition>>();
-//		out.put("q0", new HashSet<Transition>(Arrays.asList(t)));
-//
-//		Automaton A = new Automaton("MyAutomaton", P, Behavior.PROACTIVE, "main.treo", out, "q0",
-//				"nl.cwi.reo.runtime.java");
-//
-//		temp.add("A", A);
-//
-//		System.out.println(temp.render());
-		// outputClass(name, st.render());
-    }
-    
-    private void compileSBA() {    	
-    	
-    	Interpreter<SymbolicAutomaton> interpreterRba = new InterpreterSBA(directories, params, monitor);
-		
-		ReoProgram<SymbolicAutomaton> programRba = interpreterRba.interpret(files.get(0));	
+	private void compileP() {
 
-		if (programRba == null) return;	
-		
-		List<Formula> components = new ArrayList<Formula>();
-		
-		for(ReoConnectorAtom<SymbolicAutomaton> sba : programRba.getConnector().flatten().getAtoms()){
-			components.add(sba.getSemantics().getFormula().rename(sba.getLinks()).NNF(false));
-			
-			System.out.println(sba.getSemantics().getFormula());
-			System.out.println(sba.getSemantics().getInterface());
+		// Interpret the Reo program
+		Interpreter<Predicate> interpreter = new InterpreterP(directories, params, monitor);
+		ReoProgram<Predicate> program = interpreter.interpret(files.get(0));
+
+		if (program == null)
+			return;
+
+		ReoConnector<Predicate> connector = program.getConnector().flatten().insertNodes(true, false, new Predicate())
+				.integrate();
+
+		// Build the template.
+		List<Component> components = new ArrayList<Component>();
+		Set<Port> intface = new HashSet<Port>();
+
+		// Identify the atomic components in the connector.
+		int n_atom = 0;
+		List<Predicate> protocols = new ArrayList<Predicate>();
+		for (ReoConnectorAtom<Predicate> atom : connector.getAtoms()) {
+			if (atom.getSourceCode().getFile() != null) {
+				intface.addAll(atom.getInterface());
+				String name = atom.getName();
+				if (name == null)
+					name = "Component";
+				components.add(new Atomic(name + n_atom++, atom.getInterface(), atom.getSourceCode().getCall()));
+			} else {
+				protocols.add(atom.getSemantics());
+			}
 		}
 		
-		Formula automaton = JavaCompiler.compose(components);
-		JavaCompiler.generateCode(automaton);
+//		Formula automaton = JavaCompiler.compose(components);
+//		JavaCompiler.generateCode(automaton);
 
-    }
+		// Compose the protocol into a single connector.
+		Predicate circuit = new Predicate().compose(protocols).restrict(intface);
 
-    private void compilePR() {    	
-    	
+		// Put the obtained formula in (a quantifier-free) disjunctive normal form.
+		Formula f = circuit.getFormula().NNF().DNF().QE();
+
+		// Transform every disjunctive clause into a transition.
+		Set<Transition> transitions = new HashSet<Transition>();
+		if (f instanceof Disjunction) {
+			for (Formula clause : ((Disjunction) f).getClauses()) {
+
+				// Compute the guard by existential quantification on all output
+				// and next memory cells in clause and QE().
+				Formula guard = null;
+
+				// Similar to guard, except do not hide one output port.
+				// if the resulting formula is of the form output = term over
+				// inputs, then add this the the map.
+				Map<Node, Term> output = new HashMap<Node, Term>();
+
+				// Similar to output.
+				Map<MemoryCell, Term> memory = new HashMap<MemoryCell, Term>();
+
+				transitions.add(new Transition(guard, output, memory));
+			}
+		}
+
+		// TODO Partition the set of transitions
+		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
+
+		
+		
+		
+		
+		// Generate a protocol component for each part in the transition
+		int n_protocol = 0;
+		for (Set<Transition> T : partition) {
+			Set<Port> ports = new HashSet<Port>();
+			for (Transition t : T)
+				ports.addAll(t.getInterface());
+
+			// TODO For convenience, we should be able to specify the initial
+			// value of each memory cell (particularly handy for fifofull)
+			Map<MemoryCell, Object> initial = new HashMap<MemoryCell, Object>();
+			
+			// TODO mem can be seen as the keyset of initial.
+			Set<MemoryCell> mem = new HashSet<MemoryCell>();
+
+			components.add(new Protocol("Protocol" + n_protocol++, ports, T, mem, initial));
+		}
+
+		// Fill in the template
+		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);
+		
+		// Generate Java code from the template
+		String code = template.generateCode(Language.JAVA);
+		System.out.println(code);
+		write(program.getName(), code);
+	}
+
+	private void compilePR() {
+
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
-		
-		ReoProgram<PRAutomaton> program = interpreter.interpret(files.get(0));	
-		
-//		ReoTemplate template = JavaCompiler.compile(program, packagename, new PRAutomaton());
-		
-		
-		if (program == null) return;	
-		
+
+		ReoProgram<PRAutomaton> program = interpreter.interpret(files.get(0));
+
+		if (program == null)
+			return;
+
 		if (verbose) {
 			System.out.println(program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate());
 			System.out.println(PRCompiler.toPR(program));
 			monitor.print();
-//	    	GraphCompiler.visualize(program);
+			// GraphCompiler.visualize(program);
 
 		}
 		/*
 		 * Compiler Settings
 		 */
-		
+
 		CompilerSettings settings = new CompilerSettings(files.get(0), Language.JAVA, false);
 		settings.ignoreInput(false);
 		settings.ignoreData(false);
@@ -267,25 +296,9 @@ public class Compiler {
 		settings.commandify(true);
 		settings.inferQueues(true);
 		settings.put("COUNT_PORTS", false);
-		
-		
-		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor,settings);
 
-		  
-    	
+		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor, settings);
+
 		c.compile();
-    }
-
-    private void compileSA() {
-    	// TODO    	
-    }
-
-    private void compileWA() {
-    	// TODO   	
-    }
-
-    private void compilePLAIN() {
-    	// TODO   	
-    }
+	}
 }
-

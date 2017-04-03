@@ -30,6 +30,11 @@ import nl.cwi.reo.util.Monitor;
  *            Reo semantics type
  */
 public final class SetComposite<T extends Semantics<T>> implements SetExpression<T> {
+	
+	/**
+	 * Component name.
+	 */
+	private final String name;
 
 	/**
 	 * Composition operator.
@@ -55,6 +60,7 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 * Constructs an empty set expression.
 	 */
 	public SetComposite() {
+		this.name = null;
 		this.operator = new StringValue("");
 		this.elements = new ArrayList<InstanceExpression<T>>();
 		this.predicate = new TruthValue(true);
@@ -64,6 +70,8 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	/**
 	 * Constructs a new set of component instances.
 	 * 
+	 * @param name
+	 *            component name
 	 * @param operator
 	 *            composition operator
 	 * @param elements
@@ -73,14 +81,23 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 * @param location
 	 *            location in Reo source file
 	 */
-	public SetComposite(TermExpression operator, List<InstanceExpression<T>> elements,
+	public SetComposite(String name, TermExpression operator, List<InstanceExpression<T>> elements,
 			PredicateExpression predicate, Location location) {
 		if (operator == null || elements == null || predicate == null || location == null)
 			throw new NullPointerException();
+		this.name = name;
 		this.operator = operator;
 		this.predicate = predicate;
 		this.elements = elements;
 		this.location = location;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Nullable
+	public String getName() {
+		return name;
 	}
 
 	/**

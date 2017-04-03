@@ -2,87 +2,62 @@ package nl.cwi.reo.compile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.SortedSet;
 
 import nl.cwi.reo.compile.components.Protocol;
-import nl.cwi.reo.compile.components.Component;
-import nl.cwi.reo.compile.components.ExtraReoTemplate;
 import nl.cwi.reo.compile.components.ReoTemplate;
 import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.ports.PrioType;
-import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.AutomatonSemantics;
-import nl.cwi.reo.semantics.symbolicautomata.Conjunction;
-import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
-import nl.cwi.reo.semantics.symbolicautomata.Existential;
-import nl.cwi.reo.semantics.symbolicautomata.Formula;
-import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
-import nl.cwi.reo.semantics.symbolicautomata.Node;
-import nl.cwi.reo.semantics.symbolicautomata.Term;
-import nl.cwi.reo.semantics.symbolicautomata.Variable;
 
+import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Disjunction;
+import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.MemoryCell;
+import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.Predicate;
+import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Variable;
+
+@Deprecated
 public class JavaCompiler {
 
-	public static <T extends AutomatonSemantics<T>> ReoTemplate compile(ReoProgram<T> program, String packagename,
-			T nodeFactory) {
+	public static ReoTemplate compile(ReoProgram<Predicate> program, String packagename, Predicate nodeFactory) {
 
-		if (program == null)
-			return null;
+		// // Separate the protocol from the atoms
+		// List<ReoConnectorComposite<Predicate>> partitionMedium = new
+		// ArrayList<ReoConnectorComposite<Predicate>>();
+		// List<ReoConnector<Predicate>> partitionBig = new
+		// ArrayList<ReoConnector<Predicate>>();
+		// List<List<ReoConnectorAtom<Predicate>>> partition = new
+		// ArrayList<List<ReoConnectorAtom<Predicate>>>();
+		//
+		// for (ReoConnectorAtom<Predicate> atoms : connector.getAtoms()) {
+		// if (atoms.getSourceCode().getFile() == null) {
+		// partition = partitionConnector(partition, atoms);
+		// } else {
+		// partitionBig.add(atoms);
+		// }
+		// }
+		//
+		// for (List<ReoConnectorAtom<Predicate>> listAtoms : partition)
+		// partitionMedium.add(new ReoConnectorComposite("", listAtoms));
+		//
+		// for (ReoConnectorComposite<Predicate> composite : partitionMedium) {
+		// partitionBig.add(getProduct(composite));
+		// }
 
-		ReoConnector<T> connector = program.getConnector().flatten().insertNodes(true, true, nodeFactory).integrate();
-
-		List<Port> ports = new ArrayList<Port>();
-		List<Component> components = new ArrayList<Component>();
-
-		int c = 0;
-		int i = 0;
-		for (ReoConnectorAtom<T> atom : connector.getAtoms()) {
-			ports.addAll(atom.getInterface());
-			Map<Integer, Set<Transition>> out = new HashMap<Integer, Set<Transition>>();
-			Integer initial = 0;
-			Component defn = new Protocol("Component" + c++, atom.getInterface(), out, initial);
-		}
-
-		List<ReoConnectorComposite<T>> partitionMedium = new ArrayList<ReoConnectorComposite<T>>();
-		List<ReoConnector<T>> partitionBig = new ArrayList<ReoConnector<T>>();
-		List<List<ReoConnectorAtom<T>>> partition = new ArrayList<List<ReoConnectorAtom<T>>>();
-
-		/*
-		 * Partitioning
-		 */
-
-		for (ReoConnectorAtom<T> atoms : connector.getAtoms()) {
-			if (atoms.getSourceCode().getFile() == null) {
-				partition = partitionConnector(partition, atoms);
-			} else {
-				partitionBig.add(atoms);
-			}
-		}
-
-		for (List<ReoConnectorAtom<T>> listAtoms : partition)
-			partitionMedium.add(new ReoConnectorComposite("", listAtoms));
-
-		for (ReoConnectorComposite<T> composite : partitionMedium) {
-			partitionBig.add(getProduct(composite));
-		}
-
-		return new ReoTemplate(program.getFile(), packagename, program.getName(), components);
+		return null;
 	}
 
 	public static <T extends AutomatonSemantics<T>> ReoConnectorComposite<T> getProduct(
@@ -94,7 +69,7 @@ public class JavaCompiler {
 			productAutomaton = new ReoConnectorAtom<T>(
 					productAutomaton.getSemantics().compose(Arrays.asList(atoms.poll().getSemantics())));
 		}
-		return new ReoConnectorComposite<T>("", Arrays.asList(productAutomaton));
+		return new ReoConnectorComposite<T>(null, "", Arrays.asList(productAutomaton));
 	}
 
 	public static <T extends AutomatonSemantics<T>> List<List<ReoConnectorAtom<T>>> partitionConnector(
@@ -178,7 +153,8 @@ public class JavaCompiler {
 		Set<Term> q = new HashSet<Term>();
 		q.addAll(quantifiers);
 		
-		Formula g = f.QE(q);
+		
+		Formula g = null; //f.QE(q);
 		
 		map = substitute(map,q);
 		mems.clear();
@@ -194,9 +170,12 @@ public class JavaCompiler {
 			if(map.get(v) instanceof Node && ((Node)map.get(v)).isInput())
 				inputs.add((Node)map.get(v));
 		}
+
+		Set<Port> inputs1 = new HashSet<Port>();
+		for (Node x : inputs)
+			inputs1.add(x.getPort());
 		
-		
-		return 	new Transition(g,ports,mems,inputs);
+		return 	new Transition(g,ports,mems,inputs1);
 	}
 	
 	public static Map<Variable,Term> substitute(Map<Variable,Term> map, Set<Term> q){
@@ -217,12 +196,11 @@ public class JavaCompiler {
 		}
 		return mapSubst;
 	}
-	
-	public static Formula compose(List<Formula> list){
-		Formula dnf=new Conjunction(list);
+
+	public static Formula compose(List<Formula> list) {
+		Formula dnf = new Conjunction(list);
 		return dnf.DNF();
 	}
-	
 	
 	public static Map<Set<Variable>,Set<Transition>> partition(List<Transition> transitions){
 	
@@ -258,14 +236,14 @@ public class JavaCompiler {
 		Set<Variable> setVariable = new HashSet<Variable>();
 		setVariable.addAll(transition.getMemory().keySet());
 		setVariable.addAll(transition.getOutput().keySet());
-		setVariable.addAll(transition.getInput());
+		for (Port p : transition.getInput())
+			setVariable.add(new Node(p));
 		
 		return setVariable;
 	}
 	
 	public static void generateCode(Formula automaton){
 		Set<Transition> transitions = new HashSet<Transition>();
-		Map<Integer,Set<Transition>> compTransition = new HashMap<Integer,Set<Transition>>();
 		Set<Port> set = new HashSet<Port>();
 		Set<MemoryCell> mem = new HashSet<MemoryCell>();
 		
@@ -273,8 +251,8 @@ public class JavaCompiler {
 			for(Formula f : ((Disjunction) automaton).getClauses()){
 				Transition transition = JavaCompiler.commandify(f);
 				transitions.add(transition);
-				for(Node n : transition.getInput() )
-					set.add(n.getPort());
+				for(Port n : transition.getInput() )
+					set.add(n);
 				for(Node n : transition.getOutput().keySet()){
 					set.add(n.getPort());
 				}
@@ -282,9 +260,8 @@ public class JavaCompiler {
 					mem.add(m);
 				}
 			}
-		compTransition.put(new Integer(0), transitions); 
 		
-		Protocol p = new Protocol("protocol",set, compTransition, mem, new Integer(0));
+		Protocol p = new Protocol("protocol", set, transitions, mem, new HashMap<MemoryCell, Object>());
 		
 		ReoTemplate reo = new ReoTemplate("testfile","", "test", Arrays.asList(p));
 		System.out.println(reo.generateCode(Language.JAVA));
@@ -313,6 +290,5 @@ public class JavaCompiler {
 //		System.out.println(new ExtraReoTemplate("testfile", "packagetest", "test",s, transitions,mem).getCode(Language.JAVA));
 		
 	}
-	
 
 }

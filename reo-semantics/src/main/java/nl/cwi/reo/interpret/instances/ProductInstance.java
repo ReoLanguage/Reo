@@ -76,7 +76,7 @@ public final class ProductInstance<T extends Semantics<T>> implements InstanceEx
 		Instance<T> i2 = second.evaluate(s, m);
 
 		List<ReoConnector<T>> components = Arrays.asList(i1.getConnector(), i2.getConnector());
-		ReoConnector<T> connector = new ReoConnectorComposite<T>(operator, components);
+		ReoConnector<T> connector = new ReoConnectorComposite<T>(null, operator, components);
 		Set<Set<Identifier>> unifications = new HashSet<Set<Identifier>>(i1.getUnifications());
 		unifications.addAll(i1.getUnifications());
 

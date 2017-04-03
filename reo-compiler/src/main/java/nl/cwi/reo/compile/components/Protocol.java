@@ -3,12 +3,11 @@
  */
 package nl.cwi.reo.compile.components;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
+import nl.cwi.reo.semantics.predicates.MemoryCell;
 
 /**
  * Compiled automaton that is independent of the target language.
@@ -23,33 +22,24 @@ public final class Protocol implements Component {
 	
 	private final Set<MemoryCell> mem;
 
-	public final Map<Integer, Set<Transition>> out;
+	public final Set<Transition> transitions;
 
-	private final Integer initial;
+	private final Map<MemoryCell, Object> initial;
 
-	public Protocol(String name, Set<Port> ports, Map<Integer, Set<Transition>> out, Set<MemoryCell> mem, int initial) {
+	public Protocol(String name, Set<Port> ports, Set<Transition> transitions, Set<MemoryCell> mem, Map<MemoryCell, Object> initial) {
 		this.name = name;
 		this.ports = ports;
-		this.out = out;
+		this.transitions = transitions;
+		this.mem = mem;
 		this.initial = initial;
-		this.mem=mem;
 	}
 
-	public Protocol(String name, Set<Port> ports, Map<Integer, Set<Transition>> out, int initial) {
-		this.name = name;
-		this.ports = ports;
-		this.out = out;
-		this.initial = initial;
-		this.mem=new HashSet<MemoryCell>();
+	public Set<Transition> getTransitions() {
+		return transitions;
 	}
 
-	
-	public Map<Integer, Set<Transition>> getTransitions() {
-		return out;
-	}
-
-	public String getInitial() {
-		return initial.toString();
+	public Map<MemoryCell, Object> getInitial() {
+		return initial;
 	}
 
 	public String getName() {

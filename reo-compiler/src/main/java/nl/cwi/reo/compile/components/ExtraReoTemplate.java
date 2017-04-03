@@ -14,9 +14,9 @@ import org.stringtemplate.v4.STGroupFile;
 
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
-import nl.cwi.reo.semantics.symbolicautomata.Variable;
+import nl.cwi.reo.semantics.predicates.MemoryCell;
 
+@Deprecated
 public final class ExtraReoTemplate {
 
 	private final String reofile;

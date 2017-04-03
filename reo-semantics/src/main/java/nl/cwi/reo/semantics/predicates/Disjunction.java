@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.symbolicautomata;
+package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,10 +20,10 @@ public class Disjunction implements Formula {
 	 */
 	public static final boolean disjunction = true;
 	
-	private final List<Formula> g;
+	private final List<Formula> clauses;
 	
-	public Disjunction(List<Formula> g) {
-		this.g = g;
+	public Disjunction(List<Formula> clauses) {
+		this.clauses = clauses;
 	}
 
 	/**
@@ -32,14 +32,14 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula getGuard() {
 		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : g){
-			if(f.getGuard() instanceof BooleanValue)
-				if(((BooleanValue) f.getGuard()).getValue()){
+		for (Formula f : clauses){
+			if(f.getGuard() instanceof BooleanValue) {
+				if(((BooleanValue) f.getGuard()).getValue()) {
 					return new BooleanValue(true);
 				}
-//					return new BooleanValue(true);
-			else
+			} else {
 				h.add(f.getGuard());
+			}
 		}
 		if(h.size()==1)
 			return h.get(0);
@@ -52,7 +52,7 @@ public class Disjunction implements Formula {
 	@Override
 	public Map<Variable, Term> getAssignment() {
 		Map<Variable, Term> assignment = new HashMap<Variable, Term>();
-		for (Formula f : g) {
+		for (Formula f : clauses) {
 			Map<Variable, Term> assignment1 = f.getAssignment();
 			if (assignment1 == null)
 				return null;
@@ -66,7 +66,7 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula rename(Map<Port, Port> links) {
 		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : g)
+		for (Formula f : clauses)
 			h.add(f.rename(links));
 		return new Disjunction(h);
 	}
@@ -74,7 +74,7 @@ public class Disjunction implements Formula {
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> P = new HashSet<Port>();
-		for (Formula f : g)
+		for (Formula f : clauses)
 			if(f instanceof Disjunction || f instanceof Conjunction || f instanceof Existential)
 				P.addAll(f.getInterface());
 		return P;
@@ -86,44 +86,61 @@ public class Disjunction implements Formula {
 	}
 	
 	public String toString(){
-		String s = "[" + g.get(0).toString() +"]";
-		for(int i=1;i<g.size(); i++){
-			s = s + "OR" + "[" + g.get(i).toString() + "]";
+		String s = "[" + clauses.get(0).toString() +"]";
+		for(int i=1;i<clauses.size(); i++){
+			s = s + "OR" + "[" + clauses.get(i).toString() + "]";
 		}
 		return s;
 	}
 
 	public List<Formula> getClauses(){
-		return g;
+		return clauses;
 	}
 	
 	@Override
 	public Disjunction DNF() {
+		List<Formula> list = new ArrayList<Formula>();
+		for (Formula f : clauses)
+			list.add(f.DNF());
+		return new Disjunction(list);
+	}
+
+	@Override
+	public Formula NNF() {
+		List<Formula> list = new ArrayList<Formula>();
+		for (Formula f : clauses)
+			list.add(f.NNF());
+		return new Disjunction(list);
+	}
+
+	@Override
+	public Formula QE() {
+		List<Formula> list = new ArrayList<Formula>();
+		for (Formula f : clauses)
+			list.add(f.QE());
+		return new Disjunction(list);
+	}
+
+	@Override
+	public Formula Substitute(Term t, Variable x) {
+		List<Formula> list = new ArrayList<Formula>();
+		for (Formula f : clauses)
+			list.add(f.Substitute(t, x));
+		return new Disjunction(list);
+	}
+
+	@Override
+	public Set<Variable> getFreeVariables() {
+		Set<Variable> vars = new HashSet<Variable>();
+		for (Formula f : clauses)
+			vars.addAll(f.getFreeVariables());
+		return vars;
+	}
+
+	@Override
+	public Map<Variable, Integer> getEvaluation() {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Formula NNF(boolean isNegative) {
-		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : g)
-			h.add(f.NNF(isNegative));
-		if(isNegative){
-			return new Conjunction(h);
-		}
-		else{
-			return new Disjunction(h);			
-		}
-	}
-
-	@Override
-	public Formula QE(Set<Term> quantifiers) {
-		List<Formula> existentialList = new ArrayList<Formula>();
-		for(Formula f : g){
-			existentialList.add(f.QE(quantifiers));
-		}
-		return new Disjunction(existentialList);
-		
+		return new HashMap<Variable, Integer>();
 	}
 
 }

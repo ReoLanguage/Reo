@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.Semantics;
@@ -18,6 +20,14 @@ import nl.cwi.reo.semantics.Semantics;
  * @see ReoConnectorComposite
  */
 public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConnector<T>> {
+
+	/**
+	 * Gets the component.
+	 * 
+	 * @return component name, or null if this component is nameless.
+	 */
+	@Nullable
+	public String getName();
 
 	/**
 	 * Checks if this connector is empty.
@@ -78,14 +88,15 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	public ReoConnector<T> integrate();
 
 	/**
-	 * Partition this connector into a list of ReoConnector with independent interfaces.
-	 *  
+	 * Partition this connector into a list of ReoConnector with independent
+	 * interfaces.
+	 * 
 	 * @return List of ReoConnector<T> where interfaces do not intersect.
 	 * 
 	 */
+	@Deprecated
 	public List<ReoConnector<T>> partition();
 
-	
 	/**
 	 * Gets the interface of this connector.
 	 * 
