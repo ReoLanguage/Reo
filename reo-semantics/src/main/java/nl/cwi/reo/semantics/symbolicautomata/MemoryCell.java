@@ -7,6 +7,8 @@ import nl.cwi.reo.interpret.ports.Port;
 
 public class MemoryCell implements Variable {
 	
+	public static final boolean memory = true;
+	
 	private final int k;
 	
 	private final String type;

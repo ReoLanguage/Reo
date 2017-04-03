@@ -34,7 +34,7 @@ public class Equality implements Formula {
 				if (((Node) t2).getPort().getType() != PortType.OUT)
 					return this;
 		}
-		if (t1 instanceof MemoryCell && t2 instanceof Constant) {
+		if (t1 instanceof MemoryCell && !((MemoryCell) t1).hasPrime() &&t2 instanceof Constant) {
 			return this;
 		}
 		return new BooleanValue(true);
@@ -95,8 +95,8 @@ public class Equality implements Formula {
 			if(t2 instanceof Node){
 				return (new Equality(t2,t1)).getAssignment();
 			}
-			if(t2 instanceof Constant){
-//				map.put((MemoryCell)t1, t2);
+			if(((MemoryCell) t1).hasPrime() && t2 instanceof Constant){
+				map.put((MemoryCell)t1, t2);
 			}
 			return map;
 		}

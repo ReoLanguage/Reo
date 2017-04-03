@@ -2,7 +2,7 @@
 fifo(a?,b!){
 	#SBA
 	[{a,~b},($q1'==a)&&($q1==null)]
-	[{b,~a},(b==$q1)&&($q1'!=null)]
+	[{b,~a},(b==$q1)&&($q1!=null)&&($q1'==null)]
 }
 sync(a?,b!){
 	#SBA

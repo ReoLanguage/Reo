@@ -286,7 +286,7 @@ public class JavaCompiler {
 		
 		Protocol p = new Protocol("protocol",set, compTransition, mem, new Integer(0));
 		
-		ReoTemplate reo = new ReoTemplate("testfile","packagetest", "main", Arrays.asList(p));
+		ReoTemplate reo = new ReoTemplate("testfile","", "test", Arrays.asList(p));
 		System.out.println(reo.generateCode(Language.JAVA));
 
 //		Set<MemoryCell> mem = new HashSet<MemoryCell>();

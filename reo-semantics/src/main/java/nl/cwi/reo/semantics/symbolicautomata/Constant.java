@@ -17,6 +17,10 @@ public class Constant implements Term {
 	public Object getValue() {
 		return c;
 	}
+	
+	public String getName(){
+		return this.toString();
+	}
 
 	@Override
 	public boolean hadOutputs() {

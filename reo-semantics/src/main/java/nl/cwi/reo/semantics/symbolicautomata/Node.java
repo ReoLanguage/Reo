@@ -6,7 +6,7 @@ import java.util.Objects;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 
-public class Node implements Variable {
+public class Node implements Variable  {
 	
 	private final Port p;
 	
