@@ -4,13 +4,14 @@ fifo(a?,b!){
 	[{a,~b},($q1'==a)&&($q1==null)]
 	[{b,~a},(b==$q1)&&($q1!=null)&&($q1'==null)]
 }
+
 sync(a?,b!){
 	#SBA
 	[{a,b},(a==b)]
-	[{~a,~b},(true)]
+	[{~a,~b},true]
 }
 main(a?,b!){
-	sync(a,c)fifo(c,b)
+	sync(a,c) fifo(c,b)
 }
 
 

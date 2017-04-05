@@ -108,6 +108,10 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula NNF() {
 		List<Formula> list = new ArrayList<Formula>();
+		
+		if(clauses.size()==1)
+			return clauses.get(0).NNF();
+		
 		for (Formula f : clauses)
 			list.add(f.NNF());
 		return new Disjunction(list);
@@ -116,6 +120,10 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula QE() {
 		List<Formula> list = new ArrayList<Formula>();
+		
+		if(clauses.size()==1)
+			return clauses.get(0).QE();
+		
 		for (Formula f : clauses)
 			list.add(f.QE());
 		return new Disjunction(list);
@@ -124,6 +132,8 @@ public class Disjunction implements Formula {
 	@Override
 	public Formula Substitute(Term t, Variable x) {
 		List<Formula> list = new ArrayList<Formula>();
+		if(clauses.size()==1)
+			return clauses.get(0).Substitute(t,x);
 		for (Formula f : clauses)
 			list.add(f.Substitute(t, x));
 		return new Disjunction(list);

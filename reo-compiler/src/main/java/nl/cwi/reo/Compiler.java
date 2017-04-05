@@ -16,6 +16,7 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.compile.PRCompiler;
+import nl.cwi.reo.compile.SBACompiler;
 import nl.cwi.reo.compile.components.Atomic;
 import nl.cwi.reo.compile.components.Component;
 import nl.cwi.reo.compile.components.Protocol;
@@ -179,12 +180,11 @@ public class Compiler {
 		// Interpret the Reo program
 		Interpreter<Predicate> interpreter = new InterpreterP(directories, params, monitor);
 		ReoProgram<Predicate> program = interpreter.interpret(files.get(0));
-
+		
 		if (program == null)
 			return;
 
-		ReoConnector<Predicate> connector = program.getConnector().flatten().insertNodes(true, false, new Predicate())
-				.integrate();
+		ReoConnector<Predicate> connector = program.getConnector().flatten().insertNodes(true, false, new Predicate()).integrate();
 
 		// Build the template.
 		List<Component> components = new ArrayList<Component>();
@@ -219,6 +219,10 @@ public class Compiler {
 		if (f instanceof Disjunction) {
 			for (Formula clause : ((Disjunction) f).getClauses()) {
 
+				//Commandify the formula:
+				Transition t = SBACompiler.commandify(clause);
+				
+				transitions.add(t);
 				// Compute the guard by existential quantification on all output
 				// and next memory cells in clause and QE().
 				Formula guard = null;
@@ -231,30 +235,37 @@ public class Compiler {
 				// Similar to output.
 				Map<MemoryCell, Term> memory = new HashMap<MemoryCell, Term>();
 
-				transitions.add(new Transition(guard, output, memory));
+//				transitions.add(new Transition(guard, output, memory));
 			}
 		}
 
 		// TODO Partition the set of transitions
 		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
 
-		
+		partition.add(transitions);
 		
 		
 		
 		// Generate a protocol component for each part in the transition
+		
+		Map<MemoryCell, Object> initial = new HashMap<MemoryCell, Object>();
 		int n_protocol = 0;
 		for (Set<Transition> T : partition) {
 			Set<Port> ports = new HashSet<Port>();
-			for (Transition t : T)
+			for (Transition t : T){
 				ports.addAll(t.getInterface());
+				for(MemoryCell m : t.getMemory().keySet()){
+					initial.put(m, 0);
+				}
+			}
 
 			// TODO For convenience, we should be able to specify the initial
 			// value of each memory cell (particularly handy for fifofull)
-			Map<MemoryCell, Object> initial = new HashMap<MemoryCell, Object>();
+			
+
 			
 			// TODO mem can be seen as the keyset of initial.
-			Set<MemoryCell> mem = new HashSet<MemoryCell>();
+			Set<MemoryCell> mem = initial.keySet();
 
 			components.add(new Protocol("Protocol" + n_protocol++, ports, T, mem, initial));
 		}

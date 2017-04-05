@@ -87,11 +87,11 @@ public class ListenerSBA extends Listener<Predicate> {
 	 * Data Terms:
 	 */
 	public void exitSba_nat(Sba_natContext ctx){
-		term.put(ctx, new Function("constant", Integer.parseInt(ctx.NAT().toString()), new ArrayList<Term>()));
+		term.put(ctx, new Function("constant", Integer.parseInt(ctx.NAT().getText()), new ArrayList<Term>()));
 	}
 	
 	public void exitSba_bool(Sba_boolContext ctx){
-		term.put(ctx, new Function("constant", Boolean.parseBoolean(ctx.BOOL().toString()), new ArrayList<Term>()));		
+		term.put(ctx, new Function("constant", Boolean.parseBoolean(ctx.sba_boolean().getText()), new ArrayList<Term>()));		
 	}
 
 	public void exitSba_string(Sba_stringContext ctx){
@@ -99,19 +99,19 @@ public class ListenerSBA extends Listener<Predicate> {
 	}
 
 	public void exitSba_decimal(Sba_decimalContext ctx){
-		term.put(ctx, new Function("constant", Double.parseDouble(ctx.DEC().toString()), new ArrayList<Term>()));
+		term.put(ctx, new Function("constant", Double.parseDouble(ctx.DEC().getText()), new ArrayList<Term>()));
 	}
 	
 	public void exitSba_dt_parameter(Sba_dt_parameterContext ctx){
-		term.put(ctx, new Node(new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("Integer"),true)));
+		term.put(ctx, new Node(new Port(ctx.ID().getText(),PortType.NONE,PrioType.NONE,new TypeTag("Integer"),true)));
 	}
 	
 	public void exitSba_dt_memorycellIn(Sba_dt_memorycellInContext ctx){
-		term.put(ctx, new MemoryCell(Integer.parseInt(ctx.NAT().toString()),false));
+		term.put(ctx, new MemoryCell(Integer.parseInt(ctx.NAT().getText()),false));
 	}
 	
 	public void exitSba_dt_memorycellOut(Sba_dt_memorycellOutContext ctx){
-		term.put(ctx, new MemoryCell(Integer.parseInt(ctx.NAT().toString()),true));		
+		term.put(ctx, new MemoryCell(Integer.parseInt(ctx.NAT().getText()),true));		
 	}
 	
 //	public void exitSba_dt_function(Sba_dt_functionContext ctx){

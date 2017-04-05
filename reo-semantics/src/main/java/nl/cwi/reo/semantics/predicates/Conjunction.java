@@ -90,8 +90,9 @@ public class Conjunction implements Formula {
 	}
 
 	@Override
-	public Disjunction DNF() {
+	public Formula DNF() {
 		List<List<Formula>> c = new ArrayList<List<Formula>>();
+//		List<Map<Variable, Integer>> var = new ArrayList<Map<Variable, Integer>>();
 		for (Formula f : clauses) {
 			Formula g = f.DNF();
 			if (g instanceof Disjunction) {
@@ -99,12 +100,14 @@ public class Conjunction implements Formula {
 			} else {
 				c.add(Arrays.asList(g));
 			}
+			
 		}
 		ClausesIterator iter = new ClausesIterator(c);
 		List<Formula> clauses = new ArrayList<Formula>();
 		while (iter.hasNext()) {
 			List<Formula> list = new ArrayList<Formula>();
 			List<Formula> tuple = iter.next();
+			Map<Variable, Integer> var = tuple.get(0).getEvaluation();
 			for (Formula f : tuple) {
 				if (f instanceof Conjunction) {
 					list.addAll(((Conjunction) f).getClauses());
@@ -114,7 +117,14 @@ public class Conjunction implements Formula {
 			}
 			clauses.add(new Conjunction(list));
 		}
+		if(clauses.size()==1)
+			return clauses.get(0);
+		if(clauses.isEmpty())
+			return new Relation("constant",true,null);
 		return new Disjunction(clauses);
+		
+		
+		
 //		Queue<Formula> queue = new LinkedList<Formula>(clauses);
 //
 //		Formula dnf = queue.poll();
@@ -194,6 +204,13 @@ public class Conjunction implements Formula {
 //	}
 
 	public List<Formula> getClauses(){
+		List<Formula> clauses = new ArrayList<Formula>();
+		for (Formula f : this.clauses){
+			if(f instanceof Conjunction)
+				clauses.addAll(((Conjunction)f).getClauses());
+			else
+				clauses.add(f);
+		}
 		return clauses;
 	}
 
@@ -201,7 +218,8 @@ public class Conjunction implements Formula {
 	public Formula NNF() {
 		List<Formula> list = new ArrayList<Formula>();
 		for (Formula f : clauses)
-			list.add(f.NNF());
+			if(f.NNF()!=null)
+				list.add(f.NNF());
 		return new Conjunction(list);
 	}
 

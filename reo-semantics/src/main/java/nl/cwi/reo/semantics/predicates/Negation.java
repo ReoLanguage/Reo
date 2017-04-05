@@ -80,6 +80,8 @@ public class Negation implements Formula {
 		} else if (f instanceof Universal) {
 			Variable x = ((Universal) f).getVariable();
 			return new Existential(x, f).NNF();
+		} else if (f instanceof Equality) {
+			return this;
 		}
 		return f.NNF();
 	}

@@ -5,7 +5,7 @@ import Tokens;
 sba      : 	'#SBA' sba_tr* ;
 sba_tr   : 	'[' sba_sc ',' sba_dc ']';
 sba_dt	 : 	NAT 									#Sba_nat
-          | BOOL									#Sba_bool
+          | sba_boolean									#Sba_bool
           | STRING									#Sba_string
           | DEC   									#Sba_decimal
           | '$q' NAT  								#Sba_dt_memorycellIn
@@ -24,6 +24,7 @@ sba_dc   : 	 sba_dt									#Sba_term
 			| sba_dt '!=' sba_dt 					#Sba_dc_inequality 
 			| sba_dc '&&' sba_dc					#Sba_dc_conjunction ;
 
+sba_boolean : 'true' | 'false';
 // sba      : '#sba' sba_tr* ;
 // sba_tr   : sba_sc ',' sba_dc ;
 // sba_dt	 : NAT | BOOL | STRING | DEC | ID ;

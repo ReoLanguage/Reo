@@ -152,6 +152,8 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 */
 	@Override
 	public ReoConnector<T> rename(Map<Port, Port> joins) {
+		if(links.isEmpty())
+			return new ReoConnectorAtom<T>(name, semantics, source, joins);			
 		return new ReoConnectorAtom<T>(name, semantics, source, Links.rename(links, joins));
 	}
 

@@ -39,6 +39,17 @@ public class Function implements Term {
 		return args;
 	}
 	
+	public String toString(){
+		if(value==null||name==null)
+			return "*";
+		String s = "(";
+		for(Term t : args){
+			s=s+", "+t.toString();
+		}
+		s = s+ ")";
+		return value.toString();
+	}
+	
 	@Override
 	public boolean hadOutputs() {
 		// TODO Auto-generated method stub
