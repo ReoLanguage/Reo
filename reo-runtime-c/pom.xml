@@ -23,6 +23,16 @@
         <artifactId>nar-maven-plugin</artifactId>
         <version>3.2.3</version>
         <extensions>true</extensions>
+        <configuration>
+          <linker>
+            <name>gcc</name>
+          </linker>
+          <libraries> 
+            <library> 
+              <type>executable</type>
+            </library>
+          </libraries>
+        </configuration> 
       </plugin>
     </plugins>
   </build>

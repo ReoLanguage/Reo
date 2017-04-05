@@ -1,92 +1,39 @@
+Reo
+===
 
-Reo compiler
-============
+Protocols coordinate interaction amongst concurrently executing processes.
+Most general purpose programming languages do not provide syntax for expressing these protocols explicitly.
+The absence of such syntax requires programmers to implement their protocols by manually via locks and semaphores. 
+Given such implicit implementation of the protocol, it is very hard, if not impossible, to reason about its correctness and efficiency of the protocol.
 
 .. _Reo: http://reo.project.cwi.nl/reo/wiki
 
-Reo_ is an *exogenous coordination language* designed by prof. dr. F. Arbab at the Centre for Mathematics and Computer Science (​CWI) in Amsterdam.
-Reo allows the programmer to specify protocols that describe interaction among components in a concurrent application.
+Reo_, an *exogenous coordination language* designed by prof. dr. F. Arbab at the Centre for Mathematics and Computer Science (​CWI) in Amsterdam, addresses this problem by providing syntax that allows explicit high-level construction of protocols.
+It is much easier to develop correct protocols that are free of dead-locks, live-locks and data races.
+The compiler of the coordination language is able to optimize the actual implementation of the protocol.
 
 Documentation
 -------------
 The documentation is available on http://reo.readthedocs.io/en/latest/
-
-What are protocols, and why do we care?
----------------------------------------
-
-Protocols, such as mutual exclusion protocol and producer/consumer, orchestrate interaction amongst concurrently executing processes.
-Unfortunately, most general purpose programming languages do not provide syntax for expressing these protocols.
-This absence requires programmers to implement their protocols by manually adding locks and buffers and ensuring their correct usage. 
-Even if the implementation correctly resembles the intended protocol, the implicit encoding of the protocol makes it hard, if not impossible, to reason about its correctness and efficiency.
-
-Reo addresses this problem by providing syntax that enables explicit high-level construction of protocols.
-If the protocol is specified explicitly, it becomes easier to write correct protocols that are free of dead-locks, live-locks and data races.
-Moreover, the compiler of the coordination language is able to optimize the actual implementation of the protocol.
-
-Installation
-------------
-
-Unix
-~~~~
-
-1. Install Java (version 1.6 or higher). You can check if the correct java version is already installed via::
-
-	java --version
-
-2. Download `Reo.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/Reo.zip>`_ via::
-
-	sudo wget https://raw.githubusercontent.com/kasperdokter/Reo/master/Reo.zip
-
-3. Add Reo to the class path and create an alias for the compiler::
-
-	export CLASSPATH=".:/path/to/archinve/reo-runtime-1.0.jar:$CLASSPATH"
-	alias reo='java -jar /path/to/archinve/reo-1.0.jar'
-
-You may want to add the export and alias commands to your startup script of your terminal (e.g., ``~/.bash_profile``).
-This way, you don't need to set the class path and the alias for every new terminal window.
-
-3. Test the installation by running::
-
-	reo
-
-Windows
-~~~~~~~
-
-1. Install Java (version 1.6 or higher).
-
-2. Download `Reo.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/Reo.zip>`_. Save to your directory for 3rd party Java libraries, say ``C:\Javalib``.
-
-3. Set the class path:
-
-	set CLASSPATH=".:/path/to/archinve/reo-runtime-1.0.jar:%CLASSPATH%"
-
-4. Create short convenient commands for the Reo compiler, using doskey commands ``doskey reo=java -jar C:\Javalib\reo-1.0.jar $*`` or using batch files (in directory in system PATH)::
-
-	//reo.bat
-	java -jar C:\Javalib\reo-1.0.jar %*	
-
-5. Test the installation by running::
-
-	reo
    
 Contribute
 ----------
 
-1. Install Java (version 1.6 or higher). You can check if the correct version is already installed via ``java -version``
+1. Install Git. Available at https://git-scm.com/downloads.
 
-2. Install Maven. You can check if the correct version is already installed via ``mvn -version``
+2. Install Java SDK 1.6+. Available at http://www.oracle.com/technetwork/java/javase/downloads/index.html. You can check if the correct version is already installed via ``java -version``
 
-3. Install Eclipse. Available at https://www.eclipse.org/downloads/
+3. Install Maven. Available at https://maven.apache.org/download.cgi.
 
-4. Change directory to eclipse workspace ``cd ../workspace``
+4. Install Eclipse. Available at https://www.eclipse.org/downloads/.
 
-5. Clone this repository via ``git clone https://github.com/kasperdokter/Reo.git``
+5. Change directory to eclipse workspace ``cd ../workspace``
 
-6. Change directory ``cd Reo``
+6. Clone this repository via ``git clone https://github.com/kasperdokter/Reo.git``
 
-7. Build the project: ``mvn install``. 
+7. Change directory ``cd Reo``
 
-8. Run the compiler: ``java -jar reo-compiler/target/reoc.jar``
+8. Build the project: ``mvn clean install``. 
 
 9. Generate Eclipse configuration: ``mvn eclipse:eclipse``
 
