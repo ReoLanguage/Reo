@@ -45,7 +45,7 @@ public final class PortExpression extends VariableExpression {
 		if (list == null)
 			return null;
 		for (Identifier x : list)
-			ports.add(new Port(x.toString(), PortType.NONE, prio, new TypeTag(""), true));
+			ports.add(new Port(x.toString(), PortType.NONE, prio, null, true));
 		return ports;
 	}
 

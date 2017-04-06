@@ -10,6 +10,8 @@ import nl.cwi.reo.interpret.ports.Port;
 
 public class Function implements Term {
 	
+	public static final boolean function = true;
+	
 	private final String name;
 	
 	private Object value;
@@ -32,6 +34,8 @@ public class Function implements Term {
 	}
 	
 	public Object getValue() {
+		if(value == null)
+			return "null";
 		return value;
 	}
 

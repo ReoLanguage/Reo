@@ -35,7 +35,7 @@ package(p) ::= <<
 >>
 
 newPort(p) ::= <<
-Port\<<p.typeTag>\> <p.name> = new PortBusyWait\<<p.typeTag>\>();
+Port\<<p:typetag()>\> <p.name> = new PortBusyWait\<<p.typeTag>\>();
 >>
 
 newComponent(c) ::= <<
@@ -55,7 +55,7 @@ join(c) ::= <<
 >>
 
 component(c) ::= <<
-private class <c.name> implements Component {
+private static class <c.name> implements Component {
 
 	<c.ports:port(); separator="\n\n">
 	
@@ -87,7 +87,7 @@ public void run() {
 	int k = 0;
 	while (true) {
 		k++;
-		<c.transitions:transition()>}; separator="\n">
+		<c.transitions:transition(); separator="\n">
 		if (k > 3) {
 			k = 0;
 			synchronized (this) {
@@ -102,7 +102,11 @@ public void run() {
 
 port(p) ::= <<
 <! private volatile <if(p.input)>Input<else>Output<endif>Port\<<p.typeTag>\> <p.name>; !>
-private volatile Port\<<p.typeTag>\> <p.name>;
+private volatile Port\<<p:typetag()>\> <p.name>;
+>>
+
+typetag(p) ::= <<
+<if(p.typeTag)><p.typeTag><else>Object<endif>
 >>
 
 memorycell(m) ::= <<
@@ -125,32 +129,25 @@ if (<guard(t); wrap, anchor>) {
 >>
 
 guard(t) ::= <<
+<if(t.equality)>equality here<endif>
 <t.guard:formula()>
 <if(t.output.keys)> && <t.output.keys:{p | <p.name>.hasGet()}; separator=" && "><endif>
 <if(t.input)> && <t.input:{p | <p.name>.hasPut()}; separator=" && "><endif>
 >>
 
 formula(f) ::= <<
-<if(f.negation)>!(<if(f.formula.equality)>equality<endif>)
-<elseif(f.equality)>(<f.t1:term()> == <f.t2:term()>)
-<elseif(t.guard.conjunction)>(<t.guard.clauses:guard(); separator=" && ">)
-<elseif(t.guard.disjunction)>(<t.guard.clauses:guard(); separator=" || ">)
+<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)>(<f.LHS:term()> == <f.RHS:term()>)<elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(t.disjunction)>(<t.clauses:formula(); separator=" || ">)
 <endif>
 >>
 
 term(t) ::= <<
-<if(t.function)><t.name>(<t.args:term(t); separator="\n">)
-<elseif(t.constant)><t.name>
-<elseif(t.port)><t.port.name>.get()
-<elseif(t.memory)><t.name>
-<else><t.name>
+<if(t.function)><t.value><elseif(t.constant)><t.name><elseif(t.node)><t.node.name>.get()<elseif(t.memory)><t.name><else><t.name>
 <endif>
 >>
 
 action(t) ::= <<
 <t:output(); separator="\n">
 <t:memory(); separator="\n">
-<! <t.input:input(); separator="\n"> !>
 >>
 
 output(a) ::= <<

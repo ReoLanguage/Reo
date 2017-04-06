@@ -538,8 +538,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		VariableExpression var = variables.get(ctx.var());
 		TypeTag type = typetags.get(ctx.type());
 		// if (type == null) type = new TypeTag(Arrays.asList(""));
-		if (type == null)
-			type = new TypeTag("");
 		parameters.put(ctx, new ParameterExpression(var, type));
 
 		// TODO : add signature option
@@ -559,8 +557,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		if (var == null)
 			var = new VariableExpression("", new ArrayList<TermExpression>(), new Location(ctx.start, filename));
 		TypeTag tag = typetags.get(ctx.type());
-		if (tag == null)
-			tag = new TypeTag();
 		PortType type = PortType.NONE;
 		if (ctx.io != null) {
 			switch (ctx.io.getType()) {
@@ -586,7 +582,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitType(TypeContext ctx) {
-		typetags.put(ctx, new TypeTag(ctx.getText()));
+		if(!ctx.getText().trim().equals(""))
+			typetags.put(ctx, new TypeTag(ctx.getText()));
 	}
 
 	/**

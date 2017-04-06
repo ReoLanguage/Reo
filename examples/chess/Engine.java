@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,7 +18,7 @@ public class Engine {
 	private final BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 	private final BufferedReader reader;
 	private final BufferedWriter writer;
-	private final int moveTime = new Random().nextInt(3000);
+	private final int moveTime = 1000;
 
 	public Engine(InputPort inputPort, OutputPort outputPort) {
 		this.inputPort = inputPort;
@@ -32,17 +33,9 @@ public class Engine {
 		else
 			stockfish = "stockfish-6-linux-64";
 
-		String path = "/ufs/dokter/workspace/Reo/examples/chess/" +stockfish;
+		String path = "./"
+				+ stockfish;
 
-		/*
-		 *  "src/main/java"
-				+ File.separator
-				+ getClass().getPackage().getName()
-						.replace('.', File.separatorChar) + File.separator
-				+ 
-		 */
-//		String path = "/home/e-spin/workspace/Reo/reo-runtime-java-lykos/src/main/java/nl/cwi/reo/templates/stockfish-6-linux-64";
-		
 		Process process = null;
 		try {
 			process = Runtime.getRuntime().exec(path);
@@ -67,10 +60,9 @@ public class Engine {
 				try {
 					while ((line = reader.readLine()) != null) {
 						builder.append(line + "\n");
-
 						if (line.startsWith("uciok")
 								|| line.startsWith("bestmove")) {
-
+	
 							queue.put(builder.toString());
 							builder = new StringBuilder();
 						}
@@ -98,7 +90,8 @@ public class Engine {
 
 	public void run() {
 		while (true) {
-			String moves = (String) inputPort.getUninterruptibly().toString();
+			String moves = (String) inputPort.getUninterruptibly();
+			System.out.println(moves);
 			String result = "";
 
 			try {
@@ -119,3 +112,4 @@ public class Engine {
 
 	}
 }
+

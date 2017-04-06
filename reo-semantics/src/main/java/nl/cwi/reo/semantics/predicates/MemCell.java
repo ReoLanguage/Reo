@@ -22,7 +22,7 @@ public class MemCell implements Variable {
 	public MemCell(String name, boolean prime) {
 		this.name = name;
 		this.prime = prime;
-		this.type = new TypeTag("");
+		this.type = null;
 	}
 
 	public MemCell(String name, boolean prime, TypeTag type) {

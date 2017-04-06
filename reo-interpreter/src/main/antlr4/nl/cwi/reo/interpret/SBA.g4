@@ -25,6 +25,7 @@ sba_dc   : 	 sba_dt									#Sba_term
 			| sba_dc '&&' sba_dc					#Sba_dc_conjunction ;
 
 sba_boolean : 'true' | 'false';
+
 // sba      : '#sba' sba_tr* ;
 // sba_tr   : sba_sc ',' sba_dc ;
 // sba_dt	 : NAT | BOOL | STRING | DEC | ID ;

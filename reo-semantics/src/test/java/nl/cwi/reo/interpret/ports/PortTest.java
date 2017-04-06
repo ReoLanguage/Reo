@@ -10,7 +10,7 @@ public class PortTest {
 	
 	@Test
 	public void join_OriginalHasNoTypes() {
-		Port origin = new Port("origin", PortType.NONE, PrioType.NONE, new TypeTag(""), false);
+		Port origin = new Port("origin", PortType.NONE, PrioType.NONE, null, false);
 		Port target = new Port("target", PortType.IN, PrioType.NONE, new TypeTag("int"), false);
 		Port composed = target.join(origin);
 		

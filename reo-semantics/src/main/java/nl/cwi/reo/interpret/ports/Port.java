@@ -40,7 +40,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 		super(name);
 		this.type = PortType.NONE;
 		this.prio = PrioType.NONE;
-		this.tag = new TypeTag("");
+		this.tag = null;
 		this.visible = true;
 	}
 
@@ -60,7 +60,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 */
 	public Port(String name, PortType type, PrioType prio, TypeTag tag, boolean hidden) {
 		super(name);
-		if (type == null || prio == null || tag == null)
+		if (type == null || prio == null )
 			throw new NullPointerException();
 		this.type = type;
 		this.prio = prio;
@@ -82,7 +82,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 		if (origin == null)
 			throw new NullPointerException();
 		PortType _type = origin.type == PortType.NONE ? type : origin.type;
-		TypeTag _tag = origin.tag.isEmpty() ? tag : origin.tag;
+		TypeTag _tag = origin.tag==null||origin.tag.isEmpty() ? tag : origin.tag;
 		boolean _visible = visible && origin.visible;
 		return new Port(name, _type, PrioType.NONE, _tag, _visible);
 	}
@@ -152,9 +152,10 @@ public final class Port extends Identifier implements Comparable<Port> {
 	public Port hide() {
 		return new Port(name, type, prio, tag, false);
 	}
-	
+
 	/**
 	 * Determines whether this port in an input port.
+	 * 
 	 * @return true if this port is an input, and false otherwise.
 	 */
 	public boolean isInput() {

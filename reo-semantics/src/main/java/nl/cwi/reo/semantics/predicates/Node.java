@@ -13,6 +13,8 @@ import nl.cwi.reo.interpret.ports.PortType;
 
 public class Node implements Variable  {
 	
+	public static final boolean node = true;
+	
 	private final Port p;
 	
 	public Node(Port p) {
