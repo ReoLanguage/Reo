@@ -219,6 +219,17 @@
     return ((angle * 180 / Math.PI) + 90) % 360;
   } //calcArrowAngle
   
+  function isBoundaryNode (node, component) {
+    if (node.left == component.left ||
+        node.top  == component.top  ||
+        node.left == component.left + component.width ||
+        node.top  == component.top  + component.height)
+    {
+      return true;
+    }
+    return false;
+  }
+  
   function updateText() {
     if (main) {
       var s1 = main.label.text + '(';
@@ -227,15 +238,20 @@
       
       canvas.forEachObject(function(obj) {
         if (obj.class == 'node') {
-          if (obj.left == main.left || obj.top == main.top || obj.left == main.left + main.width || obj.top == main.top + main.height) {
+          if (isBoundaryNode(obj,obj.component)) {
             s1 += space1 + obj.label.text;
             space1 = ','
             
           }
         }
         if (obj.class == 'channel')
-          s2 += space2 + 'sync(' + obj.circle1.label.text + ',' + obj.circle2.label.text + ')';
-          space2 = ' ';
+          if (obj.circle1.component === main ||
+              obj.circle2.component === main ||
+              (isBoundaryNode(obj.circle1,obj.circle1.component) && isBoundaryNode(obj.circle2,obj.circle2.component)))
+          {
+            s2 += space2 + 'sync(' + obj.circle1.label.text + ',' + obj.circle2.label.text + ')';
+            space2 = ' ';
+          }
       });
       
       s1 = s1 + ') {\n  ' + s2 + '\n}';
@@ -304,8 +320,8 @@
     origX = pointer.x;
     origY = pointer.y;
     var p = canvas.getActiveObject();
-    console.log(p);
     if (p) {
+      console.log(p.component.id);
       origLeft = p.left;
       origTop = p.top;
       return;
@@ -438,16 +454,17 @@
           updateLine(p.linesOut[k], 1);
         }
         canvas.calcOffset();
+        canvas.deactivateAll();
       }
       if (p.class == 'component') {
         p.label.setCoords();
         reorderComponents(p);
-        p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});    
+        p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
+        canvas.deactivateAll();
       }
       if (p.class == 'label') {
         p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});    
       }
-      canvas.deactivateAll();
     }
   });
   
