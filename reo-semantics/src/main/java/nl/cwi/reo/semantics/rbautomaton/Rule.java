@@ -14,12 +14,12 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.util.Monitor;
 
-public class Rules {
+public class Rule {
 
 	private Map<Port,Role> sync;
 	private Formula f;
 	
-	public Rules(Map<Port,Role> sync, Formula f){
+	public Rule(Map<Port,Role> sync, Formula f){
 		this.sync=sync;
 		this.f=f;
 	}
@@ -50,7 +50,7 @@ public class Rules {
 		return setPort;
 	}
 	
-	public Rules rename(Map<Port, Port> links) {
+	public Rule rename(Map<Port, Port> links) {
 		Map<Port,Role> map = new HashMap<Port,Role>();
 		for (Port p : sync.keySet()){
 			if(links.containsKey(p)){
@@ -60,10 +60,10 @@ public class Rules {
 				map.put(p, sync.get(p));
 		}
 			
-		return new Rules(map,f.rename(links));
+		return new Rule(map,f.rename(links));
 	}
 	
-	public boolean hasEdge(Rules r){
+	public boolean hasEdge(Rule r){
 		Map<Port,Role> map = r.getSync();
 		boolean hasEdge = false;
 		for(Port p : sync.keySet()){
@@ -71,9 +71,6 @@ public class Rules {
 				return false;
 			}
 			if(sync.get(p).getValue()==2 && map.get(p).getValue()==0){
-				return false;
-			}
-			if(sync.get(p).getValue()==1 && map.get(p).getValue()==1){
 				return false;
 			}
 		}
@@ -92,8 +89,8 @@ public class Rules {
 		return s;
 	}
 	
-	public @Nullable Rules evaluate(Scope s, Monitor m){
+	public @Nullable Rule evaluate(Scope s, Monitor m){
 		
-		return new Rules(sync,f.evaluate(s, m));  
+		return new Rule(sync,f.evaluate(s, m));  
 	}
 }

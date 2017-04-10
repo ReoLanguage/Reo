@@ -41,7 +41,7 @@ import nl.cwi.reo.semantics.predicates.MemoryCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Predicate;
 import nl.cwi.reo.semantics.predicates.Term;
-import nl.cwi.reo.semantics.rbautomaton.Rules;
+import nl.cwi.reo.semantics.rbautomaton.Rule;
 import nl.cwi.reo.semantics.rbautomaton.RulesBasedAutomaton;
 import nl.cwi.reo.util.Monitor;
 
@@ -220,7 +220,7 @@ public class Compiler {
 
 		// Transform every disjunctive clause into a transition.
 		Set<Transition> transitions = new HashSet<Transition>();
-		for (Rules rule : circuit.getRules()) {
+		for (Rule rule : circuit.getRules()) {
 
 			//Commandify the formula:
 			Transition t = SBACompiler.commandify(rule.getFormula());

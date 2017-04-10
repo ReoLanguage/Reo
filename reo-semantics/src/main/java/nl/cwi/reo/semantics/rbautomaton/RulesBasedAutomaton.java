@@ -22,13 +22,13 @@ import nl.cwi.reo.util.Monitor;
 
 public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 
-	private final Set<Rules> s;
+	private final Set<Rule> s;
 
 	/**
 	 * Constructs an automaton, with an empty set of rules.
 	 */
 	public RulesBasedAutomaton() {
-		this.s = new HashSet<Rules>();
+		this.s = new HashSet<Rule>();
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 * @param f
 	 *            formula
 	 */
-	public RulesBasedAutomaton(Set<Rules> s) {
+	public RulesBasedAutomaton(Set<Rule> s) {
 		this.s = s;
 	}
 
@@ -46,23 +46,23 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 * 
 	 * @return formula
 	 */
-	public Set<Rules> getRules() {
-		Set<Rules> setRules = new HashSet<Rules>();
+	public Set<Rule> getRules() {
+		Set<Rule> setRules = new HashSet<Rule>();
 		Map<Port,Role> map = new HashMap<Port,Role>();
 		List<Formula> listF = new ArrayList<Formula>();
 		
 		int i=0;
-		for(Rules rule : s){
+		for(Rule rule : s){
 			i++;
 			int j=0;
-			Rules tmp = rule;
-			for(Rules r : s){
+			Rule tmp = rule;
+			for(Rule r : s){
 				if(i!=j && rule.hasEdge(r)){
 					map.putAll(r.getSync());
 					listF.add(r.getFormula());
 				}
 			}
-			setRules.add(new Rules(map,new Conjunction(listF)));
+			setRules.add(new Rule(map,new Conjunction(listF)));
 		}
 		return s;
 	}
@@ -72,8 +72,8 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 */
 	@Override
 	public @Nullable RulesBasedAutomaton evaluate(Scope s, Monitor m) {
-		Set<Rules> setRules = new HashSet<Rules>();
-		for(Rules r : this.s){
+		Set<Rule> setRules = new HashSet<Rule>();
+		for(Rule r : this.s){
 			setRules.add(r.evaluate(s,m));
 		}
 		return new RulesBasedAutomaton(setRules);
@@ -85,7 +85,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> p = new HashSet<Port>();
-		for(Rules r : s){
+		for(Rule r : s){
 			p.addAll(r.getFiringPorts());
 		}
 		return p;
@@ -112,8 +112,8 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 */
 	@Override
 	public RulesBasedAutomaton rename(Map<Port, Port> links) {
-		Set<Rules> setRules = new HashSet<Rules>();
-		for(Rules r : s){
+		Set<Rule> setRules = new HashSet<Rule>();
+		for(Rule r : s){
 			setRules.add(r.rename(links));
 		}
 		return new RulesBasedAutomaton(setRules);
@@ -124,7 +124,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 */
 	@Override
 	public RulesBasedAutomaton compose(List<RulesBasedAutomaton> components) {
-		Set<Rules> s = new HashSet<Rules>();
+		Set<Rule> s = new HashSet<Rule>();
 		for (RulesBasedAutomaton A : components)
 			s.addAll(A.getRules());
 		return new RulesBasedAutomaton(s);
@@ -132,7 +132,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 
 	public String toString(){
 		String s = "[";
-		for(Rules r : this.s){
+		for(Rule r : this.s){
 			s=s+r.toString();
 		}
 		s=s+"]";
@@ -144,13 +144,13 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 */
 	@Override
 	public RulesBasedAutomaton restrict(Collection<? extends Port> intface) {
-		Set<Rules> setRules = new HashSet<Rules>();
-		for (Rules r : s){
+		Set<Rule> setRules = new HashSet<Rule>();
+		for (Rule r : s){
 			Formula g = r.getFormula();
 			for(Port p : r.getFiringPorts())
 				if (!intface.contains(p))
 					g = new Existential(new Node(p), g);
-			setRules.add(new Rules(r.getSync(),g));
+			setRules.add(new Rule(r.getSync(),g));
 		}
 		return new RulesBasedAutomaton(setRules);
 	}

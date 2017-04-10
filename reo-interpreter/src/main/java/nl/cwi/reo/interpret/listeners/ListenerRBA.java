@@ -42,7 +42,7 @@ import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.rbautomaton.Role;
-import nl.cwi.reo.semantics.rbautomaton.Rules;
+import nl.cwi.reo.semantics.rbautomaton.Rule;
 import nl.cwi.reo.semantics.rbautomaton.RulesBasedAutomaton;
 import nl.cwi.reo.util.Monitor;
 
@@ -51,7 +51,7 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 	private ParseTreeProperty<RulesBasedAutomaton> automaton = new ParseTreeProperty<RulesBasedAutomaton>();
 	private ParseTreeProperty<Formula> rba_formula = new ParseTreeProperty<Formula>();
 	private ParseTreeProperty<Term> term = new ParseTreeProperty<Term>();	
-	private ParseTreeProperty<Rules> rules = new ParseTreeProperty<Rules>();	
+	private ParseTreeProperty<Rule> rules = new ParseTreeProperty<Rule>();	
 
 	private Map<Port,Role> mapPorts = new HashMap<Port,Role>();
 	private final Term asterix = new Function(null, new ArrayList<Term>());
@@ -74,7 +74,7 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 	 */
 
 	public void exitRba(RbaContext ctx) {
-		Set<Rules> s = new HashSet<Rules>();
+		Set<Rule> s = new HashSet<Rule>();
 		for(Rba_ruleContext rbaContext : ctx.rba_rule()){
 			s.add(rules.get(rbaContext));
 		}
@@ -90,7 +90,7 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 	}
 	
 	public void exitRba_rule(Rba_ruleContext ctx) {
-		rules.put(ctx, new Rules(mapPorts,rba_formula.get(ctx.rba_formula())));
+		rules.put(ctx, new Rule(mapPorts,rba_formula.get(ctx.rba_formula())));
 	}
 	
 	/*
