@@ -139,7 +139,6 @@
       p.setCoords();
       if (p.class == 'component') {
         p.label.setCoords();
-        canvas.sendToBack(p);
         p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});    
       }
       if (p.class == 'label') {

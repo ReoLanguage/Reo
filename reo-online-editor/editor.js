@@ -9,18 +9,33 @@
     document.getElementById(mode).style.border = '2px solid white';
     mode = 'select';
     this.style.border = '2px solid black';
+    canvas.forEachObject(function(obj) {
+      if (obj.class === 'component') {
+        obj.set({'selectable': true});
+      }
+    });
   };
   
   document.getElementById("component").onclick = function() {
     document.getElementById(mode).style.border = '2px solid white';
     mode = 'component';
     this.style.border = '2px solid black';
+    canvas.forEachObject(function(obj) {
+      if (obj.class === 'component') {
+        obj.set({'selectable': false});
+      }
+    });
   };
   
   document.getElementById("sync").onclick = function() {
     document.getElementById(mode).style.border = '2px solid white';
     mode = 'sync';
     this.style.border = '2px solid black';
+    canvas.forEachObject(function(obj) {
+      if (obj.class === 'component') {
+        obj.set({'selectable': false});
+      }
+    });
   };
   
   document.getElementById("downloadsvg").onclick = function () {
@@ -214,7 +229,7 @@
         if (obj.class == 'node') {
           if (obj.left == main.left || obj.top == main.top || obj.left == main.left + main.width || obj.top == main.top + main.height) {
             s1 += space1 + obj.label.text;
-            space1 = ', '
+            space1 = ','
             
           }
         }
@@ -296,6 +311,7 @@
       return;
     }
     if (mode == 'sync') {
+      canvas.deactivateAll();
       var line = drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
       snapToComponent(line.circle1,main);
       canvas.setActiveObject(line.circle2);
@@ -425,14 +441,25 @@
       }
       if (p.class == 'component') {
         p.label.setCoords();
-        canvas.sendToBack(p);
+        reorderComponents(p);
         p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});    
       }
       if (p.class == 'label') {
         p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});    
       }
+      canvas.deactivateAll();
     }
   });
+  
+  /* Reorders the components so that all components are behind the other elements and p is in front of the other components */
+  function reorderComponents(p) {
+    canvas.sendToBack(p);
+    canvas.forEachObject(function(obj) {
+      if (obj.class === 'component' && obj !== p) {
+        canvas.sendToBack(obj);
+      }
+    });
+  }
   
   function drawComponent(x1,y1,x2,y2) {
     var width = (x2 - x1);
