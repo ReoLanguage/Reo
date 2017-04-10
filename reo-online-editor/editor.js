@@ -228,7 +228,7 @@
     }
   }
   
-  function snapToComponent(node,comp) {
+  function snapToComponent(node, comp) {
     var right = comp.left + comp.width;
     var bottom = comp.top + comp.height;
     if (node.left > right) // right side
@@ -289,6 +289,7 @@
     origX = pointer.x;
     origY = pointer.y;
     var p = canvas.getActiveObject();
+    console.log(p);
     if (p) {
       origLeft = p.left;
       origTop = p.top;
@@ -476,7 +477,7 @@
   }
   
   var main = drawComponent(50,50,750,550);
-  main.set({id: 'main', hasBorders: false, hasControls: false, selectable: false});
+  main.set({id: 'main', hasBorders: false, hasControls: false, evented: false});
   main.label.set({'text': 'main'});
   id = '0';
   document.getElementById("select").click();
