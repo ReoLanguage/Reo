@@ -25,9 +25,9 @@ public class WindowConsumer implements Component {
 	private static final int OFFSET_INCREMENT = 25;
 	private static final int WIDTH = 300;
 
-	private volatile Map<String,Port<Integer>> map = new HashMap<String,Port<Integer>>();
+	private volatile Map<String,Port<Object>> map = new HashMap<String,Port<Object>>();
 	
-	public WindowConsumer(String name, Port<Integer> a) {
+	public WindowConsumer(String name, Port<Object> a) {
 		a.setConsumer(this);
 		map.put(name,a);
 	}

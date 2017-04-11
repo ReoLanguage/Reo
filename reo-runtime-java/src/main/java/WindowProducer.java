@@ -21,13 +21,10 @@ import nl.cwi.reo.runtime.java.Component;
 import nl.cwi.reo.runtime.java.Port;
 
 public class WindowProducer implements Component {
-	private static final int HEIGHT = 400;
-	private static final int OFFSET_INCREMENT = 25;
-	private static final int WIDTH = 300;
 	
-	private volatile Map<String,Port<Integer>> map = new HashMap<String,Port<Integer>>();
+	private volatile Map<String,Port<Object>> map = new HashMap<String,Port<Object>>();
 	
-	public WindowProducer(String name,Port<Integer> a) {
+	public WindowProducer(String name,Port<Object> a) {
 		a.setProducer(this);
 		map.put(name,a);
 	}
@@ -43,7 +40,12 @@ public class WindowProducer implements Component {
 	public void run() {	
 		openThenWait(map);
 	}
+	
+	private static final int HEIGHT = 400;
+	private static final int OFFSET_INCREMENT = 25;
+	private static final int WIDTH = 300;
 
+	
 	public static <T> void openThenWait(Map<String, Port<T>> inputPorts) {
 
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment()

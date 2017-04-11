@@ -89,17 +89,28 @@ public class Existential implements Formula {
 			for (Formula fi : ((Conjunction) f).getClauses()) {
 				if (fi instanceof Equality) {
 					Equality e = (Equality) fi;
+					if (e.getLHS().equals(x) ) {
+						t = e.getRHS();
+					} else if (e.getRHS().equals(x)) {
+						t =  e.getLHS();
+					} 
+					list.add(fi);
+				}
+				if (fi instanceof Negation && ((Negation)fi).getFormula() instanceof Equality) {
+					Equality e = (Equality) ((Negation)fi).getFormula();
 					if (e.getLHS().equals(x)) {
 						t = e.getRHS();
 					} else if (e.getRHS().equals(x)) {
 						t =  e.getLHS();
-					} else {
-						list.add(fi);
-					}
+					} 
+					list.add(fi);
+					
 				}
 			}
 			if (t != null)
 				return new Conjunction(list).Substitute(t, x);
+			else
+				return new Conjunction(list);
 		}
 		return this;
 	}

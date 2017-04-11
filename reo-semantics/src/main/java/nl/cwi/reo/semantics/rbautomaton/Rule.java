@@ -63,18 +63,22 @@ public class Rule {
 		return new Rule(map,f.rename(links));
 	}
 	
-	public boolean hasEdge(Rule r){
-		Map<Port,Role> map = r.getSync();
-		boolean hasEdge = false;
-		for(Port p : sync.keySet()){
-			if(sync.get(p).getValue()==1 && map.get(p).getValue()==0){
-				return false;
-			}
-			if(sync.get(p).getValue()==2 && map.get(p).getValue()==0){
-				return false;
-			}
-		}
-		return true;
+	/**
+	 * 
+	 * @param r
+	 * @return
+	 */
+	public Rule merge(Rule r){
+		/*
+		 * This method assumes that both rules are in Conjunctive Normal Form
+		 */
+		
+//		List<Formula> f = new ArrayList<Formula>();
+//		Map<Port,Role> map = new HashMap<Port,Role>();
+//		
+//		f.add(r.getFormula());
+//		for(Port p :  )
+		return null;
 	}
 	
 	public String toString(){

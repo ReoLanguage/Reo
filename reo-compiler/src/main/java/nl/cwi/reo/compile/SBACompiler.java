@@ -11,6 +11,7 @@ import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
+import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryCell;
@@ -46,7 +47,7 @@ public class SBACompiler {
 
 		if(f instanceof Conjunction)
 			literals = ((Conjunction) f).getClauses();
-		
+				
 		Map<Variable,Term> assignements = new HashMap<Variable,Term>();
 		List<Formula> guards = new ArrayList<Formula>();
 		
@@ -61,6 +62,10 @@ public class SBACompiler {
 					Equality equality = (Equality) l;
 					Term t1 = equality.getLHS();
 					Term t2 = equality.getRHS();
+					if(t1.equals(t2)){
+						literalsToRemove.add(l);
+						continue;	
+					}
 					
 					if(t1 instanceof Variable && doneVariables.containsAll(t2.getFreeVariables())){
 						if(!(t2 instanceof Function && (((Function)t2).getName()==null || ((Function)t2).getValue()==null))){

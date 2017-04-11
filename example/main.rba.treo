@@ -9,7 +9,7 @@ sync(a?,b!){
 	{(a,b),(a==b)}
 }
 
-main(a?,b!){
+test(a?,b!){
 	sync(a,c)fifo(c,b)
 }
 

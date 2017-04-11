@@ -36,6 +36,7 @@ import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.semantics.predicates.Disjunction;
+import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryCell;
 import nl.cwi.reo.semantics.predicates.Node;
@@ -215,15 +216,23 @@ public class Compiler {
 //		JavaCompiler.generateCode(automaton);
 
 		// Compose the protocol into a single connector.
-//		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols).restrict(intface);
 		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
 
 		// Transform every disjunctive clause into a transition.
 		Set<Transition> transitions = new HashSet<Transition>();
-		for (Rule rule : circuit.getRules()) {
-
+		Set<Rule> setRules = circuit.getNewRules();
+		for (Rule rule : setRules) {
+			
+			// Quantify and eliminate by substitution all hidden nodes
+			Formula f = rule.getFormula();
+			for(Port p : rule.getAllPorts()){
+				if(p.isHidden())
+					f = new Existential(new Node(p),f);
+			}
+			f=f.QE();
+			
 			//Commandify the formula:
-			Transition t = SBACompiler.commandify(rule.getFormula());
+			Transition t = SBACompiler.commandify(f);
 			
 			transitions.add(t);
 		}

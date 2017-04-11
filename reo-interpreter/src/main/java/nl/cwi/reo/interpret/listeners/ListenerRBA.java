@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.RbaContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_boolContext;
+import nl.cwi.reo.interpret.ReoParser.Rba_boolean_formulaContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_conjunctionContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_decimalContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_defContext;
@@ -40,6 +41,7 @@ import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryCell;
 import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.rbautomaton.Role;
 import nl.cwi.reo.semantics.rbautomaton.Rule;
@@ -127,7 +129,11 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 	public void exitRba_inequality(Rba_inequalityContext ctx){
 		rba_formula.put(ctx, new Negation(new Equality(term.get(ctx.rba_term(0)),term.get(ctx.rba_term(1)))));		
 	}	
+	public void exitRba_boolean_formula(Rba_boolean_formulaContext ctx){
+		rba_formula.put(ctx, new Relation(ctx.rba_boolean().getText(),Arrays.asList(new Function("constant", Boolean.parseBoolean(ctx.rba_boolean().getText()), new ArrayList<Term>()))));		
+	}	
 
+	
 	/*
 	 * Terms:
 	 */

@@ -77,7 +77,7 @@ public final class ReoTemplate {
 		String path = "../reo-runtime-java/src/main/java";
 		
 		try {
-			Files.write(Paths.get(path, "test.java"), Arrays.asList(temp.render()),
+			Files.write(Paths.get(path, name+".java"), Arrays.asList(temp.render()),
 					Charset.defaultCharset());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

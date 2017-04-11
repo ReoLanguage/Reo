@@ -51,8 +51,9 @@ public class Node implements Variable  {
 
 	@Override
 	public Term Substitute(Term t, Variable x) {
-		// TODO Auto-generated method stub
-		return null;
+		if(this.equals(x))
+			return t;
+		return this;
 	}
 
 	@Override

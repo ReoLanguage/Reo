@@ -110,11 +110,11 @@ typetag(p) ::= <<
 >>
 
 memorycell(m) ::= <<
-private <m.type> <m.name>;
+private <if(m.type)><m.type><else>Object<endif> <m.name>;
 >>
 
 constructor(c) ::= <<
-public <c.name>(<c.ports:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
+public <c.name>(<c.ports:{p | Port\<<p:typetag()>\> <p.name>}; separator=", ">) {
 	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
 	<c.ports:{p | this.<p.name> = <p.name>;}; separator="\n">
 	activate();
@@ -129,10 +129,7 @@ if (<guard(t); wrap, anchor>) {
 >>
 
 guard(t) ::= <<
-<if(t.equality)>equality here<endif>
-<t.guard:formula()>
-<if(t.output.keys)> && <t.output.keys:{p | <p.name>.hasGet()}; separator=" && "><endif>
-<if(t.input)> && <t.input:{p | <p.name>.hasPut()}; separator=" && "><endif>
+<if(t.equality)>equality here<endif><t.guard:formula()><if(t.output.keys)> && <t.output.keys:{p | <p.name>.hasGet()}; separator=" && "><endif><if(t.input)> && <t.input:{p | <p.name>.hasPut()}; separator=" && "><endif>
 >>
 
 formula(f) ::= <<
@@ -141,9 +138,9 @@ formula(f) ::= <<
 >>
 
 term(t) ::= <<
-<if(t.function)><t.value><elseif(t.constant)><t.name><elseif(t.node)><t.node.name>.get()<elseif(t.memory)><t.name><else><t.name>
-<endif>
+<if(t.function)><t.value><elseif(t.constant)><t.name><elseif(t.node)><t.name>.get()<elseif(t.memory)><t.name><else><t.name><endif>
 >>
+
 
 action(t) ::= <<
 <t:output(); separator="\n">

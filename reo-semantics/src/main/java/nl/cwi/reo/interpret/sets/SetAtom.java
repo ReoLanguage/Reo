@@ -48,8 +48,10 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 *            reference to source code
 	 */
 	public SetAtom(String name, T atom, Reference source) {
-		if (atom == null || source == null)
+		if (atom == null && source == null)
 			throw new NullPointerException();
+//		if (atom==null)
+//			getDefault();
 		this.name = name;
 		this.atom = atom;
 		this.source = source;

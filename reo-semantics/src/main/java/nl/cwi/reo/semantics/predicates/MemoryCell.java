@@ -23,7 +23,7 @@ public class MemoryCell implements Variable {
 	public MemoryCell(int k, boolean prime) {
 		this.k = k;
 		this.prime = prime;
-		this.type="";
+		this.type=null;
 	}
 
 	public MemoryCell(int k, boolean prime, String type) {
