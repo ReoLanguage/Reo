@@ -7,26 +7,18 @@ public class test {
 
   public static void main(String[] args) {
 
-    Port<Object> a = new PortWaitNotify<Object>();
-    Port<Object> b = new PortWaitNotify<Object>();
+    Port<Object> a = new PortBusyWait<>();
+    Port<Object> b = new PortBusyWait<>();
+    Port<Object> c = new PortBusyWait<>();
 
-    Component Protocol0 = new Protocol0(a, b);
-    Component Comp0 = new WindowConsumer("b",b);
-    Component Comp1 = new WindowProducer("a",a);
-    
+    Component Protocol0 = new Protocol0(a, b, c);
+
  	Thread thread_Protocol0 = new Thread(Protocol0); 
- 	Thread thread_Comp0 = new Thread(Comp0);
- 	Thread thread_Comp1 = new Thread(Comp1);
- 	
+
 	thread_Protocol0.start();
-	thread_Comp0.start();
-	thread_Comp1.start();
 
     try {
       thread_Protocol0.join();
-      thread_Comp0.join();
-      thread_Comp0.join();
-
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
@@ -39,13 +31,19 @@ public class test {
 
   	private volatile Port<Object> b;
 
+  	private volatile Port<Object> c;
+
   	private Object q1;
 
-  	public Protocol0(Port<Object> a, Port<Object> b) {
+  	private Object q1;
+
+  	public Protocol0(Port<Object> a, Port<Object> b, Port<Object> c) {
   		a.setConsumer(this);
-  		b.setProducer(this);
+  		b.setConsumer(this);
+  		c.setConsumer(this);
   		this.a = a;
   		this.b = b;
+  		this.c = c;
   		activate();
   	}
 
@@ -57,19 +55,35 @@ public class test {
   		int k = 0;
   		while (true) {
   			k++;
-  			if (((q1 == null)) && a.hasPut()) {
-  				 
-  				q1 = a.get(); 
-  				k = 0;
-  			}
-  			if (((q1 == null)) && a.hasPut()) {
-  				 
-  				q1 = a.get(); 
-  				k = 0;
-  			}
-  			if ((!((q1 == null))) && b.hasGet()) {
-  				b.put(q1); 
+  			if ((!((q1 == null))) && c.hasGet() && c.hasPut()) {
+  				c.put(q1); 
   				q1 = null; 
+  				k = 0;
+  			}
+  			if (((q1 == null)) && a.hasGet() && a.hasPut() && b.hasPut() && c.hasPut()) {
+  				a.put(c.get()); 
+  				q1 = b.get(); 
+  				k = 0;
+  			}
+  			if ((!((q1 == null))) && c.hasPut()) {
+  				 
+  				q1 = null;
+  				q1 = c.get(); 
+  				k = 0;
+  			}
+  			if (((q1 == null)) && a.hasGet() && a.hasPut() && b.hasPut() && c.hasPut()) {
+  				a.put(c.get()); 
+  				q1 = b.get(); 
+  				k = 0;
+  			}
+  			if (((q1 == null)) && a.hasGet() && a.hasPut() && b.hasPut() && c.hasPut()) {
+  				a.put(c.get()); 
+  				q1 = b.get(); 
+  				k = 0;
+  			}
+  			if (((q1 == null)) && a.hasGet() && a.hasPut() && b.hasPut() && c.hasPut()) {
+  				a.put(c.get()); 
+  				q1 = b.get(); 
   				k = 0;
   			}
   			if (k > 3) {

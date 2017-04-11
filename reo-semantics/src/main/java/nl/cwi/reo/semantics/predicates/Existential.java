@@ -74,7 +74,7 @@ public class Existential implements Formula {
 	@Override
 	public Formula QE() {
 		if (f instanceof Existential) {
-			return new Existential(x, f.QE());
+			return new Existential(x, f.QE()).QE();
 		} else if (f instanceof Disjunction) {
 			List<Formula> list = new ArrayList<Formula>();
 			for (Formula fi : ((Disjunction) f).getClauses())
