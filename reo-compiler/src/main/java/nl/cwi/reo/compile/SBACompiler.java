@@ -30,7 +30,6 @@ public class SBACompiler {
 
 		for (Variable v : f.getFreeVariables()){
 			if(v instanceof Node && ((Node) v).isInput()){
-				allInputPorts.add(((Node)v).getPort());
 				allImportVariables.add(v);
 			}
 			if(v instanceof MemoryCell && !((MemoryCell) v).hasPrime())
@@ -157,6 +156,11 @@ public class SBACompiler {
 
 		Map<MemoryCell, Term> memory = new HashMap<MemoryCell, Term>();
 		
+		for (Variable v : f.getFreeVariables()){
+			if(v instanceof Node && ((Node) v).isInput()){
+				allInputPorts.add(((Node)v).getPort());
+			}
+		}
 		for(Variable v : assignements.keySet()){
 			if(v instanceof Node){
 				output.put((Node)v, assignements.get(v));
