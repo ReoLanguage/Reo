@@ -20,34 +20,15 @@ import javax.swing.JTextField;
 import nl.cwi.reo.runtime.java.Component;
 import nl.cwi.reo.runtime.java.Port;
 
-public class WindowProducer implements Component {
-	
-	private volatile Map<String,Port<Object>> map = new HashMap<String,Port<Object>>();
-	
-	public WindowProducer(String name,Port<Object> a) {
-		a.setProducer(this);
-		map.put(name,a);
-	}
-	
-	@Override
-	public void activate() { 
-		synchronized (this) {
-			notify();	
-		} 
-	}
-
-	@Override
-	public void run() {	
-		openThenWait(map);
-	}
-	
+public class WindowP {
 	private static final int HEIGHT = 400;
 	private static final int OFFSET_INCREMENT = 25;
 	private static final int WIDTH = 300;
 
 	
-	public static <T> void openThenWait(Map<String, Port<T>> inputPorts) {
-
+	public static <T> void window(String name, Port<Object> inputPorts) {
+		Map<String,Port<Object>> map = new HashMap<String,Port<Object>>();
+		map.put(name,inputPorts);
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getCenterPoint();
 
@@ -56,7 +37,7 @@ public class WindowProducer implements Component {
 
 		final Semaphore semaphore = new Semaphore(0);
 
-		for (Entry<String, Port<T>> entr : inputPorts.entrySet()) {
+		for (Entry<String, Port<Object>> entr : map.entrySet()) {
 			JFrame window = openAndGetOutput(entr.getValue(), entr.getKey());
 
 			int x = leftOffset + leftCenter.x - WIDTH / 2;

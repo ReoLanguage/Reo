@@ -24,34 +24,44 @@ public class SBACompiler {
 
 	public static Transition commandify(Formula f){
 		
-		Set<Variable> allImportVariables = new HashSet<Variable>();
-		Set<Port> allInputPorts = new HashSet<Port>();
-		Set<Variable> allExportVariables = new HashSet<Variable>();
-
-		for (Variable v : f.getFreeVariables()){
-			if(v instanceof Node && ((Node) v).isInput()){
-				allImportVariables.add(v);
-			}
-			if(v instanceof MemoryCell && !((MemoryCell) v).hasPrime())
-				allImportVariables.add(v);
-			
-			if(v instanceof Node && !((Node) v).isInput())
-				allExportVariables.add(v);
-			if(v instanceof MemoryCell && ((MemoryCell) v).hasPrime())
-				allExportVariables.add(v);
-		}
-		
 		List<Formula> literals = new ArrayList<Formula>();
 		List<Formula> literalsToRemove = new ArrayList<Formula>();
 
 		if(f instanceof Conjunction)
 			literals = ((Conjunction) f).getClauses();
-				
+		
+		//Remove from literals all equalities as x?=x!
+		for(Formula l : literals){	
+			if(l instanceof Equality){
+				Equality equality = (Equality) l;
+				Term t1 = equality.getLHS();
+				Term t2 = equality.getRHS();
+				if(t1.equals(t2)){
+					literalsToRemove.add(l);
+				}
+			}
+		}
+		for(Formula l : literalsToRemove){
+			literals.remove(l);
+		}
+		literalsToRemove.clear();
+
+		//Build set of input ports and known variables (memory cell without prime and input ports)
+		Set<Variable> doneVariables = new HashSet<Variable>();
+		Set<Port> allInputPorts = new HashSet<Port>();
+
+		for (Variable v : f.getFreeVariables()){
+			if(v instanceof Node && ((Node) v).isInput()){
+				allInputPorts.add(((Node)v).getPort());
+				doneVariables.add(v);
+			}
+			if(v instanceof MemoryCell && !((MemoryCell) v).hasPrime())
+				doneVariables.add(v);
+		}
+		
 		Map<Variable,Term> assignements = new HashMap<Variable,Term>();
 		List<Formula> guards = new ArrayList<Formula>();
 		
-		Set<Variable> doneVariables = new HashSet<Variable>();
-		doneVariables.addAll(allImportVariables);
 		int nDoneVariables = -1;
 		while (nDoneVariables < doneVariables.size()) {
 			nDoneVariables = doneVariables.size();	
@@ -61,10 +71,6 @@ public class SBACompiler {
 					Equality equality = (Equality) l;
 					Term t1 = equality.getLHS();
 					Term t2 = equality.getRHS();
-					if(t1.equals(t2)){
-						literalsToRemove.add(l);
-						continue;	
-					}
 					
 					if(t1 instanceof Variable && doneVariables.containsAll(t2.getFreeVariables())){
 						if(!(t2 instanceof Function && (((Function)t2).getName()==null || ((Function)t2).getValue()==null))){
@@ -155,12 +161,7 @@ public class SBACompiler {
 		Map<Node, Term> output = new HashMap<Node, Term>();
 
 		Map<MemoryCell, Term> memory = new HashMap<MemoryCell, Term>();
-		
-		for (Variable v : f.getFreeVariables()){
-			if(v instanceof Node && ((Node) v).isInput()){
-				allInputPorts.add(((Node)v).getPort());
-			}
-		}
+
 		for(Variable v : assignements.keySet()){
 			if(v instanceof Node){
 				output.put((Node)v, assignements.get(v));

@@ -229,7 +229,6 @@ public class Compiler {
 				if(p.isHidden())
 					f = new Existential(new Node(p),f);
 			}
-			//TODO : QE on hidden node of a merger creates a mix node and is not correctly interpreted by commandify.  
 			f=f.QE();
 			
 			//Commandify the formula:

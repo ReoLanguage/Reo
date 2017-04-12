@@ -35,7 +35,7 @@ package(p) ::= <<
 >>
 
 newPort(p) ::= <<
-Port\<<p:typetag()>\> <p.name> = new PortBusyWait\<<p.typeTag>\>();
+Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
 >>
 
 newComponent(c) ::= <<

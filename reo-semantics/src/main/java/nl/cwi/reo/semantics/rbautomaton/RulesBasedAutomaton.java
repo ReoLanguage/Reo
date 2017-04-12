@@ -111,9 +111,9 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 
 		for (Port p : ports) {
 			if (p.getType() == PortType.IN) {
-				outs.add(p);
+				outs.add(new Port(p.getName(),(p.isInput()?PortType.OUT:PortType.IN),p.getPrioType(),p.getTypeTag(),true));
 			} else {
-				inps.add(p);
+				inps.add(new Port(p.getName(),(p.isInput()?PortType.OUT:PortType.IN),p.getPrioType(),p.getTypeTag(),false));
 			}
 		}
 
