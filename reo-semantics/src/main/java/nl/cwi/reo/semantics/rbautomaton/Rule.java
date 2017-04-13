@@ -55,7 +55,7 @@ public class Rule {
 		for (Port p : sync.keySet()){
 			if(links.containsKey(p)){
 				map.put(links.get(p),sync.get(p));
-			}
+			}	
 			else
 				map.put(p, sync.get(p));
 		}
@@ -89,8 +89,9 @@ public class Rule {
 			s=s+p.getName()+":"+sync.get(p).toString()+(i==(sync.size())?":":",")+ " ";
 		}
 		s=s+") , ";
-		s=s+f.toString() + " }";
-		return s;
+		if(f!=null)
+			s=s+f.toString() ;
+		return s+"}";
 	}
 	
 	public @Nullable Rule evaluate(Scope s, Monitor m){

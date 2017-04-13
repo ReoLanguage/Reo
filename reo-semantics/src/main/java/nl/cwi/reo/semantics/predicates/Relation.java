@@ -1,5 +1,6 @@
 package nl.cwi.reo.semantics.predicates;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,49 +65,48 @@ public class Relation implements Formula {
 
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public Set<Port> getInterface() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Formula rename(Map<Port, Port> links) {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public Formula NNF() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public Formula DNF() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public Formula QE() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 	@Override
 	public Formula Substitute(Term t, Variable x) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Term> listTerms = new ArrayList<Term>();
+		for(Term term : args){
+			if(term.equals(t))
+				listTerms.add(x);
+			else
+				listTerms.add(term);
+		}
+		return new Relation(this.name,this.value,listTerms);
 	}
 
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

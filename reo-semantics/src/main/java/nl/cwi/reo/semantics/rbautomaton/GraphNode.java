@@ -58,7 +58,7 @@ public class GraphNode {
 	 */
 	public boolean hasEdge(GraphNode n){
 		Map<Port,Role> map = n.getRule().getSync();
-//		boolean hasEdge = false;
+		boolean hasEdge = false;
 		for(Port p : rule.getSync().keySet()){
 			int r = rule.getSync().get(p).getValue();
 			int l = map.get(p)!=null?map.get(p).getValue():-1;
@@ -68,8 +68,11 @@ public class GraphNode {
 			}
 			if(r==0 && (l==1||l==2)){
 				return false;
-			}	
+			}
+			if((r==1||r==2) && (l==1||l==2)){
+				hasEdge=true;
+			}
 		}
-		return true;
+		return hasEdge;
 	}
 }

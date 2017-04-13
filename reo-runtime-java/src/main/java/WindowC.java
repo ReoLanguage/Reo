@@ -20,33 +20,15 @@ import javax.swing.JTextArea;
 import nl.cwi.reo.runtime.java.Component;
 import nl.cwi.reo.runtime.java.Port;
 
-public class WindowConsumer implements Component {
+public class WindowC {
 	private static final int HEIGHT = 400;
 	private static final int OFFSET_INCREMENT = 25;
 	private static final int WIDTH = 300;
 
-	private volatile Map<String,Port<Object>> map = new HashMap<String,Port<Object>>();
+	private volatile static Map<String,Port<Object>> outputPorts = new HashMap<String,Port<Object>>();
 	
-	public WindowConsumer(String name, Port<Object> a) {
-		a.setConsumer(this);
-		map.put(name,a);
-	}
-	
-	@Override
-	public void activate() { 
-		synchronized (this) {
-			notify();	
-		} 
-	}
-
-	@Override
-	public void run() {	
-		openThenWait(map);
-//		WindowComponent.consume(a); 
-	}
-	
-	public static <T> void openThenWait(Map<String, Port<T>> outputPorts) {
-
+	public static <T> void window(String name, Port<Object> a) {
+		outputPorts.put(name,a);
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getCenterPoint();
 
@@ -55,7 +37,7 @@ public class WindowConsumer implements Component {
 
 		final Semaphore semaphore = new Semaphore(0);
 
-		for (Entry<String, Port<T>> entr : outputPorts.entrySet()) {
+		for (Entry<String, Port<Object>> entr : outputPorts.entrySet()) {
 			JFrame window = openAndGetInput(entr.getValue(), entr.getKey());
 
 			int x = rightOffset + rightCenter.x - WIDTH / 2;

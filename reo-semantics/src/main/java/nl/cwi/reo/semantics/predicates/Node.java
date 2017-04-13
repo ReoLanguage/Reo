@@ -51,8 +51,12 @@ public class Node implements Variable  {
 
 	@Override
 	public Term Substitute(Term t, Variable x) {
-		if(this.equals(x))
-			return t;
+		if(this.equals(x)){
+			if(t instanceof Node)
+				return new Node(new Port(((Node)t).getName(),((Node)x).getPort().getType(),((Node)x).getPort().getPrioType(),((Node)x).getPort().getTypeTag(),true));
+			else
+				return t;
+		}
 		return this;
 	}
 

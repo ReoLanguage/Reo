@@ -3,6 +3,7 @@ package nl.cwi.reo.semantics.rbautomaton;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -110,9 +111,9 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 
 		for (Port p : ports) {
 			if (p.getType() == PortType.IN) {
-				inps.add(p);
+				outs.add(new Port(p.getName(),(p.isInput()?PortType.OUT:PortType.IN),p.getPrioType(),p.getTypeTag(),true));
 			} else {
-				outs.add(p);
+				inps.add(new Port(p.getName(),(p.isInput()?PortType.OUT:PortType.IN),p.getPrioType(),p.getTypeTag(),false));
 			}
 		}
 
@@ -122,18 +123,15 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		 */
 		for (Port p : inps) {
 			Formula transition = null;
-			Map<Port,Role> map = null;
+			Map<Port,Role> map = new HashMap<Port,Role>();
+			map.put(p, Role.FIRE);
 			for (Port x : inps) {
 				if (!x.equals(p)) {
-					Term t_null = new Function("constant", null, new ArrayList<Term>());
-					Formula neq = new Negation(new Equality(new Node(x), t_null));
-					if (transition == null)
-						transition = neq;
-					else
-						transition = new Conjunction((Arrays.asList(transition, neq)));
+					map.put(x, Role.BLOCK);
 				}
 			}
 			for (Port x : outs) {
+				map.put(x, Role.FIRE);
 				Formula eq = new Equality(new Node(p), new Node(x));
 				if (transition == null)
 					transition = eq;
@@ -170,11 +168,10 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	}
 
 	public String toString(){
-		String s = "[";
+		String s = "";
 		for(Rule r : this.s){
-			s=s+r.toString();
+			s=s+r.toString()+"\n";
 		}
-		s=s+"]";
 		return s;
 	}
 	
