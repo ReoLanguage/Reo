@@ -239,20 +239,38 @@
       canvas.forEachObject(function(obj) {
         if (obj.class == 'node') {
           console.log('node ' + obj.id + ' in component ' + obj.component.id);
-          if (isBoundaryNode(obj,obj.component)) {
+          if (obj.component.id == 'main' && isBoundaryNode(obj,obj.component)) {
             s1 += space1 + obj.label.text;
-            space1 = ','
+            space1 = ',';
             
           }
         }
-        if (obj.class == 'channel')
+        if (obj.class == 'channel') {
           if (obj.circle1.component === main ||
               obj.circle2.component === main ||
-              (isBoundaryNode(obj.circle1,obj.circle1.component) && isBoundaryNode(obj.circle2,obj.circle2.component)))
+               (isBoundaryNode(obj.circle1,obj.circle1.component) &&
+                isBoundaryNode(obj.circle2,obj.circle2.component) &&
+                obj.circle1.component != obj.circle2.component
+               )
+             )
           {
             s2 += space2 + 'sync(' + obj.circle1.label.text + ',' + obj.circle2.label.text + ')';
             space2 = ' ';
           }
+        }
+        if (obj.class == 'component' && obj != main) {
+          var s3 = obj.label.text + '(';
+          var space3 = '';
+          canvas.forEachObject(function(obj2) {
+            if (obj2.class == 'node' && obj2.component === obj && isBoundaryNode(obj2, obj2.component)) {
+              s3 += space3 + obj2.label.text;
+              space3 = ',';
+            }
+          });
+          s3 += ')';
+          s2 += space2 + s3;
+          space2 = ' ';
+        }
       });
       
       s1 = s1 + ') {\n  ' + s2 + '\n}';
@@ -280,6 +298,7 @@
     for (i = 0; i < node.linesOut.length; i++) {
       updateLine(node.linesOut[i], 1);
     }
+    updateText();
   }
   
   function snapOutComponent(node, comp, connectednode) {
@@ -296,6 +315,13 @@
     node.setCoords();
     node.label.set({'left': node.left + node.labelOffsetX, 'top': node.top + node.labelOffsetY});
     node.label.setCoords();
+    for (i = 0; i < node.linesIn.length; i++) {
+      updateLine(node.linesIn[i], 2);
+    }
+    for (i = 0; i < node.linesOut.length; i++) {
+      updateLine(node.linesOut[i], 1);
+    }
+    updateText();
   }
 
   canvas.on('object:moving', function(e) {
