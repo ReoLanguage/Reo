@@ -321,7 +321,8 @@
     origY = pointer.y;
     var p = canvas.getActiveObject();
     if (p) {
-      console.log(p.component.id);
+      if(p.class == 'node')
+        console.log(p.component.id);
       origLeft = p.left;
       origTop = p.top;
       return;
