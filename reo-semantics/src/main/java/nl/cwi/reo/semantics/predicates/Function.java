@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.stringtemplate.v4.ST;
+
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 
 public class Function implements Term {
 	
@@ -42,16 +45,13 @@ public class Function implements Term {
 	public List<Term> getArgs() {
 		return args;
 	}
-	
-	public String toString(){
-		if(value==null||name==null)
-			return "*";
-		String s = "(";
-		for(Term t : args){
-			s=s+", "+t.toString();
-		}
-		s = s+ ")";
-		return value.toString();
+
+	@Override
+	public String toString() {
+		ST st = new ST("<name><if(args)>(<args; separator=\", \">)<endif>");
+		st.add("name", name);
+		st.add("args", args);
+		return st.render();
 	}
 	
 	@Override
@@ -82,6 +82,15 @@ public class Function implements Term {
 		for (Term t : args) 
 			vars.addAll(t.getFreeVariables());
 		return vars;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TypeTag getTypeTag() {
+		// TODO infer type tags of functions.
+		return null;
 	}
 
 }

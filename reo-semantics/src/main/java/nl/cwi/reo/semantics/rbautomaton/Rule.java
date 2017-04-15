@@ -1,9 +1,8 @@
 package nl.cwi.reo.semantics.rbautomaton;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,18 +79,35 @@ public class Rule {
 //		for(Port p :  )
 		return null;
 	}
-	
-	public String toString(){
-		String s = "{ (";
-		int i = 0;
-		for(Port p : sync.keySet()){
-			i++;
-			s=s+p.getName()+":"+sync.get(p).toString()+(i==(sync.size())?":":",")+ " ";
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString(){		
+		String s = "{";
+		Iterator<Map.Entry<Port, Role>> iter = this.sync.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry<Port, Role> pair = iter.next();
+			switch (pair.getValue()) {
+			case BLOCK:
+				s += "~";
+				break;
+			case FIRE:
+				s += "?";
+				break;
+			case TRIGGER:
+				s += "";
+				break;
+			default:
+				break;
+			}
+			s += pair.getKey() + (iter.hasNext() ? ", " : "");
 		}
-		s=s+") , ";
+		s += "} ";
 		if(f!=null)
-			s=s+f.toString() ;
-		return s+"}";
+			s += f.toString();
+		return s;
 	}
 	
 	public @Nullable Rule evaluate(Scope s, Monitor m){

@@ -1,7 +1,6 @@
 package nl.cwi.reo.interpret.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +37,7 @@ import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
-import nl.cwi.reo.semantics.predicates.MemoryCell;
+import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Relation;
@@ -56,7 +55,7 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 	private ParseTreeProperty<Rule> rules = new ParseTreeProperty<Rule>();	
 
 	private Map<Port,Role> mapPorts = new HashMap<Port,Role>();
-	private final Term asterix = new Function(null, new ArrayList<Term>());
+	private final Term asterix = new Function("*", null, new ArrayList<Term>());
 	
 	public ListenerRBA(Monitor m) {
 		super(m);
@@ -64,10 +63,6 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 
 	public void exitAtom(AtomContext ctx) {
 		atoms.put(ctx, automaton.get(ctx.rba()));
-	}
-
-	public void enterAtom(AtomContext ctx) {
-		System.out.println(ctx.getText());
 	}
 
 	
@@ -130,7 +125,9 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 		rba_formula.put(ctx, new Negation(new Equality(term.get(ctx.rba_term(0)),term.get(ctx.rba_term(1)))));		
 	}	
 	public void exitRba_boolean_formula(Rba_boolean_formulaContext ctx){
-		rba_formula.put(ctx, new Relation(ctx.rba_boolean().getText(),Arrays.asList(new Function("constant", Boolean.parseBoolean(ctx.rba_boolean().getText()), new ArrayList<Term>()))));		
+//		rba_formula.put(ctx, new Relation(ctx.rba_boolean().getText(),Arrays.asList(new Function("constant", Boolean.parseBoolean(ctx.rba_boolean().getText()), new ArrayList<Term>()))));	
+		String b = ctx.rba_boolean().getText();
+		rba_formula.put(ctx, new Relation(b, b, null));
 	}	
 
 	
@@ -158,98 +155,15 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 	}
 	
 	public void exitRba_memorycellIn(Rba_memorycellInContext ctx){
-		term.put(ctx, new MemoryCell(Integer.parseInt(ctx.NAT().getText()),false));
+		term.put(ctx, new MemCell(ctx.ID().getText(), false));
 	}
 	
 	public void exitRba_memorycellOut(Rba_memorycellOutContext ctx){
-		term.put(ctx, new MemoryCell(Integer.parseInt(ctx.NAT().getText()),true));		
+		term.put(ctx, new MemCell(ctx.ID().getText(), true));
 	}
 	
 	public void exitRba_null(Rba_nullContext ctx){
 		term.put(ctx, asterix);
 	}
-	
-////	public void exitSba_dt_function(Sba_dt_functionContext ctx){
-////		List<Term> termList = new ArrayList<Term>();
-////		for(Sba_dtContext Sbacontext : ctx.Sba_dt()){
-////			termList.add(term.get(Sbacontext));
-////		}
-////		dataterm.put(ctx, new Function(ctx.ID().toString(),transitions));		
-////	}
-//	
-//	
-//	/*
-//	 * Synchronisation constraints:
-//	 */
-//	
-//	public void exitSba_sc(Sba_scContext ctx){
-//		
-//		List<Formula> formulaList = new ArrayList<Formula>();
-//		
-//		for(Sba_portContext ctx_port : ctx.sba_port()){
-//			if(incPorts.get(ctx_port)!=null){
-//				formulaList.add(new Negation(new Equality(new Node(incPorts.get(ctx_port)), asterix)));
-//			}
-//			if(excPorts.get(ctx_port)!=null){
-//				formulaList.add(new Equality(new Node(excPorts.get(ctx_port)), asterix));
-//			}
-//		}
-//		sba_formula.put(ctx, new Conjunction(formulaList));
-////		syncConstraint.put(ctx, new SyncConstraint(incPort,excPort));
-//	}
-//	
-//	/*
-//	 * Ports :
-//	 */
-//	
-//	public void exitSba_included_port(Sba_included_portContext ctx){
-//		incPorts.put(ctx, new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("Integer"),true));
-//	}
-//	public void exitSba_excluded_port(Sba_excluded_portContext ctx){
-//		excPorts.put(ctx, new Port(ctx.ID().toString(),PortType.NONE,PrioType.NONE,new TypeTag("Integer"),true));
-//	}
-//	
-//	
-//	/*
-//	 * Data Constraint :
-//	 */
-//	public void exitSba_term(Sba_termContext ctx){
-//		sba_formula.put(ctx, new Equality(term.get(ctx.sba_dt()), new Function("constant", true, new ArrayList<Term>())));
-//
-//	}
-//	public void exitSba_def(Sba_defContext ctx){
-////		if(dataConstraint.get(ctx) instanceof Conjunction)
-////			dataConstraint.put(ctx, new Conjunction(dataConstraint.get(ctx)));
-////		DataConstraint d = dataConstraint.get(ctx.Sba_dc());
-//		sba_formula.put(ctx, sba_formula.get(ctx.sba_dc()));
-//	}
-//	
-//	public void exitSba_dc_equality(Sba_dc_equalityContext ctx){
-//		sba_formula.put(ctx, new Equality(term.get(ctx.sba_dt(0)),term.get(ctx.sba_dt(1))));
-//	}
-//	
-//	public void exitSba_dc_inequality(Sba_dc_inequalityContext ctx){
-//		sba_formula.put(ctx, new Negation(new Equality(term.get(ctx.sba_dt(0)),term.get(ctx.sba_dt(1)))));
-//	}
-//	
-//	public void exitSba_dc_conjunction(Sba_dc_conjunctionContext ctx){
-//		sba_formula.put(ctx, new Conjunction(Arrays.asList(sba_formula.get(ctx.sba_dc(0)),sba_formula.get(ctx.sba_dc(1)))));
-//	}
-//		
-	
-	
-	
-//	public void exitPr_param(Pr_paramContext ctx) {
-//		if(ctx.ID()!=null){
-//			params.put(ctx, new StringValue(ctx.ID().toString()));			
-//		}
-//		if(ctx.NAT()!=null){
-//			params.put(ctx, new IntegerValue(Integer.parseInt(ctx.NAT().toString())));			
-//		}
-//		if(ctx.STRING()!=null){
-//			params.put(ctx, new StringValue(ctx.STRING().toString().replaceAll("\"", "")));			
-//		}
-//		
-//	}
 
 }

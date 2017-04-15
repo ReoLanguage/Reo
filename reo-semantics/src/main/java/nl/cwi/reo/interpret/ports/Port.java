@@ -60,7 +60,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 */
 	public Port(String name, PortType type, PrioType prio, TypeTag tag, boolean hidden) {
 		super(name);
-		if (type == null || prio == null )
+		if (type == null || prio == null)
 			throw new NullPointerException();
 		this.type = type;
 		this.prio = prio;
@@ -82,7 +82,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 		if (origin == null)
 			throw new NullPointerException();
 		PortType _type = origin.type == PortType.NONE ? type : origin.type;
-		TypeTag _tag = origin.tag==null||origin.tag.isEmpty() ? tag : origin.tag;
+		TypeTag _tag = origin.tag == null ? tag : origin.tag;
 		boolean _visible = visible && origin.visible;
 		return new Port(name, _type, PrioType.NONE, _tag, _visible);
 	}
@@ -145,6 +145,17 @@ public final class Port extends Identifier implements Comparable<Port> {
 	}
 
 	/**
+	 * Constructs a copy of this port with the specified tag.
+	 * 
+	 * @param tag
+	 *            new type tag
+	 * @return port with new type tag
+	 */
+	public Port setTag(TypeTag tag) {
+		return new Port(name, type, prio, tag, visible);
+	}
+
+	/**
 	 * Constructs a copy of this port with visibility set to false.
 	 * 
 	 * @return invisible copy of this port
@@ -167,7 +178,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 */
 	@Override
 	public String toString() {
-		return (visible ? "" : "*") + prio + name + type + tag;
+		return (visible ? "" : "*") + prio + name + type + (tag == null ? "" : tag);
 	}
 
 	@Override

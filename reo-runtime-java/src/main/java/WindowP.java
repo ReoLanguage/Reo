@@ -17,20 +17,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import nl.cwi.reo.runtime.java.Component;
 import nl.cwi.reo.runtime.java.Port;
 
+@Deprecated
 public class WindowP {
 	private static final int HEIGHT = 400;
 	private static final int OFFSET_INCREMENT = 25;
 	private static final int WIDTH = 300;
 
-	
 	public static <T> void window(String name, Port<Object> inputPorts) {
-		Map<String,Port<Object>> map = new HashMap<String,Port<Object>>();
-		map.put(name,inputPorts);
-		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getCenterPoint();
+		Map<String, Port<Object>> map = new HashMap<String, Port<Object>>();
+		map.put(name, inputPorts);
+		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 
 		Point leftCenter = new Point(center.x / 2, center.y);
 		int leftOffset = 0;
@@ -57,18 +55,15 @@ public class WindowP {
 			window.setVisible(true);
 		}
 
-		semaphore
-				.acquireUninterruptibly(2);
+		semaphore.acquireUninterruptibly(2);
 	}
 
-	
 	public static <T> JFrame openAndGetOutput(final Port<T> port, String portName) {
 		JFrame window = new JFrame("Port: " + portName);
 
 		final JTextArea textArea = new JTextArea();
 		textArea.setEditable(false);
-		textArea.setText("This is a live interaction window for port:\n\n    "
-				+ portName
+		textArea.setText("This is a live interaction window for port:\n\n    " + portName
 				+ "\n\nUsage: insert a datum-to-put in the text field on the bottom of this window, and press <RETURN>.\n");
 
 		textArea.setLineWrap(true);
@@ -89,10 +84,8 @@ public class WindowP {
 
 					port.put(datum);
 					synchronized (textArea) {
-						textArea.append("\n! Completed put("
-								+ Datum.convertToString(datum) + ")");
-						textArea.setCaretPosition(textArea.getDocument()
-								.getLength());
+						textArea.append("\n! Completed put(" + Datum.convertToString(datum) + ")");
+						textArea.setCaretPosition(textArea.getDocument().getLength());
 					}
 				}
 			}
@@ -110,17 +103,14 @@ public class WindowP {
 						textField.setText("");
 
 						synchronized (textArea) {
-							textArea.append("\n? Performing put("
-									+ Datum.convertToString(datum) + ")");
-							textArea.setCaretPosition(textArea.getDocument()
-									.getLength());
+							textArea.append("\n? Performing put(" + Datum.convertToString(datum) + ")");
+							textArea.setCaretPosition(textArea.getDocument().getLength());
 						}
 
 					} else
 						synchronized (textArea) {
 							textArea.append("\n? Parse failure");
-							textArea.setCaretPosition(textArea.getDocument()
-									.getLength());
+							textArea.setCaretPosition(textArea.getDocument().getLength());
 						}
 
 					if (datum != null)

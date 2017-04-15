@@ -1,7 +1,7 @@
-fifo(a?,b!){
+fifo(a?,b!) {
 	#RBA
-	{(a,~b),($q1'==a)&&($q1==null)}
-	{(b,~a),(b==$q1)&&($q1!=null)&&($q1'==null)}
+	{a, ~b} $m = null, $m' = a
+	{~a, b} $m != null, b = $m, $m' = null
 }
 
 //producer(a?){
@@ -13,12 +13,12 @@ fifo(a?,b!){
 
 sync(a?,b!){
 	#RBA
-	{(a,b),(a==b)}
+	{a,b} a=b
 }
 
 syncdrain(a?,b?){
 	#RBA
-	{(a,b), true}
+	{a,b} true
 }
 
 

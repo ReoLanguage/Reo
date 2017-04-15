@@ -8,9 +8,9 @@ public class test2 {
 
   public static void main(String[] args) {
 
-	    Port<Object> a = new PortWaitNotify<Object>();
-	    Port<Object> b = new PortWaitNotify<Object>();
-	    Port<Object> c = new PortWaitNotify<Object>();
+	    Port<String> a = new PortWaitNotify<String>();
+	    Port<String> b = new PortWaitNotify<String>();
+	    Port<String> c = new PortWaitNotify<String>();
 
 	    Component Protocol0 = new Protocol0(a, b, c);
 	    Component Comp0 = new WindowConsumer("c",c);
@@ -39,10 +39,10 @@ public class test2 {
 	  }
 
   public static class WindowConsumer implements Component {
-		private static Port<Object> a;
+		private static Port<String> a;
 		private static String name;
 		
-		public WindowConsumer(String name, Port<Object> a) {
+		public WindowConsumer(String name, Port<String> a) {
 			a.setConsumer(this);
 			WindowConsumer.name=name;
 			WindowConsumer.a=a;
@@ -57,14 +57,14 @@ public class test2 {
 
 		@Override
 		public void run() {	
-			WindowC.window(name,a);
+			Windows.consumer(name,a);
 		}
   }
   public static class WindowProducer0 implements Component {
-		private static Port<Object> a;
+		private static Port<String> a;
 		private static String name;
 		
-		public WindowProducer0(String name, Port<Object> a) {
+		public WindowProducer0(String name, Port<String> a) {
 			a.setProducer(this);
 			WindowProducer0.name=name;
 			WindowProducer0.a=a;
@@ -79,14 +79,14 @@ public class test2 {
 
 		@Override
 		public void run() {	
-			WindowP.window(name,a);
+			Windows.producer(name,a);
 		}
   }
   public static class WindowProducer1 implements Component {
-		private static Port<Object> a;
+		private static Port<String> a;
 		private static String name;
 		
-		public WindowProducer1(String name, Port<Object> a) {
+		public WindowProducer1(String name, Port<String> a) {
 			a.setProducer(this);
 			WindowProducer1.name=name;
 			WindowProducer1.a=a;
@@ -101,21 +101,21 @@ public class test2 {
 
 		@Override
 		public void run() {	
-			WindowP.window(name,a);
+			Windows.producer(name,a);
 		}
   }
   
   private static class Protocol0 implements Component {
 
-  	private volatile Port<Object> a;
+  	private volatile Port<String> a;
 
-  	private volatile Port<Object> b;
+  	private volatile Port<String> b;
 
-  	private volatile Port<Object> c;
+  	private volatile Port<String> c;
 
-  	private Object q1;
+  	private String q1;
 
-  	public Protocol0(Port<Object> a, Port<Object> b, Port<Object> c) {
+  	public Protocol0(Port<String> a, Port<String> b, Port<String> c) {
   		a.setConsumer(this);
   		b.setConsumer(this);
   		c.setProducer(this);

@@ -10,8 +10,7 @@ defn      : ID '='? component ;
 
 // Components
 component : var                                                   # component_variable
-          | sign '{' atom ('|' source)? '}'                       # component_atomic
-          | sign '{'  source '}'                 			      # component_atomic
+          | sign '{' (atom | source | atom source) '}'            # component_atomic
           | sign multiset                                         # component_composite ;
 atom      : pa | cam | wa | sa | pr | sba | p | rba ;
 source    : LANG ':' STRING ( '(' ID (',' ID)* ')' )? ;

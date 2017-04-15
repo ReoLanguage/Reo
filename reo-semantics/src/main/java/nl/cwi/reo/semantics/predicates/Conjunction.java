@@ -15,18 +15,18 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
 public class Conjunction implements Formula {
-	
+
 	/**
 	 * Flag for string template.
 	 */
 	public static final boolean conjunction = true;
-	
+
 	private final List<Formula> clauses;
-	
+
 	public Conjunction(List<Formula> clauses) {
 		this.clauses = clauses;
 	}
-	
+
 	public List<Formula> getFormula() {
 		return clauses;
 	}
@@ -71,19 +71,19 @@ public class Conjunction implements Formula {
 	public Set<Port> getInterface() {
 		Set<Port> P = new HashSet<Port>();
 		for (Formula f : clauses)
-			if(!(f instanceof Equality)&&(f.getInterface()!=null))
+			if (!(f instanceof Equality) && (f.getInterface() != null))
 				P.addAll(f.getInterface());
 		return P;
 	}
 
-	public String toString(){
+	public String toString() {
 		String s = clauses.get(0).toString();
-		for(int i=1;i<clauses.size(); i++){
+		for (int i = 1; i < clauses.size(); i++) {
 			s = s + " & " + clauses.get(i).toString();
 		}
 		return s;
 	}
-	
+
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
 		return this;
@@ -92,7 +92,8 @@ public class Conjunction implements Formula {
 	@Override
 	public Formula DNF() {
 		List<List<Formula>> c = new ArrayList<List<Formula>>();
-//		List<Map<Variable, Integer>> var = new ArrayList<Map<Variable, Integer>>();
+		// List<Map<Variable, Integer>> var = new ArrayList<Map<Variable,
+		// Integer>>();
 		for (Formula f : clauses) {
 			Formula g = f.DNF();
 			if (g instanceof Disjunction) {
@@ -100,7 +101,7 @@ public class Conjunction implements Formula {
 			} else {
 				c.add(Arrays.asList(g));
 			}
-			
+
 		}
 		ClausesIterator iter = new ClausesIterator(c);
 		List<Formula> clauses = new ArrayList<Formula>();
@@ -117,97 +118,96 @@ public class Conjunction implements Formula {
 			}
 			clauses.add(new Conjunction(list));
 		}
-		if(clauses.size()==1)
+		if (clauses.size() == 1)
 			return clauses.get(0);
-		if(clauses.isEmpty())
-			return new Relation("constant",true,null);
+		if (clauses.isEmpty())
+			return new Relation("constant", "true", null);
 		return new Disjunction(clauses);
-		
-		
-		
-//		Queue<Formula> queue = new LinkedList<Formula>(clauses);
-//
-//		Formula dnf = queue.poll();
-//		
-//		while(!queue.isEmpty()){
-//			if(dnf instanceof Conjunction){
-//				List<Formula> newConjunction = new ArrayList<Formula>();
-//				for(Formula g : queue){
-//					if(g instanceof Conjunction){
-//						queue.remove(g);
-//						newConjunction.add(g);
-//					}
-//				}
-//				queue.add(new Conjunction(newConjunction));
-//				dnf=queue.poll();
-//			}
-//			if(dnf instanceof Disjunction){
-//				Formula f = queue.poll();
-//				List<Formula> disjunctFormula = new ArrayList<Formula>();
-//				if(f instanceof Disjunction){
-//					// TODO : optimize this part
-//					for(Formula formulas : ((Disjunction) dnf).getClauses()){
-//						if(formulas instanceof Conjunction){
-//							for(Formula form : ((Disjunction) f).getClauses()){
-//								if(form instanceof Conjunction){
-//									List<Formula> c = new ArrayList<Formula>();
-//									c.addAll(((Conjunction) formulas).getFormula());
-//									c.addAll(((Conjunction) form).getFormula());
-//									Set<Synchron> p = new HashSet<Synchron>();
-//									if(new Conjunction(c).canSynchronize(p)!=null)
-//										disjunctFormula.add(new Conjunction(c));
-//								}
-//							}
-//						}
-//						else
-//							throw new UnsupportedOperationException();
-//						
-//					}
-//				}
-//				dnf=new Disjunction(disjunctFormula);
-//			}
-//		}
-		
-//		for(Formula f : g){
-//			if(f instanceof Disjunction){
-//				
-//			}
-//		}
-//		return dnf;
-	}
-	
-//	public Set<Synchron> canSynchronize(Set<Synchron> p){
-//		boolean canSync=true;
-//		for(Formula f : clauses){
-//			if(f instanceof Synchron){
-//				for(Synchron port : p){
-//					if((port.getPort().getName().equals(((Synchron) f).getPort().getName()))){
-//						if((port.isSync())&&!((Synchron)f).isSync()||!(port.isSync())&&((Synchron)f).isSync()){
-//							return null;
-//						}
-//					}
-//				}
-//				p.add(((Synchron) f));
-//			}
-//			if(f instanceof Conjunction){
-//				if(((Conjunction) f).canSynchronize(p)!=null)
-//					p.addAll(((Conjunction) f).canSynchronize(p));
-//				else
-//					return null;
-//			}
-//			
-//		}
-//		if(canSync)
-//			return p;
-//		else
-//			return null;
-//	}
 
-	public List<Formula> getClauses(){
+		// Queue<Formula> queue = new LinkedList<Formula>(clauses);
+		//
+		// Formula dnf = queue.poll();
+		//
+		// while(!queue.isEmpty()){
+		// if(dnf instanceof Conjunction){
+		// List<Formula> newConjunction = new ArrayList<Formula>();
+		// for(Formula g : queue){
+		// if(g instanceof Conjunction){
+		// queue.remove(g);
+		// newConjunction.add(g);
+		// }
+		// }
+		// queue.add(new Conjunction(newConjunction));
+		// dnf=queue.poll();
+		// }
+		// if(dnf instanceof Disjunction){
+		// Formula f = queue.poll();
+		// List<Formula> disjunctFormula = new ArrayList<Formula>();
+		// if(f instanceof Disjunction){
+		// // TODO : optimize this part
+		// for(Formula formulas : ((Disjunction) dnf).getClauses()){
+		// if(formulas instanceof Conjunction){
+		// for(Formula form : ((Disjunction) f).getClauses()){
+		// if(form instanceof Conjunction){
+		// List<Formula> c = new ArrayList<Formula>();
+		// c.addAll(((Conjunction) formulas).getFormula());
+		// c.addAll(((Conjunction) form).getFormula());
+		// Set<Synchron> p = new HashSet<Synchron>();
+		// if(new Conjunction(c).canSynchronize(p)!=null)
+		// disjunctFormula.add(new Conjunction(c));
+		// }
+		// }
+		// }
+		// else
+		// throw new UnsupportedOperationException();
+		//
+		// }
+		// }
+		// dnf=new Disjunction(disjunctFormula);
+		// }
+		// }
+
+		// for(Formula f : g){
+		// if(f instanceof Disjunction){
+		//
+		// }
+		// }
+		// return dnf;
+	}
+
+	// public Set<Synchron> canSynchronize(Set<Synchron> p){
+	// boolean canSync=true;
+	// for(Formula f : clauses){
+	// if(f instanceof Synchron){
+	// for(Synchron port : p){
+	// if((port.getPort().getName().equals(((Synchron)
+	// f).getPort().getName()))){
+	// if((port.isSync())&&!((Synchron)f).isSync()||!(port.isSync())&&((Synchron)f).isSync()){
+	// return null;
+	// }
+	// }
+	// }
+	// p.add(((Synchron) f));
+	// }
+	// if(f instanceof Conjunction){
+	// if(((Conjunction) f).canSynchronize(p)!=null)
+	// p.addAll(((Conjunction) f).canSynchronize(p));
+	// else
+	// return null;
+	// }
+	//
+	// }
+	// if(canSync)
+	// return p;
+	// else
+	// return null;
+	// }
+
+	public List<Formula> getClauses() {
 		List<Formula> clauses = new ArrayList<Formula>();
-		for (Formula f : this.clauses){
-			if(f instanceof Conjunction)
-				clauses.addAll(((Conjunction)f).getClauses());
+		for (Formula f : this.clauses) {
+			if (f instanceof Conjunction)
+				clauses.addAll(((Conjunction) f).getClauses());
 			else
 				clauses.add(f);
 		}
@@ -218,7 +218,7 @@ public class Conjunction implements Formula {
 	public Formula NNF() {
 		List<Formula> list = new ArrayList<Formula>();
 		for (Formula f : clauses)
-			if(f.NNF()!=null)
+			if (f.NNF() != null)
 				list.add(f.NNF());
 		return new Conjunction(list);
 	}
@@ -255,12 +255,12 @@ public class Conjunction implements Formula {
 			if (f instanceof Equality) {
 				Equality e = (Equality) f;
 				if (e.getLHS() instanceof Variable && e.getRHS() instanceof Variable) {
-					Integer p = map.get((Variable)e.getLHS());
-					Integer q = map.get((Variable)e.getRHS());
+					Integer p = map.get((Variable) e.getLHS());
+					Integer q = map.get((Variable) e.getRHS());
 					if (p != null && q == null) {
-						map.put((Variable)e.getRHS(), p);
+						map.put((Variable) e.getRHS(), p);
 					} else if (q != null && p == null) {
-						map.put((Variable)e.getLHS(), p);
+						map.put((Variable) e.getLHS(), p);
 					}
 				}
 			}

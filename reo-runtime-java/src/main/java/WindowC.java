@@ -17,20 +17,19 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import nl.cwi.reo.runtime.java.Component;
 import nl.cwi.reo.runtime.java.Port;
 
+@Deprecated
 public class WindowC {
 	private static final int HEIGHT = 400;
 	private static final int OFFSET_INCREMENT = 25;
 	private static final int WIDTH = 300;
 
-	private volatile static Map<String,Port<Object>> outputPorts = new HashMap<String,Port<Object>>();
-	
+	private volatile static Map<String, Port<Object>> outputPorts = new HashMap<String, Port<Object>>();
+
 	public static <T> void window(String name, Port<Object> a) {
-		outputPorts.put(name,a);
-		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getCenterPoint();
+		outputPorts.put(name, a);
+		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 
 		Point rightCenter = new Point(center.x + center.x / 2, center.y);
 		int rightOffset = 0;
@@ -57,18 +56,15 @@ public class WindowC {
 			window.setVisible(true);
 		}
 
-		semaphore
-				.acquireUninterruptibly(2);
+		semaphore.acquireUninterruptibly(2);
 	}
-	
-	
+
 	public static <T> JFrame openAndGetInput(final Port<T> port, String portName) {
 		JFrame window = new JFrame("Port: " + portName);
 
 		final JTextArea textArea = new JTextArea();
 		textArea.setEditable(false);
-		textArea.setText("This is a live interaction window for port:\n\n    "
-				+ portName
+		textArea.setText("This is a live interaction window for port:\n\n    " + portName
 				+ "\n\nUsage: click the button on the bottom of this window.\n");
 
 		textArea.setLineWrap(true);
@@ -88,10 +84,8 @@ public class WindowC {
 
 					Object datum = port.get();
 					synchronized (textArea) {
-						textArea.append("\n! Completed get(), received "
-								+ Datum.convertToString(datum));
-						textArea.setCaretPosition(textArea.getDocument()
-								.getLength());
+						textArea.append("\n! Completed get(), received " + Datum.convertToString(datum));
+						textArea.setCaretPosition(textArea.getDocument().getLength());
 					}
 				}
 			}
@@ -103,8 +97,7 @@ public class WindowC {
 			public void actionPerformed(ActionEvent e) {
 				synchronized (textArea) {
 					textArea.append("\n? Performing get()");
-					textArea.setCaretPosition(textArea.getDocument()
-							.getLength());
+					textArea.setCaretPosition(textArea.getDocument().getLength());
 				}
 
 				while (true)

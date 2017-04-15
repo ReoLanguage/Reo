@@ -7,7 +7,7 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.MemoryCell;
+import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
 
@@ -19,7 +19,7 @@ public final class Transition {
 	private final Formula guard;
 
 	/**
-	 * Guard
+	 * Set of input ports
 	 */
 	private final Set<Port> input;
 
@@ -31,7 +31,7 @@ public final class Transition {
 	/**
 	 * Memory update
 	 */
-	private final Map<MemoryCell, Term> memory;
+	private final Map<MemCell, Term> memory;
 
 	/**
 	 * Constructs a new transition.
@@ -43,7 +43,7 @@ public final class Transition {
 	 * @param memory
 	 *            update of the memory cells
 	 */
-	public Transition(Formula guard, Map<Node, Term> output, Map<MemoryCell, Term> memory) {
+	public Transition(Formula guard, Map<Node, Term> output, Map<MemCell, Term> memory) {
 		if (guard == null)
 			throw new IllegalArgumentException("No guard specified.");
 		if (output == null)
@@ -59,7 +59,7 @@ public final class Transition {
 	}
 	
 
-	public Transition(Formula guard, Map<Node, Term> output, Map<MemoryCell, Term> memory, Set<Port> input) {
+	public Transition(Formula guard, Map<Node, Term> output, Map<MemCell, Term> memory, Set<Port> input) {
 		if (guard == null)
 			throw new IllegalArgumentException("No guard specified.");
 		if (output == null)
@@ -69,7 +69,7 @@ public final class Transition {
 		this.guard = guard;
 		this.output = Collections.unmodifiableMap(output);
 		this.memory = Collections.unmodifiableMap(memory);
-		this.input = input;
+		this.input = Collections.unmodifiableSet(input);
 	}
 
 	/**
@@ -100,11 +100,11 @@ public final class Transition {
 	}
 
 	/**
-	 * Retrieves the job constraint of the current transition.
+	 * Retrieves the values assigned to memory cells.
 	 * 
 	 * @return assignment of terms to memory cells.
 	 */
-	public Map<MemoryCell, Term> getMemory() {
+	public Map<MemCell, Term> getMemory() {
 		return this.memory;
 	}
 

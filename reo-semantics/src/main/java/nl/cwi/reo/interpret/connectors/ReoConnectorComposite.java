@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -18,6 +16,7 @@ import org.stringtemplate.v4.ST;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
@@ -33,7 +32,7 @@ import nl.cwi.reo.util.Monitor;
  *            semantics object type
  */
 public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoConnector<T> {
-	
+
 	/**
 	 * Component name.
 	 */
@@ -97,7 +96,8 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 * @param links
 	 *            set of links mapping local ports to global ports
 	 */
-	public ReoConnectorComposite(String name, String operator, List<ReoConnector<T>> components, Map<Port, Port> links) {
+	public ReoConnectorComposite(String name, String operator, List<ReoConnector<T>> components,
+			Map<Port, Port> links) {
 		this.name = name;
 		for (ReoConnector<T> X : components)
 			for (Port p : X.getInterface())
@@ -131,7 +131,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		}
 		return new ReoConnectorComposite<T>(null, operator, comps);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -280,7 +280,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 					// if (mergers && new Integer(1).compareTo(outs.get(p)) > 0)
 					// {
 					if (mergers && outs.get(p) > 1) {
-						pi = p.rename(p.getName() + "." + A.size()).hide();
+						pi = p.rename(p.getName() + "_" + A.size()).hide();
 						if (ins.get(p) == 0)
 							// if (new Integer(0).equals(ins.get(p)))
 							A.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), !p.isHidden()));
@@ -292,7 +292,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 					if (replicators && ins.get(p) > 1) {
 						// if (replicators && new
 						// Integer(1).compareTo(ins.get(p)) > 0) {
-						pi = p.rename(p.getName() + "." + A.size()).hide();
+						pi = p.rename(p.getName() + "_" + A.size()).hide();
 						if (outs.get(p) == 0)
 							// if (new Integer(0).equals(outs.get(p)))
 							A.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), !p.isHidden()));
@@ -366,27 +366,62 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 		return components.isEmpty();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public List<ReoConnector<T>> partition() {
-		List<ReoConnector<T>> partition = new ArrayList<ReoConnector<T>>();
-//		this.flatten();
-//		this.flatten().integrate();
-//		for(ReoConnector<T> connectors : this.getComponents()){
-//			
-//		}
+	public ReoConnector<T> propagate(Monitor m) {
+
+		Map<Port, Port> r = new HashMap<Port, Port>();
 		
-		Queue<ReoConnector<T>> queueConnector = new LinkedList<ReoConnector<T>>(this.getComponents());
-		while(!queueConnector.isEmpty()){
-			ReoConnector<T> connector = queueConnector.poll();
-			if(connector instanceof ReoConnectorAtom<?>){
-				
+		for (Set<Port> part : getTypePartition()) {
+			TypeTag tag = null;
+			for (Port p : part) {
+				TypeTag p_tag = p.getTypeTag();
+				if (p.getTypeTag() != null) {
+					if (tag != null && !tag.equals(p_tag)) {
+						m.add("Conflicting port types: " + tag + " and " + p_tag + ".");
+						return null;
+					}
+					tag = p_tag;
+				}
 			}
-			else{
-				queueConnector.addAll(connector.getAtoms());
-			}
-		};
+			for (Port p : part)
+				r.put(p, p.setTag(tag));
 			
-		
-		return null;
+		}
+
+		return new ReoConnectorComposite<T>(name, operator, components, Links.rename(links, r));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Set<Port>> getTypePartition() {
+		Set<Set<Port>> partition = new HashSet<Set<Port>>();
+
+		for (ReoConnector<T> c : components) {
+			Set<Set<Port>> c_partition = c.getTypePartition();
+			for (Set<Port> c_part : c_partition) {
+				Set<Port> newpart = new HashSet<Port>();
+				for (Port p : c_part)
+					newpart.add(links.get(p));
+
+				Set<Set<Port>> newpartition = new HashSet<Set<Port>>();
+				for (Set<Port> part : partition) {
+					if (Collections.disjoint(part, newpart)) {
+						newpartition.add(part);
+					} else {
+						newpart.addAll(part);
+					}
+				}
+
+				newpartition.add(newpart);
+
+				partition = newpartition;
+			}
+		}
+		return partition;
 	}
 }

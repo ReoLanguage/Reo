@@ -7,26 +7,24 @@ import nl.cwi.reo.runtime.java.*;
 
 public class <S.name> {
 
-  public static void main(String[] args) {
+	public static void main(String[] args) {
     
-    <S.ports:newPort(); separator="\n">
+		<S.ports:newPort(); separator="\n">
     
-    <S.components:newComponent(); separator="\n">
+		<S.components:newComponent(); separator="\n">
 	
- 	<S.components:newThread(); separator="\n"> 
+		<S.components:newThread(); separator="\n"> 
 
-	<S.components:start(); separator="\n">
+		<S.components:start(); separator="\n">
 	
-    try {
-      <S.components:join(); separator="\n">
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    
-  }
+		try {
+			<S.components:join(); separator="\n">
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
-  <S.components:component(); separator="\n\n">
-  
+	<S.components:component(); separator="\n\n">
 }
 >>
 
@@ -57,15 +55,13 @@ join(c) ::= <<
 component(c) ::= <<
 private static class <c.name> implements Component {
 
-	<c.ports:port(); separator="\n\n">
-	
-	<c.mem:memorycell(); separator="\n\n">
+	<c.ports:port(); separator="\n">	
+	<c.mem:memorycell(); separator="\n">
 	
 	<c:constructor()>
 	
 	<if(c.atomic)><c:atomic()><else><c:protocol()><endif>
 }
-
 >>
 
 atomic(c) ::= <<
@@ -133,8 +129,7 @@ guard(t) ::= <<
 >>
 
 formula(f) ::= <<
-<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)>(<f.LHS:term()> == <f.RHS:term()>)<elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(t.disjunction)>(<t.clauses:formula(); separator=" || ">)
-<endif>
+<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)><f.LHS:term()> == <f.RHS:term()><elseif(f.relation)><f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif><elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(f.disjunction)>(<f.clauses:formula(); separator=" || ">)<endif>
 >>
 
 term(t) ::= <<

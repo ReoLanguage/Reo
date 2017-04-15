@@ -6,7 +6,6 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;

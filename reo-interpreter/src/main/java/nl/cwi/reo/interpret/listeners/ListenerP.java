@@ -178,7 +178,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_true(P_trueContext ctx) {
-		formulas.put(ctx, new Relation("truthvalue", new Boolean(true), new ArrayList<Term>()));
+		formulas.put(ctx, new Relation("truthvalue", "true", new ArrayList<Term>()));
 	}
 
 	@Override
@@ -187,7 +187,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_false(P_falseContext ctx) {
-		formulas.put(ctx, new Relation("truthvalue", new Boolean(false), new ArrayList<Term>()));
+		formulas.put(ctx, new Relation("truthvalue", "false", new ArrayList<Term>()));
 	}
 
 	/**

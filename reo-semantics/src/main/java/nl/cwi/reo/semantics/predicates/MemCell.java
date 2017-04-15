@@ -12,6 +12,8 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 
 public class MemCell implements Variable {
+	
+	public static final boolean memory = true;
 
 	private final String name;
 
@@ -41,6 +43,10 @@ public class MemCell implements Variable {
 
 	public boolean hasPrime() {
 		return prime;
+	}
+	
+	public MemCell setType(TypeTag type) {
+		return new MemCell(name, prime, type);
 	}
 
 	@Override
@@ -103,5 +109,13 @@ public class MemCell implements Variable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.getName(), this.prime);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TypeTag getTypeTag() {
+		return type;
 	}
 }

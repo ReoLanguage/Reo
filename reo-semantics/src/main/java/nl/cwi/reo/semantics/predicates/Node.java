@@ -10,6 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 
 public class Node implements Variable  {
 	
@@ -52,9 +53,9 @@ public class Node implements Variable  {
 	@Override
 	public Term Substitute(Term t, Variable x) {
 		if(this.equals(x)){
-			if(t instanceof Node)
-				return new Node(new Port(((Node)t).getName(),((Node)x).getPort().getType(),((Node)x).getPort().getPrioType(),((Node)x).getPort().getTypeTag(),true));
-			else
+//			if(t instanceof Node)
+//				return new Node(new Port(((Node)t).getName(),((Node)x).getPort().getType(),((Node)x).getPort().getPrioType(),((Node)x).getPort().getTypeTag(),true));
+//			else
 				return t;
 		}
 		return this;
@@ -86,5 +87,13 @@ public class Node implements Variable  {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.p);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TypeTag getTypeTag() {
+		return this.p.getTypeTag();
 	}
 }

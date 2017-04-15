@@ -9,6 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.util.Monitor;
 
 /**
  * A SubComponent is a part of a Connector.
@@ -88,14 +89,23 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	public ReoConnector<T> integrate();
 
 	/**
-	 * Partition this connector into a list of ReoConnector with independent
-	 * interfaces.
+	 * Propagates type tags of ports that must have the same type.
 	 * 
-	 * @return List of ReoConnector<T> where interfaces do not intersect.
+	 * @param m
+	 *            message container
 	 * 
+	 * @return connector wherein every port has its inferred type, or null if
+	 *         there is a type conflict.
 	 */
-	@Deprecated
-	public List<ReoConnector<T>> partition();
+	public ReoConnector<T> propagate(Monitor m);
+
+	/**
+	 * Gets a partitioning of all ports of this connector, where each part
+	 * consists of ports that must have the same type tag.
+	 * 
+	 * @return partitioning of ports with respect to port type equivalence.
+	 */
+	public Set<Set<Port>> getTypePartition();
 
 	/**
 	 * Gets the interface of this connector.

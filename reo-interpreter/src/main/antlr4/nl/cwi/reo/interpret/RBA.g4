@@ -3,28 +3,25 @@ grammar RBA;
 import Tokens;
 
 rba      : 	'#RBA' rba_rule* ;
-rba_rule :	'{' '(' rba_sync* ')' ',' rba_formula '}';		
+rba_rule :	'{' (rba_port (',' rba_port)* )? '}' rba_formula;
 
-rba_sync :	 ID 										#rba_syncAtom
-			| ID ',' 									#rba_syncAtom
+rba_port :	 ID 										#rba_syncAtom
 			| '!' ID 									#rba_syncTriger 
-			| '!'ID ','									#rba_syncTriger 
-			| '~'ID	','						 			#rba_syncBlock 
 			| '~'ID							 			#rba_syncBlock ;   
 
-rba_formula : rba_formula AND rba_formula (AND rba_formula)*		#rba_conjunction
-			| '(' rba_formula ')' 									#rba_def
-			| rba_term '==' rba_term								#rba_equality
-			| rba_term '!=' rba_term								#rba_inequality
-			| rba_boolean											#rba_boolean_formula; 
+rba_formula : rba_formula (',' rba_formula)+			#rba_conjunction
+			| '(' rba_formula ')' 						#rba_def
+			| rba_term '=' rba_term						#rba_equality
+			| rba_term '!=' rba_term					#rba_inequality
+			| rba_boolean								#rba_boolean_formula;
 			
 
 rba_term	 : 	NAT 									#rba_nat
 	      	| BOOL										#rba_bool
           	| STRING									#rba_string
           	| DEC   									#rba_decimal
-          	| '$q' NAT  								#rba_memorycellIn
-          	| '$q' NAT '\'' 							#rba_memorycellOut
+          	| '$' ID  									#rba_memorycellIn
+          	| '$' ID '\''	 							#rba_memorycellOut
           	| 'null' 									#rba_null 
           	| ID										#rba_parameter ;
 

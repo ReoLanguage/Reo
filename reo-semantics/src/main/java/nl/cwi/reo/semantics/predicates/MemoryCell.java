@@ -9,6 +9,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 
 public class MemoryCell implements Variable {
 	
@@ -101,5 +102,13 @@ public class MemoryCell implements Variable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.getName(), this.prime);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TypeTag getTypeTag() {
+		return null;
 	}
 }

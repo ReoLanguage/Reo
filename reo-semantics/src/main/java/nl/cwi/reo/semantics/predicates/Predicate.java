@@ -26,7 +26,7 @@ public class Predicate implements Semantics<Predicate> {
 	 * composition.
 	 */
 	public Predicate() {
-		this.f = new Relation("constant", true, new ArrayList<Term>());
+		this.f = new Relation("constant", "true", null);
 	}
 
 	/**

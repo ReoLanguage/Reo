@@ -7,34 +7,38 @@ import java.util.Map;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
 public class Relation implements Formula {
-	
+
+	public static final boolean relation = true;
+
 	private final String name;
-	
-	private Object value;
-	
+
+	private String value;
+
+	@Nullable
 	private final List<Term> args;
 
 	public Relation(String name, List<Term> args) {
 		this.name = name;
 		this.args = args;
 	}
-	
-	public Relation(String name, Object value, List<Term> args) {
+
+	public Relation(String name, String value, List<Term> args) {
 		this.name = name;
 		this.value = value;
 		this.args = args;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public Object getValue() {
 		return value;
 	}
@@ -44,10 +48,19 @@ public class Relation implements Formula {
 	}
 
 	@Override
+	public String toString() {
+		ST st = new ST("<name><if(args)>(<args; separator=\", \">)<endif>");
+		st.add("name", name);
+		st.add("args", args);
+		return st.render();
+	}
+
+	@Override
 	public Set<Variable> getFreeVariables() {
 		Set<Variable> vars = new HashSet<Variable>();
-		for (Term t : args) 
-			vars.addAll(t.getFreeVariables());
+		if (args != null)
+			for (Term t : args)
+				vars.addAll(t.getFreeVariables());
 		return vars;
 	}
 
@@ -95,14 +108,16 @@ public class Relation implements Formula {
 
 	@Override
 	public Formula Substitute(Term t, Variable x) {
+		if (args == null)
+			return this;
 		List<Term> listTerms = new ArrayList<Term>();
-		for(Term term : args){
-			if(term.equals(t))
+		for (Term term : args) {
+			if (term.equals(t))
 				listTerms.add(x);
 			else
 				listTerms.add(term);
 		}
-		return new Relation(this.name,this.value,listTerms);
+		return new Relation(this.name, this.value, listTerms);
 	}
 
 	@Override

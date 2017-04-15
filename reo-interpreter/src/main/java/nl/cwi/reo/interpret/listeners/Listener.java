@@ -94,6 +94,7 @@ import nl.cwi.reo.interpret.ReoParser.PortContext;
 import nl.cwi.reo.interpret.ReoParser.PortsContext;
 import nl.cwi.reo.interpret.ReoParser.SecnContext;
 import nl.cwi.reo.interpret.ReoParser.SignContext;
+import nl.cwi.reo.interpret.ReoParser.SourceContext;
 import nl.cwi.reo.interpret.ReoParser.TermContext;
 import nl.cwi.reo.interpret.ReoParser.Term_booleanContext;
 import nl.cwi.reo.interpret.ReoParser.Term_bracketsContext;
@@ -176,8 +177,9 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	// Variables
 	private ParseTreeProperty<VariableExpression> variables = new ParseTreeProperty<VariableExpression>();
 
-	// Semantics
+	// Atoms
 	protected ParseTreeProperty<T> atoms = new ParseTreeProperty<T>();
+	protected ParseTreeProperty<Reference> sources = new ParseTreeProperty<Reference>();
 
 	/**
 	 * Constructs a new generic listener.
@@ -288,11 +290,15 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		if (atom == null && ctx.source()==null)
 			throw new NullPointerException("No semantics object or source code attached to parse tree.");
 		SignatureExpression sign = signatureExpressions.get(ctx.sign());
-		Reference s = new Reference();
-		if (ctx.source() != null)
-			s = new Reference(ctx.source().STRING().getText(), ctx.source().LANG().getText().toUpperCase());
+		Reference s = ctx.source() != null ? sources.get(ctx.source()) : new Reference();
 		String name = componentnames.get(ctx);
 		components.put(ctx, new ComponentDefinition<T>(sign, new SetAtom<T>(name, atom, s)));
+	}
+	
+	@Override
+	public void exitSource(SourceContext ctx) {
+		// TODO Put arguments here
+		sources.put(ctx, new Reference(ctx.STRING().getText(), ctx.LANG().getText().toUpperCase()));
 	}
 	
 	@Override

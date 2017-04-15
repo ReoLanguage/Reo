@@ -25,11 +25,11 @@ import nl.cwi.reo.util.Monitor;
  *            Reo semantics type
  */
 public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnector<T> {
-	
+
 	/**
 	 * Component name.
 	 */
-	private final String name;	
+	private final String name;
 
 	/**
 	 * Semantics object.
@@ -100,7 +100,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 		this.source = source;
 		this.links = Collections.unmodifiableMap(links);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -152,8 +152,8 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 */
 	@Override
 	public ReoConnector<T> rename(Map<Port, Port> joins) {
-		if(links.isEmpty())
-			return new ReoConnectorAtom<T>(name, semantics, source, joins);			
+		if (links.isEmpty())
+			return new ReoConnectorAtom<T>(name, semantics, source, joins);
 		return new ReoConnectorAtom<T>(name, semantics, source, Links.rename(links, joins));
 	}
 
@@ -220,11 +220,30 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 		return Arrays.asList(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public List<ReoConnector<T>> partition() {
-		// List<ReoConnector<T>> partition = new ArrayList<ReoConnector<T>>();
-		// partition.add(this);
-		return Arrays.asList(this);
+	public ReoConnector<T> propagate(Monitor m) {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Set<Port>> getTypePartition() {
+		Set<Set<Port>> partition = new HashSet<Set<Port>>();
+		Set<Port> partDefault = new HashSet<Port>();
+		for (Port p : links.values()) {
+			if (p.getTypeTag() == null) {
+				partDefault.add(p);
+			} else {
+				partition.add(new HashSet<Port>(Arrays.asList(p)));
+			}
+		}
+		partition.add(partDefault);
+		return partition;
 	}
 
 }

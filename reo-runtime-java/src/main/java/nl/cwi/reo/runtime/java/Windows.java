@@ -1,3 +1,4 @@
+package nl.cwi.reo.runtime.java;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -9,10 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,66 +20,37 @@ import javax.swing.JTextField;
 
 import nl.cwi.reo.runtime.java.Port;
 
-public class PortWindows<T> {
+public class Windows {
 	private static final int HEIGHT = 400;
 	private static final int OFFSET_INCREMENT = 25;
 	private static final int WIDTH = 300;
 
-	public static <T> void openThenWait(Map<String, Port<T>> inputPorts, Map<String, Port<T>> outputPorts) {
+	public static void producer(String name, Port<String> inputPorts) {
 
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 
 		Point leftCenter = new Point(center.x / 2, center.y);
-		Point rightCenter = new Point(center.x + center.x / 2, center.y);
 		int leftOffset = 0;
-		int rightOffset = 0;
 
-		final Semaphore semaphore = new Semaphore(0);
+		JFrame window = openAndGetOutput(inputPorts, name);
 
-		for (Entry<String, Port<T>> entr : inputPorts.entrySet()) {
-			JFrame window = openAndGetInput(entr.getValue(), entr.getKey());
+		int x = leftOffset + leftCenter.x - WIDTH / 2;
+		int y = leftOffset + leftCenter.y - HEIGHT / 2;
+		leftOffset += OFFSET_INCREMENT;
 
-			int x = rightOffset + rightCenter.x - WIDTH / 2;
-			int y = rightOffset + rightCenter.y - HEIGHT / 2;
-			rightOffset += OFFSET_INCREMENT;
+		window.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
+		});
 
-			window.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
-					// semaphore.release();
-				}
-			});
-
-			window.setLocation(x, y);
-			window.setSize(WIDTH, HEIGHT);
-			window.setVisible(true);
-		}
-
-		for (Entry<String, Port<T>> entr : outputPorts.entrySet()) {
-			JFrame window = openAndGetOutput(entr.getValue(), entr.getKey());
-
-			int x = leftOffset + leftCenter.x - WIDTH / 2;
-			int y = leftOffset + leftCenter.y - HEIGHT / 2;
-			leftOffset += OFFSET_INCREMENT;
-
-			window.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent e) {
-					System.exit(0);
-					// semaphore.release();
-				}
-			});
-
-			window.setLocation(x, y);
-			window.setSize(WIDTH, HEIGHT);
-			window.setVisible(true);
-		}
-
-		semaphore.acquireUninterruptibly(inputPorts.size() + outputPorts.size());
+		window.setLocation(x, y);
+		window.setSize(WIDTH, HEIGHT);
+		window.setVisible(true);
 	}
 
-	public static <T> JFrame openAndGetOutput(final Port<T> port, String portName) {
+	public static JFrame openAndGetOutput(final Port<String> port, String portName) {
 		JFrame window = new JFrame("Port: " + portName);
 
 		final JTextArea textArea = new JTextArea();
@@ -93,11 +62,12 @@ public class PortWindows<T> {
 		textArea.setWrapStyleWord(true);
 		textArea.setFont(new Font("courier", Font.PLAIN, 12));
 
-		final LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<T>();
+		final LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
+
 		new Thread() {
 			public void run() {
 				while (true) {
-					T datum = null;
+					String datum = null;
 					while (true)
 						try {
 							datum = queue.take();
@@ -107,7 +77,7 @@ public class PortWindows<T> {
 
 					port.put(datum);
 					synchronized (textArea) {
-						textArea.append("\n! Completed put(" + Datum.convertToString(datum) + ")");
+						textArea.append("\n! Completed put(\"" + datum + "\")");
 						textArea.setCaretPosition(textArea.getDocument().getLength());
 					}
 				}
@@ -119,22 +89,13 @@ public class PortWindows<T> {
 			@Override
 			public void keyTyped(KeyEvent event) {
 				if (event.getKeyChar() == '\n') {
-					T datum = null;
-					String datumText = textField.getText();
-					if (Datum.canConvertToObject(datumText)) {
-						datum = (T) Datum.convertToObject(datumText);
-						textField.setText("");
+					String datum = textField.getText();
+					textField.setText("");
 
-						synchronized (textArea) {
-							textArea.append("\n? Performing put(" + Datum.convertToString(datum) + ")");
-							textArea.setCaretPosition(textArea.getDocument().getLength());
-						}
-
-					} else
-						synchronized (textArea) {
-							textArea.append("\n? Parse failure");
-							textArea.setCaretPosition(textArea.getDocument().getLength());
-						}
+					synchronized (textArea) {
+						textArea.append("\n? Performing put(\"" + datum + "\")");
+						textArea.setCaretPosition(textArea.getDocument().getLength());
+					}
 
 					if (datum != null)
 						while (true)
@@ -160,7 +121,31 @@ public class PortWindows<T> {
 		return window;
 	}
 
-	public static <T> JFrame openAndGetInput(final Port<T> port, String portName) {
+	public static void consumer(String name, Port<String> a) {
+		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+
+		Point rightCenter = new Point(center.x + center.x / 2, center.y);
+		int rightOffset = 0;
+
+		JFrame window = openAndGetInput(a, name);
+
+		int x = rightOffset + rightCenter.x - WIDTH / 2;
+		int y = rightOffset + rightCenter.y - HEIGHT / 2;
+		rightOffset += OFFSET_INCREMENT;
+
+		window.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
+		});
+
+		window.setLocation(x, y);
+		window.setSize(WIDTH, HEIGHT);
+		window.setVisible(true);
+	}
+
+	public static JFrame openAndGetInput(final Port<String> port, String portName) {
 		JFrame window = new JFrame("Port: " + portName);
 
 		final JTextArea textArea = new JTextArea();
@@ -172,7 +157,7 @@ public class PortWindows<T> {
 		textArea.setWrapStyleWord(true);
 		textArea.setFont(new Font("courier", Font.PLAIN, 12));
 
-		final LinkedBlockingQueue<Object> queue = new LinkedBlockingQueue<Object>();
+		final LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 		new Thread() {
 			public void run() {
 				while (true) {
@@ -182,10 +167,9 @@ public class PortWindows<T> {
 							break;
 						} catch (InterruptedException exception) {
 						}
-
-					Object datum = port.get();
+					String datum = port.get();
 					synchronized (textArea) {
-						textArea.append("\n! Completed get(), received " + Datum.convertToString(datum));
+						textArea.append("\n! Completed get(), received " + datum);
 						textArea.setCaretPosition(textArea.getDocument().getLength());
 					}
 				}
@@ -203,7 +187,7 @@ public class PortWindows<T> {
 
 				while (true)
 					try {
-						queue.put(new Object());
+						queue.put("request");
 						break;
 					} catch (InterruptedException exception) {
 					}
@@ -222,4 +206,5 @@ public class PortWindows<T> {
 		window.pack();
 		return window;
 	}
+
 }

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 
 public interface Term {
 
@@ -28,4 +29,11 @@ public interface Term {
 	 * @return set of all free variables.
 	 */
 	public Set<Variable> getFreeVariables();
+
+	/**
+	 * Gets the type tag of this term.
+	 * 
+	 * @return type tag of this term.
+	 */
+	public TypeTag getTypeTag();
 }

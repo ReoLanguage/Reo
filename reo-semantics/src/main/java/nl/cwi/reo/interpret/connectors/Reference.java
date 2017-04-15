@@ -1,7 +1,5 @@
 package nl.cwi.reo.interpret.connectors;
 
-import java.io.File;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -10,22 +8,18 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class Reference {
 
 	@Nullable
-	private final File file;
-	
-	private final String call;
+	private final String ref;
 
 	@Nullable
 	private Language lang;
 	
 	public Reference() {
-		this.file = null;
-		this.call = "";
+		this.ref = null;
 		this.lang = null;
 	}
 	
-	public Reference(String file, String language) {
-		this.file = new File(file);
-		this.call = "";
+	public Reference(String ref, String language) {
+		this.ref = ref;
 		if (language == "C11")
 			this.lang = Language.C11;
 		if (language == "JAVA")
@@ -33,12 +27,8 @@ public final class Reference {
 	}
 
 	@Nullable
-	public File getFile() {
-		return file;
-	}
-
-	public String getCall() {
-		return call;
+	public String getReference() {
+		return ref;
 	}
 	
 	@Nullable
@@ -48,6 +38,6 @@ public final class Reference {
 	
 	@Override
 	public String toString() {
-		return call + (file == null ? "" : " at " + file.getPath());
+		return ref != null ? ref : "";
 	}
 }

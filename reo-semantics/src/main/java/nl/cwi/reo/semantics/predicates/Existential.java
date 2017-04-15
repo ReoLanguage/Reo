@@ -73,6 +73,8 @@ public class Existential implements Formula {
 
 	@Override
 	public Formula QE() {
+		if (!f.getFreeVariables().contains(x))
+			return f.QE();
 		if (f instanceof Existential) {
 			return new Existential(x, f.QE()).QE();
 		} else if (f instanceof Disjunction) {
@@ -80,37 +82,33 @@ public class Existential implements Formula {
 			for (Formula fi : ((Disjunction) f).getClauses())
 				list.add(new Existential(x, fi));
 			return new Disjunction(list).QE();
-		} else if (f instanceof Conjunction) {
-			
-			// TODO This code incorrectly assumes that conjunctions are not nested.
-			
+		} else if (f instanceof Conjunction) {			
 			List<Formula> list = new ArrayList<Formula>();
 			Term t = null;
 			for (Formula fi : ((Conjunction) f).getClauses()) {
-				if (fi instanceof Equality) {
+				if (t == null && fi instanceof Equality) {
 					Equality e = (Equality) fi;
 					if (e.getLHS().equals(x) ) {
 						t = e.getRHS();
 					} else if (e.getRHS().equals(x)) {
-						t =  e.getLHS();
-					} 
-					list.add(fi);
-				}
-				if (fi instanceof Negation && ((Negation)fi).getFormula() instanceof Equality) {
-					Equality e = (Equality) ((Negation)fi).getFormula();
-					if (e.getLHS().equals(x)) {
-						t = e.getRHS();
-					} else if (e.getRHS().equals(x)) {
-						t =  e.getLHS();
-					} 
-					list.add(fi);
-					
+						t = e.getLHS();
+					} else {
+						list.add(fi);
+					}
+				} else {
+					list.add(fi);	
 				}
 			}
-			if (t != null)
-				return new Conjunction(list).Substitute(t, x);
-			else
-				return new Conjunction(list);
+			if (t != null) {
+				switch (list.size()) {
+				case 0:
+					return new Relation("true", "true", null);
+				case 1:
+					return list.get(0).Substitute(t, x);
+				default:
+					return new Conjunction(list).Substitute(t, x);
+				}
+			}
 		}
 		return this;
 	}

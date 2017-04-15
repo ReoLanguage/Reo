@@ -23,6 +23,7 @@ import nl.cwi.reo.semantics.AutomatonSemantics;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.MemoryCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Predicate;
@@ -134,14 +135,14 @@ public class JavaCompiler {
 		System.out.println(f);
 		map = f.getAssignment();
 		
-		Map<MemoryCell,Term> mems = new HashMap<MemoryCell,Term>();
+		Map<MemCell,Term> mems = new HashMap<MemCell,Term>();
 		Map<Node,Term> ports = new HashMap<Node,Term>();
 		Set<Node> inputs = new HashSet<Node>();
 		Set<Node> quantifiers = new HashSet<Node>();
 		
 		for(Variable v : map.keySet()){
-			if(v instanceof MemoryCell)
-				mems.put((MemoryCell)v,map.get(v));
+			if(v instanceof MemCell)
+				mems.put((MemCell)v,map.get(v));
 			if(v instanceof Node && !((Node) v).isInput()){
 				ports.put((Node)v, map.get(v));
 			}
@@ -162,8 +163,8 @@ public class JavaCompiler {
 		inputs.clear();
 		
 		for(Variable v : map.keySet()){
-			if(v instanceof MemoryCell)
-				mems.put((MemoryCell)v,map.get(v));
+			if(v instanceof MemCell)
+				mems.put((MemCell)v,map.get(v));
 			if(v instanceof Node && !((Node) v).isInput()){
 				ports.put((Node)v, map.get(v));
 			}
@@ -245,7 +246,7 @@ public class JavaCompiler {
 	public static void generateCode(Formula automaton){
 		Set<Transition> transitions = new HashSet<Transition>();
 		Set<Port> set = new HashSet<Port>();
-		Set<MemoryCell> mem = new HashSet<MemoryCell>();
+		Set<MemCell> mem = new HashSet<MemCell>();
 		
 		if(automaton instanceof Disjunction)
 			for(Formula f : ((Disjunction) automaton).getClauses()){
@@ -256,12 +257,12 @@ public class JavaCompiler {
 				for(Node n : transition.getOutput().keySet()){
 					set.add(n.getPort());
 				}
-				for(MemoryCell m: transition.getMemory().keySet()){
+				for(MemCell m: transition.getMemory().keySet()){
 					mem.add(m);
 				}
 			}
 		
-		Protocol p = new Protocol("protocol", set, transitions, mem, new HashMap<MemoryCell, Object>());
+		Protocol p = new Protocol("protocol", set, transitions, new HashMap<MemCell, Object>());
 		
 		ReoTemplate reo = new ReoTemplate("testfile","", "test", Arrays.asList(p));
 		System.out.println(reo.generateCode(Language.JAVA));

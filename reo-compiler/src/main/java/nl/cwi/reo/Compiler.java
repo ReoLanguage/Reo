@@ -16,7 +16,7 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.compile.PRCompiler;
-import nl.cwi.reo.compile.SBACompiler;
+import nl.cwi.reo.compile.RBACompiler;
 import nl.cwi.reo.compile.components.Atomic;
 import nl.cwi.reo.compile.components.Component;
 import nl.cwi.reo.compile.components.Protocol;
@@ -24,13 +24,17 @@ import nl.cwi.reo.compile.components.ReoTemplate;
 import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
+import nl.cwi.reo.interpret.connectors.Reference;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
+import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.interpreters.InterpreterPR;
 import nl.cwi.reo.interpret.interpreters.InterpreterRBA;
 import nl.cwi.reo.interpret.interpreters.InterpreterP;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 
 import nl.cwi.reo.semantics.SemanticsType;
@@ -38,6 +42,7 @@ import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.MemoryCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Predicate;
@@ -86,8 +91,7 @@ public class Compiler {
 	/**
 	 * Partitioning
 	 */
-	@Parameter(names = { "-pt",
-			"--partitioning" }, description = "partition regarding synchronous and asynchronous sections")
+	@Parameter(names = { "-pt", "--partitioning" }, description = "synchronous region decomposition")
 	private boolean partitioning = false;
 
 	/**
@@ -187,33 +191,54 @@ public class Compiler {
 		// Interpret the Reo program
 		Interpreter<RulesBasedAutomaton> interpreter = new InterpreterRBA(directories, params, monitor);
 		ReoProgram<RulesBasedAutomaton> program = interpreter.interpret(files.get(0));
-		
+
 		if (program == null)
 			return;
 
-		ReoConnector<RulesBasedAutomaton> connector = program.getConnector().flatten().insertNodes(true, false, new RulesBasedAutomaton()).integrate();
+		// If necessary, add port windows
+		List<ReoConnector<RulesBasedAutomaton>> list = new ArrayList<>();
+		list.add(program.getConnector());
+		for (Port p : program.getConnector().getInterface()) {
+			if (!p.isHidden()) {
+				String name = "PortWindow";
+				Reference src = new Reference(p.isInput() ? "Windows.producer" : "Windows.consumer", "JAVA");
+				Port q = null;
+				if (p.isInput()) 
+					q = new Port(p.getName(), PortType.OUT, p.getPrioType(), new TypeTag("String"), true);
+				else 
+					q = new Port(p.getName(), PortType.IN, p.getPrioType(), new TypeTag("String"), true);
+				Set<Port> ports = new HashSet<Port>(Arrays.asList(q));
+				RulesBasedAutomaton atom = new RulesBasedAutomaton().getDefault(ports);
+				ReoConnectorAtom<RulesBasedAutomaton> window = new ReoConnectorAtom<>(name, atom, src);
+				list.add(window);
+			}
+		}
+		String cname = program.getConnector().getName();
+		ReoConnector<RulesBasedAutomaton> connector = new ReoConnectorComposite<>(cname, "", list);
+
+		connector = connector.propagate(monitor);
+		connector = connector.flatten();
+		connector = connector.insertNodes(true, false, new RulesBasedAutomaton());
+		connector = connector.integrate();
 
 		// Build the template.
 		List<Component> components = new ArrayList<Component>();
 		Set<Port> intface = new HashSet<Port>();
 
 		// Identify the atomic components in the connector.
-		int n_atom = 0;
+		int n_atom = 1;
 		List<RulesBasedAutomaton> protocols = new ArrayList<RulesBasedAutomaton>();
 		for (ReoConnectorAtom<RulesBasedAutomaton> atom : connector.getAtoms()) {
-			if (atom.getSourceCode().getFile() != null) {
+			if (atom.getSourceCode().getReference() != null) {
 				intface.addAll(atom.getInterface());
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
-				components.add(new Atomic(name + n_atom++, atom.getInterface(), atom.getSourceCode().getCall()));
+				components.add(new Atomic(name + n_atom++, atom.getInterface(), atom.getSourceCode().getReference()));
 			} else {
 				protocols.add(atom.getSemantics());
 			}
 		}
-		
-//		Formula automaton = JavaCompiler.compose(components);
-//		JavaCompiler.generateCode(automaton);
 
 		// Compose the protocol into a single connector.
 		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
@@ -222,18 +247,17 @@ public class Compiler {
 		Set<Transition> transitions = new HashSet<Transition>();
 		Set<Rule> setRules = circuit.getNewRules();
 		for (Rule rule : setRules) {
-			
+
 			// Quantify and eliminate by substitution all hidden nodes
 			Formula f = rule.getFormula();
-			for(Port p : rule.getAllPorts()){
-				if(p.isHidden())
-					f = new Existential(new Node(p),f);
-			}
-			f=f.QE();
-			
-			//Commandify the formula:
-			Transition t = SBACompiler.commandify(f);
-			
+			for (Port p : rule.getAllPorts())
+				if (p.isHidden())
+					f = new Existential(new Node(p), f);
+			f = f.QE();
+
+			// Commandify the formula:
+			Transition t = RBACompiler.commandify(f);
+
 			transitions.add(t);
 		}
 
@@ -241,52 +265,43 @@ public class Compiler {
 		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
 
 		partition.add(transitions);
-		
-		
-		
+
 		// Generate a protocol component for each part in the transition
-		
-		Map<MemoryCell, Object> initial = new HashMap<MemoryCell, Object>();
-		int n_protocol = 0;
+
+		Map<MemCell, Object> initial = new HashMap<MemCell, Object>();
+		int n_protocol = 1;
 		for (Set<Transition> T : partition) {
 			Set<Port> ports = new HashSet<Port>();
-			for (Transition t : T){
+			for (Transition t : T) {
 				ports.addAll(t.getInterface());
-				for(MemoryCell m : t.getMemory().keySet()){
-					initial.put(m, 0);
+				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
+					MemCell x = m.getKey().setType(m.getValue().getTypeTag());
+					initial.put(x, null);
 				}
 			}
-
-			// TODO For convenience, we should be able to specify the initial
-			// value of each memory cell (particularly handy for fifofull)
-			
-
-			
-			// TODO mem can be seen as the keyset of initial.
-			Set<MemoryCell> mem = initial.keySet();
-
-			components.add(new Protocol("Protocol" + n_protocol++, ports, T, mem, initial));
+			components.add(new Protocol("Protocol" + n_protocol++, ports, T, initial));
 		}
 
 		// Fill in the template
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);
-		
+
 		// Generate Java code from the template
 		String code = template.generateCode(Language.JAVA);
 		System.out.println(code);
 		write(program.getName(), code);
 	}
-	
+
 	private void compileP() {
 
 		// Interpret the Reo program
 		Interpreter<Predicate> interpreter = new InterpreterP(directories, params, monitor);
 		ReoProgram<Predicate> program = interpreter.interpret(files.get(0));
-		
+
 		if (program == null)
 			return;
 
-		ReoConnector<Predicate> connector = program.getConnector().flatten().insertNodes(true, false, new Predicate()).integrate();
+		ReoConnector<Predicate> connector = program.getConnector().flatten().insertNodes(true, false, new Predicate())
+				.integrate();
 
 		// Build the template.
 		List<Component> components = new ArrayList<Component>();
@@ -296,24 +311,25 @@ public class Compiler {
 		int n_atom = 0;
 		List<Predicate> protocols = new ArrayList<Predicate>();
 		for (ReoConnectorAtom<Predicate> atom : connector.getAtoms()) {
-			if (atom.getSourceCode().getFile() != null) {
+			if (atom.getSourceCode().getReference() != null) {
 				intface.addAll(atom.getInterface());
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
-				components.add(new Atomic(name + n_atom++, atom.getInterface(), atom.getSourceCode().getCall()));
+				components.add(new Atomic(name + n_atom++, atom.getInterface(), atom.getSourceCode().getReference()));
 			} else {
 				protocols.add(atom.getSemantics());
 			}
 		}
-		
-//		Formula automaton = JavaCompiler.compose(components);
-//		JavaCompiler.generateCode(automaton);
+
+		// Formula automaton = JavaCompiler.compose(components);
+		// JavaCompiler.generateCode(automaton);
 
 		// Compose the protocol into a single connector.
 		Predicate circuit = new Predicate().compose(protocols).restrict(intface);
 
-		// Put the obtained formula in (a quantifier-free) disjunctive normal form.
+		// Put the obtained formula in (a quantifier-free) disjunctive normal
+		// form.
 		Formula f = circuit.getFormula().NNF().DNF().QE();
 
 		// Transform every disjunctive clause into a transition.
@@ -321,9 +337,9 @@ public class Compiler {
 		if (f instanceof Disjunction) {
 			for (Formula clause : ((Disjunction) f).getClauses()) {
 
-				//Commandify the formula:
-				Transition t = SBACompiler.commandify(clause);
-				
+				// Commandify the formula:
+				Transition t = RBACompiler.commandify(clause);
+
 				transitions.add(t);
 				// Compute the guard by existential quantification on all output
 				// and next memory cells in clause and QE().
@@ -337,7 +353,7 @@ public class Compiler {
 				// Similar to output.
 				Map<MemoryCell, Term> memory = new HashMap<MemoryCell, Term>();
 
-//				transitions.add(new Transition(guard, output, memory));
+				// transitions.add(new Transition(guard, output, memory));
 			}
 		}
 
@@ -345,36 +361,29 @@ public class Compiler {
 		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
 
 		partition.add(transitions);
-		
-		
-		
+
 		// Generate a protocol component for each part in the transition
-		
-		Map<MemoryCell, Object> initial = new HashMap<MemoryCell, Object>();
+
+		Map<MemCell, Object> initial = new HashMap<MemCell, Object>();
 		int n_protocol = 0;
 		for (Set<Transition> T : partition) {
 			Set<Port> ports = new HashSet<Port>();
-			for (Transition t : T){
+			for (Transition t : T) {
 				ports.addAll(t.getInterface());
-				for(MemoryCell m : t.getMemory().keySet()){
+				for (MemCell m : t.getMemory().keySet()) {
 					initial.put(m, 0);
 				}
 			}
 
 			// TODO For convenience, we should be able to specify the initial
 			// value of each memory cell (particularly handy for fifofull)
-			
 
-			
-			// TODO mem can be seen as the keyset of initial.
-			Set<MemoryCell> mem = initial.keySet();
-
-			components.add(new Protocol("Protocol" + n_protocol++, ports, T, mem, initial));
+			components.add(new Protocol("Protocol" + n_protocol++, ports, T, initial));
 		}
 
 		// Fill in the template
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);
-		
+
 		// Generate Java code from the template
 		String code = template.generateCode(Language.JAVA);
 		System.out.println(code);

@@ -52,7 +52,7 @@ public class PRCompiler {
 
 			if (atom.getSemantics().getName().equals("identity")) {
 				Map<String, Object> worker = new HashMap<String, Object>();
-				defs.add("WORKER" + ++i + " = " + atom.getSourceCode().getFile().toString().replace("\"", ""));
+				defs.add("WORKER" + ++i + " = " + atom.getSourceCode().getReference().toString().replace("\"", ""));
 				worker.put("ref", "WORKER" + i);
 				worker.put("inputs", inputs);
 				worker.put("outputs", outputs);
