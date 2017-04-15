@@ -238,6 +238,7 @@
       
       canvas.forEachObject(function(obj) {
         if (obj.class == 'node') {
+          console.log('node ' + obj.id + ' in component ' + obj.component.id);
           if (isBoundaryNode(obj,obj.component)) {
             s1 += space1 + obj.label.text;
             space1 = ','
@@ -321,8 +322,6 @@
     origY = pointer.y;
     var p = canvas.getActiveObject();
     if (p) {
-      if(p.class == 'node')
-        console.log(p.component.id);
       origLeft = p.left;
       origTop = p.top;
       return;
@@ -443,15 +442,19 @@
         for (j = 0; j < p.linesIn.length; j++) {
           if (p.linesIn[j].circle1.component.size < p.component.size)
             snapOutComponent(p.linesIn[j].circle1,p.linesIn[j].circle1.component,p);
-          p.linesIn[j].circle1.component = p.component;
-          snapToComponent(p.linesIn[j].circle1,p.component);
+          else {
+            p.linesIn[j].circle1.component = p.component;
+            snapToComponent(p.linesIn[j].circle1,p.component);
+          }
           updateLine(p.linesIn[j], 2);
         }
         for (k = 0; k < p.linesOut.length; k++) {
           if (p.linesOut[k].circle2.component.size < p.component.size)
             snapOutComponent(p.linesOut[k].circle2,p.linesOut[k].circle2.component,p);
-          p.linesOut[k].circle2.component = p.component;
-          snapToComponent(p.linesOut[k].circle2,p.component);
+          else {
+            p.linesOut[k].circle2.component = p.component;
+            snapToComponent(p.linesOut[k].circle2,p.component);
+          }
           updateLine(p.linesOut[k], 1);
         }
         canvas.calcOffset();
