@@ -114,7 +114,7 @@ public class LykosCompiler {
 		// Add primitives to the protocol or to the list of workers
 //		for (ReoConnectorAtom<PRAutomaton> atom : program.insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
 		for (ReoConnectorAtom<PRAutomaton> atom : program.getAtoms()) {
-			if ((atom.getSourceCode()) == (null) || atom.getSourceCode().getReference() == null) {
+			if ((atom.getSourceCode()) == (null) || atom.getSourceCode().getCall() == null) {
 				PRAutomaton X = atom.getSemantics();
 				Primitive pr = new Primitive("nl.cwi.reo.pr.autom.libr." + X.getName(), "");
 				String param = X.getVariable() != null ? X.getVariable().toString() : null;
@@ -271,8 +271,8 @@ public class LykosCompiler {
 			name = "" + counterWorker++;
 		}
 
-		String nameWorker = atom.getSourceCode().getReference().toString().substring(1,
-				atom.getSourceCode().getReference().toString().length() - 1);
+		String nameWorker = atom.getSourceCode().getCall().toString().substring(1,
+				atom.getSourceCode().getCall().toString().length() - 1);
 		
 
 		defs.putWorkerName(new TypedName(name, Type.WORKER_NAME), nameWorker, monitor);

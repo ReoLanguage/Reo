@@ -12,6 +12,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.components.ComponentDefinition;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.components.ComponentVariable;
+import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.Reference;
 import nl.cwi.reo.interpret.instances.ComponentInstance;
 import nl.cwi.reo.interpret.instances.ProductInstance;
@@ -264,7 +265,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void enterDefn(DefnContext ctx) {
 		componentnames.put(ctx.component(), ctx.ID().getText());
 	}
-	
+
 	@Override
 	public void exitDefn(DefnContext ctx) {
 		VariableExpression e = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(),
@@ -286,21 +287,46 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitComponent_atomic(Component_atomicContext ctx) {
-		T atom = atoms.get(ctx.atom());
-		if (atom == null && ctx.source()==null)
-			throw new NullPointerException("No semantics object or source code attached to parse tree.");
 		SignatureExpression sign = signatureExpressions.get(ctx.sign());
-		Reference s = ctx.source() != null ? sources.get(ctx.source()) : new Reference();
 		String name = componentnames.get(ctx);
+		
+		// Get the atomic semantics.
+		T atom = null;
+		if (ctx.atom() != null) {
+			atom = atoms.get(ctx.atom());
+			if (atom == null)
+				throw new NullPointerException("No semantics object attached to parse tree.");
+		}
+		
+		// Get the source code reference
+		Reference s = null;
+		if (ctx.source() != null) {
+			String call = ctx.source().STRING().getText();
+			Language lang;
+			switch (ctx.source().lang.getType()) {
+			case ReoParser.JAVA:
+				lang = Language.JAVA;
+				break;
+			case ReoParser.C11:
+				lang = Language.C11;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown source language.");
+			}
+			List<? extends VariableExpression> params = sign.getParameters();
+			s = new Reference(call, lang, params);
+		} else {
+			s = new Reference();
+		}
+		
 		components.put(ctx, new ComponentDefinition<T>(sign, new SetAtom<T>(name, atom, s)));
 	}
-	
+
 	@Override
 	public void exitSource(SourceContext ctx) {
-		// TODO Put arguments here
-		sources.put(ctx, new Reference(ctx.STRING().getText(), ctx.LANG().getText().toUpperCase()));
+		
 	}
-	
+
 	@Override
 	public void enterComponent_composite(Component_compositeContext ctx) {
 		componentnames.put(ctx.multiset(), componentnames.get(ctx));
@@ -588,7 +614,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitType(TypeContext ctx) {
-		if(!ctx.getText().trim().equals(""))
+		if (!ctx.getText().trim().equals(""))
 			typetags.put(ctx, new TypeTag(ctx.getText()));
 	}
 

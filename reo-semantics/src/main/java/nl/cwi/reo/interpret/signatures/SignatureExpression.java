@@ -61,6 +61,14 @@ public final class SignatureExpression implements ParameterType {
 		this.nodes = nodes;
 		this.location = location;
 	}
+	
+	/**
+	 * Gets the list of parameters in this signature.
+	 * @return list of parameters
+	 */
+	public List<ParameterExpression> getParameters() {
+		return this.params;
+	}
 
 	/**
 	 * Evaluates this interface for a given list of parameter values and a given

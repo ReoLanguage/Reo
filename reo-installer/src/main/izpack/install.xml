@@ -15,16 +15,6 @@
   </locale>
  
   <guiprefs width="800" height="600" resizable="no">
-    <splash>images/peas_load.gif</splash>
-    <laf name="substance">
-      <os family="windows" />
-      <os family="unix" />
-      <param name="variant" value="mist-silver" />
-    </laf>
-    <laf name="substance">
-      <os family="mac" />
-      <param name="variant" value="mist-aqua" />
-    </laf>
     <modifier key="useHeadingPanel" value="yes" />
   </guiprefs>
  
@@ -36,10 +26,9 @@
   </panels>
  
   <packs>
-    <pack name="Test Core" required="yes">
-      <description>The core files needed for the application</description>
-      <fileset dir="plain" targetdir="${INSTALL_PATH}" override="true"/>
-      <parsable targetfile="${INSTALL_PATH}/test.properties"/>
+    <pack name="Compiler" required="yes">
+      <description>The Reo compiler</description>
+      <singlefile src="lib/reo-runtime-java.jar" target="${INSTALL_PATH}/bin/reo-runtime-java.jar" override="true" />
     </pack>
   </packs>
  

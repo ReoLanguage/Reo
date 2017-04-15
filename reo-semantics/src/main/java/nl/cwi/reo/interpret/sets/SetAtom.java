@@ -50,8 +50,6 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	public SetAtom(String name, T atom, Reference source) {
 		if (atom == null && source == null)
 			throw new NullPointerException();
-//		if (atom==null)
-//			getDefault();
 		this.name = name;
 		this.atom = atom;
 		this.source = source;
@@ -72,10 +70,11 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	@Override
 	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
-		T semantics = atom.evaluate(s, m);
-		if (semantics == null)
+		T _atom = atom.evaluate(s, m);
+		Reference _source = source.evaluate(s, m);
+		if (_atom == null || _source == null)
 			return null;
-		return new Instance<T>(new ReoConnectorAtom<T>(name, semantics, source), new HashSet<Set<Identifier>>());
+		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<Set<Identifier>>());
 	}
 
 	/**

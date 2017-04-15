@@ -35,6 +35,10 @@ import nl.cwi.reo.interpret.interpreters.InterpreterP;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.values.BooleanValue;
+import nl.cwi.reo.interpret.values.DecimalValue;
+import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 
 import nl.cwi.reo.semantics.SemanticsType;
@@ -201,14 +205,14 @@ public class Compiler {
 		for (Port p : program.getConnector().getInterface()) {
 			if (!p.isHidden()) {
 				String name = "PortWindow";
-				Reference src = new Reference(p.isInput() ? "Windows.producer" : "Windows.consumer", "JAVA");
+				Reference src = new Reference(p.isInput() ? "Windows.producer" : "Windows.consumer", Language.JAVA);
 				Port q = null;
-				if (p.isInput()) 
+				if (p.isInput())
 					q = new Port(p.getName(), PortType.OUT, p.getPrioType(), new TypeTag("String"), true);
-				else 
+				else
 					q = new Port(p.getName(), PortType.IN, p.getPrioType(), new TypeTag("String"), true);
-				Set<Port> ports = new HashSet<Port>(Arrays.asList(q));
-				RulesBasedAutomaton atom = new RulesBasedAutomaton().getDefault(ports);
+				Set<Port> iface = new HashSet<Port>(Arrays.asList(q));
+				RulesBasedAutomaton atom = new RulesBasedAutomaton().getDefault(iface);
 				ReoConnectorAtom<RulesBasedAutomaton> window = new ReoConnectorAtom<>(name, atom, src);
 				list.add(window);
 			}
@@ -229,12 +233,26 @@ public class Compiler {
 		int n_atom = 1;
 		List<RulesBasedAutomaton> protocols = new ArrayList<RulesBasedAutomaton>();
 		for (ReoConnectorAtom<RulesBasedAutomaton> atom : connector.getAtoms()) {
-			if (atom.getSourceCode().getReference() != null) {
+			if (atom.getSourceCode().getCall() != null) {
 				intface.addAll(atom.getInterface());
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
-				components.add(new Atomic(name + n_atom++, atom.getInterface(), atom.getSourceCode().getReference()));
+
+				// TODO the string representation of parameter values is target
+				// language dependent.
+				List<String> params = new ArrayList<>();
+				for (Value v : atom.getSourceCode().getValues()) {
+					if (v instanceof BooleanValue) {
+						params.add(((BooleanValue) v).getValue() ? "true" : "false");
+					} else if (v instanceof StringValue) {
+						params.add("\"" + ((StringValue) v).getValue() + "\"");
+					} else if (v instanceof DecimalValue) {
+						params.add(Double.toString(((DecimalValue) v).getValue()));
+					}
+				}
+				components
+						.add(new Atomic(name + n_atom++, params, atom.getInterface(), atom.getSourceCode().getCall()));
 			} else {
 				protocols.add(atom.getSemantics());
 			}
@@ -311,12 +329,13 @@ public class Compiler {
 		int n_atom = 0;
 		List<Predicate> protocols = new ArrayList<Predicate>();
 		for (ReoConnectorAtom<Predicate> atom : connector.getAtoms()) {
-			if (atom.getSourceCode().getReference() != null) {
+			if (atom.getSourceCode().getCall() != null) {
 				intface.addAll(atom.getInterface());
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
-				components.add(new Atomic(name + n_atom++, atom.getInterface(), atom.getSourceCode().getReference()));
+				components.add(new Atomic(name + n_atom++, new ArrayList<>(), atom.getInterface(),
+						atom.getSourceCode().getCall()));
 			} else {
 				protocols.add(atom.getSemantics());
 			}

@@ -3,6 +3,7 @@
  */
 package nl.cwi.reo.compile.components;
 
+import java.util.List;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
@@ -18,19 +19,26 @@ public final class Atomic implements Component {
 	public final boolean atomic = true;
 
 	private final String name;
+	
+	private final List<String> params;
 
 	private final Set<Port> ports;
 	
 	private final String call;
 
-	public Atomic(String name, Set<Port> ports, String call) {
+	public Atomic(String name, List<String> params, Set<Port> ports, String call) {
 		this.name = name;
+		this.params = params;
 		this.ports = ports;
 		this.call = call;
 	}
 
 	public String getName() {
 		return name;
+	}
+	
+	public List<String> getParameters() {
+		return params;
 	}
 
 	public Set<Port> getPorts() {
