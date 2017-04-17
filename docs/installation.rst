@@ -22,6 +22,7 @@ Unix & Mac OS
 	alias reo='java -jar /home/<username>/Reo/reo-1.0.jar'
 
 with your username substituted for `<username>`. In the CLASSPATH and alias, do not use `~` to refer to your home directory, because expansion of `~` to `/home/<username>/` does not work withing quotes.  
+
 .. tip:: 
 	Add the export and alias commands to your startup script of your terminal (e.g., ``~/.bashrc``).
 	This way, you don't need to set the class path and the alias for every new terminal window.
