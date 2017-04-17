@@ -12,12 +12,13 @@ Reo_, an *exogenous coordination language* designed by prof. dr. F. Arbab at the
 It is much easier to develop correct protocols that are free of dead-locks, live-locks and data races.
 The compiler of the coordination language is able to optimize the actual implementation of the protocol.
 
-Documentation
--------------
-The documentation is available on http://reo.readthedocs.io/en/latest/
+Installation & Documentation
+----------------------------
+Steps for installation and the documentation are available on http://reo.readthedocs.io/en/latest/
    
 Contribute
 ----------
+If you wish to contribute to the development of Reo, use the following instructions to obtain your own copy of the source code:
 
 1. Install Git. Available at https://git-scm.com/downloads.
 
