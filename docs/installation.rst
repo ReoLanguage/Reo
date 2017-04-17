@@ -3,8 +3,8 @@
 Installation
 ============
 
-Unix
-----
+Unix & Mac OS
+-------------
 
 1. Install Java SDK 1.6 or higher. You can check if the correct java version is already installed via::
 
@@ -18,9 +18,11 @@ Unix
 
 3. Add Reo to the class path and create an alias for the compiler::
 
-	export CLASSPATH=".:/home/<username>/Reo/reo-runtime-1.0.jar:$CLASSPATH"
+	export CLASSPATH=".:/home/<username>/Reo/reo-runtime-java-lykos-1.0.jar:$CLASSPATH"
 	alias reo='java -jar /home/<username>/Reo/reo-1.0.jar'
 
+  with your username substituted for `<username>`. In the CLASSPATH and alias, do not use `~` to refer to your home directory, because expansion of `~` to `/home/<username>/` does not work withing quotes.
+  
 .. tip:: 
 	Add the export and alias commands to your startup script of your terminal (e.g., ``~/.bashrc``).
 	This way, you don't need to set the class path and the alias for every new terminal window.
@@ -33,17 +35,17 @@ Unix
 Windows
 -------
 
-1. Install Install Java SDK 1.6 or higher.
+1. Install Java SDK 1.6 or higher.
 
-2. Download the `reo-1.0.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-1.0.zip>`_, and save it in, for example, ``C:\Program Files\Reo``
+2. Download the `reo-1.0.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-1.0.zip>`_, and extract it in, for example, ``C:\Program Files\Reo``
 
-3. Set the ``CLASSPATH`` environment variable to ``.;C:\Program Files\Reo\reo-runtime-1.0.jar;%CLASSPATH%`` either permenantly via::
+3. Append the ``CLASSPATH`` environment variable with ``.;C:\Program Files\Reo\reo-runtime-java-lykos-1.0.jar;%CLASSPATH%`` either permenantly via::
 
 	Control Panel » System » Advanced » Environment Variables
 
    or only for this terminal session via::
 
-	set CLASSPATH=".;C:\Program Files\Reo\reo-runtime-1.0.jar;%CLASSPATH%"
+	set CLASSPATH=".;C:\Program Files\Reo\reo-runtime-java-lykos-1.0.jar;%CLASSPATH%"
 
 4. Create short convenient commands for the Reo compiler, using batch files (in directory in system PATH)::
 
