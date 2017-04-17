@@ -12,7 +12,6 @@ and a consumer that **alternately** prints the produced strings "Hello, " and "w
 If you are asked to write a small program that implements the above informal specification, you may come up with the following Java code:
 
 .. code-block:: java
-	:linenos:
 
 	import java.util.concurrent.Semaphore;
 
@@ -107,11 +106,11 @@ Let us now analyze the Java implementation by answering a few simple questions.
 
 1. Where is the "Hello, " string computed?
 
-On line 15.
+On line 15: `String redText = "Hello, ";`.
 
 2. Where is the text printed?
 
-On line 53.
+On line 53: `System.out.print(buffer);`.
 
 For the next question, however, it is not possible to point at a single line of code:
 
@@ -119,11 +118,11 @@ For the next question, however, it is not possible to point at a single line of 
 
 		a. What determines which producers goes first? 
 
-		This is determined by the initial value of the semaphores on lines 5 and 6, together with the usage of the semaphores on lines 17, 21, 33, and 37.
+		This is determined by the initial value of the semaphores on lines 5 and 6, together with the acquire and release statements of the semaphores on lines 17, 21, 33, and 37.
 
 		b. What takes care of buffer protection? 
 
-		This program establishes buffer protection by the code on lines 18, 20, 34, 36, 51, and 57.
+		This is established by the acquire and release statements of the buffer semaphore on lines 18, 20, 34, 36, 51, and 57.
 
 The reason why this third question is much more difficult to answer is because the protocol is **implicit**.
 
