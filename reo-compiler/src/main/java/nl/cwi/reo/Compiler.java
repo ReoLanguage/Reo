@@ -205,7 +205,10 @@ public class Compiler {
 		for (Port p : program.getConnector().getInterface()) {
 			if (!p.isHidden()) {
 				String name = "PortWindow";
-				Reference src = new Reference(p.isInput() ? "Windows.producer" : "Windows.consumer", Language.JAVA);
+				Value v = new StringValue(p.getName().toString());
+				List<Value> values = Arrays.asList(v);
+				
+				Reference src = new Reference(p.isInput() ? "Windows.producer" : "Windows.consumer", Language.JAVA, null, values);
 				Port q = null;
 				if (p.isInput())
 					q = new Port(p.getName(), PortType.OUT, p.getPrioType(), new TypeTag("String"), true);
@@ -217,8 +220,15 @@ public class Compiler {
 				list.add(window);
 			}
 		}
-		String cname = program.getConnector().getName();
-		ReoConnector<RulesBasedAutomaton> connector = new ReoConnectorComposite<>(cname, "", list);
+		
+		// Hide all ports
+		int i = 1;
+		Map<Port, Port> r = new HashMap<Port, Port>();
+		for (Map.Entry<Port, Port> link : program.getConnector().getLinks().entrySet()) {
+			Port p = link.getValue();
+			r.put(p, p.rename("_" + i++));			
+		}		
+		ReoConnector<RulesBasedAutomaton> connector = new ReoConnectorComposite<>(null, "", list).rename(r);
 
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();

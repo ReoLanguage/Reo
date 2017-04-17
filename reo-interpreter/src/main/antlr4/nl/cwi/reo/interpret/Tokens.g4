@@ -28,7 +28,7 @@ C11     : 'C11' ;
 NAT     : ('0'|[1-9][0-9]*) ;
 DEC     : ('0'|[1-9][0-9]*) '.' [0-9]+ ;
 BOOL    : 'true'|'false' ;
-ID      : [a-zA-Z_][a-zA-Z0-9_]*;
+ID      : [a-zA-Z][a-zA-Z0-9_]*;
 STRING  : '\"' .*? '\"' ;
 SPACES  : [ \t\r\n]+ -> skip ;
 SL_COMM : '//' .*? ('\n'|EOF) -> skip ;

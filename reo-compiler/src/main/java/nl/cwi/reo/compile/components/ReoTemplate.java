@@ -83,6 +83,6 @@ public final class ReoTemplate {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return temp.render();
+		return temp.render(72);
 	}
 }

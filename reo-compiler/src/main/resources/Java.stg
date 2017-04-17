@@ -70,7 +70,7 @@ public synchronized void activate() {
 }
 
 public void run() {
-	<c.call>	
+	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p | <p.name>}; separator=", ">);
 }
 >>
 
@@ -110,7 +110,7 @@ private <if(m.type)><m.type><else>Object<endif> <m.name>;
 >>
 
 constructor(c) ::= <<
-public <c.name>(<c.ports:{p | Port\<<p:typetag()>\> <p.name>}; separator=", ">) {
+public <c.name>(<c.ports:{p | Port\<<p:typetag()>\> <p.name>}; wrap, anchor, separator=", ">) {
 	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
 	<c.ports:{p | this.<p.name> = <p.name>;}; separator="\n">
 	activate();

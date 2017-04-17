@@ -169,7 +169,7 @@ public class Windows {
 						}
 					String datum = port.get();
 					synchronized (textArea) {
-						textArea.append("\n! Completed get(), received " + datum);
+						textArea.append("\n! Completed get(), received \"" + datum + "\"");
 						textArea.setCaretPosition(textArea.getDocument().getLength());
 					}
 				}
