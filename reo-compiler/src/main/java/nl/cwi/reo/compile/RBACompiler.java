@@ -24,11 +24,13 @@ public class RBACompiler {
 
 	public static Transition commandify(Formula f) {
 
+		Formula g = f.QE();
+
 		List<Formula> literals = new ArrayList<Formula>();
 		List<Formula> literalsToRemove = new ArrayList<Formula>();
 
-		if (f instanceof Conjunction)
-			literals = ((Conjunction) f).getClauses();
+		if (g instanceof Conjunction)
+			literals = ((Conjunction) g).getClauses();
 
 		// Remove from literals all equalities as x?=x!
 		for (Formula l : literals) {
@@ -51,7 +53,7 @@ public class RBACompiler {
 		Set<Variable> doneVariables = new HashSet<Variable>();
 		Set<Port> allInputPorts = new HashSet<Port>();
 
-		for (Variable v : f.getFreeVariables()) {
+		for (Variable v : g.getFreeVariables()) {
 			if (v instanceof Node && ((Node) v).isInput()) {
 				allInputPorts.add(((Node) v).getPort());
 				doneVariables.add(v);

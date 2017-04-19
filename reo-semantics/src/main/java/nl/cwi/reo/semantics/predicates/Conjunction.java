@@ -26,6 +26,26 @@ public class Conjunction implements Formula {
 	public Conjunction(List<Formula> clauses) {
 		this.clauses = clauses;
 	}
+	
+	public static Formula conjunction(List<Formula> clauses) {
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses) {
+			if (f instanceof Relation) {
+				if (!((Relation) f).getValue().equals("true"))
+					_clauses.add(f);
+			} else if (!clauses.contains(f)) {
+				_clauses.add(f);
+			}
+		}
+		switch (_clauses.size()) {
+		case 0:
+			return new Relation("true", "true", null);
+		case 1:
+			return _clauses.get(0);
+		default:
+			return new Conjunction(clauses);
+		}
+	}
 
 	public List<Formula> getFormula() {
 		return clauses;

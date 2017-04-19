@@ -15,68 +15,67 @@ import nl.cwi.reo.util.Monitor;
 
 public class Rule {
 
-	private Map<Port,Role> sync;
+	private Map<Port, Boolean> sync;
 	private Formula f;
-	
-	public Rule(Map<Port,Role> sync, Formula f){
-		this.sync=sync;
-		this.f=f;
+
+	public Rule(Map<Port, Boolean> sync, Formula f) {
+		this.sync = sync;
+		this.f = f;
 	}
-	
-	public Map<Port,Role> getSync(){
+
+	public Map<Port, Boolean> getSync() {
 		return sync;
 	}
-	
-	public Formula getFormula(){
+
+	public Formula getFormula() {
 		return f;
 	}
-	
-	public Set<Port> getFiringPorts(){
+
+	public Set<Port> getFiringPorts() {
 		Set<Port> setPort = new HashSet<Port>();
-		for(Port p : sync.keySet()){
-			if(sync.get(p).getValue()!=0){
+		for (Port p : sync.keySet()) {
+			if (sync.get(p)) {
 				setPort.add(p);
 			}
 		}
 		return setPort;
 	}
-	
-	public Set<Port> getAllPorts(){
+
+	public Set<Port> getAllPorts() {
 		Set<Port> setPort = new HashSet<Port>();
-		for(Port p : sync.keySet()){
+		for (Port p : sync.keySet()) {
 			setPort.add(p);
 		}
 		return setPort;
 	}
-	
+
 	public Rule rename(Map<Port, Port> links) {
-		Map<Port,Role> map = new HashMap<Port,Role>();
-		for (Port p : sync.keySet()){
-			if(links.containsKey(p)){
-				map.put(links.get(p),sync.get(p));
-			}	
-			else
+		Map<Port, Boolean> map = new HashMap<>();
+		for (Port p : sync.keySet()) {
+			if (links.containsKey(p)) {
+				map.put(links.get(p), sync.get(p));
+			} else
 				map.put(p, sync.get(p));
 		}
-			
-		return new Rule(map,f.rename(links));
+
+		return new Rule(map, f.rename(links));
 	}
-	
+
 	/**
 	 * 
 	 * @param r
 	 * @return
 	 */
-	public Rule merge(Rule r){
+	public Rule merge(Rule r) {
 		/*
 		 * This method assumes that both rules are in Conjunctive Normal Form
 		 */
-		
-//		List<Formula> f = new ArrayList<Formula>();
-//		Map<Port,Role> map = new HashMap<Port,Role>();
-//		
-//		f.add(r.getFormula());
-//		for(Port p :  )
+
+		// List<Formula> f = new ArrayList<Formula>();
+		// Map<Port,Role> map = new HashMap<Port,Role>();
+		//
+		// f.add(r.getFormula());
+		// for(Port p : )
 		return null;
 	}
 
@@ -84,34 +83,22 @@ public class Rule {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String toString(){		
+	public String toString() {
 		String s = "{";
-		Iterator<Map.Entry<Port, Role>> iter = this.sync.entrySet().iterator();
+		Iterator<Map.Entry<Port, Boolean>> iter = this.sync.entrySet().iterator();
 		while (iter.hasNext()) {
-			Map.Entry<Port, Role> pair = iter.next();
-			switch (pair.getValue()) {
-			case BLOCK:
-				s += "~";
-				break;
-			case FIRE:
-				s += "?";
-				break;
-			case TRIGGER:
-				s += "";
-				break;
-			default:
-				break;
-			}
+			Map.Entry<Port, Boolean> pair = iter.next();
+			s += pair.getValue() ? "" : "~";
 			s += pair.getKey() + (iter.hasNext() ? ", " : "");
 		}
 		s += "} ";
-		if(f!=null)
+		if (f != null)
 			s += f.toString();
 		return s;
 	}
-	
-	public @Nullable Rule evaluate(Scope s, Monitor m){
-		
-		return new Rule(sync,f.evaluate(s, m));  
+
+	public @Nullable Rule evaluate(Scope s, Monitor m) {
+
+		return new Rule(sync, f.evaluate(s, m));
 	}
 }

@@ -5,9 +5,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
@@ -21,9 +23,10 @@ import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Relation;
-import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
 
 public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
@@ -55,7 +58,8 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	public Set<Rule> getRules() {
 		return s;
 	}
-
+	
+	@Deprecated
 	public Set<Rule> getNewRules() {
 		Set<Rule> setRules = new HashSet<Rule>();
 		Graph g = new Graph(s).isolate();
@@ -124,15 +128,15 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		 */
 		for (Port p : inps) {
 			Formula transition = null;
-			Map<Port, Role> map = new HashMap<Port, Role>();
-			map.put(p, Role.FIRE);
+			Map<Port, Boolean> map = new HashMap<>();
+			map.put(p, true);
 			for (Port x : inps) {
 				if (!x.equals(p)) {
-					map.put(x, Role.BLOCK);
+					map.put(x, false);
 				}
 			}
 			for (Port x : outs) {
-				map.put(x, Role.FIRE);
+				map.put(x, false);
 				Formula eq = new Equality(new Node(p), new Node(x));
 				if (transition == null)
 					transition = eq;
@@ -150,11 +154,11 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		Set<Rule> rules = new HashSet<Rule>();
 
 		for (Port p : ports) {
-			Map<Port, Role> map = new HashMap<Port, Role>();
-			map.put(p, Role.FIRE);
+			Map<Port, Boolean> map = new HashMap<>();
+			map.put(p, true);
 			for (Port x : ports)
 				if (!x.equals(p))
-					map.put(x, Role.BLOCK);
+					map.put(x, false);
 			Formula guard = new Relation("true", "true", null);
 			rules.add(new Rule(map, guard));
 		}
@@ -179,10 +183,138 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 */
 	@Override
 	public RulesBasedAutomaton compose(List<RulesBasedAutomaton> components) {
-		Set<Rule> s = new HashSet<Rule>(this.s);
-		for (RulesBasedAutomaton A : components)
-			s.addAll(A.getRules());
-		return new RulesBasedAutomaton(s);
+
+		// Rename all memory cells and put *all* components into a list.
+		List<RulesBasedAutomaton> list = new ArrayList<>();
+
+		List<RulesBasedAutomaton> oldlist = new ArrayList<>(components);
+		oldlist.add(this);
+		int i = 1;
+		for (RulesBasedAutomaton A : oldlist) {
+			Set<Rule> s = new HashSet<Rule>(this.s);
+			Map<String, String> rename = new HashMap<>();
+			for (Rule r : A.getRules()) {
+				for (Variable v : r.getFormula().getFreeVariables()) {
+					if (v instanceof MemCell) {
+						String name = ((MemCell) v).getName();
+						if (!rename.containsKey(name))
+							rename.put(name, "m" + i++);
+					}
+				}
+			}
+			for (Rule r : A.getRules()) {
+				Formula _f = r.getFormula();
+				for (Map.Entry<String, String> entry : rename.entrySet()) {
+					_f = _f.Substitute(new MemCell(entry.getValue(), false), new MemCell(entry.getKey(), false));
+					_f = _f.Substitute(new MemCell(entry.getValue(), true), new MemCell(entry.getKey(), true));
+				}
+				s.add(new Rule(r.getSync(), _f));
+			}
+			list.add(new RulesBasedAutomaton(s));
+		}
+
+		// Compose the list of RBAs into a single list of rules.
+		Set<Rule> rules = new HashSet<>();
+
+		Set<Rule> marked = new HashSet<>();
+
+		for (RulesBasedAutomaton A : list) {
+			for (Rule x : A.getRules()) {
+
+				if (marked.contains(x))
+					continue;
+
+				Stack<Rule> rule = new Stack<>();
+				Stack<Rule> stack = new Stack<>();
+
+				rule.push(x);
+				stack.push(null);
+
+				Iterator<RulesBasedAutomaton> iter = list.iterator();
+
+				loop: while (true) {
+
+					while (iter.hasNext()) {
+						RulesBasedAutomaton B = iter.next();
+
+						boolean hasOptions = false;
+
+						for (Rule y : B.getRules()) {
+							if (!rule.contains(y) && synchronize(compose(rule), y)) {
+								stack.push(y);
+								hasOptions = true;
+							}
+						}
+
+						if (hasOptions) {
+							Rule z = stack.pop();
+							rule.push(z);
+							stack.push(null);
+							iter = list.iterator();
+						}
+					}
+
+					rules.add(compose(rule));
+
+					while (stack.peek() == null) {
+						marked.add(rule.pop());
+						stack.pop();
+						if (stack.empty())
+							break loop;
+					}
+
+					rule.push(stack.pop());
+					stack.push(null);
+					iter = list.iterator();
+
+				}
+
+			}
+		}
+
+		return new RulesBasedAutomaton(rules);
+	}
+
+	/**
+	 * Determines whether there exists a port p such that both rules fire p, and
+	 * whether the conjunction is satisfiable.
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	private static boolean synchronize(Rule x, Rule y) {
+		boolean synchronize = false;
+		for (Port p : x.getSync().keySet()) {
+			if (x.getSync().get(p)) {
+				Boolean b = y.getSync().get(p);
+				if (b != null && b.equals(true)) {
+					synchronize = true;
+				} else { 
+					return false;
+				}
+			}
+		}
+		return synchronize;
+	}
+
+	/**
+	 * Composes the current collection of local rules into a global rule.
+	 * 
+	 * @param rule
+	 *            stack of local rules
+	 * @return global rule
+	 */
+	private static Rule compose(Stack<Rule> rule) {
+		List<Formula> clauses = new ArrayList<Formula>();
+		Map<Port, Boolean> sync = new HashMap<>();
+
+		for (Rule r : rule) {
+			sync.putAll(r.getSync());
+			clauses.add(r.getFormula());
+		}
+
+		return new Rule(sync, Conjunction.conjunction(clauses));
 	}
 
 	/**

@@ -25,11 +25,13 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	/**
 	 * Component name.
 	 */
+	@Nullable
 	private final String name;
 
 	/**
 	 * Reo semantics object.
 	 */
+	@Nullable
 	private final T atom;
 
 	/**
@@ -48,7 +50,7 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 *            reference to source code
 	 */
 	public SetAtom(String name, T atom, Reference source) {
-		if (atom == null && source == null)
+		if (source == null)
 			throw new NullPointerException();
 		this.name = name;
 		this.atom = atom;
@@ -70,7 +72,7 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	@Override
 	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
-		T _atom = atom.evaluate(s, m);
+		T _atom = atom != null ? atom.evaluate(s, m) : atom;
 		Reference _source = source.evaluate(s, m);
 		if (_atom == null || _source == null)
 			return null;

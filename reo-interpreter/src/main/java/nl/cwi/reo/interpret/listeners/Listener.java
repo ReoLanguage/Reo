@@ -294,8 +294,9 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		T atom = null;
 		if (ctx.atom() != null) {
 			atom = atoms.get(ctx.atom());
-			if (atom == null)
-				throw new NullPointerException("No semantics object attached to parse tree.");
+			if (atom == null) {
+				m.add("Incorrect semantics specified.");
+			}
 		}
 		
 		// Get the source code reference

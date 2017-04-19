@@ -1,5 +1,6 @@
 package nl.cwi.reo.semantics.rbautomaton;
 
+@Deprecated
 public enum Role {
 	BLOCK(0),
 	FIRE(1),

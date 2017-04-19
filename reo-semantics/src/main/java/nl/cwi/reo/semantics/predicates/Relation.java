@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -123,6 +124,30 @@ public class Relation implements Formula {
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Relation))
+			return false;
+		Relation p = (Relation) other;
+		return Objects.equals(this.name, p.name) && Objects.equals(this.value, p.value)
+				&& Objects.equals(this.args, p.args);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getName(), this.value, this.args);
 	}
 
 }
