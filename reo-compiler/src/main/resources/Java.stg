@@ -65,8 +65,10 @@ private static class <c.name> implements Component {
 >>
 
 atomic(c) ::= <<
-public synchronized void activate() {
-	notify();
+public void activate() {
+	synchronized (this) {
+		notify();
+	}
 }
 
 public void run() {
@@ -75,22 +77,24 @@ public void run() {
 >>
 
 protocol(c) ::= <<
-public synchronized void activate() {
-	notify();
+public void activate() {
+	synchronized (this) {
+		notify();
+	}
 }
 
 public void run() {
 	int k = 0;
 	while (true) {
 		k++;
-		<c.transitions:transition(); separator="\n">
-		if (k > 3) {
-			k = 0;
-			synchronized (this) {
+		synchronized (this) {
+			<c.transitions:transition(); separator="\n">
+			if (k > 3) {
+				k = 0;
 				try { 
 					wait(); 
-				} catch (InterruptedException e) { }
-			}	
+				} catch (InterruptedException e) { }	
+			}
 		}
 	}
 }
