@@ -33,7 +33,7 @@ public class Conjunction implements Formula {
 			if (f instanceof Relation) {
 				if (!((Relation) f).getValue().equals("true"))
 					_clauses.add(f);
-			} else if (!clauses.contains(f)) {
+			} else if (!_clauses.contains(f)) {
 				_clauses.add(f);
 			}
 		}
@@ -43,7 +43,7 @@ public class Conjunction implements Formula {
 		case 1:
 			return _clauses.get(0);
 		default:
-			return new Conjunction(clauses);
+			return new Conjunction(_clauses);
 		}
 	}
 

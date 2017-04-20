@@ -136,7 +136,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 				}
 			}
 			for (Port x : outs) {
-				map.put(x, false);
+				map.put(x, true);
 				Formula eq = new Equality(new Node(p), new Node(x));
 				if (transition == null)
 					transition = eq;
@@ -216,7 +216,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		// Compose the list of RBAs into a single list of rules.
 		Set<Rule> rules = new HashSet<>();
 
-		Set<Rule> marked = new HashSet<>();
+		Set<Rule> marked = new HashSet<>(); // correct?
 
 		for (RulesBasedAutomaton A : list) {
 			for (Rule x : A.getRules()) {
@@ -237,18 +237,12 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 					while (iter.hasNext()) {
 						RulesBasedAutomaton B = iter.next();
 
-						boolean hasOptions = false;
-
-						for (Rule y : B.getRules()) {
-							if (!rule.contains(y) && synchronize(compose(rule), y)) {
+						for (Rule y : B.getRules())
+							if (!rule.contains(y) && synchronize(compose(rule), y))
 								stack.push(y);
-								hasOptions = true;
-							}
-						}
 
-						if (hasOptions) {
-							Rule z = stack.pop();
-							rule.push(z);
+						if (stack.peek() != null) {
+							rule.push(stack.pop());
 							stack.push(null);
 							iter = list.iterator();
 						}
@@ -275,6 +269,45 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		return new RulesBasedAutomaton(rules);
 	}
 
+	public RulesBasedAutomaton compose1(List<RulesBasedAutomaton> components) {
+
+		// Rename all memory cells and put *all* components into a list.
+		List<RulesBasedAutomaton> list = new ArrayList<>();
+
+		List<RulesBasedAutomaton> oldlist = new ArrayList<>(components);
+		oldlist.add(this);
+		int i = 1;
+		for (RulesBasedAutomaton A : oldlist) {
+			Set<Rule> s = new HashSet<Rule>(this.s);
+			Map<String, String> rename = new HashMap<>();
+			for (Rule r : A.getRules()) {
+				for (Variable v : r.getFormula().getFreeVariables()) {
+					if (v instanceof MemCell) {
+						String name = ((MemCell) v).getName();
+						if (!rename.containsKey(name))
+							rename.put(name, "m" + i++);
+					}
+				}
+			}
+			for (Rule r : A.getRules()) {
+				Formula _f = r.getFormula();
+				for (Map.Entry<String, String> entry : rename.entrySet()) {
+					_f = _f.Substitute(new MemCell(entry.getValue(), false), new MemCell(entry.getKey(), false));
+					_f = _f.Substitute(new MemCell(entry.getValue(), true), new MemCell(entry.getKey(), true));
+				}
+				s.add(new Rule(r.getSync(), _f));
+			}
+			list.add(new RulesBasedAutomaton(s));
+		}
+
+		// Compose the list of RBAs into a single list of rules.
+		Set<Rule> rules = new HashSet<>();
+
+		// TODO Graph based approach
+		
+		return new RulesBasedAutomaton(rules);
+	}
+	
 	/**
 	 * Determines whether there exists a port p such that both rules fire p, and
 	 * whether the conjunction is satisfiable.
@@ -288,10 +321,12 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		for (Port p : x.getSync().keySet()) {
 			if (x.getSync().get(p)) {
 				Boolean b = y.getSync().get(p);
-				if (b != null && b.equals(true)) {
-					synchronize = true;
-				} else { 
-					return false;
+				if (b != null) {
+					if (b.equals(true)) {
+						synchronize = true;
+					} else {
+						return false;
+					}
 				}
 			}
 		}

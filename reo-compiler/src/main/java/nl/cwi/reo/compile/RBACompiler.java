@@ -1,8 +1,10 @@
 package nl.cwi.reo.compile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +64,7 @@ public class RBACompiler {
 				doneVariables.add(v);
 		}
 
-		Map<Variable, Term> assignements = new HashMap<Variable, Term>();
+		Map<Variable, Term> assignements = new LinkedHashMap<Variable, Term>();
 		List<Formula> guards = new ArrayList<Formula>();
 
 		int nDoneVariables = -1;
@@ -175,9 +177,12 @@ public class RBACompiler {
 
 		Map<Node, Term> output = new HashMap<Node, Term>();
 
-		Map<MemCell, Term> memory = new HashMap<MemCell, Term>();
+		Map<MemCell, Term> memory = new LinkedHashMap<MemCell, Term>();
 
-		for (Variable v : assignements.keySet()) {
+		List<Variable> keys = new ArrayList<>(assignements.keySet());
+		Collections.reverse(keys);
+		
+		for (Variable v : keys) {
 			if (v instanceof Node) {
 				output.put((Node) v, assignements.get(v));
 			}

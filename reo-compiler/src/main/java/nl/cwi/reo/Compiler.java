@@ -194,6 +194,8 @@ public class Compiler {
 	}
 
 	private void compileRBA() {
+		
+		Long t1 = System.nanoTime();
 
 		// Interpret the Reo program
 		Interpreter<RulesBasedAutomaton> interpreter = new InterpreterRBA(directories, params, monitor);
@@ -230,15 +232,19 @@ public class Compiler {
 		Map<Port, Port> r = new HashMap<Port, Port>();
 		for (Map.Entry<Port, Port> link : program.getConnector().getLinks().entrySet()) {
 			Port p = link.getValue();
-			r.put(p, p.rename("_" + i++));
+			r.put(p, p.rename("_" + i++).hide());
 		}
 		ReoConnector<RulesBasedAutomaton> connector = new ReoConnectorComposite<>(null, "", list).rename(r);
 
+		Long t2 = System.nanoTime();
+		
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();
 		connector = connector.insertNodes(true, false, new RulesBasedAutomaton());
 		connector = connector.integrate();
 
+
+		Long t3 = System.nanoTime();
 		// Build the template.
 		List<Component> components = new ArrayList<Component>();
 		Set<Port> intface = new HashSet<Port>();
@@ -272,9 +278,13 @@ public class Compiler {
 			}
 		}
 
+		Long t4 = System.nanoTime();
+		
 		// Compose the protocol into a single connector.
 		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
 
+		Long t5 = System.nanoTime();
+		
 		// Transform every disjunctive clause into a transition.
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : circuit.getRules()) {
@@ -291,6 +301,8 @@ public class Compiler {
 			transitions.add(t);
 		}
 
+		Long t6 = System.nanoTime();
+		
 		// TODO Partition the set of transitions
 		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
 
@@ -302,23 +314,44 @@ public class Compiler {
 		for (Set<Transition> T : partition) {
 			Map<MemCell, Object> initial = new HashMap<>();
 			Set<Port> ports = new HashSet<>();
-			for (Transition t : T) {
-				ports.addAll(t.getInterface());
+
+			Map<MemCell, TypeTag> tags = new HashMap<>();
+			for (Transition t : T) {				
 				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
-					MemCell x = m.getKey().setType(m.getValue().getTypeTag());
-					initial.put(x, null);
+					MemCell x = m.getKey();
+					if (!tags.containsKey(x) || tags.get(x) == null) {
+						TypeTag tag = m.getValue().getTypeTag();
+						tags.put(x, tag);
+					}
 				}
 			}
+			
+			for (Transition t : T) {
+				ports.addAll(t.getInterface());
+				
+				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
+					initial.put(m.getKey().setType(tags.get(m.getKey())), null);
+				}
+			}
+			
 			components.add(new Protocol("Protocol" + n_protocol++, ports, T, initial));
 		}
+
+		Long t7 = System.nanoTime();
+
+		System.out.println("interpret   " + (t2 - t1)/1000000000 + " seconds");
+		System.out.println("flattening  " + (t3 - t2)/1000000000 + " seconds");
+		System.out.println("workers     " + (t4 - t3)/1000000000 + " seconds");
+		System.out.println("composition " + (t5 - t4)/1000000000 + " seconds");
+		System.out.println("commandify  " + (t6 - t5)/1000000000 + " seconds");
+		System.out.println("template    " + (t7 - t6)/1000000000 + " seconds");
 
 		// Fill in the template
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);
 
 		// Generate Java code from the template
 		String code = template.generateCode(Language.JAVA);
-		System.out.println(code);
-		write(program.getName(), code);
+		write(program.getName() + ".java", code);		
 	}
 
 	private void compileP() {

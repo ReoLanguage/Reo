@@ -10,6 +10,11 @@ public class MyTestComponents {
 			A.put(i);
 	}
 	
+	public static void producer(Output<String> A) {
+		for (int i = 0; i < k; i++)
+			A.put("hello" + i);
+	}
+	
 	public static void consume(Input<Integer> A) {
 		long a = System.nanoTime();
 		for (int i = 0; i < k; i++)

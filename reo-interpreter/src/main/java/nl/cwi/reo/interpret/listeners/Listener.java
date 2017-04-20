@@ -302,7 +302,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		// Get the source code reference
 		Reference s = null;
 		if (ctx.source() != null) {
-			String call = ctx.source().STRING().getText();
+			String call = ctx.source().STRING().getText().replace("\"", "");
 			Language lang;
 			switch (ctx.source().lang.getType()) {
 			case ReoParser.JAVA:

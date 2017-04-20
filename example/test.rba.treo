@@ -21,10 +21,16 @@ syncdrain(a?,b?){
 	{a,b} true
 }
 
-test(a[1..3]?,b[1]!) {
-	{ syncdrain(a[i], a[i+1]) | i : <1..2> }
-	{ fifo(b[i], b[i+1]) | i : <1..2> }
-	{ sync(a[i], b[i]) | i : <1..3> }
+producer(a!) {
+	#RBA {a} true
+	Java:"MyTestComponents.producer"
+}
+
+test(b[1]!) {
+	{ syncdrain(a[i], a[i+1]) | i : <1..250> }
+	{ fifo(b[i+1], b[i]) | i : <1..250> }
+	{ sync(a[i], b[i]) | i : <1..251> }
+	{ producer(a[i]) | i : <1..251> }
 }
 
 test1(a?,b?,c!){
