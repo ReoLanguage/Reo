@@ -184,7 +184,9 @@ public class Compiler {
 	 */
 	public boolean write(String name, String code) {
 		try {
-			FileWriter out = new FileWriter(outdir + File.separator + name);
+			File file = new File(outdir + File.separator + name);
+			file.getParentFile().mkdirs();
+			FileWriter out = new FileWriter(file);
 			out.write(code);
 			out.close();
 		} catch (IOException e) {
@@ -339,12 +341,12 @@ public class Compiler {
 
 		Long t7 = System.nanoTime();
 
-		System.out.println("interpret   " + (t2 - t1)/1000000000 + " seconds");
-		System.out.println("flattening  " + (t3 - t2)/1000000000 + " seconds");
-		System.out.println("workers     " + (t4 - t3)/1000000000 + " seconds");
-		System.out.println("composition " + (t5 - t4)/1000000000 + " seconds");
-		System.out.println("commandify  " + (t6 - t5)/1000000000 + " seconds");
-		System.out.println("template    " + (t7 - t6)/1000000000 + " seconds");
+//		System.out.println("interpret   " + (t2 - t1)/1000000000 + " seconds");
+//		System.out.println("flattening  " + (t3 - t2)/1000000000 + " seconds");
+//		System.out.println("workers     " + (t4 - t3)/1000000000 + " seconds");
+//		System.out.println("composition " + (t5 - t4)/1000000000 + " seconds");
+//		System.out.println("commandify  " + (t6 - t5)/1000000000 + " seconds");
+//		System.out.println("template    " + (t7 - t6)/1000000000 + " seconds");
 
 		// Fill in the template
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);

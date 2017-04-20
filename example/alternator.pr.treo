@@ -1,0 +1,15 @@
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+producer(a!) {
+	#PR identity(;a)
+	Java:"MyTestComponents.producer"
+}
+
+alternator(b[1]!) {
+	{ syncdrain(a[i], a[i+1]) | i : <1..50> }
+	{ fifo1(b[i+1], b[i]) | i : <1..50> }
+	{ sync(a[i], b[i]) | i : <1..51> }
+	{ producer(a[i]) | i : <1..51> }
+}
