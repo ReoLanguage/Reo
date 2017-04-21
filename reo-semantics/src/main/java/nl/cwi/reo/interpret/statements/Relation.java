@@ -4,24 +4,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
+import java.util.Stack;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.instances.Instance;
+import nl.cwi.reo.interpret.terms.ListExpression;
+import nl.cwi.reo.interpret.terms.Range;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.terms.Tuple;
+import nl.cwi.reo.interpret.terms.VariableTermExpression;
 import nl.cwi.reo.interpret.values.BooleanValue;
 import nl.cwi.reo.interpret.values.DecimalValue;
 import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
@@ -68,16 +75,54 @@ public final class Relation implements PredicateExpression {
 	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
 
-		List<Scope> scopes = new ArrayList<Scope>();
+//		List<Scope> scopes = new ArrayList<Scope>();
+//
+//		List<Iterator<Term>> iters = new ArrayList<Iterator<Term>>();
+//		for (TermExpression arg : arguments) {
+//			List<Term> terms = arg.evaluate(s, m);
+//			if (terms == null)
+//				return null;
+//			iters.add(terms.iterator());
+//		}
 
-		List<Iterator<Term>> iters = new ArrayList<Iterator<Term>>();
-		for (TermExpression arg : arguments) {
-			List<Term> terms = arg.evaluate(s, m);
-			if (terms == null)
-				return null;
-			iters.add(terms.iterator());
-		}
-
+ 		List<Scope> scopes = new ArrayList<Scope>();
+ 
+ 		List<Iterator<Term>> iters = new ArrayList<Iterator<Term>>();
+ 		Stack<TermExpression> queue = new Stack<TermExpression>();
+ 		queue.addAll(arguments);
+ 		int counter=0;
+ 		int size = 0;
+ 		
+ 		while(!queue.isEmpty()){
+ //		for (TermExpression arg : arguments) {
+ 			TermExpression arg=queue.pop();
+ 			if(arg instanceof VariableTermExpression){
+ //				for(TermExpression t : ((VariableTermExpression) arg).getIndices()){
+ //					
+ //				}
+ 				if(((VariableTermExpression) arg).getIndices()!=null && size!=0){
+ 					TermExpression t1 = ((VariableTermExpression) arg).getIndices().get(0);
+ 					if(t1 instanceof Range){
+ 						Scope scope = ((Range) t1).findParamFromSize(size);
+ 						s.putAll(scope);
+ 					}
+ 				}
+ 			}
+ 			List<Term> terms = arg.evaluate(s, m);
+ 			if (terms == null){
+ 				counter++;
+ 				queue.add(arg);
+ 			}
+ 			else{
+ 				counter=0;
+ 				iters.add(terms.iterator());
+ 			}
+ 			if(arg instanceof ListExpression)
+ 				size=terms.size();
+ 			if(counter>queue.size())
+ 				return null;
+ 		}
+		
 		while (Tuple.hasNext(iters)) {
 			List<Term> args = Tuple.next(iters);
 
@@ -85,9 +130,9 @@ public final class Relation implements PredicateExpression {
 			case EQ:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier && args.get(1) instanceof Value) {
-						scopes.add(s.extend((Identifier) args.get(0), (Value) args.get(1)));
+						s=s.extend((Identifier) args.get(0), (Value) args.get(1));
 					} else if (args.get(1) instanceof Identifier && args.get(0) instanceof Value) {
-						scopes.add(s.extend((Identifier) args.get(1), (Value) args.get(0)));
+						s=s.extend((Identifier) args.get(1), (Value) args.get(0));
 					} else if (args.get(0) instanceof IntegerValue && args.get(0) instanceof IntegerValue
 							&& ((IntegerValue) args.get(0)).getValue() == ((IntegerValue) args.get(1)).getValue())
 						return Arrays.asList(s);
@@ -97,7 +142,7 @@ public final class Relation implements PredicateExpression {
 				} else {
 					m.add(location, "= takes 2 arguments");
 				}
-				return scopes;
+				break;
 			case GEQ:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
@@ -111,7 +156,7 @@ public final class Relation implements PredicateExpression {
 				} else {
 					m.add(location, ">= takes 2 arguments");
 				}
-				return new ArrayList<Scope>();
+				break;
 			case GT:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
@@ -125,7 +170,7 @@ public final class Relation implements PredicateExpression {
 				} else {
 					m.add(location, "> takes 2 arguments");
 				}
-				return new ArrayList<Scope>();
+				break;
 			case LEQ:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
@@ -139,7 +184,7 @@ public final class Relation implements PredicateExpression {
 				} else {
 					m.add(location, "<= takes 2 arguments");
 				}
-				return new ArrayList<Scope>();
+				break;
 			case LT:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
@@ -153,7 +198,7 @@ public final class Relation implements PredicateExpression {
 				} else {
 					m.add(location, "< takes 2 arguments");
 				}
-				return new ArrayList<Scope>();
+				break;
 			case NEQ:
 				if (args.size() == 2) {
 					if (args.get(0) instanceof Identifier || args.get(0) instanceof Identifier)
@@ -179,13 +224,13 @@ public final class Relation implements PredicateExpression {
 				} else {
 					m.add(location, "!= takes 2 arguments");
 				}
-				return new ArrayList<Scope>();
+				break;
 			default:
 				throw new IllegalArgumentException("Undefined operation " + symbol + ".");
 			}
 		}
-
-		return new ArrayList<Scope>();
+		scopes.add(s);
+		return scopes;
 	}
 
 	/**
@@ -198,7 +243,27 @@ public final class Relation implements PredicateExpression {
 			vars.addAll(t.getVariables());
 		return vars;
 	}
+	/**
+	 * {@inheritDoc}
+	 */
+	public Set<Identifier> getLocalVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		for (TermExpression t : arguments)
+			if(t instanceof VariableTermExpression)
+				vars.addAll(t.getVariables());
+		return vars;
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public Set<Identifier> getGlobalVariables() {
+		Set<Identifier> vars = new HashSet<Identifier>();
+		for (TermExpression t : arguments)
+			if(!(t instanceof VariableTermExpression))
+				vars.addAll(t.getVariables());
+		return vars;
+	}
 	/**
 	 * {@inheritDoc}
 	 */

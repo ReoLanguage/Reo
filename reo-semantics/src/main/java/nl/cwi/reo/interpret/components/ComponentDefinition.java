@@ -50,10 +50,11 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 	@Nullable
 	public Component<T> evaluate(Scope s, Monitor m) {
 		Set<Identifier> deps = set.getVariables();
+		Set<Identifier> params = sign.getParams();
 		Scope scope = new Scope();
 		Value v;
 		for (Identifier x : deps) {
-			if ((v = s.get(x)) != null)
+			if ((v = s.get(x)) != null || params.contains(x))
 				scope.put(x, v);
 			else{
 				m.add("Variable " + x.toString() + " is not defined.");

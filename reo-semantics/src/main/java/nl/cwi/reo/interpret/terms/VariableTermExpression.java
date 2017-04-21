@@ -55,6 +55,10 @@ public class VariableTermExpression implements TermExpression {
 		return variable.getVariables();
 	}
 
+	public List<TermExpression> getIndices() {
+		return variable.getIndices();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

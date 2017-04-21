@@ -2,9 +2,11 @@ package nl.cwi.reo.interpret.signatures;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
@@ -19,6 +21,7 @@ import nl.cwi.reo.interpret.values.DecimalValue;
 import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.NodeExpression;
 import nl.cwi.reo.interpret.variables.Parameter;
 import nl.cwi.reo.interpret.variables.ParameterExpression;
@@ -62,6 +65,15 @@ public final class SignatureExpression implements ParameterType {
 		this.location = location;
 	}
 
+	public Set<Identifier> getParams(){
+		Set<Identifier> l = new HashSet<Identifier>();
+		for(ParameterExpression exp : params){
+			l.addAll(exp.getVariables());
+		}
+		return l;
+	}
+	
+	
 	/**
 	 * Evaluates this interface for a given list of parameter values and a given
 	 * list of ports.

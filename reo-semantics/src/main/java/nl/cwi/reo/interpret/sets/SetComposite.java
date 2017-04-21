@@ -15,6 +15,7 @@ import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.instances.InstanceExpression;
 import nl.cwi.reo.interpret.statements.TruthValue;
 import nl.cwi.reo.interpret.statements.PredicateExpression;
+import nl.cwi.reo.interpret.statements.Relation;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.values.StringValue;
@@ -145,7 +146,17 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 		Set<Identifier> vars = new HashSet<Identifier>();
 		for (InstanceExpression<T> I : elements)
 			vars.addAll(I.getVariables());
-		vars.removeAll(predicate.getVariables());
+		if(predicate instanceof Relation){
+			for(Identifier i : ((Relation)predicate).getLocalVariables())
+				if(vars.contains(i))
+					vars.remove(i);
+				else
+					vars.add(i);
+			vars.addAll(((Relation)predicate).getGlobalVariables());
+		}
+		//TODO : implement getGlobalVariable and getLocalVariable for all predicates
+		else
+			vars.removeAll(predicate.getVariables());
 		return vars;
 	}
 
