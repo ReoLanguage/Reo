@@ -33,6 +33,8 @@ public class RBACompiler {
 
 		if (g instanceof Conjunction)
 			literals = ((Conjunction) g).getClauses();
+		if (g instanceof Equality)
+			literals.add(g);
 
 		// Remove from literals all equalities as x?=x!
 		for (Formula l : literals) {
@@ -179,9 +181,10 @@ public class RBACompiler {
 
 		Map<MemCell, Term> memory = new LinkedHashMap<MemCell, Term>();
 
+		assignements = sort(assignements);
 		List<Variable> keys = new ArrayList<>(assignements.keySet());
-		Collections.reverse(keys);
 		
+//		Collections.reverse(keys);		
 		for (Variable v : keys) {
 			if (v instanceof Node) {
 				output.put((Node) v, assignements.get(v));
@@ -192,6 +195,22 @@ public class RBACompiler {
 		}
 
 		return new Transition(guard, output, memory, allInputPorts);
+	}
+	
+	public static Map<Variable, Term> sort(Map<Variable, Term> assignements ){
+		Map<Variable, Term> assign = new LinkedHashMap<Variable,Term>();
+		List<Variable> var = new ArrayList<Variable>();
+		for(Variable v : assignements.keySet()){
+			if(assignements.get(v) instanceof Function && ((Function)assignements.get(v)).getValue().equals("null")){
+				var.add(var.size(), v);
+			}
+			else
+				var.add(0,v);
+		}
+		for(Variable v : var){
+			assign.put(v, assignements.get(v));
+		}
+		return assign;
 	}
 
 }

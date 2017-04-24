@@ -6,7 +6,6 @@ import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.ports.Port;
 
-@Deprecated
 public class GraphNode {
 
 	private List<GraphNode> childs;
@@ -64,9 +63,9 @@ public class GraphNode {
 		boolean hasEdge = false;
 		for (Port p : rule.getSync().keySet()) {
 			if (rule.getSync().get(p)) {
-				if (x.getSync().get(p) == true) {
+				if (x.getSync().get(p)!=null && x.getSync().get(p)) {
 					hasEdge = true;
-				} else { 
+				} else if(x.getSync().get(p)!=null && !x.getSync().get(p)){ 
 					return false;
 				}
 			}

@@ -283,7 +283,12 @@ public class Compiler {
 		Long t4 = System.nanoTime();
 		
 		// Compose the protocol into a single connector.
-		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
+		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose1(protocols);
+//		System.out.println("Graph based : \n" + circuit );
+//		circuit = new RulesBasedAutomaton().compose(protocols);
+//		System.out.println(circuit+"\n");
+//		RulesBasedAutomaton circuit2 = new RulesBasedAutomaton().compose(protocols);
+//		System.out.println("List based : \n" +circuit2);
 
 		Long t5 = System.nanoTime();
 		
@@ -341,12 +346,12 @@ public class Compiler {
 
 		Long t7 = System.nanoTime();
 
-//		System.out.println("interpret   " + (t2 - t1)/1000000000 + " seconds");
-//		System.out.println("flattening  " + (t3 - t2)/1000000000 + " seconds");
-//		System.out.println("workers     " + (t4 - t3)/1000000000 + " seconds");
-//		System.out.println("composition " + (t5 - t4)/1000000000 + " seconds");
-//		System.out.println("commandify  " + (t6 - t5)/1000000000 + " seconds");
-//		System.out.println("template    " + (t7 - t6)/1000000000 + " seconds");
+		System.out.println("interpret   " + (t2 - t1)/1000000000 + " seconds");
+		System.out.println("flattening  " + (t3 - t2)/1000000000 + " seconds");
+		System.out.println("workers     " + (t4 - t3)/1000000000 + " seconds");
+		System.out.println("composition " + (t5 - t4)/1000000000 + " seconds");
+		System.out.println("commandify  " + (t6 - t5)/1000000000 + " seconds");
+		System.out.println("template    " + (t7 - t6)/1000000000 + " seconds");
 
 		// Fill in the template
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);

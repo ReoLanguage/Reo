@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
@@ -302,11 +304,24 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 
 		// Compose the list of RBAs into a single list of rules.
 		Set<Rule> rules = new HashSet<>();
+		for(RulesBasedAutomaton A : list){
+			rules.addAll(A.getRules());
+		}
+		Graph G = new Graph(rules);
+		
+//		G=G.addHyperLinks();
+
+		G=G.isolate1();
+		
+		Set<Rule> s = G.getRules();
+		
 
 		// TODO Graph based approach
 		
-		return new RulesBasedAutomaton(rules);
+		return new RulesBasedAutomaton(s);
 	}
+	
+	
 	
 	/**
 	 * Determines whether there exists a port p such that both rules fire p, and

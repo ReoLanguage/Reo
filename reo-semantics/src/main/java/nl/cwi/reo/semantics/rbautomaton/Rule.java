@@ -66,19 +66,20 @@ public class Rule {
 	 * @param r
 	 * @return
 	 */
-	public Rule merge(Rule r) {
-		/*
-		 * This method assumes that both rules are in Conjunctive Normal Form
-		 */
+	public boolean canSync(Rule r) {
 
-		// List<Formula> f = new ArrayList<Formula>();
-		// Map<Port,Role> map = new HashMap<Port,Role>();
-		//
-		// f.add(r.getFormula());
-		// for(Port p : )
-		return null;
+		boolean hasEdge = false;
+		for (Port p : sync.keySet()) {
+			if (sync.get(p)) {
+				if (r.getSync().get(p)!=null && r.getSync().get(p)) {
+					hasEdge = true;
+				} else if(r.getSync().get(p)!=null && !r.getSync().get(p)){ 
+					return false;
+				}
+			}
+		}
+		return hasEdge;
 	}
-
 	/**
 	 * {@inheritDoc}
 	 */
