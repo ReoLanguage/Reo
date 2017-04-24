@@ -124,28 +124,28 @@ public class Graph {
 		List<GraphNode> newNodes = new ArrayList<GraphNode>();
 		
 		Set<Set<Rule>> newRuleSet = new HashSet<>();
-//		System.out.println("Number of nodes : " + n.size());
 		int connectedParts = 0;
 		List<Set<GraphNode>> listLeaves = new ArrayList<Set<GraphNode>>();
 		listLeaves.add(new HashSet<GraphNode>());
 		int j = 0;
 		
+		//Go over all nodes in the graph, find connected parts and all leaf nodes.
 		for (GraphNode node : n) {
-			Set<Rule> newRule = new HashSet<>();
-			if(node.getChilds().size()==1 && !node.isVisited()){
-//				System.out.println(node.toString() + " is a leaf ");
-				listLeaves.get(j).add(node);
-			}
 			Queue<GraphNode> queue = new LinkedList<GraphNode>();
 			GraphNode child = null;
+
+			//If the node has one child, it's a leaf
+			if(node.getChilds().size()==1 && !node.isVisited()){
+				listLeaves.get(j).add(node);
+			}
 			if(!node.isVisited()){
 				queue.addAll(node.getChilds());
 				child = queue.poll();
 			}
+
 			node.setFlag(true);
-//			if(child != null)
-//				newRule.add(child.getRule());
-			
+	
+			//Go through all child of the node, until there is no child, save the node if it is a leaf, and count the nodes of connected parts.
 			while (!queue.isEmpty() || (child != null && !child.isVisited())) {
 				connectedParts++;
 				child.setFlag(true);
@@ -156,29 +156,27 @@ public class Graph {
 						queue.add(n);
 					}
 				}
-//				if(i>1)
-//					System.out.println(child.toString() + " has " + i + " childs ");
+				
+				//It's a leaf, add it to the listLeave
 				if(i==1){
-//					System.out.println(child.toString() + " is a leaf ");
 					listLeaves.get(j).add(child);
 				}
 				for (GraphNode n : child.getParents())
 					if (!n.isVisited() && !queue.contains(n))
 						queue.add(n);
-//				newRule.add(child.getRule());
 				child = queue.poll();
 			}
 			if(connectedParts != 0){
-//				System.out.print("\n Connex part of " + (connectedParts+1) + " nodes \n");
 				listLeaves.add(new HashSet<GraphNode>());
 				j++;
 			}
 			connectedParts=0;
-//			newRuleSet.add(newRule);
 		}
+		
 		resetFlags();
-
 		newRuleSet = new HashSet<>();
+		
+		//Go through all leaves, and build the new list of rules
 		for(Set<GraphNode> setNode : listLeaves){
 			for(GraphNode node : setNode){
 				Set<Rule> newRule = new HashSet<>();
@@ -195,12 +193,12 @@ public class Graph {
 				if(child != null)
 					newRule.add(child.getRule());
 				
+				//A rule is added to the list if the node is a child, and if its rule compose with the new big rule
 				while (!queue.isEmpty() || (child != null && !child.isVisited())) {
 					connectedParts++;
 					child.setFlag(true);
 					for (GraphNode n : child.getChilds()){
 						if (!n.isVisited() && !queue.contains(n) && n.getRule().canSync(merge(new ArrayList<>(newRule)))){
-//							n.setFlag(true);
 							newRule.add(n.getRule());
 							queue.add(n);
 						}
@@ -208,35 +206,13 @@ public class Graph {
 					child = queue.poll();
 				}
 				resetFlags();
-//				for(GraphNode g : setNode){
-//					g.setFlag(false);
-//				}
 				newRuleSet.add(newRule);
 			}
 		}
 		
 		for (Set<Rule> newRule : newRuleSet)
 			newNodes.add(new GraphNode(merge(new ArrayList<>(newRule)), new ArrayList<>(), new ArrayList<>()));
-		
-//		for (GraphNode node : n) {
-//			List<Rule> listRules = new ArrayList<Rule>();
-//			Queue<GraphNode> queue = new LinkedList<GraphNode>(node.getChilds());
-//			GraphNode child = queue.poll();
-//			if (child != null) {
-//				while (!queue.isEmpty() || (child != null && !child.isVisited())) {
-//					child.setFlag(true);
-//					for (GraphNode n : child.getChilds())
-//						if (!n.isVisited())
-//							queue.add(n);
-//					listRules.add(child.getRule());
-//					child = queue.poll();
-//				}
-//				newNodes.add(new GraphNode(merge(listRules), new ArrayList<GraphNode>(), new ArrayList<GraphNode>()));
-//			} else {
-//				newNodes.add(node);
-//			}
-//			resetFlags();
-//		}
+
 		return new Graph(newNodes);
 
 	}
