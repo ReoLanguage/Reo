@@ -149,6 +149,9 @@ public class Equality implements Formula {
 			if (b != null)
 				s1 = new Node(b);
 		}
+		if(t1 instanceof Function) {
+			s1 = t1.rename(links);
+		}
 
 		Term s2 = t2;
 		if (t2 instanceof Node) {
@@ -171,7 +174,13 @@ public class Equality implements Formula {
 
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		return this;
+		Term t_1 = t1;
+		Term t_2 = t2;
+		if(t1 instanceof Function)
+			t_1 = ((Function) t1).evaluate(s, m);
+		if(t2 instanceof Function)
+			t_2 = ((Function) t2).evaluate(s, m);
+		return new Equality(t_1,t_2);
 	}
 
 	@Override

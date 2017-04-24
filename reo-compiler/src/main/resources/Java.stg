@@ -137,7 +137,11 @@ formula(f) ::= <<
 >>
 
 term(t) ::= <<
-<if(t.function)><t.value><elseif(t.constant)><t.name><elseif(t.node)><t.name>.get()<elseif(t.memory)><t.name><else><t.name><endif>
+<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.get()<elseif(t.memory)><t.name><else><t.name><endif>
+>>
+
+function(t) ::=<<
+<t.value>(<t.args:{p | <if(p.input)> <p.name>.get() <else> <p.name> <endif>}; separator=",">)
 >>
 
 

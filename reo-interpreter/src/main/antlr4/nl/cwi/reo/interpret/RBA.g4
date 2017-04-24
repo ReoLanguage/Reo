@@ -20,6 +20,7 @@ rba_term	: NAT 										#rba_nat
 	      	| BOOL										#rba_bool
           	| STRING									#rba_string
           	| DEC   									#rba_decimal
+          	| ID '(' rba_term (',' rba_term)* ')'		#rba_function
           	| '$' ID  									#rba_memorycellIn
           	| '$' ID '\''	 							#rba_memorycellOut
           	| 'null' 									#rba_null 

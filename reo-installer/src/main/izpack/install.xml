@@ -17,11 +17,16 @@
   <guiprefs width="800" height="600" resizable="no">
     <modifier key="useHeadingPanel" value="yes" />
   </guiprefs>
- 
+
+   <resources>
+        <res id="ProcessPanel.Spec.xml" src="ProcessPanel.Spec.xml"/>
+   </resources>
+
   <panels>
     <panel classname="TargetPanel"/>
     <panel classname="PacksPanel"/>
     <panel classname="InstallPanel"/>
+    <panel classname="ProcessPanel"/>
     <panel classname="FinishPanel"/>
   </panels>
  
@@ -29,7 +34,12 @@
     <pack name="Compiler" required="yes">
       <description>The Reo compiler</description>
       <singlefile src="lib/reo-runtime-java.jar" target="${INSTALL_PATH}/bin/reo-runtime-java.jar" override="true" />
+      <file src="installer.sh" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/installer.sh" stage="never" keep="true">
+          <os family="unix" />
+      </executable>
+      <file src="installer.bat" targetdir="$INSTALL_PATH" override="true" />
     </pack>
   </packs>
- 
+
 </izpack:installation>

@@ -1,0 +1,29 @@
+sync(a?,b!){
+        #RBA
+        {a,b} a=b
+}
+lossy(a?,b!){
+        #RBA
+        {a,b} a=b
+	{a,~b} true
+}
+producer(a!String) {
+        #RBA {a} true
+        Java:"Workers2.producer"
+}
+
+consumer(a?String) {
+        #RBA {a} true
+        Java:"Workers2.consumer"
+}
+
+test() {
+ //       { sync(a[i], b) | i : <1..N> }
+        { lossy(a[i], b) | i : <1..N> }
+        { producer(a[i]) | i : <1..N> }
+        consumer(b)
+   |
+        N=5
+}
+
+

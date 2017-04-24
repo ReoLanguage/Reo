@@ -135,7 +135,7 @@ public class Graph {
 			GraphNode child = null;
 
 			//If the node has one child, it's a leaf
-			if(node.getChilds().size()==1 && !node.isVisited()){
+			if(node.getChilds().size()<1 && !node.isVisited()){
 				listLeaves.get(j).add(node);
 			}
 			if(!node.isVisited()){

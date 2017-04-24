@@ -8,8 +8,11 @@ import java.util.Set;
 
 import org.stringtemplate.v4.ST;
 
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.util.Monitor;
 
 public class Function implements Term {
 	
@@ -76,6 +79,22 @@ public class Function implements Term {
 		return new Function(name, value, list);
 	}
 
+	public Term evaluate(Scope s, Monitor m){
+		String valueEval = "";
+		if(value instanceof String && s.get(new Identifier((String)value))!=null){
+			valueEval = s.get(new Identifier((String)value)).toString();
+		}
+		else
+			m.add("Cannot evaluate this function");
+		
+		if(valueEval.substring(0, 1).equals("\""))
+			valueEval = valueEval.substring(1, valueEval.length());
+		if(valueEval.substring(valueEval.length()-1,valueEval.length()).equals("\""))
+			valueEval = valueEval.substring(0, valueEval.length()-1);
+		
+		return new Function(name,valueEval, args);
+	}
+	
 	@Override
 	public Set<Variable> getFreeVariables() {
 		Set<Variable> vars = new HashSet<Variable>();

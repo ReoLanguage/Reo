@@ -20,6 +20,7 @@ import nl.cwi.reo.interpret.ReoParser.Rba_defContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_equalityContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_formulaContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_inequalityContext;
+import nl.cwi.reo.interpret.ReoParser.Rba_functionContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_memorycellInContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_memorycellOutContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_natContext;
@@ -28,6 +29,7 @@ import nl.cwi.reo.interpret.ReoParser.Rba_parameterContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_ruleContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_stringContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_syncFireContext;
+import nl.cwi.reo.interpret.ReoParser.Rba_termContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_syncBlockContext;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
@@ -151,6 +153,13 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 
 	public void exitRba_decimal(Rba_decimalContext ctx) {
 		term.put(ctx, new Function("constant", Double.parseDouble(ctx.DEC().getText()), new ArrayList<Term>()));
+	}
+	public void exitRba_function(Rba_functionContext ctx) {
+		List<Term> args = new ArrayList<Term>();
+		for( Rba_termContext arg : ctx.rba_term()){
+			args.add(term.get(arg));
+		}
+		term.put(ctx, new Function("n-ary function",ctx.ID().getText(),args));
 	}
 
 	public void exitRba_parameter(Rba_parameterContext ctx) {
