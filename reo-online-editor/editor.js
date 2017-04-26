@@ -352,16 +352,19 @@
       origTop = p.top;
       return;
     }
+    if (mode == 'select') {
+      
+    }
+    if (mode == 'component') {
+      var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
+      canvas.setActiveObject(comp);
+    }
     if (mode == 'sync') {
       canvas.deactivateAll();
       var line = drawLine(pointer.x,pointer.y,pointer.x,pointer.y);
       snapToComponent(line.circle1,main);
       canvas.setActiveObject(line.circle2);
       updateLine(line,2);      
-    }
-    if (mode == 'component') {
-      var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
-      canvas.setActiveObject(comp);
     }
   }); //mouse:down
   

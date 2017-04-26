@@ -4,6 +4,22 @@
   var active, isDown, origX, origY, origLeft, origTop;
   var mode = 'select';
   var id = '0';
+  
+  fabric.Node = fabric.util.createClass(fabric.Circle, {
+    type: 'node',
+    class: 'node',
+    component: '',
+    id: '',
+    
+    initialize: function (options) {
+      options = options || {};
+      this.callSuper('initialize', options);
+    },
+    
+    _render: function (ctx) {
+      this.callSuper('_render', ctx);
+    }
+  });
 
  var rect = new fabric.Rect({
     left: 100,
@@ -24,7 +40,7 @@
   
   canvas.add(rect);
 
-  var c = new fabric.Circle({
+  var c = new fabric.Node({
     left: 200,
     top: 200,
     strokeWidth: 5,
@@ -46,6 +62,8 @@
     origY = pointer.y;
     console.log('origX: ' + origX + ' origY: ' + origY);
     var p = canvas.getActiveObject();
+    if (p)
+      console.log(p);
     if (p && p.class == 'component') {
       var group = new fabric.Group([ p.clone() ], {
         left: p.left,
@@ -56,11 +74,11 @@
       canvas.forEachObject(function(obj) {
         if (obj.class != 'component' && obj.component == p) {
           group.addWithUpdate(obj.clone());
-          canvas.remove(obj);        
+          canvas.remove(obj);
         }
       });
       canvas.remove(p);
-      canvas.clear().renderAll();
+      canvas.renderAll();
       canvas.add(group);
       canvas.setActiveObject(group);
       origLeft = group.left;
