@@ -3,8 +3,10 @@ package nl.cwi.reo.interpret.listeners;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
@@ -27,6 +29,7 @@ import nl.cwi.reo.interpret.ReoParser.Rba_natContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_nullContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_parameterContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_ruleContext;
+import nl.cwi.reo.interpret.ReoParser.Rba_initialContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_stringContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_syncFireContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_termContext;
@@ -56,6 +59,7 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 	private ParseTreeProperty<Rule> rules = new ParseTreeProperty<>();
 
 	private Map<Port, Boolean> mapPorts = new HashMap<>();
+	private Map<Term, Term> initial = new HashMap<>();
 	private final Term asterix = new Function("*", null, new ArrayList<>());
 
 	public ListenerRBA(Monitor m) {
@@ -64,6 +68,9 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 
 	public void exitAtom(AtomContext ctx) {
 		atoms.put(ctx, automaton.get(ctx.rba()));
+	}
+	public void enterAtom(AtomContext ctx){
+		initial = new HashMap<>();
 	}
 
 	/*
@@ -75,7 +82,7 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 		for (Rba_ruleContext rbaContext : ctx.rba_rule()) {
 			s.add(rules.get(rbaContext));
 		}
-		automaton.put(ctx, new RulesBasedAutomaton(s));
+		automaton.put(ctx, new RulesBasedAutomaton(s,initial));
 	}
 
 	/*
@@ -88,6 +95,13 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 
 	public void exitRba_rule(Rba_ruleContext ctx) {
 		rules.put(ctx, new Rule(mapPorts, rba_formula.get(ctx.rba_formula())));
+	}
+
+	public void exitRba_initial(Rba_initialContext ctx) {
+		Queue<Rba_termContext> queue = new LinkedList<Rba_termContext>(ctx.rba_term());
+		while(!queue.isEmpty()){
+			initial.put(term.get(queue.poll()), term.get(queue.poll()));
+		}
 	}
 
 	/*

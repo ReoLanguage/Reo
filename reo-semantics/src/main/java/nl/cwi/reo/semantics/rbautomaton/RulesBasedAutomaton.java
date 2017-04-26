@@ -6,10 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
@@ -19,15 +17,23 @@ import org.stringtemplate.v4.ST;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.values.BooleanValue;
+import nl.cwi.reo.interpret.values.DecimalValue;
+import nl.cwi.reo.interpret.values.IntegerValue;
+import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Relation;
+import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
 
@@ -35,11 +41,13 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 
 	private final Set<Rule> s;
 
+	private final Map<Term,Term> initial;
 	/**
 	 * Constructs an automaton, with an empty set of rules.
 	 */
 	public RulesBasedAutomaton() {
 		this.s = new HashSet<Rule>();
+		initial = new HashMap<Term,Term>();
 	}
 
 	/**
@@ -50,6 +58,19 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 */
 	public RulesBasedAutomaton(Set<Rule> s) {
 		this.s = s;
+		this.initial = new HashMap<Term,Term>();
+	}
+	
+	
+	/**
+	 * Constructs a new automaton from a given set of rules and initial values.
+	 * 
+	 * @param f
+	 *            formula
+	 */
+	public RulesBasedAutomaton(Set<Rule> s, Map<Term,Term> initial) {
+		this.s = s;
+		this.initial = initial;
 	}
 
 	/**
@@ -59,6 +80,10 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 */
 	public Set<Rule> getRules() {
 		return s;
+	}
+	
+	public Map<Term,Term> getInitials(){
+		return initial;
 	}
 	
 	@Deprecated
@@ -80,7 +105,20 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		for (Rule r : this.s) {
 			setRules.add(r.evaluate(s, m));
 		}
-		return new RulesBasedAutomaton(setRules);
+		for(Term t : initial.keySet()){
+			if(s.get(new Identifier(initial.get(t).toString()))!=null){
+				Value v = s.get(new Identifier(initial.get(t).toString()));
+				if(v instanceof StringValue)
+					initial.put(t,new Function("constant",((StringValue) v).getValue(),new ArrayList<Term>()));
+				if(v instanceof BooleanValue)
+					initial.put(t,new Function("constant",((BooleanValue) v).getValue(),new ArrayList<Term>()));
+				if(v instanceof IntegerValue)
+					initial.put(t,new Function("constant",((IntegerValue) v).getValue(),new ArrayList<Term>()));
+				if(v instanceof DecimalValue)
+					initial.put(t,new Function("constant",((DecimalValue) v).getValue(),new ArrayList<Term>()));
+			}
+		}
+		return new RulesBasedAutomaton(setRules,initial);
 	}
 
 	/**
@@ -94,6 +132,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		}
 		return p;
 	}
+	
 
 	/**
 	 * {@inheritDoc}
@@ -148,7 +187,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 			rules.add(new Rule(map, transition));
 		}
 
-		return new RulesBasedAutomaton(rules);
+		return new RulesBasedAutomaton(rules,initial);
 	}
 
 	public RulesBasedAutomaton getDefault(Set<Port> ports) {
@@ -177,7 +216,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		for (Rule r : s) {
 			setRules.add(r.rename(links));
 		}
-		return new RulesBasedAutomaton(setRules);
+		return new RulesBasedAutomaton(setRules,initial);
 	}
 
 	/**
@@ -212,7 +251,12 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 				}
 				s.add(new Rule(r.getSync(), _f));
 			}
-			list.add(new RulesBasedAutomaton(s));
+			for(Term t : A.getInitials().keySet()){
+				if(t instanceof MemCell){
+					initial.put(new MemCell(rename.get(((MemCell) t).getName()),((MemCell) t).hasPrime()), A.getInitials().get(t));
+				}
+			}
+			list.add(new RulesBasedAutomaton(s,initial));
 		}
 
 		// Compose the list of RBAs into a single list of rules.
@@ -268,14 +312,13 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 			}
 		}
 
-		return new RulesBasedAutomaton(rules);
+		return new RulesBasedAutomaton(rules,initial);
 	}
 
 	public RulesBasedAutomaton compose1(List<RulesBasedAutomaton> components) {
 
 		// Rename all memory cells and put *all* components into a list.
 		List<RulesBasedAutomaton> list = new ArrayList<>();
-
 		List<RulesBasedAutomaton> oldlist = new ArrayList<>(components);
 		oldlist.add(this);
 		int i = 1;
@@ -299,26 +342,27 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 				}
 				s.add(new Rule(r.getSync(), _f));
 			}
-			list.add(new RulesBasedAutomaton(s));
+			for(Term t : A.getInitials().keySet()){
+				if(t instanceof MemCell){
+					initial.put(new MemCell(rename.get(((MemCell) t).getName()),((MemCell) t).hasPrime()), A.getInitials().get(t));
+				}
+			}
+			list.add(new RulesBasedAutomaton(s,initial));
 		}
 
 		// Compose the list of RBAs into a single list of rules.
 		Set<Rule> rules = new HashSet<>();
+		Map<Term,Term> initialValue = new HashMap<Term,Term>();
 		for(RulesBasedAutomaton A : list){
 			rules.addAll(A.getRules());
+			initialValue.putAll(A.initial);
 		}
+
 		Graph G = new Graph(rules);
-		
-//		G=G.addHyperLinks();
-
 		G=G.isolate1();
-		
 		Set<Rule> s = G.getRules();
-		
 
-		// TODO Graph based approach
-		
-		return new RulesBasedAutomaton(s);
+		return new RulesBasedAutomaton(s,initialValue);
 	}
 	
 	
@@ -344,6 +388,9 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 					}
 				}
 			}
+			else
+				if(y.getSync().get(p)!=null && y.getSync().get(p))
+					return false;
 		}
 		return synchronize;
 	}
@@ -390,7 +437,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 					g = new Existential(new Node(p), g);
 			setRules.add(new Rule(r.getSync(), g));
 		}
-		return new RulesBasedAutomaton(setRules);
+		return new RulesBasedAutomaton(setRules,initial);
 	}
 
 }

@@ -2,7 +2,8 @@ grammar RBA;
 
 import Tokens;
 
-rba      	: 	'#RBA' rba_rule* ;
+rba      	: 	'#RBA' (rba_initial)? rba_rule* ;
+rba_initial :	rba_term '=' rba_term (';' rba_term '=' rba_term )*;
 rba_rule 	:	'{' (rba_port (',' rba_port)* )? '}' rba_formula;
 
 rba_port 	: ID 										#rba_syncFire

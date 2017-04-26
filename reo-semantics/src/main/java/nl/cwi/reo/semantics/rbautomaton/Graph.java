@@ -193,7 +193,7 @@ public class Graph {
 				if(child != null)
 					newRule.add(child.getRule());
 				
-				//A rule is added to the list if the node is a child, and if its rule compose with the new big rule
+				//A rule is added to the list if the node is a child, and if its rule compose with the new composed rule
 				while (!queue.isEmpty() || (child != null && !child.isVisited())) {
 					connectedParts++;
 					child.setFlag(true);

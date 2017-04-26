@@ -1,0 +1,8 @@
+section reo;
+
+lossy(a?String,b!String){
+	#RBA
+	{a,~b} $m'=a
+	{a,b} a=b
+}
+

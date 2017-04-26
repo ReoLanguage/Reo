@@ -1,0 +1,18 @@
+section slides.main;
+
+import reo.sync;
+import slides.shiftlossyfifo.shiftlossyfifo;
+
+import slides.main.red;
+import slides.main.green;
+import slides.main.blue;
+import slides.sequencer.seqc;
+
+main9() {
+  red(a) green(b) blue(c) connector9(a, b, c)
+}
+
+connector9(a, b, c) {
+  seqc(x, y) sync(a, x) sync(b, y) 
+  shiftlossyfifo(m, c) sync(x, m) sync(y, m)
+}

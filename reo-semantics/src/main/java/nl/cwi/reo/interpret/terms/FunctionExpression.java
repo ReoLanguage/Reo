@@ -78,6 +78,10 @@ public final class FunctionExpression implements TermExpression {
 						list.add(IntegerValue.add((IntegerValue) args.get(0), (IntegerValue) args.get(1)));
 					} else if (args.get(0) instanceof StringValue && args.get(1) instanceof StringValue) {
 						list.add(StringValue.concat((StringValue) args.get(0), (StringValue) args.get(1)));
+					} else if (args.get(0) instanceof IntegerValue && args.get(1) instanceof StringValue) {
+						list.add(StringValue.concat((StringValue) args.get(0), (StringValue) args.get(1)));
+					} else if (args.get(0) instanceof StringValue && args.get(1) instanceof StringValue) {
+						list.add(StringValue.concat((StringValue) args.get(0), (StringValue) args.get(1)));
 					} else if (args.get(0) instanceof DecimalValue && args.get(1) instanceof DecimalValue) {
 						list.add(DecimalValue.add((DecimalValue) args.get(0), (DecimalValue) args.get(1)));
 					} else {

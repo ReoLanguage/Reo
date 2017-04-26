@@ -36,6 +36,7 @@ import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.values.BooleanValue;
 import nl.cwi.reo.interpret.values.DecimalValue;
+import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
@@ -44,6 +45,7 @@ import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
@@ -283,12 +285,8 @@ public class Compiler {
 		Long t4 = System.nanoTime();
 		
 		// Compose the protocol into a single connector.
-		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose1(protocols);
-//		System.out.println("Graph based : \n" + circuit );
-//		circuit = new RulesBasedAutomaton().compose(protocols);
-//		System.out.println(circuit+"\n");
-//		RulesBasedAutomaton circuit2 = new RulesBasedAutomaton().compose(protocols);
-//		System.out.println("List based : \n" +circuit2);
+//		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose1(protocols);
+		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
 
 		Long t5 = System.nanoTime();
 		
@@ -326,9 +324,42 @@ public class Compiler {
 			for (Transition t : T) {				
 				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
 					MemCell x = m.getKey();
-					if (!tags.containsKey(x) || tags.get(x) == null) {
-						TypeTag tag = m.getValue().getTypeTag();
+					MemCell x_prime = new MemCell(x.getName(),!x.hasPrime());
+					
+					if ((!tags.containsKey(x) || tags.get(x) == null) && (!tags.containsKey(x_prime) || tags.get(x_prime)==null)) {
+						Term initialValueLHS = circuit.getInitials().get(new MemCell(m.getKey().getName(),false));
+						Term initialValueRHS = null;
+						if(m.getValue() instanceof MemCell)
+							initialValueRHS = circuit.getInitials().get(new MemCell(((MemCell)m.getValue()).getName(),false));
+						
+						TypeTag tag;
+						if(initialValueLHS !=null && initialValueLHS instanceof Function && ((Function)initialValueLHS).getValue() instanceof String){
+							tag = new TypeTag("String");
+						}
+						if(initialValueRHS !=null && initialValueRHS instanceof Function && ((Function)initialValueRHS).getValue() instanceof String){
+							tag = new TypeTag("String");
+						}
+						if(initialValueLHS !=null && initialValueLHS instanceof Function && ((Function)initialValueLHS).getValue() instanceof Integer){
+							tag = new TypeTag("String");
+						}
+						if(initialValueRHS !=null && initialValueRHS instanceof Function && ((Function)initialValueRHS).getValue() instanceof Integer){
+							tag = new TypeTag("String");
+						}
+						
+						else{
+							tag = m.getValue().getTypeTag();
+						}
+						tags.remove(x);
+						tags.remove(x_prime);
 						tags.put(x, tag);
+						tags.put(x_prime, tag);
+						
+						if(m.getValue() instanceof MemCell){
+							tags.remove((MemCell)m.getValue());
+							tags.remove(new MemCell(((MemCell)m.getValue()).getName(),!((MemCell)m.getValue()).hasPrime()));
+							tags.put((MemCell)m.getValue(), tag);
+							tags.put(new MemCell(((MemCell)m.getValue()).getName(),!((MemCell)m.getValue()).hasPrime()), tag);
+						}
 					}
 				}
 			}
@@ -337,7 +368,8 @@ public class Compiler {
 				ports.addAll(t.getInterface());
 				
 				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
-					initial.put(m.getKey().setType(tags.get(m.getKey())), null);
+					Term initialValue = circuit.getInitials().get(new MemCell(m.getKey().getName(),false));
+					initial.put(m.getKey().setType(tags.get(m.getKey())), (initialValue!=null?initialValue.toString():null));
 				}
 			}
 			

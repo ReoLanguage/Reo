@@ -56,7 +56,7 @@ component(c) ::= <<
 private static class <c.name> implements Component {
 
 	<c.ports:port(); separator="\n">	
-	<c.mem:memorycell(); separator="\n">
+	<c:memorycell(); separator="\n">
 	
 	<c:constructor()>
 	
@@ -109,8 +109,10 @@ typetag(p) ::= <<
 <if(p.typeTag)><p.typeTag><else>Object<endif>
 >>
 
-memorycell(m) ::= <<
-private <if(m.type)><m.type><else>Object<endif> <m.name>;
+memorycell(c) ::= <<
+<! <c.initial.keys:{m | private <if(m.type)><m.type><else>Object<endif> <m.name> <if(mem.get(m))> = <mem.get(m)> <endif>}; separator="\n">;  !>
+
+<c.initial.keys:{m | private <if(m.type)><m.type><else>Object<endif> <m.name> <if(c.initial.(m))> = <c.initial.(m).value><else> = null <endif>; }; separator = "\n"> 
 >>
 
 constructor(c) ::= <<
@@ -141,7 +143,7 @@ term(t) ::= <<
 >>
 
 function(t) ::=<<
-<t.value>(<t.args:{p | <if(p.input)> <p.name>.get() <else> <p.name> <endif>}; separator=",">)
+<t.value><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.get() <else> <p.name> <endif>}; separator=",">)<endif>
 >>
 
 

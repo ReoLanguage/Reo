@@ -1,0 +1,20 @@
+// Does not compile.
+
+section slides.main;
+
+import reo.sync;
+import slides.variable.variable;
+
+import slides.main.red;
+import slides.main.green;
+import slides.main.blue;
+import slides.sequencer.seqc;
+
+main8() {
+  red(a) green(b) blue(c) connector8(a, b, c)
+}
+
+connector8(a, b, c) {
+  seqc(x, y) variable(a, x) variable(b, y) 
+  sync(m, c) sync(x, m) sync(y, m)
+}
