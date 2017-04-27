@@ -130,7 +130,8 @@
       hasBorders: false,
       hasControls: false,
       selectable: false,
-      hoverCursor: 'default'
+      hoverCursor: 'default',
+      class: 'arrow'
     });
     
     // ...and two nodes
@@ -238,7 +239,7 @@
       
       canvas.forEachObject(function(obj) {
         if (obj.class == 'node') {
-          console.log('node ' + obj.id + ' in component ' + obj.component.id);
+          //console.log('node ' + obj.id + ' in component ' + obj.component.id);
           if (obj.component.id == 'main' && isBoundaryNode(obj,obj.component)) {
             s1 += space1 + obj.label.text;
             space1 = ',';
@@ -341,19 +342,94 @@
     updateText();
   }); //text:editing:exited
   
+  function copy(obj) {
+    var obj2 = obj.clone();
+    if (obj.class == 'component') {
+      obj2.set({
+        'size': obj.size,
+        'class': obj.class,
+        'status': obj.status,
+        'id': obj.id,
+        'label': obj.label
+      });
+      obj2.label.object = obj2;
+    }
+    if (obj.class == 'node') {
+      obj2.set({
+        'class': obj.class,
+        'component': obj.component,
+        'id': obj.id,
+        'label': obj.label,
+        'linesIn': obj.linesIn,
+        'linesOut': obj.linesOut
+      });
+      obj2.label.object = obj2;
+      for (i = 0; i < obj.linesIn.length; i++) {
+        obj.linesIn[i].c2 = obj2;
+      }
+      for (i = 0; i < obj.linesOut.length; i++) {
+        obj.linesOut[i].c1 = obj2;
+      }
+    }
+    if (obj.class == 'channel') {
+      obj2.set({
+        'class': obj.class,
+        'channel': obj.channel,
+        'arrow': obj.arrow,
+        'circle1': obj.circle1,
+        'circle2': obj.circle2
+      });
+      obj.arrow.line = obj2;
+      obj.circle1.line = obj2;
+      obj.circle2.line = obj2;
+    }
+    if (obj.class == 'label') {
+      obj2.set({
+        'class': obj.class,
+        'object': obj.object
+      });
+      obj.object.label = obj2;
+    }
+    return obj2;
+  }
+  
   canvas.on('mouse:down', function(e) {
     isDown = true;
     var pointer = canvas.getPointer(e.e);
     origX = pointer.x;
     origY = pointer.y;
     var p = canvas.getActiveObject();
+    if (mode == 'select') {
+      console.log('Mode is select');
+      if (p && p.class == 'component') {
+        console.log('Creating a group');
+        var p2 = copy(p);
+        var group = new fabric.Group([ p2 ], {
+          left: p.left,
+          top: p.top,
+          originX: 'left',
+          originY: 'top',
+          class: 'group'
+        });
+        canvas.forEachObject(function(obj) {
+          if (obj.class != 'component' && obj.component == p) {
+            var obj2 = copy(obj);
+            group.addWithUpdate(obj2);
+            canvas.remove(obj);
+          }
+        });
+        canvas.remove(p);
+        canvas.renderAll();
+        canvas.add(group);
+        canvas.setActiveObject(group);
+        origLeft = group.left;
+        origTop = group.top;
+      }
+    }
     if (p) {
       origLeft = p.left;
       origTop = p.top;
       return;
-    }
-    if (mode == 'select') {
-      
     }
     if (mode == 'component') {
       var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
@@ -428,6 +504,11 @@
       p.label.set({top: p.top + p.labelOffsetY});
       p.label.setCoords();
     }
+    if (p.class == 'group') {
+      p.set({left: origLeft + pointer.x - origX});
+      p.set({top: origTop + pointer.y - origY});
+      p.setCoords();
+    }
     canvas.renderAll();
   }); //mouse:move
   
@@ -498,8 +579,20 @@
       if (p.class == 'label') {
         p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});    
       }
+      if (p.class == 'group') {
+        var items = p._objects;
+        p._restoreObjectsState();
+        canvas.remove(p);
+        var comp = items[0];
+        canvas.add(comp);
+        for (var i = 1; i < items.length; i++) {
+          items[i].set({'component': comp});
+          canvas.add(items[i]);
+        }
+        canvas.renderAll();
+      }
     }
-  });
+  }); //mouse:up
   
   /* Reorders the components so that all components are behind the other elements and p is in front of the other components */
   function reorderComponents(p) {
@@ -522,7 +615,6 @@
       top: top,
       width: width,
       height, height,
-      size: width * height,
       fill: 'transparent',
       stroke: '#000',
       strokeWidth: 1,
@@ -531,6 +623,7 @@
       originY: 'top',
       //hasBorders: false,
       //hasControls: false,
+      size: width * height,
       class: 'component',
       status: 'drawing',
       id: generateId()

@@ -57,7 +57,8 @@
         left: p.left,
         top: p.top,
         originX: 'left',
-        originY: 'top'
+        originY: 'top',
+        class: 'group'
       });
       canvas.forEachObject(function(obj) {
         if (obj.class != 'component' && obj.component == p) {
@@ -87,7 +88,7 @@
     if (!p)
       return;
     var pointer = canvas.getPointer(e.e);
-    if (p.type == 'group') {
+    if (p.class == 'group') {
       p.set({left: origLeft + pointer.x - origX});
       p.set({top: origTop + pointer.y - origY});
       p.setCoords();
@@ -98,7 +99,7 @@
   canvas.on('mouse:up', function(e){
     isDown = false;
     var p = canvas.getActiveObject();
-    if (p && p.type == 'group') {
+    if (p && p.class == 'group') {
       var items = p._objects;
       p._restoreObjectsState();
       canvas.remove(p);
@@ -110,6 +111,6 @@
       }
       canvas.renderAll();
     }
-  }); //mouse:down
+  }); //mouse:up
 
 })();
