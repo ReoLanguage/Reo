@@ -4,22 +4,6 @@
   var active, isDown, origX, origY, origLeft, origTop;
   var mode = 'select';
   var id = '0';
-  
-  fabric.Node = fabric.util.createClass(fabric.Circle, {
-    type: 'node',
-    class: 'node',
-    component: '',
-    id: '',
-    
-    initialize: function (options) {
-      options = options || {};
-      this.callSuper('initialize', options);
-    },
-    
-    _render: function (ctx) {
-      this.callSuper('_render', ctx);
-    }
-  });
 
  var rect = new fabric.Rect({
     left: 100,
@@ -40,7 +24,7 @@
   
   canvas.add(rect);
 
-  var c = new fabric.Node({
+  var c = new fabric.Circle({
     left: 200,
     top: 200,
     strokeWidth: 5,
@@ -60,12 +44,16 @@
     var pointer = canvas.getPointer(e.e);
     origX = pointer.x;
     origY = pointer.y;
-    console.log('origX: ' + origX + ' origY: ' + origY);
     var p = canvas.getActiveObject();
     if (p)
       console.log(p);
     if (p && p.class == 'component') {
-      var group = new fabric.Group([ p.clone() ], {
+      var copy = p.clone();
+      copy.set({
+        'class': p.class,
+        'id': p.id
+      });
+      var group = new fabric.Group([ copy ], {
         left: p.left,
         top: p.top,
         originX: 'left',
@@ -73,7 +61,13 @@
       });
       canvas.forEachObject(function(obj) {
         if (obj.class != 'component' && obj.component == p) {
-          group.addWithUpdate(obj.clone());
+          var copy = obj.clone();
+          copy.set({
+            'class': obj.class,
+            'component': obj.component,
+            'id': obj.id  
+          });
+          group.addWithUpdate(copy);
           canvas.remove(obj);
         }
       });
@@ -83,7 +77,6 @@
       canvas.setActiveObject(group);
       origLeft = group.left;
       origTop = group.top;
-      console.log('origLeft: ' + origLeft + ' origTop: ' + origTop);
     }
   }); //mouse:down
   
@@ -109,7 +102,10 @@
       var items = p._objects;
       p._restoreObjectsState();
       canvas.remove(p);
-      for (var i = 0; i < items.length; i++) {
+      var comp = items[0];
+      canvas.add(comp);
+      for (var i = 1; i < items.length; i++) {
+        items[i].set({'component': comp});
         canvas.add(items[i]);
       }
       canvas.renderAll();
