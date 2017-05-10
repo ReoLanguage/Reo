@@ -315,9 +315,10 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		return new RulesBasedAutomaton(rules,initial);
 	}
 
-	public RulesBasedAutomaton compose1(List<RulesBasedAutomaton> components) {
+	public RulesBasedAutomaton compose1(List<RulesBasedAutomaton> components, Set<Port> intface) {
 
 		// Rename all memory cells and put *all* components into a list.
+		List<Port> p =new ArrayList<>();
 		List<RulesBasedAutomaton> list = new ArrayList<>();
 		List<RulesBasedAutomaton> oldlist = new ArrayList<>(components);
 		oldlist.add(this);
@@ -340,6 +341,10 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 					_f = _f.Substitute(new MemCell(entry.getValue(), false), new MemCell(entry.getKey(), false));
 					_f = _f.Substitute(new MemCell(entry.getValue(), true), new MemCell(entry.getKey(), true));
 				}
+				for(Port port : r.getSync().keySet()){
+					if(!p.contains(port))
+						p.add(port);
+				}
 				s.add(new Rule(r.getSync(), _f));
 			}
 			for(Term t : A.getInitials().keySet()){
@@ -351,17 +356,26 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		}
 
 		// Compose the list of RBAs into a single list of rules.
-		Set<Rule> rules = new HashSet<>();
+		List<Hypergraph> hypergraphs = new ArrayList<>();
 		Map<Term,Term> initialValue = new HashMap<Term,Term>();
 		for(RulesBasedAutomaton A : list){
-			rules.addAll(A.getRules());
-			initialValue.putAll(A.initial);
+			if(!A.getRules().isEmpty()){
+				hypergraphs.add(new Hypergraph(A.getRules()));
+				initialValue.putAll(A.initial);
+			}
 		}
 
-		Graph G = new Graph(rules);
-		G=G.isolate1();
-		Set<Rule> s = G.getRules();
-
+		Hypergraph composedAutomaton = hypergraphs.get(0);
+		hypergraphs.remove(0);
+		for(Hypergraph h : hypergraphs){
+			composedAutomaton = composedAutomaton.compose(h);
+		}
+		
+		for(Port port : p){
+			if(!intface.contains(port))
+				composedAutomaton = composedAutomaton.hide(port);
+		}
+		
 		return new RulesBasedAutomaton(s,initialValue);
 	}
 	

@@ -1,0 +1,14 @@
+
+import reo.sync;
+import reo.syncdrain;
+import reo.lossy;
+
+xrouter(in, out[1..n]) {
+  syncdrain(in, m)
+  {lossy(in, out[i]) sync(out[i], m) | i:<1..n> }
+}
+
+
+testxrouter(a?,b!,c!){
+	sync(a,x)xrouter(x,b,c)
+}

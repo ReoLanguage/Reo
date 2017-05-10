@@ -15,7 +15,7 @@ main11()
 {
   { red(a[i]) | i : <1..n> }
   blue(b) 
-  connector11<ileg, sync>(a[1..n], b)
+  connector11<ileg[1..n], sync>(a[1..n], b)
 |
   ileg[1..n] = <sync, lossy, fifo1, variable, shiftlossyfifo, lossyfifo1>
 }

@@ -1,0 +1,9 @@
+import reo.sync;
+import reo.fifo1;
+
+test2(a?String,b!String){
+	sync(a,x)
+//	lossy(x,y)
+//	sync(y,z)
+	fifo1(x,b)
+}

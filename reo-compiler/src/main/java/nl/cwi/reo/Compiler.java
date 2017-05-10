@@ -43,6 +43,7 @@ import nl.cwi.reo.pr.comp.CompilerSettings;
 
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
+import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
@@ -285,13 +286,15 @@ public class Compiler {
 		Long t4 = System.nanoTime();
 		
 		// Compose the protocol into a single connector.
-//		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose1(protocols);
-		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
+		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose1(protocols,intface);
+//		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
 
 		Long t5 = System.nanoTime();
 		
 		// Transform every disjunctive clause into a transition.
 		Set<Transition> transitions = new HashSet<>();
+//		Integer[] sizeGuard = new Integer[circuit.getRules().size()];
+//		int k=0;
 		for (Rule rule : circuit.getRules()) {
 
 			// Hide all internal ports
@@ -302,11 +305,21 @@ public class Compiler {
 
 			// Commandify the formula:
 			Transition t = RBACompiler.commandify(f);
-
+//			if(t.getGuard() instanceof Conjunction)
+//				sizeGuard[k]=((Conjunction)t.getGuard()).getClauses().size();
+//			k++;
 			transitions.add(t);
 		}
 
 		Long t6 = System.nanoTime();
+		
+//        Integer[] indexes = new Integer[sizeGuard.length];
+//        for (int j = 0; j < sizeGuard.length; j++)
+//        {
+//            indexes[j] = j;
+//        }
+//        
+//        Arrays.sort(indexes,sizeGuard);
 		
 		// TODO Partition the set of transitions
 		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
@@ -369,7 +382,9 @@ public class Compiler {
 				
 				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
 					Term initialValue = circuit.getInitials().get(new MemCell(m.getKey().getName(),false));
-					initial.put(m.getKey().setType(tags.get(m.getKey())), (initialValue!=null?initialValue.toString():null));
+					if(initialValue instanceof Function && ((Function) initialValue).getValue() instanceof Integer)
+						initialValue = (initialValue!=null?new Function(((Function)initialValue).getName(),"\""+((Function)initialValue).getValue().toString()+"\"", new ArrayList<Term>()):null);
+					initial.put(m.getKey().setType(tags.get(m.getKey())), initialValue);
 				}
 			}
 			

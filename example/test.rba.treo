@@ -19,11 +19,16 @@ consumer(a?String) {
 
 test() {
  //       { sync(a[i], b) | i : <1..N> }
-        { lossy(a[i], b) | i : <1..N> }
-        { producer(a[i]) | i : <1..N> }
-        consumer(b)
-   |
-        N=5
+	sync(a,x)
+	sync(a,y)
+	sync(y,b)
+	sync(x,b)
+//	sync(c,b)
+//        { lossy(a[i], b) | i : <1..N> }
+//        { producer(a[i]) | i : <1..N> }
+//        consumer(b)
+//   |
+//        N=5
 }
 
 
