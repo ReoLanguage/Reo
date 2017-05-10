@@ -286,8 +286,8 @@ public class Compiler {
 		Long t4 = System.nanoTime();
 		
 		// Compose the protocol into a single connector.
-		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose1(protocols,intface);
-//		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
+//		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose1(protocols,intface);
+		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
 
 		Long t5 = System.nanoTime();
 		
