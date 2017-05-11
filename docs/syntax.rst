@@ -104,7 +104,6 @@ The composition is established by sharing nodes.
 For example, the following code shows the composition of two ``fifo1``-channels.
 
 .. code-block:: text
-	:linenos:
 	
 	{
 		fifo1(a,b) // first
@@ -132,14 +131,12 @@ The composition of the two ``fifo1``-channel explicitly instantiates each ``fifo
 In this case, may could obtain the same construction using only *one* explicit instantiation using a **predicates**
 
 .. code-block:: text
-	:linenos:
 	
 	{ fifo1(a[i],a[i+1]) | i : <0..1> }
 
 This for loop is equivalent to the composition
 
 .. code-block:: text
-	:linenos:
 	
 	{ fifo1(a[0],a[1]) fifo1(a[1],a[2]) }
 
@@ -150,7 +147,6 @@ In the composition of the two ``fifo1``-channels, shared node b is still visible
 Hence, another component, say ``producer``, may synchronize with node b as follows
 
 .. code-block:: text
-	:linenos:
 	
 	main() {
 		fifo1(a,b)
@@ -167,7 +163,6 @@ by wrapping the composition of the two ``fifo1``-channels in a new component ``f
 this new component
 
 .. code-block:: text
-	:linenos:
 
 	fifo2(a,c) { 
 	  fifo1(a,b) 
@@ -191,7 +186,6 @@ The lower and upper bounds for the iterated parameter consist of integer numbers
 In may be useful to allow variable iteration bounds
 
 .. code-block:: text
-	:linenos:
 	
 	fifo<k>(a[0], a[1...k-1], a[k]) { fifo1(a[i],a[i+1]) |	i : <0..k-1 }
 
@@ -201,7 +195,6 @@ component definition.
 We may also use parameters in the following way
 
 .. code-block:: text
-	:linenos:
 
 	transformer<f>(a,b) {
 	  #CASM
@@ -211,7 +204,6 @@ We may also use parameters in the following way
 Or, as follows
 
 .. code-block:: text
-	:linenos:
 	
 	filter<R>(a,b) {
 	  #CASM
