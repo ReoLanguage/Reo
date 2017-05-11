@@ -6,7 +6,7 @@ Syntax of Reo
 	This page is still under construction and the presented language constructs may not be up-to-date.
 	Sorry for the inconvenience.
 
-Components and interfaces
+Components and interfaces!
 -------------------------
 
 Reo programs consist of *components* that interact via shared *nodes*.
