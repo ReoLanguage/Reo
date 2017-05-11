@@ -30,7 +30,7 @@ The following example shows how we can define a component by referring to Java s
    
 	// producer.treo
 	producer(a!) { 
-		#PR identity(;a) | Java:"com.example.MyClass.myProducer"
+	   #PR identity(;a) | Java:"com.example.MyClass.myProducer"
 	}
 
 This piece of code defines an atomic component called ``producer`` with a single output port ``a``.
@@ -51,11 +51,11 @@ Another possibility is to define a component via a particular semantic model, su
    
 	// buffer.treo 
 	buffer(a?,b!) {
-		#CASM
-			q0 -> q1 : {a}, x' == d(a) 
-			q1 -> q0 : {b}, d(b) == x  
+	   #CASM
+	   q0 -> q1 : {a}, x' == d(a) 
+	   q1 -> q0 : {b}, d(b) == x  
 	|
-		C/C++:"example::Buffer"
+	   C/C++:"example::Buffer"
 	}
 
 The above code is pseudo code, because the Reo compiler does not yet support C/C++.
@@ -65,12 +65,12 @@ There are more than thirty semantics for Reo. Therefore, one may provide a secon
 
 .. code-block:: text
 
-   // fifo1.wa.treo
+	// fifo1.wa.treo
 	define fifo1(a?,b!) {
-      #WA
-				q0 : initial
-				q0 -> q1 : {a}, true, {}
-				q1 -> q0 : {b}, true, {}
+	   #WA
+	   q0 : initial
+	   q0 -> q1 : {a}, true, {}
+	   q1 -> q0 : {b}, true, {}
 	}
 
 .. note:: 
@@ -84,13 +84,13 @@ Composition
 Now that we defined the ``fifo1``-channel, we may start using it by *instantiating* our ``fifo1``-channel as follows
 
 .. code-block:: text
-	
-   // main.treo
-   import reo.fifo1;
-   
-   main() {
-	  fifo1(x,y)
-   }
+
+	// main.treo
+	import reo.fifo1;
+   	
+	main() {
+   	   fifo1(x,y)
+   	}
 
 This Reo program accomplishes the following tasks:
 
@@ -106,8 +106,8 @@ For example, the following code shows the composition of two ``fifo1``-channels.
 .. code-block:: text
 	
 	{
-		fifo1(a,b) // first
-		fifo1(b,c) // second
+	   fifo1(a,b) // first
+	   fifo1(b,c) // second
 	}
 
 The first and second ``fifo1``-channel share the common node b.
@@ -149,9 +149,9 @@ Hence, another component, say ``producer``, may synchronize with node b as follo
 .. code-block:: text
 	
 	main() {
-		fifo1(a,b)
-		fifo1(b,c)
-		producer(b) // this component synchronizes on the 'internal' node b
+	   fifo1(a,b)
+	   fifo1(b,c)
+	   producer(b) // this component synchronizes on the 'internal' node b
 	}
 
 The data provided by the producer flows via the **second** ``fifo1``-channel from node b to node c, 
@@ -165,13 +165,13 @@ this new component
 .. code-block:: text
 
 	fifo2(a,c) { 
-	  fifo1(a,b) 
-	  fifo1(b,c)
+	   fifo1(a,b) 
+	   fifo1(b,c)
 	}
 
 	main() {
-		fifo2(a,c)
-		producer(b) // node b is different from node b used in the definition of fifo2
+	   fifo2(a,c)
+	   producer(b) // node b is different from node b used in the definition of fifo2
 	}
 
 Since we know for each component in the definition of ``fifo2`` whether a node is used as input, output or both,
@@ -197,8 +197,8 @@ We may also use parameters in the following way
 .. code-block:: text
 
 	transformer<f>(a,b) {
-	  #CASM
-	  	q -- {a,b}, d(b) == f(d(a)) -> q;
+	   #CASM
+	   q -- {a,b}, d(b) == f(d(a)) -> q;
 	}
 
 Or, as follows
@@ -206,8 +206,8 @@ Or, as follows
 .. code-block:: text
 	
 	filter<R>(a,b) {
-	  #CASM
-	  q -- {a,b}, R(d_a) -> q;
-	  q -- {a}, ~R(d_a) -> q;
+	   #CASM
+	   q -- {a,b}, R(d_a) -> q;
+	   q -- {a}, ~R(d_a) -> q;
 	}
 	
