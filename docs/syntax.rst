@@ -9,7 +9,7 @@ Syntax of Reo
 Components and interfaces
 -------------------------
 
-Reo programs consist of *components* that interact via shared *nodes*. Something that does not hurt!
+Reo programs consist of *components* that interact via shared *nodes*.
 Each component has access to a given set of nodes, called its *interface*.
 To distinguish them from other nodes, the nodes that comprise the interface of a component are also called its *ports*.
 An atomic component uses each of its ports either for input or for output, but not both.
