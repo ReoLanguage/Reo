@@ -2,7 +2,9 @@ package nl.cwi.reo.semantics.rbautomaton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Existential;
@@ -10,13 +12,13 @@ import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Node;
 
 public class RuleNode implements HypergraphNode{
-	private List<Hyperedge> hyperedges;
+	private Set<Hyperedge> hyperedges;
 	private List<RuleNode> exclusiveRules = new ArrayList<>();
 	private Rule rule;
 	
 	private boolean visited;
 
-	public RuleNode(Rule r, List<Hyperedge> hyperedge) {
+	public RuleNode(Rule r, Set<Hyperedge> hyperedge) {
 		this.rule = r;
 		this.hyperedges=hyperedge;
 		visited = false;
@@ -24,7 +26,7 @@ public class RuleNode implements HypergraphNode{
 	
 	public RuleNode(Rule r){
 		this.rule = r;
-		this.hyperedges = new ArrayList<Hyperedge>();
+		this.hyperedges = new HashSet<Hyperedge>();
 		visited = false;		
 	}
 	
@@ -33,7 +35,7 @@ public class RuleNode implements HypergraphNode{
 	}
 	
 	
-	public List<Hyperedge> getHyperedges(){
+	public Set<Hyperedge> getHyperedges(){
 		return hyperedges;
 	}
 	
@@ -46,6 +48,10 @@ public class RuleNode implements HypergraphNode{
 	
 	public void addHyperedge(Hyperedge h){
 		hyperedges.add(h);
+	}
+	
+	public void rmHyperedge(Hyperedge h){
+		hyperedges.remove(h);
 	}
 	
 	public boolean isVisited() {
@@ -70,6 +76,15 @@ public class RuleNode implements HypergraphNode{
 		rule=new Rule(rule.getSync(),formula);
 		return this;
 	}
+	
+	public RuleNode compose(RuleNode r){
+//		Rule newRule=new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
+		rule = new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
+		hyperedges.addAll(r.getHyperedges());
+//		return new RuleNode(newRule,this.getHyperedges());
+		return this;
+	}
+	
 	
 	
 	public RuleNode hide(PortNode p){

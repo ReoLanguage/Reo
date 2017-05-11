@@ -1,7 +1,10 @@
 package nl.cwi.reo.semantics.rbautomaton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Disjunction;
@@ -37,10 +40,79 @@ public class Hyperedge {
 		return this;
 	}
 	
+	public Hyperedge addLeaves(List<RuleNode> r){
+		leaves.addAll(r);
+		for(RuleNode rule : r)
+			rule.addHyperedge(this);
+		return this;
+	}
+	
+	public Hyperedge rmLeaves(List<RuleNode> r){
+		leaves.removeAll(r);
+		for(RuleNode rule : r)
+			rule.rmHyperedge(this);
+		return this;
+	}
+	
 	public Hyperedge compose(Formula f){
 		for(RuleNode r : leaves){
 			r.compose(f);
 		}
+		return this;
+	}
+
+	/*
+	 * List<RuleNode> list = h.getLeaves();
+	 * if(list.size==1)
+	 * 		for(rules in leaves)
+	 * 			rules.compose(h.getLeaves().get(0));
+	 * if(list.size>1)
+	 * 		
+	 * for(leaves in hyperedge)
+	 */
+	public Hyperedge compose(Hyperedge h){
+		if(!root.getPort().equals(h.getRoot().getPort())){
+			new Exception("Those two hyperedges cannot compose because of two different roots");
+		}
+		List<RuleNode> list = new ArrayList<RuleNode>();
+		List<RuleNode> ruleNodes = new ArrayList<RuleNode>();
+		ruleNodes.addAll(h.getLeaves());
+		
+		if(ruleNodes.size()==1){
+			for(RuleNode r : leaves){
+				list.add(r.compose(h.getLeaves().get(0)));
+			}
+			Queue<Hyperedge> l = new LinkedList<>(h.getLeaves().get(0).getHyperedges());
+			while(!l.isEmpty()){
+				Hyperedge edge = l.poll();
+				edge.rmLeaves(ruleNodes);
+				edge.addLeaves(list);
+			}
+			rmLeaves(leaves);
+			addLeaves(list);
+			h.rmLeaves(ruleNodes);
+		}
+		else{
+			Queue<RuleNode> h_leaves = new LinkedList<RuleNode>(h.getLeaves());
+			while(!h_leaves.isEmpty()){
+				RuleNode rule=h_leaves.poll();
+				for(RuleNode r : leaves){
+					list.add(r.compose(rule));
+				}
+				Queue<Hyperedge> listEdges = new LinkedList<>(rule.getHyperedges());
+				while(!listEdges.isEmpty()){
+					Hyperedge e = listEdges.poll();
+					if(!e.equals(h)){
+						e.addLeaves(list);
+						rule.addHyperedge(e);
+					}
+					e.rmLeaves(Arrays.asList(rule));
+				}
+//			}
+//			this.rmLeaves(leaves);
+			}
+		}
+
 		return this;
 	}
 	

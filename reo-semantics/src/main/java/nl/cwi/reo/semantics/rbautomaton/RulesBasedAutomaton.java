@@ -368,15 +368,16 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		Hypergraph composedAutomaton = hypergraphs.get(0);
 		hypergraphs.remove(0);
 		for(Hypergraph h : hypergraphs){
-			composedAutomaton = composedAutomaton.compose(h);
+			composedAutomaton = composedAutomaton.compose(h);	
 		}
+		composedAutomaton = composedAutomaton.distribute();
 		
 		for(Port port : p){
 			if(!intface.contains(port))
 				composedAutomaton = composedAutomaton.hide(port);
 		}
 		
-		return new RulesBasedAutomaton(s,initialValue);
+		return new RulesBasedAutomaton(composedAutomaton.getRules(),initialValue);
 	}
 	
 	
