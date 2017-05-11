@@ -167,7 +167,6 @@ The first step consist of isolating the computation that is done in each process
 To this end, we create a Java class in ``Processes.java`` that contains the a method for each original process:
 
 .. code-block:: java
-	:linenos:
 
 	import nl.cwi.pr.runtime.api.InputPort;
 	import nl.cwi.pr.runtime.api.OutputPort;
