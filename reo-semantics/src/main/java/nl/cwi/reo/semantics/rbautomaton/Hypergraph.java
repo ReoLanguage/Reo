@@ -34,7 +34,7 @@ public class Hypergraph {
 						getHyperedges(v).get(0).addLeave(rule);
 					}
 					else{
-						Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
+						HashSet<RuleNode> ruleNodes = new HashSet<RuleNode>();
 						ruleNodes.add(rule);
 						hyperedges.add(new Hyperedge(new PortNode(v),ruleNodes));
 					}
@@ -85,7 +85,7 @@ public class Hypergraph {
 	 * Distribute single hyperedges
 	 * @return
 	 */
-	public Hypergraph distribute(){
+	public Hypergraph distributeSingleEdge(){
 						
 		for(Port p : variables){
 			List<Hyperedge> singleEdge = new ArrayList<>();
@@ -102,10 +102,10 @@ public class Hypergraph {
 					for(Hyperedge e : multiEdge){
 						e.compose(h);
 					}
-					rules.remove(h.getLeaves());
+					rules.remove(h.getLeaves().get(0));
 				}
 				if(!multiEdge.isEmpty())
-					hyperedges.remove(singleEdge);
+					hyperedges.removeAll(singleEdge);
 			}
 			if(singleEdge.size()>1){
 				Hyperedge e = singleEdge.get(0);
@@ -117,6 +117,35 @@ public class Hypergraph {
 				hyperedges.removeAll(singleEdge);
 			}
 			
+		}
+		
+		return this;
+	}
+	
+	/**
+	 * Distribute multi rules hyperedges
+	 * @return
+	 */
+	public Hypergraph distributeMultiEdge(){
+						
+		for(Port p : variables){
+			List<Hyperedge> multiEdge = new ArrayList<>();
+		
+			multiEdge.addAll(getHyperedges(p));
+			Hyperedge toDistribute = multiEdge.get(0);
+			multiEdge.remove(0);
+			
+			if(!multiEdge.isEmpty()){
+				for(Hyperedge h : multiEdge){
+					h.compose(toDistribute);
+				}
+				rules.clear();
+				if(!multiEdge.isEmpty())
+					hyperedges.remove(toDistribute);
+				for(Hyperedge g : hyperedges){
+					rules.addAll(g.getLeaves());
+				}
+			}			
 		}
 		
 		return this;
@@ -172,8 +201,7 @@ public class Hypergraph {
 	public Set<Rule> getRules(){
 		Set<Rule> s = new HashSet<>();		
 		
-		for(Hyperedge r : hyperedges){
-//			r.ge
+		for(RuleNode r : rules){
 			s.add(r.getRule());
 		}
 		

@@ -22,9 +22,9 @@ import nl.cwi.reo.semantics.predicates.Term;
 
 public class Hyperedge {
 	private PortNode root;
-	private Set<RuleNode> leaves;
+	private HashSet<RuleNode> leaves;
 	
-	public Hyperedge(PortNode root, Set<RuleNode> leaves){
+	public Hyperedge(PortNode root, HashSet<RuleNode> leaves){
 		root.addHyperedge(this);
 		this.root=root;
 		this.leaves=leaves;
@@ -52,12 +52,22 @@ public class Hyperedge {
 	}
 	
 	public Hyperedge addLeave(RuleNode r){
+		//Update hashcodes :
+		HashSet<RuleNode> s = new HashSet<RuleNode>(leaves);
+		leaves.clear();
+		leaves = s;
+		
 		leaves.add(r);
 		r.addHyperedge(this);
 		return this;
 	}
 	
 	public Hyperedge addLeaves(List<RuleNode> r){
+		//Update hashcodes :
+		HashSet<RuleNode> s = new HashSet<RuleNode>(leaves);
+		leaves.clear();
+		leaves = s;
+		
 		leaves.addAll(r);
 		for(RuleNode rule : r)
 			rule.addHyperedge(this);
@@ -65,9 +75,25 @@ public class Hyperedge {
 	}
 	
 	public Hyperedge rmLeaves(Set<RuleNode> r){
+		//Update hashcodes :
+		HashSet<RuleNode> s = new HashSet<RuleNode>(leaves);
+		leaves.clear();
+		leaves = s;
+		
 		leaves.removeAll(r);
 		for(RuleNode rule : r)
 			rule.rmHyperedge(this);
+		return this;
+	}
+	
+	public Hyperedge rmLeave(RuleNode r){
+		//Update hashcodes :
+		HashSet<RuleNode> s = new HashSet<RuleNode>(leaves);
+		leaves.clear();
+		leaves = s;
+		
+		leaves.remove(r);
+		r.rmHyperedge(this);
 		return this;
 	}
 	
@@ -82,42 +108,70 @@ public class Hyperedge {
 		if(!root.getPort().equals(h.getRoot().getPort())){
 			new Exception("Those two hyperedges cannot compose because of two different roots");
 		}
-		List<RuleNode> list = new ArrayList<RuleNode>();
+		Set<RuleNode> list = new HashSet<RuleNode>();
 		Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
 		ruleNodes.addAll(h.getLeaves());
+		list.addAll(leaves);
 		
 		if(ruleNodes.size()==1){
+			//Single rule to compose
 			RuleNode h_ruleNode = h.getLeaves().get(0);
+			//Add rules to other hyperedges from the single rule to compose and remove the single rule
 			for(Hyperedge edge : h_ruleNode.getHyperedges()){
 				if(!edge.getRoot().equals(getRoot())){
 					edge.rmLeaves(ruleNodes);
 					edge.addLeaves(getLeaves());
 				}
 			}
-			
+			//Compose single rule
 			for(RuleNode r : leaves){
 				r.compose(h.getLeaves().get(0));
 			}
 		}
 		else{
-			Queue<RuleNode> h_leaves = new LinkedList<RuleNode>(h.getLeaves());
-			while(!h_leaves.isEmpty()){
-				RuleNode rule=h_leaves.poll();
-				for(RuleNode r : leaves){
-					list.add(r.compose(rule));
-				}
-				Queue<Hyperedge> listEdges = new LinkedList<>(rule.getHyperedges());
-				while(!listEdges.isEmpty()){
-					Hyperedge e = listEdges.poll();
-					if(!e.equals(h)){
-						e.addLeaves(list);
-						rule.addHyperedge(e);
-					}
-					Set<RuleNode> s = new HashSet<RuleNode>();
-					s.add(rule);
-					e.rmLeaves(s);
+			
+			List<RuleNode> newRules = new ArrayList<>();
+			
+			for(RuleNode ruleToCompose : list){
+				//Compose formula and add union of hyperedges to rule
+				newRules = ruleToCompose.compose(h.getLeaves());
+				//Remove previous rule of "this" hyperedge
+				Queue<Hyperedge> hyperedge = new LinkedList<Hyperedge>(ruleToCompose.getHyperedges());
+				while(!hyperedge.isEmpty()){
+					Hyperedge edge = hyperedge.poll();
+					edge.rmLeave(ruleToCompose);
+					edge.addLeaves(newRules);
 				}
 			}
+			
+			//Remove rules of "h" hyperedge
+			for(RuleNode r : ruleNodes){
+				for(Hyperedge edge : r.getHyperedges()){
+					if(!edge.getRoot().equals(getRoot())){
+						edge.rmLeaves(ruleNodes);
+//						edge.addLeaves(newRules);
+					}
+				}
+			}
+			
+//			Queue<RuleNode> h_leaves = new LinkedList<RuleNode>(h.getLeaves());
+//			while(!h_leaves.isEmpty()){
+//				RuleNode rule=h_leaves.poll();
+//				for(RuleNode r : leaves){
+//					list.add(r.compose(rule));
+//				}
+//				Queue<Hyperedge> listEdges = new LinkedList<>(rule.getHyperedges());
+//				while(!listEdges.isEmpty()){
+//					Hyperedge e = listEdges.poll();
+//					if(!e.equals(h)){
+//						e.addLeaves(list);
+//						rule.addHyperedge(e);
+//					}
+//					Set<RuleNode> s = new HashSet<RuleNode>();
+//					s.add(rule);
+//					e.rmLeaves(s);
+//				}
+//			}
 		}
 
 		return this;
@@ -192,20 +246,20 @@ public class Hyperedge {
 	 */
 	@Override
 	public int hashCode() {
-		int hash=0;
-		if(leaves!=null){
-			for(RuleNode r : leaves){
-				hash=hash+r.hashCode();
-			}
-		}
-		return Objects.hash(this.root.getPort(),hash);
+//		int hash=0;
+//		if(leaves!=null){
+//			for(RuleNode r : leaves){
+//				hash=hash+r.hashCode();
+//			}
+//		}
+		return Objects.hash(this.root.getPort(),leaves);
 	}
 	
 	public String toString(){
 		String s = "";
 		int i = leaves.size();
 		for(RuleNode r : leaves){
-			s=s+r.toString() + (i>1?" || ":"");
+			s=s+r.toString() + (i>1?" || \n ":"");
 			i--;
 		}
 		return s;

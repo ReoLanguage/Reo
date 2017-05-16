@@ -9,14 +9,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.sound.sampled.Port;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.Variable;
 
 public class RuleNode implements HypergraphNode{
 	private Set<Hyperedge> hyperedges;
@@ -79,25 +81,56 @@ public class RuleNode implements HypergraphNode{
 	}
 	
 	public RuleNode compose(Formula f){
-		Formula formula = new Conjunction(Arrays.asList(rule.getFormula(),f));
+		boolean canSync = true;
+		List<Formula> clauses = new ArrayList<Formula>();
+		if(f instanceof Disjunction){
+			for(Formula clause : ((Disjunction) f).getClauses()){
+				for(Variable v : clause.getFreeVariables()){
+					if(v instanceof Node && !rule.getSync().get((((Node)v).getPort()))){
+						canSync=false;
+					}
+				}
+				if(canSync){
+					clauses.add(clause);
+				}
+			}
+		}
+		Formula formula;
+		if(clauses.size()==1)
+			formula = new Conjunction(Arrays.asList(rule.getFormula(),clauses.get(0)));
+		else
+			formula = new Conjunction(Arrays.asList(rule.getFormula(),new Disjunction(clauses)));
 		rule=new Rule(rule.getSync(),formula);
 		return this;
 	}
 	
-	public RuleNode compose(RuleNode r){
-//		Rule newRule=new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormulaMap<K, V>r.getRule().getFormula())));
-		
+	public RuleNode compose(RuleNode r){		
 		rule.getSync().putAll(r.getRule().getSync());
 		rule = new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
-//		for(Hyperedge h : r.getHyperedges())
-//			hyperedges.add(new Hyperedge(h.getRoot(),));
-//		hyperedges.addAll(r.getHyperedges());
-//		Set<Hyperedge> s = this.getHyperedges();
-//		s.addAll(r.getHyperedges());
-//		return new RuleNode(newRule,s);
 		return this;
 	}
 	
+	public List<RuleNode> compose(List<RuleNode> rules){	
+		List<RuleNode> listNewRuleNodes = new ArrayList<>();
+		for(RuleNode r : rules){
+			Map<Port,Boolean> map = new HashMap<Port,Boolean>();
+			map.putAll(rule.getSync());
+			map.putAll(r.getRule().getSync());
+			Rule newRule = new Rule(map,new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
+			
+			RuleNode newRuleNode = new RuleNode(newRule,new HashSet<>(hyperedges));
+			for(Hyperedge h : r.getHyperedges()){
+				if(getHyperedges(h.getRoot())==null){
+					newRuleNode.getHyperedges().add(h);
+					h.addLeave(newRuleNode);
+				}
+			}
+			
+			listNewRuleNodes.add(newRuleNode);
+		}
+		
+		return listNewRuleNodes;
+	}
 	
 	
 	public RuleNode hide(PortNode p){
@@ -118,7 +151,7 @@ public class RuleNode implements HypergraphNode{
 		if (!(other instanceof RuleNode))
 			return false;
 		RuleNode rule = (RuleNode) other;
-		return this.rule.equals(rule);
+		return Objects.equals(this.rule.getFormula(),(rule.getRule().getFormula()));
 	}
 
 	/**
@@ -126,9 +159,12 @@ public class RuleNode implements HypergraphNode{
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.rule);
+		Formula f = this.getRule().getFormula();
+		
+		return Objects.hash(f);
 	}
 	
+	//1975929195
 	public String toString(){
 		String s = "("+rule.toString()+")";
 //		s=s+"excl rules : (";

@@ -370,9 +370,9 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		for(Hypergraph h : hypergraphs){
 			composedAutomaton = composedAutomaton.compose(h);	
 		}
-		composedAutomaton = composedAutomaton.distribute();
+		composedAutomaton = composedAutomaton.distributeSingleEdge();
+		composedAutomaton = composedAutomaton.distributeMultiEdge();
 		
-		Set<Rule> s = new HashSet<Rule>();
 		
 		for(Port port : p){
 			if(!intface.contains(port))
