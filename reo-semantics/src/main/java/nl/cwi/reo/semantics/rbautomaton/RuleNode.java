@@ -2,9 +2,16 @@ package nl.cwi.reo.semantics.rbautomaton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import javax.sound.sampled.Port;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Existential;
@@ -78,10 +85,16 @@ public class RuleNode implements HypergraphNode{
 	}
 	
 	public RuleNode compose(RuleNode r){
-//		Rule newRule=new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
+//		Rule newRule=new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormulaMap<K, V>r.getRule().getFormula())));
+		
+		rule.getSync().putAll(r.getRule().getSync());
 		rule = new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
-		hyperedges.addAll(r.getHyperedges());
-//		return new RuleNode(newRule,this.getHyperedges());
+//		for(Hyperedge h : r.getHyperedges())
+//			hyperedges.add(new Hyperedge(h.getRoot(),));
+//		hyperedges.addAll(r.getHyperedges());
+//		Set<Hyperedge> s = this.getHyperedges();
+//		s.addAll(r.getHyperedges());
+//		return new RuleNode(newRule,s);
 		return this;
 	}
 	
@@ -90,6 +103,30 @@ public class RuleNode implements HypergraphNode{
 	public RuleNode hide(PortNode p){
 		rule = new Rule(rule.getSync(),(new Existential(new Node(p.getPort()),rule.getFormula())).QE());
 		return this;
+	}
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof RuleNode))
+			return false;
+		RuleNode rule = (RuleNode) other;
+		return this.rule.equals(rule);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.rule);
 	}
 	
 	public String toString(){

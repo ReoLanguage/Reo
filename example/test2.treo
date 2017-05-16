@@ -1,9 +1,12 @@
 import reo.sync;
+import reo.syncdrain;
 import reo.fifo1;
 
-test2(a?String,b!String){
-	sync(a,x)
+test2(a?String,b?String,c!String){
+	sync(a,c)
+	syncdrain(a,b)
+	sync(b,x)
 //	lossy(x,y)
 //	sync(y,z)
-	fifo1(x,b)
+	fifo1(x,c)
 }

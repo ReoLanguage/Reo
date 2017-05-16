@@ -1,11 +1,8 @@
 package nl.cwi.reo.semantics.rbautomaton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
@@ -37,7 +34,7 @@ public class Hypergraph {
 						getHyperedges(v).get(0).addLeave(rule);
 					}
 					else{
-						List<RuleNode> ruleNodes = new ArrayList<RuleNode>();
+						Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
 						ruleNodes.add(rule);
 						hyperedges.add(new Hyperedge(new PortNode(v),ruleNodes));
 					}
@@ -114,17 +111,25 @@ public class Hypergraph {
 				Hyperedge e = singleEdge.get(0);
 				singleEdge.remove(0);
 				for(Hyperedge h : singleEdge){
-					e = e.compose(h);
-					rules.remove(h.getLeaves());
+					rules.remove(h.getLeaves().get(0));
+					e.compose(h);
 				}
 				hyperedges.removeAll(singleEdge);
-//				hyperedges.add(e);
-//				rules.addAll(e.getLeaves());
 			}
 			
 		}
 		
 		return this;
+	}
+	
+	public void removeHyperedge(List<Hyperedge> edges){
+		hyperedges.removeAll(edges);
+		for(Hyperedge e : edges){
+			for(RuleNode r : e.getLeaves()){
+				r.rmHyperedge(e);
+			}
+		}
+		
 	}
 	
 	/**
@@ -165,58 +170,67 @@ public class Hypergraph {
 	 * @return
 	 */
 	public Set<Rule> getRules(){
-		Set<Rule> s = new HashSet<>();
-		int nbHyperedges = 0;
-		for(RuleNode r : rules){
-			int i = 0;
-			nbHyperedges = r.getHyperedges().size();
-			List<Rule> ruleList = new ArrayList<Rule>();
-			for(Hyperedge h : r.getHyperedges()){
-				if(getHyperedges(h.getRoot().getPort()).size()==1){
-					i++;
-					if(nbHyperedges==i)
-						s.add(r.getRule());
-				}
-				else{
-					ruleList.add(r.getRule());
-					for(Hyperedge h2 : getHyperedges(h.getRoot().getPort())){
-						if(!h.equals(h2)){
-							List<Rule> ruleList_tmp = new ArrayList<Rule>();
-							for(RuleNode rule : h2.getLeaves()){
-								for(Rule t : ruleList){
-//									ruleList_tmp.add(new RuleNode(rule.getRule(),rule.getHyperedges()).compose(t.getFormula()).getRule());
-								}
-							}
-							ruleList=ruleList_tmp;
-						}
-					}
-				}
-			}
-			s.addAll(ruleList);
+		Set<Rule> s = new HashSet<>();		
+		
+		for(Hyperedge r : hyperedges){
+//			r.ge
+			s.add(r.getRule());
 		}
 		
-		/*
-		 * Remove rules with the same formula  
-		 */
+		return s;
 		
-		Set<Rule> s2 = new HashSet<>();
-		int i=0;
-		
-		for(Rule r : s){
-			int j=0;
-			boolean add=true;
-			for(Rule r2 : s){
-				if(j>i && r.getFormula().equals(r2.getFormula())){
-					add=false;
-				}
-				j++;
-			}
-			i++;
-			if(add){
-				s2.add(r);
-			}
-		}
-		return s2;
+//		Set<Rule> s = new HashSet<>();
+//		int nbHyperedges = 0;
+//		for(RuleNode r : rules){
+//			int i = 0;
+//			nbHyperedges = r.getHyperedges().size();
+//			List<Rule> ruleList = new ArrayList<Rule>();
+//			for(Hyperedge h : r.getHyperedges()){
+//				if(getHyperedges(h.getRoot().getPort()).size()==1){
+//					i++;
+//					if(nbHyperedges==i)
+//						s.add(r.getRule());
+//				}
+//				else{
+//					ruleList.add(r.getRule());
+//					for(Hyperedge h2 : getHyperedges(h.getRoot().getPort())){
+//						if(!h.equals(h2)){
+//							List<Rule> ruleList_tmp = new ArrayList<Rule>();
+//							for(RuleNode rule : h2.getLeaves()){
+//								for(Rule t : ruleList){
+////									ruleList_tmp.add(new RuleNode(rule.getRule(),rule.getHyperedges()).compose(t.getFormula()).getRule());
+//								}
+//							}
+//							ruleList=ruleList_tmp;
+//						}
+//					}
+//				}
+//			}
+//			s.addAll(ruleList);
+//		}
+//		
+//		/*
+//		 * Remove rules with the same formula  
+//		 */
+//		
+//		Set<Rule> s2 = new HashSet<>();
+//		int i=0;
+//		
+//		for(Rule r : s){
+//			int j=0;
+//			boolean add=true;
+//			for(Rule r2 : s){
+//				if(j>i && r.getFormula().equals(r2.getFormula())){
+//					add=false;
+//				}
+//				j++;
+//			}
+//			i++;
+//			if(add){
+//				s2.add(r);
+//			}
+//		}
+//		return s2;
 	}
 
 	

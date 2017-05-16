@@ -1,11 +1,18 @@
 package nl.cwi.reo.semantics.rbautomaton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
+import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
@@ -15,14 +22,14 @@ import nl.cwi.reo.semantics.predicates.Term;
 
 public class Hyperedge {
 	private PortNode root;
-	private List<RuleNode> leaves;
+	private Set<RuleNode> leaves;
 	
-	public Hyperedge(PortNode root, List<RuleNode> leaves){
+	public Hyperedge(PortNode root, Set<RuleNode> leaves){
 		root.addHyperedge(this);
 		this.root=root;
+		this.leaves=leaves;
 		for(RuleNode r : leaves)
 			r.addHyperedge(this);
-		this.leaves=leaves;
 		
 	}
 	
@@ -31,7 +38,17 @@ public class Hyperedge {
 	}
 	
 	public List<RuleNode> getLeaves(){
-		return leaves;
+		return new ArrayList<>(leaves);
+	}
+
+	public Rule getRule(){
+		List<Formula> list = new ArrayList<Formula>();
+		Map<Port,Boolean> map = new HashMap<>();
+		for(RuleNode r : leaves){
+			list.add(r.getRule().getFormula());
+			map.putAll(r.getRule().getSync());
+		}
+		return new Rule(map,new Disjunction(list));
 	}
 	
 	public Hyperedge addLeave(RuleNode r){
@@ -47,7 +64,7 @@ public class Hyperedge {
 		return this;
 	}
 	
-	public Hyperedge rmLeaves(List<RuleNode> r){
+	public Hyperedge rmLeaves(Set<RuleNode> r){
 		leaves.removeAll(r);
 		for(RuleNode rule : r)
 			rule.rmHyperedge(this);
@@ -61,36 +78,26 @@ public class Hyperedge {
 		return this;
 	}
 
-	/*
-	 * List<RuleNode> list = h.getLeaves();
-	 * if(list.size==1)
-	 * 		for(rules in leaves)
-	 * 			rules.compose(h.getLeaves().get(0));
-	 * if(list.size>1)
-	 * 		
-	 * for(leaves in hyperedge)
-	 */
 	public Hyperedge compose(Hyperedge h){
 		if(!root.getPort().equals(h.getRoot().getPort())){
 			new Exception("Those two hyperedges cannot compose because of two different roots");
 		}
 		List<RuleNode> list = new ArrayList<RuleNode>();
-		List<RuleNode> ruleNodes = new ArrayList<RuleNode>();
+		Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
 		ruleNodes.addAll(h.getLeaves());
 		
 		if(ruleNodes.size()==1){
+			RuleNode h_ruleNode = h.getLeaves().get(0);
+			for(Hyperedge edge : h_ruleNode.getHyperedges()){
+				if(!edge.getRoot().equals(getRoot())){
+					edge.rmLeaves(ruleNodes);
+					edge.addLeaves(getLeaves());
+				}
+			}
+			
 			for(RuleNode r : leaves){
-				list.add(r.compose(h.getLeaves().get(0)));
+				r.compose(h.getLeaves().get(0));
 			}
-			Queue<Hyperedge> l = new LinkedList<>(h.getLeaves().get(0).getHyperedges());
-			while(!l.isEmpty()){
-				Hyperedge edge = l.poll();
-				edge.rmLeaves(ruleNodes);
-				edge.addLeaves(list);
-			}
-			rmLeaves(leaves);
-			addLeaves(list);
-			h.rmLeaves(ruleNodes);
 		}
 		else{
 			Queue<RuleNode> h_leaves = new LinkedList<RuleNode>(h.getLeaves());
@@ -106,10 +113,10 @@ public class Hyperedge {
 						e.addLeaves(list);
 						rule.addHyperedge(e);
 					}
-					e.rmLeaves(Arrays.asList(rule));
+					Set<RuleNode> s = new HashSet<RuleNode>();
+					s.add(rule);
+					e.rmLeaves(s);
 				}
-//			}
-//			this.rmLeaves(leaves);
 			}
 		}
 
@@ -152,6 +159,46 @@ public class Hyperedge {
 		}
 
 		return new Disjunction(f);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Hyperedge))
+			return false;
+		
+		Hyperedge p = (Hyperedge) other;
+		for(RuleNode r : p.getLeaves()){
+			boolean b = false;
+			for(RuleNode r2 : leaves){
+				if(r2.equals(r)){
+					b=true;
+				}
+			}
+			if(!b)
+				return false;
+		}
+		return root.equals(p.getRoot()) &&leaves.size()==p.getLeaves().size();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		int hash=0;
+		if(leaves!=null){
+			for(RuleNode r : leaves){
+				hash=hash+r.hashCode();
+			}
+		}
+		return Objects.hash(this.root.getPort(),hash);
 	}
 	
 	public String toString(){

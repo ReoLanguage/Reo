@@ -372,6 +372,8 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		}
 		composedAutomaton = composedAutomaton.distribute();
 		
+		Set<Rule> s = new HashSet<Rule>();
+		
 		for(Port port : p){
 			if(!intface.contains(port))
 				composedAutomaton = composedAutomaton.hide(port);
