@@ -131,7 +131,7 @@ if (<guard(t); wrap, anchor>) {
 >>
 
 guard(t) ::= <<
-<if(t.equality)>equality here<endif><t.guard:formula()><if(t.output.keys)> && <t.output.keys:{p | <p.name>.hasGet()}; separator=" && "><endif><if(t.input)> && <t.input:{p | <p.name>.hasPut()}; separator=" && "><endif>
+<if(t.equality)>equality here<endif><t.guard:formula()><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" "><if(t.input)> && <t.input:{p | <p.name>.hasPut()}; separator=" && "><endif>
 >>
 
 formula(f) ::= <<
@@ -153,7 +153,7 @@ action(t) ::= <<
 >>
 
 output(a) ::= <<
-<a.output.keys:{p | <p.name>.put(<a.output.(p):term()>);}; separator="\n"> 
+<a.output.keys:{p | <if(!p.void)><p.name>.put(<a.output.(p):term()>)<else><a.output.(p):term()><endif>;}; separator="\n"> 
 >>
 
 memory(m) ::= <<

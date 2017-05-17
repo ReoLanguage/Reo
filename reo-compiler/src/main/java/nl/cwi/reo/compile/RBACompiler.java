@@ -165,6 +165,12 @@ public class RBACompiler {
 		}
 
 		Formula guard = null;
+		List<Formula> list = new ArrayList<>();
+		for(Formula l : guards){
+			if(!(l instanceof Relation && ((Relation) l).getValue().equals("true")))
+				list.add(l);
+		}
+		guards = list;
 		switch (guards.size()) {
 		case 0:
 			guard = new Relation("true", "true", null);

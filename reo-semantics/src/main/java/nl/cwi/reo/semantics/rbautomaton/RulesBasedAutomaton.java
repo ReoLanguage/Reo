@@ -374,10 +374,10 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 		composedAutomaton = composedAutomaton.distributeMultiEdge();
 		
 		
-		for(Port port : p){
-			if(!intface.contains(port))
-				composedAutomaton = composedAutomaton.hide(port);
-		}
+//		for(Port port : p){
+//			if(!intface.contains(port))
+//				composedAutomaton = composedAutomaton.hide(port);
+//		}
 		
 		return new RulesBasedAutomaton(composedAutomaton.getRules(),initialValue);
 	}

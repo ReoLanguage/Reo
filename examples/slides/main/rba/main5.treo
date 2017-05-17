@@ -1,12 +1,12 @@
-section slides.main;
+section slides.main.rba;
 
 import reo.fifo1;
 import reo.sync;
 import reo.lossy;
 
-import slides.main.red;
-import slides.main.green;
-import slides.main.blue;
+import slides.main.rba.red;
+import slides.main.rba.green;
+import slides.main.rba.blue;
 import slides.sequencer.seqc;
 
 main5() {

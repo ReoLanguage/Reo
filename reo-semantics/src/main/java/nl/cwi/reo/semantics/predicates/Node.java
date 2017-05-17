@@ -49,6 +49,10 @@ public class Node implements Variable  {
 	public boolean isInput() {
 		return p.isInput();
 	}
+	
+	public boolean isVoid(){
+		return p.getName().equals("null")?true:false;
+	}
 
 	@Override
 	public Term Substitute(Term t, Variable x) {

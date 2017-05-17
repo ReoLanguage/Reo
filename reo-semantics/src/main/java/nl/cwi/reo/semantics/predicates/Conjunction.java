@@ -256,7 +256,8 @@ public class Conjunction implements Formula {
 	public Formula Substitute(Term t, Variable x) {
 		List<Formula> list = new ArrayList<Formula>();
 		for (Formula f : clauses)
-			list.add(f.Substitute(t, x));
+			if(!(f instanceof Relation && ((Relation) f).getValue().equals("true")))
+				list.add(f.Substitute(t, x));
 		return new Conjunction(list);
 	}
 

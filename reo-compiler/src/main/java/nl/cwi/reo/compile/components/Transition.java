@@ -117,7 +117,9 @@ public final class Transition {
 	public Set<Port> getInterface() {
 		Set<Port> ports = new HashSet<Port>(input);
 		for (Node x : output.keySet())
-			ports.add(x.getPort());
+			if(!x.isVoid())
+				ports.add(x.getPort());	
+		
 		return ports;
 	}
 }

@@ -200,7 +200,11 @@ public class Equality implements Formula {
 
 	@Override
 	public Formula Substitute(Term t, Variable x) {
-		return new Equality(t1.Substitute(t, x), t2.Substitute(t, x));
+		Term t_1 = t1.Substitute(t, x);
+		Term t_2 = t2.Substitute(t, x);
+		if(t_1.equals(t_2))
+			return new Relation("true","true",null);
+		return new Equality(t_1, t_2);
 	}
 
 	@Override

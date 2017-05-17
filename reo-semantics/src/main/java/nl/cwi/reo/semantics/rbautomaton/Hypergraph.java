@@ -200,6 +200,10 @@ public class Hypergraph {
 	 */
 	public Set<Rule> getRules(){
 		Set<Rule> s = new HashSet<>();		
+		rules.clear();
+		for(Hyperedge g : hyperedges){
+			rules.addAll(g.getLeaves());
+		}
 		
 		for(RuleNode r : rules){
 			s.add(r.getRule());

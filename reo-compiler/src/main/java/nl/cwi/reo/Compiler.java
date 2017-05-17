@@ -50,6 +50,7 @@ import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.semantics.rbautomaton.Rule;
 import nl.cwi.reo.semantics.rbautomaton.RulesBasedAutomaton;
 import nl.cwi.reo.util.Message;
@@ -299,15 +300,30 @@ public class Compiler {
 
 			// Hide all internal ports
 			Formula f = rule.getFormula();
-			for (Port p : rule.getAllPorts())
+			Set<Variable> vars = f.getFreeVariables();
+			Set<Port> ports = new HashSet<>();
+			for(Variable v : vars){
+				if(v instanceof Node){
+					ports.add(((Node) v).getPort());
+				}
+			}
+			Set<Port> losingPorts = new HashSet<Port>();
+			Map<Node,Term> losingData = new HashMap<Node,Term>(); 
+			for (Port p : rule.getAllPorts()){
 				if (!intface.contains(p))
 					f = new Existential(new Node(p), f);
+				else if(rule.getSync().get(p) && !ports.contains(p)){
+					losingPorts.add(p);
+					losingData.put(new Node(new Port("null")), new Node(p));
+				}
+			}
 
 			// Commandify the formula:
 			Transition t = RBACompiler.commandify(f);
-//			if(t.getGuard() instanceof Conjunction)
-//				sizeGuard[k]=((Conjunction)t.getGuard()).getClauses().size();
-//			k++;
+			losingPorts.addAll(t.getInput());
+			losingData.putAll(t.getOutput());
+			t = new Transition(t.getGuard(), losingData, t.getMemory(), losingPorts);
+
 			transitions.add(t);
 		}
 

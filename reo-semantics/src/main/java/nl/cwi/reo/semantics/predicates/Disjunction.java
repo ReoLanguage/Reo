@@ -124,8 +124,11 @@ public class Disjunction implements Formula {
 		if(clauses.size()==1)
 			return clauses.get(0).QE();
 		
-		for (Formula f : clauses)
+		for (Formula f : clauses){
+			if(f instanceof Equality && ((Equality) f).getLHS().equals(((Equality) f).getRHS()))
+				return new Relation("true","true",null);
 			list.add(f.QE());
+		}
 		return new Disjunction(list);
 	}
 
@@ -134,8 +137,12 @@ public class Disjunction implements Formula {
 		List<Formula> list = new ArrayList<Formula>();
 		if(clauses.size()==1)
 			return clauses.get(0).Substitute(t,x);
-		for (Formula f : clauses)
-			list.add(f.Substitute(t, x));
+		for (Formula f : clauses){
+			Formula formula = f.Substitute(t, x);
+			if(formula instanceof Relation && ((Relation) formula).getValue().equals("true"))
+				return formula;
+			list.add(formula);
+		}
 		return new Disjunction(list);
 	}
 

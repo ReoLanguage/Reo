@@ -86,7 +86,7 @@ public class RuleNode implements HypergraphNode{
 		if(f instanceof Disjunction){
 			for(Formula clause : ((Disjunction) f).getClauses()){
 				for(Variable v : clause.getFreeVariables()){
-					if(v instanceof Node && !rule.getSync().get((((Node)v).getPort()))){
+					if(v instanceof Node && rule.getSync().get(((Node)v).getPort())!=null && !rule.getSync().get(((Node)v).getPort())){
 						canSync=false;
 					}
 				}
