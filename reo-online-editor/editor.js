@@ -299,7 +299,7 @@
     a.set({'line': line});
     b.set({'line': line});
     c1.linesOut.push(line);
-    c2.linesIn.push(line);
+    c2.linesOut.push(line);
     updateNode(c1);
     updateNode(c2);
     
@@ -367,7 +367,7 @@
     line.set({'arrow': a, 'arrow2': b, 'circle1': c1, 'circle2': c2});
     a.set({'line': line});
     b.set({'line': line});
-    c1.linesOut.push(line);
+    c1.linesIn.push(line);
     c2.linesIn.push(line);
     updateNode(c1);
     updateNode(c2);
@@ -393,7 +393,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'channel',
-      channel: 'sync'
+      channel: 'FIFO1'
     });
     
     // ...an arrowhead...
@@ -468,6 +468,7 @@
     var y1 = line.circle1.get('top');
     var x2 = line.circle2.get('left');
     var y2 = line.circle2.get('top');
+    line.set({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2});
     
     if (x1 == x2 && y1 == y2) {
       line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
@@ -1013,7 +1014,5 @@
   main.label.set({'text': 'main'});
   id = '0';
   document.getElementById("select").click();
-  drawFIFO1(100,100,200,100);
-  //drawSync(300,100,400,100);
-
+  drawSync(100,100,200,100);
 })();
