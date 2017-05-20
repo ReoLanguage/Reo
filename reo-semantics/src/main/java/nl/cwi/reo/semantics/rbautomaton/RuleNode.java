@@ -29,7 +29,9 @@ public class RuleNode implements HypergraphNode{
 
 	public RuleNode(Rule r, Set<Hyperedge> hyperedge) {
 		this.rule = r;
-		this.hyperedges=hyperedge;
+		this.hyperedges = new HashSet<>();
+		for(Hyperedge h : hyperedge)
+			addToHyperedge(h);
 		visited = false;
 	}
 	
@@ -55,12 +57,14 @@ public class RuleNode implements HypergraphNode{
 		return null;
 	}
 	
-	public void addHyperedge(Hyperedge h){
+	public void addToHyperedge(Hyperedge h){
 		hyperedges.add(h);
+		getHyperedges(h.getRoot()).addLeave(this);
 	}
 	
-	public void rmHyperedge(Hyperedge h){
+	public void rmFromHyperedge(Hyperedge h){
 		hyperedges.remove(h);
+		h.rmLeave(this);
 	}
 	
 	public boolean isVisited() {
@@ -104,13 +108,67 @@ public class RuleNode implements HypergraphNode{
 		return this;
 	}
 	
-	public RuleNode compose(RuleNode r){		
+	public RuleNode compose(RuleNode r){
+		if(!rule.canSync(r.getRule())){
+			return null;
+		}
 		rule.getSync().putAll(r.getRule().getSync());
 		rule = new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
+		Set<Hyperedge> set = new HashSet<>(r.getHyperedges());
+		for(Hyperedge h : set){
+			if(getHyperedges(h.getRoot())==null){
+				addToHyperedge(h);
+			}
+			else{
+				List<RuleNode> list = new ArrayList<>(h.getLeaves());
+				for(RuleNode ruleNodes : list){
+					ruleNodes.addToHyperedge(getHyperedges(h.getRoot()));
+					
+				}
+				
+//				System.out.println("Merge");
+				//Merge hyperedges
+			}
+		}
 		return this;
 	}
 	
-	public List<RuleNode> compose(List<RuleNode> rules){	
+	public void erase(){
+		Set<Hyperedge> s = new HashSet<>(hyperedges);
+		for(Hyperedge h : s){
+			rmFromHyperedge(h);
+		}
+	}
+	
+	public void isolate(){
+		Set<Hyperedge> s = new HashSet<>(hyperedges);
+		for(Hyperedge h : s){
+			h.rmLeave(this);
+		}
+		hyperedges=s;
+	}
+	
+	public RuleNode duplicate(){
+		return new RuleNode(this.getRule(),this.getHyperedges());
+	}
+	
+	public List<RuleNode> compose(List<RuleNode> rules){
+		/*
+		 * Composition of a RuleNode with a list of RuleNode results in the composition of formula, 
+		 * and, for each RuleNode of "rules", the union of hyperedges of its rule and this Rule (except the hyperedge with a commun root node). 
+		 * 
+		 * Remove "this" rule from hypergraph, store its hyperedges in a list.
+		 * Compose "this" rule formula with all other rules of the list.
+		 * Return a new list of composed rules.
+		 * 
+		 * For all rules in the new list of composed rules, add "this" list of hyperedges.
+		 * 
+		 */
+		Set<Hyperedge> hyperedges = new HashSet<>(this.getHyperedges());
+		this.isolate();
+		
+		
+		
 		List<RuleNode> listNewRuleNodes = new ArrayList<>();
 		for(RuleNode r : rules){
 			Map<Port,Boolean> map = new HashMap<Port,Boolean>();
@@ -121,8 +179,7 @@ public class RuleNode implements HypergraphNode{
 			RuleNode newRuleNode = new RuleNode(newRule,new HashSet<>(hyperedges));
 			for(Hyperedge h : r.getHyperedges()){
 				if(getHyperedges(h.getRoot())==null){
-					newRuleNode.getHyperedges().add(h);
-					h.addLeave(newRuleNode);
+					newRuleNode.addToHyperedge(h);
 				}
 			}
 			
@@ -130,6 +187,26 @@ public class RuleNode implements HypergraphNode{
 		}
 		
 		return listNewRuleNodes;
+		
+//		List<RuleNode> listNewRuleNodes = new ArrayList<>();
+//		for(RuleNode r : rules){
+//			Map<Port,Boolean> map = new HashMap<Port,Boolean>();
+//			map.putAll(rule.getSync());
+//			map.putAll(r.getRule().getSync());
+//			Rule newRule = new Rule(map,new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
+//			
+//			RuleNode newRuleNode = new RuleNode(newRule,new HashSet<>(hyperedges));
+//			for(Hyperedge h : r.getHyperedges()){
+//				if(getHyperedges(h.getRoot())==null){
+//					newRuleNode.getHyperedges().add(h);
+//					h.addLeave(newRuleNode);
+//				}
+//			}
+//			
+//			listNewRuleNodes.add(newRuleNode);
+//		}
+//		
+//		return listNewRuleNodes;
 	}
 	
 	

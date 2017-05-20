@@ -6,7 +6,7 @@ import reo.fifo1;
 //test2(a?String,b?String,c!String){
 //test2(a?String,b?String,c?String,d?String){
 
-test2(a?String,c?String,b!String){
+test2(a?String,c?String,b?String,d?String){
 
 	sync(a,x)
 	lossy(b,x)

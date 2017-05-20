@@ -31,10 +31,10 @@ public class Hypergraph {
 			for(Port v : r.getSync().keySet()){
 				if(r.getSync().get(v)){
 					if(!getHyperedges(v).isEmpty()){
-						getHyperedges(v).get(0).addLeave(rule);
+						rule.addToHyperedge(getHyperedges(v).get(0));
 					}
 					else{
-						HashSet<RuleNode> ruleNodes = new HashSet<RuleNode>();
+						List<RuleNode> ruleNodes = new ArrayList<RuleNode>();
 						ruleNodes.add(rule);
 						hyperedges.add(new Hyperedge(new PortNode(v),ruleNodes));
 					}
@@ -97,16 +97,6 @@ public class Hypergraph {
 				else
 					multiEdge.add(h);
 			}
-			if(!multiEdge.isEmpty()){
-				for(Hyperedge h : singleEdge){
-					for(Hyperedge e : multiEdge){
-						e.compose(h);
-					}
-					rules.remove(h.getLeaves().get(0));
-				}
-				if(!multiEdge.isEmpty())
-					hyperedges.removeAll(singleEdge);
-			}
 			if(singleEdge.size()>1){
 				Hyperedge e = singleEdge.get(0);
 				singleEdge.remove(0);
@@ -115,8 +105,20 @@ public class Hypergraph {
 					e.compose(h);
 				}
 				hyperedges.removeAll(singleEdge);
+				singleEdge.clear();
+				singleEdge.add(e);
 			}
-			
+			if(!multiEdge.isEmpty()){
+				Hyperedge e = multiEdge.get(0);
+				for(Hyperedge h : singleEdge){
+					rules.remove(h.getLeaves().get(0));
+					e.compose(h);
+
+				}
+				if(!multiEdge.isEmpty()){
+					hyperedges.removeAll(singleEdge);
+				}
+			}			
 		}
 		
 		return this;
@@ -135,27 +137,36 @@ public class Hypergraph {
 			Hyperedge toDistribute = multiEdge.get(0);
 			multiEdge.remove(0);
 			
-			if(!multiEdge.isEmpty()){
-				for(Hyperedge h : multiEdge){
-					h.compose(toDistribute);
-				}
-				rules.clear();
-				if(!multiEdge.isEmpty())
-					hyperedges.remove(toDistribute);
-				for(Hyperedge g : hyperedges){
-					rules.addAll(g.getLeaves());
-				}
-			}			
+			for(Hyperedge h : multiEdge){
+				toDistribute = h.compose(toDistribute);
+			}
+			removeEmptyHyperedge();	
 		}
+		rules.clear();
+		
+		for(Hyperedge g : hyperedges){
+			rules.addAll(g.getLeaves());
+		}	
 		
 		return this;
+	}
+	
+	public void removeEmptyHyperedge(){
+		List<Hyperedge> s = new ArrayList<>(hyperedges);
+		for(Hyperedge e : s){
+			if(e.getLeaves().size()==0){
+				e.getRoot().rmHyperedge(e);
+				hyperedges.remove(e);
+			}
+		}
+		
 	}
 	
 	public void removeHyperedge(List<Hyperedge> edges){
 		hyperedges.removeAll(edges);
 		for(Hyperedge e : edges){
 			for(RuleNode r : e.getLeaves()){
-				r.rmHyperedge(e);
+				r.rmFromHyperedge(e);
 			}
 		}
 		

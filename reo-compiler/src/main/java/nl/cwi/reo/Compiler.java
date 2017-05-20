@@ -312,17 +312,27 @@ public class Compiler {
 			for (Port p : rule.getAllPorts()){
 				if (!intface.contains(p))
 					f = new Existential(new Node(p), f);
-				else if(rule.getSync().get(p) && !ports.contains(p)){
+				else if(rule.getSync().get(p)){ //&& !ports.contains(p)){
 					losingPorts.add(p);
-					losingData.put(new Node(new Port("null")), new Node(p));
+					losingData.put(new Node(new Port("null"+p.getName())), new Node(p));
 				}
 			}
 
 			// Commandify the formula:
 			Transition t = RBACompiler.commandify(f);
-			losingPorts.addAll(t.getInput());
-			losingData.putAll(t.getOutput());
-			t = new Transition(t.getGuard(), losingData, t.getMemory(), losingPorts);
+			Set<Port> portList = new HashSet<Port>(losingPorts);
+			for(Port p : portList){
+				if(!t.getInput().contains(p) && !t.getOutput().containsKey(new Node(p))){
+					losingPorts.addAll(t.getInput());
+					losingData.putAll(t.getOutput());
+				}
+				else{
+					losingPorts.remove(p);
+					losingData.remove(new Node(p));
+				}
+			}
+			if(!losingData.isEmpty() && !losingPorts.isEmpty())
+				t = new Transition(t.getGuard(), losingData, t.getMemory(), losingPorts);
 
 			transitions.add(t);
 		}

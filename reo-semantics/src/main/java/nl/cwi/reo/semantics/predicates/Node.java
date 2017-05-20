@@ -21,7 +21,7 @@ public class Node implements Variable  {
 	public Node(Port p) {
 		this.p = p;
 	}
-
+	
 	public Port getPort() {
 		return p;
 	}
@@ -51,7 +51,12 @@ public class Node implements Variable  {
 	}
 	
 	public boolean isVoid(){
-		return p.getName().equals("null")?true:false;
+		if(p.getName().length()>4){
+			String s = p.getName().substring(0,4);
+			return s.equals("null")?true:false;
+		}
+		else
+			return false;
 	}
 
 	@Override

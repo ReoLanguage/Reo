@@ -42,6 +42,10 @@ public class PortNode implements HypergraphNode{
 	public void addHyperedge(Hyperedge h){
 		hyperedges.add(h);
 	}
+
+	public void rmHyperedge(Hyperedge h){
+		hyperedges.remove(h);
+	}
 	
 	public boolean isVisited() {
 		return visited;
