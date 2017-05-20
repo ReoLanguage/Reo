@@ -2,6 +2,7 @@ package nl.cwi.reo.semantics.predicates;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -225,4 +226,27 @@ public class Equality implements Formula {
 		return map;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Equality))
+			return false;
+		Equality eq = (Equality) other;
+		return (Objects.equals(this.t1, eq.t1)&&Objects.equals(this.t2, eq.t2))||
+				Objects.equals(this.t1, eq.t2)&&Objects.equals(this.t2, eq.t1);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.t1,this.t2);
+	}
 }

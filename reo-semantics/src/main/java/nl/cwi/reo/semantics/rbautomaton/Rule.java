@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -11,6 +12,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.util.Monitor;
 
 public class Rule {
@@ -77,6 +79,8 @@ public class Rule {
 					return false;
 				}
 			}
+			else if(r.getSync()!=null && r.getSync().get(p)!=null &&r.getSync().get(p))
+				return false;
 		}
 		return hasEdge;
 	}
@@ -101,5 +105,28 @@ public class Rule {
 	public @Nullable Rule evaluate(Scope s, Monitor m) {
 
 		return new Rule(sync, f.evaluate(s, m));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Rule))
+			return false;
+		Rule rule = (Rule) other;
+		return (Objects.equals(this.sync, rule.sync) && Objects.equals(this.f, rule.f));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.sync,this.f);
 	}
 }

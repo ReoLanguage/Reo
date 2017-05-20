@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
@@ -112,4 +114,29 @@ public class Function implements Term {
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Function))
+			return false;
+		Function func = (Function) other;
+		return (Objects.equals(this.name, func.name)&&Objects.equals(this.value, func.value))&&
+				Objects.equals(this.args, func.args);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.name,this.value,this.args);
+	}
+	
+	
 }

@@ -44,10 +44,12 @@ import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemCell;
+import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
@@ -200,7 +202,6 @@ public class Compiler {
 	}
 
 	private void compileRBA() {
-		
 		Long t1 = System.nanoTime();
 
 		// Interpret the Reo program
@@ -309,12 +310,24 @@ public class Compiler {
 			}
 			Set<Port> losingPorts = new HashSet<Port>();
 			Map<Node,Term> losingData = new HashMap<Node,Term>(); 
+			Set<Formula> negativePortGuard=new HashSet<Formula>(); 
 			for (Port p : rule.getAllPorts()){
 				if (!intface.contains(p))
 					f = new Existential(new Node(p), f);
 				else if(rule.getSync().get(p)){ //&& !ports.contains(p)){
 					losingPorts.add(p);
 					losingData.put(new Node(new Port("null"+p.getName())), new Node(p));
+				}
+				if(!rule.getSync().get(p)){
+					for(Rule _rule : circuit.getRules()){
+						if(_rule.getSync().get(p)!=null && _rule.getSync().get(p)){
+							for(Port port : _rule.getFiringPorts()){
+								if(intface.contains(port) && rule.getSync().get(port)==null){
+									negativePortGuard.add(new Equality(new Node(port),new Function("false",false, new ArrayList<>())));
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -331,8 +344,12 @@ public class Compiler {
 					losingData.remove(new Node(p));
 				}
 			}
+			negativePortGuard.add(t.getGuard());
+			if(!negativePortGuard.isEmpty())
+				t = new Transition(new Conjunction(new ArrayList<>(negativePortGuard)), t.getOutput(), t.getMemory(), t.getInput());
+
 			if(!losingData.isEmpty() && !losingPorts.isEmpty())
-				t = new Transition(t.getGuard(), losingData, t.getMemory(), losingPorts);
+				t = new Transition(new Conjunction(new ArrayList<>(negativePortGuard)), losingData, t.getMemory(), losingPorts);
 
 			transitions.add(t);
 		}

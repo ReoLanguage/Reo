@@ -59,7 +59,7 @@ public class RuleNode implements HypergraphNode{
 	
 	public void addToHyperedge(Hyperedge h){
 		hyperedges.add(h);
-		getHyperedges(h.getRoot()).addLeave(this);
+		h.addLeave(this);
 	}
 	
 	public void rmFromHyperedge(Hyperedge h){
@@ -112,23 +112,17 @@ public class RuleNode implements HypergraphNode{
 		if(!rule.canSync(r.getRule())){
 			return null;
 		}
+
+			
 		rule.getSync().putAll(r.getRule().getSync());
-		rule = new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
+		if(rule.getFormula().equals(r.getRule().getFormula()))
+			rule = new Rule(rule.getSync(),rule.getFormula());
+		else
+			rule = new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));			
+		
 		Set<Hyperedge> set = new HashSet<>(r.getHyperedges());
 		for(Hyperedge h : set){
-			if(getHyperedges(h.getRoot())==null){
-				addToHyperedge(h);
-			}
-			else{
-				List<RuleNode> list = new ArrayList<>(h.getLeaves());
-				for(RuleNode ruleNodes : list){
-					ruleNodes.addToHyperedge(getHyperedges(h.getRoot()));
-					
-				}
-				
-//				System.out.println("Merge");
-				//Merge hyperedges
-			}
+			addToHyperedge(h);
 		}
 		return this;
 	}
@@ -228,7 +222,8 @@ public class RuleNode implements HypergraphNode{
 		if (!(other instanceof RuleNode))
 			return false;
 		RuleNode rule = (RuleNode) other;
-		return Objects.equals(this.rule.getFormula(),(rule.getRule().getFormula()));
+		return Objects.equals(this.getRule(),rule.getRule());
+//		return Objects.equals(this.rule.getFormula(),(rule.getRule().getFormula()));
 	}
 
 	/**
@@ -236,9 +231,9 @@ public class RuleNode implements HypergraphNode{
 	 */
 	@Override
 	public int hashCode() {
-		Formula f = this.getRule().getFormula();
+//		Formula f = this.getRule().getFormula();
 		
-		return Objects.hash(f);
+		return Objects.hash(this.getRule());
 	}
 	
 	//1975929195
