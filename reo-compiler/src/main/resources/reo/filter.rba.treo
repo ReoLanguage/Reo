@@ -2,6 +2,6 @@ section reo;
 
 filter<k:string>(a?, b!) {
 	#RBA
-	{a,b} b=k(a)
+	{a,b} k(b)=a
 }
 

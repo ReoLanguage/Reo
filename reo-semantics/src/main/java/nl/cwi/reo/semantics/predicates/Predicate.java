@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -148,6 +149,30 @@ public class Predicate implements Semantics<Predicate> {
 			if (!intface.contains(p))
 				g = new Existential(new Node(p), g);
 		return new Predicate(g);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Predicate))
+			return false;
+		
+		Predicate p = (Predicate) other;
+		return Objects.equals(f, p.getFormula());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(f);
 	}
 
 }

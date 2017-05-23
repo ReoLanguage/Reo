@@ -112,7 +112,6 @@ public class RuleNode implements HypergraphNode{
 		if(!rule.canSync(r.getRule())){
 			return null;
 		}
-
 			
 		rule.getSync().putAll(r.getRule().getSync());
 		if(rule.getFormula().equals(r.getRule().getFormula()))
@@ -146,44 +145,6 @@ public class RuleNode implements HypergraphNode{
 		return new RuleNode(this.getRule(),this.getHyperedges());
 	}
 	
-	public List<RuleNode> compose(List<RuleNode> rules){
-		/*
-		 * Composition of a RuleNode with a list of RuleNode results in the composition of formula, 
-		 * and, for each RuleNode of "rules", the union of hyperedges of its rule and this Rule (except the hyperedge with a commun root node). 
-		 * 
-		 * Remove "this" rule from hypergraph, store its hyperedges in a list.
-		 * Compose "this" rule formula with all other rules of the list.
-		 * Return a new list of composed rules.
-		 * 
-		 * For all rules in the new list of composed rules, add "this" list of hyperedges.
-		 * 
-		 */
-		Set<Hyperedge> hyperedges = new HashSet<>(this.getHyperedges());
-		this.isolate();
-		
-		
-		
-		List<RuleNode> listNewRuleNodes = new ArrayList<>();
-		for(RuleNode r : rules){
-			Map<Port,Boolean> map = new HashMap<Port,Boolean>();
-			map.putAll(rule.getSync());
-			map.putAll(r.getRule().getSync());
-			Rule newRule = new Rule(map,new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
-			
-			RuleNode newRuleNode = new RuleNode(newRule,new HashSet<>(hyperedges));
-			for(Hyperedge h : r.getHyperedges()){
-				if(getHyperedges(h.getRoot())==null){
-					newRuleNode.addToHyperedge(h);
-				}
-			}
-			
-			listNewRuleNodes.add(newRuleNode);
-		}
-		
-		return listNewRuleNodes;
-		
-	}
-	
 	
 	public RuleNode hide(PortNode p){
 		rule = new Rule(rule.getSync(),(new Existential(new Node(p.getPort()),rule.getFormula())).QE());
@@ -211,7 +172,7 @@ public class RuleNode implements HypergraphNode{
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getRule());
+		return Objects.hash(this.getRule().hashCode());
 	}
 	
 	public String toString(){

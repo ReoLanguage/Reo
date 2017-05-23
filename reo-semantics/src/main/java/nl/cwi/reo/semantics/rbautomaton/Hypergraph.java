@@ -34,7 +34,7 @@ public class Hypergraph {
 						rule.addToHyperedge(getHyperedges(v).get(0));
 					}
 					else{
-						List<RuleNode> ruleNodes = new ArrayList<RuleNode>();
+						Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
 						ruleNodes.add(rule);
 						hyperedges.add(new Hyperedge(new PortNode(v),ruleNodes));
 					}
@@ -86,7 +86,7 @@ public class Hypergraph {
 	 * @return
 	 */
 	public Hypergraph distributeSingleEdge(){
-						
+				
 		for(Port p : variables){
 			List<Hyperedge> singleEdge = new ArrayList<>();
 			List<Hyperedge> multiEdge = new ArrayList<>();
@@ -101,7 +101,7 @@ public class Hypergraph {
 				Hyperedge e = singleEdge.get(0);
 				singleEdge.remove(0);
 				for(Hyperedge h : singleEdge){
-					rules.remove(h.getLeaves().get(0));
+					rules.remove(h.getLeaves().iterator().next());
 					e.compose(h);
 				}
 				hyperedges.removeAll(singleEdge);
@@ -111,14 +111,14 @@ public class Hypergraph {
 			if(!multiEdge.isEmpty()){
 				Hyperedge e = multiEdge.get(0);
 				for(Hyperedge h : singleEdge){
-					rules.remove(h.getLeaves().get(0));
+					rules.remove(h.getLeaves().iterator().next());
 					e.compose(h);
 
 				}
 				if(!multiEdge.isEmpty()){
 					hyperedges.removeAll(singleEdge);
 				}
-			}			
+			}	
 		}
 		
 		return this;
@@ -129,7 +129,7 @@ public class Hypergraph {
 	 * @return
 	 */
 	public Hypergraph distributeMultiEdge(){
-						
+				
 		for(Port p : variables){
 			List<Hyperedge> multiEdge = new ArrayList<>();
 		
@@ -140,7 +140,7 @@ public class Hypergraph {
 			for(Hyperedge h : multiEdge){
 				toDistribute = h.compose(toDistribute);
 			}
-			removeEmptyHyperedge();	
+			removeEmptyHyperedge();
 		}
 		rules.clear();
 		
@@ -221,59 +221,6 @@ public class Hypergraph {
 		}
 		
 		return s;
-		
-//		Set<Rule> s = new HashSet<>();
-//		int nbHyperedges = 0;
-//		for(RuleNode r : rules){
-//			int i = 0;
-//			nbHyperedges = r.getHyperedges().size();
-//			List<Rule> ruleList = new ArrayList<Rule>();
-//			for(Hyperedge h : r.getHyperedges()){
-//				if(getHyperedges(h.getRoot().getPort()).size()==1){
-//					i++;
-//					if(nbHyperedges==i)
-//						s.add(r.getRule());
-//				}
-//				else{
-//					ruleList.add(r.getRule());
-//					for(Hyperedge h2 : getHyperedges(h.getRoot().getPort())){
-//						if(!h.equals(h2)){
-//							List<Rule> ruleList_tmp = new ArrayList<Rule>();
-//							for(RuleNode rule : h2.getLeaves()){
-//								for(Rule t : ruleList){
-////									ruleList_tmp.add(new RuleNode(rule.getRule(),rule.getHyperedges()).compose(t.getFormula()).getRule());
-//								}
-//							}
-//							ruleList=ruleList_tmp;
-//						}
-//					}
-//				}
-//			}
-//			s.addAll(ruleList);
-//		}
-//		
-//		/*
-//		 * Remove rules with the same formula  
-//		 */
-//		
-//		Set<Rule> s2 = new HashSet<>();
-//		int i=0;
-//		
-//		for(Rule r : s){
-//			int j=0;
-//			boolean add=true;
-//			for(Rule r2 : s){
-//				if(j>i && r.getFormula().equals(r2.getFormula())){
-//					add=false;
-//				}
-//				j++;
-//			}
-//			i++;
-//			if(add){
-//				s2.add(r);
-//			}
-//		}
-//		return s2;
 	}
 
 	

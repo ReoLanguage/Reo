@@ -52,7 +52,7 @@ public class Rule {
 	}
 
 	public Rule rename(Map<Port, Port> links) {
-		Map<Port, Boolean> map = new HashMap<>();
+		HashMap<Port, Boolean> map = new HashMap<>();
 		for (Port p : sync.keySet()) {
 			if (links.containsKey(p)) {
 				map.put(links.get(p), sync.get(p));

@@ -291,8 +291,7 @@ public class Conjunction implements Formula {
 	 */
 	@Override
 	public int hashCode() {
-		Set<Formula> s = new HashSet<>(clauses);
-		return Objects.hash(s);
+		return Objects.hash(clauses);
 	}
 
 

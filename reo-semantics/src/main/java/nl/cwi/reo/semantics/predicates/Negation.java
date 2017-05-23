@@ -2,8 +2,10 @@ package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -116,5 +118,28 @@ public class Negation implements Formula {
 				map.put(entry.getKey(), 0);
 		}
 		return map;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Negation))
+			return false;
+		Negation n = (Negation)other;
+		return Objects.equals(f, n.getFormula());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(f);
 	}
 }

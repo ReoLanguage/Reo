@@ -1,7 +1,9 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -24,7 +26,10 @@ public class Universal implements Formula {
 	public Variable getVariable() {
 		return x;
 	}
-
+	public Formula getFormula() {
+		return f;
+	}
+	
 	@Override
 	public Formula getGuard() {
 		throw new UnsupportedOperationException();
@@ -93,6 +98,30 @@ public class Universal implements Formula {
 		Map<Variable, Integer> map = f.getEvaluation();
 		map.remove(x);
 		return map;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Universal))
+			return false;
+		Universal u = (Universal)other;
+		
+		return Objects.equals(this.x, u.getVariable())&&Objects.equals(this.f, u.getFormula());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(x,f);
 	}
 
 }

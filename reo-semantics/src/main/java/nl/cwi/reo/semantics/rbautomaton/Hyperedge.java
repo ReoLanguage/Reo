@@ -22,12 +22,12 @@ import nl.cwi.reo.semantics.predicates.Term;
 
 public class Hyperedge {
 	private PortNode root;
-	private List<RuleNode> leaves;
+	private Set<RuleNode> leaves;
 	
-	public Hyperedge(PortNode root, List<RuleNode> leaves){
+	public Hyperedge(PortNode root, Set<RuleNode> leaves){
 		root.addHyperedge(this);
 		this.root=root;
-		this.leaves = new ArrayList<RuleNode>();
+		this.leaves = new HashSet<RuleNode>();
 		for(RuleNode r : leaves)
 			r.addToHyperedge(this);
 		
@@ -37,7 +37,7 @@ public class Hyperedge {
 		return root;
 	}
 	
-	public List<RuleNode> getLeaves(){
+	public Set<RuleNode> getLeaves(){
 		return leaves;
 	}
 
@@ -52,11 +52,13 @@ public class Hyperedge {
 	}
 	
 	public Hyperedge addLeave(RuleNode r){
+		leaves=new HashSet<>(leaves);
 		leaves.add(r);
 		return this;
 	}
 	
 	public Hyperedge addLeaves(List<RuleNode> r){
+		leaves=new HashSet<>(leaves);
 		leaves.addAll(r);
 		return this;
 	}
@@ -68,11 +70,13 @@ public class Hyperedge {
 	}
 	
 	public Hyperedge rmLeave(RuleNode r){
+		leaves=new HashSet<>(leaves);
 		leaves.remove(r);
 		return this;
 	}
 	
 	public Hyperedge compose(Formula f){
+		leaves=new HashSet<>(leaves);
 		for(RuleNode r : leaves){
 			r.compose(f);
 		}
@@ -94,7 +98,7 @@ public class Hyperedge {
 		
 		if(ruleNodes.size()==1){
 			//Single rule to compose
-			RuleNode h_ruleNode = h.getLeaves().get(0);
+			RuleNode h_ruleNode = h.getLeaves().iterator().next();
 			RuleNode toCompose = new RuleNode(h_ruleNode.getRule(),h_ruleNode.getHyperedges());
 			toCompose.rmFromHyperedge(h);
 			//Compose single rule

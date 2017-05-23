@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -158,6 +159,32 @@ public class Disjunction implements Formula {
 	public Map<Variable, Integer> getEvaluation() {
 		// TODO Auto-generated method stub
 		return new HashMap<Variable, Integer>();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Disjunction))
+			return false;
+		Set<Formula> s = new HashSet<>(this.getClauses());
+		Set<Formula> s2 = new HashSet<>(((Disjunction)other).getClauses());
+		
+		return Objects.equals(s, s2);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		Set<Formula> s = new HashSet<>(clauses);
+		return Objects.hash(s);
 	}
 
 }
