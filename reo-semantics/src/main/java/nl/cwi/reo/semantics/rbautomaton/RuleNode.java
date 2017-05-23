@@ -182,25 +182,6 @@ public class RuleNode implements HypergraphNode{
 		
 		return listNewRuleNodes;
 		
-//		List<RuleNode> listNewRuleNodes = new ArrayList<>();
-//		for(RuleNode r : rules){
-//			Map<Port,Boolean> map = new HashMap<Port,Boolean>();
-//			map.putAll(rule.getSync());
-//			map.putAll(r.getRule().getSync());
-//			Rule newRule = new Rule(map,new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
-//			
-//			RuleNode newRuleNode = new RuleNode(newRule,new HashSet<>(hyperedges));
-//			for(Hyperedge h : r.getHyperedges()){
-//				if(getHyperedges(h.getRoot())==null){
-//					newRuleNode.getHyperedges().add(h);
-//					h.addLeave(newRuleNode);
-//				}
-//			}
-//			
-//			listNewRuleNodes.add(newRuleNode);
-//		}
-//		
-//		return listNewRuleNodes;
 	}
 	
 	
@@ -223,7 +204,6 @@ public class RuleNode implements HypergraphNode{
 			return false;
 		RuleNode rule = (RuleNode) other;
 		return Objects.equals(this.getRule(),rule.getRule());
-//		return Objects.equals(this.rule.getFormula(),(rule.getRule().getFormula()));
 	}
 
 	/**
@@ -231,20 +211,12 @@ public class RuleNode implements HypergraphNode{
 	 */
 	@Override
 	public int hashCode() {
-//		Formula f = this.getRule().getFormula();
-		
 		return Objects.hash(this.getRule());
 	}
 	
-	//1975929195
 	public String toString(){
 		String s = "("+rule.toString()+")";
-//		s=s+"excl rules : (";
-//		int i =0;
-//		for(RuleNode r : exclusiveRules){
-//			s=s+(i!=0?",":"")+r.getRule().toString()+"\n";
-//			i++;
-//		}
+
 		return s;
 	}
 }

@@ -25,18 +25,18 @@ public class ExclusiveRouter<T> implements Component {
 	
 	public void run() {		
 		while (true) {			
-			if (a.hasPut() && b.hasGet()) {
+			if (a.hasPut()!=null && b.hasGet()) {
 				T d_a = a.get();
 				b.put(d_a);
 				continue;
 			}
-			if (a.hasPut() && c.hasGet()) {
+			if (a.hasPut()!=null && c.hasGet()) {
 				T d_a = a.get();
 				c.put(d_a);
 				continue;
 			}
 			synchronized (this) {
-				if (!a.hasPut() || (!b.hasGet() && !c.hasGet())) 
+				if (a.hasPut()==null || (!b.hasGet() && !c.hasGet())) 
 					try { wait(); } catch (InterruptedException e) { }	
 			}
 		}

@@ -21,7 +21,8 @@ public class PortBuffer<T> implements Port<T> {
 	public void setProducer(Component p) { prod = p; }
 	public void setConsumer(Component c) { cons = c; }	
 	public void setGet() { get = true; }
-	public boolean hasPut() { return !put.isEmpty(); }
+	public T hasPut() { return put.isEmpty()?put.get(0):null; }
+	public T peek() { return put.isEmpty()?put.get(0):null;}
 	public T take() { synchronized (this) { return put.remove(0); } }
 	public void setPut(T datum) { synchronized (this) { put.add(datum); } }
 	public boolean hasGet() { return put.size() < k; }

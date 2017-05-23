@@ -17,7 +17,8 @@ public class PortWaitNotify<T> implements Port<T> {
 		return datum;
 	}
 	public boolean hasGet() { return get && put == null; }
-	public boolean hasPut() { return put != null; }
+	public T hasPut() { return put; }
+	public T peek() { return put; }
 	public void activateProducer() { prod.activate(); }
 	public void activateConsumer() { cons.activate(); }
 	public void put(T datum) {

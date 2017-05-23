@@ -295,8 +295,6 @@ public class Compiler {
 		
 		// Transform every disjunctive clause into a transition.
 		Set<Transition> transitions = new HashSet<>();
-//		Integer[] sizeGuard = new Integer[circuit.getRules().size()];
-//		int k=0;
 		for (Rule rule : circuit.getRules()) {
 
 			// Hide all internal ports
@@ -318,21 +316,25 @@ public class Compiler {
 					losingPorts.add(p);
 					losingData.put(new Node(new Port("null"+p.getName())), new Node(p));
 				}
-				if(!rule.getSync().get(p)){
-					for(Rule _rule : circuit.getRules()){
-						if(_rule.getSync().get(p)!=null && _rule.getSync().get(p)){
-							for(Port port : _rule.getFiringPorts()){
-								if(intface.contains(port) && rule.getSync().get(port)==null){
-									negativePortGuard.add(new Equality(new Node(port),new Function("false",false, new ArrayList<>())));
-								}
-							}
-						}
-					}
-				}
+				/*
+				 * Add negative information in guard :
+				 */
+//				if(!rule.getSync().get(p)){
+//					for(Rule _rule : circuit.getRules()){
+//						if(_rule.getSync().get(p)!=null && _rule.getSync().get(p)){
+//							for(Port port : _rule.getFiringPorts()){
+//								if(intface.contains(port) && rule.getSync().get(port)==null){
+//									negativePortGuard.add(new Equality(new Node(port),new Function("false",false, new ArrayList<>())));
+//								}
+//							}
+//						}
+//					}
+//				}
 			}
 
 			// Commandify the formula:
 			Transition t = RBACompiler.commandify(f);
+			
 			Set<Port> portList = new HashSet<Port>(losingPorts);
 			for(Port p : portList){
 				if(!t.getInput().contains(p) && !t.getOutput().containsKey(new Node(p))){
@@ -349,20 +351,13 @@ public class Compiler {
 				t = new Transition(new Conjunction(new ArrayList<>(negativePortGuard)), t.getOutput(), t.getMemory(), t.getInput());
 
 			if(!losingData.isEmpty() && !losingPorts.isEmpty())
-				t = new Transition(new Conjunction(new ArrayList<>(negativePortGuard)), losingData, t.getMemory(), losingPorts);
-
-			transitions.add(t);
+				t = new Transition(new Conjunction(new ArrayList<>(negativePortGuard)), losingData, t.getMemory(), losingPorts);			
+			
+			if(!(t.getInput().isEmpty()&&t.getMemory().isEmpty()&&t.getOutput().isEmpty()))
+				transitions.add(t);
 		}
 
 		Long t6 = System.nanoTime();
-		
-//        Integer[] indexes = new Integer[sizeGuard.length];
-//        for (int j = 0; j < sizeGuard.length; j++)
-//        {
-//            indexes[j] = j;
-//        }
-//        
-//        Arrays.sort(indexes,sizeGuard);
 		
 		// TODO Partition the set of transitions
 		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
@@ -388,7 +383,12 @@ public class Compiler {
 						if(m.getValue() instanceof MemCell)
 							initialValueRHS = circuit.getInitials().get(new MemCell(((MemCell)m.getValue()).getName(),false));
 						
-						TypeTag tag;
+						TypeTag tag=m.getValue().getTypeTag();
+						for(Node n : t.getOutput().keySet()){
+							if(t.getOutput().get(n) instanceof MemCell && ((MemCell)t.getOutput().get(n)).getName().equals(m.getKey().getName())&&n.getPort().getTypeTag()!=null){
+								tag = new TypeTag(n.getPort().getTypeTag().toString());
+							}
+						}
 						if(initialValueLHS !=null && initialValueLHS instanceof Function && ((Function)initialValueLHS).getValue() instanceof String){
 							tag = new TypeTag("String");
 						}
@@ -396,14 +396,10 @@ public class Compiler {
 							tag = new TypeTag("String");
 						}
 						if(initialValueLHS !=null && initialValueLHS instanceof Function && ((Function)initialValueLHS).getValue() instanceof Integer){
-							tag = new TypeTag("String");
+							tag = new TypeTag("Integer");
 						}
 						if(initialValueRHS !=null && initialValueRHS instanceof Function && ((Function)initialValueRHS).getValue() instanceof Integer){
-							tag = new TypeTag("String");
-						}
-						
-						else{
-							tag = m.getValue().getTypeTag();
+							tag = new TypeTag("Integer");
 						}
 						tags.remove(x);
 						tags.remove(x_prime);

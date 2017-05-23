@@ -16,23 +16,42 @@ import reo.fifofull;
 */
 
 chess = (){
-
-
+	fifofull<"">(x,WhiteI)
+	Engine1(WhiteI,WhiteO)
+	Engine2(BlackI,BlackO)
+	visualize(WhiteI,WhiteO,Display1,BlackI)
+	visualize(BlackI,BlackO,Display2,WhiteI)
+	Display(Display1,Display2)
 }
 
-visualize(C?,R?,M!,O!){
+Engine1(a?String,b!String){
+	#RBA {a,b} true
+	Java:"Workers.Engine"
+}
+
+Engine2(a?String,b!String){
+	#RBA {a,b} true
+	Java:"Workers.Engine"
+}
+
+Display(a?String,b?String){
+	#RBA {a,b} true
+	Java:"Workers.Display"
+}
+
+visualize(C?String,R?String,M!String,O!String){
 	//
 	// This function take :
 	//	the input port of an engine (C?)
 	//	the output port of an engine (R?)
-	//	the port of the display (M)
+	//	the port of the display (M!)
 	//
 	// display the visualisation of engines playing.
 	//
 
 	fifo1(C,k)
-      	{ transformer<PARSE>(R,M) | PARSE = "Functions.parse"}
-	{ binop<CONCATENATE>(k,M,O) | CONCATENATE = "Functions.concatenate" }
+      	transformer<"Function.parse">(R,M)
+	binop<"Function.concatenate">(k,M,O)
 
 }
 

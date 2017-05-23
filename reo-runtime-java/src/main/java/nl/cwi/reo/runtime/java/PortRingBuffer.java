@@ -21,7 +21,8 @@ public class PortRingBuffer<T> implements Port<T> {
 		head = n;
 	}
 	public void setGet() { }
-	public boolean hasPut() { return head != tail; }
+	public T hasPut() { return head != tail?put[head]:null; }
+	public T peek() { return head != tail?put[head]:null; }
 	public boolean hasGet() { 
 		int n;
 		return tail != ((n = head + 1) == put.length ? 0 : n); 

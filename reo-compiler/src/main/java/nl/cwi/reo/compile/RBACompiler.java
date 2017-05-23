@@ -200,7 +200,38 @@ public class RBACompiler {
 			}
 		}
 
-		return new Transition(guard, output, memory, allInputPorts);
+		/*
+		 * For all ports, in the transition, 
+		 * 	- peek value except for last peek, where it gets the value.
+		 * For all ports at the interface (ie protocol is not consumer and producer),
+		 * 	- transitivity over put and get on same port during the same transition.
+		 */
+		Map<Node, Term> output_substitution = new HashMap<Node, Term>(output);
+		for(Node n : output.keySet()){
+			Set<Variable> s = output.get(n).getFreeVariables();
+			for(Variable v : s){
+				if(output.containsKey(v)){
+					output_substitution.put(n, output.get(n).Substitute(output.get(v), v));
+				}
+			}
+		}
+		
+		Map<MemCell, Term> mem_substitution = new LinkedHashMap<MemCell, Term>(memory);
+		for(MemCell m : memory.keySet()){
+			Set<Variable> s = memory.get(m).getFreeVariables();
+			for(Variable v : s){
+				if(output_substitution.containsKey(v)){
+					mem_substitution.put(m, memory.get(m).Substitute(output_substitution.get(v), v));
+				}
+			}
+//			if(!mem_substitution.containsKey(m))
+//				if(mem_substitution.get(m)!=null)
+//					mem_substitution.put(m, memory.get(m));
+//				else
+//					null_mem.put(m, memory.get(m));
+		}
+//		mem_substitution.putAll(null_mem);
+		return new Transition(guard, output_substitution, mem_substitution, allInputPorts);
 	}
 	
 	public static Map<Variable, Term> sort(Map<Variable, Term> assignements ){

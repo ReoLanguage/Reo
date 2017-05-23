@@ -3,13 +3,17 @@ package nl.cwi.reo.compile.components;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.rbautomaton.RuleNode;
 
 public final class Transition {
 
@@ -121,5 +125,31 @@ public final class Transition {
 				ports.add(x.getPort());	
 		
 		return ports;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(@Nullable Object other) {
+		if (other == null)
+			return false;
+		if (other == this)
+			return true;
+		if (!(other instanceof Transition))
+			return false;
+		Transition rule = (Transition) other;
+		return Objects.equals(this.guard,rule.getGuard())&&
+				Objects.equals(this.output,rule.getOutput())&&
+				Objects.equals(this.memory,rule.getMemory())&&
+				Objects.equals(this.input,rule.getInput());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.guard,this.output,this.memory,this.input);
 	}
 }

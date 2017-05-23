@@ -3,18 +3,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import nl.cwi.reo.runtime.java.Input;
-import nl.cwi.reo.runtime.java.Output;
+public class Functions {
 
-public class Function {
+	public static Object concatenate(Object object1, Object object2) {
+		if (object1 == null)
+			throw new NullPointerException();
+		if (object2 == null)
+			throw new NullPointerException();
+		if (!(object1 instanceof String))
+			throw new IllegalArgumentException();
+		if (!(object2 instanceof String))
+			throw new IllegalArgumentException();
 
-	public static String add(String a, String b) {
-//		if(a instanceof Integer && b instanceof Integer)
-//			return (Integer)a+(Integer)b;
-		return a+b;
+		String string = (((String) object1) + " " + ((String) object2)).trim();
+		if (string.length() > 10000)
+			string = "";
+
+		return string;
 	}
-	
-	public static String majority(Object object) {
+
+	public static Object majority(Object object) {
 		if (object == null)
 			throw new NullPointerException();
 
@@ -40,31 +48,7 @@ public class Function {
 		return result;
 	}
 
-	
-	public static void consumer(Input<String> a) {
-		for (int i = 0; i < 300; i++)
-			System.out.println(i + ": " + a.get() + " ");
-		System.exit(0);
-	}
-	
-	public static String concatenate(Object object1, Object object2) {
-		if (object1 == null)
-			throw new NullPointerException();
-		if (object2 == null)
-			throw new NullPointerException();
-		if (!(object1 instanceof String))
-			throw new IllegalArgumentException();
-		if (!(object2 instanceof String))
-			throw new IllegalArgumentException();
-
-		String string = (((String) object1) + " " + ((String) object2)).trim();
-		if (string.length() > 10000)
-			string = "";
-
-		return string;
-	}
-
-	public static String parse(Object object) {
+	public static Object parse(Object object) {
 		if (object == null)
 			throw new NullPointerException();
 
@@ -78,4 +62,18 @@ public class Function {
 
 		return result;
 	}
+	
+	public static Integer add(Object left, Object right) {
+		if (left == null)
+			throw new NullPointerException();
+		if (right == null)
+			throw new NullPointerException();
+		if (!(left instanceof Integer))
+			throw new IllegalArgumentException();
+		if (!(right instanceof Integer))
+			throw new IllegalArgumentException();
+
+		return ((Integer) left) + ((Integer) right);
+	}
+	
 }

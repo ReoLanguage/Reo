@@ -5,7 +5,8 @@ public interface Port<T> extends Input<T>, Output<T> {
 	public void setConsumer(Component c);
 	public void setPut(T datum);
 	public void setGet();
-	public boolean hasPut();
+	public T hasPut();
+	public T peek();
 	public boolean hasGet();
 	public T take();
 	public void activateProducer();

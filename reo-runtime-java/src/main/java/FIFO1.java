@@ -35,7 +35,7 @@ public class FIFO1<T> implements Component {
 						a.setGet();
 						run_a.incrementAndGet(); 
 					}
-					if (q == 0 && a.hasPut()) {
+					if (q == 0 && a.hasPut()!=null) {
 						m = a.take();
 						run_a.incrementAndGet();
 						q = 1;
@@ -44,11 +44,11 @@ public class FIFO1<T> implements Component {
 					}
 					break execute;
 				case 1:
-					if (!b.hasPut()) {
+					if (b.hasPut()==null) {
 						b.setPut(m);
 						run_b.incrementAndGet();
 					}
-					if (q == 1 && !b.hasPut()) {
+					if (q == 1 && b.hasPut()==null) {
 						q = 0;
 						System.out.println("fire b");
 						continue;

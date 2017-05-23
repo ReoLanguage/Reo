@@ -11,7 +11,9 @@ public class PortBusyWait<T> implements Port<T> {
 	public void setGet() { get = true; }
 	public void setPut(T datum) { put = datum; }
 	public boolean hasGet() { return get; }
-	public boolean hasPut() { return put != null; }
+	public T hasPut() { return put; }
+	public T peek() { return put; }
+	
 	public T take() { 
 		T datum;
 		while ((datum = put) == null) { }

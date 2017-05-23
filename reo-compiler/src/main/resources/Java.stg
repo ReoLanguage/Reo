@@ -84,17 +84,15 @@ public void activate() {
 }
 
 public void run() {
-	int k = 0;
 	while (true) {
-		k++;
-		synchronized (this) {
 			<c.transitions:transition(); separator="\n">
-			if (k > 3) {
-				k = 0;
+		synchronized (this) {
+			while(true) {
+				<c.transitions:check_transition(); separator="\n">
 				try { 
 					wait(); 
-				} catch (InterruptedException e) { }	
-			}
+				} catch (InterruptedException e) { }
+			}	
 		}
 	}
 }
@@ -123,15 +121,18 @@ public <c.name>(<c.ports:{p | Port\<<p:typetag()>\> <p.name>}; wrap, anchor, sep
 }
 >>
 
+check_transition(t) ::= <<
+if (<guard(t); wrap, anchor>) break;
+>>
+
 transition(t) ::= <<
 if (<guard(t); wrap, anchor>) {
 	<action(t)>
-	k = 0;
 }
 >>
 
 guard(t) ::= <<
-<if(t.equality)>equality here<endif><t.guard:formula()><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" "><if(t.input)> && <t.input:{p | <p.name>.hasPut()}; separator=" && "><endif>
+<if(t.equality)>equality here<endif><t.guard:formula()><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" "><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif>
 >>
 
 formula(f) ::= <<
@@ -143,17 +144,18 @@ guardTerm(t) ::= <<
 >>
 
 term(t) ::= <<
-<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.get()<elseif(t.memory)><t.name><else><t.name><endif>
+<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.peek()<elseif(t.memory)><t.name><else><t.name><endif>
 >>
 
 function(t) ::=<<
-<t.value><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.get() <else> <p.name> <endif>}; separator=",">)<endif>
+<t.value><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
 >>
 
 
 action(t) ::= <<
 <t:output(); separator="\n">
 <t:memory(); separator="\n">
+<t.input:{p | <p:input()>}; separator="\n">
 >>
 
 output(a) ::= <<
@@ -165,6 +167,6 @@ memory(m) ::= <<
 >>
 
 input(p) ::= <<
-<if(p.input)><p.name>.get();<endif>
+<p.name>.get();
 >>
 
