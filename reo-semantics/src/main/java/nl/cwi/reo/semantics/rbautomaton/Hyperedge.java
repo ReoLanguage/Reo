@@ -99,62 +99,31 @@ public class Hyperedge {
 		if(ruleNodes.size()==1){
 			//Single rule to compose
 			RuleNode h_ruleNode = h.getLeaves().iterator().next();
-			RuleNode toCompose = new RuleNode(h_ruleNode.getRule(),h_ruleNode.getHyperedges());
-			toCompose.rmFromHyperedge(h);
+			h_ruleNode.rmFromHyperedge(h);
 			//Compose single rule
-			for(RuleNode r : list){
-				if(r.compose(toCompose)==null){
+			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(list);
+
+			while(!rulesToCompose.isEmpty()){
+				RuleNode r = rulesToCompose.poll();
+				if(r.compose(h_ruleNode)!=null)
 					r.erase();
-					for(RuleNode rule : leaves){
-						if(rule.equals(r)){
-							for(Port p : toCompose.getRule().getSync().keySet())
-								if(toCompose.getRule().getSync().get(p))
-									rule.getRule().getSync().put(p, false);
-						}
-					}
-				}
 			}
-			toCompose.erase();
 			h_ruleNode.erase();
 		}
+		
 		else{
-			
-			//List of rules to compose
 			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(h.getLeaves());
 			while(!rulesToCompose.isEmpty()){
-				RuleNode h_ruleNode = rulesToCompose.poll();
-				//Duplicate rule
-				RuleNode toCompose = new RuleNode(h_ruleNode.getRule(),h_ruleNode.getHyperedges());
-				toCompose.rmFromHyperedge(h);
-				//Compose single rule
-				for(RuleNode r : list){
-					
-					if(!r.getRule().equals(toCompose.getRule())){
-						RuleNode r2= new RuleNode(new Rule(new HashMap<Port,Boolean>(r.getRule().getSync()),r.getRule().getFormula()),r.getHyperedges());
-						if(r2.compose(toCompose)==null){
-							r2.erase();
-							for(RuleNode rule : leaves){
-								if(rule.equals(r)){
-									for(Port p : toCompose.getRule().getSync().keySet())
-										if(toCompose.getRule().getSync().get(p))
-											rule.getRule().getSync().put(p, false);
-								}
-							}
-						}
-					}
-					else{
-						RuleNode r2=new RuleNode(new Rule(new HashMap<Port,Boolean>(r.getRule().getSync()),r.getRule().getFormula()),r.getHyperedges());
-						r2.rmFromHyperedge(h);
-						r2.rmFromHyperedge(this);
-						r2.compose(toCompose);
-					}					
+				RuleNode r1 = rulesToCompose.poll();
+				for(RuleNode r2 : list){
+					r1.compose(r2);
 				}
-				toCompose.erase();
-				h_ruleNode.erase();
+				r1.erase();
 			}
 			for(RuleNode r:list)
 				r.erase();
 		}
+		
 
 		return this;
 	}
@@ -210,17 +179,8 @@ public class Hyperedge {
 			return false;
 		
 		Hyperedge p = (Hyperedge) other;
-		for(RuleNode r : p.getLeaves()){
-			boolean b = false;
-			for(RuleNode r2 : leaves){
-				if(r2.equals(r)){
-					b=true;
-				}
-			}
-			if(!b)
-				return false;
-		}
-		return root.equals(p.getRoot()) &&leaves.size()==p.getLeaves().size();
+		
+		return Objects.equals(root.getPort(),p.getRoot().getPort()) && Objects.equals(leaves,p.getLeaves());
 	}
 	
 	/**
@@ -228,10 +188,8 @@ public class Hyperedge {
 	 */
 	@Override
 	public int hashCode() {
-		int hashcode =0;
-		for(RuleNode r : leaves)
-			hashcode=0+r.hashCode();
-		return Objects.hash(this.root.getPort(),hashcode);
+
+		return Objects.hash(this.root.getPort(),leaves);
 	}
 	
 	public String toString(){

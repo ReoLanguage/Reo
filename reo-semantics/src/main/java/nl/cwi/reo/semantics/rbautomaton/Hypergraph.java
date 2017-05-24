@@ -2,8 +2,13 @@ package nl.cwi.reo.semantics.rbautomaton;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Disjunction;
@@ -11,23 +16,18 @@ import nl.cwi.reo.semantics.predicates.Formula;
 
 public class Hypergraph {
 
-	private List<Hyperedge> hyperedges;
+	private Set<Hyperedge> hyperedges;
 	
-	private Set<Port> variables;
-	
-	private Set<RuleNode> rules;
 
 	/**
 	 * Build a tree out of a root port and a set of rules.
 	 * Every rules that must fire the root port is added as child.
 	 */
 	public Hypergraph(Set<Rule> l) {
-		hyperedges = new ArrayList<Hyperedge>();
-		variables = new HashSet<Port>();
-		rules = new HashSet<>();
+		hyperedges = new HashSet<Hyperedge>();
+
 		for(Rule r : l){	
 			RuleNode rule = new RuleNode(r);
-			rules.add(rule);
 			for(Port v : r.getSync().keySet()){
 				if(r.getSync().get(v)){
 					if(!getHyperedges(v).isEmpty()){
@@ -38,7 +38,6 @@ public class Hypergraph {
 						ruleNodes.add(rule);
 						hyperedges.add(new Hyperedge(new PortNode(v),ruleNodes));
 					}
-					variables.add(v);
 				}
 			}
 			
@@ -56,18 +55,10 @@ public class Hypergraph {
 		return hyperedgeList;
 	}
 	
-	public List<Hyperedge> getHyperedges(){
+	public Set<Hyperedge> getHyperedges(){
 		return hyperedges;
 	}
-	
-	public Set<RuleNode> getRuleNode(){
-		return rules;
-	}
-	
-	public Set<Port> getVariable(){
-		return variables;
-	}
-	
+
 	
 	/**
 	 * Composition of two hypergraphs by taking the union of hyperedges and merging commune PortNode 
@@ -76,8 +67,6 @@ public class Hypergraph {
 	 */
 	public Hypergraph compose(Hypergraph h) {
 		hyperedges.addAll(h.getHyperedges());
-		variables.addAll(h.getVariable());
-		rules.addAll(h.getRuleNode());		
 		return this;
 	}
 	
@@ -86,7 +75,11 @@ public class Hypergraph {
 	 * @return
 	 */
 	public Hypergraph distributeSingleEdge(){
-				
+		Set<Port> variables = new HashSet<>();
+		for(Hyperedge h : hyperedges){
+			variables.add(h.getRoot().getPort());
+		}
+		
 		for(Port p : variables){
 			List<Hyperedge> singleEdge = new ArrayList<>();
 			List<Hyperedge> multiEdge = new ArrayList<>();
@@ -101,23 +94,23 @@ public class Hypergraph {
 				Hyperedge e = singleEdge.get(0);
 				singleEdge.remove(0);
 				for(Hyperedge h : singleEdge){
-					rules.remove(h.getLeaves().iterator().next());
 					e.compose(h);
 				}
 				hyperedges.removeAll(singleEdge);
 				singleEdge.clear();
 				singleEdge.add(e);
+				removeEmptyHyperedge();
 			}
 			if(!multiEdge.isEmpty()){
 				Hyperedge e = multiEdge.get(0);
 				for(Hyperedge h : singleEdge){
-					rules.remove(h.getLeaves().iterator().next());
 					e.compose(h);
 
 				}
 				if(!multiEdge.isEmpty()){
 					hyperedges.removeAll(singleEdge);
 				}
+				removeEmptyHyperedge();
 			}	
 		}
 		
@@ -129,7 +122,11 @@ public class Hypergraph {
 	 * @return
 	 */
 	public Hypergraph distributeMultiEdge(){
-				
+		Set<Port> variables = new HashSet<>();
+		for(Hyperedge h : hyperedges){
+			variables.add(h.getRoot().getPort());
+		}
+		
 		for(Port p : variables){
 			List<Hyperedge> multiEdge = new ArrayList<>();
 		
@@ -142,23 +139,23 @@ public class Hypergraph {
 			}
 			removeEmptyHyperedge();
 		}
-		rules.clear();
 		
-		for(Hyperedge g : hyperedges){
-			rules.addAll(g.getLeaves());
-		}	
 		
 		return this;
 	}
 	
 	public void removeEmptyHyperedge(){
-		List<Hyperedge> s = new ArrayList<>(hyperedges);
-		for(Hyperedge e : s){
+		Set<Hyperedge> s = new HashSet<>();
+		Queue<Hyperedge> q = new LinkedList<>(hyperedges);
+		while(!q.isEmpty()){
+			Hyperedge e = q.poll();
 			if(e.getLeaves().size()==0){
 				e.getRoot().rmHyperedge(e);
-				hyperedges.remove(e);
 			}
+			else
+				s.add(e);
 		}
+		hyperedges=s;
 		
 	}
 	
@@ -210,8 +207,8 @@ public class Hypergraph {
 	 * @return
 	 */
 	public Set<Rule> getRules(){
-		Set<Rule> s = new HashSet<>();		
-		rules.clear();
+		Set<Rule> s = new HashSet<>();	
+		Set<RuleNode> rules = new HashSet<>();
 		for(Hyperedge g : hyperedges){
 			rules.addAll(g.getLeaves());
 		}
@@ -225,7 +222,10 @@ public class Hypergraph {
 
 	
 	public String toString(){
-
+		Set<Port> variables = new HashSet<>();
+		for(Hyperedge h : hyperedges){
+			variables.add(h.getRoot().getPort());
+		}
 		String s = "";
 		for(Port var : variables){
 			s = s+ "Root : "+var.toString()+"\n{";

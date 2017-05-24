@@ -3,6 +3,7 @@ package nl.cwi.reo;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -430,21 +431,34 @@ public class Compiler {
 			components.add(new Protocol("Protocol" + n_protocol++, ports, T, initial));
 		}
 
-		Long t7 = System.nanoTime();
 
 		System.out.println("interpret   " + (t2 - t1)/1000000000 + " seconds");
 		System.out.println("flattening  " + (t3 - t2)/1000000000 + " seconds");
 		System.out.println("workers     " + (t4 - t3)/1000000000 + " seconds");
 		System.out.println("composition " + (t5 - t4)/1000000000 + " seconds");
 		System.out.println("commandify  " + (t6 - t5)/1000000000 + " seconds");
-		System.out.println("template    " + (t7 - t6)/1000000000 + " seconds");
+//		System.out.println("template    " + (t7 - t6)/1000000000 + " seconds");
+		
 
 		// Fill in the template
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);
 
 		// Generate Java code from the template
 		String code = template.generateCode(Language.JAVA);
-		write(program.getName() + ".java", code);		
+		write(program.getName() + ".java", code);
+
+		Long t7 = System.nanoTime();
+	
+//		if(true){
+//			try{
+//				PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
+//				writer.println("Compilation time : "+(t7-t1) + " nanosecondes");
+//				writer.close();
+//			} catch (IOException e) { // do something  
+//			}
+//		}
+
+		
 	}
 
 	private void compileP() {
@@ -555,6 +569,7 @@ public class Compiler {
 	}
 
 	private void compilePR() {
+		Long t1 = System.nanoTime();
 
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
 
@@ -586,5 +601,15 @@ public class Compiler {
 		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor, settings);
 
 		c.compile();
+		Long t2 = System.nanoTime();
+
+//		if(true){
+//			try{
+//				PrintWriter writer = new PrintWriter(outdir+"compilation_time_lykos.txt", "UTF-8");
+//				writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
+//				writer.close();
+//			} catch (IOException e) { // do something  
+//			}
+//		}
 	}
 }

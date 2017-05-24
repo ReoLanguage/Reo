@@ -112,18 +112,24 @@ public class RuleNode implements HypergraphNode{
 		if(!rule.canSync(r.getRule())){
 			return null;
 		}
-			
-		rule.getSync().putAll(r.getRule().getSync());
-		if(rule.getFormula().equals(r.getRule().getFormula()))
-			rule = new Rule(rule.getSync(),rule.getFormula());
-		else
-			rule = new Rule(rule.getSync(),new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));			
-		
-		Set<Hyperedge> set = new HashSet<>(r.getHyperedges());
-		for(Hyperedge h : set){
-			addToHyperedge(h);
+		Map<Port,Boolean> map = rule.getSync();
+		map.putAll(r.getRule().getSync());
+
+		Rule r1;
+		if(rule.getFormula().equals(r.getRule().getFormula())){
+			r1 = new Rule(map,rule.getFormula());
 		}
-		return this;
+		else{
+			r1 = new Rule(map,new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
+		}
+		
+		Set<Hyperedge> set = new HashSet<>(hyperedges);
+		for(Hyperedge h : r.getHyperedges()){
+			if(!h.getLeaves().isEmpty())
+				set.add(h);
+		}
+		
+		return new RuleNode(r1,set);
 	}
 	
 	public void erase(){
@@ -172,7 +178,7 @@ public class RuleNode implements HypergraphNode{
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getRule().hashCode());
+		return Objects.hash(this.getRule());
 	}
 	
 	public String toString(){
