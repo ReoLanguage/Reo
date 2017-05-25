@@ -48,12 +48,12 @@ import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.rbautomaton.Rule;
-import nl.cwi.reo.semantics.rbautomaton.RulesBasedAutomaton;
+import nl.cwi.reo.semantics.rbautomaton.ConstraintHypergraph;
 import nl.cwi.reo.util.Monitor;
 
-public class ListenerRBA extends Listener<RulesBasedAutomaton> {
+public class ListenerRBA extends Listener<ConstraintHypergraph> {
 
-	private ParseTreeProperty<RulesBasedAutomaton> automaton = new ParseTreeProperty<>();
+	private ParseTreeProperty<ConstraintHypergraph> automaton = new ParseTreeProperty<>();
 	private ParseTreeProperty<Formula> rba_formula = new ParseTreeProperty<>();
 	private ParseTreeProperty<Term> term = new ParseTreeProperty<>();
 	private ParseTreeProperty<Rule> rules = new ParseTreeProperty<>();
@@ -82,7 +82,7 @@ public class ListenerRBA extends Listener<RulesBasedAutomaton> {
 		for (Rba_ruleContext rbaContext : ctx.rba_rule()) {
 			s.add(rules.get(rbaContext));
 		}
-		automaton.put(ctx, new RulesBasedAutomaton(s,initial));
+		automaton.put(ctx, new ConstraintHypergraph(s,initial));
 	}
 
 	/*

@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
@@ -37,15 +39,18 @@ import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
 
-public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
+public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 
 	private final Set<Rule> s;
+	
+	private Set<HyperEdge> hyperedges;
 
 	private final Map<Term,Term> initial;
 	/**
 	 * Constructs an automaton, with an empty set of rules.
 	 */
-	public RulesBasedAutomaton() {
+	public ConstraintHypergraph() {
+		this.hyperedges = new HashSet<HyperEdge>();
 		this.s = new HashSet<Rule>();
 		initial = new HashMap<Term,Term>();
 	}
@@ -56,11 +61,28 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 * @param f
 	 *            formula
 	 */
-	public RulesBasedAutomaton(Set<Rule> s) {
-		this.s = s;
+	public ConstraintHypergraph(Set<Rule> s) {
+		hyperedges = new HashSet<HyperEdge>();
+
+		for(Rule r : s){	
+			RuleNode rule = new RuleNode(r);
+			for(Port v : r.getSync().keySet()){
+				if(r.getSync().get(v)){
+					if(!getHyperedges(v).isEmpty()){
+						rule.addToHyperedge(getHyperedges(v).get(0));
+					}
+					else{
+						Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
+						ruleNodes.add(rule);
+						hyperedges.add(new HyperEdge(new PortNode(v),ruleNodes));
+					}
+				}
+			}
+			
+		}
+		this.s=getRules();
 		this.initial = new HashMap<Term,Term>();
 	}
-	
 	
 	/**
 	 * Constructs a new automaton from a given set of rules and initial values.
@@ -68,39 +90,72 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 * @param f
 	 *            formula
 	 */
-	public RulesBasedAutomaton(Set<Rule> s, Map<Term,Term> initial) {
-		this.s = s;
+	public ConstraintHypergraph(Set<Rule> s, Map<Term,Term> initial) {
+		hyperedges = new HashSet<HyperEdge>();
+
+		for(Rule r : s){	
+			RuleNode rule = new RuleNode(r);
+			for(Port v : r.getSync().keySet()){
+				if(r.getSync().get(v)){
+					if(!getHyperedges(v).isEmpty()){
+						rule.addToHyperedge(getHyperedges(v).get(0));
+					}
+					else{
+						Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
+						ruleNodes.add(rule);
+						hyperedges.add(new HyperEdge(new PortNode(v),ruleNodes));
+					}
+				}
+			}
+			
+		}
+		this.s=getRules();
 		this.initial = initial;
 	}
+	
+	public List<HyperEdge> getHyperedges(Port p){
+		List<HyperEdge> hyperedgeList = new ArrayList<HyperEdge>();
+		for(HyperEdge h : hyperedges){
+			if(h.getRoot().getPort().equals(p)){
+				hyperedgeList.add(h);
+			}
+		}
+		return hyperedgeList;
+	}
+	
+	public Set<HyperEdge> getHyperedges(){
+		return hyperedges;
+	}
+	
+	
 
 	/**
-	 * Gets the rules of this automaton.
-	 * 
-	 * @return formula
+	 * Get rules for commandification
+	 * @return
 	 */
-	public Set<Rule> getRules() {
+	public Set<Rule> getRules(){
+		Set<Rule> s = new HashSet<>();	
+		Set<RuleNode> rules = new HashSet<>();
+		for(HyperEdge g : hyperedges){
+			rules.addAll(g.getLeaves());
+		}
+		
+		for(RuleNode r : rules){
+			s.add(r.getRule());
+		}
+		
 		return s;
 	}
 	
 	public Map<Term,Term> getInitials(){
 		return initial;
 	}
-	
-	@Deprecated
-	public Set<Rule> getNewRules() {
-		Set<Rule> setRules = new HashSet<Rule>();
-		Graph g = new Graph(s).isolate();
-		for (GraphNode n : g.getNodes()) {
-			setRules.add(n.getRule());
-		}
-		return setRules;
-	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public @Nullable RulesBasedAutomaton evaluate(Scope s, Monitor m) {
+	public @Nullable ConstraintHypergraph evaluate(Scope s, Monitor m) {
 		Set<Rule> setRules = new HashSet<Rule>();
 		for (Rule r : this.s) {
 			setRules.add(r.evaluate(s, m));
@@ -118,7 +173,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 					initial.put(t,new Function("constant",((DecimalValue) v).getValue(),new ArrayList<Term>()));
 			}
 		}
-		return new RulesBasedAutomaton(setRules,initial);
+		return new ConstraintHypergraph(setRules,initial);
 	}
 
 	/**
@@ -146,7 +201,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public RulesBasedAutomaton getNode(Set<Port> node) {
+	public ConstraintHypergraph getNode(Set<Port> node) {
 
 		Set<Port> ports = new HashSet<Port>(node);
 
@@ -187,10 +242,10 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 			rules.add(new Rule(map, transition));
 		}
 
-		return new RulesBasedAutomaton(rules,initial);
+		return new ConstraintHypergraph(rules,initial);
 	}
 
-	public RulesBasedAutomaton getDefault(Set<Port> ports) {
+	public ConstraintHypergraph getDefault(Set<Port> ports) {
 
 		Set<Rule> rules = new HashSet<Rule>();
 
@@ -204,126 +259,41 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 			rules.add(new Rule(map, guard));
 		}
 
-		return new RulesBasedAutomaton(rules);
+		return new ConstraintHypergraph(rules);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public RulesBasedAutomaton rename(Map<Port, Port> links) {
+	public ConstraintHypergraph rename(Map<Port, Port> links) {
 		Set<Rule> setRules = new HashSet<Rule>();
 		for (Rule r : s) {
 			setRules.add(r.rename(links));
 		}
-		return new RulesBasedAutomaton(setRules,initial);
+		return new ConstraintHypergraph(setRules,initial);
 	}
-
+	
 	/**
-	 * {@inheritDoc}
+	 * Composition of two hypergraphs by taking the union of hyperedges and merging commune PortNode 
+	 * 
+	 * @return new hypergraph 
 	 */
-	@Override
-	public RulesBasedAutomaton compose(List<RulesBasedAutomaton> components) {
-
-		// Rename all memory cells and put *all* components into a list.
-		List<RulesBasedAutomaton> list = new ArrayList<>();
-
-		List<RulesBasedAutomaton> oldlist = new ArrayList<>(components);
-		oldlist.add(this);
-		int i = 1;
-		for (RulesBasedAutomaton A : oldlist) {
-			Set<Rule> s = new HashSet<Rule>(this.s);
-			Map<String, String> rename = new HashMap<>();
-			for (Rule r : A.getRules()) {
-				for (Variable v : r.getFormula().getFreeVariables()) {
-					if (v instanceof MemCell) {
-						String name = ((MemCell) v).getName();
-						if (!rename.containsKey(name))
-							rename.put(name, "m" + i++);
-					}
-				}
-			}
-			for (Rule r : A.getRules()) {
-				Formula _f = r.getFormula();
-				for (Map.Entry<String, String> entry : rename.entrySet()) {
-					_f = _f.Substitute(new MemCell(entry.getValue(), false), new MemCell(entry.getKey(), false));
-					_f = _f.Substitute(new MemCell(entry.getValue(), true), new MemCell(entry.getKey(), true));
-				}
-				s.add(new Rule(r.getSync(), _f));
-			}
-			for(Term t : A.getInitials().keySet()){
-				if(t instanceof MemCell){
-					initial.put(new MemCell(rename.get(((MemCell) t).getName()),((MemCell) t).hasPrime()), A.getInitials().get(t));
-				}
-			}
-			list.add(new RulesBasedAutomaton(s,initial));
-		}
-
-		// Compose the list of RBAs into a single list of rules.
-		Set<Rule> rules = new HashSet<>();
-
-		Set<Rule> marked = new HashSet<>(); // correct?
-
-		for (RulesBasedAutomaton A : list) {
-			for (Rule x : A.getRules()) {
-
-				if (marked.contains(x))
-					continue;
-
-				Stack<Rule> rule = new Stack<>();
-				Stack<Rule> stack = new Stack<>();
-
-				rule.push(x);
-				stack.push(null);
-
-				Iterator<RulesBasedAutomaton> iter = list.iterator();
-
-				loop: while (true) {
-
-					while (iter.hasNext()) {
-						RulesBasedAutomaton B = iter.next();
-
-						for (Rule y : B.getRules())
-							if (!rule.contains(y) && synchronize(compose(rule), y))
-								stack.push(y);
-
-						if (stack.peek() != null) {
-							rule.push(stack.pop());
-							stack.push(null);
-							iter = list.iterator();
-						}
-					}
-
-					rules.add(compose(rule));
-
-					while (stack.peek() == null) {
-						marked.add(rule.pop());
-						stack.pop();
-						if (stack.empty())
-							break loop;
-					}
-
-					rule.push(stack.pop());
-					stack.push(null);
-					iter = list.iterator();
-
-				}
-
-			}
-		}
-
-		return new RulesBasedAutomaton(rules,initial);
+	public ConstraintHypergraph compose(ConstraintHypergraph h) {
+		hyperedges.addAll(h.getHyperedges());
+		return this;
 	}
 
-	public RulesBasedAutomaton compose1(List<RulesBasedAutomaton> components, Set<Port> intface) {
+	@Override
+	public ConstraintHypergraph compose(List<ConstraintHypergraph> components) {
 
 		// Rename all memory cells and put *all* components into a list.
 		List<Port> p =new ArrayList<>();
-		List<RulesBasedAutomaton> list = new ArrayList<>();
-		List<RulesBasedAutomaton> oldlist = new ArrayList<>(components);
+		List<ConstraintHypergraph> list = new ArrayList<>();
+		List<ConstraintHypergraph> oldlist = new ArrayList<>(components);
 		oldlist.add(this);
 		int i = 1;
-		for (RulesBasedAutomaton A : oldlist) {
+		for (ConstraintHypergraph A : oldlist) {
 			Set<Rule> s = new HashSet<Rule>(this.s);
 			Map<String, String> rename = new HashMap<>();
 			for (Rule r : A.getRules()) {
@@ -352,79 +322,122 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 					initial.put(new MemCell(rename.get(((MemCell) t).getName()),((MemCell) t).hasPrime()), A.getInitials().get(t));
 				}
 			}
-			list.add(new RulesBasedAutomaton(s,initial));
+			list.add(new ConstraintHypergraph(s,initial));
 		}
 
 		// Compose the list of RBAs into a single list of rules.
-		List<Hypergraph> hypergraphs = new ArrayList<>();
+		List<ConstraintHypergraph> hypergraphs = new ArrayList<>();
 		Map<Term,Term> initialValue = new HashMap<Term,Term>();
-		for(RulesBasedAutomaton A : list){
+		for(ConstraintHypergraph A : list){
 			if(!A.getRules().isEmpty()){
-				hypergraphs.add(new Hypergraph(A.getRules()));
+				hypergraphs.add(new ConstraintHypergraph(A.getRules()));
 				initialValue.putAll(A.initial);
 			}
 		}
 
-		Hypergraph composedAutomaton = hypergraphs.get(0);
+		ConstraintHypergraph composedAutomaton = hypergraphs.get(0);
 		hypergraphs.remove(0);
-		for(Hypergraph h : hypergraphs){
+		for(ConstraintHypergraph h : hypergraphs){
 			composedAutomaton = composedAutomaton.compose(h);	
 		}
 		composedAutomaton = composedAutomaton.distributeSingleEdge();
 		composedAutomaton = composedAutomaton.distributeMultiEdge();
 		
-		return new RulesBasedAutomaton(composedAutomaton.getRules(),initialValue);
+		return new ConstraintHypergraph(composedAutomaton.getRules(),initialValue);
+
 	}
 	
 	
-	
 	/**
-	 * Determines whether there exists a port p such that both rules fire p, and
-	 * whether the conjunction is satisfiable.
-	 * 
-	 * @param x
-	 * @param y
+	 * Distribute single hyperedges
 	 * @return
 	 */
-	private static boolean synchronize(Rule x, Rule y) {
-		boolean synchronize = false;
-		for (Port p : x.getSync().keySet()) {
-			if (x.getSync().get(p)) {
-				Boolean b = y.getSync().get(p);
-				if (b != null) {
-					if (b.equals(true)) {
-						synchronize = true;
-					} else {
-						return false;
-					}
+	public ConstraintHypergraph distributeSingleEdge(){
+		Set<Port> variables = new HashSet<>();
+		for(HyperEdge h : hyperedges){
+			variables.add(h.getRoot().getPort());
+		}
+		
+		for(Port p : variables){
+			List<HyperEdge> singleEdge = new ArrayList<>();
+			List<HyperEdge> multiEdge = new ArrayList<>();
+			
+			for(HyperEdge h : getHyperedges(p)){
+				if(h.getLeaves().size()==1)
+					singleEdge.add(h);
+				else
+					multiEdge.add(h);
+			}
+			if(singleEdge.size()>1){
+				HyperEdge e = singleEdge.get(0);
+				singleEdge.remove(0);
+				for(HyperEdge h : singleEdge){
+					e.compose(h);
 				}
+				hyperedges.removeAll(singleEdge);
+				singleEdge.clear();
+				singleEdge.add(e);
+				removeEmptyHyperedge();
+			}
+			if(!multiEdge.isEmpty()){
+				HyperEdge e = multiEdge.get(0);
+				for(HyperEdge h : singleEdge){
+					e.compose(h);
+
+				}
+				if(!multiEdge.isEmpty()){
+					hyperedges.removeAll(singleEdge);
+				}
+				removeEmptyHyperedge();
+			}	
+		}
+		
+		return this;
+	}
+	
+	/**
+	 * Distribute multi rules hyperedges
+	 * @return
+	 */
+	public ConstraintHypergraph distributeMultiEdge(){
+		Set<Port> variables = new HashSet<>();
+		for(HyperEdge h : hyperedges){
+			variables.add(h.getRoot().getPort());
+		}
+		
+		for(Port p : variables){
+			List<HyperEdge> multiEdge = new ArrayList<>();
+		
+			multiEdge.addAll(getHyperedges(p));
+			HyperEdge toDistribute = multiEdge.get(0);
+			multiEdge.remove(0);
+			
+			for(HyperEdge h : multiEdge){
+				toDistribute = h.compose(toDistribute);
+			}
+			removeEmptyHyperedge();
+		}
+		
+		
+		return this;
+	}
+	
+	public void removeEmptyHyperedge(){
+		Set<HyperEdge> s = new HashSet<>();
+		Queue<HyperEdge> q = new LinkedList<>(hyperedges);
+		while(!q.isEmpty()){
+			HyperEdge e = q.poll();
+			if(e.getLeaves().size()==0){
+				e.getRoot().rmHyperedge(e);
 			}
 			else
-				if(y.getSync().get(p)!=null && y.getSync().get(p))
-					return false;
+				s.add(e);
 		}
-		return synchronize;
+		hyperedges=s;
+		
 	}
-
-	/**
-	 * Composes the current collection of local rules into a global rule.
-	 * 
-	 * @param rule
-	 *            stack of local rules
-	 * @return global rule
-	 */
-	private static Rule compose(Stack<Rule> rule) {
-		List<Formula> clauses = new ArrayList<Formula>();
-		Map<Port, Boolean> sync = new HashMap<>();
-
-		for (Rule r : rule) {
-			sync.putAll(r.getSync());
-			clauses.add(r.getFormula());
-		}
-
-		return new Rule(sync, Conjunction.conjunction(clauses));
-	}
-
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -439,7 +452,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public RulesBasedAutomaton restrict(Collection<? extends Port> intface) {
+	public ConstraintHypergraph restrict(Collection<? extends Port> intface) {
 		Set<Rule> setRules = new HashSet<Rule>();
 		for (Rule r : s) {
 			Formula g = r.getFormula();
@@ -448,7 +461,7 @@ public class RulesBasedAutomaton implements Semantics<RulesBasedAutomaton> {
 					g = new Existential(new Node(p), g);
 			setRules.add(new Rule(r.getSync(), g));
 		}
-		return new RulesBasedAutomaton(setRules,initial);
+		return new ConstraintHypergraph(setRules,initial);
 	}
 
 }

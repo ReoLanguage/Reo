@@ -55,7 +55,7 @@ import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.semantics.rbautomaton.Rule;
-import nl.cwi.reo.semantics.rbautomaton.RulesBasedAutomaton;
+import nl.cwi.reo.semantics.rbautomaton.ConstraintHypergraph;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
@@ -206,14 +206,14 @@ public class Compiler {
 		Long t1 = System.nanoTime();
 
 		// Interpret the Reo program
-		Interpreter<RulesBasedAutomaton> interpreter = new InterpreterRBA(directories, params, monitor);
-		ReoProgram<RulesBasedAutomaton> program = interpreter.interpret(files.get(0));
+		Interpreter<ConstraintHypergraph> interpreter = new InterpreterRBA(directories, params, monitor);
+		ReoProgram<ConstraintHypergraph> program = interpreter.interpret(files.get(0));
 
 		if (program == null)
 			return;
 
 		// If necessary, add port windows
-		List<ReoConnector<RulesBasedAutomaton>> list = new ArrayList<>();
+		List<ReoConnector<ConstraintHypergraph>> list = new ArrayList<>();
 		list.add(program.getConnector());
 		for (Port p : program.getConnector().getInterface()) {
 			if (!p.isHidden()) {
@@ -229,8 +229,8 @@ public class Compiler {
 				else
 					q = new Port(p.getName(), PortType.IN, p.getPrioType(), new TypeTag("String"), true);
 				Set<Port> iface = new HashSet<Port>(Arrays.asList(q));
-				RulesBasedAutomaton atom = new RulesBasedAutomaton().getDefault(iface);
-				ReoConnectorAtom<RulesBasedAutomaton> window = new ReoConnectorAtom<>(name, atom, src);
+				ConstraintHypergraph atom = new ConstraintHypergraph().getDefault(iface);
+				ReoConnectorAtom<ConstraintHypergraph> window = new ReoConnectorAtom<>(name, atom, src);
 				list.add(window);
 			}
 		}
@@ -242,13 +242,13 @@ public class Compiler {
 			Port p = link.getValue();
 			r.put(p, p.rename("_" + i++).hide());
 		}
-		ReoConnector<RulesBasedAutomaton> connector = new ReoConnectorComposite<>(null, "", list).rename(r);
+		ReoConnector<ConstraintHypergraph> connector = new ReoConnectorComposite<>(null, "", list).rename(r);
 
 		Long t2 = System.nanoTime();
 		
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();
-		connector = connector.insertNodes(true, false, new RulesBasedAutomaton());
+		connector = connector.insertNodes(true, false, new ConstraintHypergraph());
 		connector = connector.integrate();
 
 
@@ -259,8 +259,8 @@ public class Compiler {
 
 		// Identify the atomic components in the connector.
 		int n_atom = 1;
-		List<RulesBasedAutomaton> protocols = new ArrayList<RulesBasedAutomaton>();
-		for (ReoConnectorAtom<RulesBasedAutomaton> atom : connector.getAtoms()) {
+		List<ConstraintHypergraph> protocols = new ArrayList<ConstraintHypergraph>();
+		for (ReoConnectorAtom<ConstraintHypergraph> atom : connector.getAtoms()) {
 			if (atom.getSourceCode().getCall() != null) {
 				intface.addAll(atom.getInterface());
 				String name = atom.getName();
@@ -289,7 +289,7 @@ public class Compiler {
 		Long t4 = System.nanoTime();
 		
 		// Compose the protocol into a single connector.
-		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose1(protocols,intface);
+		ConstraintHypergraph circuit = new ConstraintHypergraph().compose(protocols);
 //		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
 
 		Long t5 = System.nanoTime();

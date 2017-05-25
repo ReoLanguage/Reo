@@ -4,10 +4,10 @@ import java.util.List;
 
 import nl.cwi.reo.interpret.listeners.ListenerRBA;
 import nl.cwi.reo.semantics.SemanticsType;
-import nl.cwi.reo.semantics.rbautomaton.RulesBasedAutomaton;
+import nl.cwi.reo.semantics.rbautomaton.ConstraintHypergraph;
 import nl.cwi.reo.util.Monitor;
 
-public class InterpreterRBA extends Interpreter<RulesBasedAutomaton> {
+public class InterpreterRBA extends Interpreter<ConstraintHypergraph> {
 	
 	/**
 	 * Constructs a Reo interpreter for symbolic automaton semantics.

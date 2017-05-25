@@ -9,12 +9,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.ports.Port;
 
 public class PortNode implements HypergraphNode{
-	private List<Hyperedge> hyperedges;	
+	private List<HyperEdge> hyperedges;	
 	private Port p;
 
 	private boolean visited;
 
-	public PortNode(Port p, List<Hyperedge> hyperedges) {
+	public PortNode(Port p, List<HyperEdge> hyperedges) {
 		this.p = p;
 		this.hyperedges = hyperedges;
 		visited = false;
@@ -22,11 +22,11 @@ public class PortNode implements HypergraphNode{
 	
 	public PortNode(Port p) {
 		this.p = p;
-		hyperedges=new ArrayList<Hyperedge>();
+		hyperedges=new ArrayList<HyperEdge>();
 		visited = false;
 	}
 	
-	public List<Hyperedge> getHyperedges(){
+	public List<HyperEdge> getHyperedges(){
 		return hyperedges;
 	}
 	
@@ -39,11 +39,11 @@ public class PortNode implements HypergraphNode{
 		return p;
 	}
 	
-	public void addHyperedge(Hyperedge h){
+	public void addHyperedge(HyperEdge h){
 		hyperedges.add(h);
 	}
 
-	public void rmHyperedge(Hyperedge h){
+	public void rmHyperedge(HyperEdge h){
 		hyperedges.remove(h);
 	}
 	

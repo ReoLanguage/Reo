@@ -20,11 +20,11 @@ import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
 
-public class Hyperedge {
+public class HyperEdge {
 	private PortNode root;
 	private Set<RuleNode> leaves;
 	
-	public Hyperedge(PortNode root, Set<RuleNode> leaves){
+	public HyperEdge(PortNode root, Set<RuleNode> leaves){
 		root.addHyperedge(this);
 		this.root=root;
 		this.leaves = new HashSet<RuleNode>();
@@ -51,31 +51,31 @@ public class Hyperedge {
 		return new Rule(map,new Disjunction(list));
 	}
 	
-	public Hyperedge addLeave(RuleNode r){
+	public HyperEdge addLeave(RuleNode r){
 		leaves=new HashSet<>(leaves);
 		leaves.add(r);
 		return this;
 	}
 	
-	public Hyperedge addLeaves(List<RuleNode> r){
+	public HyperEdge addLeaves(List<RuleNode> r){
 		leaves=new HashSet<>(leaves);
 		leaves.addAll(r);
 		return this;
 	}
 	
-	public Hyperedge rmLeaves(Set<RuleNode> r){
+	public HyperEdge rmLeaves(Set<RuleNode> r){
 		for(RuleNode rule : r)
 			rule.rmFromHyperedge(this);
 		return this;
 	}
 	
-	public Hyperedge rmLeave(RuleNode r){
+	public HyperEdge rmLeave(RuleNode r){
 		leaves=new HashSet<>(leaves);
 		leaves.remove(r);
 		return this;
 	}
 	
-	public Hyperedge compose(Formula f){
+	public HyperEdge compose(Formula f){
 		leaves=new HashSet<>(leaves);
 		for(RuleNode r : leaves){
 			r.compose(f);
@@ -83,11 +83,11 @@ public class Hyperedge {
 		return this;
 	}
 	
-	public Hyperedge duplicate(){
-		return new Hyperedge(this.root,this.leaves);
+	public HyperEdge duplicate(){
+		return new HyperEdge(this.root,this.leaves);
 	}
 
-	public Hyperedge compose(Hyperedge h){ 
+	public HyperEdge compose(HyperEdge h){ 
 		if(!root.getPort().equals(h.getRoot().getPort())){
 			new Exception("Those two hyperedges cannot compose because of two different roots");
 		}
@@ -128,7 +128,7 @@ public class Hyperedge {
 		return this;
 	}
 	
-	public Hyperedge hide(PortNode p){
+	public HyperEdge hide(PortNode p){
 		for(RuleNode r:leaves){
 			r.hide(p);
 		}
@@ -175,10 +175,10 @@ public class Hyperedge {
 			return false;
 		if (other == this)
 			return true;
-		if (!(other instanceof Hyperedge))
+		if (!(other instanceof HyperEdge))
 			return false;
 		
-		Hyperedge p = (Hyperedge) other;
+		HyperEdge p = (HyperEdge) other;
 		
 		return Objects.equals(root.getPort(),p.getRoot().getPort()) && Objects.equals(leaves,p.getLeaves());
 	}

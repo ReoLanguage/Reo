@@ -21,23 +21,23 @@ import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Variable;
 
 public class RuleNode implements HypergraphNode{
-	private Set<Hyperedge> hyperedges;
+	private Set<HyperEdge> hyperedges;
 	private List<RuleNode> exclusiveRules = new ArrayList<>();
 	private Rule rule;
 	
 	private boolean visited;
 
-	public RuleNode(Rule r, Set<Hyperedge> hyperedge) {
+	public RuleNode(Rule r, Set<HyperEdge> hyperedge) {
 		this.rule = r;
 		this.hyperedges = new HashSet<>();
-		for(Hyperedge h : hyperedge)
+		for(HyperEdge h : hyperedge)
 			addToHyperedge(h);
 		visited = false;
 	}
 	
 	public RuleNode(Rule r){
 		this.rule = r;
-		this.hyperedges = new HashSet<Hyperedge>();
+		this.hyperedges = new HashSet<HyperEdge>();
 		visited = false;		
 	}
 	
@@ -46,23 +46,23 @@ public class RuleNode implements HypergraphNode{
 	}
 	
 	
-	public Set<Hyperedge> getHyperedges(){
+	public Set<HyperEdge> getHyperedges(){
 		return hyperedges;
 	}
 	
-	public Hyperedge getHyperedges(PortNode p){
-		for(Hyperedge h : hyperedges)
+	public HyperEdge getHyperedges(PortNode p){
+		for(HyperEdge h : hyperedges)
 			if(h.getRoot().getPort().equals(p.getPort()))
 				return h;
 		return null;
 	}
 	
-	public void addToHyperedge(Hyperedge h){
+	public void addToHyperedge(HyperEdge h){
 		hyperedges.add(h);
 		h.addLeave(this);
 	}
 	
-	public void rmFromHyperedge(Hyperedge h){
+	public void rmFromHyperedge(HyperEdge h){
 		hyperedges.remove(h);
 		h.rmLeave(this);
 	}
@@ -123,8 +123,8 @@ public class RuleNode implements HypergraphNode{
 			r1 = new Rule(map,new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
 		}
 		
-		Set<Hyperedge> set = new HashSet<>(hyperedges);
-		for(Hyperedge h : r.getHyperedges()){
+		Set<HyperEdge> set = new HashSet<>(hyperedges);
+		for(HyperEdge h : r.getHyperedges()){
 			if(!h.getLeaves().isEmpty())
 				set.add(h);
 		}
@@ -133,15 +133,15 @@ public class RuleNode implements HypergraphNode{
 	}
 	
 	public void erase(){
-		Set<Hyperedge> s = new HashSet<>(hyperedges);
-		for(Hyperedge h : s){
+		Set<HyperEdge> s = new HashSet<>(hyperedges);
+		for(HyperEdge h : s){
 			rmFromHyperedge(h);
 		}
 	}
 	
 	public void isolate(){
-		Set<Hyperedge> s = new HashSet<>(hyperedges);
-		for(Hyperedge h : s){
+		Set<HyperEdge> s = new HashSet<>(hyperedges);
+		for(HyperEdge h : s){
 			h.rmLeave(this);
 		}
 		hyperedges=s;
