@@ -5,13 +5,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
@@ -41,9 +39,7 @@ import nl.cwi.reo.util.Monitor;
 
 public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 
-	private final Set<Rule> s;
-	
-	private Set<HyperEdge> hyperedges;
+	private final Set<HyperEdge> hyperedges;
 
 	private final Map<Term,Term> initial;
 	/**
@@ -51,7 +47,6 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 */
 	public ConstraintHypergraph() {
 		this.hyperedges = new HashSet<HyperEdge>();
-		this.s = new HashSet<Rule>();
 		initial = new HashMap<Term,Term>();
 	}
 
@@ -80,7 +75,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			}
 			
 		}
-		this.s=getRules();
+//		this.s=getRules();
 		this.initial = new HashMap<Term,Term>();
 	}
 	
@@ -92,7 +87,6 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 */
 	public ConstraintHypergraph(Set<Rule> s, Map<Term,Term> initial) {
 		hyperedges = new HashSet<HyperEdge>();
-
 		for(Rule r : s){	
 			RuleNode rule = new RuleNode(r);
 			for(Port v : r.getSync().keySet()){
@@ -109,7 +103,6 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			}
 			
 		}
-		this.s=getRules();
 		this.initial = initial;
 	}
 	
@@ -135,15 +128,13 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 */
 	public Set<Rule> getRules(){
 		Set<Rule> s = new HashSet<>();	
-		Set<RuleNode> rules = new HashSet<>();
+
 		for(HyperEdge g : hyperedges){
-			rules.addAll(g.getLeaves());
+			for(RuleNode r : g.getLeaves()){
+				s.add(r.getRule());
+			}
 		}
-		
-		for(RuleNode r : rules){
-			s.add(r.getRule());
-		}
-		
+				
 		return s;
 	}
 	
@@ -157,7 +148,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public @Nullable ConstraintHypergraph evaluate(Scope s, Monitor m) {
 		Set<Rule> setRules = new HashSet<Rule>();
-		for (Rule r : this.s) {
+		for (Rule r : getRules()) {
 			setRules.add(r.evaluate(s, m));
 		}
 		for(Term t : initial.keySet()){
@@ -182,7 +173,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> p = new HashSet<Port>();
-		for (Rule r : s) {
+		for (Rule r : getRules()) {
 			p.addAll(r.getFiringPorts());
 		}
 		return p;
@@ -268,7 +259,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public ConstraintHypergraph rename(Map<Port, Port> links) {
 		Set<Rule> setRules = new HashSet<Rule>();
-		for (Rule r : s) {
+		for (Rule r : getRules()) {
 			setRules.add(r.rename(links));
 		}
 		return new ConstraintHypergraph(setRules,initial);
@@ -294,7 +285,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		oldlist.add(this);
 		int i = 1;
 		for (ConstraintHypergraph A : oldlist) {
-			Set<Rule> s = new HashSet<Rule>(this.s);
+			Set<Rule> s = new HashSet<Rule>(getRules());
 			Map<String, String> rename = new HashMap<>();
 			for (Rule r : A.getRules()) {
 				for (Variable v : r.getFormula().getFreeVariables()) {
@@ -433,7 +424,8 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			else
 				s.add(e);
 		}
-		hyperedges=s;
+		hyperedges.clear();
+		hyperedges.addAll(s);
 		
 	}
 	
@@ -444,7 +436,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public String toString() {
 		ST st = new ST("<rules; separator=\"\n\">");
-		st.add("rules", this.s);
+		st.add("rules", getRules());
 		return st.render();
 	}
 
@@ -454,7 +446,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public ConstraintHypergraph restrict(Collection<? extends Port> intface) {
 		Set<Rule> setRules = new HashSet<Rule>();
-		for (Rule r : s) {
+		for (Rule r : getRules()) {
 			Formula g = r.getFormula();
 			for (Port p : r.getFiringPorts())
 				if (!intface.contains(p))
