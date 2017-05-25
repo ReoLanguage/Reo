@@ -75,7 +75,6 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			}
 			
 		}
-//		this.s=getRules();
 		this.initial = new HashMap<Term,Term>();
 	}
 	
@@ -264,16 +263,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		}
 		return new ConstraintHypergraph(setRules,initial);
 	}
-	
-	/**
-	 * Composition of two hypergraphs by taking the union of hyperedges and merging commune PortNode 
-	 * 
-	 * @return new hypergraph 
-	 */
-	public ConstraintHypergraph compose(ConstraintHypergraph h) {
-		hyperedges.addAll(h.getHyperedges());
-		return this;
-	}
+
 
 	@Override
 	public ConstraintHypergraph compose(List<ConstraintHypergraph> components) {
@@ -317,22 +307,20 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		}
 
 		// Compose the list of RBAs into a single list of rules.
-		List<ConstraintHypergraph> hypergraphs = new ArrayList<>();
-		Map<Term,Term> initialValue = new HashMap<Term,Term>();
-		for(ConstraintHypergraph A : list){
-			if(!A.getRules().isEmpty()){
-				hypergraphs.add(new ConstraintHypergraph(A.getRules()));
-				initialValue.putAll(A.initial);
-			}
-		}
 
-		ConstraintHypergraph composedAutomaton = hypergraphs.get(0);
-		hypergraphs.remove(0);
-		for(ConstraintHypergraph h : hypergraphs){
-			composedAutomaton = composedAutomaton.compose(h);	
+		Map<Term,Term> initialValue = new HashMap<Term,Term>();
+
+		ConstraintHypergraph composedAutomaton = list.get(0);
+		list.remove(0);
+		for(ConstraintHypergraph h : list){
+			if(!h.getRules().isEmpty()){
+				composedAutomaton.getHyperedges().addAll(h.getHyperedges());
+				initialValue.putAll(h.getInitials());
+			}
+
 		}
-		composedAutomaton = composedAutomaton.distributeSingleEdge();
-		composedAutomaton = composedAutomaton.distributeMultiEdge();
+		composedAutomaton.distributeSingleEdge();
+		composedAutomaton.distributeMultiEdge();
 		
 		return new ConstraintHypergraph(composedAutomaton.getRules(),initialValue);
 
