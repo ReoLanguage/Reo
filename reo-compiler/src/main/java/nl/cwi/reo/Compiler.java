@@ -347,6 +347,7 @@ public class Compiler {
 					losingData.remove(new Node(p));
 				}
 			}
+			
 			negativePortGuard.add(t.getGuard());
 			if(!negativePortGuard.isEmpty())
 				t = new Transition(new Conjunction(new ArrayList<>(negativePortGuard)), t.getOutput(), t.getMemory(), t.getInput());

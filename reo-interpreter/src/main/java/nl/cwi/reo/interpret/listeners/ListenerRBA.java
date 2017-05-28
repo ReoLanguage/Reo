@@ -71,6 +71,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	}
 	public void enterAtom(AtomContext ctx){
 		initial = new HashMap<>();
+		mapPorts = new HashMap<>();
 	}
 
 	/*

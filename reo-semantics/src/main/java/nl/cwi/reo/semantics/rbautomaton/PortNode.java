@@ -2,11 +2,14 @@ package nl.cwi.reo.semantics.rbautomaton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.util.Monitor;
 
 public class PortNode implements HypergraphNode{
 	private List<HyperEdge> hyperedges;	
@@ -54,6 +57,11 @@ public class PortNode implements HypergraphNode{
 	@Override
 	public void setFlag(boolean flag) {
 		this.visited = flag;
+	}
+	
+	public PortNode rename(Map<Port,Port> links){
+		p=p.rename(links.get(p).getName());
+		return this;
 	}
 	
 	/**

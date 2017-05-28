@@ -59,7 +59,7 @@ public class Rule {
 			} else
 				map.put(p, sync.get(p));
 		}
-
+		
 		return new Rule(map, f.rename(links));
 	}
 

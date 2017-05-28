@@ -12,13 +12,16 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.util.Monitor;
 
 public class RuleNode implements HypergraphNode{
 	private Set<HyperEdge> hyperedges;
@@ -151,9 +154,27 @@ public class RuleNode implements HypergraphNode{
 		return new RuleNode(this.getRule(),this.getHyperedges());
 	}
 	
+	public RuleNode rename(Map<Port,Port> links){
+		rule=rule.rename(links);
+		return this;
+	}
+	
+	public RuleNode substitute(Map<String,String> rename){
+		for (Map.Entry<String, String> entry : rename.entrySet()) {
+			rule = new Rule(rule.getSync(),rule.getFormula().Substitute(new MemCell(entry.getValue(), false), new MemCell(entry.getKey(), false)));
+			rule = new Rule(rule.getSync(),rule.getFormula().Substitute(new MemCell(entry.getValue(), true), new MemCell(entry.getKey(), true)));
+		}
+//		rule = new Rule(rule.getSync(),rule.getFormula());
+		return this;
+	}
 	
 	public RuleNode hide(PortNode p){
 		rule = new Rule(rule.getSync(),(new Existential(new Node(p.getPort()),rule.getFormula())).QE());
+		return this;
+	}
+	
+	public RuleNode evaluate(Scope s, Monitor m) {
+		rule= rule.evaluate(s, m);
 		return this;
 	}
 	
