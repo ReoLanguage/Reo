@@ -323,23 +323,24 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			for (RuleNode r : A.getRuleNodes()) {
 				r.substitute(rename);
 			}
-			for(Term t : A.getInitials().keySet()){
+			Map<Term,Term> init = new HashMap<>(A.getInitials());
+			for(Term t : init.keySet()){
 				if(t instanceof MemCell){
-					initial.put(new MemCell(rename.get(((MemCell) t).getName()),((MemCell) t).hasPrime()), A.getInitials().get(t));
+					A.getInitials().put(new MemCell(rename.get(((MemCell) t).getName()),((MemCell) t).hasPrime()), A.getInitials().get(t));
 				}
 			}
 		}
 
 		// Compose the list of RBAs into a single list of rules.
 
-		Map<Term,Term> initialValue = new HashMap<Term,Term>();
+//		Map<Term,Term> initialValue = new HashMap<Term,Term>();
 
 		ConstraintHypergraph composedAutomaton = list.get(0);
 		list.remove(0);
 		for(ConstraintHypergraph h : list){
 			if(!h.getRules().isEmpty()){
 				composedAutomaton.getHyperedges().addAll(h.getHyperedges());
-				initialValue.putAll(h.getInitials());
+				composedAutomaton.getInitials().putAll(h.getInitials());
 			}
 
 		}

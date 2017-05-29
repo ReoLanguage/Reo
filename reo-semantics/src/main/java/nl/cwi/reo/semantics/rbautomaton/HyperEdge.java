@@ -113,15 +113,28 @@ public class HyperEdge {
 		
 		else{
 			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(h.getLeaves());
+			Set<RuleNode> areEqual = new HashSet<>();
+
 			while(!rulesToCompose.isEmpty()){
 				RuleNode r1 = rulesToCompose.poll();
+				Boolean equal = false;
+				
 				for(RuleNode r2 : list){
-					r1.compose(r2);
+					RuleNode r = r1.compose(r2);
+					if(r!=null && r.equals(r2)){
+						areEqual.add(r2);
+						equal=true;
+					}
+//						areEqual=true;
 				}
-				r1.erase();
+				if(!equal)
+					r1.erase();
+				else
+					r1.rmFromHyperedge(h);
 			}
 			for(RuleNode r:list)
-				r.erase();
+				if(!areEqual.contains(r))
+					r.erase();
 		}
 		
 
