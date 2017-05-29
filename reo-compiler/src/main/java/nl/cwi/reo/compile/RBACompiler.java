@@ -213,6 +213,8 @@ public class RBACompiler {
 				if(output.containsKey(v)){
 					output_substitution.put(n, output.get(n).Substitute(output.get(v), v));
 				}
+				if(memory.containsKey(v) && !(memory.get(v) instanceof Function && ((Function)memory.get(v)).getName().equals("*")))
+					output_substitution.put(n, output.get(n).Substitute(memory.get(v), v));
 			}
 		}
 		
