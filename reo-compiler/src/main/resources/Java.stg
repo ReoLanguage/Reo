@@ -17,7 +17,6 @@ public class <S.name> {
 		<S.ports:newPort(); separator="\n">
 		
 		<S.components:newComponentAtomic(); separator="\n">
-    	<S.ports:{p | list.add(<p.name>);}; separator="\n">
 		<S.components:newComponentProtocol(); separator="\n">
 	
 		<S.components:newThread(); separator="\n"> 
@@ -47,7 +46,8 @@ newComponentAtomic(c) ::= <<
 <if(c.atomic)>Component <c.name> = new <c.name>(<c.ports:{p|<p.name>}; separator=", ">);<endif>
 >>
 newComponentProtocol(c) ::= <<
-<if(c.atomic)><else>Component <c.name> = new <c.name>(list);<endif>
+<if(c.atomic)><else>    	<c.ports:{p | list.add(<p.name>);}; separator="\n">
+Component <c.name> = new <c.name>(list);<endif>
 >>
 
 newThread(c) ::= <<
