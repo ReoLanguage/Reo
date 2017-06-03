@@ -23,31 +23,31 @@ import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
 
-public class RuleNode implements HypergraphNode{
+public class RuleNode {
+	
+	static int incId = 0;
 	private Set<HyperEdge> hyperedges;
 	private List<RuleNode> exclusiveRules = new ArrayList<>();
 	private Rule rule;
-	
-	private boolean visited;
+	private int id;
 
 	public RuleNode(Rule r, Set<HyperEdge> hyperedge) {
 		this.rule = r;
 		this.hyperedges = new HashSet<>();
 		for(HyperEdge h : hyperedge)
 			addToHyperedge(h);
-		visited = false;
+		incId++;
+		id=incId;
 	}
 	
 	public RuleNode(Rule r){
 		this.rule = r;
 		this.hyperedges = new HashSet<HyperEdge>();
-		visited = false;		
 	}
 	
 	public Rule getRule(){
 		return rule;
 	}
-	
 	
 	public Set<HyperEdge> getHyperedges(){
 		return hyperedges;
@@ -70,21 +70,12 @@ public class RuleNode implements HypergraphNode{
 		h.rmLeave(this);
 	}
 	
-	public boolean isVisited() {
-		return visited;
-	}
-
 	public List<RuleNode> getExclRules(){
 		return exclusiveRules;
 	}
 	
 	public void addExclRules(RuleNode n){
 		exclusiveRules.add(n);
-	}
-	
-	@Override
-	public void setFlag(boolean flag) {
-		this.visited = flag;
 	}
 	
 	public RuleNode compose(Formula f){
@@ -115,11 +106,12 @@ public class RuleNode implements HypergraphNode{
 		if(!rule.canSync(r.getRule())){
 			return null;
 		}
-		Map<Port,Boolean> map = rule.getSync();
+		Map<Port,Boolean> map = new HashMap<>(rule.getSync());
 		map.putAll(r.getRule().getSync());
 
 		Rule r1;
 		if(rule.getFormula().equals(r.getRule().getFormula())){
+//			return this;
 			r1 = new Rule(map,rule.getFormula());
 		}
 		else{
@@ -164,7 +156,6 @@ public class RuleNode implements HypergraphNode{
 			rule = new Rule(rule.getSync(),rule.getFormula().Substitute(new MemCell(entry.getValue(), false), new MemCell(entry.getKey(), false)));
 			rule = new Rule(rule.getSync(),rule.getFormula().Substitute(new MemCell(entry.getValue(), true), new MemCell(entry.getKey(), true)));
 		}
-//		rule = new Rule(rule.getSync(),rule.getFormula());
 		return this;
 	}
 	
@@ -199,7 +190,7 @@ public class RuleNode implements HypergraphNode{
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getRule());
+		return Objects.hash(id);
 	}
 	
 	public String toString(){

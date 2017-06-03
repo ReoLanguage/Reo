@@ -1,7 +1,12 @@
 package nl.cwi.reo.interpret.ports;
 
+import java.util.Objects;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.semantics.rbautomaton.Rule;
 
 /**
  * An identifier that is decorated with a port type, a priority type, a type
@@ -185,4 +190,26 @@ public final class Port extends Identifier implements Comparable<Port> {
 	public int compareTo(Port other) {
 		return this.name.compareTo(other.name);
 	}
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public boolean equals(@Nullable Object other) {
+//		if (other == null)
+//			return false;
+//		if (other == this)
+//			return true;
+//		if (!(other instanceof Port))
+//			return false;
+//		Port p = (Port) other;
+//		return (Objects.equals(this.name, p.name));
+//	}
+//
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public int hashCode() {
+//		return Objects.hash(this.name);
+//	}
 }

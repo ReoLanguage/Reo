@@ -1,6 +1,7 @@
 package nl.cwi.reo.compile.components;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
@@ -37,6 +39,19 @@ public final class Transition {
 	 */
 	private final Map<MemCell, Term> memory;
 
+	
+	/**
+	 * Maude variable
+	 */
+	static int instancecounter = 0;
+	private Map<MemCell,Integer> mapM = new HashMap<>();
+
+	private Map<String,String> mapInM = new HashMap<>();
+	private Map<String,String> mapInP = new HashMap<>();
+	private Map<String,String> mapOutM = new HashMap<>();
+	private Map<String,String> mapOutP = new HashMap<>();
+	private int nb;
+	
 	/**
 	 * Constructs a new transition.
 	 * 
@@ -60,6 +75,8 @@ public final class Transition {
 		Set<Port> I = new HashSet<Port>();
 		// find all *used* ports in the formula and the terms.
 		this.input = I;
+		instancecounter++;
+		nb=instancecounter;
 	}
 	
 
@@ -74,6 +91,8 @@ public final class Transition {
 		this.output = Collections.unmodifiableMap(output);
 		this.memory = Collections.unmodifiableMap(memory);
 		this.input = Collections.unmodifiableSet(input);
+		instancecounter++;
+		nb=instancecounter;
 	}
 
 	/**
@@ -111,7 +130,92 @@ public final class Transition {
 	public Map<MemCell, Term> getMemory() {
 		return this.memory;
 	}
-
+	
+	public Map<MemCell,Integer> getMapM() {
+		Set<MemCell> s = this.memory.keySet();
+		Map<MemCell,Integer> map = new HashMap<>();
+		for(MemCell m : s){
+			map.put(m,Integer.parseInt(m.getName().substring(1)));
+		}
+		this.mapM=map;
+		return this.mapM;
+	}
+	
+	public Map<String,String> getMapInM() {
+		Set<Term> s = new HashSet<>(this.output.values());
+		s.addAll(new HashSet<>(memory.values()));
+		Map<String,String> map = new HashMap<>();
+		for(Term n : s){
+			if(n instanceof MemCell)
+				map.put(((MemCell)n).getName().substring(1),"d_"+((MemCell)n).getName());
+		}
+		for(MemCell m : memory.keySet()){
+			if(!map.containsKey(((MemCell)m).getName().substring(1))){
+				map.put(((MemCell)m).getName().substring(1),"*");				
+			}
+		}
+		this.mapInM=map;
+		return this.mapInM;
+	}
+	
+	public Map<String,String> getMapInP() {
+		Set<Term> s = new HashSet<>(this.output.values());
+		s.addAll(new HashSet<>(memory.values()));
+		Map<String,String> map = new HashMap<>();
+		for(Term n : s){
+			if(n instanceof Node)
+				map.put(((Node)n).getName().substring(1),"d"+((Node)n).getName());
+		}
+		for(Node m : output.keySet()){
+			if(!map.containsKey(((Node)m).getName().substring(1))){
+				map.put(((Node)m).getName().substring(1),"*");				
+			}
+		}
+		this.mapInP=map;
+		return this.mapInP;
+	}
+	
+	public Map<String,String> getMapOutP() {
+		Map<String,String> map = new HashMap<>();
+		for(Node m : output.keySet()){
+			if(output.get(m) instanceof MemCell)
+				map.put(m.getName().substring(1),"d_"+((MemCell)(output.get(m))).getName());	
+			if(output.get(m) instanceof Node)
+				map.put(m.getName().substring(1),"d"+((Node)output.get(m)).getName());	
+		}
+		Set<Term> s = new HashSet<>(this.output.values());
+		s.addAll(new HashSet<>(memory.values()));
+		for(Term m : s){
+			if(m instanceof Node)
+				map.put(((Node)m).getName().substring(1),"*");				
+		}
+		this.mapOutP=map;
+		return this.mapOutP;
+	}
+	
+	public Map<String,String> getMapOutM() {
+		Map<String,String> map = new HashMap<>();
+		for(MemCell m : memory.keySet()){
+			if(memory.get(m) instanceof MemCell)
+				map.put(m.getName().substring(1),"d_"+((MemCell)(memory.get(m))).getName());	
+			if(memory.get(m) instanceof Node)
+				map.put(m.getName().substring(1),"d"+((Node)memory.get(m)).getName());	
+		}
+		
+		Set<Term> s = new HashSet<>(this.output.values());
+		s.addAll(new HashSet<>(memory.values()));
+		for(Term m : s){
+			if(m instanceof MemCell)
+				map.put(((MemCell)m).getName().substring(1),"*");				
+		}
+		this.mapOutM=map;
+		return this.mapOutM;
+	}	
+	
+	public int getNb(){
+		return nb;
+	}
+	
 	
 	/**
 	 * Gets the set of ports that participate in this transition.

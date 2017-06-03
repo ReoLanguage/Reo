@@ -445,19 +445,27 @@ public class Compiler {
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);
 
 		// Generate Java code from the template
-		String code = template.generateCode(Language.JAVA);
-		write(program.getName() + ".java", code);
+		Language L = Language.JAVA;
+		String code = template.generateCode(L);
+		switch(L){
+			case JAVA:
+				write(program.getName() + ".java", code);
+				break;
+			case MAUDE:
+				write(program.getName() + ".maude", code);
+				break;
+			default:break;
+		}
 
 		Long t7 = System.nanoTime();
 	
-//		if(true){
-//			try{
-//				PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
-//				writer.println("Compilation time : "+(t7-t1) + " nanosecondes");
-//				writer.close();
-//			} catch (IOException e) { // do something  
-//			}
-//		}
+
+		try{
+			PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
+			writer.println("Compilation time : "+(t7-t1) + " nanosecondes");
+			writer.close();
+		} catch (IOException e) { // do something  
+		}
 
 		
 	}
@@ -604,13 +612,12 @@ public class Compiler {
 		c.compile();
 		Long t2 = System.nanoTime();
 
-//		if(true){
-//			try{
-//				PrintWriter writer = new PrintWriter(outdir+"compilation_time_lykos.txt", "UTF-8");
-//				writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
-//				writer.close();
-//			} catch (IOException e) { // do something  
-//			}
-//		}
+
+		try{
+			PrintWriter writer = new PrintWriter(outdir+"compilation_time_lykos.txt", "UTF-8");
+			writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
+			writer.close();
+		} catch (IOException e) { // do something  
+		}
 	}
 }

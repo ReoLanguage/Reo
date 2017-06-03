@@ -11,6 +11,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.util.Monitor;
@@ -128,5 +130,6 @@ public class Rule {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.sync,this.f);
+		
 	}
 }

@@ -147,7 +147,7 @@ public class Relation implements Formula {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getName(), this.value, this.args);
+		return Objects.hash(this.name, this.value, this.args);
 	}
 
 }

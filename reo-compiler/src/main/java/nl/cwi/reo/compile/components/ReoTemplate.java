@@ -67,22 +67,16 @@ public final class ReoTemplate {
 		case JAVA:
 			group = new STGroupFile("Java.stg");
 			break;
+		case MAUDE:
+			group = new STGroupFile("Maude.stg");
+			break;
 		default:
 			return "";
 		}
 
 		ST temp = group.getInstanceOf("main");
 		temp.add("S", this);
-		
-//		String path = "../reo-runtime-java/src/main/java";
-//		
-//		try {
-//			Files.write(Paths.get(path, name+".java"), Arrays.asList(temp.render()),
-//					Charset.defaultCharset());
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+
 		return temp.render(72);
 	}
 }

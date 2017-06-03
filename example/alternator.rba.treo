@@ -12,6 +12,7 @@ sync(a?,b!){
 syncdrain(a?,b?){
 	#RBA
 	{a,b} true
+
 }
 
 producer(a!String) {
@@ -28,9 +29,9 @@ alternator() {
 	{ syncdrain(a[i], a[i+1]) | i : <1..N> }
 	{ fifo1(b[i+1], b[i]) | i : <1..N> }
 	{ sync(a[i], b[i]) | i : <1..(N+1)> }
-	{ producer(a[i]) | i : <1..(N+1)> }
+	{ producer(a[i])   | i : <1..(N+1)> }
 	consumer(b[1])
-|
-	N=10
+  |
+	N=350
 }
 

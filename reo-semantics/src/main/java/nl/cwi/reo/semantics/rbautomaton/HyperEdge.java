@@ -21,16 +21,19 @@ import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
 
 public class HyperEdge {
+	
+	static int incId = 0;
 	private PortNode root;
 	private Set<RuleNode> leaves;
+	private int id;
 	
 	public HyperEdge(PortNode root, Set<RuleNode> leaves){
-		root.addHyperedge(this);
 		this.root=root;
 		this.leaves = new HashSet<RuleNode>();
 		for(RuleNode r : leaves)
 			r.addToHyperedge(this);
-		
+		incId++;
+		id=incId;
 	}
 	
 	public PortNode getRoot(){
@@ -91,47 +94,48 @@ public class HyperEdge {
 		if(!root.getPort().equals(h.getRoot().getPort())){
 			new Exception("Those two hyperedges cannot compose because of two different roots");
 		}
-		Set<RuleNode> list = new HashSet<RuleNode>();
-		Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
-		ruleNodes.addAll(h.getLeaves());
-		list.addAll(leaves);
 		
-		if(ruleNodes.size()==1){
+		if(h.getLeaves().size()==1){
 			//Single rule to compose
 			RuleNode h_ruleNode = h.getLeaves().iterator().next();
 			h_ruleNode.rmFromHyperedge(h);
 			//Compose single rule
-			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(list);
+			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(leaves);
 
 			while(!rulesToCompose.isEmpty()){
 				RuleNode r = rulesToCompose.poll();
-				if(r.compose(h_ruleNode)!=null)
+				RuleNode rule = r.compose(h_ruleNode);
+				if(rule!=null)
 					r.erase();
 			}
 			h_ruleNode.erase();
+			
 		}
 		
 		else{
+			Set<RuleNode> list = new HashSet<RuleNode>(leaves);
+
 			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(h.getLeaves());
 			Set<RuleNode> areEqual = new HashSet<>();
 
 			while(!rulesToCompose.isEmpty()){
 				RuleNode r1 = rulesToCompose.poll();
+				r1.rmFromHyperedge(h);
 				Boolean equal = false;
-				
 				for(RuleNode r2 : list){
 					RuleNode r = r1.compose(r2);
 					if(r!=null && r.equals(r2)){
 						areEqual.add(r2);
 						equal=true;
 					}
-//						areEqual=true;
 				}
 				if(!equal)
 					r1.erase();
 				else
 					r1.rmFromHyperedge(h);
 			}
+//			list = new HashSet<>(leaves);
+
 			for(RuleNode r:list)
 				if(!areEqual.contains(r))
 					r.erase();
@@ -201,8 +205,8 @@ public class HyperEdge {
 	 */
 	@Override
 	public int hashCode() {
-
-		return Objects.hash(this.root.getPort(),leaves);
+		return id;
+//		return Objects.hash(this.root.getPort(),leaves);
 	}
 	
 	public String toString(){

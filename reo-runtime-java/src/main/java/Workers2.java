@@ -14,7 +14,7 @@ public class Workers2 {
 	public static void consumer(Input<String> a) {
 		for (int i = 0; i < k*N; i++){
 			a.get();
-//			System.out.println( i + ": " + a.get() + " ");
+			System.out.println( i + ": " + a.get() + " ");
 		}
 		System.out.println(" done ");
 		System.exit(0);

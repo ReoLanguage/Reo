@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 
@@ -47,7 +48,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 * Constructs an automaton, with an empty set of rules.
 	 */
 	public ConstraintHypergraph() {
-		this.hyperedges = new HashSet<HyperEdge>();
+		hyperedges = new HashSet<HyperEdge>();
 		initial = new HashMap<Term,Term>();
 	}
 
@@ -87,7 +88,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 */
 	public ConstraintHypergraph(List<HyperEdge> h, Map<Term,Term> initial) {
 		this.hyperedges=new HashSet<HyperEdge>(h);
-		this.initial = initial;
+		this.initial = new HashMap<>(initial);
 	}
 	
 	/**
@@ -120,7 +121,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	public List<HyperEdge> getHyperedges(Port p){
 		List<HyperEdge> hyperedgeList = new ArrayList<HyperEdge>();
 		for(HyperEdge h : hyperedges){
-			if(h.getRoot().getPort().equals(p)){
+			if(h.getRoot().getPort().equals(p) && !h.getLeaves().isEmpty()){
 				hyperedgeList.add(h);
 			}
 		}
@@ -174,7 +175,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	public Map<Term,Term> getInitials(){
 		return initial;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -308,6 +309,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 
 		// Rename all memory cells and put *all* components into a list.
 		List<ConstraintHypergraph> list = new ArrayList<>(components);
+		List<ConstraintHypergraph> newList = new ArrayList<>(components);
 		int i = 1;
 		for (ConstraintHypergraph A : list) {
 			Map<String, String> rename = new HashMap<>();
@@ -323,29 +325,26 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			for (RuleNode r : A.getRuleNodes()) {
 				r.substitute(rename);
 			}
+
 			Map<Term,Term> init = new HashMap<>(A.getInitials());
 			for(Term t : init.keySet()){
 				if(t instanceof MemCell){
 					A.getInitials().put(new MemCell(rename.get(((MemCell) t).getName()),((MemCell) t).hasPrime()), A.getInitials().get(t));
 				}
 			}
+			
+			newList.add(new ConstraintHypergraph(new ArrayList<>(A.getHyperedges()),A.getInitials()));
 		}
 
 		// Compose the list of RBAs into a single list of rules.
 
-//		Map<Term,Term> initialValue = new HashMap<Term,Term>();
-
-		ConstraintHypergraph composedAutomaton = list.get(0);
-		list.remove(0);
-		for(ConstraintHypergraph h : list){
-			if(!h.getRules().isEmpty()){
-				composedAutomaton.getHyperedges().addAll(h.getHyperedges());
-				composedAutomaton.getInitials().putAll(h.getInitials());
-			}
-
+		ConstraintHypergraph composedAutomaton = new ConstraintHypergraph();
+		for(ConstraintHypergraph h : newList){
+			composedAutomaton.getHyperedges().addAll(h.getHyperedges());
+			composedAutomaton.getInitials().putAll(h.getInitials());
 		}
-		composedAutomaton.distributeSingleEdge();
-		composedAutomaton.distributeMultiEdge();
+		composedAutomaton = composedAutomaton.distributeSingleEdge();
+ 		composedAutomaton.distributeMultiEdge();
 		
 		return composedAutomaton;
 //		return new ConstraintHypergraph(composedAutomaton.getRules(),initialValue);
@@ -357,7 +356,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 * Distribute single hyperedges
 	 * @return
 	 */
-	public void distributeSingleEdge(){
+	public ConstraintHypergraph distributeSingleEdge(){
 		Set<Port> variables = new HashSet<>();
 		for(HyperEdge h : hyperedges){
 			variables.add(h.getRoot().getPort());
@@ -379,10 +378,8 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				for(HyperEdge h : singleEdge){
 					e.compose(h);
 				}
-				hyperedges.removeAll(singleEdge);
 				singleEdge.clear();
 				singleEdge.add(e);
-				removeEmptyHyperedge();
 			}
 			if(!multiEdge.isEmpty()){
 				HyperEdge e = multiEdge.get(0);
@@ -393,9 +390,9 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				if(!multiEdge.isEmpty()){
 					hyperedges.removeAll(singleEdge);
 				}
-				removeEmptyHyperedge();
 			}	
-		}	
+		}
+		return new ConstraintHypergraph(new ArrayList<>(hyperedges),initial);
 	}
 	
 	/**
@@ -414,11 +411,18 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			multiEdge.addAll(getHyperedges(p));
 			HyperEdge toDistribute = multiEdge.get(0);
 			multiEdge.remove(0);
-			
+			boolean mult=false;
 			for(HyperEdge h : multiEdge){
-				toDistribute = h.compose(toDistribute);
+				if(!h.getLeaves().isEmpty()){
+					toDistribute = h.compose(toDistribute);
+					mult=true;
+				}
 			}
-			removeEmptyHyperedge();
+			if(mult){
+				Set<HyperEdge> s = new HashSet<>(hyperedges);
+				hyperedges.clear();
+				hyperedges.addAll(s);
+			}
 		}
 	}
 	
@@ -427,10 +431,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		Queue<HyperEdge> q = new LinkedList<>(hyperedges);
 		while(!q.isEmpty()){
 			HyperEdge e = q.poll();
-			if(e.getLeaves().size()==0){
-				e.getRoot().rmHyperedge(e);
-			}
-			else
+			if(!(e.getLeaves().size()==0))
 				s.add(e);
 		}
 		hyperedges.clear();

@@ -3,7 +3,9 @@
  */
 package nl.cwi.reo.compile.components;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
@@ -24,6 +26,8 @@ public final class Atomic implements Component {
 
 	private final Set<Port> ports;
 	
+	private final Map<Port,Integer> listPort = new HashMap<>();
+	
 	private final String call;
 
 	public Atomic(String name, List<String> params, Set<Port> ports, String call) {
@@ -41,6 +45,15 @@ public final class Atomic implements Component {
 		return params;
 	}
 
+	public Map<Port,Integer> getListPort() {
+		int i=0;
+		for(Port p : ports){
+			listPort.put(p,i);
+			i++;
+		}
+		return listPort;
+	}
+	
 	public Set<Port> getPorts() {
 		return ports;
 	}

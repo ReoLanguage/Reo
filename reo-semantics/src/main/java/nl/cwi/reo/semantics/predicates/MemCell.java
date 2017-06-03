@@ -35,7 +35,7 @@ public class MemCell implements Variable {
 
 	public String getName() {
 		return name;
-	}
+	}	
 
 	public TypeTag getType() {
 		return type;

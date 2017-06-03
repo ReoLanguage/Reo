@@ -24,8 +24,12 @@ public class Conjunction implements Formula {
 
 	private final List<Formula> clauses;
 
+	private final Set<Formula> clausesSet;
+
+	
 	public Conjunction(List<Formula> clauses) {
 		this.clauses = clauses;
+		this.clausesSet = new HashSet<>(clauses);
 	}
 	
 	public static Formula conjunction(List<Formula> clauses) {
@@ -269,6 +273,10 @@ public class Conjunction implements Formula {
 		return vars;
 	}
 	
+	public Set<Formula> getClausesSet(){
+		return this.clausesSet;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -280,10 +288,12 @@ public class Conjunction implements Formula {
 			return true;
 		if (!(other instanceof Conjunction))
 			return false;
-		Set<Formula> s = new HashSet<>(this.getClauses());
-		Set<Formula> s2 = new HashSet<>(((Conjunction)other).getClauses());
+//		Set<Formula> s = new HashSet<>(this.getClauses());
+//		Set<Formula> s2 = new HashSet<>(((Conjunction)other).getClauses());
+//		
+//		return Objects.equals(s, s2);
 		
-		return Objects.equals(s, s2);
+		return Objects.equals(this.getClausesSet(), ((Conjunction)other).getClausesSet());
 	}
 
 	/**

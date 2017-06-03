@@ -225,12 +225,12 @@ public class RBACompiler {
 				if(output_substitution.containsKey(v)){
 					mem_substitution.put(m, memory.get(m).Substitute(output_substitution.get(v), v));
 				}
+				if(memory.containsKey(v) && !(memory.get(v) instanceof Function && ((Function)memory.get(v)).getName().equals("*")))
+					mem_substitution.put(m, memory.get(v).Substitute(memory.get(v), v));
 			}
 //			if(!mem_substitution.containsKey(m))
 //				if(mem_substitution.get(m)!=null)
 //					mem_substitution.put(m, memory.get(m));
-//				else
-//					null_mem.put(m, memory.get(m));
 		}
 //		mem_substitution.putAll(null_mem);
 		return new Transition(guard, output_substitution, mem_substitution, allInputPorts);
