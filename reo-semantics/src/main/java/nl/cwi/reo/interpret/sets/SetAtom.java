@@ -21,10 +21,17 @@ import nl.cwi.reo.util.Monitor;
  *            Reo semantics type
  */
 public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
+	
+	/**
+	 * Component name.
+	 */
+	@Nullable
+	private final String name;
 
 	/**
 	 * Reo semantics object.
 	 */
+	@Nullable
 	private final T atom;
 
 	/**
@@ -35,16 +42,27 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	/**
 	 * Constructs a new atomic set.
 	 * 
+	 * @param name
+	 *            component name
 	 * @param atom
 	 *            semantics object
 	 * @param source
 	 *            reference to source code
 	 */
-	public SetAtom(T atom, Reference source) {
-		if (atom == null || source == null)
+	public SetAtom(String name, T atom, Reference source) {
+		if (source == null)
 			throw new NullPointerException();
+		this.name = name;
 		this.atom = atom;
 		this.source = source;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Nullable
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -54,10 +72,11 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	@Override
 	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
-		T semantics = atom.evaluate(s, m);
-		if (semantics == null)
+		T _atom = atom != null ? atom.evaluate(s, m) : atom;
+		Reference _source = source.evaluate(s, m);
+		if (_atom == null || _source == null)
 			return null;
-		return new Instance<T>(new ReoConnectorAtom<T>(semantics, source), new HashSet<Set<Identifier>>());
+		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<Set<Identifier>>());
 	}
 
 	/**
@@ -77,5 +96,11 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 		st.add("atom", atom);
 		st.add("source", source);
 		return st.render();
+	}
+
+	@Override
+	public boolean canEvaluate(Set<Identifier> deps) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

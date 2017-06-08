@@ -15,7 +15,7 @@ import nl.cwi.reo.interpret.ports.Port;
  *            semantics
  */
 public interface Semantics<T> extends Expression<T> {
-
+	
 	/**
 	 * Gets the set of ports in the interface.
 	 * 
@@ -39,6 +39,7 @@ public interface Semantics<T> extends Expression<T> {
 	 */
 	public T getNode(Set<Port> node);
 
+	
 	/**
 	 * Renames ports in the interface according to a set of links
 	 * 

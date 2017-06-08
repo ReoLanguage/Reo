@@ -1,6 +1,10 @@
 package nl.cwi.reo.compile.components;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -10,8 +14,9 @@ import org.stringtemplate.v4.STGroupFile;
 
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
+import nl.cwi.reo.semantics.predicates.MemoryCell;
 
+@Deprecated
 public final class ExtraReoTemplate {
 
 	private final String reofile;
@@ -22,12 +27,12 @@ public final class ExtraReoTemplate {
 
 	private final Set<Port> ports;
 
-	private final List<TransitionRule> transitions;
+	private final List<Transition> transitions;
 
 	private final Set<MemoryCell> mem;
 
 	
-	public ExtraReoTemplate(String reofile, String packagename, String name, Set<Port> ports, List<TransitionRule> transitions, Set<MemoryCell> memoryCells) {
+	public ExtraReoTemplate(String reofile, String packagename, String name, Set<Port> ports, List<Transition> transitions, Set<MemoryCell> memoryCells) {
 		this.reofile = reofile;
 		this.packagename = packagename;
 		this.name = name;
@@ -52,7 +57,7 @@ public final class ExtraReoTemplate {
 	public Set<Port> getPorts() {
 		return ports;
 	}
-	public List<TransitionRule> getTransitions(){
+	public List<Transition> getTransitions(){
 		return transitions;
 	}
 	public Set<MemoryCell> getMem(){
@@ -76,8 +81,23 @@ public final class ExtraReoTemplate {
 			break;
 		}
 
-		ST temp = group.getInstanceOf("main");
-		temp.add("S", this);
-		return temp.render();
+		ST temp1 = group.getInstanceOf("main");
+		ST temp2 = group.getInstanceOf("Component");
+		temp1.add("S", this);
+		temp2.add("S", this);
+		
+		String path = "/home/e-spin/workspace/Reo/reo-runtime-java/src/main/java";
+		
+		try {
+			Files.write(Paths.get(path, "test.java"), Arrays.asList(temp1.render()),
+					Charset.defaultCharset());
+			Files.write(Paths.get(path, "Component1.java"), Arrays.asList(temp2.render()),
+					Charset.defaultCharset());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		temp1.add("S", this);
+		return temp1.render();
 	}
 }

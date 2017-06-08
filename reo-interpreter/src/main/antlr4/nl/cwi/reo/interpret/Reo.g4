@@ -1,6 +1,6 @@
 grammar Reo;
 
-import Tokens, PA, WA, CAM, SA, PR, SBA;
+import Tokens, PA, WA, CAM, SA, PR, SBA, P, RBA;
 
 // Reo File
 file      : secn? imps* defn* EOF;
@@ -10,10 +10,10 @@ defn      : ID '='? component ;
 
 // Components
 component : var                                                   # component_variable
-          | sign '{' atom ('|' source)? '}'                       # component_atomic
+          | sign '{' (atom | source | atom source) '}'            # component_atomic
           | sign multiset                                         # component_composite ;
-atom      : pa | cam | wa | sa | pr | sba ;
-source    : LANG ':' STRING ( '(' ID (',' ID)* ')' )? ;
+atom      : pa | cam | wa | sa | pr | sba | p | rba ;
+source    : lang=(JAVA | C) ':' STRING ;
 
 // Multisets
 multiset  : instance                                              # multiset_constraint

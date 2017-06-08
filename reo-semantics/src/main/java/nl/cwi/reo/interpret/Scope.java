@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -77,6 +78,10 @@ public final class Scope {
 
 	public boolean isEmpty() {
 		return assignments.isEmpty();
+	}
+	
+	public Set<Identifier> getKeys() {
+		return assignments.keySet();
 	}
 
 	@Override

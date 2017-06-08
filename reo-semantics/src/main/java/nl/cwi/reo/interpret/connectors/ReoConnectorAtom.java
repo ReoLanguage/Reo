@@ -27,6 +27,11 @@ import nl.cwi.reo.util.Monitor;
 public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnector<T> {
 
 	/**
+	 * Component name.
+	 */
+	private final String name;
+
+	/**
 	 * Semantics object.
 	 */
 	private final T semantics;
@@ -48,6 +53,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 *            semantics
 	 */
 	public ReoConnectorAtom(T atom) {
+		this.name = null;
 		this.semantics = atom;
 		this.source = new Reference();
 		Map<Port, Port> links = new HashMap<Port, Port>();
@@ -59,12 +65,15 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	/**
 	 * Constructs a new atomic component.
 	 * 
+	 * @param name
+	 *            component name
 	 * @param semantics
 	 *            semantics
 	 * @param source
 	 *            reference to source code
 	 */
-	public ReoConnectorAtom(T semantics, Reference source) {
+	public ReoConnectorAtom(String name, T semantics, Reference source) {
+		this.name = name;
 		this.semantics = semantics;
 		this.source = source;
 		Map<Port, Port> links = new HashMap<Port, Port>();
@@ -76,6 +85,8 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	/**
 	 * Constructs a new atomic component.
 	 * 
+	 * @param name
+	 *            component name
 	 * @param semantics
 	 *            semantics
 	 * @param source
@@ -83,10 +94,19 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * @param links
 	 *            set of links
 	 */
-	public ReoConnectorAtom(T semantics, Reference source, Map<Port, Port> links) {
+	public ReoConnectorAtom(String name, T semantics, Reference source, Map<Port, Port> links) {
+		this.name = name;
 		this.semantics = semantics;
 		this.source = source;
 		this.links = Collections.unmodifiableMap(links);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Nullable
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -124,7 +144,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 		T semantics = this.semantics.evaluate(s, m);
 		if (semantics == null)
 			return null;
-		return new ReoConnectorAtom<T>(semantics, source);
+		return new ReoConnectorAtom<T>(name, semantics, source);
 	}
 
 	/**
@@ -132,7 +152,9 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 */
 	@Override
 	public ReoConnector<T> rename(Map<Port, Port> joins) {
-		return new ReoConnectorAtom<T>(semantics, source, Links.rename(links, joins));
+		if (links.isEmpty())
+			return new ReoConnectorAtom<T>(name, semantics, source, joins);
+		return new ReoConnectorAtom<T>(name, semantics, source, Links.rename(links, joins));
 	}
 
 	/**
@@ -156,7 +178,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 */
 	@Override
 	public ReoConnector<T> integrate() {
-		return new ReoConnectorAtom<T>(semantics.rename(links), source);
+		return new ReoConnectorAtom<T>(name, semantics.rename(links), source);
 	}
 
 	/**
@@ -198,11 +220,30 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 		return Arrays.asList(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public List<ReoConnector<T>> partition() {
-//		List<ReoConnector<T>> partition = new ArrayList<ReoConnector<T>>();
-//		partition.add(this);
-		return Arrays.asList(this);
+	public ReoConnector<T> propagate(Monitor m) {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Set<Port>> getTypePartition() {
+		Set<Set<Port>> partition = new HashSet<Set<Port>>();
+		Set<Port> partDefault = new HashSet<Port>();
+		for (Port p : links.values()) {
+			if (p.getTypeTag() == null) {
+				partDefault.add(p);
+			} else {
+				partition.add(new HashSet<Port>(Arrays.asList(p)));
+			}
+		}
+		partition.add(partDefault);
+		return partition;
 	}
 
 }

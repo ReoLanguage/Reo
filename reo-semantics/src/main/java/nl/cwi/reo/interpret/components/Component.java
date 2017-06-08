@@ -81,7 +81,7 @@ public final class Component<T extends Semantics<T>> implements Value {
 	 */
 	@Override
 	public String toString() {
-		return "" + sign + set; // scope
+		return "" + sign + set;
 	}
 
 	/**

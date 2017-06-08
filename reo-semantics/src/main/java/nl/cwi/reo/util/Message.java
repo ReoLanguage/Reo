@@ -4,8 +4,6 @@ import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.variables.Identifier;
-
 /**
  * A message generated during compilation.
  */

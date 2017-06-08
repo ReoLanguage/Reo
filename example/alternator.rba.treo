@@ -1,0 +1,37 @@
+fifo1(a?,b!) {
+	#RBA
+	{a, ~b} $m = null, $m' = a
+	{~a, b} $m != null, b = $m, $m' = null
+}
+
+sync(a?,b!){
+	#RBA
+	{a,b} a=b
+}
+
+syncdrain(a?,b?){
+	#RBA
+	{a,b} true
+
+}
+
+producer(a!String) {
+	#RBA {a} true
+	Java:"Workers2.producer"
+}
+
+consumer(a?String) {
+	#RBA {a} true
+	Java:"Workers2.consumer"
+}
+
+alternator() {
+	{ syncdrain(a[i], a[i+1]) | i : <1..N> }
+	{ fifo1(b[i+1], b[i]) | i : <1..N> }
+	{ sync(a[i], b[i]) | i : <1..(N+1)> }
+	{ producer(a[i])   | i : <1..(N+1)> }
+	consumer(b[1])
+  |
+	N=350
+}
+

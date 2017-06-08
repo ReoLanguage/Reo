@@ -6,39 +6,44 @@ package nl.cwi.reo.semantics;
 public enum SemanticsType {
 	
 	/**
-	 * Symbolic Automata.
-	 */
-	SBA, 
-	
-	/**
-	 * Port automata.
-	 */
-	PA, 
-	
-	/**
 	 * Constraint automata with memory.
 	 */
 	CAM, 
 	
 	/**
-	 * Work automata.
+	 * Predicates.
 	 */
-	WA, 
+	P,
 	
 	/**
-	 * Seepage automata.
+	 * Port automata.
 	 */
-	SA, 
-	
-	/**
-	 * Atomic components for Lykos compiler by Sung-Shik Jongmans.
-	 */
-	PR,
+	PA,
 	
 	/**
 	 * Plain semantics.
 	 */
-	PLAIN;
+	PLAIN, 
+	
+	/**
+	 * Atomic components for Lykos compiler by Sung-Shik Jongmans.
+	 */
+	PR, 
+	
+	/**
+	 * Rule Based automata.
+	 */
+	RBA,
+	
+	/**
+	 * Seepage automata.
+	 */
+	SA,
+	
+	/**
+	 * Work automata.
+	 */
+	WA;
 	
 	/**
 	 * {@inheritDoc}
@@ -46,13 +51,14 @@ public enum SemanticsType {
 	@Override
 	public String toString() {
 		switch(this) {
-		case PA: return "pa";
-		case PR: return "pr";
 		case CAM: return "cam";
-		case WA: return "wa";
-		case SA: return "sa";
-		case SBA: return "sba";
+		case P: return "p";
+		case PA: return "pa";
 		case PLAIN: return "plain";
+		case PR: return "pr";
+		case RBA: return "rba";
+		case SA: return "sa";
+		case WA: return "wa";
 		default: throw new IllegalArgumentException();
 		}
 	}

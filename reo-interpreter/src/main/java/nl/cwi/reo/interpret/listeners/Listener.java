@@ -12,6 +12,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.components.ComponentDefinition;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.components.ComponentVariable;
+import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.Reference;
 import nl.cwi.reo.interpret.instances.ComponentInstance;
 import nl.cwi.reo.interpret.instances.ProductInstance;
@@ -94,6 +95,7 @@ import nl.cwi.reo.interpret.ReoParser.PortContext;
 import nl.cwi.reo.interpret.ReoParser.PortsContext;
 import nl.cwi.reo.interpret.ReoParser.SecnContext;
 import nl.cwi.reo.interpret.ReoParser.SignContext;
+import nl.cwi.reo.interpret.ReoParser.SourceContext;
 import nl.cwi.reo.interpret.ReoParser.TermContext;
 import nl.cwi.reo.interpret.ReoParser.Term_booleanContext;
 import nl.cwi.reo.interpret.ReoParser.Term_bracketsContext;
@@ -140,6 +142,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	// Components
 	private ParseTreeProperty<ComponentExpression<T>> components = new ParseTreeProperty<ComponentExpression<T>>();
+	private ParseTreeProperty<String> componentnames = new ParseTreeProperty<String>();
 
 	// Formulas
 	private ParseTreeProperty<PredicateExpression> formula = new ParseTreeProperty<PredicateExpression>();
@@ -175,8 +178,9 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	// Variables
 	private ParseTreeProperty<VariableExpression> variables = new ParseTreeProperty<VariableExpression>();
 
-	// Semantics
+	// Atoms
 	protected ParseTreeProperty<T> atoms = new ParseTreeProperty<T>();
+	protected ParseTreeProperty<Reference> sources = new ParseTreeProperty<Reference>();
 
 	/**
 	 * Constructs a new generic listener.
@@ -258,6 +262,11 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	@Override
+	public void enterDefn(DefnContext ctx) {
+		componentnames.put(ctx.component(), ctx.ID().getText());
+	}
+
+	@Override
 	public void exitDefn(DefnContext ctx) {
 		VariableExpression e = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(),
 				new Location(ctx.ID().getSymbol(), filename));
@@ -278,11 +287,52 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitComponent_atomic(Component_atomicContext ctx) {
-		T atom = atoms.get(ctx.atom());
-		Reference s = new Reference();
-		if (ctx.source() != null)
-			s = new Reference(ctx.source().STRING().getText(), ctx.source().LANG().getText().toUpperCase());
-		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()), new SetAtom<T>(atom, s)));
+		SignatureExpression sign = signatureExpressions.get(ctx.sign());
+		String name = componentnames.get(ctx);
+		
+		// Get the atomic semantics.
+		T atom = null;
+		if (ctx.atom() != null) {
+			atom = atoms.get(ctx.atom());
+			if (atom == null) {
+				m.add("Incorrect semantics specified.");
+			}
+		}
+		
+		// Get the source code reference
+		Reference s = null;
+		if (ctx.source() != null) {
+			String call = ctx.source().STRING().getText().replace("\"", "");
+			Language lang;
+			switch (ctx.source().lang.getType()) {
+			case ReoParser.JAVA:
+				lang = Language.JAVA;
+				break;
+			case ReoParser.C11:
+				lang = Language.C11;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown source language.");
+			}
+			List<? extends VariableExpression> params = sign.getParameters();
+			s = new Reference(call, lang, params);
+		} else {
+			s = new Reference();
+		}
+		
+		components.put(ctx, new ComponentDefinition<T>(sign, new SetAtom<T>(name, atom, s)));
+	}
+
+	@Override
+	public void exitSource(SourceContext ctx) {
+		
+	}
+
+	@Override
+	public void enterComponent_composite(Component_compositeContext ctx) {
+		componentnames.put(ctx.multiset(), componentnames.get(ctx));
+		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()),
+				(SetComposite<T>) instances.get(ctx.multiset())));
 	}
 
 	@Override
@@ -303,7 +353,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitMultiset_setbuilder(Multiset_setbuilderContext ctx) {
-
+		String name = componentnames.get(ctx);
 		List<InstanceExpression<T>> stmtlist = new ArrayList<InstanceExpression<T>>();
 		for (MultisetContext stmt_ctx : ctx.multiset())
 			stmtlist.add(instances.get(stmt_ctx));
@@ -313,22 +363,23 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		PredicateExpression P = formula.get(ctx.formula());
 		if (P == null)
 			P = new TruthValue(true);
-		instances.put(ctx, new SetComposite<T>(operator, stmtlist, P,
-				new Location(ctx.start, filename)));
+		instances.put(ctx, new SetComposite<T>(name, operator, stmtlist, P, new Location(ctx.start, filename)));
 	}
 
 	@Override
 	public void exitMultiset_else(Multiset_elseContext ctx) {
+		String name = componentnames.get(ctx);
 		SetExpression<T> m1 = sets.get(ctx.multiset(0));
 		SetExpression<T> m2 = sets.get(ctx.multiset(1));
-		sets.put(ctx, new SetElse<T>(m1, m2));
+		sets.put(ctx, new SetElse<T>(name, m1, m2));
 	}
 
 	@Override
 	public void exitMultiset_without(Multiset_withoutContext ctx) {
+		String name = componentnames.get(ctx);
 		SetExpression<T> m1 = sets.get(ctx.multiset(0));
 		SetExpression<T> m2 = sets.get(ctx.multiset(1));
-		sets.put(ctx, new SetWithout<T>(m1, m2));
+		sets.put(ctx, new SetWithout<T>(name, m1, m2));
 	}
 
 	/**
@@ -520,8 +571,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		VariableExpression var = variables.get(ctx.var());
 		TypeTag type = typetags.get(ctx.type());
 		// if (type == null) type = new TypeTag(Arrays.asList(""));
-		if (type == null)
-			type = new TypeTag("");
 		parameters.put(ctx, new ParameterExpression(var, type));
 
 		// TODO : add signature option
@@ -541,8 +590,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		if (var == null)
 			var = new VariableExpression("", new ArrayList<TermExpression>(), new Location(ctx.start, filename));
 		TypeTag tag = typetags.get(ctx.type());
-		if (tag == null)
-			tag = new TypeTag();
 		PortType type = PortType.NONE;
 		if (ctx.io != null) {
 			switch (ctx.io.getType()) {
@@ -568,7 +615,8 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitType(TypeContext ctx) {
-		typetags.put(ctx, new TypeTag(ctx.getText()));
+		if (!ctx.getText().trim().equals(""))
+			typetags.put(ctx, new TypeTag(ctx.getText()));
 	}
 
 	/**
@@ -651,8 +699,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		terms.put(ctx, new ListExpression(termsList.get(ctx.list())));
 	}
 
-
-
 	@Override
 	public void exitTerm_instance(Term_instanceContext ctx) {
 		terms.put(ctx, new InstanceTermExpression<T>(instances.get(ctx.instance())));
@@ -719,6 +765,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		for (TermContext expr_ctx : ctx.term())
 			list.add(terms.get(expr_ctx));
 		termsList.put(ctx, list);
-//		terms.put(ctx, new ListExpression(list));
+		// terms.put(ctx, new ListExpression(list));
 	}
 }

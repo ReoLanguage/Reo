@@ -5,6 +5,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,8 +32,13 @@ import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.components.Component;
+import nl.cwi.reo.interpret.connectors.Reference;
+import nl.cwi.reo.interpret.connectors.ReoConnector;
+import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
+import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -175,7 +181,7 @@ public class Interpreter<T extends Semantics<T>> {
 			@SuppressWarnings("unchecked")
 			Instance<T> i = ((Component<T>)main).instantiate(params, null, m);
 			String[] namesplit = name.split("\\.");
-			if (i != null)
+			if (i != null)			
 				return new ReoProgram<T>(namesplit[namesplit.length - 1], file, i.getConnector());
 		}
 

@@ -6,8 +6,6 @@ import java.util.Objects;
 import org.antlr.v4.runtime.Token;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.variables.Identifier;
-
 /**
  * A location in a Reo source file.
  */

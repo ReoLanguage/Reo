@@ -1,0 +1,59 @@
+<izpack:installation version="5.0"
+                     xmlns:izpack="http://izpack.org/schema/installation"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
+ 
+  <info>
+    <appname>Reo</appname>
+    <appversion>0.0</appversion>
+    <appsubpath>Reo</appsubpath>
+    <javaversion>1.6</javaversion>
+  </info>
+ 
+  <locale>
+    <langpack iso3="eng"/>
+  </locale>
+ 
+  <guiprefs width="800" height="600" resizable="no">
+    <modifier key="useHeadingPanel" value="yes" />
+  </guiprefs>
+
+   <resources>
+        <res id="ProcessPanel.Spec.xml" src="ProcessPanel.Spec.xml"/>
+   </resources>
+
+  <panels>
+    <panel classname="TargetPanel"/>
+    <panel classname="PacksPanel"/>
+    <panel classname="InstallPanel"/>
+    <panel classname="ProcessPanel"/>
+    <panel classname="FinishPanel"/>
+  </panels>
+ 
+  <packs>
+    <pack name="Compiler" required="yes">
+      <description>The Reo compiler</description>
+      <singlefile src="lib/reo-runtime-java.jar" target="${INSTALL_PATH}/bin/reo-runtime-java.jar" override="true" />
+      <singlefile src="lib/reo-runtime-java-lykos.jar" target="${INSTALL_PATH}/bin/reo-runtime-java-lykos.jar" override="true" />
+      <fileset dir="examples" targetdir="${INSTALL_PATH}/workspace/examples"/>
+      <fileset dir="workers" targetdir="${INSTALL_PATH}/workspace/workers"/>
+      <file src="reo-1.0.jar" targetdir="${INSTALL_PATH}/bin" override="true" />
+      <file src=".reosource" targetdir="${INSTALL_PATH}" override="true" />
+<!--      <singlefile src="lib/reo-1.0.jar" target="${INSTALL_PATH}/bin/reo.jar" override="true" />-->
+      <file src="installer.sh" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/installer.sh" stage="never" keep="true">
+          <os family="unix" />
+      </executable>
+      <file src="installer.bat" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/installer.bat" stage="never" keep="true">
+          <os family="windows" />
+      </executable>
+      <file src="permanent_settings.bat" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/permanent_settings.bat" stage="never" keep="true">
+          <os family="windows" />
+      </executable>
+
+    </pack>
+  </packs>
+
+</izpack:installation>

@@ -1,77 +1,57 @@
-import reo.sync;
 import reo.binop;
 import reo.fifo1;
 import reo.transformer;
-import reo.syncdrain;
-import reo.filter;
 import reo.fifofull;
 
+/*
+* For this exercise, you can use some workers accessible by the class Workers.java
+* You can link to a Java code source in an atomic file by :
+*
+* 	Name = (*interface*){ #PR
+*
+*		identity(*ports*;)
+*	|
+*		Java:"Workers.**** "
+*	}
+*/
+
 chess = (){
-
-	{
-	Team<T,T>(whiteI,whiteR[1..T],whiteC[1..T],whiteM,whiteO)
-	fifo1(whiteO,blackI)
-	Team<1,1>(blackI,blackR,blackC,blackM,blackO)
-	fifofull<"">(blackO,whiteI)
-	
-	{
-		{ Engine(whiteC[i],whiteR[i])  | i:<1..T> }
-		Engine(blackC,blackR)
-	|
-	
-		Engine=(a?,b!){
-			#PR
-			identity(a;b)
-		|
-			Java:"runtime.chess.Workers.Engine"
-		}
-	}
-	
-	{ Display(whiteM,blackM)
-	|
-	  Display(a?,b?){
-		#PR
-		identity(a;b)
-	  |
-		Java:"runtime.chess.Workers.Display"
-
-	  }
-	}
-	|
-
-	T=3
-	}
-	
+	fifofull<"">(x,WhiteI)
+	Engine1(WhiteI,WhiteO)
+	Engine2(BlackI,BlackO)
+	visualize(WhiteI,WhiteO,Display1,BlackI)
+	visualize(BlackI,BlackO,Display2,WhiteI)
+	Display(Display1,Display2)
 }
 
-Team<T:int,P:int>(a?,y[1..T]?,hist[1..P]!,move!,out!){
-        fifo1(a,h)
-
-        { sync(a,hist[i]) | i:<1..P> }
-
-        { transformer<PARSE>(y[j],Q[j]) | j : <1..T>, PARSE = "runtime.chess.Functions.parse"}
-
-        concatenator(Q[1..T],p)
-        {transformer<MAJORITY>(p,d) | MAJORITY = "runtime.chess.Functions.majority" }
-        syncdrain(d,h)
-        { filter<MOVE>(d,e) | MOVE = "runtime.chess.Relations.Move" }
-        sync(e,move)
-        { binop<CONCATENATE>(h,e,out) | CONCATENATE = "runtime.chess.Functions.concatenate" }
-
+Engine1(a?String,b!String){
+	#RBA {a,b} true
+	Java:"Workers.Engine"
 }
 
-concatenator(a[1..N]?,b!){
-        { sync(a[1],b) | N=1}
+Engine2(a?String,b!String){
+	#RBA {a,b} true
+	Java:"Workers.Engine"
+}
 
-        { sync(a[1],P[1])
-                { binop<CONCATENATE>(a[i+1],P[i],P[i+1])
-                |
-                i:<1..(N-1)>,
-                CONCATENATE = "runtime.chess.Functions.concatenate"
-                }
+Display(a?String,b?String){
+	#RBA {a,b} true
+	Java:"Workers.Display"
+}
 
-          sync(P[N],b)
-        |
-          N>1}
+visualize(C?String,R?String,M!String,O!String){
+	//
+	// This function take :
+	//	the input port of an engine (C?)
+	//	the output port of an engine (R?)
+	//	the port of the display (M!)
+	//
+	// display the visualisation of engines playing.
+	//
+
+	fifo1(C,k)
+      	transformer<"Function.parse">(R,M)
+	binop<"Function.concatenate">(k,M,O)
+
 }
 

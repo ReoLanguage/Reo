@@ -56,7 +56,8 @@ public class LykosCompiler {
 	private final MyToolErrorAccumulator monitor;
 	private final String name;
 
-	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, String packagename, Monitor m,CompilerSettings settings) {
+	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, String packagename,
+			Monitor m, CompilerSettings settings) {
 
 		this.outputpath = outputpath;
 		this.packagename = packagename;
@@ -66,8 +67,8 @@ public class LykosCompiler {
 		 * Compiler settings
 		 */
 
-		this.settings=settings;
-		
+		this.settings = settings;
+
 		// Define Language for compilation
 		Language targetLanguage = Language.JAVA;
 
@@ -75,12 +76,11 @@ public class LykosCompiler {
 		 * Main program to compile with Lykos
 		 */
 
-//		this.program = program.flatten();
-		if(program!=null){
+		// this.program = program.flatten();
+		if (program != null) {
 			this.program = program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate();
-			this.name=program.getName();
-		}
-		else
+			this.name = program.getName();
+		} else
 			throw new NullPointerException();
 		/*
 		 * Creation of different Factories for Lykos compilation
@@ -112,32 +112,31 @@ public class LykosCompiler {
 		List<InterpretedWorker> workers = new ArrayList<InterpretedWorker>();
 
 		// Add primitives to the protocol or to the list of workers
-//		for (ReoConnectorAtom<PRAutomaton> atom : program.insertNodes(true, true, new PRAutomaton()).integrate().getAtoms()) {
+		// for (ReoConnectorAtom<PRAutomaton> atom : program.insertNodes(true,
+		// true, new PRAutomaton()).integrate().getAtoms()) {
 		for (ReoConnectorAtom<PRAutomaton> atom : program.getAtoms()) {
-			if ((atom.getSourceCode()) == (null) || atom.getSourceCode().getFile() == null) {
+			if (atom.getSourceCode() == null || atom.getSourceCode().getCall() == null) {
 				PRAutomaton X = atom.getSemantics();
 				Primitive pr = new Primitive("nl.cwi.reo.pr.autom.libr." + X.getName(), "");
 				String param = X.getVariable() != null ? X.getVariable().toString() : null;
 				pr.setSignature(getMemberSignature(X.getName(), param, X.getInterface()));
-				c.addChild(pr);		
-			}
-			else{
+				c.addChild(pr);
+			} else {
 				workers.add(new InterpretedWorker(getWorkerSignature(atom)));
-				for(Port p: atom.getInterface()){
-					if(p.getType()==PortType.IN)
-						P.add(new Port(p.getName(),PortType.OUT,p.getPrioType(),p.getTypeTag(),true));
+				for (Port p : atom.getInterface()) {
+					if (p.getType() == PortType.IN)
+						P.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), true));
 					else
-						P.add(new Port(p.getName(),PortType.IN,p.getPrioType(),p.getTypeTag(),true));
+						P.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), true));
 				}
 			}
 		}
 		P.addAll(program.getInterface());
 
-//		for(Map.Entry<Port,Port> p : program.getLinks().entrySet()){
-//			if(p.getValue().getType()==p.getKey().getType())
-//				P.add(p.getValue());
-//		}
-		
+		// for(Map.Entry<Port,Port> p : program.getLinks().entrySet()){
+		// if(p.getValue().getType()==p.getKey().getType())
+		// P.add(p.getValue());
+		// }
 
 		c.setSignature(getMainMemberSignature(this.name, null, P));
 
@@ -184,9 +183,9 @@ public class LykosCompiler {
 		int numberOPort = 0;
 		int numberIPort = 0;
 		for (Port p : ports) {
-			if(p.getType()==PortType.IN)
+			if (p.getType() == PortType.IN)
 				numberIPort++;
-			if(p.getType()==PortType.OUT)
+			if (p.getType() == PortType.OUT)
 				numberOPort++;
 		}
 		for (Port p : ports) {
@@ -194,10 +193,12 @@ public class LykosCompiler {
 			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 			switch (p.getType()) {
 			case IN:
-				inputPortsOrArrays.put(new TypedName("in" + ((numberIPort!=1)?(numberInPort++):("")) , Type.PORT), jp);
+				inputPortsOrArrays.put(new TypedName("in" + ((numberIPort != 1) ? (numberInPort++) : ("")), Type.PORT),
+						jp);
 				break;
 			case OUT:
-				outputPortsOrArrays.put(new TypedName("out" + ((numberOPort!=1)?(numberOutPort++):("")), Type.PORT), jp);
+				outputPortsOrArrays
+						.put(new TypedName("out" + ((numberOPort != 1) ? (numberOutPort++) : ("")), Type.PORT), jp);
 				break;
 			default:
 				throw new RuntimeException("Port of atomic component should be in or out ports");
@@ -218,8 +219,6 @@ public class LykosCompiler {
 		if (variable != null)
 			extralogicals.put(new TypedName("d", Type.EXTRALOGICAL), new Extralogical(variable));
 
-//		int numberInPort = 1;
-//		int numberOutPort = 1;
 		for (Port p : ports) {
 			PortSpec pSpec = new PortSpec(p.getName());
 			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
@@ -238,7 +237,7 @@ public class LykosCompiler {
 		return new MemberSignature(typedName, new LinkedHashMap<>(), extralogicals, inputPortsOrArrays,
 				outputPortsOrArrays, portFactory);
 	}
-	
+
 	/**
 	 * Constructs a new worker signature
 	 * 
@@ -254,7 +253,7 @@ public class LykosCompiler {
 		for (Port p : atom.getSemantics().getInterface()) {
 			PortSpec pSpec = new PortSpec(p.getName());
 			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
-			
+
 			switch (p.getType()) {
 			case IN:
 				jp.addAnnotation("portType", nl.cwi.reo.pr.misc.PortFactory.PortType.OUTPUT);
@@ -271,9 +270,7 @@ public class LykosCompiler {
 			name = "" + counterWorker++;
 		}
 
-		String nameWorker = atom.getSourceCode().getFile().toString().substring(1,
-				atom.getSourceCode().getFile().toString().length() - 1);
-		
+		String nameWorker = atom.getSourceCode().getCall();
 
 		defs.putWorkerName(new TypedName(name, Type.WORKER_NAME), nameWorker, monitor);
 

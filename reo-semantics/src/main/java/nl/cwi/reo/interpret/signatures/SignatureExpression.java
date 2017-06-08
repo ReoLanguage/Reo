@@ -64,6 +64,14 @@ public final class SignatureExpression implements ParameterType {
 		this.nodes = nodes;
 		this.location = location;
 	}
+	
+	/**
+	 * Gets the list of parameters in this signature.
+	 * @return list of parameters
+	 */
+	public List<ParameterExpression> getParameters() {
+		return this.params;
+	}
 
 	public Set<Identifier> getParams(){
 		Set<Identifier> l = new HashSet<Identifier>();

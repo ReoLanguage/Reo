@@ -1,0 +1,22 @@
+section slides.main.rba;
+
+import reo.sync;
+import reo.lossy;
+
+import slides.main.rba.red;
+import slides.main.rba.green;
+import slides.main.rba.blue;
+import slides.sequencer.seqc;
+
+main3() {
+  red(a) green(b) blue(c) connector3(a, b, c)
+}
+
+connector3(a, b, c) {
+  seqc(x, y) lossy(a, x) lossy(b, y) 
+  sync(m, c) sync(x, m) sync(y, m)
+}
+
+
+
+

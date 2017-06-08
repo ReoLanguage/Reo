@@ -1,0 +1,11 @@
+section slides.main.rba;
+
+import slides.alternator.alternator;
+
+import slides.main.rba.red;
+import slides.main.rba.green;
+import slides.main.rba.blue;
+
+main1() {
+  red(a) green(b) blue(c) alternator(a, b, c)
+}

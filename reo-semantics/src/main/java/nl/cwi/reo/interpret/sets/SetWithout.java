@@ -17,6 +17,11 @@ import nl.cwi.reo.util.Monitor;
  *            Reo semantics type
  */
 public final class SetWithout<T extends Semantics<T>> implements SetExpression<T> {
+	
+	/**
+	 * Component name.
+	 */
+	private final String name;
 
 	/**
 	 * First set.
@@ -31,14 +36,25 @@ public final class SetWithout<T extends Semantics<T>> implements SetExpression<T
 	/**
 	 * Short circuit subtraction of two sets of constraints.
 	 * 
+	 * @param name
+	 *            component name
 	 * @param first
 	 *            first set
 	 * @param second
 	 *            second set
 	 */
-	public SetWithout(SetExpression<T> first, SetExpression<T> second) {
+	public SetWithout(String name, SetExpression<T> first, SetExpression<T> second) {
+		this.name = name;
 		this.first = first;
 		this.second = second;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Nullable
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -72,6 +88,12 @@ public final class SetWithout<T extends Semantics<T>> implements SetExpression<T
 	@Override
 	public String toString() {
 		return first + " - " + second;
+	}
+
+	@Override
+	public boolean canEvaluate(Set<Identifier> deps) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

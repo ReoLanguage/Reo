@@ -1,7 +1,12 @@
 package nl.cwi.reo.interpret.ports;
 
+import java.util.Objects;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.semantics.rbautomaton.Rule;
 
 /**
  * An identifier that is decorated with a port type, a priority type, a type
@@ -40,7 +45,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 		super(name);
 		this.type = PortType.NONE;
 		this.prio = PrioType.NONE;
-		this.tag = new TypeTag("");
+		this.tag = null;
 		this.visible = true;
 	}
 
@@ -60,7 +65,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 */
 	public Port(String name, PortType type, PrioType prio, TypeTag tag, boolean hidden) {
 		super(name);
-		if (type == null || prio == null || tag == null)
+		if (type == null || prio == null)
 			throw new NullPointerException();
 		this.type = type;
 		this.prio = prio;
@@ -82,7 +87,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 		if (origin == null)
 			throw new NullPointerException();
 		PortType _type = origin.type == PortType.NONE ? type : origin.type;
-		TypeTag _tag = origin.tag.isEmpty() ? tag : origin.tag;
+		TypeTag _tag = origin.tag == null ? tag : origin.tag;
 		boolean _visible = visible && origin.visible;
 		return new Port(name, _type, PrioType.NONE, _tag, _visible);
 	}
@@ -145,6 +150,17 @@ public final class Port extends Identifier implements Comparable<Port> {
 	}
 
 	/**
+	 * Constructs a copy of this port with the specified tag.
+	 * 
+	 * @param tag
+	 *            new type tag
+	 * @return port with new type tag
+	 */
+	public Port setTag(TypeTag tag) {
+		return new Port(name, type, prio, tag, visible);
+	}
+
+	/**
 	 * Constructs a copy of this port with visibility set to false.
 	 * 
 	 * @return invisible copy of this port
@@ -152,9 +168,10 @@ public final class Port extends Identifier implements Comparable<Port> {
 	public Port hide() {
 		return new Port(name, type, prio, tag, false);
 	}
-	
+
 	/**
 	 * Determines whether this port in an input port.
+	 * 
 	 * @return true if this port is an input, and false otherwise.
 	 */
 	public boolean isInput() {
@@ -166,11 +183,33 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 */
 	@Override
 	public String toString() {
-		return (visible ? "" : "*") + prio + name + type + tag;
+		return (visible ? "" : "*") + prio + name + type + (tag == null ? "" : tag);
 	}
 
 	@Override
 	public int compareTo(Port other) {
 		return this.name.compareTo(other.name);
 	}
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public boolean equals(@Nullable Object other) {
+//		if (other == null)
+//			return false;
+//		if (other == this)
+//			return true;
+//		if (!(other instanceof Port))
+//			return false;
+//		Port p = (Port) other;
+//		return (Objects.equals(this.name, p.name));
+//	}
+//
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public int hashCode() {
+//		return Objects.hash(this.name);
+//	}
 }

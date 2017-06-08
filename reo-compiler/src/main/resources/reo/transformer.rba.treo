@@ -1,0 +1,6 @@
+section reo;
+
+transformer<k:string>(a?, b!) {
+	#RBA
+	{a,b} k(a)=b
+}

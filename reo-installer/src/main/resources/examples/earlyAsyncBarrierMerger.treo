@@ -1,0 +1,28 @@
+import reo.fifo1;
+import reo.fifofull;
+import reo.syncdrain;
+
+producer(a!String) {
+	#RBA {a} true
+	Java:"Workers.producer"
+}
+
+consumer(a?String) {
+	#RBA {a} true
+	Java:"Workers.consumer"
+}
+
+
+earlyAsyncBarrierMerger(){
+{
+	{ fifo1(a[i],b) | i:<1..(N+1)> }
+	{ producer(a[i]) | i:<1..(N+1)> }
+	{ syncdrain(a[i],c[i]) | i:<1..(N+1)> }
+	{ fifo1(a[i],d[i]) | i:<1..(N+1)> }
+	{ fifofull<"">(d[i],c[i]) | i:<1..(N+1)> }
+	{ syncdrain(d[i],d[i+1]) | i:<1..N> }
+|
+ 	N=10
+}
+	consumer(b)
+}

@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.util.Monitor;
 
 /**
  * A SubComponent is a part of a Connector.
@@ -18,6 +21,14 @@ import nl.cwi.reo.semantics.Semantics;
  * @see ReoConnectorComposite
  */
 public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConnector<T>> {
+
+	/**
+	 * Gets the component.
+	 * 
+	 * @return component name, or null if this component is nameless.
+	 */
+	@Nullable
+	public String getName();
 
 	/**
 	 * Checks if this connector is empty.
@@ -78,14 +89,24 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	public ReoConnector<T> integrate();
 
 	/**
-	 * Partition this connector into a list of ReoConnector with independent interfaces.
-	 *  
-	 * @return List of ReoConnector<T> where interfaces do not intersect.
+	 * Propagates type tags of ports that must have the same type.
 	 * 
+	 * @param m
+	 *            message container
+	 * 
+	 * @return connector wherein every port has its inferred type, or null if
+	 *         there is a type conflict.
 	 */
-	public List<ReoConnector<T>> partition();
+	public ReoConnector<T> propagate(Monitor m);
 
-	
+	/**
+	 * Gets a partitioning of all ports of this connector, where each part
+	 * consists of ports that must have the same type tag.
+	 * 
+	 * @return partitioning of ports with respect to port type equivalence.
+	 */
+	public Set<Set<Port>> getTypePartition();
+
 	/**
 	 * Gets the interface of this connector.
 	 * 

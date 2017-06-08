@@ -51,12 +51,12 @@ public class ReoConnectorTest {
 		links_cd.put(new Port("x"), c_i);
 		links_cd.put(new Port("y"), d_o);
 
-		ReoConnector<Plain> ab = new ReoConnectorAtom<Plain>(fifo, s, links_ab);
-		ReoConnector<Plain> bc = new ReoConnectorAtom<Plain>(fifo, s, links_bc);
-		ReoConnector<Plain> cd = new ReoConnectorAtom<Plain>(fifo, s, links_cd);
+		ReoConnector<Plain> ab = new ReoConnectorAtom<Plain>("fifo", fifo, s, links_ab);
+		ReoConnector<Plain> bc = new ReoConnectorAtom<Plain>("fifo", fifo, s, links_bc);
+		ReoConnector<Plain> cd = new ReoConnectorAtom<Plain>("fifo", fifo, s, links_cd);
 
-		ReoConnector<Plain> abc = new ReoConnectorComposite<Plain>("prod", Arrays.asList(ab, bc));
-		ReoConnector<Plain> connector = new ReoConnectorComposite<Plain>("", Arrays.asList(abc, cd));
+		ReoConnector<Plain> abc = new ReoConnectorComposite<Plain>("abc", "prod", Arrays.asList(ab, bc));
+		ReoConnector<Plain> connector = new ReoConnectorComposite<Plain>("connector", "", Arrays.asList(abc, cd));
 
 		ReoConnector<Plain> flat = connector.flatten().integrate();
 		

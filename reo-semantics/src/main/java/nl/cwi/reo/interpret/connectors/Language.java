@@ -16,6 +16,11 @@ public enum Language {
 	C11,
 	
 	/**
+	 * Maude language
+	 */
+	MAUDE,
+	
+	/**
 	 * Proto Runtime
 	 */
 	PRT, 
@@ -33,6 +38,7 @@ public enum Language {
 		switch(this) {
 		case JAVA: return "Java";
 		case C11: return "C11";
+		case MAUDE: return "Maude";
 		case PRT: return "Proto runtime";
 		case TEXT: return "Text";
 		default: throw new IllegalArgumentException();

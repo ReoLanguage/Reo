@@ -11,7 +11,9 @@ public class PortFIFO1<T> implements Port<T> {
 	public void setPut(T datum) { put = datum; }
 	public T take() { T datum = put; put = null; return datum; }
 	public boolean hasGet() { return put == null; }
-	public boolean hasPut() { return put != null; }
+	public T hasPut() { return put; }
+	public T peek() { return put; }
+	
 	public void activateProducer() { producer.activate(); }
 	public void activateConsumer() { consumer.activate(); }
 	public void put(T datum) {

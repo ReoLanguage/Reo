@@ -1,0 +1,27 @@
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+
+producer(a!String) {
+	#PR 
+	identity(a;)
+	Java:"WorkersLykos.producer"
+}
+
+consumer(a?String) {
+	#PR 
+	identity(a;)
+	Java:"WorkersLykos.consumer"
+}
+
+alternator_lykos() {
+	{ syncdrain(a[i], a[i+1]) | i : <1..(N-1)> }
+	{ fifo1(b[i+1], b[i]) | i : <1..(N-1)> }
+	{ sync(a[i], b[i]) | i : <1..N> }
+	{ producer(a[i]) | i : <1..N> }
+	consumer(b[1])
+|
+	 N=35
+}
+

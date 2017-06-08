@@ -1,0 +1,30 @@
+section slides.main;
+
+import reo.fifo1;
+import reo.sync;
+import reo.lossy;
+import slides.variable.variable;
+import slides.lossyfifo.lossyfifo1;
+import slides.shiftlossyfifo.shiftlossyfifo;
+
+import slides.main.red;
+import slides.main.blue;
+import slides.sequencer.seqc;
+
+main13() 
+{
+  { red(a[i]) | i : <1..n> }
+  blue(b) 
+  connector11<ileg[1..n], sync>(a[1..n], b)
+|
+  ileg[1..n] = <sync, lossy, fifo1, shiftlossyfifo, lossyfifo1>
+}
+
+connector11<ileg[1..n](?, !), oleg(?, !)>(a[1..n], b) 
+{
+  seqc(x[1..n]) 
+  { ileg[i](a[i], x[i]) sync(x[i], m) | i : <1..n> }
+  oleg(m, b)
+}
+
+

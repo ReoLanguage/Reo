@@ -1,0 +1,5 @@
+import reo.transformer;
+
+transformerTest(a?String,b!String){
+	transformer<"Function.majority">(a,b)
+}

@@ -6,7 +6,6 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
-import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
@@ -45,7 +44,7 @@ public final class PortExpression extends VariableExpression {
 		if (list == null)
 			return null;
 		for (Identifier x : list)
-			ports.add(new Port(x.toString(), PortType.NONE, prio, new TypeTag(""), true));
+			ports.add(new Port(x.toString(), PortType.NONE, prio, null, true));
 		return ports;
 	}
 

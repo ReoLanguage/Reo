@@ -2,191 +2,205 @@ main(S) ::= <<
 /**
  * Generated from <S.file> by Reo 1.0.
  */
-package <S.package>;
+<! <S.package:package(); separator="\n"> !>
+import java.util.List;
+import java.util.ArrayList;
 
 import nl.cwi.reo.runtime.java.*;
 
 public class <S.name> {
 
-  public static void main(String[] args) {
-    
-    <S.ports:newPort(); separator="\n">
-    
-	<S.instances:newInstance(); separator="\n">
+	public static void main(String[] args) {
+    	
+    	List\<Port\<String\>> list = new ArrayList\<>();
+    	
+		<S.ports:newPort(); separator="\n">
+		
+		<S.components:newComponentAtomic(); separator="\n">
+		<S.components:newComponentProtocol(); separator="\n">
 	
-	<S.instances:newThread(); separator="\n">
+		<S.components:newThread(); separator="\n"> 
 
-	<S.instances:start(); separator="\n">
+		<S.components:start(); separator="\n">
 	
-    try {
-      <S.instances:join(); separator="\n">
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }	
+		try {
+			<S.components:join(); separator="\n">
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
-    System.exit(0);
-
-  }
-
-  <S.definitions:definition(); separator="\n\n">
-  
+	<S.components:component(); separator="\n\n">
 }
+>>
+
+package(p) ::= <<
+<if(p)>package <p>;<endif>
 >>
 
 newPort(p) ::= <<
-Port\<<p.typeTag>\> <p.name> = new PortBusyWait\<<p.typeTag>\>();
+Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
 >>
 
-newInstance(I) ::= <<
-Component <I.name> = new <I.definition>(<I.ports:{p|<p.name>}; separator=", ">);
+newComponentAtomic(c) ::= <<
+<if(c.atomic)>Component <c.name> = new <c.name>(<c.ports:{p|<p.name>}; separator=", ">);<endif>
+>>
+newComponentProtocol(c) ::= <<
+<if(c.atomic)><else>    	<c.ports:{p | list.add(<p.name>);}; separator="\n">
+Component <c.name> = new <c.name>(list);<endif>
 >>
 
-start(I) ::= <<
-<I.name>.start();
+newThread(c) ::= <<
+Thread thread_<c.name> = new Thread(<c.name>);
+>> 
+
+start(c) ::= <<
+thread_<c.name>.start();
 >>
 
-join(I) ::= <<
-<if(!I.deamon)><I.name>.join();<endif>
+join(c) ::= <<
+<if(!c.deamon)>thread_<c.name>.join();<endif>
 >>
 
-definition(A) ::= <<
-<if(A.component)><A:component()>
-<elseif(A.automaton)><A:automaton()>
+component(c) ::= <<
+private static class <c.name> implements Component {
+
+	<c.ports:port(); separator="\n">	
+	<c:memorycell(); separator="\n">
+	
+	<c:constructor()>
+	
+	<if(c.atomic)><c:atomic()><else><c:protocol()><endif>
+}
+>>
+
+atomic(c) ::= <<
+public void activate() {
+	synchronized (this) {
+		notify();
+	}
+}
+
+public void run() {
+	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p | <p.name>}; separator=", ">);
+}
+>>
+
+protocol(c) ::= <<
+public void activate() {
+	synchronized (this) {
+		notify();
+	}
+}
+interface Rule {
+    void fire();
+}
+
+private Rule[] rules = new Rule[] {
+    <c.transitions:transition(); separator="\n">
+};
+
+	
+public void run() {
+	int i = 0;
+	int s = rules.length;
+	while (true) {
+	
+		rules[i].fire();			
+	
+		i=(i+1)%s;
+		
+		synchronized (this) {
+			while(true) {
+				<c.transitions:check_transition(); separator="\n">
+				try { 
+					wait(); 
+				} catch (InterruptedException e) { }
+			}	
+		}
+	}
+}
+>>
+
+port(p) ::= <<
+<! private volatile <if(p.input)>Input<else>Output<endif>Port\<<p.typeTag>\> <p.name>; !>
+private volatile Port\<<p:typetag()>\> <p.name>;
+>>
+
+typetag(p) ::= <<
+<if(p.typeTag)><p.typeTag><else>Object<endif>
+>>
+
+memorycell(c) ::= <<
+<! <c.initial.keys:{m | private <if(m.type)><m.type><else>Object<endif> <m.name> <if(mem.get(m))> = <mem.get(m)> <endif>}; separator="\n">;  !>
+
+<c.initial.keys:{m | private <if(m.type)><m.type><else>String<endif> <m.name> <if(c.initial.(m))> = <c.initial.(m).value><else> = null <endif>; }; separator = "\n"> 
+>>
+
+constructor(c) ::= <<
+<if(c.atomic)>
+public <c.name>(<c.ports:{p | Port\< <p.typeTag> > <p.name>}; separator="\n">) {
+	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
+	<c.ports:{p | this.<p.name> = <p.name>;}; separator="\n">
+	activate();
+}
+<else>
+public <c.name>(List\<Port\<String\>> list) {
+	<c.ports:{p | list.get(<c.listPort.(p)>).<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
+	<c.ports:{p | this.<p.name> = list.get(<c.listPort.(p)>);}; separator="\n">
+	activate();
+}
 <endif>
 >>
 
-
-
-
-<! Port fields !>
-
-
-
-
-port(p) ::= <<
-/**
- * <if(p.input)>Input<else>Output<endif> port <p.name> of this automaton.
- */
-private volatile Port\<<p.typeTag>\> <p.name>;
->>
-
-
-
-
-<! Atomic component class !>
-
-
-
-
-component(A) ::= <<
-/**
- * An active Reo component that runs code of an atomic component.
- */
-private class <A.name> implements Component {
-
-  <A.interface:port(); separator="\n\n">
-			
-  public <A.name>(<A.interface:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
-    <A.interface:{a | <a.name>.<if(a.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
-    <A.interface:{a | this.<a.name> = <a.name>;}; separator="\n">
-  }
-
-  public synchronized void hit() {
-    notify();
-  }
-
-  public void run() {
-    <A.call>	
-  }
-}
->>
-
-
-
-
-<! Active automaton class !>
-
-
-
-
-automaton(A) ::= <<
-/**
- * An active Reo component that is generated from an automaton.
- */
-private class <A.name> implements Component {
-
-  <A.interface:port(); separator="\n\n">
-  
-  <A.memory:memorycell(); separator="\n\n">
-  
-  /**
-   * Current state of this automaton.
-   */
-  private int q = 0;
-			
-  public <A.name>(<A.interface:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
-    <A.interface:{a | <a.name>.<if(a.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
-    <A.interface:{a | this.<a.name> = <a.name>;}; separator="\n">
-  }
-
-  public synchronized void hit() {
-    notify();	
-  }
-
-  public void run() {
-    <run(A)>	
-  }
-}
->>
-
-memorycell(m) ::= <<
-/**
- * Memory cell <m.name> of this automaton.
- */
-private <m.type> <m.name>;
->>
-
-run(A) ::= <<
-int k = 0;
-while (true) {
-  k++;
-  <A.transitions:transition(); separator="\n">
-  if (k > 3) {
-    k = 0;
-    try { wait(); } catch (InterruptedException e) { }	
-  }
-}
->>
-
-outs(q, out) ::= <<
-case <q>:
-  <out.(q):transition()>
+check_transition(t) ::= <<
+if (<guard(t); wrap, anchor>) break;
 >>
 
 transition(t) ::= <<
-if (<guard(t)>) {
-  <action(t)>
-  k = 0;
+new Rule() { public void fire() { 
+if (<guard(t); wrap, anchor>) {
+	<action(t)>
 }
->>
-
-action(t) ::= <<
-<t.SyncConstraint:{p | <if(p.input)><p.typeTag> d_<p.name> = <p.name>.get();
-<endif>}; separator=""><t.action.keys:{k | <k>.put(<t.action.(k)>);}; separator="\n">
-q = <t.target>;
->>
-
-doSync(p) ::= <<
-<if(p.input)><p.name>.canGet()
-<else><p.name>.canPut()
-<endif>
+} },
 >>
 
 guard(t) ::= <<
-<t.SyncConstraint:canSync(); separator=" && ">
+<if(t.equality)>equality here<endif><t.guard:formula()><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" "><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif>
 >>
 
-canSync(p) ::= <<
-<p.name>.<if(p.input)>canGet()<else>canPut()<endif>
+formula(f) ::= <<
+<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)><f.LHS:guardTerm()> == <f.RHS:guardTerm()><elseif(f.relation)><f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif><elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(f.disjunction)>(<f.clauses:formula(); separator=" || ">)<endif>
+>>
+
+guardTerm(t) ::= <<
+<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.hasGet()<elseif(t.memory)><t.name><else><t.name><endif>
+>>
+
+term(t) ::= <<
+<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.peek()<elseif(t.memory)><t.name><else><t.name><endif>
+>>
+
+function(t) ::=<<
+<t.value><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
+>>
+
+
+action(t) ::= <<
+<t:output(); separator="\n">
+<t:memory(); separator="\n">
+<t.input:{p | <p:input()>}; separator="\n">
+>>
+
+output(a) ::= <<
+<a.output.keys:{p | <if(!p.void)><p.name>.put(<a.output.(p):term()>)<else><a.output.(p):term()><endif>;}; separator="\n"> 
+>>
+
+memory(m) ::= <<
+<m.memory.keys:{p | <p.name> = <m.memory.(p):term()>;}; separator="\n"> 
+>>
+
+input(p) ::= <<
+<p.name>.get();
 >>
 

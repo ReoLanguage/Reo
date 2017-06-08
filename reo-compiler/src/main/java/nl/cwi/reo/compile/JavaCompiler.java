@@ -4,87 +4,61 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.SortedSet;
 
-import nl.cwi.reo.compile.components.ActiveAutomaton;
-import nl.cwi.reo.compile.components.Definition;
-import nl.cwi.reo.compile.components.ExtraReoTemplate;
-import nl.cwi.reo.compile.components.Instance;
+import nl.cwi.reo.compile.components.Protocol;
 import nl.cwi.reo.compile.components.ReoTemplate;
-import nl.cwi.reo.compile.components.TransitionRule;
+import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
-import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.ports.PrioType;
-import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.AutomatonSemantics;
-import nl.cwi.reo.semantics.symbolicautomata.Conjunction;
-import nl.cwi.reo.semantics.symbolicautomata.Disjunction;
-import nl.cwi.reo.semantics.symbolicautomata.Formula;
-import nl.cwi.reo.semantics.symbolicautomata.MemoryCell;
-import nl.cwi.reo.semantics.symbolicautomata.Node;
-import nl.cwi.reo.semantics.symbolicautomata.Term;
-import nl.cwi.reo.semantics.symbolicautomata.Variable;
 
+import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Disjunction;
+import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.MemCell;
+import nl.cwi.reo.semantics.predicates.MemoryCell;
+import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.Predicate;
+import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Variable;
+
+@Deprecated
 public class JavaCompiler {
 
-	public static <T extends AutomatonSemantics<T>> ReoTemplate compile(ReoProgram<T> program, String packagename,
-			T nodeFactory) {
+	public static ReoTemplate compile(ReoProgram<Predicate> program, String packagename, Predicate nodeFactory) {
 
-		if (program == null)
-			return null;
+		// // Separate the protocol from the atoms
+		// List<ReoConnectorComposite<Predicate>> partitionMedium = new
+		// ArrayList<ReoConnectorComposite<Predicate>>();
+		// List<ReoConnector<Predicate>> partitionBig = new
+		// ArrayList<ReoConnector<Predicate>>();
+		// List<List<ReoConnectorAtom<Predicate>>> partition = new
+		// ArrayList<List<ReoConnectorAtom<Predicate>>>();
+		//
+		// for (ReoConnectorAtom<Predicate> atoms : connector.getAtoms()) {
+		// if (atoms.getSourceCode().getFile() == null) {
+		// partition = partitionConnector(partition, atoms);
+		// } else {
+		// partitionBig.add(atoms);
+		// }
+		// }
+		//
+		// for (List<ReoConnectorAtom<Predicate>> listAtoms : partition)
+		// partitionMedium.add(new ReoConnectorComposite("", listAtoms));
+		//
+		// for (ReoConnectorComposite<Predicate> composite : partitionMedium) {
+		// partitionBig.add(getProduct(composite));
+		// }
 
-		ReoConnector<T> connector = program.getConnector().flatten().insertNodes(true, true, nodeFactory).integrate();
-
-		List<Port> ports = new ArrayList<Port>();
-		List<Instance> instances = new ArrayList<Instance>();
-		List<Definition> definitions = new ArrayList<Definition>();
-
-		int c = 0;
-		int i = 0;
-		for (ReoConnectorAtom<T> atom : connector.getAtoms()) {
-			List<Port> atom_ports = new ArrayList<Port>(atom.getInterface());
-			ports.addAll(atom_ports);
-			Map<Integer, Set<TransitionRule>> out = new HashMap<Integer, Set<TransitionRule>>();
-			Integer initial = 0;
-			Definition defn = new ActiveAutomaton("Component" + c++, atom_ports, out, initial);
-			instances.add(new Instance("Instance" + i++, defn, atom_ports));
-		}
-
-		List<ReoConnectorComposite<T>> partitionMedium = new ArrayList<ReoConnectorComposite<T>>();
-		List<ReoConnector<T>> partitionBig = new ArrayList<ReoConnector<T>>();
-		List<List<ReoConnectorAtom<T>>> partition = new ArrayList<List<ReoConnectorAtom<T>>>();
-
-		/*
-		 * Partitioning
-		 */
-
-		for (ReoConnectorAtom<T> atoms : connector.getAtoms()) {
-			if (atoms.getSourceCode().getFile() == null) {
-				partition = partitionConnector(partition, atoms);
-			} else {
-				partitionBig.add(atoms);
-			}
-		}
-
-		for (List<ReoConnectorAtom<T>> listAtoms : partition)
-			partitionMedium.add(new ReoConnectorComposite("", listAtoms));
-
-		for (ReoConnectorComposite<T> composite : partitionMedium) {
-			partitionBig.add(getProduct(composite));
-		}
-
-		return new ReoTemplate(program.getFile(), packagename, program.getName(), ports, instances, definitions);
+		return null;
 	}
 
 	public static <T extends AutomatonSemantics<T>> ReoConnectorComposite<T> getProduct(
@@ -96,7 +70,7 @@ public class JavaCompiler {
 			productAutomaton = new ReoConnectorAtom<T>(
 					productAutomaton.getSemantics().compose(Arrays.asList(atoms.poll().getSemantics())));
 		}
-		return new ReoConnectorComposite<T>("", Arrays.asList(productAutomaton));
+		return new ReoConnectorComposite<T>(null, "", Arrays.asList(productAutomaton));
 	}
 
 	public static <T extends AutomatonSemantics<T>> List<List<ReoConnectorAtom<T>>> partitionConnector(
@@ -155,49 +129,167 @@ public class JavaCompiler {
 	 * @return a transition if the formula is a conjunction of literals, or null
 	 *         otherwise.
 	 */
-	public static TransitionRule commandify(Formula f) {
-		Map<Port,Term> map = new HashMap<Port,Term>();
+	public static Transition commandify(Formula f) {
+		Map<Variable,Term> map = new HashMap<Variable,Term>();
 		
 		System.out.println(f);
 		map = f.getAssignment();
-		Set<Port> s = f.getInterface();
-		return 	new TransitionRule(f.getInterface(),f.getAssignment());
+		
+		Map<MemCell,Term> mems = new HashMap<MemCell,Term>();
+		Map<Node,Term> ports = new HashMap<Node,Term>();
+		Set<Node> inputs = new HashSet<Node>();
+		Set<Node> quantifiers = new HashSet<Node>();
+		
+		for(Variable v : map.keySet()){
+			if(v instanceof MemCell)
+				mems.put((MemCell)v,map.get(v));
+			if(v instanceof Node && !((Node) v).isInput()){
+				ports.put((Node)v, map.get(v));
+			}
+			if(map.get(v) instanceof Node && ((Node)map.get(v)).isInput())
+				inputs.add((Node)map.get(v));
+		}
+		quantifiers.addAll(inputs);
+		quantifiers.addAll(ports.keySet());
+		Set<Term> q = new HashSet<Term>();
+		q.addAll(quantifiers);
+		
+		
+		Formula g = null; //f.QE(q);
+		
+		map = substitute(map,q);
+		mems.clear();
+		ports.clear();
+		inputs.clear();
+		
+		for(Variable v : map.keySet()){
+			if(v instanceof MemCell)
+				mems.put((MemCell)v,map.get(v));
+			if(v instanceof Node && !((Node) v).isInput()){
+				ports.put((Node)v, map.get(v));
+			}
+			if(map.get(v) instanceof Node && ((Node)map.get(v)).isInput())
+				inputs.add((Node)map.get(v));
+		}
+
+		Set<Port> inputs1 = new HashSet<Port>();
+		for (Node x : inputs)
+			inputs1.add(x.getPort());
+		
+		return 	new Transition(g,ports,mems,inputs1);
 	}
 	
-	public static Formula compose(List<Formula> list){
-		Formula dnf=new Conjunction(list);
-		return dnf.DNF();
-	}
-		
-	public static void generateCode(Formula automaton){
-		List<TransitionRule> transitions = new ArrayList<TransitionRule>();
-		if(automaton instanceof Disjunction)
-			for(Formula f : ((Disjunction) automaton).getFormula())
-				transitions.add(JavaCompiler.commandify(f));
-		Set<MemoryCell> mem = new HashSet<MemoryCell>();
-		for(TransitionRule tr : transitions){
-			for(Term t :tr.getAction().values()){
-				if(t instanceof MemoryCell)
-					mem.add(((MemoryCell) t));
+	public static Map<Variable,Term> substitute(Map<Variable,Term> map, Set<Term> q){
+		Map<Variable,Term> mapSubst = new HashMap<Variable,Term>();
+		mapSubst.putAll(map);
+		for(Variable v : map.keySet()){
+			if((v instanceof MemoryCell && !((MemoryCell)v).hasPrime()))
+				mapSubst.remove(v);
+			if(q.contains(v) ){
+				for(Variable var : map.keySet()){
+					if(map.get(var).equals(v)){
+						Term term = map.get(v);
+						mapSubst.remove(v);
+						mapSubst.put(var,term);
+					}	
+				}
 			}
 		}
+		return mapSubst;
+	}
+
+	public static Formula compose(List<Formula> list) {
+		Formula dnf = new Conjunction(list);
+		return dnf.DNF();
+	}
+	
+	public static Map<Set<Variable>,Set<Transition>> partition(List<Transition> transitions){
+	
+		Map<Set<Variable>,Set<Transition>> map = new HashMap<Set<Variable>,Set<Transition>>();
 		
-		for(MemoryCell m : mem){
-			for(TransitionRule tr : transitions){
-				for(Port p :tr.getAction().keySet()){
-					if(tr.getAction().get(p).equals(m)){
-						PortType portType = ((m.hasPrime())?PortType.IN:PortType.OUT);
-						tr.getAction().replace(p, new Node(new Port(m.getName(),portType,PrioType.NONE, new TypeTag(m.getType()),true)));
-					}
+		Queue<Transition> queue = new LinkedList<Transition>(transitions);
+
+		Transition tr = queue.poll();
+		map.put(getVariables(tr), new HashSet<Transition>(Arrays.asList(tr)));
+		
+		while(!queue.isEmpty()){
+			tr = queue.poll();
+			Set<Variable> v = getVariables(tr);
+			for(Set<Variable> s : map.keySet()){
+				if(v.retainAll(s)){
+					Set<Transition> transitionSet = map.get(s);
+					transitionSet.add(tr);
+					map.remove(s);
+					s.addAll(getVariables(tr));
+					map.put(s,transitionSet);
+				}
+				else{
+					map.put(getVariables(tr), new HashSet<Transition>(Arrays.asList(tr)));
 				}
 			}
 		}
 		
-		Set<Port> s = new HashSet<Port>();
-		s.addAll(automaton.getInterface());
-		System.out.println(new ExtraReoTemplate("testfile", "packagetest", "test",s, transitions,mem).getCode(Language.JAVA));
 		
+		return map;
 	}
 	
+	public static Set<Variable> getVariables(Transition transition){
+		Set<Variable> setVariable = new HashSet<Variable>();
+		setVariable.addAll(transition.getMemory().keySet());
+		setVariable.addAll(transition.getOutput().keySet());
+		for (Port p : transition.getInput())
+			setVariable.add(new Node(p));
+		
+		return setVariable;
+	}
+	
+	public static void generateCode(Formula automaton){
+		Set<Transition> transitions = new HashSet<Transition>();
+		Set<Port> set = new HashSet<Port>();
+		Set<MemCell> mem = new HashSet<MemCell>();
+		
+		if(automaton instanceof Disjunction)
+			for(Formula f : ((Disjunction) automaton).getClauses()){
+				Transition transition = JavaCompiler.commandify(f);
+				transitions.add(transition);
+				for(Port n : transition.getInput() )
+					set.add(n);
+				for(Node n : transition.getOutput().keySet()){
+					set.add(n.getPort());
+				}
+				for(MemCell m: transition.getMemory().keySet()){
+					mem.add(m);
+				}
+			}
+		
+		Protocol p = new Protocol("protocol", set, transitions, new HashMap<MemCell, Object>());
+		
+		ReoTemplate reo = new ReoTemplate("testfile","", "test", Arrays.asList(p));
+		System.out.println(reo.generateCode(Language.JAVA));
+
+//		Set<MemoryCell> mem = new HashSet<MemoryCell>();
+		
+//		for(Transition tr : transitions){
+//			mem.addAll(tr.getMemory());
+//		}
+		
+//		Map<Set<Variable>,Set<TransitionRule>> list = partition(transitions);
+		
+//		for(MemoryCell m : mem){
+//			for(TransitionRule tr : transitions){
+//				for(Port p :tr.getAction().keySet()){
+//					if(tr.getAction().get(p).equals(m)){
+//						PortType portType = ((m.hasPrime())?PortType.IN:PortType.OUT);
+//						tr.getAction().replace(p, new Node(new Port(m.getName(),portType,PrioType.NONE, new TypeTag(m.getType()),true)));
+//					}
+//				}
+//			}
+//		}
+//		
+//		Set<Port> s = new HashSet<Port>();
+//		s.addAll(automaton.getInterface());
+//		System.out.println(new ExtraReoTemplate("testfile", "packagetest", "test",s, transitions,mem).getCode(Language.JAVA));
+		
+	}
 
 }

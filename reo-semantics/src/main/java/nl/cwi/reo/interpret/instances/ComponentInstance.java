@@ -89,4 +89,10 @@ public final class ComponentInstance<T extends Semantics<T>> implements Instance
 		return "" + component + values + ports;
 	}
 
+	@Override
+	public boolean canEvaluate(Set<Identifier> deps) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
