@@ -1,4 +1,4 @@
-Welcome to Reo's documentation!
+﻿Welcome to Reo's documentation!
 ===============================
 
 .. _Reo: http://reo.project.cwi.nl/reo/wiki
@@ -33,9 +33,9 @@ The contents of the documentation is as follows:
 .. toctree::
 	:maxdepth: 2
 
-	introduction
 	installation
-	syntax
+	introduction
+	tutorial
 	contribute
 
 Indices and tables

@@ -1,10 +1,5 @@
-Syntax of Reo
-=============
-
-
-.. attention:: 
-	This page is still under construction and the presented language constructs may not be up-to-date.
-	Sorry for the inconvenience.
+Reo Tutorial
+============
 
 Components and interfaces
 -------------------------
@@ -13,31 +8,55 @@ Reo programs consist of *components* that interact via shared *nodes*.
 Each component has access to a given set of nodes, called its *interface*.
 To distinguish them from other nodes, the nodes that comprise the interface of a component are also called its *ports*.
 An atomic component uses each of its ports either for input or for output, but not both.
-Ports of a component comprise the only means of communication between the component and its environment: a component has 
-no means of communication or concurrency control other than blocking I/O operations that it can perform on its own ports. 
-A component may synchronize with its environment via *put* operations on its own output ports and *get* operations on 
-its own input ports.  The put and get operations may specify an optional time-out.  A put or get opreration blocks until 
-either it succeeds, or its specified time-out expires.  A put or get operation with no time-out blocks for ever, 
-or until it succeeds.
+Ports of a component comprise the only means of communication between the component and its environment: 
+a component has no means of communication or concurrency control other than blocking I/O operations that it can perform on its own ports. 
+A component may synchronize with its environment via *put* operations on its own output ports and *get* operations on its own input ports.  
+The put and get operations may specify an optional time-out. 
+A put or get operation blocks until either it succeeds, or its specified time-out expires. 
+A put or get operation with no time-out blocks for ever, or until it succeeds.
 
-Definition
-----------
+There are four ways to define a component in Reo
 
-Before we can start using components, we need to define them. 
-The following example shows how we can define a component by referring to Java source code
+First of all, we can define a component by referring to Java source code.
 
 .. code-block:: text
    
 	// producer.treo
-	producer(a!) { 
-	   #PR identity(;a) | Java:"com.example.MyClass.myProducer"
+	producer(a!String) { 
+	   Java: "com.example.MyClass.myProducer";
 	}
 
-This piece of code defines an atomic component called ``producer`` with a single output port ``a``.
-The ``Java`` tag indicates that the implementation of this component consists of a piece of Java code. More specifically, 
-the provided reference links to a Java class: the implementation of the producer component consists of the Java
-method ``myProducer`` in class ``com.example.MyClass``. 
-Components can also be defined by methods written in other general purpose languages, such as C/C++
+
+This code in ``producer.treo`` defines an atomic component called ``producer`` with a single output port ``a`` of type ``String``.
+The ``Java`` tag indicates that the implementation of this component consists of a piece of Java code. 
+The provided reference links to a Java class that implements the producer component as a Java method ``myProducer`` in class ``com.example.MyClass``. 
+
+.. code-block:: java
+
+	// MyClass.java
+	package com.example;
+
+	import nl.cwi.reo.OutputPort;
+
+	public class MyClass {
+		public static void myProducer(OutputPort<String> a) {
+			a.put("Hello World!");
+			return;
+		}
+	} 
+
+We can compile the producer via::
+
+	> ls
+	myClass.java producer.treo
+	> reo producer.treo
+	> javac producer.java
+	> java producer
+
+This brings up a *port window* that allows you to take data items produced by the producer.
+
+The current version of Reo can generate only Java code, and therefore, only Java components can be defined. 
+It is only a matter of time until Reo can generate code for other languages, such as C/C++, and that components defined in these languages can be defined.
 
 Arguments of the Java function are automatically linked to the ports in the interface of its respective atomic component.
 The exclamation mark (``!``) indicates that the Reo component ``producer`` uses the node  ``a`` as its output port.
@@ -45,59 +64,102 @@ A question mark (``?``) after a node ``a`` in an interface indicates that its co
 A colon (``:``) after a node ``a`` indicates that its component uses ``a`` both as input and as output 
 (this is not allowed for non-atomic components).
 
-Another possibility is to define a component via a particular semantic model, such as *constraint automaton with state memory*
+Second, we can define a component by defining its behavior in a certain semantics.
+Currently, we can express the behavior only as a *constraint automaton with memory*
+
+.. code-block:: text
+   
+	// buffer.treo
+	buffer(a?,b!) {
+	   q0 -> q1 : {a}, x' == d(a) 
+	   q1 -> q0 : {b}, d(b) == x
+	}
+
+Third, we can define a component as a Java component and a constraint automaton with memory simultaniously:
+
+.. code-block:: text
+   
+	// buffer.treo
+	buffer(a?,b!) {
+	   Java: "com.example.MyClass.myBuffer";
+	   q0 -> q1 : {a}, x' == d(a) 
+	   q1 -> q0 : {b}, d(b) == x  
+	}
+
+where the Java buffer is defined in the class
+
+.. code-block:: Java
+
+	// MyClass.java
+	package com.example;
+
+	import nl.cwi.reo.OutputPort;
+
+	public class MyClass {
+		public static void myBuffer(InputPort<String> a, OutputPort<String> a) {
+			a.put("Hello World!");
+			return;
+		}
+	} 
+
+In this case, the Reo compiler treats the Java code as the definition of the component, while the constraint automaton with memory is used as annotation that approximates the behavior the the Java component. Although the current version of Reo simply ignores the constraint automaton representation of the buffer component, future versions of can use the constraint automaton for tools like deadlock detection.
+
+Sections and Imports
+--------------------
+
+In large application, it is likely that different component would get the same name. 
+To be able to distinguish between the two components, we put the components in different sections.
+For example, we can put the ``buffer`` component defined above in a section called MySection by adding the statement ``section mySection;`` to  the beginning of the file.
 
 .. code-block:: text
    
 	// buffer.treo 
+	section mySection;
+
 	buffer(a?,b!) {
-	   #CASM
+	   Java: "com.example.MyClass.myBuffer";
 	   q0 -> q1 : {a}, x' == d(a) 
 	   q1 -> q0 : {b}, d(b) == x  
-	|
-	   C/C++:"example::Buffer"
 	}
 
-The above code is pseudo code, because the Reo compiler does not yet support C/C++.
-
-There are more than thirty semantics for Reo. Therefore, one may provide a second definition of the 
-*same* component, using a *different* semantics. For example, the *work automaton* semantics
+In other files, we can reuse this buffer by simply importing it as follows:
 
 .. code-block:: text
-
-	// fifo1.wa.treo
-	define fifo1(a?,b!) {
-	   #WA
-	   q0 : initial
-	   q0 -> q1 : {a}, true, {}
-	   q1 -> q0 : {b}, true, {}
+   
+	// other.treo
+	import mySection.buffer;
+ 
+	other() {
+		buffer(a,b)            // #1
+		mySection.buffer(a,b)  // #2
 	}
 
-.. note:: 
-	The ``fifo1`` component is one of the basic components in Reo. Its has the semantics of a
-	1-place buffer that accepts input from node a and offers output at node b. Components with
-	exactly two nodes are called **channels**.
+Option 1 is the simplest way to use an imported component, as it does not explicitly defines from which section it comes.
+However, if we imported two buffer components from different sections, then Option 2 allows us to be precise on which buffer we mean.
 
 Composition
 -----------
 
-Now that we defined the ``fifo1``-channel, we may start using it by *instantiating* our ``fifo1``-channel as follows
+
+Now that we defined the buffer, we may start using it by *instantiating* our buffer.
 
 .. code-block:: text
 
 	// main.treo
-	import reo.fifo1;
+	import buffer;
    	
-	main() {
-   	   fifo1(x,y)
-   	}
+	main() { }
+
+
 
 This Reo program accomplishes the following tasks:
 
-1. is imports the Reo component called ``fifo1``.
-2. it defines a new Reo component called ``main``.
-3. it creates two new nodes `x` and `y`.
-4. it creates an instance of the Reo component ``fifo1`` with `a` substituted by `x` and `b` substituted by `y`.
+1. is imports the buffer component.
+2. it defines a new main component.
+3. it creates two new nodes x and y.
+4. it creates an instance of the buffer component with a substituted by x and b substituted by y.
+
+Reo has a standard library that defines components in a section called reo.
 
 We may compose multiple component by placing them next to each other.
 The composition is established by sharing nodes.
