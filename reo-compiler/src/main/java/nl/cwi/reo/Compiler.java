@@ -460,12 +460,12 @@ public class Compiler {
 		Long t7 = System.nanoTime();
 	
 
-		try{
-			PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
-			writer.println("Compilation time : "+(t7-t1) + " nanosecondes");
-			writer.close();
-		} catch (IOException e) { // do something  
-		}
+//		try{
+//			PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
+//			writer.println("Compilation time : "+(t7-t1) + " nanosecondes");
+//			writer.close();
+//		} catch (IOException e) { // do something  
+//		}
 
 		
 	}
@@ -613,11 +613,11 @@ public class Compiler {
 		Long t2 = System.nanoTime();
 
 
-		try{
-			PrintWriter writer = new PrintWriter(outdir+"compilation_time_lykos.txt", "UTF-8");
-			writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
-			writer.close();
-		} catch (IOException e) { // do something  
-		}
+//		try{
+//			PrintWriter writer = new PrintWriter(outdir+"compilation_time_lykos.txt", "UTF-8");
+//			writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
+//			writer.close();
+//		} catch (IOException e) { // do something  
+//		}
 	}
 }

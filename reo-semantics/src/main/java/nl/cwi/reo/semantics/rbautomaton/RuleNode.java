@@ -43,6 +43,8 @@ public class RuleNode {
 	public RuleNode(Rule r){
 		this.rule = r;
 		this.hyperedges = new HashSet<HyperEdge>();
+		incId++;
+		id=incId;
 	}
 	
 	public Rule getRule(){
@@ -111,8 +113,10 @@ public class RuleNode {
 
 		Rule r1;
 		if(rule.getFormula().equals(r.getRule().getFormula())){
-//			return this;
-			r1 = new Rule(map,rule.getFormula());
+			if(r.getRule().getSync().equals(rule.getSync()))
+				return this;
+			else
+				r1 = new Rule(map,rule.getFormula());
 		}
 		else{
 			r1 = new Rule(map,new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
@@ -169,6 +173,9 @@ public class RuleNode {
 		return this;
 	}
 	
+	public int getId(){
+		return id;
+	}
 	
 	/**
 	 * {@inheritDoc}
@@ -182,7 +189,7 @@ public class RuleNode {
 		if (!(other instanceof RuleNode))
 			return false;
 		RuleNode rule = (RuleNode) other;
-		return Objects.equals(this.getRule(),rule.getRule());
+		return Objects.equals(id,rule.getId());
 	}
 
 	/**

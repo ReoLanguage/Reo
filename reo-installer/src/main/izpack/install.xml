@@ -34,11 +34,25 @@
     <pack name="Compiler" required="yes">
       <description>The Reo compiler</description>
       <singlefile src="lib/reo-runtime-java.jar" target="${INSTALL_PATH}/bin/reo-runtime-java.jar" override="true" />
+      <singlefile src="lib/reo-runtime-java-lykos.jar" target="${INSTALL_PATH}/bin/reo-runtime-java-lykos.jar" override="true" />
+      <fileset dir="examples" targetdir="${INSTALL_PATH}/workspace/examples"/>
+      <fileset dir="workers" targetdir="${INSTALL_PATH}/workspace/workers"/>
+      <file src="reo-1.0.jar" targetdir="${INSTALL_PATH}/bin" override="true" />
+      <file src=".reosource" targetdir="${INSTALL_PATH}" override="true" />
+<!--      <singlefile src="lib/reo-1.0.jar" target="${INSTALL_PATH}/bin/reo.jar" override="true" />-->
       <file src="installer.sh" targetdir="$INSTALL_PATH" override="true" />
       <executable targetfile="$INSTALL_PATH/installer.sh" stage="never" keep="true">
           <os family="unix" />
       </executable>
       <file src="installer.bat" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/installer.bat" stage="never" keep="true">
+          <os family="windows" />
+      </executable>
+      <file src="permanent_settings.bat" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/permanent_settings.bat" stage="never" keep="true">
+          <os family="windows" />
+      </executable>
+
     </pack>
   </packs>
 

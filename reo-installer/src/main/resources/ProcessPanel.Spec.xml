@@ -11,7 +11,7 @@
 
     <job name="Installer">
         <os family="windows" />
-        <executefile name="$INSTALL_PATH/installer.sh">
+        <executefile name="$INSTALL_PATH\installer.bat">
         </executefile>
     </job>
      <onFail previous="true" next="false" />

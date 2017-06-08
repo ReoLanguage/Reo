@@ -1,0 +1,150 @@
+main(S) ::= <<
+
+ *** Generated from <S.file> by Reo 1.0.
+
+mod CONNECTOR is 
+		inc SIGNATURE .
+		
+	<S.components:component(); separator="\n\n">
+endm
+>>
+
+component(c) ::= <<
+<if(c.protocol)>vars <c:memorycell(); separator=""><S.ports:newVar(); separator=" "> : Data .
+<c:protocol()><endif>
+>>
+
+memorycell(c) ::= <<
+<c.initial.keys:{m |d_<m.name>}; separator = " "> 
+>>
+
+protocol(c) ::= <<
+<c.transitions:transition(); separator="\n">
+	
+eq startc = <c.state:{p | <p>}; separator=" "> .
+>>
+
+
+transition(t) ::= << 
+rl [<t.nb>] : <t.mapInM.keys:{p | m(<p>,<t.mapInM.(p)>)}; separator=" " > <t.mapInP.keys:{p | p(<p>,<t.mapInP.(p)>)}; separator=" " > =>
+<t.mapOutP.keys:{p | p(<p>,<t.mapOutP.(p)>)}; separator=" " > <t.mapOutM.keys:{p | m(<p>,<t.mapOutM.(p)>)}; separator=" " >  .
+>>
+
+memory(m) ::= <<
+<m.memory.keys:{p | <p.name> = <m.memory.(p):term()>;}; separator="\n"> 
+>>
+
+guard(t) ::= <<
+<t.guard:formula()><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" "><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif>
+>>
+
+action(t) ::= <<
+<t:output(); separator="\n">
+
+<t.input:{p | <p:input()>}; separator="\n">
+>>
+
+
+
+formula(f) ::= <<
+<if(f.negation)>!(<f.formula:formula()>)
+	<elseif(f.equality)><f.LHS:guardTerm()> == <f.RHS:guardTerm()>
+	<elseif(f.relation)><f.value><if(f.args)>(<f.args:term(); separator=", ">)
+<endif>
+		
+	<elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)
+	<elseif(f.disjunction)>(<f.clauses:formula(); separator=" || ">)
+<endif>
+>>
+
+package(p) ::= <<
+<if(p)>package <p>;<endif>
+>>
+newVar(p) ::= <<
+d<p.name>
+>>
+
+newPort(p) ::= <<
+Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
+>>
+
+newComponent(c) ::= <<
+Component <c.name> = new <c.name>(<c.ports:{p|<p.name>}; separator=", ">);
+>>
+
+newThread(c) ::= <<
+Thread thread_<c.name> = new Thread(<c.name>);
+>> 
+
+start(c) ::= <<
+thread_<c.name>.start();
+>>
+
+join(c) ::= <<
+<if(!c.deamon)>thread_<c.name>.join();<endif>
+>>
+
+
+
+atomic(c) ::= <<
+public void activate() {
+	synchronized (this) {
+		notify();
+	}
+}
+
+public void run() {
+	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p | <p.name>}; separator=", ">);
+}
+>>
+
+
+
+port(p) ::= <<
+<! private volatile <if(p.input)>Input<else>Output<endif>Port\<<p.typeTag>\> <p.name>; !>
+private volatile Port\<<p:typetag()>\> <p.name>;
+>>
+
+typetag(p) ::= <<
+<if(p.typeTag)><p.typeTag><else>Object<endif>
+>>
+
+
+
+constructor(c) ::= <<
+public <c.name>(<c.ports:{p | Port\<<p:typetag()>\> <p.name>}; wrap, anchor, separator=", ">) {
+	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
+	<c.ports:{p | this.<p.name> = <p.name>;}; separator="\n">
+	activate();
+}
+>>
+
+check_transition(t) ::= <<
+if (<guard(t); wrap, anchor>) break;
+>>
+
+
+
+guardTerm(t) ::= <<
+<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.hasGet()<elseif(t.memory)><t.name><else><t.name><endif>
+>>
+
+term(t) ::= <<
+<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.peek()<elseif(t.memory)><t.name><else><t.name><endif>
+>>
+
+function(t) ::=<<
+<t.value><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
+>>
+
+
+
+
+output(a) ::= <<
+<a.output.keys:{p | <if(!p.void)><p.name>.put(<a.output.(p):term()>)<else><a.output.(p):term()><endif>;}; separator="\n"> 
+>>
+
+input(p) ::= <<
+<p.name>.get();
+>>
+

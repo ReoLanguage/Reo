@@ -1,0 +1,2 @@
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  export CLASSPATH="$CLASSPATH:.:$DIR/bin/reo-runtime-java.jar:$DIR/bin/reo-runtime-java-lykos.jar"

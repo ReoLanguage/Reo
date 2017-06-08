@@ -1,40 +1,18 @@
 #!/bin/bash
 
-if type -p java; then
-    _java=java
-elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]]; then
-    _java="$JAVA_HOME/bin/java"
+  BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+
+if grep -q "alias reo="  ~/.bashrc
+then 
+   echo "Alias already exist";
 else
-    echo "no java"
+  echo "alias reo='java -jar $BASEDIR/bin/reo-1.0.jar'" >> ~/.bashrc 
 fi
 
-if [[ "$_java" ]]; then
-    version=$("$_java" -version 2>&1 | awk -F '"' '/version/ {print $2}')
-    echo version "$version"
-    if [[ "$version" > "1.6" ]]; then
-        echo version is more than 1.6
-    else
-        echo version is less than 1.6
-    fi
+if grep -q ".reosource"  ~/.bashrc
+then
+   echo "ClassPath already set";
+else
+  echo ". $BASEDIR/.reosource" >> ~/.bashrc
 fi
-
-  if [ -z "$1" ]; then
-    echo "alias name:"
-    read NAME
-  else
-    NAME=$1
-  fi
-
-  if [ -z "$2" ]; then
-    echo "alias definition:"
-    read DEFINTION
-  else
-    if [ "$2" = "-cd" ]; then
-      DEFINTION='cd '
-    else
-      DEFINTION=$2
-    fi
-  fi
-
-  echo "alias $NAME='$DEFINTION'" >> ~/.bashrc
-  . ~/.bashrc
