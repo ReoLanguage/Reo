@@ -1,0 +1,31 @@
+===================================
+=                                 =
+=   README for Reo installation   =
+=                                 =
+===================================
+
+
+====
+For Unix-like Systems :
+====
+
+You need to set some environment variable before being able to use Reo. In your shell, execute the following commands:
+
+	>$ export CLASSPATH="$CLASSPATH:.:$DIR/bin/reo-runtime-java.jar:$DIR/bin/reo-runtime-java-lykos.jar"
+
+	>$ alias reo='java -jar $BASEDIR/bin/reo-1.0.jar'	
+
+If you want to make Reo setting automatic for each Shell sessions, you can either run "reoinit.sh" or happen in your ~/.bashrc manually :
+
+	>$ source $BASEDIR/.reosource
+
+Close and open a new terminal to make it effective or run 
+
+	>$ source ~/.bashrc 
+
+===
+For Windows Systems : 
+===
+
+reo-installer
+

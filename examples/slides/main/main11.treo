@@ -26,10 +26,3 @@ connector11<ileg[1..n](?, !), oleg(?, !)>(a[1..n], b)
   { ileg[i](a[i], x[i]) sync(x[i], m) | i : <1..n> }
   oleg(m, b)
 }
-
-
-
-
-
-
-

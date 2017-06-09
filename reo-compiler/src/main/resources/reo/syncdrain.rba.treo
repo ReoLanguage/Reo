@@ -1,6 +1,6 @@
 section reo;
 
-syncdrain(a?String,b?String){
+syncdrain(a?,b?){
 	#RBA
 	{a,b} true
 }

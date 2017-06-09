@@ -10,7 +10,7 @@ public class Workers2 {
 	public static void producer(Output<String> a) {
 		for (int i = 0; i < N; i++)
 			a.put("d" + i);
-		System.out.println(" done ");
+		System.out.println(" Producer finished ");
 		System.exit(0);
 	}
 	
@@ -18,7 +18,7 @@ public class Workers2 {
 		for (int i = 0; i < k*N; i++){
 			System.out.println( i + ": " + a.get() + " ");
 		}
-		System.out.println(" done ");
+		System.out.println(" Consumer finished ");
 		System.exit(0);
 	}
 }

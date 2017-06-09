@@ -1,6 +1,6 @@
 section reo;
 
-lossy(a?String,b!String){
+lossy(a?,b!){
 	#RBA
 	{a,~b} true
 	{a,b} a=b

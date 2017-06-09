@@ -1,6 +1,6 @@
 section slides.main;
 
-blue(a?) 
+blue(a?String) 
 {
-  Java:"workers.Consumer.blue"
+  Java:"nl.cwi.reo.components.Workers2.consumer"
 }

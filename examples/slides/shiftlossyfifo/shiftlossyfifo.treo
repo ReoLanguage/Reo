@@ -12,5 +12,5 @@ import reo.lossy;
 shiftlossyfifo(in, out) {
   sync(in,a) fifo1(a, b) fifo1(b, c) 
   xrouter (c,d,e)
-  syncdrain(a,g) sync(d,f) sync(e,g) sync(f,out) fifofull<0>(f,g)
+  syncdrain(a,g) sync(d,f) sync(e,g) sync(f,out) fifofull<"0">(f,g)
 }

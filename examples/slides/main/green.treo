@@ -2,5 +2,5 @@ section slides.main;
 
 green(a!) 
 {
- Java:"workers.Producer.green"
+ Java:"nl.cwi.reo.components.Workers2.producer"
 }

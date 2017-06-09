@@ -1,6 +1,6 @@
 section reo;
 
-sync(a?String,b!String){
+sync(a?,b!){
 	#RBA
 	{a,b} a=b
 }

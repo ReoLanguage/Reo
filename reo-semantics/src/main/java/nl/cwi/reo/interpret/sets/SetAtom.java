@@ -74,7 +74,7 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	public Instance<T> evaluate(Scope s, Monitor m) {
 		T _atom = atom != null ? atom.evaluate(s, m) : atom;
 		Reference _source = source.evaluate(s, m);
-		if (_atom == null || _source == null)
+		if ( _source == null)
 			return null;
 		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<Set<Identifier>>());
 	}

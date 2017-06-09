@@ -1,6 +1,6 @@
 section slides.main;
 
-red(a!) 
+red(a!String) 
 {
-  Java:"workers.Producer.red"
+  Java:"nl.cwi.reo.components.Workers2.producer"
 }

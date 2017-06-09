@@ -394,12 +394,12 @@ public class Compiler {
 				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
 					Term initialValue = circuit.getInitials().get(new MemCell(m.getKey().getName(),false));
 					if(initialValue instanceof Function && ((Function) initialValue).getValue() instanceof Integer)
-						initialValue = (initialValue!=null?new Function(((Function)initialValue).getName(),"\""+((Function)initialValue).getValue().toString()+"\"", new ArrayList<Term>()):null);
+						initialValue = (initialValue!=null?new Function(((Function)initialValue).getName(),((Function)initialValue).getValue().toString(), new ArrayList<Term>()):null);
 					initial.put(m.getKey().setType(tags.get(m.getKey())), initialValue);
 				}
 			}
 			
-			components.add(new Protocol("Protocol" + n_protocol++, ports, T, initial));
+			components.add(new Protocol("Protocol" + n_protocol++, intface, T, initial));
 		}		
 
 		// Fill in the template

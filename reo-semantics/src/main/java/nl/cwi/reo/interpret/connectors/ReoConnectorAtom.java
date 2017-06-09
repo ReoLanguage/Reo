@@ -72,14 +72,18 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * @param source
 	 *            reference to source code
 	 */
-	public ReoConnectorAtom(String name, T semantics, Reference source) {
+	public ReoConnectorAtom(String name, T semantics, Reference source) {		
 		this.name = name;
 		this.semantics = semantics;
 		this.source = source;
-		Map<Port, Port> links = new HashMap<Port, Port>();
-		for (Port p : semantics.getInterface())
-			links.put(p, p);
-		this.links = Collections.unmodifiableMap(links);
+		if(semantics != null){
+			Map<Port, Port> links = new HashMap<Port, Port>();
+			for (Port p : semantics.getInterface())
+				links.put(p, p);
+			this.links = Collections.unmodifiableMap(links);
+		}
+		else
+			this.links = new HashMap<>();
 	}
 
 	/**
@@ -178,7 +182,9 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 */
 	@Override
 	public ReoConnector<T> integrate() {
-		return new ReoConnectorAtom<T>(name, semantics.rename(links), source);
+		if(semantics !=null)
+			return new ReoConnectorAtom<T>(name, semantics.rename(links), source);
+		return new ReoConnectorAtom<T>(name, semantics, source, links);
 	}
 
 	/**
