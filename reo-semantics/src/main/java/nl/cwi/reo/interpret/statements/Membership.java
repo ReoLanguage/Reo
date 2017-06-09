@@ -80,4 +80,18 @@ public final class Membership implements PredicateExpression {
 		return x + ":" + list;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
+		Set<Identifier> vars = list.getVariables();
+		vars.removeAll(defns);
+		if (vars.isEmpty()) {
+			defns.addAll(vars);
+			return defns;
+		}
+		return null;
+	}
+
 }

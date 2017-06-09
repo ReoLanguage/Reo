@@ -23,9 +23,7 @@ import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.sets.SetAtom;
 import nl.cwi.reo.interpret.sets.SetComposite;
-import nl.cwi.reo.interpret.sets.SetElse;
 import nl.cwi.reo.interpret.sets.SetExpression;
-import nl.cwi.reo.interpret.sets.SetWithout;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
 import nl.cwi.reo.interpret.statements.TruthValue;
 import nl.cwi.reo.interpret.statements.Conjunction;
@@ -149,7 +147,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	// Instances
 	private ParseTreeProperty<InstanceExpression<T>> instances = new ParseTreeProperty<InstanceExpression<T>>();
-	private ParseTreeProperty<SetExpression<T>> sets = new ParseTreeProperty<SetExpression<T>>();
 
 	// Terms
 	private ParseTreeProperty<TermExpression> terms = new ParseTreeProperty<TermExpression>();
@@ -212,7 +209,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		components = new ParseTreeProperty<ComponentExpression<T>>();
 		formula = new ParseTreeProperty<PredicateExpression>();
 		instances = new ParseTreeProperty<InstanceExpression<T>>();
-		sets = new ParseTreeProperty<SetExpression<T>>();
 		terms = new ParseTreeProperty<TermExpression>();
 		termsList = new ParseTreeProperty<List<TermExpression>>();
 		signatureExpressions = new ParseTreeProperty<SignatureExpression>();
@@ -368,18 +364,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitMultiset_else(Multiset_elseContext ctx) {
-		String name = componentnames.get(ctx);
-		SetExpression<T> m1 = sets.get(ctx.multiset(0));
-		SetExpression<T> m2 = sets.get(ctx.multiset(1));
-		sets.put(ctx, new SetElse<T>(name, m1, m2));
 	}
 
 	@Override
 	public void exitMultiset_without(Multiset_withoutContext ctx) {
-		String name = componentnames.get(ctx);
-		SetExpression<T> m1 = sets.get(ctx.multiset(0));
-		SetExpression<T> m2 = sets.get(ctx.multiset(1));
-		sets.put(ctx, new SetWithout<T>(name, m1, m2));
 	}
 
 	/**

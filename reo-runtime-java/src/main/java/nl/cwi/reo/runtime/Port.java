@@ -1,4 +1,4 @@
-package nl.cwi.reo.runtime.java;
+package nl.cwi.reo.runtime;
 
 public interface Port<T> extends Input<T>, Output<T> {
 	public void setProducer(Component p);

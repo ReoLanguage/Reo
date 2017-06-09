@@ -6,7 +6,7 @@ main(S) ::= <<
 import java.util.List;
 import java.util.ArrayList;
 
-import nl.cwi.reo.runtime.java.*;
+import nl.cwi.reo.runtime.*;
 
 public class <S.name> {
 

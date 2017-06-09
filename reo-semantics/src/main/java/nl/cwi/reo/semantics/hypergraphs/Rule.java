@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.rbautomaton;
+package nl.cwi.reo.semantics.hypergraphs;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,10 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.predicates.Conjunction;
-import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.util.Monitor;
 
 public class Rule {

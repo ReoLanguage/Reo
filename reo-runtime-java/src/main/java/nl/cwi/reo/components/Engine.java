@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import nl.cwi.reo.runtime.java.Port;
+import nl.cwi.reo.runtime.Port;
 
 public class Engine {
 	private final Port<String> inputPort;

@@ -1,4 +1,4 @@
-package nl.cwi.reo.runtime.java;
+package nl.cwi.reo.runtime;
 
 import java.util.ArrayList;
 import java.util.List;

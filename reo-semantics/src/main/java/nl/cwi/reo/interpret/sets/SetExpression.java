@@ -1,8 +1,11 @@
 package nl.cwi.reo.interpret.sets;
 
+import java.util.Set;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.instances.InstanceExpression;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 
 /**
@@ -20,5 +23,14 @@ public interface SetExpression<T extends Semantics<T>> extends InstanceExpressio
 	 */
 	@Nullable
 	public String getName();
+
+	/**
+	 * Checks whether this set can be evaluated, given a set of defined variables.
+	 * This method assumes that all variables that have indices are defined, and they
+	 * are ignored.
+	 * 
+	 * @return true, if the set can be evaluated.
+	 */
+	public boolean canEvaluate(Set<Identifier> deps);
 
 }

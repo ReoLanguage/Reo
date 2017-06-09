@@ -34,4 +34,12 @@ public interface PredicateExpression extends Expression<List<Scope>> {
 	 */
 	public Set<Identifier> getVariables();
 
+	/**
+	 * Returns the set of all variables that have no indices and are defined by
+	 * the predicate, given an initial set of defined variables.
+	 * 
+	 * @return set of defined variables, or null if not all variables are defined.
+	 */
+	public Set<Identifier> getDefinedVariables(Set<Identifier> defns);
+
 }

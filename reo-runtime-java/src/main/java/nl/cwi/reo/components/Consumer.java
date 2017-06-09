@@ -1,6 +1,6 @@
 package nl.cwi.reo.components;
-import nl.cwi.reo.runtime.java.Component;
-import nl.cwi.reo.runtime.java.Port;
+import nl.cwi.reo.runtime.Component;
+import nl.cwi.reo.runtime.Port;
 
 @SuppressWarnings("initialization")
 public class Consumer implements Component {

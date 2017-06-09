@@ -1,12 +1,7 @@
 package nl.cwi.reo.interpret.ports;
 
-import java.util.Objects;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.semantics.rbautomaton.Rule;
 
 /**
  * An identifier that is decorated with a port type, a priority type, a type

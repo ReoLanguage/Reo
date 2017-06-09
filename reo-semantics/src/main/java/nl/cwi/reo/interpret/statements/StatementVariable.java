@@ -66,5 +66,11 @@ public class StatementVariable implements PredicateExpression {
 	public String toString() {
 		return variable.toString();
 	}
+
+	@Override
+	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
+		// TODO Take care of this!
+		return defns;
+	}
 	
 }

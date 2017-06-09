@@ -101,10 +101,4 @@ public final class ProductInstance<T extends Semantics<T>> implements InstanceEx
 		return "" + first + operator + second;
 	}
 
-	@Override
-	public boolean canEvaluate(Set<Identifier> deps) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

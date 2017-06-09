@@ -8,7 +8,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.sets.SetExpression;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
-import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
@@ -43,7 +42,7 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 		this.sign = sign;
 		this.set = set;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -52,18 +51,8 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 	public Component<T> evaluate(Scope s, Monitor m) {
 		Set<Identifier> deps = new HashSet<Identifier>(s.getKeys());
 		deps.addAll(sign.getParams());
-		if (!set.canEvaluate(s.getKeys())) return null;
-//		Set<Identifier> params = sign.getParams();
-//		Scope scope = new Scope();
-//		Value v;
-//		for (Identifier x : deps) {
-//			if ((v = s.get(x)) != null || params.contains(x))
-//				scope.put(x, v);
-//			else {
-//				m.add("Variable " + x.toString() + " is not defined.");
-//				return null;
-//			}
-//		}
+		if (!set.canEvaluate(deps))
+			return null;
 		return new Component<T>(s, sign, set);
 	}
 
@@ -82,5 +71,5 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 	public String toString() {
 		return "" + sign + set;
 	}
-	
+
 }

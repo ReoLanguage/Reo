@@ -2,6 +2,7 @@ package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -54,6 +55,16 @@ public final class Negation implements PredicateExpression {
 	@Override
 	public String toString() {
 		return "!(" + predicate + ")";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
+		Set<Identifier> diff = new HashSet<>(predicate.getDefinedVariables(defns));
+		diff.removeAll(defns);
+		return diff.isEmpty() ? defns : null;
 	}
 
 }

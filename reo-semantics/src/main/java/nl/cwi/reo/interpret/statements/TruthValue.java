@@ -56,4 +56,12 @@ public class TruthValue implements PredicateExpression {
 	public String toString() {
 		return Boolean.toString(bool);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
+		return defns;
+	}
 }

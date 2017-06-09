@@ -22,7 +22,5 @@ public interface InstanceExpression<T extends Semantics<T>> extends Expression<I
 	 * @return set of undefined variables.
 	 */
 	public Set<Identifier> getVariables();
-	
-	public boolean canEvaluate(Set<Identifier> deps);
 
 }

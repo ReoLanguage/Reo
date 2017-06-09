@@ -21,7 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import nl.cwi.reo.runtime.java.Port;
+import nl.cwi.reo.runtime.Port;
 
 public class PortWindows<T> {
 	private static final int HEIGHT = 400;

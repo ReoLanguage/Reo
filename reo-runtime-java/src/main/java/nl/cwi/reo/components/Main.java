@@ -1,8 +1,8 @@
 package nl.cwi.reo.components;
-import nl.cwi.reo.runtime.java.Component;
-import nl.cwi.reo.runtime.java.Port;
-import nl.cwi.reo.runtime.java.PortBusyWait;
-import nl.cwi.reo.runtime.java.PortRingBuffer;
+import nl.cwi.reo.runtime.Component;
+import nl.cwi.reo.runtime.Port;
+import nl.cwi.reo.runtime.PortBusyWait;
+import nl.cwi.reo.runtime.PortRingBuffer;
 
 @SuppressWarnings("initialization")
 public class Main {

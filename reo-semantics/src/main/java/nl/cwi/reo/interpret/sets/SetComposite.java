@@ -31,7 +31,7 @@ import nl.cwi.reo.util.Monitor;
  *            Reo semantics type
  */
 public final class SetComposite<T extends Semantics<T>> implements SetExpression<T> {
-	
+
 	/**
 	 * Component name.
 	 */
@@ -92,7 +92,7 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 		this.elements = elements;
 		this.location = location;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -163,15 +163,16 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 		Set<Identifier> vars = new HashSet<Identifier>();
 		for (InstanceExpression<T> I : elements)
 			vars.addAll(I.getVariables());
-		if(predicate instanceof Relation){
-			for(Identifier i : ((Relation)predicate).getLocalVariables())
-				if(vars.contains(i))
+		if (predicate instanceof Relation) {
+			for (Identifier i : ((Relation) predicate).getLocalVariables())
+				if (vars.contains(i))
 					vars.remove(i);
 				else
 					vars.add(i);
-			vars.addAll(((Relation)predicate).getGlobalVariables());
+			vars.addAll(((Relation) predicate).getGlobalVariables());
 		}
-		//TODO : implement getGlobalVariable and getLocalVariable for all predicates
+		// TODO : implement getGlobalVariable and getLocalVariable for all
+		// predicates
 		else
 			vars.removeAll(predicate.getVariables());
 		return vars;
@@ -191,7 +192,10 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 
 	@Override
 	public boolean canEvaluate(Set<Identifier> deps) {
-		// TODO Auto-generated method stub
-		return false;
+		Set<Identifier> vars = new HashSet<Identifier>();
+		for (InstanceExpression<T> I : elements)
+			vars.addAll(I.getVariables());
+		vars.removeAll(predicate.getDefinedVariables(deps));
+		return vars.isEmpty();
 	}
 }

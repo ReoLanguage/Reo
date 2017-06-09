@@ -1,7 +1,7 @@
 package nl.cwi.reo.components;
-import nl.cwi.reo.runtime.java.Input;
-import nl.cwi.reo.runtime.java.Output;
-import nl.cwi.reo.runtime.java.Port;
+import nl.cwi.reo.runtime.Input;
+import nl.cwi.reo.runtime.Output;
+import nl.cwi.reo.runtime.Port;
 
 public class Workers {
 

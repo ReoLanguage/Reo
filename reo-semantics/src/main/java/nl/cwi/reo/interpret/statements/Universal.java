@@ -82,4 +82,16 @@ public final class Universal implements PredicateExpression {
 		return "exists " + membership + "(" + predicate + ")";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
+		Set<Identifier> defnsX = new HashSet<>(defns);
+		defns.add(membership.getVariable());
+		Set<Identifier> newDefs = predicate.getDefinedVariables(defnsX);
+		newDefs.remove(membership.getVariable());
+		return newDefs;
+	}
+
 }

@@ -144,7 +144,9 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 	 */
 	public Set<Identifier> getVariables() {
 		Set<Identifier> vars = new HashSet<Identifier>();
-		vars.add(new Identifier(name));
+		// TODO Check if this works
+		if (indices.isEmpty()) 
+			vars.add(new Identifier(name));
 		return vars;
 	}
 

@@ -2,8 +2,5 @@ section slides.main;
 
 red(a!) 
 {
-  #PR
-  identity(;a)
-|
   Java:"workers.Producer.red"
 }

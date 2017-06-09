@@ -19,7 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import nl.cwi.reo.runtime.java.Port;
+import nl.cwi.reo.runtime.Port;
 
 @Deprecated
 public class WindowP {

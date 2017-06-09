@@ -38,6 +38,8 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
+import nl.cwi.reo.semantics.hypergraphs.Rule;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
@@ -47,8 +49,6 @@ import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
-import nl.cwi.reo.semantics.rbautomaton.Rule;
-import nl.cwi.reo.semantics.rbautomaton.ConstraintHypergraph;
 import nl.cwi.reo.util.Monitor;
 
 public class ListenerRBA extends Listener<ConstraintHypergraph> {

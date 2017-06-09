@@ -111,4 +111,35 @@ public final class Conjunction implements PredicateExpression {
 		return st.render();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
+		Set<Identifier> vars = new HashSet<Identifier>(defns);
+		Queue<PredicateExpression> stack = new LinkedList<PredicateExpression>(predicates);
+		PredicateExpression P = null;
+		int counter = 0;
+
+		while (!stack.isEmpty()) {
+
+			P = stack.poll();
+			
+			Set<Identifier> defnP = P.getDefinedVariables(vars);
+			
+			if (defnP == null) {
+				counter++;
+				stack.add(P);
+			} else {
+				counter = 0;
+				vars.addAll(defnP);
+			}
+			
+			if (counter > stack.size())
+				return null;
+		}
+		
+		return vars;
+	}
+
 }

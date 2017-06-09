@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.rbautomaton;
+package nl.cwi.reo.semantics.hypergraphs;
 
 import java.util.List;
 import java.util.Map;

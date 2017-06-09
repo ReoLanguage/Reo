@@ -85,4 +85,26 @@ public final class Disjunction implements PredicateExpression {
 		st.add("predicates", predicates);
 		return st.render();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
+
+		Set<Identifier> vars = new HashSet<>(defns);
+		Queue<PredicateExpression> queue = new LinkedList<PredicateExpression>(predicates);
+		PredicateExpression P = null;
+
+		while (!queue.isEmpty()) {
+			P = queue.poll();
+			Set<Identifier> defsP = P.getDefinedVariables(vars);
+			if (defsP == null)
+				return null;
+			else
+				vars.addAll(defsP);
+		}
+		
+		return vars;
+	}
 }

@@ -3,7 +3,6 @@ package nl.cwi.reo;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,6 +14,7 @@ import java.util.Set;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
+import nl.cwi.reo.compile.CompilerType;
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.compile.PRCompiler;
 import nl.cwi.reo.compile.RBACompiler;
@@ -37,25 +37,20 @@ import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.values.BooleanValue;
 import nl.cwi.reo.interpret.values.DecimalValue;
-import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
-
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
+import nl.cwi.reo.semantics.hypergraphs.Rule;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.semantics.predicates.Conjunction;
-import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemCell;
-import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
-import nl.cwi.reo.semantics.rbautomaton.Rule;
-import nl.cwi.reo.semantics.rbautomaton.ConstraintHypergraph;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
@@ -112,8 +107,8 @@ public class Compiler {
 	/**
 	 * Semantics type of Reo connectors.
 	 */
-	@Parameter(names = { "-s", "--semantics" }, description = "used type of Reo semantics")
-	public SemanticsType semantics = SemanticsType.PR;
+	@Parameter(names = { "-c", "--compiler" }, description = "Select the correct compiler")
+	public CompilerType compilertype = CompilerType.IHC;
 
 	/**
 	 * Semantics type of Reo connectors.
@@ -151,25 +146,12 @@ public class Compiler {
 			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));
 
 		// Select the correct compiler.
-		switch (semantics) {
-		case CAM:
-			break;
-		case P:
-			compileP();
-			break;
-		case PA:
-			break;
-		case PLAIN:
-			break;
-		case PR:
+		switch (compilertype) {
+		case LYKOS:
 			compilePR();
 			break;
-		case RBA:
+		case IHC:
 			compileRBA();
-			break;
-		case SA:
-			break;
-		case WA:
 			break;
 		default:
 			monitor.add("Please specify the used semantics.");
@@ -203,7 +185,6 @@ public class Compiler {
 	}
 
 	private void compileRBA() {
-		Long t1 = System.nanoTime();
 
 		// Interpret the Reo program
 		Interpreter<ConstraintHypergraph> interpreter = new InterpreterRBA(directories, params, monitor);
@@ -243,16 +224,12 @@ public class Compiler {
 			r.put(p, p.rename("_" + i++).hide());
 		}
 		ReoConnector<ConstraintHypergraph> connector = new ReoConnectorComposite<>(null, "", list).rename(r);
-
-		Long t2 = System.nanoTime();
 		
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();
 		connector = connector.insertNodes(true, false, new ConstraintHypergraph());
 		connector = connector.integrate();
 
-
-		Long t3 = System.nanoTime();
 		// Build the template.
 		List<Component> components = new ArrayList<Component>();
 		Set<Port> intface = new HashSet<Port>();
@@ -285,14 +262,9 @@ public class Compiler {
 				protocols.add(atom.getSemantics());
 			}
 		}
-
-		Long t4 = System.nanoTime();
 		
 		// Compose the protocol into a single connector.
 		ConstraintHypergraph circuit = new ConstraintHypergraph().compose(protocols);
-//		RulesBasedAutomaton circuit = new RulesBasedAutomaton().compose(protocols);
-
-		Long t5 = System.nanoTime();
 		
 		// Transform every disjunctive clause into a transition.
 		Set<Transition> transitions = new HashSet<>();
@@ -358,8 +330,6 @@ public class Compiler {
 			if(!(t.getInput().isEmpty()&&t.getMemory().isEmpty()&&t.getOutput().isEmpty()))
 				transitions.add(t);
 		}
-
-		Long t6 = System.nanoTime();
 		
 		// TODO Partition the set of transitions
 		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
@@ -430,16 +400,7 @@ public class Compiler {
 			}
 			
 			components.add(new Protocol("Protocol" + n_protocol++, ports, T, initial));
-		}
-
-
-		System.out.println("interpret   " + (t2 - t1)/1000000000 + " seconds");
-		System.out.println("flattening  " + (t3 - t2)/1000000000 + " seconds");
-		System.out.println("workers     " + (t4 - t3)/1000000000 + " seconds");
-		System.out.println("composition " + (t5 - t4)/1000000000 + " seconds");
-		System.out.println("commandify  " + (t6 - t5)/1000000000 + " seconds");
-//		System.out.println("template    " + (t7 - t6)/1000000000 + " seconds");
-		
+		}		
 
 		// Fill in the template
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);
@@ -455,130 +416,10 @@ public class Compiler {
 				write(program.getName() + ".maude", code);
 				break;
 			default:break;
-		}
-
-		Long t7 = System.nanoTime();
+		}		
+	}
 	
-
-//		try{
-//			PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
-//			writer.println("Compilation time : "+(t7-t1) + " nanosecondes");
-//			writer.close();
-//		} catch (IOException e) { // do something  
-//		}
-
-		
-	}
-
-	private void compileP() {
-
-		// // Interpret the Reo program
-		// Interpreter<Predicate> interpreter = new InterpreterP(directories,
-		// params, monitor);
-		// ReoProgram<Predicate> program = interpreter.interpret(files.get(0));
-		//
-		// if (program == null)
-		// return;
-		//
-		// ReoConnector<Predicate> connector =
-		// program.getConnector().flatten().insertNodes(true, false, new
-		// Predicate())
-		// .integrate();
-		//
-		// // Build the template.
-		// List<Component> components = new ArrayList<Component>();
-		// Set<Port> intface = new HashSet<Port>();
-		//
-		// // Identify the atomic components in the connector.
-		// int n_atom = 0;
-		// List<Predicate> protocols = new ArrayList<Predicate>();
-		// for (ReoConnectorAtom<Predicate> atom : connector.getAtoms()) {
-		// if (atom.getSourceCode().getCall() != null) {
-		// intface.addAll(atom.getInterface());
-		// String name = atom.getName();
-		// if (name == null)
-		// name = "Component";
-		// components.add(new Atomic(name + n_atom++, new ArrayList<>(),
-		// atom.getInterface(),
-		// atom.getSourceCode().getCall()));
-		// } else {
-		// protocols.add(atom.getSemantics());
-		// }
-		// }
-		//
-		// // Formula automaton = JavaCompiler.compose(components);
-		// // JavaCompiler.generateCode(automaton);
-		//
-		// // Compose the protocol into a single connector.
-		// Predicate circuit = new
-		// Predicate().compose(protocols).restrict(intface);
-		//
-		// // Put the obtained formula in (a quantifier-free) disjunctive normal
-		// // form.
-		// Formula f = circuit.getFormula().NNF().DNF().QE();
-		//
-		// // Transform every disjunctive clause into a transition.
-		// Set<Transition> transitions = new HashSet<Transition>();
-		// if (f instanceof Disjunction) {
-		// for (Formula clause : ((Disjunction) f).getClauses()) {
-		//
-		// // Commandify the formula:
-		// Transition t = RBACompiler.commandify(clause);
-		//
-		// transitions.add(t);
-		// // Compute the guard by existential quantification on all output
-		// // and next memory cells in clause and QE().
-		// Formula guard = null;
-		//
-		// // Similar to guard, except do not hide one output port.
-		// // if the resulting formula is of the form output = term over
-		// // inputs, then add this the the map.
-		// Map<Node, Term> output = new HashMap<Node, Term>();
-		//
-		// // Similar to output.
-		// Map<MemoryCell, Term> memory = new HashMap<MemoryCell, Term>();
-		//
-		// // transitions.add(new Transition(guard, output, memory));
-		// }
-		// }
-		//
-		// // TODO Partition the set of transitions
-		// Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
-		//
-		// partition.add(transitions);
-		//
-		// // Generate a protocol component for each part in the transition
-		//
-		// Map<MemCell, Object> initial = new HashMap<MemCell, Object>();
-		// int n_protocol = 0;
-		// for (Set<Transition> T : partition) {
-		// Set<Port> ports = new HashSet<Port>();
-		// for (Transition t : T) {
-		// ports.addAll(t.getInterface());
-		// for (MemCell m : t.getMemory().keySet()) {
-		// initial.put(m, 0);
-		// }
-		// }
-		//
-		// // TODO For convenience, we should be able to specify the initial
-		// // value of each memory cell (particularly handy for fifofull)
-		//
-		// components.add(new Protocol("Protocol" + n_protocol++, ports, T,
-		// initial));
-		// }
-		//
-		// // Fill in the template
-		// ReoTemplate template = new ReoTemplate(program.getFile(),
-		// packagename, program.getName(), components);
-		//
-		// // Generate Java code from the template
-		// String code = template.generateCode(Language.JAVA);
-		// System.out.println(code);
-		// write(program.getName(), code);
-	}
-
 	private void compilePR() {
-		Long t1 = System.nanoTime();
 
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
 
@@ -594,6 +435,7 @@ public class Compiler {
 			// GraphCompiler.visualize(program);
 
 		}
+		
 		/*
 		 * Compiler Settings
 		 */
@@ -610,14 +452,6 @@ public class Compiler {
 		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor, settings);
 
 		c.compile();
-		Long t2 = System.nanoTime();
 
-
-//		try{
-//			PrintWriter writer = new PrintWriter(outdir+"compilation_time_lykos.txt", "UTF-8");
-//			writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
-//			writer.close();
-//		} catch (IOException e) { // do something  
-//		}
 	}
 }

@@ -1,5 +1,5 @@
 package nl.cwi.reo.components;
-import nl.cwi.reo.runtime.java.Port;
+import nl.cwi.reo.runtime.Port;
 
 public class Scheduler {
 	

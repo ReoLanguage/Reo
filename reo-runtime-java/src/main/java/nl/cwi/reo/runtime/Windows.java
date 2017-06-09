@@ -1,4 +1,4 @@
-package nl.cwi.reo.runtime.java;
+package nl.cwi.reo.runtime;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -18,7 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import nl.cwi.reo.runtime.java.Port;
+import nl.cwi.reo.runtime.Port;
 
 public class Windows {
 	private static final int HEIGHT = 400;

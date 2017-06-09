@@ -1,4 +1,4 @@
-package nl.cwi.reo.runtime.java;
+package nl.cwi.reo.runtime;
 
 @SuppressWarnings("initialization")
 public class PortWaitNotify<T> implements Port<T> {

@@ -21,7 +21,7 @@ import nl.cwi.reo.util.Monitor;
  *            Reo semantics type
  */
 public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
-	
+
 	/**
 	 * Component name.
 	 */
@@ -56,7 +56,7 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 		this.atom = atom;
 		this.source = source;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -100,7 +100,6 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 
 	@Override
 	public boolean canEvaluate(Set<Identifier> deps) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 }
