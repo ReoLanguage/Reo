@@ -16,4 +16,5 @@
     </job>
      <onFail previous="true" next="false" />
      <onSuccess previous="false" next="true" />
+
 </izpack:processing>
