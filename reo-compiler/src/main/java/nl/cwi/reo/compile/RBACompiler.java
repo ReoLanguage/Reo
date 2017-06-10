@@ -23,9 +23,7 @@ import nl.cwi.reo.semantics.predicates.Variable;
 
 public class RBACompiler {
 
-	public static Transition commandify(Formula f) {
-
-		Formula g = f.QE();
+	public static Transition commandify(Formula g) {
 
 		List<Formula> literals = new ArrayList<Formula>();
 		List<Formula> literalsToRemove = new ArrayList<Formula>();

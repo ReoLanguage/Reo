@@ -32,6 +32,6 @@ alternator() {
 	{ producer(a[i])   | i : <1..(N+1)> }
 	consumer(b[1])
   |
-	N=350
+	N=5000
 }
 

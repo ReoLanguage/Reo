@@ -43,11 +43,7 @@ public class Rule {
 	}
 
 	public Set<Port> getAllPorts() {
-		Set<Port> setPort = new HashSet<Port>();
-		for (Port p : sync.keySet()) {
-			setPort.add(p);
-		}
-		return setPort;
+		return new HashSet<>(sync.keySet());
 	}
 
 	public Rule rename(Map<Port, Port> links) {

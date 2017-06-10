@@ -43,14 +43,12 @@ import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
 import nl.cwi.reo.semantics.hypergraphs.Rule;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
-import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemCell;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
-import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
@@ -108,7 +106,7 @@ public class Compiler {
 	 * Semantics type of Reo connectors.
 	 */
 	@Parameter(names = { "-c", "--compiler" }, description = "Select the correct compiler")
-	public CompilerType compilertype = CompilerType.IHC;
+	public CompilerType compilertype = CompilerType.DEFAULT;
 
 	/**
 	 * Semantics type of Reo connectors.
@@ -139,6 +137,8 @@ public class Compiler {
 
 	public void run() {
 
+		long t0 = System.nanoTime();
+
 		// Get the root locations of Reo source files and libraries.
 		directories.add(".");
 		String comppath = System.getenv("COMPATH");
@@ -150,14 +150,21 @@ public class Compiler {
 		case LYKOS:
 			compilePR();
 			break;
-		case IHC:
-			compileRBA();
+		case DEFAULT:
+			compile();
 			break;
 		default:
-			monitor.add("Please specify the used semantics.");
+			monitor.add("Please specify the compiler.");
 			break;
 		}
 
+		long t1 = System.nanoTime();
+
+		long time = (t1 - t0) / 1000000000;
+		long minutes = time / 60;
+		long seconds = time % 60;
+
+		System.out.println("Compilation time: " + String.format("%d:%02d", minutes, seconds));
 		// Print all messages.
 		monitor.print();
 	}
@@ -171,9 +178,22 @@ public class Compiler {
 	 *            content of the file
 	 * @return <code>true</code> if the files are successfully written.
 	 */
-	public boolean write(String name, String code) {
+	public boolean write(String name, String code, Language L) {
+
+		String extension = "";
+		switch (L) {
+		case JAVA:
+			extension = ".java";
+			break;
+		case MAUDE:
+			extension = ".maude";
+			break;
+		default:
+			break;
+		}
+		
 		try {
-			File file = new File(outdir + File.separator + name);
+			File file = new File(outdir + File.separator + name + extension);
 			file.getParentFile().mkdirs();
 			FileWriter out = new FileWriter(file);
 			out.write(code);
@@ -181,10 +201,11 @@ public class Compiler {
 		} catch (IOException e) {
 			return false;
 		}
+		
 		return true;
 	}
 
-	private void compileRBA() {
+	private void compile() {
 
 		// Interpret the Reo program
 		Interpreter<ConstraintHypergraph> interpreter = new InterpreterRBA(directories, params, monitor);
@@ -224,7 +245,7 @@ public class Compiler {
 			r.put(p, p.rename("_" + i++).hide());
 		}
 		ReoConnector<ConstraintHypergraph> connector = new ReoConnectorComposite<>(null, "", list).rename(r);
-		
+
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();
 		connector = connector.insertNodes(true, false, new ConstraintHypergraph());
@@ -262,145 +283,107 @@ public class Compiler {
 				protocols.add(atom.getSemantics());
 			}
 		}
-		
+
 		// Compose the protocol into a single connector.
 		ConstraintHypergraph circuit = new ConstraintHypergraph().compose(protocols);
-		
-		// Transform every disjunctive clause into a transition.
+
+		// Transform every rule in the circuit into a transition.
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : circuit.getRules()) {
 
 			// Hide all internal ports
 			Formula f = rule.getFormula();
-			Set<Variable> vars = f.getFreeVariables();
-			Set<Port> ports = new HashSet<>();
-			for(Variable v : vars){
-				if(v instanceof Node){
-					ports.add(((Node) v).getPort());
-				}
-			}
-			Set<Port> losingPorts = new HashSet<Port>();
-			Map<Node,Term> losingData = new HashMap<Node,Term>(); 
-			Set<Formula> negativePortGuard=new HashSet<Formula>(); 
-			for (Port p : rule.getAllPorts()){
+			for (Port p : rule.getAllPorts())
 				if (!intface.contains(p))
-					f = new Existential(new Node(p), f);
-				else if(rule.getSync().get(p)){ //&& !ports.contains(p)){
-					losingPorts.add(p);
-					losingData.put(new Node(new Port("null"+p.getName())), new Node(p));
-				}
-				/*
-				 * Add negative information in guard :
-				 */
-//				if(!rule.getSync().get(p)){
-//					for(Rule _rule : circuit.getRules()){
-//						if(_rule.getSync().get(p)!=null && _rule.getSync().get(p)){
-//							for(Port port : _rule.getFiringPorts()){
-//								if(intface.contains(port) && rule.getSync().get(port)==null){
-//									negativePortGuard.add(new Equality(new Node(port),new Function("false",false, new ArrayList<>())));
-//								}
-//							}
-//						}
-//					}
-//				}
-			}
+					f = new Existential(new Node(p), f).QE();
 
 			// Commandify the formula:
 			Transition t = RBACompiler.commandify(f);
-			
-			Set<Port> portList = new HashSet<Port>(losingPorts);
-			for(Port p : portList){
-				if(!t.getInput().contains(p) && !t.getOutput().containsKey(new Node(p))){
-					losingPorts.addAll(t.getInput());
-					losingData.putAll(t.getOutput());
-				}
-				else{
-					losingPorts.remove(p);
-					losingData.remove(new Node(p));
-				}
-			}
-			
-			negativePortGuard.add(t.getGuard());
-			if(!negativePortGuard.isEmpty())
-				t = new Transition(new Conjunction(new ArrayList<>(negativePortGuard)), t.getOutput(), t.getMemory(), t.getInput());
 
-			if(!losingData.isEmpty() && !losingPorts.isEmpty())
-				t = new Transition(new Conjunction(new ArrayList<>(negativePortGuard)), losingData, t.getMemory(), losingPorts);			
-			
-			if(!(t.getInput().isEmpty()&&t.getMemory().isEmpty()&&t.getOutput().isEmpty()))
+			if (!(t.getInput().isEmpty() && t.getMemory().isEmpty() && t.getOutput().isEmpty()))
 				transitions.add(t);
 		}
-		
+
 		// TODO Partition the set of transitions
-		Set<Set<Transition>> partition = new HashSet<Set<Transition>>();
+		Set<Set<Transition>> partition = new HashSet<>();
 
 		partition.add(transitions);
 
 		// Generate a protocol component for each part in the transition
-
 		int n_protocol = 1;
-		for (Set<Transition> T : partition) {
+		for (Set<Transition> part : partition) {
 			Map<MemCell, Object> initial = new HashMap<>();
 			Set<Port> ports = new HashSet<>();
 
 			Map<MemCell, TypeTag> tags = new HashMap<>();
-			for (Transition t : T) {				
+			for (Transition t : part) {
 				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
 					MemCell x = m.getKey();
-					MemCell x_prime = new MemCell(x.getName(),!x.hasPrime());
-					
-					if ((!tags.containsKey(x) || tags.get(x) == null) && (!tags.containsKey(x_prime) || tags.get(x_prime)==null)) {
-						Term initialValueLHS = circuit.getInitials().get(new MemCell(m.getKey().getName(),false));
+					MemCell x_prime = new MemCell(x.getName(), !x.hasPrime());
+
+					if ((!tags.containsKey(x) || tags.get(x) == null)
+							&& (!tags.containsKey(x_prime) || tags.get(x_prime) == null)) {
+						Term initialValueLHS = circuit.getInitials().get(new MemCell(m.getKey().getName(), false));
 						Term initialValueRHS = null;
-						if(m.getValue() instanceof MemCell)
-							initialValueRHS = circuit.getInitials().get(new MemCell(((MemCell)m.getValue()).getName(),false));
-						
-						TypeTag tag=m.getValue().getTypeTag();
-						for(Node n : t.getOutput().keySet()){
-							if(t.getOutput().get(n) instanceof MemCell && ((MemCell)t.getOutput().get(n)).getName().equals(m.getKey().getName())&&n.getPort().getTypeTag()!=null){
+						if (m.getValue() instanceof MemCell)
+							initialValueRHS = circuit.getInitials()
+									.get(new MemCell(((MemCell) m.getValue()).getName(), false));
+
+						TypeTag tag = m.getValue().getTypeTag();
+						for (Node n : t.getOutput().keySet()) {
+							if (t.getOutput().get(n) instanceof MemCell
+									&& ((MemCell) t.getOutput().get(n)).getName().equals(m.getKey().getName())
+									&& n.getPort().getTypeTag() != null) {
 								tag = new TypeTag(n.getPort().getTypeTag().toString());
 							}
 						}
-						if(initialValueLHS !=null && initialValueLHS instanceof Function && ((Function)initialValueLHS).getValue() instanceof String){
+						if (initialValueLHS != null && initialValueLHS instanceof Function
+								&& ((Function) initialValueLHS).getValue() instanceof String) {
 							tag = new TypeTag("String");
 						}
-						if(initialValueRHS !=null && initialValueRHS instanceof Function && ((Function)initialValueRHS).getValue() instanceof String){
+						if (initialValueRHS != null && initialValueRHS instanceof Function
+								&& ((Function) initialValueRHS).getValue() instanceof String) {
 							tag = new TypeTag("String");
 						}
-						if(initialValueLHS !=null && initialValueLHS instanceof Function && ((Function)initialValueLHS).getValue() instanceof Integer){
+						if (initialValueLHS != null && initialValueLHS instanceof Function
+								&& ((Function) initialValueLHS).getValue() instanceof Integer) {
 							tag = new TypeTag("Integer");
 						}
-						if(initialValueRHS !=null && initialValueRHS instanceof Function && ((Function)initialValueRHS).getValue() instanceof Integer){
+						if (initialValueRHS != null && initialValueRHS instanceof Function
+								&& ((Function) initialValueRHS).getValue() instanceof Integer) {
 							tag = new TypeTag("Integer");
 						}
 						tags.remove(x);
 						tags.remove(x_prime);
 						tags.put(x, tag);
 						tags.put(x_prime, tag);
-						
-						if(m.getValue() instanceof MemCell){
-							tags.remove((MemCell)m.getValue());
-							tags.remove(new MemCell(((MemCell)m.getValue()).getName(),!((MemCell)m.getValue()).hasPrime()));
-							tags.put((MemCell)m.getValue(), tag);
-							tags.put(new MemCell(((MemCell)m.getValue()).getName(),!((MemCell)m.getValue()).hasPrime()), tag);
+
+						if (m.getValue() instanceof MemCell) {
+							tags.remove((MemCell) m.getValue());
+							tags.remove(new MemCell(((MemCell) m.getValue()).getName(),
+									!((MemCell) m.getValue()).hasPrime()));
+							tags.put((MemCell) m.getValue(), tag);
+							tags.put(new MemCell(((MemCell) m.getValue()).getName(),
+									!((MemCell) m.getValue()).hasPrime()), tag);
 						}
 					}
 				}
 			}
-			
-			for (Transition t : T) {
+
+			for (Transition t : part) {
 				ports.addAll(t.getInterface());
-				
+
 				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
-					Term initialValue = circuit.getInitials().get(new MemCell(m.getKey().getName(),false));
-					if(initialValue instanceof Function && ((Function) initialValue).getValue() instanceof Integer)
-						initialValue = (initialValue!=null?new Function(((Function)initialValue).getName(),((Function)initialValue).getValue().toString(), new ArrayList<Term>()):null);
+					Term initialValue = circuit.getInitials().get(new MemCell(m.getKey().getName(), false));
+					if (initialValue instanceof Function && ((Function) initialValue).getValue() instanceof Integer)
+						initialValue = (initialValue != null ? new Function(((Function) initialValue).getName(),
+								((Function) initialValue).getValue().toString(), new ArrayList<Term>()) : null);
 					initial.put(m.getKey().setType(tags.get(m.getKey())), initialValue);
 				}
 			}
-			
-			components.add(new Protocol("Protocol" + n_protocol++, intface, T, initial));
-		}		
+
+			components.add(new Protocol("Protocol" + n_protocol++, intface, part, initial));
+		}
 
 		// Fill in the template
 		ReoTemplate template = new ReoTemplate(program.getFile(), packagename, program.getName(), components);
@@ -408,17 +391,9 @@ public class Compiler {
 		// Generate Java code from the template
 		Language L = Language.JAVA;
 		String code = template.generateCode(L);
-		switch(L){
-			case JAVA:
-				write(program.getName() + ".java", code);
-				break;
-			case MAUDE:
-				write(program.getName() + ".maude", code);
-				break;
-			default:break;
-		}		
+		write(program.getName(), code, L);
 	}
-	
+
 	private void compilePR() {
 
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
@@ -435,7 +410,7 @@ public class Compiler {
 			// GraphCompiler.visualize(program);
 
 		}
-		
+
 		/*
 		 * Compiler Settings
 		 */
