@@ -3,61 +3,14 @@
 Installation
 ============
 
-Unix & Mac OS
--------------
-
 1. Install Java SDK 1.6 or higher. You can check if the correct java version is already installed via::
 
 	java --version
 
-2. Download and unpack `reo-1.0.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-1.0.zip>`_ via::
+2. Download and run reo-installer <https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-installer-1.0.jar>`
 
-	cd /home/<username>/Reo
-	wget https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-1.0.zip
-	unzip reo-1.0.zip
-
-3. Add Reo to the class path and create an alias for the compiler::
-
-	export CLASSPATH=".:/home/<username>/Reo/reo-runtime-java-lykos-1.0.jar:$CLASSPATH"
-	alias reo='java -jar /home/<username>/Reo/reo-1.0.jar'
-
-   with your username substituted for `<username>`. In the CLASSPATH and alias, do not use `~` to refer to your home directory,
-   because expansion of `~` to `/home/<username>/` does not work withing quotes.  
-
-.. tip:: 
-	Add the export and alias commands to your startup script of your terminal (e.g., ``~/.bashrc``).
-	This way, you don't need to set the class path and the alias for every new terminal window.
+3. Go to your installation directory and follow the step written in the README to set Reo environment variables 
 
 3. Test the installation by running::
 
 	reo
-
-
-Windows
--------
-
-1. Install Java SDK 1.6 or higher.
-
-2. Download the `reo-1.0.zip <https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-1.0.zip>`_, and extract it in, for example, ``C:\Program Files\Reo``
-
-3. Append the ``CLASSPATH`` environment variable with ``.;C:\Program Files\Reo\reo-runtime-java-lykos-1.0.jar;%CLASSPATH%`` either permenantly via::
-
-	Control Panel » System » Advanced » Environment Variables
-
-   or only for this terminal session via::
-
-	set CLASSPATH=".;C:\Program Files\Reo\reo-runtime-java-lykos-1.0.jar;%CLASSPATH%"
-
-4. Create short convenient commands for the Reo compiler, using batch files (in directory in system PATH)::
-
-		//reo.bat
-		java -jar C:\Program Files\Reo\reo-1.0.jar %*
-
-   or, use doskey commands::
-
-		doskey reo=java -jar C:\Program Files\Reo\reo-1.0.jar $*
-
-5. Test the installation by running::
-
-	reo
-
