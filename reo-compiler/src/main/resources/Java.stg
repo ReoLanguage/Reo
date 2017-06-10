@@ -142,7 +142,7 @@ memorycell(c) ::= <<
 
 constructor(c) ::= <<
 <if(c.atomic)>
-public <c.name>(<c.ports:{p | Port\< <p.typeTag> > <p.name>}; separator="\n">) {
+public <c.name>(<c.ports:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
 	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
 	<c.ports:{p | this.<p.name> = <p.name>;}; separator="\n">
 	activate();

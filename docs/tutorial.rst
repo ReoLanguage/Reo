@@ -15,45 +15,56 @@ The put and get operations may specify an optional time-out.
 A put or get operation blocks until either it succeeds, or its specified time-out expires. 
 A put or get operation with no time-out blocks for ever, or until it succeeds.
 
-There are four ways to define a component in Reo
+To define a component in Reo, we can refer to Java source code and/or define its behavior as a constraint automaton. 
+
+1. Reference to Java source code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 First of all, we can define a component by referring to Java source code.
 
 .. code-block:: text
    
-	// producer.treo
-	producer(a!String) { 
-	   Java: "com.example.MyClass.myProducer";
+	// buffer.treo
+	buffer<init:String>(a?String, b!String) {
+	   Java: "com.example.MyClass.myBuffer"
 	}
 
 
-This code in ``producer.treo`` defines an atomic component called ``producer`` with a single output port ``a`` of type ``String``.
-The ``Java`` tag indicates that the implementation of this component consists of a piece of Java code. 
+This code in ``buffer.treo`` defines an atomic component called ``buffer`` with an input port a of type String, an output port b of type String, and an parameter init of type String.
+The Java-tag indicates that the implementation of this component consists of a piece of Java code. 
 The provided reference links to a Java class that implements the producer component as a Java method ``myProducer`` in class ``com.example.MyClass``. 
 
 .. code-block:: java
 
 	// MyClass.java
-	package com.example;
+	import nl.cwi.reo.runtime.Input;
+	import nl.cwi.reo.runtime.Output;
 
-	import nl.cwi.reo.OutputPort;
-
-	public class MyClass {
-		public static void myProducer(OutputPort<String> a) {
-			a.put("Hello World!");
-			return;
+	public class MyClass {	
+		public static void myBuffer(String init, Input<String> a, Output<String> b) {
+			String content = init;
+			while (true) {
+				b.put(content);
+				content = a.get();
+			}
 		}
 	} 
 
-We can compile the producer via::
+Note that the order of the parameters and ports in ``buffer.treo`` is identical to the order of the arguments of the static function ``myBuffer``.
+Furthermore, the type tags of the parameter and ports correspond to the data types of the arguments: 
+``a?String`` corresponds to ``Input<String> a``, ``b!String`` corresponds to ``Output<String> b``, and ``init:String`` corresponds to ``String init``.
+
+Ensure that the current directory ``.`` and the Reo runtime ``reo-runtime-java-1.0.jar`` are added to the Java classpath.
+Then, we can compile the producer via::
 
 	> ls
-	myClass.java producer.treo
-	> reo producer.treo
-	> javac producer.java
-	> java producer
+	MyClass.java buffer.treo
+	> reo buffer.treo -p "Hello world!"
+	> javac buffer.java
+	> java buffer
 
-This brings up a *port window* that allows you to take data items produced by the producer.
+The ``p`` option allows us to speficy the initial string in the buffer. Using commas in a string splits the string into multiple arguments.
+The last command runs the generated application and brings up two *port windows* that allow us to put data into the buffer and take it out of the buffer.
 
 The current version of Reo can generate only Java code, and therefore, only Java components can be defined. 
 It is only a matter of time until Reo can generate code for other languages, such as C/C++, and that components defined in these languages can be defined.
@@ -63,6 +74,9 @@ The exclamation mark (``!``) indicates that the Reo component ``producer`` uses 
 A question mark (``?``) after a node ``a`` in an interface indicates that its component uses ``a`` as an input node.
 A colon (``:``) after a node ``a`` indicates that its component uses ``a`` both as input and as output 
 (this is not allowed for non-atomic components).
+
+2. Defining a Constraint Automaton
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Second, we can define a component by defining its behavior in a certain semantics.
 Currently, we can express the behavior only as a *constraint automaton with memory*
@@ -75,7 +89,7 @@ Currently, we can express the behavior only as a *constraint automaton with memo
 	   q1 -> q0 : {b}, d(b) == x
 	}
 
-Third, we can define a component as a Java component and a constraint automaton with memory simultaniously:
+We can define a component as a Java component and a constraint automaton with memory simultaniously:
 
 .. code-block:: text
    
@@ -85,22 +99,6 @@ Third, we can define a component as a Java component and a constraint automaton 
 	   q0 -> q1 : {a}, x' == d(a) 
 	   q1 -> q0 : {b}, d(b) == x  
 	}
-
-where the Java buffer is defined in the class
-
-.. code-block:: Java
-
-	// MyClass.java
-	package com.example;
-
-	import nl.cwi.reo.OutputPort;
-
-	public class MyClass {
-		public static void myBuffer(InputPort<String> a, OutputPort<String> a) {
-			a.put("Hello World!");
-			return;
-		}
-	} 
 
 In this case, the Reo compiler treats the Java code as the definition of the component, while the constraint automaton with memory is used as annotation that approximates the behavior the the Java component. Although the current version of Reo simply ignores the constraint automaton representation of the buffer component, future versions of can use the constraint automaton for tools like deadlock detection.
 

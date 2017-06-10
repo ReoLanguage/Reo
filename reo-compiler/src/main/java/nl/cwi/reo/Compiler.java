@@ -16,7 +16,6 @@ import com.beust.jcommander.Parameter;
 
 import nl.cwi.reo.compile.CompilerType;
 import nl.cwi.reo.compile.LykosCompiler;
-import nl.cwi.reo.compile.PRCompiler;
 import nl.cwi.reo.compile.RBACompiler;
 import nl.cwi.reo.compile.components.Atomic;
 import nl.cwi.reo.compile.components.Component;
@@ -109,12 +108,6 @@ public class Compiler {
 	public CompilerType compilertype = CompilerType.DEFAULT;
 
 	/**
-	 * Semantics type of Reo connectors.
-	 */
-	@Parameter(names = { "-v", "--verbose" }, description = "show verbose output")
-	public boolean verbose = false;
-
-	/**
 	 * Message container.
 	 */
 	private final Monitor monitor = new Monitor();
@@ -164,7 +157,9 @@ public class Compiler {
 		long minutes = time / 60;
 		long seconds = time % 60;
 
-		System.out.println("Compilation time: " + String.format("%d:%02d", minutes, seconds));
+		// System.out.println("Compilation time: " + String.format("%d:%02d",
+		// minutes, seconds));
+
 		// Print all messages.
 		monitor.print();
 	}
@@ -191,7 +186,7 @@ public class Compiler {
 		default:
 			break;
 		}
-		
+
 		try {
 			File file = new File(outdir + File.separator + name + extension);
 			file.getParentFile().mkdirs();
@@ -201,7 +196,7 @@ public class Compiler {
 		} catch (IOException e) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -307,7 +302,8 @@ public class Compiler {
 		// TODO Partition the set of transitions
 		Set<Set<Transition>> partition = new HashSet<>();
 
-		partition.add(transitions);
+		if (!transitions.isEmpty())
+			partition.add(transitions);
 
 		// Generate a protocol component for each part in the transition
 		int n_protocol = 1;
@@ -402,14 +398,6 @@ public class Compiler {
 
 		if (program == null)
 			return;
-
-		if (verbose) {
-			System.out.println(program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate());
-			System.out.println(PRCompiler.toPR(program));
-			monitor.print();
-			// GraphCompiler.visualize(program);
-
-		}
 
 		/*
 		 * Compiler Settings
