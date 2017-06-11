@@ -10,10 +10,10 @@ defn      : ID '='? component ;
 
 // Components
 component : var                                                   # component_variable
-          | sign '{' (atom | source | atom source) '}'            # component_atomic
+          | sign '{' (atom | source | source atom) '}'            # component_atomic
           | sign multiset                                         # component_composite ;
 atom      : pa | cam | wa | sa | pr | sba | p | rba ;
-source    : lang=(JAVA | C) ':' STRING ;
+source    : lang=(JAVA | C) ':' STRING;
 
 // Multisets
 multiset  : instance                                              # multiset_constraint
