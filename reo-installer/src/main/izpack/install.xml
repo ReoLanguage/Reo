@@ -19,14 +19,14 @@
   </guiprefs>
 
    <resources>
-        <res id="ProcessPanel.Spec.xml" src="ProcessPanel.Spec.xml"/>
+<!--        <res id="ProcessPanel.Spec.xml" src="ProcessPanel.Spec.xml"/> -->
    </resources>
 
   <panels>
     <panel classname="TargetPanel"/>
     <panel classname="PacksPanel"/>
     <panel classname="InstallPanel"/>
-    <panel classname="ProcessPanel"/>
+<!--    <panel classname="ProcessPanel"/>-->
     <panel classname="FinishPanel"/>
   </panels>
  
@@ -38,21 +38,18 @@
       <fileset dir="examples" targetdir="${INSTALL_PATH}/workspace/examples"/>
       <fileset dir="workers" targetdir="${INSTALL_PATH}/workspace/workers"/>
       <file src="reo-1.0.jar" targetdir="${INSTALL_PATH}/bin" override="true" />
-      <file src=".reosource" targetdir="${INSTALL_PATH}" override="true" />
-<!--      <singlefile src="lib/reo-1.0.jar" target="${INSTALL_PATH}/bin/reo.jar" override="true" />-->
-      <file src="installer.sh" targetdir="$INSTALL_PATH" override="true" />
-      <executable targetfile="$INSTALL_PATH/installer.sh" stage="never" keep="true">
+      <file src="installer.sh" os="unix" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/installer.sh" stage="postinstall" keep="false">
           <os family="unix" />
       </executable>
-      <file src="installer.bat" targetdir="$INSTALL_PATH" override="true" />
-      <executable targetfile="$INSTALL_PATH/installer.bat" stage="never" keep="true">
+      <file src="installer.sh" os="mac" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/installer.sh" stage="postinstall" keep="false">
+          <os family="mac" />
+      </executable>
+      <file src="installer.bat" os="windows" targetdir="$INSTALL_PATH" override="true" />
+      <executable targetfile="$INSTALL_PATH/installer.bat" stage="postinstall" keep="false">
           <os family="windows" />
       </executable>
-      <file src="permanent_settings.bat" targetdir="$INSTALL_PATH" override="true" />
-      <executable targetfile="$INSTALL_PATH/permanent_settings.bat" stage="never" keep="true">
-          <os family="windows" />
-      </executable>
-
     </pack>
   </packs>
 
