@@ -50,14 +50,14 @@ public class Node implements Variable  {
 		return p.isInput();
 	}
 	
-	public boolean isVoid(){
-		if(p.getName().length()>4){
-			String s = p.getName().substring(0,4);
-			return s.equals("null")?true:false;
-		}
-		else
-			return false;
-	}
+//	public boolean isVoid(){
+//		if(p.getName().length()>4){
+//			String s = p.getName().substring(0,4);
+//			return s.equals("null")?true:false;
+//		}
+//		else
+//			return false;
+//	}
 
 	@Override
 	public Term Substitute(Term t, Variable x) {

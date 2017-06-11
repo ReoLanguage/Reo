@@ -41,12 +41,16 @@ import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
+import nl.cwi.reo.semantics.hypergraphs.HyperEdge;
 import nl.cwi.reo.semantics.hypergraphs.Rule;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
+import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemCell;
+import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.Node;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.util.Message;
@@ -293,9 +297,27 @@ public class Compiler {
 
 			// Hide all internal ports
 			Formula f = rule.getFormula();
+			Set<Port> pNegSet = new HashSet<>();
 			for (Port p : rule.getAllPorts())
-				if (!intface.contains(p))
+				if (!intface.contains(p)){
 					f = new Existential(new Node(p), f).QE();
+//					if(!rule.getSync().get(p)){
+//						for(HyperEdge h : circuit.getHyperedges(p)){
+//							for(Port pNeg : h.getRule().getFiringPorts()){
+//								if(intface.contains(pNeg) && !pNegSet.contains(pNeg)){
+//									f = new Conjunction(Arrays.asList(f, new Equality(new Node(pNeg),new Function("*",null))));
+//									pNegSet.add(pNeg);
+//								}
+//							}
+//						}
+//					}
+				}
+				else{
+					if(rule.getSync().get(p))
+						f = new Conjunction(Arrays.asList(f, new Negation(new Equality(new Node(p),new Function("*",null)))));
+					else
+						f = new Conjunction(Arrays.asList(f, new Equality(new Node(p),new Function("*",null))));						
+				}
 
 			// Commandify the formula:
 			Transition t = RBACompiler.commandify(f);

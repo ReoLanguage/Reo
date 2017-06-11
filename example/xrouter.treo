@@ -1,6 +1,6 @@
 import reo.sync;
 import reo.syncdrain;
-import lossy;
+import reo.lossy;
 
 xrouter(in, out[1..n]) {
   sync(in, s) syncdrain(s, m)

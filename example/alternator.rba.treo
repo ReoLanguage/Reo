@@ -17,12 +17,12 @@ syncdrain(a?,b?){
 
 producer(a!String) {
 	#RBA {a} true
-	Java:"Workers2.producer"
+	Java:"nl.cwi.reo.components.Workers2.producer"
 }
 
 consumer(a?String) {
 	#RBA {a} true
-	Java:"Workers2.consumer"
+	Java:"nl.cwi.reo.components.Workers2.consumer"
 }
 
 alternator() {
@@ -32,6 +32,6 @@ alternator() {
 	{ producer(a[i])   | i : <1..(N+1)> }
 	consumer(b[1])
   |
-	N=5000
+	N=10
 }
 

@@ -1,0 +1,31 @@
+import reo.fifo1;
+import reo.lossy;
+import reo.fifofull;
+import reo.syncdrain;
+import reo.sync;
+
+producer(a!String) {
+	#RBA {a} true
+	Java:"Workers2.producer"
+}
+
+consumer(a?String) {
+	#RBA {a} true
+	Java:"Workers2.consumer"
+}
+
+
+earlyAsyncOutSequencer(){
+
+	producer(a)
+	fifo1(a,b)
+	syncdrain(b,d)
+
+	{ lossy(b,c[i]) sync(c[i],d) sync(c[i],e[i]) syncdrain(e[i],f[i+1]) consumer(e[i]) | i:<1..(N+1)> }
+
+	{ fifo1(f[i+1],f[i+2]) | i:<1..N> }
+	 fifofull<"">(f[1],f[2])
+	 sync(f[N+2],f[1])
+|
+ 	N=10
+}
