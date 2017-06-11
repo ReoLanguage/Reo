@@ -9,12 +9,12 @@ xrouter(in, out[1..n]) {
 }
 
 
-testxrouter(a?,b!){
+testxrouter(a?,b!,c!){
 //	sync(m,b)
 //	lossy(a,m)sync(m,d)
 //	syncdrain(a,d)
 //	lossy(a,y)sync(y,d)
 //	sync(y,c)
 	sync(a,x)xrouter(x,b,c)
-//	sync(a,x)lossy(x,b)
+//	sync(a,x)lossy(x,y)sync(y,b)
 }

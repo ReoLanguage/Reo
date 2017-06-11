@@ -16,13 +16,13 @@ syncdrain(a?,b?){
 }
 
 producer(a!String) {
-	#RBA {a} true
 	Java:"nl.cwi.reo.components.Workers2.producer"
+	#RBA {a} true
 }
 
 consumer(a?String) {
-	#RBA {a} true
 	Java:"nl.cwi.reo.components.Workers2.consumer"
+	#RBA {a} true
 }
 
 alternator() {

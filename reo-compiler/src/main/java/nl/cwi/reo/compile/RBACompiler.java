@@ -93,7 +93,8 @@ public class RBACompiler {
 								guards.add(l);
 								literalsToRemove.add(l);
 							}
-							if ((t1 instanceof Node && !((Node)t1).getPort().isInput())) {
+							if ((t1 instanceof Node )){//&& !((Node)t1).getPort().isInput())) {
+								if(allInputPorts.contains(((Node)t1).getPort())) allInputPorts.remove(((Node)t1).getPort());
 								guards.add(l);
 								literalsToRemove.add(l);
 							}

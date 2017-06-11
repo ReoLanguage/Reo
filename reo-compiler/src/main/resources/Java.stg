@@ -174,7 +174,11 @@ guard(t) ::= <<
 >>
 
 formula(f) ::= <<
-<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)><f.LHS:guardTerm()> == <f.RHS:guardTerm()><elseif(f.relation)><f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif><elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(f.disjunction)>(<f.clauses:formula(); separator=" || ">)<endif>
+<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)><f:equality()><elseif(f.relation)><f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif><elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(f.disjunction)>(<f.clauses:formula(); separator=" || ">)<endif>
+>>
+
+equality(f) ::= <<
+<if(f.LHS.node)><if(!f.RHS.constant.value)>!<f.LHS.name>.hasGet()<else><f.LHS:guardTerm()> == <f.RHS:guardTerm()><endif><else><f.LHS:guardTerm()> == <f.RHS:guardTerm()><endif>
 >>
 
 guardTerm(t) ::= <<
