@@ -81,19 +81,21 @@ A colon (``:``) after a node ``a`` indicates that its component uses ``a`` both 
 2. Definition of formal semantics
 ---------------------------------
 
-Second, we can define a component by defining its behavior in a formal semantics, such as *constraint automaton with memory*:
+Second, we can define a component by defining its behavior in a formal semantics.
 
 .. code-block:: text
    
 	// buffer.treo
-	buffer(a?String,b!String) {
-	   q0 -> q1 : {a}, x' == a 
-	   q1 -> q0 : {b}, b == x
+	buffer<init:String>(a?String,b!String) {
+	   #RBA
+	   $m=init
+	   {a, ~b} $m = null, $m' = a
+	   {~a, b} $m != null, b = $m, $m' = null
 	}
 
-This constraint automaton has two states, q0 and q1, and one memory cell, x. 
-In q0, the buffer can perform an I/O operation on port a, indicated by the synchronization constraint {a}, and assign the observed value at a to the next value of memory cell x.
-In q1, the buffer can perform an I/O operation on port b, indicated by the synchronization constraint {b}, and assign the current value in memory cell x to port b.
+The buffer consists of a single memory cell m, whose initial value is given by init.
+If the buffer is empty ($m = null), it can perform an I/O operation on port a and blocks port b (indicated by the synchronization constraint {a, ~b}) and assign the observed value at a to the next value of memory cell $m'.
+If the buffer is full ($m != null), it can perform an I/O operation on port b and block  port a (indicated by the synchronization constraint {~a, b}) and assign the current value in memory cell m to port b, and clears the value of m ($m' = null).
 
 We can define a component as a Java component and a constraint automaton with memory simultaniously:
 
@@ -102,8 +104,10 @@ We can define a component as a Java component and a constraint automaton with me
 	// buffer.treo
 	buffer(a?,b!) {
 	   Java: "MyClass.myBuffer"
-	   q0 -> q1 : {a}, x' == a 
-	   q1 -> q0 : {b}, b == x  
+	   #RBA
+	   $m=init
+	   {a, ~b} $m = null, $m' = a
+	   {~a, b} $m != null, b = $m, $m' = null
 	}
 
 In this case, the Reo compiler treats the Java code as the definition of the component, while the constraint automaton with memory is used only as annotation.
@@ -121,13 +125,15 @@ The most expressive way to define a component in Reo is via composition.
    
 	// buffer2.treo
 	buffer2(a?,b!) {
-	   buffer(a,x)
-	   buffer(x,b)
+	   buffer<"*">(a,x)
+	   buffer<"*">(x,b)
 	}
 
-	buffer(a?String,b!String) {
-	   q0 -> q1 : {a}, x' == a 
-	   q1 -> q0 : {b}, b == x
+	buffer<init:String>(a?String,b!String) {
+	   #RBA
+	   $m=init
+	   {a, ~b} $m = null, $m' = a
+	   {~a, b} $m != null, b = $m, $m' = null
 	}
 
 This Reo program defines an atomic buffer component and a composite buffer2 component.
