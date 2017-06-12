@@ -13,20 +13,17 @@ component : var                                                   # component_va
           | sign '{' (atom | source | source atom) '}'            # component_atomic
           | sign multiset                                         # component_composite ;
 atom      : pa | cam | wa | sa | pr | sba | p | rba ;
-source    : lang=(JAVA | C) ':' STRING;
+source    : lang=(JAVA | C11) ':' STRING;
 
 // Multisets
 multiset  : instance                                              # multiset_constraint
-          | term? '{' (multiset)* ('|' formula)? '}'                # multiset_setbuilder
-          | multiset '+' multiset                                 # multiset_else
-          | multiset '-' multiset                                 # multiset_without ;
-//          | 'for' ID '=' term '..' term multiset                  # multiset_iteration
-//          | 'if' formula multiset ('else' formula multiset)* 
-//          ('else' multiset)?                                      # multiset_condition ;
+          | term? '{' multiset* ('|' formula)? '}'                # multiset_setbuilder
+          | 'for' ID '=' term '..' term multiset                  # multiset_iteration
+          | 'if' formula multiset ('else' formula multiset)* 
+          ('else' multiset)?                                      # multiset_condition ;
 
 // Instances
 instance  : component list? ports                                 # instance_atomic
-//          | instance term instance                                # instance_composition
           | instance '*' instance                                 # instance_product
           | instance '+' instance                                 # instance_sum	
           | instance ';' instance                                 # instance_semicolon;
