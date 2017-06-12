@@ -2,7 +2,7 @@ main(S) ::= <<
 /**
  * Generated from <S.file> by Reo 1.0.
  */
-<! <S.package:package(); separator="\n"> !>
+<S.package:package(); separator="\n">
 import java.util.List;
 import java.util.ArrayList;
 
@@ -12,11 +12,12 @@ public class <S.name> {
 
 	public static void main(String[] args) {
     	
-    	List\<Port\<String\>> list = new ArrayList\<>();
+		List\<Port\<String\>> list = new ArrayList\<>();
     	
 		<S.ports:newPort(); separator="\n">
 		
 		<S.components:newComponentAtomic(); separator="\n">
+		
 		<S.components:newComponentProtocol(); separator="\n">
 	
 		<S.components:newThread(); separator="\n"> 
@@ -45,8 +46,9 @@ Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
 newComponentAtomic(c) ::= <<
 <if(c.atomic)>Component <c.name> = new <c.name>(<c.ports:{p|<p.name>}; separator=", ">);<endif>
 >>
+
 newComponentProtocol(c) ::= <<
-<if(c.atomic)><else>    	<c.ports:{p | list.add(<p.name>);}; separator="\n">
+<if(!c.atomic)><c.ports:{p | list.add(<p.name>);}; separator="\n">
 Component <c.name> = new <c.name>(list);<endif>
 >>
 
@@ -105,13 +107,13 @@ public void run() {
 	int i = 0;
 	int j = 0;
 	int s = rules.length;
+	
 	while (true) {
-
-		rules[(i+j)%s].fire();			
-
-		i=(i+1)%s;
-		if(i==0)
-			j=(j+1)%s;
+		rules[(i+j) % s].fire();			
+		
+		i = (i+1) % s;
+		if (i == 0)
+			j = (j+1) % s;
 		
 		synchronized (this) {
 			while(true) {
@@ -142,7 +144,7 @@ memorycell(c) ::= <<
 
 constructor(c) ::= <<
 <if(c.atomic)>
-public <c.name>(<c.ports:{p | Port\<<p.typeTag>\> <p.name>}; separator=", ">) {
+public <c.name>(<c.ports:{p | Port\<<p:typetag()>\> <p.name>}; separator=", ">) {
 	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
 	<c.ports:{p | this.<p.name> = <p.name>;}; separator="\n">
 	activate();
@@ -161,11 +163,13 @@ if (<guard(t); wrap, anchor>) break;
 >>
 
 transition(t) ::= <<
-new Rule() { public void fire() { 
-if (<guard(t); wrap, anchor>) {
-	<action(t)>
-}
-} },
+new Rule() { 
+	public void fire() { 
+		if (<guard(t); wrap, anchor>) {
+			<action(t)>
+		}
+	}
+},
 >>
 
 guard(t) ::= <<
@@ -178,11 +182,7 @@ formula(f) ::= <<
 >>
 
 equality(f) ::= <<
-<if(f.LHS.node)><if(!f.RHS.constant.value)>!<f.LHS.name>.hasGet()<else><f.LHS:guardTerm()> == <f.RHS:guardTerm()><endif><else><f.LHS:guardTerm()> == <f.RHS:guardTerm()><endif>
->>
-
-guardTerm(t) ::= <<
-<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.peek()<elseif(t.memory)><t.name><else><t.name><endif>
+<if(f.LHS.node)><if(!f.RHS.constant.value)>!<f.LHS.name>.hasGet()<else><f.LHS:term()> == <f.RHS:term()><endif><else><f.LHS:term()> == <f.RHS:term()><endif>
 >>
 
 term(t) ::= <<

@@ -1,20 +1,10 @@
 package nl.cwi.reo.compile.components;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
-
-import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.ports.Port;
 
 public final class ReoTemplate {
@@ -58,25 +48,5 @@ public final class ReoTemplate {
 
 	public List<Component> getComponents() {
 		return components;
-	}
-
-	public String generateCode(Language L) {
-		STGroup group = null;
-		
-		switch (L) {
-		case JAVA:
-			group = new STGroupFile("Java.stg");
-			break;
-		case MAUDE:
-			group = new STGroupFile("Maude.stg");
-			break;
-		default:
-			return "";
-		}
-
-		ST temp = group.getInstanceOf("main");
-		temp.add("S", this);
-
-		return temp.render(72);
 	}
 }

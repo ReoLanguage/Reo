@@ -1,5 +1,5 @@
-Reo Tutorial
-============
+Tutorial
+========
 
 Components and interfaces
 -------------------------

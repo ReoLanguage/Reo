@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
+
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
@@ -69,11 +73,10 @@ public class Compiler {
 	private List<String> files = new ArrayList<String>();
 
 	/**
-	 * List of parameters for the main component.
+	 * Compiler type.
 	 */
-	@Parameter(names = { "-p",
-			"--params" }, variableArity = true, description = "list of parameters to instantiate the main component")
-	public List<String> params = new ArrayList<String>();
+	@Parameter(names = { "-c", "--compiler" }, description = "compiler")
+	public CompilerType compilertype = CompilerType.DEFAULT;
 
 	/**
 	 * List of of directories that contain all necessary Reo components
@@ -83,17 +86,30 @@ public class Compiler {
 	private List<String> directories = new ArrayList<String>();
 
 	/**
+	 * List of available options.
+	 */
+	@Parameter(names = { "-h", "--help" }, description = "lists all available options", help = true)
+	private boolean help;
+
+	/**
 	 * List of provided Reo source files.
 	 */
 	@Parameter(names = { "-o", "--output-dir" }, description = "output directory")
 	private String outdir = ".";
 
 	/**
+	 * List of parameters for the main component.
+	 */
+	@Parameter(names = { "-p",
+			"--params" }, variableArity = true, description = "list of parameters to instantiate the main component")
+	public List<String> params = new ArrayList<String>();
+
+	/**
 	 * Package
 	 */
 	@Parameter(names = { "-pkg", "--package" }, description = "target code package")
-	private String packagename = "";
-
+	private String packagename;
+	
 	/**
 	 * Partitioning
 	 */
@@ -101,16 +117,11 @@ public class Compiler {
 	private boolean partitioning = false;
 
 	/**
-	 * List of available options.
+	 * Target language.
 	 */
-	@Parameter(names = { "-h", "--help" }, description = "show all available options", help = true)
-	private boolean help;
-
-	/**
-	 * Semantics type of Reo connectors.
-	 */
-	@Parameter(names = { "-c", "--compiler" }, description = "Select the correct compiler")
-	public CompilerType compilertype = CompilerType.DEFAULT;
+	@Parameter(names = { "-t",
+			"--target" }, variableArity = true, description = "target language")
+	public Language lang = Language.JAVA;
 
 	/**
 	 * Message container.
@@ -123,7 +134,8 @@ public class Compiler {
 			JCommander jc = new JCommander(compiler, args);
 			jc.setProgramName("reo");
 			if (compiler.files.size() == 0) {
-				jc.usage();
+				System.out.println("Reo compiler v1.0.0");
+				System.out.println("Developed at CWI Amsterdam");
 			} else {
 				compiler.run();
 			}
@@ -391,21 +403,28 @@ public class Compiler {
 
 		// Generate Java code from the template
 		Language L = Language.JAVA;
-		String code = template.generateCode(L);
-		
-		// Write the code to a file
+		STGroup group = null;
 		String extension = "";
+		
 		switch (L) {
 		case JAVA:
+			group = new STGroupFile("Java.stg");
 			extension = ".java";
 			break;
 		case MAUDE:
+			group = new STGroupFile("Maude.stg");
 			extension = ".maude";
 			break;
 		default:
 			break;
 		}
 
+		ST stringtemplate = group.getInstanceOf("main");
+		stringtemplate.add("S", template);
+	
+		String code = stringtemplate.render(72);
+		
+		// Write the code to a file
 		try {
 			File file = new File(outdir + File.separator + program.getName() + extension);
 			file.getParentFile().mkdirs();

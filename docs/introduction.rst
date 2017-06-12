@@ -1,5 +1,5 @@
-Introduction to Reo
-===================
+Introduction
+============
 
 A simple concurrent program
 ---------------------------
@@ -167,35 +167,36 @@ The first step consist of isolating the computation that is done in each process
 To this end, we create a Java class in ``Processes.java`` that contains the a method for each original process:
 
 .. code-block:: java
-
-	import nl.cwi.pr.runtime.api.InputPort;
-	import nl.cwi.pr.runtime.api.OutputPort;
+	
+	import nl.cwi.reo.runtime.Input;
+	import nl.cwi.reo.runtime.Output;
 
 	public class Processes {
 
-		public static void Red(OutputPort port) {
-			while (true) {
-				for (int i = 0; i < 30000000; ++i);
-				Object datum = "Hello, ";
-				port.putUninterruptibly(datum);
-			}
-		}
+	public static void Red(Output<String> port) {
+	   while (true) {
+	      for (int i = 0; i < 30000000; ++i);
+	      String datum = "Hello, ";
+	      port.put(datum);
+	   }
+	}
 
-		public static void Green(OutputPort port) {
-			while (true) {
-				for (int i = 0; i < 50000000; ++i);
-				Object datum = "world!";
-				port.putUninterruptibly(datum);
-			}
-		}
+	public static void Green(Output<String> port) {
+	   while (true) {
+	      for (int i = 0; i < 50000000; ++i);
+	      String datum = "world! ";
+	      port.put(datum);
+	   }
+	}
 
-		public static void Blue(InputPort port) {
-			for (int k = 0; k < 10; ++k) {
-				for (int i = 0; i < 40000000; ++i);
-				Object datum = port.getUninterruptibly();
-				System.out.println(datum);
-			}
-		}
+	public static void Blue(Input<String> port) {
+	   for (int k = 0; k < 10; ++k) {
+	      for (int i = 0; i < 40000000; ++i);
+	         String datum = port.get();
+	         System.out.print(datum);
+	      }
+	   }
+	   System.exit(0);
 	}
 
 Note that the code of each Java method is completely independent of any other method, since no variables are explicitly shared.
@@ -210,15 +211,16 @@ In the next step, we declare the protocol by means of the Reo file called ``main
 	import reo.sync;
 	import reo.fifo1;
 
-	main = (){ red(a) green(b) blue(c) alternator(a, b, c) }
-
-	red = (a!){ #PR identity(a;) | Java:"Processes.Red" }
-
-	green = (a!){ #PR identity(a;) | Java:"Processes.Green" }
-
-	blue = (a?){ #PR identity(;a) | Java:"Processes.Blue" }
-
-	alternator = (a,b,c){ syncdrain(a, b) sync(b, x) fifo1(x, c) sync(a, c) }
+	// The main component
+	main(a,b,c) { red(a) green(b) blue(c) alternator(a,b,c) }
+	
+	// The atomic components
+	red(a!String) { Java: "Processes.Red" }
+	green(a!String) { Java: "Processes.Green" }
+	blue(a?String) { Java: "Processes.Blue" }
+	
+	// The alternator protocol
+	alternator(a,b,c) { syncdrain(a, b) sync(b, x) fifo1(x, c) sync(a, c) }
 
 This Reo file defines the main component, which is a set containing an instance of the Red, Green, and Blue process, and an instance of the alternator protocol.
 The definition Red, Green, and Blue processes just refers to the Java source code from ``Processes.java``.
@@ -233,7 +235,7 @@ Next, change directory to where ``main.treo`` and ``Processes.java`` are located
 
 These commands respectively
 
-	(1) compile Reo code to Java source code (by generating ``Main.java`` and ``Protocol_Main.java``), 
+	(1) compile Reo code to Java source code (by generating ``main.java``), 
 	(2) compile Java source code to executable Java classes, and 
 	(3) execute the complete program.
 
