@@ -30,7 +30,7 @@ Contribute
 ----------
 If you wish to contribute to the development of Reo, use the following instructions to obtain your own copy of the source code:
 
-1. Install `Git <https://git-scm.com/downloads?`_.
+1. Install `Git <https://git-scm.com/downloads>`_.
 
 2. Install `Java SDK 1.6+ <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_. You can check if the correct version is already installed via ``java -version``.
 
