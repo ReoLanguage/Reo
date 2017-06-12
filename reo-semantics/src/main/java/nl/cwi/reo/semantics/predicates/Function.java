@@ -76,8 +76,10 @@ public class Function implements Term {
 	@Override
 	public Term Substitute(Term t, Variable x) {
 		List<Term> list = new ArrayList<Term>();
-		for (Term s : args)
-			list.add(s.Substitute(t, x));
+		if(args!=null){
+			for (Term s : args)
+				list.add(s.Substitute(t, x));
+		}
 		return new Function(name, value, list);
 	}
 
@@ -100,8 +102,11 @@ public class Function implements Term {
 	@Override
 	public Set<Variable> getFreeVariables() {
 		Set<Variable> vars = new HashSet<Variable>();
-		for (Term t : args) 
-			vars.addAll(t.getFreeVariables());
+		if(args!=null){
+			for (Term t : args) 
+				if(t != null)
+					vars.addAll(t.getFreeVariables());
+		}
 		return vars;
 	}
 

@@ -16,4 +16,5 @@ testxrouter(a?,b!,c!){
 //	lossy(a,y)sync(y,d)
 //	sync(y,c)
 	sync(a,x)xrouter(x,b,c)
+//	sync(a,x)lossy(x,y)sync(y,b)
 }

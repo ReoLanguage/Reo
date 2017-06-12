@@ -1,0 +1,22 @@
+import reo.fifo1;
+import reo.sync;
+
+producer(a!String) {
+	#RBA {a} true
+	Java:"Workers.producer"
+}
+
+consumer(a?String) {
+	#RBA {a} true
+	Java:"Workers.consumer"
+}
+
+
+earlyAsyncReplicator(c,a[1],a[2],a[3]){
+	fifo1(c,b)
+{
+	{ sync(b,a[i]) | i:<1..(N+1)> }
+|
+ 	N=3
+}
+}
