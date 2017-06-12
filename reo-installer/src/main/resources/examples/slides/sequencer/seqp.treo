@@ -1,0 +1,29 @@
+section slides.sequencer;
+
+import reo.fifo1;
+import reo.fifofull;
+import reo.sync;
+
+seqp(p[1..n]) {
+  {
+    fifo1(x[i], x[i+1])
+    sync(x[i+1], p[i])
+  | 
+    i : <2..n>
+  }
+  fifofull<0>(x[1], x[2])
+  sync(x[2],p[1])
+  sync(x[n+1], x[1])
+}
+
+
+
+
+
+
+
+
+
+
+
+

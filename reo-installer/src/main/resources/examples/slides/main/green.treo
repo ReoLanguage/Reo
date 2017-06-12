@@ -1,0 +1,6 @@
+section slides.main;
+
+green(a!) 
+{
+ Java:"workers.Producer.green"
+}

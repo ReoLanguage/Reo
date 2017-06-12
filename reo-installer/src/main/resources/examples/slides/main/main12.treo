@@ -1,0 +1,31 @@
+section slides.main;
+
+import reo.sync;
+import reo.syncdrain;
+
+import slides.main.red;
+import slides.main.green;
+import slides.main.blue;
+import slides.sequencer.seqp;
+
+main12() {
+  red(a) green(b) blue(c) connector12(a, b, c)
+}
+
+connector12(a, b, c) {
+  seqp(x, y, z) sync(a, a1) sync(b, b1) sync(a1, c) sync(b1, c) 
+  syncdrain(a1, a2) syncdrain(b1, z) sync(x, a2) sync(y, a2)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

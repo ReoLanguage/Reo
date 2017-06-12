@@ -35,8 +35,7 @@
       <description>The Reo compiler</description>
       <singlefile src="lib/reo-runtime-java.jar" target="${INSTALL_PATH}/bin/reo-runtime-java.jar" override="true" />
       <singlefile src="lib/reo-runtime-java-lykos.jar" target="${INSTALL_PATH}/bin/reo-runtime-java-lykos.jar" override="true" />
-      <fileset dir="examples" targetdir="${INSTALL_PATH}/workspace/examples"/>
-      <fileset dir="workers" targetdir="${INSTALL_PATH}/workspace/workers"/>
+      <fileset dir="examples" targetdir="${INSTALL_PATH}/examples"/>
       <file src="reo-1.0.jar" targetdir="${INSTALL_PATH}/bin" override="true" />
       <file src="installer.sh" os="unix" targetdir="$INSTALL_PATH" override="true" />
       <executable targetfile="$INSTALL_PATH/installer.sh" stage="postinstall" keep="false">
