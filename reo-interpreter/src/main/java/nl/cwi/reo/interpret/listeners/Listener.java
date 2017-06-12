@@ -82,9 +82,7 @@ import nl.cwi.reo.interpret.ReoParser.Instance_sumContext;
 import nl.cwi.reo.interpret.ReoParser.ListContext;
 import nl.cwi.reo.interpret.ReoParser.MultisetContext;
 import nl.cwi.reo.interpret.ReoParser.Multiset_constraintContext;
-import nl.cwi.reo.interpret.ReoParser.Multiset_elseContext;
 import nl.cwi.reo.interpret.ReoParser.Multiset_setbuilderContext;
-import nl.cwi.reo.interpret.ReoParser.Multiset_withoutContext;
 import nl.cwi.reo.interpret.ReoParser.NodeContext;
 import nl.cwi.reo.interpret.ReoParser.NodesContext;
 import nl.cwi.reo.interpret.ReoParser.ParamContext;
@@ -360,14 +358,6 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		if (P == null)
 			P = new TruthValue(true);
 		instances.put(ctx, new SetComposite<T>(name, operator, stmtlist, P, new Location(ctx.start, filename)));
-	}
-
-	@Override
-	public void exitMultiset_else(Multiset_elseContext ctx) {
-	}
-
-	@Override
-	public void exitMultiset_without(Multiset_withoutContext ctx) {
 	}
 
 	/**

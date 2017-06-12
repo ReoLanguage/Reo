@@ -18,15 +18,12 @@ source    : lang=(JAVA | C) ':' STRING;
 // Multisets
 multiset  : instance                                              # multiset_constraint
           | term? '{' multiset* ('|' formula)? '}'                # multiset_setbuilder
-          | multiset '+' multiset                                 # multiset_else
-          | multiset '-' multiset                                 # multiset_without ;
-//          | 'for' ID '=' term '..' term multiset                  # multiset_iteration
-//          | 'if' formula multiset ('else' formula multiset)* 
-//          ('else' multiset)?                                      # multiset_condition ;
+          | 'for' ID '=' term '..' term multiset                  # multiset_iteration
+          | 'if' formula multiset ('else' formula multiset)* 
+          ('else' multiset)?                                      # multiset_condition ;
 
 // Instances
 instance  : component list? ports                                 # instance_atomic
-//          | instance term instance                                # instance_composition
           | instance '*' instance                                 # instance_product
           | instance '+' instance                                 # instance_sum	
           | instance ';' instance                                 # instance_semicolon;
