@@ -14,9 +14,9 @@ The compiler of the coordination language is able to optimize the actual impleme
 
 Installation
 ------------
-1. Install `Java SDK 1.6+ <http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html>`_. You can check if the correct java version is installed by running ``java --version``.	
+1. Install `Java SDK 1.6+ <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_. You can check if the correct java version is installed by running ``java --version``.	
 
-2. Download and run the `reo-installer <https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-installer-1.0.jar>`_.
+2. Download and run the `installer <https://raw.githubusercontent.com/kasperdokter/Reo/master/reo-installer-1.0.jar>`_.
 
 3. Go to your installation directory and follow the step written in the README.
 
@@ -24,19 +24,19 @@ Installation
 
 Documentation
 -------------
-The documentation is available on http://reo.readthedocs.io/en/latest/
+The `Reo documentation <http://reo.readthedocs.io/en/latest/>`_ is available on `Read The Docs <https://readthedocs.org/>`_.
    
 Contribute
 ----------
 If you wish to contribute to the development of Reo, use the following instructions to obtain your own copy of the source code:
 
-1. Install Git. Available at https://git-scm.com/downloads.
+1. Install `Git <https://git-scm.com/downloads?`_.
 
-2. Install Java SDK 1.6+. Available at http://www.oracle.com/technetwork/java/javase/downloads/index.html. You can check if the correct version is already installed via ``java -version``
+2. Install `Java SDK 1.6+ <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_. You can check if the correct version is already installed via ``java -version``.
 
-3. Install Maven. Available at https://maven.apache.org/download.cgi.
+3. Install `Maven <https://maven.apache.org/download.cgi>`_.
 
-4. Install Eclipse. Available at https://www.eclipse.org/downloads/.
+4. Install `Eclipse <https://www.eclipse.org/downloads/>`_.
 
 5. Change directory to eclipse workspace ``cd ../workspace``
 
@@ -46,8 +46,8 @@ If you wish to contribute to the development of Reo, use the following instructi
 
 8. Build the project: ``mvn clean install``. 
 
-9. Generate Eclipse configuration: ``mvn eclipse:eclipse``
+9. Generate Eclipse configuration via ``mvn eclipse:eclipse``
 
 10. Import project to Eclipse: ``File > Import...``, select ``General > Existing Projects into Workspace``, hit ``Next``, select root directory and point to the cloned repository, hit ``Finish``.
 
-11. Start coding
+11. Start coding :)
