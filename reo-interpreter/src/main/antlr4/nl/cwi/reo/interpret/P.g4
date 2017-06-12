@@ -2,7 +2,7 @@ grammar P;
 
 import Tokens;
 
-p      : p_form ;
+p      : '#P' p_form ;
 
 p_form : '(' p_form ')'         #p_brackets     
        | 'forall' p_var p_form  #p_forall
