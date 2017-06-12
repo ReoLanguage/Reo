@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
+import nl.cwi.reo.interpret.ReoParser.Rba_trContext;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.RbaContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_boolContext;
@@ -84,6 +84,19 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 			s.add(rules.get(rbaContext));
 		}
 		automaton.put(ctx, new ConstraintHypergraph(s,initial));
+	}
+	
+	/*
+	 * State based rule :
+	 */
+	
+	public void exitRba_tr(Rba_trContext ctx) {
+//		Rule r = rules.get(ctx.rba_rule());
+//		rules.put(ctx, new Rule(r.getSync(), new Conjunction(r.getFormula(),new Equality(new MemCell(ctx.ID(0).getText(),false),new MemCell(ctx.ID(0).getText(),true)));
+//		State q1 = new State(ctx.ID(0).getText());
+//		State q2 = new State(ctx.ID(1).getText());
+//		SortedSet<Port> sc = scs.get(ctx.pa_sc());
+//		transitions.put(ctx, new Transition<NullLabel>(q1, q2, sc, new NullLabel()));	
 	}
 
 	/*

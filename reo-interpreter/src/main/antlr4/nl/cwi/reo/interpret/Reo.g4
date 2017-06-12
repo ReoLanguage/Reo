@@ -17,7 +17,7 @@ source    : lang=(JAVA | C) ':' STRING;
 
 // Multisets
 multiset  : instance                                              # multiset_constraint
-          | term? '{' multiset* ('|' formula)? '}'                # multiset_setbuilder
+          | term? '{' (multiset)* ('|' formula)? '}'                # multiset_setbuilder
           | multiset '+' multiset                                 # multiset_else
           | multiset '-' multiset                                 # multiset_without ;
 //          | 'for' ID '=' term '..' term multiset                  # multiset_iteration

@@ -408,19 +408,21 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			List<HyperEdge> multiEdge = new ArrayList<>();
 
 			multiEdge.addAll(getHyperedges(p));
-			HyperEdge toDistribute = multiEdge.get(0);
-			multiEdge.remove(0);
-			boolean mult = false;
-			for (HyperEdge h : multiEdge) {
-				if (!h.getLeaves().isEmpty()) {
-					toDistribute = h.compose(toDistribute);
-					mult = true;
+			if(!multiEdge.isEmpty()){
+				HyperEdge toDistribute = multiEdge.get(0);
+				multiEdge.remove(0);
+				boolean mult = false;
+				for (HyperEdge h : multiEdge) {
+					if (!h.getLeaves().isEmpty()) {
+						toDistribute = h.compose(toDistribute);
+						mult = true;
+					}
 				}
-			}
-			if (mult) {
-				Set<HyperEdge> s = new HashSet<>(hyperedges);
-				hyperedges.clear();
-				hyperedges.addAll(s);
+				if (mult) {
+					Set<HyperEdge> s = new HashSet<>(hyperedges);
+					hyperedges.clear();
+					hyperedges.addAll(s);
+				}
 			}
 		}
 	}
