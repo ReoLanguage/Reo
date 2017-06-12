@@ -106,6 +106,7 @@
       <plugin>
         <groupId>org.codehaus.izpack</groupId>
         <artifactId>izpack-maven-plugin</artifactId>
+	<version>5.1.1</version>
         <executions>
           <execution>
             <phase>package</phase>

@@ -135,8 +135,6 @@ public class Compiler {
 
 	public void run() {
 
-		long t0 = System.nanoTime();
-
 		// Get the root locations of Reo source files and libraries.
 		directories.add(".");
 		String comppath = System.getenv("COMPATH");
@@ -156,53 +154,8 @@ public class Compiler {
 			break;
 		}
 
-		long t1 = System.nanoTime();
-
-		long time = (t1 - t0) / 1000000000;
-		long minutes = time / 60;
-		long seconds = time % 60;
-
-		// System.out.println("Compilation time: " + String.format("%d:%02d",
-		// minutes, seconds));
-
 		// Print all messages.
 		monitor.print();
-	}
-
-	/**
-	 * Writes code to a file in the specified output directory.
-	 * 
-	 * @param name
-	 *            file name with extension
-	 * @param code
-	 *            content of the file
-	 * @return <code>true</code> if the files are successfully written.
-	 */
-	public boolean write(String name, String code, Language L) {
-
-		String extension = "";
-		switch (L) {
-		case JAVA:
-			extension = ".java";
-			break;
-		case MAUDE:
-			extension = ".maude";
-			break;
-		default:
-			break;
-		}
-
-		try {
-			File file = new File(outdir + File.separator + name + extension);
-			file.getParentFile().mkdirs();
-			FileWriter out = new FileWriter(file);
-			out.write(code);
-			out.close();
-		} catch (IOException e) {
-			return false;
-		}
-
-		return true;
 	}
 
 	private void compile() {
@@ -439,7 +392,27 @@ public class Compiler {
 		// Generate Java code from the template
 		Language L = Language.JAVA;
 		String code = template.generateCode(L);
-		write(program.getName(), code, L);
+		
+		// Write the code to a file
+		String extension = "";
+		switch (L) {
+		case JAVA:
+			extension = ".java";
+			break;
+		case MAUDE:
+			extension = ".maude";
+			break;
+		default:
+			break;
+		}
+
+		try {
+			File file = new File(outdir + File.separator + program.getName() + extension);
+			file.getParentFile().mkdirs();
+			FileWriter out = new FileWriter(file);
+			out.write(code);
+			out.close();
+		} catch (IOException e) { }
 	}
 
 	private void compilePR() {

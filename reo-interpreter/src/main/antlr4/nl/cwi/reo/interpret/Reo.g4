@@ -13,7 +13,7 @@ component : var                                                   # component_va
           | sign '{' (atom | source | source atom) '}'            # component_atomic
           | sign multiset                                         # component_composite ;
 atom      : pa | cam | wa | sa | pr | sba | p | rba ;
-source    : lang=(JAVA | C) ':' STRING;
+source    : lang=(JAVA | C11) ':' STRING;
 
 // Multisets
 multiset  : instance                                              # multiset_constraint
