@@ -9,4 +9,4 @@ Installation
 
 3. Go to your installation directory and follow the step written in the README.
 
-3. Test the installation by running ``reo``.
+4. Test the installation by running ``reo``.
