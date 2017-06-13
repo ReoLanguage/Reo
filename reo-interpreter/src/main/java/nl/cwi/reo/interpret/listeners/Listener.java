@@ -283,7 +283,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	public void exitComponent_atomic(Component_atomicContext ctx) {
 		SignatureExpression sign = signatureExpressions.get(ctx.sign());
 		String name = componentnames.get(ctx);
-		
+
 		// Get the atomic semantics.
 		T atom = null;
 		if (ctx.atom() != null) {
@@ -292,7 +292,7 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 				m.add("Incorrect semantics specified.");
 			}
 		}
-		
+
 		// Get the source code reference
 		Reference s = null;
 		if (ctx.source() != null) {
@@ -313,13 +313,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		} else {
 			s = new Reference();
 		}
-		
+
 		components.put(ctx, new ComponentDefinition<T>(sign, new SetAtom<T>(name, atom, s)));
 	}
 
 	@Override
 	public void exitSource(SourceContext ctx) {
-		
+
 	}
 
 	@Override
@@ -369,13 +369,11 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		ComponentExpression<T> cexpr = components.get(ctx.component());
 		List<TermExpression> list = termsList.get(ctx.list());
 		if (list == null)
-			list = new ArrayList<TermExpression>();
+			list = new ArrayList<>();
 
-		List<PortExpression> v = new ArrayList<PortExpression>();
-
-		for (PortExpression p : portlists.get(ctx.ports())) {
+		List<PortExpression> v = new ArrayList<>();
+		for (PortExpression p : portlists.get(ctx.ports()))
 			v.add(p);
-		}
 		PortListExpression var = new PortListExpression(v);
 		instances.put(ctx, new ComponentInstance<T>(cexpr, new ListExpression(list), var));
 	}
@@ -424,13 +422,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	@Override
 	public void exitFormula_structdefn(Formula_structdefnContext ctx) {
-		List<ParameterExpression> params = new ArrayList<ParameterExpression>();
+		List<ParameterExpression> params = new ArrayList<>();
 		for (ParamContext p : ctx.param())
 			params.add(parameters.get(p));
-		SignatureExpression sign = new SignatureExpression(params, new ArrayList<NodeExpression>(),
+		SignatureExpression sign = new SignatureExpression(params, new ArrayList<>(),
 				new Location(ctx.start, filename));
 		SetExpression<T> set = new SetComposite<T>();
-		VariableExpression var = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(),
+		VariableExpression var = new VariableExpression(ctx.ID().getText(), new ArrayList<>(),
 				new Location(ctx.ID().getSymbol(), filename));
 		TermExpression te1 = new VariableTermExpression(var);
 		TermExpression te2 = new ComponentTermExpression<T>(new ComponentDefinition<T>(sign, set));
@@ -525,10 +523,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	@Override
 	public void exitSign(SignContext ctx) {
 
-		List<NodeExpression> nodes = new ArrayList<NodeExpression>();
+		List<NodeExpression> nodes = new ArrayList<>();
 		for (NodeExpression n : nodelists.get(ctx.nodes()))
 			nodes.add(n);
-		List<ParameterExpression> parameters = new ArrayList<ParameterExpression>();
+		List<ParameterExpression> parameters = new ArrayList<>();
 		if (ctx.params() != null)
 			for (ParameterExpression p : parameterlists.get(ctx.params()))
 				parameters.add(p);

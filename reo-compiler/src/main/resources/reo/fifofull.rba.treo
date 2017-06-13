@@ -1,6 +1,6 @@
 section reo;
 
-fifofull<k:string>(a?,b!) {
+fifofull<k:String>(a?,b!) {
 	#RBA
 	$m=k
 	{a, ~b} $m = null, $m' = a

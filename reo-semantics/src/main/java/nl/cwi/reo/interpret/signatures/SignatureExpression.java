@@ -64,24 +64,24 @@ public final class SignatureExpression implements ParameterType {
 		this.nodes = nodes;
 		this.location = location;
 	}
-	
+
 	/**
 	 * Gets the list of parameters in this signature.
+	 * 
 	 * @return list of parameters
 	 */
 	public List<ParameterExpression> getParameters() {
 		return this.params;
 	}
 
-	public Set<Identifier> getParams(){
+	public Set<Identifier> getParams() {
 		Set<Identifier> l = new HashSet<Identifier>();
-		for(ParameterExpression exp : params){
+		for (ParameterExpression exp : params) {
 			l.addAll(exp.getVariables());
 		}
 		return l;
 	}
-	
-	
+
 	/**
 	 * Evaluates this interface for a given list of parameter values and a given
 	 * list of ports.
@@ -147,24 +147,39 @@ public final class SignatureExpression implements ParameterType {
 			Parameter x = param.next();
 			Object v = value.next();
 
-			if (v instanceof Value) {
-				s.put(x, (Value) v);
-			} else if (v instanceof String) {
-				String t = "";
-				if (x.getType() instanceof TypeTag)
-					t = ((TypeTag)x.getType()).toString();
+			if (x.getType() instanceof TypeTag) {
+				String t = ((TypeTag) x.getType()).toString();
 				
-				if (t.equals("int") || t.equals("Integer"))
-					s.put(x, new IntegerValue(Integer.parseInt((String)v)));
-				else if (t.equals("double") || t.equals("Double"))
-					s.put(x, new DecimalValue(Double.parseDouble((String)v)));
-				else if (t.equals("string") || t.equals("String"))
-					s.put(x, new StringValue((String)v));
-				else 
-					m.add(location, "Failed to cast parameter " + s + " to " + t);
-			} else {
-				m.add(location, "Term " + v + " has undefined type.");
-				return null;
+				if (v instanceof Value) {
+					Value val = (Value) v;
+					if ((t.equals("int") || t.equals("Integer")) && val instanceof IntegerValue)
+						s.put(x, val);
+					else if ((t.equals("double") || t.equals("Double")) && val instanceof DecimalValue)
+						s.put(x, new DecimalValue(Double.parseDouble((String) v)));
+					else if ((t.equals("string") || t.equals("String")) && val instanceof StringValue)
+						s.put(x, new StringValue((String) v));
+					else {
+						m.add(location, "Value assigned to " + x + " is of wrong type.");
+						return null;
+					}
+				} else if (v instanceof String) {
+					String str = (String) v;
+					if (t.equals("int") || t.equals("Integer"))
+						s.put(x, new IntegerValue(Integer.parseInt(str)));
+					else if (t.equals("double") || t.equals("Double"))
+						s.put(x, new DecimalValue(Double.parseDouble(str)));
+					else if (t.equals("string") || t.equals("String"))
+						s.put(x, new StringValue(str));
+					else {
+						m.add(location, "Failed to cast parameter " + x + " to " + t + ".");
+						return null;
+					}
+				} else {
+					m.add(location, "Term " + v + " has undefined type.");
+					return null;
+				}
+			} else if (x.getType() instanceof SignatureExpression) {
+				//TODO type-checking for component values
 			}
 		}
 
@@ -213,17 +228,17 @@ public final class SignatureExpression implements ParameterType {
 			int size_nodes = ports.size() - k_nodes;
 
 			if (rng_nodes != null) {
-				if(rng_nodes.evaluate(s, new Monitor())!=null){
-					// This if statement evaluate a range with the parameter in the scope
-				}
-				else{
-				Scope defs = rng_nodes.findParamFromSize(size_nodes);
-				if (defs != null) {
-					s.putAll(defs);
+				if (rng_nodes.evaluate(s, new Monitor()) != null) {
+					// This if statement evaluate a range with the parameter in
+					// the scope
 				} else {
-					m.add(location, "Parameters in " + rng_nodes + " cannot be deduced from its length.");
-					return null;
-				}
+					Scope defs = rng_nodes.findParamFromSize(size_nodes);
+					if (defs != null) {
+						s.putAll(defs);
+					} else {
+						m.add(location, "Parameters in " + rng_nodes + " cannot be deduced from its length.");
+						return null;
+					}
 				}
 			} else {
 				if (size_nodes != 0) {

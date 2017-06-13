@@ -1,0 +1,5 @@
+section slides.main;
+
+blue(a?String) {
+  Java:"workers.Consumer.blue"
+}

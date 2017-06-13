@@ -23,7 +23,7 @@ public final class StringValue implements Value, TermExpression {
 	private String x;
 
 	/**
-	 * Constructs a new integer value.
+	 * Constructs a new string value.
 	 * 
 	 * @param x
 	 *            value

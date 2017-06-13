@@ -1,0 +1,8 @@
+
+import slides.regulatorwwr.regulatorwwr;
+import reo.syncdrain;
+import reo.sync;
+
+circ1(a?, b?, c?, d!) {
+ regulatorwwr(a, x, d) sync(b, x) sync(c, x)
+}
