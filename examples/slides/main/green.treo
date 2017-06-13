@@ -1,6 +1,6 @@
 section slides.main;
 
-green(a!) 
+green(a!String) 
 {
  Java:"nl.cwi.reo.components.Workers2.producer"
 }
