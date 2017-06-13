@@ -25,20 +25,82 @@
       <artifactId>reo-compiler</artifactId>
       <version>1.0</version>
     </dependency>
-    <dependency>
+     <dependency>
+      <groupId>nl.cwi.reo</groupId>
+      <artifactId>reo-runtime-java-lykos</artifactId>
+      <version>1.0</version>
+    </dependency>
+   <dependency>
       <groupId>nl.cwi.reo</groupId>
       <artifactId>reo-runtime-java</artifactId>
       <version>1.0</version>
     </dependency>
     <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+      <version>1.58</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.graphstream</groupId>
+      <artifactId>gs-core</artifactId>
+      <version>1.0</version>
+    </dependency>
+<!--
+    <dependency>
       <groupId>nl.cwi.reo</groupId>
-      <artifactId>reo-runtime-java-lykos</artifactId>
+      <artifactId>reo-interpreter</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>nl.cwi.reo</groupId>
+      <artifactId>reo-semantics</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>nl.cwi.reo</groupId>
+      <artifactId>reo-scheduler</artifactId>
+      <version>1.0</version>
+    </dependency>
+-->
+    <dependency>
+      <groupId>nl.cwi.reo</groupId>
+      <artifactId>reo-compiler-lykos</artifactId>
       <version>1.0</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>nl.cwi.reo.Compiler</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <finalName>reo-1.0</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <attach>false</attach>
+          <outputDirectory>${izpack.staging}/lib</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
