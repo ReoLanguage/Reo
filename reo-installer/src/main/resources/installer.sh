@@ -39,12 +39,12 @@ How to compile and run examples :
 ======
 Go to folder \"examples/slides/main\" and execute : 
 
-        >$  reo FILE.treo -cp ../.. -o OUTPUT_DIR 
+        >$  reo FILE.treo -cp ../..
 
-The option -cp indicate the classpath for reo dependencies. The option -o is the output directory.
-Moove to the OUTPUT_DIR and compile the file with : 
+The option -cp indicate the classpath for reo dependencies.
+Compile the file with : 
 
-        >$  javac OUTPUT_DIR/*.java 
+        >$  javac *.java 
 
 Note that if you are using external java classes, you should first compile those classes before compiling the generated code. 
 Run the application with : 
