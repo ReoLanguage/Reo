@@ -33,9 +33,10 @@
   <packs>
     <pack name="Compiler" required="yes">
       <description>The Reo compiler</description>
-      <singlefile src="lib/reo-runtime-java.jar" target="${INSTALL_PATH}/bin/reo-runtime-java.jar" override="true" />
-      <singlefile src="lib/reo-runtime-java-lykos.jar" target="${INSTALL_PATH}/bin/reo-runtime-java-lykos.jar" override="true" />
-      <file src="lib/reo-1.0.jar" targetdir="${INSTALL_PATH}/bin" override="true" />
+      <singlefile src="deps/reo-runtime-java.jar" target="${INSTALL_PATH}/bin/reo-runtime-java.jar" override="true" />
+      <singlefile src="deps/reo-runtime-java-lykos.jar" target="${INSTALL_PATH}/bin/reo-runtime-java-lykos.jar" override="true" />
+      <!--<file src="bin/reo-1.0.jar" targetdir="${INSTALL_PATH}/bin" override="true" />-->
+      <fileset dir="bin/" targetdir="${INSTALL_PATH}/bin"/>
       <fileset dir="examples" targetdir="${INSTALL_PATH}/examples"/>
       <file src="installer.sh" os="unix" targetdir="$INSTALL_PATH" override="true" />
       <executable targetfile="$INSTALL_PATH/installer.sh" stage="postinstall" keep="false">

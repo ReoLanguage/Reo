@@ -74,6 +74,7 @@
 
   <build>
     <plugins>
+       <!-- compose a jar with dependencies -->
        <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -86,10 +87,10 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <finalName>reo-1.0</finalName>
+          <finalName>reo-${project.parent.version}</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <attach>false</attach>
-          <outputDirectory>${izpack.staging}/lib</outputDirectory>
+          <outputDirectory>${izpack.staging}/bin</outputDirectory>
         </configuration>
         <executions>
           <execution>
@@ -140,7 +141,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <outputDirectory>${izpack.staging}/lib</outputDirectory>
+              <outputDirectory>${izpack.staging}/deps</outputDirectory>
               <excludeScope>system</excludeScope>
               <!-- this excludes tools.jar, e.g. -->
               <excludeArtifactIds>mycustompanels</excludeArtifactIds>
