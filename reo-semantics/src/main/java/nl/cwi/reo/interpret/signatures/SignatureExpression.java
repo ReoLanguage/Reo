@@ -157,7 +157,7 @@ public final class SignatureExpression implements ParameterType {
 					else if ((t.equals("double") || t.equals("Double")) && val instanceof DecimalValue)
 						s.put(x, new DecimalValue(Double.parseDouble((String) v)));
 					else if ((t.equals("string") || t.equals("String")) && val instanceof StringValue)
-						s.put(x, new StringValue((String) v));
+						s.put(x, new StringValue(v.toString()));
 					else {
 						m.add(location, "Value assigned to " + x + " is of wrong type.");
 						return null;

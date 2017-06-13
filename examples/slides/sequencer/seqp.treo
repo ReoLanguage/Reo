@@ -11,7 +11,7 @@ seqp(p[1..n]) {
   | 
     i : <2..n>
   }
-  fifofull<0>(x[1], x[2])
+  fifofull<"0">(x[1], x[2])
   sync(x[2],p[1])
   sync(x[n+1], x[1])
 }
