@@ -3,22 +3,16 @@ main(S) ::= <<
  * Generated from <S.file> by Reo 1.0.
  */
 <S.package:package(); separator="\n">
-import java.util.List;
-import java.util.ArrayList;
 
 import nl.cwi.reo.runtime.*;
 
 public class <S.name> {
 
+	<S.ports:newPort(); separator="\n">
+
 	public static void main(String[] args) {
-    	
-		List\<Port\<String\>> list = new ArrayList\<>();
-    	
-		<S.ports:newPort(); separator="\n">
-		
-		<S.components:newComponentAtomic(); separator="\n">
-		
-		<S.components:newComponentProtocol(); separator="\n">
+    	    					
+		<S.components:newComponent(); separator="\n">
 	
 		<S.components:newThread(); separator="\n"> 
 
@@ -40,16 +34,11 @@ package(p) ::= <<
 >>
 
 newPort(p) ::= <<
-Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
+public static Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
 >>
 
-newComponentAtomic(c) ::= <<
-<if(c.atomic)>Component <c.name> = new <c.name>(<c.ports:{p|<p.name>}; separator=", ">);<endif>
->>
-
-newComponentProtocol(c) ::= <<
-<if(!c.atomic)><c.ports:{p | list.add(<p.name>);}; separator="\n">
-Component <c.name> = new <c.name>(list);<endif>
+newComponent(c) ::= <<
+Component <c.name> = new <c.name>();
 >>
 
 newThread(c) ::= <<
@@ -67,7 +56,6 @@ join(c) ::= <<
 component(c) ::= <<
 private static class <c.name> implements Component {
 
-	<c.ports:port(); separator="\n">	
 	<c:memorycell(); separator="\n">
 	
 	<c:constructor()>
@@ -143,16 +131,16 @@ memorycell(c) ::= <<
 >>
 
 constructor(c) ::= <<
+
+
 <if(c.atomic)>
-public <c.name>(<c.ports:{p | Port\<<p:typetag()>\> <p.name>}; separator=", ">) {
+public <c.name>() {
 	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
-	<c.ports:{p | this.<p.name> = <p.name>;}; separator="\n">
 	activate();
 }
 <else>
-public <c.name>(List\<Port\<String\>> list) {
-	<c.ports:{p | list.get(<c.listPort.(p)>).<if(p.input)>setProducer(this);<else>setConsumer(this);<endif>}; separator="\n">
-	<c.ports:{p | this.<p.name> = list.get(<c.listPort.(p)>);}; separator="\n">
+public <c.name>() {
+	<c.ports:{p | <p.name>.<if(p.input)>setProducer(this);<else>setConsumer(this);<endif>}; separator="\n">
 	activate();
 }
 <endif>
