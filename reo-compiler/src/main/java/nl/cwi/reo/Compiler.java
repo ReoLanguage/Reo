@@ -254,12 +254,11 @@ public class Compiler {
 
 		// Transform every rule in the circuit into a transition.
 		Set<Transition> transitions = new HashSet<>();
-		Set<Port> losingPorts = new HashSet<Port>();
 		for (Rule rule : circuit.getRules()) {
 
 			// Hide all internal ports
 			Formula f = rule.getFormula();
-			Set<Port> pNegSet = new HashSet<>();
+//			Set<Port> pNegSet = new HashSet<>();
 			for (Port p : rule.getAllPorts()){
 				if (!intface.contains(p)){
 					f = new Existential(new Node(p), f).QE();
@@ -299,18 +298,7 @@ public class Compiler {
 //			}
 			
 			// Commandify the formula:
-			Transition t = RBACompiler.commandify(f);
-
-			Set<Port> portList = new HashSet<Port>(losingPorts);
-			for(Port p : portList){
-				if(!t.getInput().contains(p) && !t.getOutput().containsKey(new Node(p))){
-					losingPorts.addAll(t.getInput());
-				}
-				else{
-					losingPorts.remove(p);
-				}
-			}
-			
+			Transition t = RBACompiler.commandify(f);			
 			
 			if (!(t.getInput().isEmpty() && t.getMemory().isEmpty() && t.getOutput().isEmpty()))
 				transitions.add(t);
