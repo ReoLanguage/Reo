@@ -426,8 +426,6 @@
       class: 'rect',
     });
     
-    console.log(rect);
-    
     // ...and two nodes
     var c1 = createNode(x1,y1);
     var c2 = createNode(x2,y2);
@@ -741,23 +739,27 @@
         var group = new fabric.Group([ p2 ], {
           left: p.left,
           top: p.top,
+          label: p.label,
+          labelOffsetX: p.labelOffsetX,
+          labelOffsetY: p.labelOffsetY,
           originX: 'left',
           originY: 'top',
           class: 'group'
         });
-        canvas.forEachObject(function(obj) {
-          console.log(obj.id);
-          //console.log('Checking object type ' + obj.type + ' with class ' + obj.class + ' and id ' + obj.id);
-          //if(obj.type == 'i-text')
-          //  console.log('references ' + obj.object.id);
-          if (obj.class != 'component' && obj.component == p) {
-          /*if ((obj.class == 'label' && obj.object == p2) ||
-              ()) {*/
+        p.label.set({'object': group});
+        // Temporarily disabled because it is buggy
+        /*canvas.forEachObject(function(obj) {
+          //console.log(obj.id);
+          console.log('Checking object type ' + obj.type + ' with class ' + obj.class + ' and id ' + obj.id);
+          if(obj.type == 'i-text')
+            console.log(' references ' + obj.object.id);
+          if ((obj.class != 'component' && obj.component == p) || (obj.class == 'label' && obj.object.component == p))
+          {
             var obj2 = copy(obj);
-            canvas.remove(obj);
             group.addWithUpdate(obj2);
+            canvas.remove(obj);
           }
-        });
+        });*/
         canvas.remove(p);
         canvas.renderAll();
         canvas.add(group);
@@ -767,6 +769,7 @@
       }
     }
     if (mode == 'component') {
+      canvas.deactivateAll();
       var comp = drawComponent(pointer.x,pointer.y,pointer.x,pointer.y);
       canvas.setActiveObject(comp);
     }
@@ -826,14 +829,6 @@
         p.label.set({left: p.left + (p.width/2), top: p.top - 15});
         p.label.setCoords();
       }
-      if (p.status == 'design') {
-        p.set({left: origLeft + pointer.x - origX});
-        p.set({top: origTop + pointer.y - origY});
-        p.setCoords();
-        p.label.set({left: p.left + p.labelOffsetX});
-        p.label.set({top: p.top + p.labelOffsetY});
-        p.label.setCoords();
-      }
     }
     if (p.class == 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
@@ -871,6 +866,9 @@
       p.set({left: origLeft + pointer.x - origX});
       p.set({top: origTop + pointer.y - origY});
       p.setCoords();
+      p.label.set({left: p.left + p.labelOffsetX});
+      p.label.set({top: p.top + p.labelOffsetY});
+      p.label.setCoords();
     }
     canvas.renderAll();
   }); //mouse:move
@@ -940,6 +938,7 @@
         canvas.deactivateAll();
       }
       if (p.class == 'label') {
+        p.setCoords();
         p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});    
       }
       if (p.class == 'group') {
@@ -947,7 +946,10 @@
         p._restoreObjectsState();
         canvas.remove(p);
         var comp = items[0];
+        comp.set({'labelOffsetX': p.labelOffsetX, 'labelOffsetY': p.labelOffsetY});
         canvas.add(comp);
+        console.log("comp is");
+        console.log(comp);
         for (var i = 1; i < items.length; i++) {
           items[i].set({'component': comp});
           canvas.add(items[i]);
@@ -959,9 +961,11 @@
   
   /* Reorders the components so that all components are behind the other elements and p is in front of the other components */
   function reorderComponents(p) {
+    canvas.sendToBack(p.label);
     canvas.sendToBack(p);
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' && obj !== p) {
+      if (obj.class == 'component' && obj != p) {
+        canvas.sendToBack(obj.label);
         canvas.sendToBack(obj);
       }
     });
@@ -978,7 +982,7 @@
       top: top,
       width: width,
       height: height,
-      fill: 'transparent',
+      fill: '#fff',
       stroke: '#000',
       strokeWidth: 1,
       hoverCursor: 'default',
@@ -1010,7 +1014,7 @@
   }
   
   var main = drawComponent(50,50,750,550);
-  main.set({id: 'main', hasBorders: false, hasControls: false, evented: false});
+  main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   main.label.set({'text': 'main'});
   id = '0';
   document.getElementById("select").click();
