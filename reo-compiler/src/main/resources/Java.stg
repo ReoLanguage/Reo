@@ -8,13 +8,11 @@ import nl.cwi.reo.runtime.*;
 
 public class <S.name> {
 
-	<S.ports:newPort(); separator="\n">
-
 	public static void main(String[] args) {
-    	    					
-		<S.components:newComponent(); separator="\n">
-	
-		<S.components:newThread(); separator="\n"> 
+
+		<S.ports:newPort(); separator="\n">
+
+		<S.components:newComponent(); separator="\n"> 
 
 		<S.components:start(); separator="\n">
 	
@@ -34,14 +32,13 @@ package(p) ::= <<
 >>
 
 newPort(p) ::= <<
-public static Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
+Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
 >>
 
 newComponent(c) ::= <<
-Component <c.name> = new <c.name>();
->>
-
-newThread(c) ::= <<
+<c.name> <c.name> = new <c.name>();
+<c.ports:{p | <p.name>.<if(p.input)>setConsumer<else>setProducer<endif>(<c.name>); }; separator="\n">
+<c.ports:{p | <c.name>.<p.name> = <p.name>;}; separator="\n">
 Thread thread_<c.name> = new Thread(<c.name>);
 >> 
 
@@ -56,12 +53,19 @@ join(c) ::= <<
 component(c) ::= <<
 private static class <c.name> implements Component {
 
+	<c.ports:port(); separator="\n">
 	<c:memorycell(); separator="\n">
-	
-	<c:constructor()>
 	
 	<if(c.atomic)><c:atomic()><else><c:protocol()><endif>
 }
+>>
+
+port(p) ::= <<
+public volatile Port\<<p.typeTag>\> <p.name>;
+>>
+
+typetag(p) ::= <<
+<if(p.typeTag)><p.typeTag><else>Object<endif>
 >>
 
 atomic(c) ::= <<
@@ -82,6 +86,7 @@ public void activate() {
 		notify();
 	}
 }
+
 interface Rule {
     void fire();
 }
@@ -90,7 +95,6 @@ private Rule[] rules = new Rule[] {
     <c.transitions:transition(); separator="\n">
 };
 
-	
 public void run() {
 	int i = 0;
 	int j = 0;
@@ -115,35 +119,10 @@ public void run() {
 }
 >>
 
-port(p) ::= <<
-<! private volatile <if(p.input)>Input<else>Output<endif>Port\<<p.typeTag>\> <p.name>; !>
-private volatile Port\<<p:typetag()>\> <p.name>;
->>
-
-typetag(p) ::= <<
-<if(p.typeTag)><p.typeTag><else>Object<endif>
->>
-
 memorycell(c) ::= <<
 <! <c.initial.keys:{m | private <if(m.type)><m.type><else>Object<endif> <m.name> <if(mem.get(m))> = <mem.get(m)> <endif>}; separator="\n">;  !>
 
 <c.initial.keys:{m | private <if(m.type)><m.type><else>String<endif> <m.name> <if(c.initial.(m))> = <c.initial.(m).value><else> = null <endif>; }; separator = "\n"> 
->>
-
-constructor(c) ::= <<
-
-
-<if(c.atomic)>
-public <c.name>() {
-	<c.ports:{p | <p.name>.<if(p.input)>setConsumer(this);<else>setProducer(this);<endif>}; separator="\n">
-	activate();
-}
-<else>
-public <c.name>() {
-	<c.ports:{p | <p.name>.<if(p.input)>setProducer(this);<else>setConsumer(this);<endif>}; separator="\n">
-	activate();
-}
-<endif>
 >>
 
 check_transition(t) ::= <<
