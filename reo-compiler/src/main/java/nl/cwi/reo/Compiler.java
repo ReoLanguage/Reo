@@ -70,52 +70,43 @@ public class Compiler {
 	/**
 	 * Compiler type.
 	 */
-	@Parameter(names = { "-c", "--compiler" }, description = "compiler")
+	@Parameter(names = { "-c" }, description = "compiler")
 	public CompilerType compilertype = CompilerType.DEFAULT;
 
 	/**
 	 * List of of directories that contain all necessary Reo components
 	 */
-	@Parameter(names = { "-cp",
-			"--compath" }, variableArity = true, description = "list of directories that contain all necessary Reo components")
+	@Parameter(names = { "-cp" }, variableArity = true, description = "list of directories that contain all necessary Reo components")
 	private List<String> directories = new ArrayList<String>();
-
-	/**
-	 * List of available options.
-	 */
-	@Parameter(names = { "-h", "--help" }, description = "lists all available options", help = true)
-	private boolean help;
 
 	/**
 	 * List of provided Reo source files.
 	 */
-	@Parameter(names = { "-o", "--output-dir" }, description = "output directory")
+	@Parameter(names = { "-o" }, description = "output directory")
 	private String outdir = ".";
 
 	/**
 	 * List of parameters for the main component.
 	 */
-	@Parameter(names = { "-p",
-			"--params" }, variableArity = true, description = "list of parameters to instantiate the main component")
+	@Parameter(names = { "-p" }, variableArity = true, description = "list of parameters to instantiate the main component")
 	public List<String> params = new ArrayList<String>();
 
 	/**
 	 * Package
 	 */
-	@Parameter(names = { "-pkg", "--package" }, description = "target code package")
+	@Parameter(names = { "-pkg" }, description = "target code package")
 	private String packagename;
-	
+
 	/**
 	 * Partitioning
 	 */
-	@Parameter(names = { "-pt", "--partitioning" }, description = "synchronous region decomposition")
+	@Parameter(names = { "-pt" }, description = "synchronous region decomposition")
 	private boolean partitioning = false;
 
 	/**
 	 * Target language.
 	 */
-	@Parameter(names = { "-t",
-			"--target" }, variableArity = true, description = "target language")
+	@Parameter(names = { "-t" }, variableArity = true, description = "target language")
 	public Language lang = Language.JAVA;
 
 	/**
@@ -129,8 +120,8 @@ public class Compiler {
 			JCommander jc = new JCommander(compiler, args);
 			jc.setProgramName("reo");
 			if (compiler.files.size() == 0) {
-				System.out.println("Reo compiler v1.0.0");
-				System.out.println("Developed at CWI Amsterdam");
+				System.out.println("Reo compiler v1.0.0\nCWI Amsterdam\n");
+				jc.usage();
 			} else {
 				compiler.run();
 			}
@@ -182,14 +173,10 @@ public class Compiler {
 				String name = "PortWindow";
 				Value v = new StringValue(p.getName().toString());
 				List<Value> values = Arrays.asList(v);
-
-				Reference src = new Reference(p.isInput() ? "Windows.producer" : "Windows.consumer", Language.JAVA,
-						null, values);
-				Port q = null;
-				if (p.isInput())
-					q = new Port(p.getName(), PortType.OUT, p.getPrioType(), new TypeTag("String"), true);
-				else
-					q = new Port(p.getName(), PortType.IN, p.getPrioType(), new TypeTag("String"), true);
+				String call = p.isInput() ? "Windows.producer" : "Windows.consumer";
+				Reference src = new Reference(call, Language.JAVA, null, values);
+				PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+				Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
 				Set<Port> iface = new HashSet<Port>(Arrays.asList(q));
 				ConstraintHypergraph atom = new ConstraintHypergraph().getDefault(iface);
 				ReoConnectorAtom<ConstraintHypergraph> window = new ReoConnectorAtom<>(name, atom, src);
@@ -220,7 +207,13 @@ public class Compiler {
 		List<ConstraintHypergraph> protocols = new ArrayList<ConstraintHypergraph>();
 		for (ReoConnectorAtom<ConstraintHypergraph> atom : connector.getAtoms()) {
 			if (atom.getSourceCode().getCall() != null) {
-				intface.addAll(atom.getInterface());
+				
+				// Add the dual port to the interface of the protocol.
+				for (Port p : atom.getInterface()) {
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					intface.add(new Port(p.getName(), t, p.getPrioType(), p.getTypeTag(), true));
+				}
+				
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
@@ -253,48 +246,62 @@ public class Compiler {
 
 			// Hide all internal ports
 			Formula f = rule.getFormula();
-//			Set<Port> pNegSet = new HashSet<>();
-			for (Port p : rule.getAllPorts()){
-				if (!intface.contains(p)){
+			// Set<Port> pNegSet = new HashSet<>();
+			for (Port p : rule.getAllPorts()) {
+				if (!intface.contains(p)) {
 					f = new Existential(new Node(p), f).QE();
-					
-//					if(!rule.getSync().get(p)){
-//						/*
-//						 * This algorithm assumes that there is only one hyperedge for each variables (ie the Hypergraph is in a distributed form).
-//						 * Given a rule S and a negative port p:
-//						 * For all rules R satisfying p fires:
-//						 * 		- if R satisfies pNeg fires and pNeg is in the interface, add pNeg to the set of port that must block for S.
-//						 *  	- if pNeg is a negative port in R and S satisfies pNeg fires, then R and S are mutually exclusives (clear pNegSet and break this loop)
-//						 * 
-//						 * For each port in pNegSet, add pNeg=* to the guard.
-//						 */
-//						HyperEdge h = circuit.getHyperedges(p).get(0);
-//						for(RuleNode ruleNode : h.getLeaves()){
-//							for(Port pNeg : ruleNode.getRule().getAllPorts()){
-//								if(!pNeg.equals(p) && ruleNode.getRule().getSync().get(pNeg) && rule.getSync().get(pNeg)!=null && !rule.getSync().get(pNeg)){
-//									pNegSet.clear();
-//									break;
-//								}
-//								if(intface.contains(pNeg) && rule.getSync().get(pNeg)==null)
-//									pNegSet.add(pNeg);
-//							}
-//						}
-//					}
+
+					// if(!rule.getSync().get(p)){
+					// /*
+					// * This algorithm assumes that there is only one hyperedge
+					// for each variables (ie the Hypergraph is in a distributed
+					// form).
+					// * Given a rule S and a negative port p:
+					// * For all rules R satisfying p fires:
+					// * - if R satisfies pNeg fires and pNeg is in the
+					// interface, add pNeg to the set of port that must block
+					// for S.
+					// * - if pNeg is a negative port in R and S satisfies pNeg
+					// fires, then R and S are mutually exclusives (clear
+					// pNegSet and break this loop)
+					// *
+					// * For each port in pNegSet, add pNeg=* to the guard.
+					// */
+					// HyperEdge h = circuit.getHyperedges(p).get(0);
+					// for(RuleNode ruleNode : h.getLeaves()){
+					// for(Port pNeg : ruleNode.getRule().getAllPorts()){
+					// if(!pNeg.equals(p) &&
+					// ruleNode.getRule().getSync().get(pNeg) &&
+					// rule.getSync().get(pNeg)!=null &&
+					// !rule.getSync().get(pNeg)){
+					// pNegSet.clear();
+					// break;
+					// }
+					// if(intface.contains(pNeg) &&
+					// rule.getSync().get(pNeg)==null)
+					// pNegSet.add(pNeg);
+					// }
+					// }
+					// }
 				}
-//				else{
-//					if(rule.getSync().get(p) && !f.getFreeVariables().contains(p))
-//						f = new Conjunction(Arrays.asList(f, new Negation(new Equality(new Node(p),new Function("*",null)))));
-//					else
-//						f = new Conjunction(Arrays.asList(f, new Equality(new Node(p),new Function("*",null))));						
-//				}
+				// else{
+				// if(rule.getSync().get(p) &&
+				// !f.getFreeVariables().contains(p))
+				// f = new Conjunction(Arrays.asList(f, new Negation(new
+				// Equality(new Node(p),new Function("*",null)))));
+				// else
+				// f = new Conjunction(Arrays.asList(f, new Equality(new
+				// Node(p),new Function("*",null))));
+				// }
 			}
-//			for(Port pNeg : pNegSet){
-//				f = new Conjunction(Arrays.asList(f, new Equality(new Node(pNeg),new Function("*",null))));
-//			}
-			
+			// for(Port pNeg : pNegSet){
+			// f = new Conjunction(Arrays.asList(f, new Equality(new
+			// Node(pNeg),new Function("*",null))));
+			// }
+
 			// Commandify the formula:
-			Transition t = RBACompiler.commandify(f);			
-			
+			Transition t = RBACompiler.commandify(f);
+
 			if (!(t.getInput().isEmpty() && t.getMemory().isEmpty() && t.getOutput().isEmpty()))
 				transitions.add(t);
 		}
@@ -388,7 +395,7 @@ public class Compiler {
 		Language L = Language.JAVA;
 		STGroup group = null;
 		String extension = "";
-		
+
 		switch (L) {
 		case JAVA:
 			group = new STGroupFile("Java.stg");
@@ -404,9 +411,9 @@ public class Compiler {
 
 		ST stringtemplate = group.getInstanceOf("main");
 		stringtemplate.add("S", template);
-	
+
 		String code = stringtemplate.render(72);
-		
+
 		// Write the code to a file
 		try {
 			File file = new File(outdir + File.separator + program.getName() + extension);
@@ -414,7 +421,8 @@ public class Compiler {
 			FileWriter out = new FileWriter(file);
 			out.write(code);
 			out.close();
-		} catch (IOException e) { }
+		} catch (IOException e) {
+		}
 	}
 
 	private void compilePR() {
