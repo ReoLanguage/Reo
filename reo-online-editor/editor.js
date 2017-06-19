@@ -731,10 +731,10 @@
       return;
     }    
     if (mode == 'select') {
-      console.log('Mode is select');
+      //console.log('Mode is select');
       if (p && p.class == 'component') {
-        console.log('p is ' + p.type + ' ' + p.id);
-        console.log('Creating a group');
+        //console.log('p is ' + p.type + ' ' + p.id);
+        //console.log('Creating a group');
         var p2 = copy(p);
         var group = new fabric.Group([ p2 ], {
           left: p.left,
@@ -764,6 +764,7 @@
         canvas.renderAll();
         canvas.add(group);
         canvas.setActiveObject(group);
+        reorderComponents(group);
         origLeft = group.left;
         origTop = group.top;
       }
@@ -929,13 +930,13 @@
           updateChannel(p.linesOut[k], 1);
         }
         canvas.calcOffset();
-        canvas.deactivateAll();
       }
       if (p.class == 'component') {
         p.label.setCoords();
         reorderComponents(p);
         p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
-        canvas.deactivateAll();
+        if (mode != 'select')
+          p.set({selectable: false});
       }
       if (p.class == 'label') {
         p.setCoords();
@@ -947,9 +948,8 @@
         canvas.remove(p);
         var comp = items[0];
         comp.set({'labelOffsetX': p.labelOffsetX, 'labelOffsetY': p.labelOffsetY});
+        comp.label.set({'object': comp});
         canvas.add(comp);
-        console.log("comp is");
-        console.log(comp);
         for (var i = 1; i < items.length; i++) {
           items[i].set({'component': comp});
           canvas.add(items[i]);
@@ -957,16 +957,17 @@
         canvas.renderAll();
       }
     }
+    canvas.deactivateAll().renderAll();
   }); //mouse:up
   
   /* Reorders the components so that all components are behind the other elements and p is in front of the other components */
   function reorderComponents(p) {
-    canvas.sendToBack(p.label);
-    canvas.sendToBack(p);
+    p.label.sendToBack();
+    p.sendToBack();
     canvas.forEachObject(function(obj) {
       if (obj.class == 'component' && obj != p) {
-        canvas.sendToBack(obj.label);
-        canvas.sendToBack(obj);
+        obj.label.sendToBack();
+        obj.sendToBack();
       }
     });
   }
