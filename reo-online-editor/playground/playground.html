@@ -1,0 +1,66 @@
+<!doctype html>
+<html><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Reo Playground</title>
+  <meta name="description" content="Reo is an exogenous coordination model. The Reo Playground visualizes various Reo connectors using animation.">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/base-min.css">
+  <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/grids-min.css">
+  <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/grids-responsive-min.css">
+
+  <link rel="stylesheet" href="playground.css">
+  <script type="text/javascript" src="canvas.js"></script>
+  <script type="text/javascript" src="connector.js"></script>
+</head><body>
+  <div id="content" class="pure-g">
+
+    <ul id="indexPanel" class="pure-u-1 pure-u-xl-1-6">
+      <li><a data-selected href="#">Introduction</a></li>
+    </ul>
+
+    <div class="pure-u-1 pure-u-xl-5-6"><div class="pure-g">
+      <div class="pure-u-1 pure-u-lg-5-6 pure-u-xl-3-4">
+      <div id="animationPanel">
+        <canvas id="animation" width="640" height="480">
+          <span class="unsupported">
+            Your browser does not support or has disabled <noscript>Javascript
+            or</noscript> the &lt;canvas&gt; element, which is required for
+            this application.
+          </span>
+        </canvas><div id="controls">
+          <canvas id="timeline" width="576" height="88">
+          </canvas><div id="controlButtons">
+<button class="backward">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+<!-- fast-backward icon -->
+  <path d="M 0,1 2,1 2,15 0,15 Z" />
+  <path d="M 9,15 9,1 2,8 Z" />
+  <path d="M 16,15 9,8 16,1 Z" />
+</svg></button><button class="play" data-state="pause">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+<!-- play icon -->
+  <path d="M 1,16 1,0 15,8 Z" />
+</svg><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+<!-- pause icon -->
+  <path d="M 2,16 2,0 7,0 7,16 Z" />
+  <path d="M 9,16 9,0 14,0 14,16 Z" />
+</svg></button><button class="forward">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+<!-- fast-forward icon -->
+  <path d="M 0,15 0,1 7,8 Z" />
+  <path d="M 7,15 7,1 14,8 Z" />
+  <path d="M 16,15 14,15 14,1 16,1 Z" />
+</svg></button>
+          </div>
+        </div>
+      </div></div>
+      <div id="description" class="pure-u-1 pure-u-lg-1-6 pure-u-xl-1-4"></div>
+    </div></div>
+
+  </div>
+  <script type="text/javascript" src="playground-data.js"></script>
+  <script type="text/javascript" src="animation.js"></script>
+  <script type="text/javascript" src="interface.js"></script>
+</body></html>

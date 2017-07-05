@@ -1,0 +1,19 @@
+- Parts of the program assume that read and write nodes have only one end, for
+  simplicity.
+
+- The UI for choice of non-deterministic alternates isn't very intuitive, and
+  currently cannot choose alternates in ticks where there are no nodes.
+
+- The animation of components is sometimes wrong, timing-wise. The animation
+  assumes that data arrives at all of the output ports at the moment there is
+  data on one of the input ports. See the lossyChooser (#debug-lossyChooser and
+  #debug-component) for an example where this assumption is not met.
+
+  The right way to do it would probably be to consider pending data items
+  inside components on a step-by-step basis, rather than just looking at the
+  final coloring. For the example connector in the Playground (Or-selector),
+  this doesn't matter.
+
+- Filters and other data-dependent channels aren't supported. All data items
+  are considered identical (since the program only keeps track of on which ends
+  there are pending data items).

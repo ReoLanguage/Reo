@@ -1,0 +1,131 @@
+*{
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+html{
+  height: 100%;
+}
+
+body{
+  height: 100%;
+  background: #eee;
+}
+
+canvas{
+  display: block;
+  box-sizing: content-box;
+  margin: .5em auto;
+
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+canvas > .unsupported{
+  display: block;
+  margin: 25% 7em;
+  text-align: center;
+}
+
+h1{
+  margin: 0 -.5em .5em -.5em;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+p{
+  margin-top: 0;
+}
+
+a{
+  color: #03f;
+  font-weight: normal;
+}
+a[data-selected]{
+  color: #000;
+  cursor: default;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#content{
+  width: 100%;
+  min-height: 100%;
+  margin: auto;
+  padding: 1em;
+  background: #fff;
+}
+/* pure-u-lg */
+@media (min-width: 64em){
+  #content{
+    width: 90%;
+    padding: 1.5em;
+  }
+}
+
+#indexPanel, #indexPanel ul{
+  list-style-position: inside;
+  padding-left: 0em;
+}
+#indexPanel{
+  list-style-type: none;
+  border-right: 2px solid #000;
+  padding: 0;
+  margin: 0;
+}
+#indexPanel > li{
+  padding-bottom: 1em;
+  font-weight: bold;
+}
+
+#animationPanel{
+  width: 650px;
+  margin: .5em auto;
+}
+
+#animation{
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAG0lEQVR42mM4c+bMfwYCgBg1o4BIQExggtQAANoaDY2fVJg1AAAAAElFTkSuQmCC");
+}
+#timeline{
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+  background:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAQCAYAAADXnxW3AAAAE0lEQVR42mNgIBKcOXPmP4TACwDsyQbHTurJBQAAAABJRU5ErkJggg==") 0px 4px,
+             url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAABCAYAAABubagXAAAAEklEQVR42mO4e/fu/4HEDAMMAEkLcsETaNQwAAAAAElFTkSuQmCC");
+  background-color: #eee;
+}
+
+#controls{
+  display: block;
+  vertical-align: middle;
+  text-align: center;
+}
+#controlButtons{
+  display: inline-block;
+  width: 64px;
+  vertical-align: middle;
+  text-align: right;
+  line-height: 0;
+}
+#controlButtons button{
+  width: 80%;
+  margin: 1px 0;
+  padding: 0.25em;
+}
+#controlButtons svg{
+  display: block;
+  margin: auto;
+}
+#controlButtons .play[data-state="play"] svg:first-child,
+#controlButtons .play[data-state="pause"] svg:last-child{
+  display: none;
+}
+
+#description{
+  padding: .5em;
+}
+#description ul{
+  margin: .5em 0;
+  padding: 0 0 0 1em;
+}
