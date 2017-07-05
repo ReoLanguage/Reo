@@ -957,13 +957,17 @@
         canvas.renderAll();
       }
     }
-    canvas.deactivateAll().renderAll();
+    canvas.deactivateAll();
+    reorderComponents();
+    canvas.renderAll();
   }); //mouse:up
   
   /* Reorders the components so that all components are behind the other elements and p is in front of the other components */
   function reorderComponents(p) {
-    p.label.sendToBack();
-    p.sendToBack();
+    if (p) {
+      p.label.sendToBack();
+      p.sendToBack();
+    }
     canvas.forEachObject(function(obj) {
       if (obj.class == 'component' && obj != p) {
         obj.label.sendToBack();
