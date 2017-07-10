@@ -69,22 +69,25 @@ public final class Protocol implements Component {
 	}
 	
 	public Set<String> getState(){
+		String s = "";
 		for(MemCell m : initial.keySet()){
 			if(initial.get(m)!=null)
-				state.add("m(" + m.getName().substring(1) + "," + initial.get(m).toString()+")");
+				s=s+"m(" + m.getName().substring(1) + "," + initial.get(m).toString()+") ";
 			else
-				state.add("m(" + m.getName().substring(1) + "," +  "*)");
+				s=s+"m(" + m.getName().substring(1) + "," +  "*) ";
 		}
+		s=s+"\n";
 		for(Port p : ports){
 			if(p.isInput()){
-				state.add("in(" + p.getName().substring(1) + ")");
-				state.add("p(" + p.getName().substring(1) + ",*)");
+				s=s+"out(" + p.getName().substring(1) + ")" +" p(" + p.getName().substring(1) + ",*) \n";
 			}
 			else{
-				state.add("out("+p.getName().substring(1)+")");
-				state.add("p("+p.getName().substring(1)+ ",*)");
+				s=s+"in("+p.getName().substring(1)+")"+" p("+p.getName().substring(1)+ ",*) \n";
 			}
+			s=s+"link("+p.getName().substring(1)+","+p.getName().substring(1)+") q("+p.getName().substring(1)+",0,*) \n";
+			
 		}
+		state.add(s);
 		return state;
 	}
 }
