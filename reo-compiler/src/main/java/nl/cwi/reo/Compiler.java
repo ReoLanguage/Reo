@@ -126,7 +126,6 @@ public class Compiler {
 				compiler.run();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			System.out.println(new Message(MessageType.ERROR, e.getMessage()));
 		}
 	}
@@ -148,7 +147,7 @@ public class Compiler {
 			compile();
 			break;
 		default:
-			monitor.add("Please specify the compiler.");
+			monitor.add("Please specify a compiler.");
 			break;
 		}
 
