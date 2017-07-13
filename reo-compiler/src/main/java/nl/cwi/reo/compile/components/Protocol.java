@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.predicates.MemCell;
+import nl.cwi.reo.semantics.predicates.MemoryVariable;
 
 /**
  * Compiled automaton that is independent of the target language.
@@ -24,13 +24,13 @@ public final class Protocol implements Component {
 
 	public final Set<Transition> transitions;
 
-	private final Map<MemCell, Object> initial;
+	private final Map<MemoryVariable, Object> initial;
 
 	private final Set<String> state = new HashSet<>();
 
 	private final Map<Port,Integer> listPort = new HashMap<>();
 	
-	public Protocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemCell, Object> initial) {
+	public Protocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {
 		this.name = name;
 		this.ports = ports;
 		this.transitions = transitions;
@@ -41,7 +41,7 @@ public final class Protocol implements Component {
 		return transitions;
 	}
 
-	public Map<MemCell, Object> getInitial() {
+	public Map<MemoryVariable, Object> getInitial() {
 		return initial;
 	}
 
@@ -62,13 +62,13 @@ public final class Protocol implements Component {
 		return listPort;
 	}
 	
-	public Set<MemCell> getMem() {
+	public Set<MemoryVariable> getMem() {
 		return initial.keySet();
 	}
 	
 	public Set<String> getState(){
 		String s = "";
-		for(MemCell m : initial.keySet()){
+		for(MemoryVariable m : initial.keySet()){
 			if(initial.get(m)!=null)
 				s=s+"m(" + m.getName().substring(1) + "," + initial.get(m).toString()+") ";
 			else

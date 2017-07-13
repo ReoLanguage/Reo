@@ -137,11 +137,11 @@ public class ClausesIterator implements Iterator<List<Formula>> {
 			}
 		}
 	}
-	
+
 	private boolean satisfiable(Formula f, Formula g) {
 		Map<Variable, Integer> map = f.getEvaluation();
 		for (Map.Entry<Variable, Integer> entry : g.getEvaluation().entrySet())
-			if (map.get(entry.getKey())!=null && !entry.getValue().equals(map.get(entry.getKey())))
+			if (map.get(entry.getKey()) != null && !entry.getValue().equals(map.get(entry.getKey())))
 				return false;
 		return true;
 	}

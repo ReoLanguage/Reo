@@ -44,9 +44,9 @@ import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
-import nl.cwi.reo.semantics.predicates.MemCell;
+import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
-import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.util.Monitor;
@@ -192,15 +192,15 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 
 	public void exitRba_parameter(Rba_parameterContext ctx) {
 		term.put(ctx,
-				new Node(new Port(ctx.ID().getText(), PortType.NONE, PrioType.NONE, new TypeTag("Integer"), true)));
+				new PortVariable(new Port(ctx.ID().getText(), PortType.NONE, PrioType.NONE, new TypeTag("Integer"), true)));
 	}
 
 	public void exitRba_memorycellIn(Rba_memorycellInContext ctx) {
-		term.put(ctx, new MemCell(ctx.ID().getText(), false));
+		term.put(ctx, new MemoryVariable(ctx.ID().getText(), false));
 	}
 
 	public void exitRba_memorycellOut(Rba_memorycellOutContext ctx) {
-		term.put(ctx, new MemCell(ctx.ID().getText(), true));
+		term.put(ctx, new MemoryVariable(ctx.ID().getText(), true));
 	}
 
 	public void exitRba_null(Rba_nullContext ctx) {

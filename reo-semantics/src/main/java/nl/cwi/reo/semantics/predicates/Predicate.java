@@ -18,8 +18,15 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
+/**
+ * Predicate semantics of Reo connectors. The predicate listener
+ * {@link nl.cwi.reo.interpret.ListenerP} uses this semantics.
+ */
 public class Predicate implements Semantics<Predicate> {
 
+	/**
+	 * Formula of this predicate
+	 */
 	private final Formula f;
 
 	/**
@@ -27,7 +34,7 @@ public class Predicate implements Semantics<Predicate> {
 	 * composition.
 	 */
 	public Predicate() {
-		this.f = new Relation("constant", "true", null);
+		this.f = new TruthValue(true);
 	}
 
 	/**
@@ -97,8 +104,8 @@ public class Predicate implements Semantics<Predicate> {
 			Formula transition = null;
 			for (Port x : inps) {
 				if (!x.equals(p)) {
-					Term t_null = new Function("constant", null, new ArrayList<Term>());
-					Formula neq = new Negation(new Equality(new Node(x), t_null));
+					Term t_null = new NullValue();
+					Formula neq = new Negation(new Equality(new PortVariable(x), t_null));
 					if (transition == null)
 						transition = neq;
 					else
@@ -106,7 +113,7 @@ public class Predicate implements Semantics<Predicate> {
 				}
 			}
 			for (Port x : outs) {
-				Formula eq = new Equality(new Node(p), new Node(x));
+				Formula eq = new Equality(new PortVariable(p), new PortVariable(x));
 				if (transition == null)
 					transition = eq;
 				else
@@ -147,10 +154,10 @@ public class Predicate implements Semantics<Predicate> {
 		Formula g = f;
 		for (Port p : P)
 			if (!intface.contains(p))
-				g = new Existential(new Node(p), g);
+				g = new Existential(new PortVariable(p), g);
 		return new Predicate(g);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -162,7 +169,7 @@ public class Predicate implements Semantics<Predicate> {
 			return true;
 		if (!(other instanceof Predicate))
 			return false;
-		
+
 		Predicate p = (Predicate) other;
 		return Objects.equals(f, p.getFormula());
 	}

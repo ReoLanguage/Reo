@@ -39,9 +39,9 @@ import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
-import nl.cwi.reo.semantics.predicates.MemCell;
+import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
-import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Predicate;
 import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
@@ -283,7 +283,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_var_port(P_var_portContext ctx) {
-		variables.put(ctx, new Node(new Port(ctx.ID().getText())));
+		variables.put(ctx, new PortVariable(new Port(ctx.ID().getText())));
 	}
 
 	@Override
@@ -292,7 +292,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_var_curr(P_var_currContext ctx) {
-		variables.put(ctx, new MemCell(ctx.ID().getText(), false));
+		variables.put(ctx, new MemoryVariable(ctx.ID().getText(), false));
 	}
 
 	@Override
@@ -301,7 +301,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_var_next(P_var_nextContext ctx) {
-		variables.put(ctx, new MemCell(ctx.getText(), true));
+		variables.put(ctx, new MemoryVariable(ctx.getText(), true));
 	}
 
 }

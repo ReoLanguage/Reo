@@ -15,6 +15,7 @@ rba_formula : 'true'									#rba_true
 			| 'false' 									#rba_false
 			| rba_formula (',' rba_formula)+			#rba_conjunction
 			| '(' rba_formula ')' 						#rba_def
+// TODO          	| ID '(' rba_term (',' rba_term)* ')'		#rba_relation
 			| rba_term '=' rba_term						#rba_equality
 			| rba_term '!=' rba_term					#rba_inequality ;
 			

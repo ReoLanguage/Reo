@@ -49,8 +49,8 @@ import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
-import nl.cwi.reo.semantics.predicates.MemCell;
-import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
@@ -244,11 +244,11 @@ public class Compiler {
 		for (Rule rule : circuit.getRules()) {
 
 			// Hide all internal ports
-			Formula f = rule.getFormula();
+			Formula f = rule.getDataConstraint();
 			// Set<Port> pNegSet = new HashSet<>();
 			for (Port p : rule.getAllPorts()) {
 				if (!intface.contains(p)) {
-					f = new Existential(new Node(p), f).QE();
+					f = new Existential(new PortVariable(p), f).QE();
 
 					// if(!rule.getSync().get(p)){
 					// /*
@@ -314,27 +314,27 @@ public class Compiler {
 		// Generate a protocol component for each part in the transition
 		int n_protocol = 1;
 		for (Set<Transition> part : partition) {
-			Map<MemCell, Object> initial = new HashMap<>();
+			Map<MemoryVariable, Object> initial = new HashMap<>();
 			Set<Port> ports = new HashSet<>();
 
-			Map<MemCell, TypeTag> tags = new HashMap<>();
+			Map<MemoryVariable, TypeTag> tags = new HashMap<>();
 			for (Transition t : part) {
-				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
-					MemCell x = m.getKey();
-					MemCell x_prime = new MemCell(x.getName(), !x.hasPrime());
+				for (Map.Entry<MemoryVariable, Term> m : t.getMemory().entrySet()) {
+					MemoryVariable x = m.getKey();
+					MemoryVariable x_prime = new MemoryVariable(x.getName(), !x.hasPrime());
 
 					if ((!tags.containsKey(x) || tags.get(x) == null)
 							&& (!tags.containsKey(x_prime) || tags.get(x_prime) == null)) {
-						Term initialValueLHS = circuit.getInitials().get(new MemCell(m.getKey().getName(), false));
+						Term initialValueLHS = circuit.getInitials().get(new MemoryVariable(m.getKey().getName(), false));
 						Term initialValueRHS = null;
-						if (m.getValue() instanceof MemCell)
+						if (m.getValue() instanceof MemoryVariable)
 							initialValueRHS = circuit.getInitials()
-									.get(new MemCell(((MemCell) m.getValue()).getName(), false));
+									.get(new MemoryVariable(((MemoryVariable) m.getValue()).getName(), false));
 
 						TypeTag tag = m.getValue().getTypeTag();
-						for (Node n : t.getOutput().keySet()) {
-							if (t.getOutput().get(n) instanceof MemCell
-									&& ((MemCell) t.getOutput().get(n)).getName().equals(m.getKey().getName())
+						for (PortVariable n : t.getOutput().keySet()) {
+							if (t.getOutput().get(n) instanceof MemoryVariable
+									&& ((MemoryVariable) t.getOutput().get(n)).getName().equals(m.getKey().getName())
 									&& n.getPort().getTypeTag() != null) {
 								tag = new TypeTag(n.getPort().getTypeTag().toString());
 							}
@@ -360,13 +360,13 @@ public class Compiler {
 						tags.put(x, tag);
 						tags.put(x_prime, tag);
 
-						if (m.getValue() instanceof MemCell) {
-							tags.remove((MemCell) m.getValue());
-							tags.remove(new MemCell(((MemCell) m.getValue()).getName(),
-									!((MemCell) m.getValue()).hasPrime()));
-							tags.put((MemCell) m.getValue(), tag);
-							tags.put(new MemCell(((MemCell) m.getValue()).getName(),
-									!((MemCell) m.getValue()).hasPrime()), tag);
+						if (m.getValue() instanceof MemoryVariable) {
+							tags.remove((MemoryVariable) m.getValue());
+							tags.remove(new MemoryVariable(((MemoryVariable) m.getValue()).getName(),
+									!((MemoryVariable) m.getValue()).hasPrime()));
+							tags.put((MemoryVariable) m.getValue(), tag);
+							tags.put(new MemoryVariable(((MemoryVariable) m.getValue()).getName(),
+									!((MemoryVariable) m.getValue()).hasPrime()), tag);
 						}
 					}
 				}
@@ -375,8 +375,8 @@ public class Compiler {
 			for (Transition t : part) {
 				ports.addAll(t.getInterface());
 
-				for (Map.Entry<MemCell, Term> m : t.getMemory().entrySet()) {
-					Term initialValue = circuit.getInitials().get(new MemCell(m.getKey().getName(), false));
+				for (Map.Entry<MemoryVariable, Term> m : t.getMemory().entrySet()) {
+					Term initialValue = circuit.getInitials().get(new MemoryVariable(m.getKey().getName(), false));
 					if (initialValue instanceof Function && ((Function) initialValue).getValue() instanceof Integer)
 						initialValue = (initialValue != null ? new Function(((Function) initialValue).getName(),
 								((Function) initialValue).getValue().toString(), new ArrayList<Term>()) : null);

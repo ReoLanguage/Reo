@@ -16,6 +16,6 @@ public class InterpreterRBA extends Interpreter<ConstraintHypergraph> {
 	 * @param monitor	message container
 	 */
 	public InterpreterRBA(List<String> dirs, List<String> values, Monitor monitor) {
-		super(SemanticsType.RBA, new ListenerRBA(monitor), dirs, values, monitor);	
+		super(SemanticsType.CH, new ListenerRBA(monitor), dirs, values, monitor);	
 	}	
 }

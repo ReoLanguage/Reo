@@ -11,8 +11,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.MemCell;
-import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 
 public final class Transition {
@@ -30,19 +30,19 @@ public final class Transition {
 	/**
 	 * Output update
 	 */
-	private final Map<Node, Term> output;
+	private final Map<PortVariable, Term> output;
 
 	/**
 	 * Memory update
 	 */
-	private final Map<MemCell, Term> memory;
+	private final Map<MemoryVariable, Term> memory;
 
 	
 	/**
 	 * Maude variable
 	 */
 	static int instancecounter = 0;
-	private Map<MemCell,Integer> mapM = new HashMap<>();
+	private Map<MemoryVariable,Integer> mapM = new HashMap<>();
 
 	private Map<String,String> mapInM = new HashMap<>();
 	private Map<String,String> mapInP = new HashMap<>();
@@ -60,7 +60,7 @@ public final class Transition {
 	 * @param memory
 	 *            update of the memory cells
 	 */
-	public Transition(Formula guard, Map<Node, Term> output, Map<MemCell, Term> memory) {
+	public Transition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory) {
 		if (guard == null)
 			throw new IllegalArgumentException("No guard specified.");
 		if (output == null)
@@ -78,7 +78,7 @@ public final class Transition {
 	}
 	
 
-	public Transition(Formula guard, Map<Node, Term> output, Map<MemCell, Term> memory, Set<Port> input) {
+	public Transition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory, Set<Port> input) {
 		if (guard == null)
 			throw new IllegalArgumentException("No guard specified.");
 		if (output == null)
@@ -116,7 +116,7 @@ public final class Transition {
 	 * 
 	 * @return assignment of terms to output ports.
 	 */
-	public Map<Node, Term> getOutput() {
+	public Map<PortVariable, Term> getOutput() {
 		return this.output;
 	}
 
@@ -125,14 +125,14 @@ public final class Transition {
 	 * 
 	 * @return assignment of terms to memory cells.
 	 */
-	public Map<MemCell, Term> getMemory() {
+	public Map<MemoryVariable, Term> getMemory() {
 		return this.memory;
 	}
 	
-	public Map<MemCell,Integer> getMapM() {
-		Set<MemCell> s = this.memory.keySet();
-		Map<MemCell,Integer> map = new HashMap<>();
-		for(MemCell m : s){
+	public Map<MemoryVariable,Integer> getMapM() {
+		Set<MemoryVariable> s = this.memory.keySet();
+		Map<MemoryVariable,Integer> map = new HashMap<>();
+		for(MemoryVariable m : s){
 			map.put(m,Integer.parseInt(m.getName().substring(1)));
 		}
 		this.mapM=map;
@@ -144,12 +144,12 @@ public final class Transition {
 		s.addAll(new HashSet<>(memory.values()));
 		Map<String,String> map = new HashMap<>();
 		for(Term n : s){
-			if(n instanceof MemCell)
-				map.put(((MemCell)n).getName().substring(1),"d_"+((MemCell)n).getName());
+			if(n instanceof MemoryVariable)
+				map.put(((MemoryVariable)n).getName().substring(1),"d_"+((MemoryVariable)n).getName());
 		}
-		for(MemCell m : memory.keySet()){
-			if(!map.containsKey(((MemCell)m).getName().substring(1))){
-				map.put(((MemCell)m).getName().substring(1),"*");				
+		for(MemoryVariable m : memory.keySet()){
+			if(!map.containsKey(((MemoryVariable)m).getName().substring(1))){
+				map.put(((MemoryVariable)m).getName().substring(1),"*");				
 			}
 		}
 		this.mapInM=map;
@@ -161,12 +161,12 @@ public final class Transition {
 		s.addAll(new HashSet<>(memory.values()));
 		Map<String,String> map = new HashMap<>();
 		for(Term n : s){
-			if(n instanceof Node)
-				map.put(((Node)n).getName().substring(1),"d"+((Node)n).getName());
+			if(n instanceof PortVariable)
+				map.put(((PortVariable)n).getName().substring(1),"d"+((PortVariable)n).getName());
 		}
-		for(Node m : output.keySet()){
-			if(!map.containsKey(((Node)m).getName().substring(1))){
-				map.put(((Node)m).getName().substring(1),"*");				
+		for(PortVariable m : output.keySet()){
+			if(!map.containsKey(((PortVariable)m).getName().substring(1))){
+				map.put(((PortVariable)m).getName().substring(1),"*");				
 			}
 		}
 		this.mapInP=map;
@@ -175,17 +175,17 @@ public final class Transition {
 	
 	public Map<String,String> getMapOutP() {
 		Map<String,String> map = new HashMap<>();
-		for(Node m : output.keySet()){
-			if(output.get(m) instanceof MemCell)
-				map.put(m.getName().substring(1),"d_"+((MemCell)(output.get(m))).getName());	
-			if(output.get(m) instanceof Node)
-				map.put(m.getName().substring(1),"d"+((Node)output.get(m)).getName());	
+		for(PortVariable m : output.keySet()){
+			if(output.get(m) instanceof MemoryVariable)
+				map.put(m.getName().substring(1),"d_"+((MemoryVariable)(output.get(m))).getName());	
+			if(output.get(m) instanceof PortVariable)
+				map.put(m.getName().substring(1),"d"+((PortVariable)output.get(m)).getName());	
 		}
 		Set<Term> s = new HashSet<>(this.output.values());
 		s.addAll(new HashSet<>(memory.values()));
 		for(Term m : s){
-			if(m instanceof Node)
-				map.put(((Node)m).getName().substring(1),"*");				
+			if(m instanceof PortVariable)
+				map.put(((PortVariable)m).getName().substring(1),"*");				
 		}
 		this.mapOutP=map;
 		return this.mapOutP;
@@ -193,18 +193,18 @@ public final class Transition {
 	
 	public Map<String,String> getMapOutM() {
 		Map<String,String> map = new HashMap<>();
-		for(MemCell m : memory.keySet()){
-			if(memory.get(m) instanceof MemCell)
-				map.put(m.getName().substring(1),"d_"+((MemCell)(memory.get(m))).getName());	
-			if(memory.get(m) instanceof Node)
-				map.put(m.getName().substring(1),"d"+((Node)memory.get(m)).getName());	
+		for(MemoryVariable m : memory.keySet()){
+			if(memory.get(m) instanceof MemoryVariable)
+				map.put(m.getName().substring(1),"d_"+((MemoryVariable)(memory.get(m))).getName());	
+			if(memory.get(m) instanceof PortVariable)
+				map.put(m.getName().substring(1),"d"+((PortVariable)memory.get(m)).getName());	
 		}
 		
 		Set<Term> s = new HashSet<>(this.output.values());
 		s.addAll(new HashSet<>(memory.values()));
 		for(Term m : s){
-			if(m instanceof MemCell)
-				map.put(((MemCell)m).getName().substring(1),"*");				
+			if(m instanceof MemoryVariable)
+				map.put(((MemoryVariable)m).getName().substring(1),"*");				
 		}
 		this.mapOutM=map;
 		return this.mapOutM;
@@ -222,7 +222,7 @@ public final class Transition {
 	 */
 	public Set<Port> getInterface() {
 		Set<Port> ports = new HashSet<Port>(input);
-		for (Node x : output.keySet())
+		for (PortVariable x : output.keySet())
 //			if(!x.isVoid())
 			ports.add(x.getPort());	
 		

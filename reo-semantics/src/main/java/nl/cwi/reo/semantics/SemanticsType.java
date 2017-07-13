@@ -11,6 +11,11 @@ public enum SemanticsType {
 	CAM, 
 	
 	/**
+	 * Constraint hypergraphs.
+	 */
+	CH,
+	
+	/**
 	 * Predicates.
 	 */
 	P,
@@ -21,7 +26,7 @@ public enum SemanticsType {
 	PA,
 	
 	/**
-	 * Plain semantics.
+	 * Plain semantics (for testing purposes).
 	 */
 	PLAIN, 
 	
@@ -29,11 +34,6 @@ public enum SemanticsType {
 	 * Atomic components for Lykos compiler by Sung-Shik Jongmans.
 	 */
 	PR, 
-	
-	/**
-	 * Rule Based automata.
-	 */
-	RBA,
 	
 	/**
 	 * Seepage automata.
@@ -52,11 +52,11 @@ public enum SemanticsType {
 	public String toString() {
 		switch(this) {
 		case CAM: return "cam";
+		case CH: return "rba";  // TODO fix this
 		case P: return "p";
 		case PA: return "pa";
 		case PLAIN: return "plain";
 		case PR: return "pr";
-		case RBA: return "rba";
 		case SA: return "sa";
 		case WA: return "wa";
 		default: throw new IllegalArgumentException();

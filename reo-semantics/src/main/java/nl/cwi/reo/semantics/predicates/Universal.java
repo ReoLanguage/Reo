@@ -29,52 +29,75 @@ public class Universal implements Formula {
 		return f;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula rename(Map<Port, Port> links) {
 		Map<Port, Port> newlinks = new HashMap<Port, Port>(links);
-		newlinks.remove(x); // this is pseudo code
+		for (Map.Entry<Port, Port> link : links.entrySet())
+			if (!link.getKey().getName().equals(x.getName()))
+				newlinks.put(link.getKey(), link.getValue());
 		return new Universal(x, f.rename(newlinks));
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> P = f.getInterface();
-		if (x instanceof Node)
-			P.remove(((Node) x).getPort());
+		if (x instanceof PortVariable)
+			P.remove(((PortVariable) x).getPort());
 		return P;
 	}
 
-	public String toString() {
-		return  "\u2200" + x + "(" + f + ")";  
-	}
-	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Disjunction DNF() {
 		throw new UnsupportedOperationException("DNF assumes a quantifier free formula.");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula NNF() {
 		return new Universal(x, f.NNF());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula QE() {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Formula Substitute(Term t, Variable x) {
+	public Formula substitute(Term t, Variable x) {
 		if (this.x.equals(x))
 			return this;
-		return new Universal(x, f.Substitute(t, x));
+		return new Universal(x, f.substitute(t, x));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
 		Set<Variable> vars = f.getFreeVariables();
@@ -82,11 +105,22 @@ public class Universal implements Formula {
 		return vars;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
 		Map<Variable, Integer> map = f.getEvaluation();
 		map.remove(x);
 		return map;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return  "\u2200" + x + "." + f;  
 	}
 	
 	/**
@@ -101,8 +135,7 @@ public class Universal implements Formula {
 		if (!(other instanceof Universal))
 			return false;
 		Universal u = (Universal)other;
-		
-		return Objects.equals(this.x, u.getVariable())&&Objects.equals(this.f, u.getFormula());
+		return Objects.equals(this.x, u.x) && Objects.equals(this.f, u.f);
 	}
 
 	/**
@@ -110,7 +143,7 @@ public class Universal implements Formula {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(x,f);
+		return Objects.hash(this.x, this.f);
 	}
 
 }
