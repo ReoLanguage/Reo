@@ -11,24 +11,24 @@ import nl.cwi.reo.util.Monitor;
 
 public interface Formula {
 
-	/**
-	 * Computes the condition on input ports by existentially quantifying over
-	 * output ports.
-	 * 
-	 * @return existential quantification of this constraint over all output
-	 *         ports.
-	 */
-	@Deprecated
-	public Formula getGuard();
-
-	/**
-	 * Computes an assignment of data terms to output ports that satisfies this
-	 * data constraint.
-	 * 
-	 * @return Assignment of data terms to output ports.
-	 */
-	@Deprecated
-	public Map<Variable, Term> getAssignment();
+//	/**
+//	 * Computes the condition on input ports by existentially quantifying over
+//	 * output ports.
+//	 * 
+//	 * @return existential quantification of this constraint over all output
+//	 *         ports.
+//	 */
+//	@Deprecated
+//	public Formula getGuard();
+//
+//	/**
+//	 * Computes an assignment of data terms to output ports that satisfies this
+//	 * data constraint.
+//	 * 
+//	 * @return Assignment of data terms to output ports.
+//	 */
+//	@Deprecated
+//	public Map<Variable, Term> getAssignment();
 
 	public @Nullable Formula evaluate(Scope s, Monitor m);
 

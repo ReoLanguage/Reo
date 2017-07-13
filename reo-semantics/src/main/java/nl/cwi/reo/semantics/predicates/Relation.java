@@ -66,18 +66,6 @@ public class Relation implements Formula {
 	}
 
 	@Override
-	public Formula getGuard() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<Variable, Term> getAssignment() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
 		return this;
 	}

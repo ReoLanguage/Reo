@@ -56,33 +56,33 @@ public class Conjunction implements Formula {
 		return clauses;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formula getGuard() {
-		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : clauses)
-			h.add(f.getGuard());
-		return new Conjunction(h);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Map<Variable, Term> getAssignment() {
-		Map<Variable, Term> assignment = new HashMap<Variable, Term>();
-		for (Formula f : clauses) {
-			Map<Variable, Term> assignment1 = f.getAssignment();
-			if (assignment1 == null)
-				return null;
-			for (Map.Entry<Variable, Term> pair : assignment1.entrySet())
-				if (assignment.put(pair.getKey(), pair.getValue()) != null)
-					return null;
-		}
-		return assignment;
-	}
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public Formula getGuard() {
+//		List<Formula> h = new ArrayList<Formula>();
+//		for (Formula f : clauses)
+//			h.add(f.getGuard());
+//		return new Conjunction(h);
+//	}
+//
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public Map<Variable, Term> getAssignment() {
+//		Map<Variable, Term> assignment = new HashMap<Variable, Term>();
+//		for (Formula f : clauses) {
+//			Map<Variable, Term> assignment1 = f.getAssignment();
+//			if (assignment1 == null)
+//				return null;
+//			for (Map.Entry<Variable, Term> pair : assignment1.entrySet())
+//				if (assignment.put(pair.getKey(), pair.getValue()) != null)
+//					return null;
+//		}
+//		return assignment;
+//	}
 
 	@Override
 	public Formula rename(Map<Port, Port> links) {

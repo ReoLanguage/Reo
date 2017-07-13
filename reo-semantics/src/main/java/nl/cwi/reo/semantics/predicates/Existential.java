@@ -28,16 +28,6 @@ public class Existential implements Formula {
 	}
 
 	@Override
-	public Formula getGuard() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Map<Variable, Term> getAssignment() {
-		return f.getAssignment();
-	}
-
-	@Override
 	public Formula rename(Map<Port, Port> links) {
 		Map<Port, Port> newlinks = new HashMap<Port, Port>(links);
 		newlinks.remove(x); // this is pseudo code

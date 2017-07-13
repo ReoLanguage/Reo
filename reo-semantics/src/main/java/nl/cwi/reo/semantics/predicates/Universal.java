@@ -1,7 +1,6 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -28,16 +27,6 @@ public class Universal implements Formula {
 	}
 	public Formula getFormula() {
 		return f;
-	}
-	
-	@Override
-	public Formula getGuard() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Map<Variable, Term> getAssignment() {
-		return f.getAssignment();
 	}
 
 	@Override

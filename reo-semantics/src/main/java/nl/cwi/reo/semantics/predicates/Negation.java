@@ -2,7 +2,6 @@ package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,16 +24,6 @@ public class Negation implements Formula {
 
 	public Negation(Formula f) {
 		this.f = f;
-	}
-
-	@Override
-	public Formula getGuard() {
-		return new Negation(f.getGuard());
-	}
-
-	@Override
-	public Map<Variable, Term> getAssignment() {
-		return new HashMap<Variable,Term>();
 	}
 
 	@Override

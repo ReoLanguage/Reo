@@ -26,16 +26,6 @@ public class BooleanValue implements Formula {
 	}
 
 	@Override
-	public Formula getGuard() {
-		return new BooleanValue(true);
-	}
-
-	@Override
-	public Map<Variable, Term> getAssignment() {
-		return new HashMap<Variable, Term>();
-	}
-
-	@Override
 	public Formula rename(Map<Port, Port> links) {
 		return this;
 	}
