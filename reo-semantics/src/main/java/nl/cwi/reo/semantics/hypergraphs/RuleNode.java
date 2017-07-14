@@ -67,7 +67,7 @@ public class RuleNode {
 		this.rule = r;
 		this.hyperedges = new HashSet<>();
 		for (HyperEdge h : hyperedge)
-			addToHyperedge(h);
+			addToHyperedge(h); // TODO cannot call this.addToHyperedge, because this is not fully initialized.
 		id = ++N;
 	}
 
@@ -110,6 +110,7 @@ public class RuleNode {
 	 * @return an arbitrary hyperedge adjacent to this rule and port p, if it
 	 *         exists, and null otherwise.
 	 */
+	@Nullable
 	public HyperEdge getHyperedges(PortNode p) {
 		for (HyperEdge h : hyperedges)
 			if (h.getSource().getPort().equals(p.getPort()))

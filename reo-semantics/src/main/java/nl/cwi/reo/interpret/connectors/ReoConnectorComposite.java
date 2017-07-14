@@ -36,6 +36,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	/**
 	 * Component name.
 	 */
+	@Nullable
 	private final String name;
 
 	/**
@@ -73,7 +74,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 * @param components
 	 *            list of subcomponents
 	 */
-	public ReoConnectorComposite(String name, String operator, List<ReoConnector<T>> components) {
+	public ReoConnectorComposite(@Nullable String name, String operator, List<ReoConnector<T>> components) {
 		this.name = name;
 		this.operator = operator;
 		this.components = Collections.unmodifiableList(components);
@@ -96,7 +97,7 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 * @param links
 	 *            set of links mapping local ports to global ports
 	 */
-	public ReoConnectorComposite(String name, String operator, List<ReoConnector<T>> components,
+	public ReoConnectorComposite(@Nullable String name, String operator, List<ReoConnector<T>> components,
 			Map<Port, Port> links) {
 		this.name = name;
 		for (ReoConnector<T> X : components)
@@ -136,7 +137,8 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 * {@inheritDoc}
 	 */
 	@Override
-	public @Nullable String getName() {
+	@Nullable
+	public String getName() {
 		return name;
 	}
 
@@ -277,24 +279,18 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 				// Find the correct renaming pi of port p.
 				switch (p.getType()) {
 				case OUT:
-					// if (mergers && new Integer(1).compareTo(outs.get(p)) > 0)
-					// {
-					if (mergers && outs.get(p) > 1) {
+					if (mergers && outs.get(p) != null && outs.get(p) > 1) {
 						pi = p.rename(p.getName() + "_" + A.size()).hide();
-						if (ins.get(p) == 0)
-							// if (new Integer(0).equals(ins.get(p)))
+						if (ins.get(p) != null && ins.get(p) == 0)
 							A.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), !p.isHidden()));
 					} else {
 						pi = p;
 					}
 					break;
 				case IN:
-					if (replicators && ins.get(p) > 1) {
-						// if (replicators && new
-						// Integer(1).compareTo(ins.get(p)) > 0) {
+					if (replicators && ins.get(p) != null && ins.get(p) > 1) {
 						pi = p.rename(p.getName() + "_" + A.size()).hide();
-						if (outs.get(p) == 0)
-							// if (new Integer(0).equals(outs.get(p)))
+						if (outs.get(p) != null && outs.get(p) == 0)
 							A.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), !p.isHidden()));
 					} else {
 						pi = p;
@@ -370,10 +366,11 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public ReoConnector<T> propagate(Monitor m) {
 
 		Map<Port, Port> r = new HashMap<Port, Port>();
-		
+
 		for (Set<Port> part : getTypePartition()) {
 			TypeTag tag = null;
 			for (Port p : part) {
@@ -388,7 +385,6 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 			}
 			for (Port p : part)
 				r.put(p, p.setTag(tag));
-			
 		}
 
 		return new ReoConnectorComposite<T>(name, operator, components, Links.rename(links, r));
@@ -405,10 +401,13 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 			Set<Set<Port>> c_partition = c.getTypePartition();
 			for (Set<Port> c_part : c_partition) {
 				Set<Port> newpart = new HashSet<Port>();
-				for (Port p : c_part)
-					newpart.add(links.get(p));
-
-				Set<Set<Port>> newpartition = new HashSet<Set<Port>>();
+				for (Port p : c_part) {
+					Port q = links.get(p); 
+					if (q != null)
+						newpart.add(q);
+				}
+				
+				Set<Set<Port>> newpartition = new HashSet<>();
 				for (Set<Port> part : partition) {
 					if (Collections.disjoint(part, newpart)) {
 						newpartition.add(part);

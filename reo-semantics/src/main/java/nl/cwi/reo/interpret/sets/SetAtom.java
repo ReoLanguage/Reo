@@ -49,7 +49,7 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 * @param source
 	 *            reference to source code
 	 */
-	public SetAtom(String name, T atom, Reference source) {
+	public SetAtom(@Nullable String name, @Nullable T atom, Reference source) {
 		if (source == null)
 			throw new NullPointerException();
 		this.name = name;
@@ -74,9 +74,9 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	public Instance<T> evaluate(Scope s, Monitor m) {
 		T _atom = atom != null ? atom.evaluate(s, m) : atom;
 		Reference _source = source.evaluate(s, m);
-		if ( _source == null)
+		if (_atom == null || _source == null)
 			return null;
-		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<Set<Identifier>>());
+		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<>());
 	}
 
 	/**
@@ -92,8 +92,9 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("{\n  <atom>\n|\n  <source>\n}");
-		st.add("atom", atom);
+		ST st = new ST("{\n<if(source)>  <source>\n<endif>  <atom>\n}");
+		if (atom != null)
+			st.add("atom", atom);
 		st.add("source", source);
 		return st.render();
 	}

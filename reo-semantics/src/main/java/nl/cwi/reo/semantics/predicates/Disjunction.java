@@ -133,7 +133,7 @@ public class Disjunction implements Formula {
 			return clauses.get(0).substitute(t, x);
 		for (Formula f : clauses) {
 			Formula formula = f.substitute(t, x);
-			if (formula instanceof Relation && ((Relation) formula).getValue().equals("true"))
+			if (formula instanceof TruthValue && ((TruthValue) formula).getBool() == true)
 				return formula;
 			list.add(formula);
 		}

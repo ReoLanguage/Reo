@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -81,7 +82,7 @@ public final class Scope {
 	}
 	
 	public Set<Identifier> getKeys() {
-		return assignments.keySet();
+		return new HashSet<>(assignments.keySet());
 	}
 
 	@Override

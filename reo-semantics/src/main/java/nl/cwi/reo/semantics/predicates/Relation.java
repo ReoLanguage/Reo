@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class Relation implements Formula {
 	/**
 	 * Value of this relation or reference to its implementation.
 	 */
+	@Nullable
 	private String value;
 
 	/**
@@ -48,8 +50,9 @@ public class Relation implements Formula {
 	 * @param args
 	 *            list of arguments
 	 */
-	public Relation(String name, List<Term> args) {
+	public Relation(String name, @Nullable List<Term> args) {
 		this.name = name;
+		this.value = null;
 		this.args = args;
 	}
 
@@ -64,7 +67,7 @@ public class Relation implements Formula {
 	 * @param args
 	 *            list of arguments
 	 */
-	public Relation(String name, String value, List<Term> args) {
+	public Relation(String name, @Nullable String value, @Nullable List<Term> args) {
 		this.name = name;
 		this.value = value;
 		this.args = args;
@@ -84,6 +87,7 @@ public class Relation implements Formula {
 	 * 
 	 * @return value of this relation.
 	 */
+	@Nullable
 	public String getValue() {
 		return value;
 	}
@@ -93,6 +97,7 @@ public class Relation implements Formula {
 	 * 
 	 * @return list of arguments of this relation.
 	 */
+	@Nullable
 	public List<Term> getArgs() {
 		return args;
 	}
@@ -113,7 +118,8 @@ public class Relation implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public @Nullable Formula evaluate(Scope s, Monitor m) {
+	@Nullable
+	public Formula evaluate(Scope s, Monitor m) {
 		return this;
 	}
 
@@ -122,7 +128,7 @@ public class Relation implements Formula {
 	 */
 	@Override
 	public Set<Port> getInterface() {
-		return null;
+		return new HashSet<>();
 	}
 
 	/**
@@ -179,7 +185,7 @@ public class Relation implements Formula {
 	 */
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
-		return null;
+		return new HashMap<>();
 	}
 
 	/**
@@ -188,8 +194,9 @@ public class Relation implements Formula {
 	@Override
 	public String toString() {
 		String s = name + "(";
-		for (Term t : args)
-			s += ", " + t;
+		if (args != null)
+			for (Term t : args)
+				s += ", " + t;
 		return s + ")";
 	}
 

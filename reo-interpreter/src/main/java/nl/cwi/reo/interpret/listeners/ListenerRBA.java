@@ -35,9 +35,6 @@ import nl.cwi.reo.interpret.ReoParser.Rba_syncFireContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_termContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_syncBlockContext;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.ports.PrioType;
-import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
 import nl.cwi.reo.semantics.hypergraphs.Rule;
 import nl.cwi.reo.semantics.predicates.Conjunction;
@@ -46,9 +43,10 @@ import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
+import nl.cwi.reo.semantics.predicates.NullValue;
 import nl.cwi.reo.semantics.predicates.PortVariable;
-import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.TruthValue;
 import nl.cwi.reo.util.Monitor;
 
 public class ListenerRBA extends Listener<ConstraintHypergraph> {
@@ -59,8 +57,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	private ParseTreeProperty<Rule> rules = new ParseTreeProperty<>();
 
 	private Map<Port, Boolean> mapPorts = new HashMap<>();
-	private Map<Term, Term> initial = new HashMap<>();
-	private final Term asterix = new Function("*", null, new ArrayList<>());
+	private Map<MemoryVariable, Term> initial = new HashMap<>();
 
 	public ListenerRBA(Monitor m) {
 		super(m);
@@ -69,7 +66,8 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	public void exitAtom(AtomContext ctx) {
 		atoms.put(ctx, automaton.get(ctx.rba()));
 	}
-	public void enterAtom(AtomContext ctx){
+
+	public void enterAtom(AtomContext ctx) {
 		initial = new HashMap<>();
 		mapPorts = new HashMap<>();
 	}
@@ -83,24 +81,28 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 		for (Rba_ruleContext rbaContext : ctx.rba_rule()) {
 			s.add(rules.get(rbaContext));
 		}
-		automaton.put(ctx, new ConstraintHypergraph(s,initial));
-	}
-	
-	/*
-	 * State based rule :
-	 */
-	
-	public void exitRba_tr(Rba_trContext ctx) {
-//		Rule r = rules.get(ctx.rba_rule());
-//		rules.put(ctx, new Rule(r.getSync(), new Conjunction(r.getFormula(),new Equality(new MemCell(ctx.ID(0).getText(),false),new MemCell(ctx.ID(0).getText(),true)));
-//		State q1 = new State(ctx.ID(0).getText());
-//		State q2 = new State(ctx.ID(1).getText());
-//		SortedSet<Port> sc = scs.get(ctx.pa_sc());
-//		transitions.put(ctx, new Transition<NullLabel>(q1, q2, sc, new NullLabel()));	
+		automaton.put(ctx, new ConstraintHypergraph(s, initial));
 	}
 
 	/*
-	 * Rules :
+	 * State based rule :
+	 */
+
+	public void exitRba_tr(Rba_trContext ctx) {
+		// Rule r = rules.get(ctx.rba_rule());
+		// rules.put(ctx, new Rule(r.getSync(), new
+		// Conjunction(r.getFormula(),new Equality(new
+		// MemCell(ctx.ID(0).getText(),false),new
+		// MemCell(ctx.ID(0).getText(),true)));
+		// State q1 = new State(ctx.ID(0).getText());
+		// State q2 = new State(ctx.ID(1).getText());
+		// SortedSet<Port> sc = scs.get(ctx.pa_sc());
+		// transitions.put(ctx, new Transition<NullLabel>(q1, q2, sc, new
+		// NullLabel()));
+	}
+
+	/**
+	 * Rules
 	 */
 
 	public void enterRba_rule(Rba_ruleContext ctx) {
@@ -112,14 +114,11 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	}
 
 	public void exitRba_initial(Rba_initialContext ctx) {
-		Queue<Rba_termContext> queue = new LinkedList<Rba_termContext>(ctx.rba_term());
-		while(!queue.isEmpty()){
-			initial.put(term.get(queue.poll()), term.get(queue.poll()));
-		}
+		initial.put(new MemoryVariable(ctx.ID().getText(), false), term.get(ctx.rba_term()));
 	}
 
-	/*
-	 * Synchronisation :
+	/**
+	 * Synchronisation constraints
 	 */
 
 	public void exitRba_syncFire(Rba_syncFireContext ctx) {
@@ -130,15 +129,14 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 		mapPorts.put(new Port(ctx.ID().getText()), false);
 	}
 
-	/*
-	 * Formula :
+	/**
+	 * Data constraints
 	 */
 
 	public void exitRba_conjunction(Rba_conjunctionContext ctx) {
 		List<Formula> l = new ArrayList<Formula>();
-		for (Rba_formulaContext f : ctx.rba_formula()) {
+		for (Rba_formulaContext f : ctx.rba_formula())
 			l.add(rba_formula.get(f));
-		}
 		rba_formula.put(ctx, new Conjunction(l));
 	}
 
@@ -155,44 +153,43 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	}
 
 	public void exitRba_true(Rba_trueContext ctx) {
-		rba_formula.put(ctx, new Relation("true", "true", null));
+		rba_formula.put(ctx, new TruthValue(true));
 	}
 
 	public void exitRba_false(Rba_falseContext ctx) {
-		rba_formula.put(ctx, new Relation("false", "false", null));
+		rba_formula.put(ctx, new TruthValue(false));
 	}
 
-	
-	
-	/*
-	 * Terms:
+	/**
+	 * Terms
 	 */
+	
 	public void exitRba_nat(Rba_natContext ctx) {
-		term.put(ctx, new Function("constant", Integer.parseInt(ctx.NAT().getText()), new ArrayList<Term>()));
+		term.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null));
 	}
 
 	public void exitRba_bool(Rba_boolContext ctx) {
-		term.put(ctx, new Function("constant", Boolean.parseBoolean(ctx.BOOL().getText()), new ArrayList<Term>()));
+		term.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null));
 	}
 
 	public void exitRba_string(Rba_stringContext ctx) {
-		term.put(ctx, new Function(ctx.STRING().toString(), new ArrayList<Term>()));
+		term.put(ctx, new Function(ctx.getText(), ctx.getText(), null));
 	}
 
 	public void exitRba_decimal(Rba_decimalContext ctx) {
-		term.put(ctx, new Function("constant", Double.parseDouble(ctx.DEC().getText()), new ArrayList<Term>()));
+		term.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null));
 	}
+
 	public void exitRba_function(Rba_functionContext ctx) {
 		List<Term> args = new ArrayList<Term>();
-		for( Rba_termContext arg : ctx.rba_term()){
+		for (Rba_termContext arg : ctx.rba_term()) {
 			args.add(term.get(arg));
 		}
-		term.put(ctx, new Function("n-ary function",ctx.ID().getText(),args));
+		term.put(ctx, new Function(ctx.ID().getText(), null, args));
 	}
 
 	public void exitRba_parameter(Rba_parameterContext ctx) {
-		term.put(ctx,
-				new PortVariable(new Port(ctx.ID().getText(), PortType.NONE, PrioType.NONE, new TypeTag("Integer"), true)));
+		term.put(ctx, new PortVariable(new Port(ctx.ID().getText())));
 	}
 
 	public void exitRba_memorycellIn(Rba_memorycellInContext ctx) {
@@ -204,7 +201,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	}
 
 	public void exitRba_null(Rba_nullContext ctx) {
-		term.put(ctx, asterix);
+		term.put(ctx, new NullValue());
 	}
 
 }

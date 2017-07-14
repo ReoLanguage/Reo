@@ -2,6 +2,8 @@ package nl.cwi.reo.semantics.automata;
 
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * Container to ease passing around a tuple of two objects. This object provides a sensible
  * implementation of equals(), returning true if equals() is true on each of the contained
@@ -33,7 +35,7 @@ public class Pair<F, S> {
      *         equal
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof Pair)) {
             return false;
         }

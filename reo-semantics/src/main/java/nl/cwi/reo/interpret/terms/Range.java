@@ -40,10 +40,16 @@ public final class Range implements TermExpression {
 		this.t2 = t2;
 	}
 
+	/**
+	 * Computes
+	 * @param size
+	 * @return
+	 */
+	@Nullable
 	public Scope findParamFromSize(int size) {
 		Scope s = new Scope();
-		List<Term> e1 = t1.evaluate(new Scope(), null);
-		List<Term> e2 = t2.evaluate(new Scope(), null);
+		List<Term> e1 = t1.evaluate(new Scope(), new Monitor());
+		List<Term> e2 = t2.evaluate(new Scope(), new Monitor());
 
 		if (e1 != null && e1.size() == 1 && e2 != null && e2.size() == 1) {
 			Term g1 = e1.get(0);

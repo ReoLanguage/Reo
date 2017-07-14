@@ -60,8 +60,12 @@ public class Predicate implements Semantics<Predicate> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public @Nullable Predicate evaluate(Scope s, Monitor m) {
-		return new Predicate(f.evaluate(s, m));
+	@Nullable
+	public Predicate evaluate(Scope s, Monitor m) {
+		Formula g = f.evaluate(s, m);
+		if (g != null)
+			return new Predicate(g);
+		return null;
 	}
 
 	/**
@@ -101,7 +105,7 @@ public class Predicate implements Semantics<Predicate> {
 		List<Formula> transitions = new ArrayList<Formula>();
 
 		for (Port p : inps) {
-			Formula transition = null;
+			Formula transition = new TruthValue(true);
 			for (Port x : inps) {
 				if (!x.equals(p)) {
 					Term t_null = new NullValue();
@@ -114,10 +118,7 @@ public class Predicate implements Semantics<Predicate> {
 			}
 			for (Port x : outs) {
 				Formula eq = new Equality(new PortVariable(p), new PortVariable(x));
-				if (transition == null)
-					transition = eq;
-				else
-					transition = new Conjunction(Arrays.asList(transition, eq));
+				transition = new Conjunction(Arrays.asList(transition, eq));
 			}
 			transitions.add(transition);
 		}

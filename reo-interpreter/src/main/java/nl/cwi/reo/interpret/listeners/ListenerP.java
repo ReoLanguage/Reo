@@ -41,10 +41,12 @@ import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
+import nl.cwi.reo.semantics.predicates.NullValue;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Predicate;
 import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.TruthValue;
 import nl.cwi.reo.semantics.predicates.Universal;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
@@ -178,7 +180,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_true(P_trueContext ctx) {
-		formulas.put(ctx, new Relation("truthvalue", "true", new ArrayList<Term>()));
+		formulas.put(ctx, new TruthValue(true));
 	}
 
 	@Override
@@ -187,7 +189,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_false(P_falseContext ctx) {
-		formulas.put(ctx, new Relation("truthvalue", "false", new ArrayList<Term>()));
+		formulas.put(ctx, new TruthValue(false));
 	}
 
 	/**
@@ -209,7 +211,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_null(P_nullContext ctx) {
-		terms.put(ctx, new Function("constant", null, new ArrayList<Term>()));
+		terms.put(ctx, new NullValue());
 	}
 
 	@Override
@@ -218,7 +220,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_natural(P_naturalContext ctx) {
-		terms.put(ctx, new Function("constant", Integer.parseInt(ctx.getText()), new ArrayList<Term>()));
+		terms.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null));
 	}
 
 	@Override
@@ -227,7 +229,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_boolean(P_booleanContext ctx) {
-		terms.put(ctx, new Function("constant", Boolean.parseBoolean(ctx.getText()), new ArrayList<Term>()));
+		terms.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null));
 	}
 
 	@Override
@@ -236,7 +238,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_string(P_stringContext ctx) {
-		terms.put(ctx, new Function("constant", ctx.getText(), new ArrayList<Term>()));
+		terms.put(ctx, new Function(ctx.getText(), ctx.getText(), null));
 	}
 
 	@Override
@@ -245,7 +247,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_decimal(P_decimalContext ctx) {
-		terms.put(ctx, new Function("constant", Double.parseDouble(ctx.getText()), new ArrayList<Term>()));
+		terms.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null));
 	}
 
 	@Override
@@ -254,7 +256,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 
 	@Override
 	public void exitP_function(P_functionContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), arguments.get(ctx.p_args())));
+		terms.put(ctx, new Function(ctx.getText(), null, arguments.get(ctx.p_args())));
 	}
 
 	/**

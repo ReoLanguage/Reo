@@ -60,8 +60,8 @@ public class TransitionIterator implements Iterator<List<Transition>> {
 		
 		// Insert a local silent self loop transition a the start of each list of local transitions.
 		for (int i = 0; i < localtransitions.size(); i++) 
-			this.localtransitions.get(i).add(0, Transition.getIdlingTransition(s1.get(i)));
-
+			this.localtransitions.get(i).add(0, Transition.getIdlingTransition(s1.get(i)));	
+		
 		// Initialize iterators.
 		for (List<Transition> Tlocal : localtransitions) {
 			Iterator<Transition> iterator = Tlocal.iterator();
@@ -69,11 +69,9 @@ public class TransitionIterator implements Iterator<List<Transition>> {
 		}
 		
 		// Initialize the tuple. This sets all local transitions to a silent self loop transition.
-		for (int i = 0; i < localtransitions.size(); i++) 
-			tuple.set(i, iterators.get(i).next());	
-		
-		// Skip this first tuple, and initialize the isNext flag.
-		jumpToNext();
+		tuple = new ArrayList<>();
+		for (Iterator<Transition> iter : iterators)
+			tuple.add(iter.next());
 		
 		// Just for fun: count total amount of increments.
 		this.actual = 0;
@@ -98,7 +96,9 @@ public class TransitionIterator implements Iterator<List<Transition>> {
 	 */
 	@Override
 	public List<Transition> next() {
-		if (!isNext) 
+		if (!isNext)
+			jumpToNext();
+		if (!isNext)
 			throw new NoSuchElementException();
 		return new ArrayList<Transition>(tuple);
 	}

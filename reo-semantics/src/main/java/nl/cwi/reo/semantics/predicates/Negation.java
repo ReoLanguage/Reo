@@ -2,6 +2,7 @@ package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +56,7 @@ public class Negation implements Formula {
 	 */
 	@Override
 	public Set<Port> getInterface() {
-		return null;
+		return new HashSet<>();
 	}
 
 	/**

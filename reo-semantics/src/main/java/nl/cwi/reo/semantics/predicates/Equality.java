@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -92,7 +93,7 @@ public class Equality implements Formula {
 	@Override
 	public Set<Port> getInterface() {
 		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<>();
 	}
 
 	/**

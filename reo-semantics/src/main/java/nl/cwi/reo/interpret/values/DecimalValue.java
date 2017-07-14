@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
@@ -57,6 +59,7 @@ public final class DecimalValue implements Value, TermExpression {
 		return new DecimalValue(a.x * b.x);
 	}
 
+	@Nullable
 	public static DecimalValue div(DecimalValue a, DecimalValue b) {
 		return b.x == 0 ? null : new DecimalValue(a.x / b.x);
 	}
@@ -93,7 +96,7 @@ public final class DecimalValue implements Value, TermExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (other == null)
 			return false;
 		if (other == this)

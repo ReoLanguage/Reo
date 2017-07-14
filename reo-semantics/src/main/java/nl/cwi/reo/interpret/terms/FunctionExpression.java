@@ -63,7 +63,7 @@ public final class FunctionExpression implements TermExpression {
 
 		List<Iterator<Term>> iters = new ArrayList<Iterator<Term>>();
 		for (TermExpression arg : arguments) {
-			List<Term> terms = arg.evaluate(s, null);
+			List<Term> terms = arg.evaluate(s, new Monitor());
 			if (terms == null)
 				return null;
 			iters.add(terms.iterator());

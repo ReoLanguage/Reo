@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret.ports;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
 
@@ -22,6 +24,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	/**
 	 * Type tag.
 	 */
+	@Nullable
 	private final TypeTag tag;
 
 	/**
@@ -58,7 +61,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 * @param hidden
 	 *            visibility
 	 */
-	public Port(String name, PortType type, PrioType prio, TypeTag tag, boolean hidden) {
+	public Port(String name, PortType type, PrioType prio, @Nullable TypeTag tag, boolean hidden) {
 		super(name);
 		if (type == null || prio == null)
 			throw new NullPointerException();
@@ -119,6 +122,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 * 
 	 * @return type tag of this port
 	 */
+	@Nullable
 	public TypeTag getTypeTag() {
 		return tag;
 	}
@@ -151,7 +155,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 *            new type tag
 	 * @return port with new type tag
 	 */
-	public Port setTag(TypeTag tag) {
+	public Port setTag(@Nullable TypeTag tag) {
 		return new Port(name, type, prio, tag, visible);
 	}
 

@@ -49,26 +49,26 @@ public final class Conjunction implements PredicateExpression {
 		List<Scope> extension = new ArrayList<Scope>();
 		List<Scope> tmpList = new ArrayList<Scope>();
 		int counter = 0;
-		
+
 		Monitor localm = new Monitor();
 
 		while (!stack.isEmpty()) {
 
 			P = stack.poll();
-			for (Scope si : scopes) {
-//				localm.clear();
-				List<Scope> list = P.evaluate(si, localm);
-				if (list == null) {
-					counter++;
-					stack.add(P);
-					continue;
-				} else if (list.equals(extension)) {
-					continue;
-				} else {
-					counter = 0;
-					tmpList.addAll(list);
+			if (P != null) {
+				for (Scope si : scopes) {
+					List<Scope> list = P.evaluate(si, localm);
+					if (list == null) {
+						counter++;
+						stack.add(P);
+						continue;
+					} else if (list.equals(extension)) {
+						continue;
+					} else {
+						counter = 0;
+						tmpList.addAll(list);
+					}
 				}
-
 			}
 			extension = tmpList;
 			tmpList = new ArrayList<Scope>();
@@ -77,12 +77,12 @@ public final class Conjunction implements PredicateExpression {
 				scopes = new ArrayList<Scope>();
 				scopes.addAll(extension);
 			}
-			
+
 			if (counter > stack.size()) {
-				for (Message msg : localm.getMessages()){
+				for (Message msg : localm.getMessages()) {
 					m.add(msg);
 				}
-//				m.print();
+				// m.print();
 				break;
 			}
 		}
@@ -115,6 +115,7 @@ public final class Conjunction implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
 		Set<Identifier> vars = new HashSet<Identifier>(defns);
 		Queue<PredicateExpression> stack = new LinkedList<PredicateExpression>(predicates);
@@ -122,23 +123,21 @@ public final class Conjunction implements PredicateExpression {
 		int counter = 0;
 
 		while (!stack.isEmpty()) {
-
 			P = stack.poll();
-			
-			Set<Identifier> defnP = P.getDefinedVariables(vars);
-			
-			if (defnP == null) {
-				counter++;
-				stack.add(P);
-			} else {
-				counter = 0;
-				vars.addAll(defnP);
+			if (P != null) {
+				Set<Identifier> defnP = P.getDefinedVariables(vars);
+				if (defnP == null) {
+					counter++;
+					stack.add(P);
+				} else {
+					counter = 0;
+					vars.addAll(defnP);
+				}
 			}
-			
 			if (counter > stack.size())
 				return null;
 		}
-		
+
 		return vars;
 	}
 

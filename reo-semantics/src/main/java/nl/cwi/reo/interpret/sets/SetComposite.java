@@ -35,6 +35,7 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	/**
 	 * Component name.
 	 */
+	@Nullable
 	private final String name;
 
 	/**
@@ -55,6 +56,7 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	/**
 	 * Location of this instance in Reo source file.
 	 */
+	@Nullable
 	private final Location location;
 
 	/**
@@ -82,9 +84,9 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 * @param location
 	 *            location in Reo source file
 	 */
-	public SetComposite(String name, TermExpression operator, List<InstanceExpression<T>> elements,
-			PredicateExpression predicate, Location location) {
-		if (operator == null || elements == null || predicate == null || location == null)
+	public SetComposite(@Nullable String name, TermExpression operator, List<InstanceExpression<T>> elements,
+			PredicateExpression predicate, @Nullable Location location) {
+		if (operator == null || elements == null || predicate == null)
 			throw new NullPointerException();
 		this.name = name;
 		this.operator = operator;
@@ -192,10 +194,15 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 
 	@Override
 	public boolean canEvaluate(Set<Identifier> deps) {
-		Set<Identifier> vars = new HashSet<Identifier>();
-		for (InstanceExpression<T> I : elements)
-			vars.addAll(I.getVariables());
-		vars.removeAll(predicate.getDefinedVariables(deps));
+		Set<Identifier> vars = new HashSet<>();
+		for (InstanceExpression<T> I : elements) {
+			Set<Identifier> varsI = I.getVariables();
+			if (varsI != null)
+				vars.addAll(varsI);
+		}
+		Set<Identifier> ids = predicate.getDefinedVariables(deps);
+		if (ids != null)
+			vars.removeAll(ids);
 		return vars.isEmpty();
 	}
 }

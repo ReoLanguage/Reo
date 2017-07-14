@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
@@ -66,15 +68,14 @@ public final class StringValue implements Value, TermExpression {
 	 */
 	@Override
 	public String toString() {
-//		return "\""+x+"\"";
 		return x;
-		}
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (other == null)
 			return false;
 		if (other == this)

@@ -88,7 +88,7 @@ public final class Component<T extends Semantics<T>> implements Value {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		/*
 		 * TODO implement a more sophisticated equality that returns true, only
 		 * if calls to their respective instantiate method return equal

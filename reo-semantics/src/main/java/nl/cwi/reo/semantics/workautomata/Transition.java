@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.ports.Port;
 
 /**
@@ -138,7 +140,7 @@ public final class Transition implements Comparable<Transition> {
 	 * @return true if the given object represents a Transition equivalent to this transition, false otherwise.
 	 */
 	@Override 
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (!(other instanceof Transition)) return false;
 		Transition t = (Transition)other;
 		return t.toString().equals(this.toString());

@@ -2,7 +2,6 @@ package nl.cwi.reo.interpret.statements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +37,11 @@ public final class Negation implements PredicateExpression {
 	@Override
 	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m) {
-		return predicate.evaluate(s, m).isEmpty() ? Arrays.asList(s) : new ArrayList<Scope>();
+		List<Scope> list = predicate.evaluate(s, m);
+		if (list == null)
+			return null;
+		// TODO is this correct?
+		return list.isEmpty() ? Arrays.asList(s) : new ArrayList<Scope>();
 	}
 
 	/**
@@ -61,8 +64,11 @@ public final class Negation implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
-		Set<Identifier> diff = new HashSet<>(predicate.getDefinedVariables(defns));
+		Set<Identifier> diff = predicate.getDefinedVariables(defns);
+		if (diff == null)
+			return null;
 		diff.removeAll(defns);
 		return diff.isEmpty() ? defns : null;
 	}

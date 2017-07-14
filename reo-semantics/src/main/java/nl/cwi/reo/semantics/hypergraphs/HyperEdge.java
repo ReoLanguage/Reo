@@ -53,9 +53,9 @@ public class HyperEdge {
 	 */
 	public HyperEdge(PortNode root, Set<RuleNode> leaves) {
 		this.port = root;
-		this.rules = new HashSet<RuleNode>();
+		this.rules = new HashSet<>();
 		for (RuleNode r : leaves)
-			r.addToHyperedge(this);
+			r.addToHyperedge(this); // TODO this object is not initialized and cannot be used here 
 		id = ++N;
 	}
 
@@ -197,7 +197,7 @@ public class HyperEdge {
 
 			while (!rulesToCompose.isEmpty()) {
 				RuleNode r = rulesToCompose.poll();
-				RuleNode rule = r.compose(h_ruleNode);
+				RuleNode rule = r.compose(h_ruleNode); // TODO r may be null
 				if (rule != null)
 					r.erase();
 			}
@@ -213,7 +213,7 @@ public class HyperEdge {
 
 			while (!rulesToCompose.isEmpty()) {
 				RuleNode r1 = rulesToCompose.poll();
-				r1.rmFromHyperedge(h);
+				r1.rmFromHyperedge(h); // TODO r1 may be null
 				Boolean equal = false;
 				for (RuleNode r2 : list) {
 					RuleNode r = r1.compose(r2);

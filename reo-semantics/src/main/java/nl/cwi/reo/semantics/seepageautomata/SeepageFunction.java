@@ -42,16 +42,16 @@ public class SeepageFunction implements Label<SeepageFunction> {
 
 	@Override
 	public SeepageFunction rename(Map<Port, Port> links) {
-		return null;
+		return this;
 	}
 
 	@Override
 	public SeepageFunction getLabel(Set<Port> N) {
-		return null;
+		return this;
 	}
 
 	@Override
 	public SeepageFunction evaluate(Scope s, Monitor m) {
-		return null;
+		return this;
 	}
 }

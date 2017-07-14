@@ -51,14 +51,14 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	/**
 	 * Map that assigns an initial value to each memory cell.
 	 */
-	private final Map<Term, Term> initial;
+	private final Map<MemoryVariable, Term> initial;
 
 	/**
 	 * Constructs an automaton, with an empty set of rules.
 	 */
 	public ConstraintHypergraph() {
-		hyperedges = new HashSet<HyperEdge>();
-		initial = new HashMap<Term, Term>();
+		hyperedges = new HashSet<>();
+		initial = new HashMap<>();
 	}
 
 	/**
@@ -68,12 +68,13 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 *            formula
 	 */
 	public ConstraintHypergraph(Set<Rule> s) {
-		hyperedges = new HashSet<HyperEdge>();
+		hyperedges = new HashSet<>();
 
 		for (Rule r : s) {
 			RuleNode rule = new RuleNode(r);
-			for (Port v : r.getSyncConstraint().keySet()) {
-				if (r.getSyncConstraint().get(v)) {
+			for (Map.Entry<Port, Boolean> sc : r.getSyncConstraint().entrySet()) {
+				if (sc.getValue() == true) {
+					Port v = sc.getKey();
 					if (!getHyperedges(v).isEmpty()) {
 						rule.addToHyperedge(getHyperedges(v).get(0));
 					} else {
@@ -85,7 +86,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			}
 
 		}
-		this.initial = new HashMap<Term, Term>();
+		this.initial = new HashMap<>();
 	}
 
 	/**
@@ -94,7 +95,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 * @param f
 	 *            formula
 	 */
-	public ConstraintHypergraph(List<HyperEdge> h, Map<Term, Term> initial) {
+	public ConstraintHypergraph(List<HyperEdge> h, Map<MemoryVariable, Term> initial) {
 		this.hyperedges = new HashSet<HyperEdge>(h);
 		this.initial = new HashMap<>(initial);
 	}
@@ -105,12 +106,13 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 * @param f
 	 *            formula
 	 */
-	public ConstraintHypergraph(Set<Rule> s, Map<Term, Term> initial) {
+	public ConstraintHypergraph(Set<Rule> s, Map<MemoryVariable, Term> initial) {
 		hyperedges = new HashSet<HyperEdge>();
 		for (Rule r : s) {
 			RuleNode rule = new RuleNode(r);
-			for (Port v : r.getSyncConstraint().keySet()) {
-				if (r.getSyncConstraint().get(v)) {
+			for (Map.Entry<Port, Boolean> sc : r.getSyncConstraint().entrySet()) {
+				if (sc.getValue() == true) {
+					Port v = sc.getKey();
 					if (!getHyperedges(v).isEmpty()) {
 						rule.addToHyperedge(getHyperedges(v).get(0));
 					} else {
@@ -120,7 +122,6 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 					}
 				}
 			}
-
 		}
 		this.initial = initial;
 	}
@@ -201,7 +202,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 * 
 	 * @return map that assigns an initial value to each memory cell.
 	 */
-	public Map<Term, Term> getInitials() {
+	public Map<MemoryVariable, Term> getInitials() {
 		return initial;
 	}
 
@@ -210,21 +211,26 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 */
 	@Override
 	public @Nullable ConstraintHypergraph evaluate(Scope s, Monitor m) {
-		for (RuleNode r : getRuleNodes()) {
+		for (RuleNode r : getRuleNodes())
 			r.evaluate(s, m);
-		}
 
-		for (Term t : initial.keySet()) {
-			if (s.get(new Identifier(initial.get(t).toString())) != null) {
-				Value v = s.get(new Identifier(initial.get(t).toString()));
+		// TODO Evaluation of the initial values should be a recursive call to
+		// an evaluate function in of terms.
+		for (Map.Entry<MemoryVariable, Term> init : initial.entrySet()) {
+			if (s.get(new Identifier(init.getValue().toString())) != null) {
+				Value v = s.get(new Identifier(init.getValue().toString()));
 				if (v instanceof StringValue)
-					initial.put(t, new Function("constant", ((StringValue) v).getValue(), new ArrayList<Term>()));
+					initial.put(init.getKey(),
+							new Function("constant", ((StringValue) v).getValue(), new ArrayList<Term>()));
 				if (v instanceof BooleanValue)
-					initial.put(t, new Function("constant", ((BooleanValue) v).getValue(), new ArrayList<Term>()));
+					initial.put(init.getKey(),
+							new Function("constant", ((BooleanValue) v).getValue(), new ArrayList<Term>()));
 				if (v instanceof IntegerValue)
-					initial.put(t, new Function("constant", ((IntegerValue) v).getValue(), new ArrayList<Term>()));
+					initial.put(init.getKey(),
+							new Function("constant", ((IntegerValue) v).getValue(), new ArrayList<Term>()));
 				if (v instanceof DecimalValue)
-					initial.put(t, new Function("constant", ((DecimalValue) v).getValue(), new ArrayList<Term>()));
+					initial.put(init.getKey(),
+							new Function("constant", ((DecimalValue) v).getValue(), new ArrayList<Term>()));
 			}
 		}
 		return new ConstraintHypergraph(getRules(), initial);
@@ -280,7 +286,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		 * Instantiate merger/relicator
 		 */
 		for (Port p : inps) {
-			Formula transition = null;
+			Formula transition = new TruthValue(true);
 			Map<Port, Boolean> map = new HashMap<>();
 			map.put(p, true);
 			for (Port x : inps) {
@@ -291,10 +297,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			for (Port x : outs) {
 				map.put(x, true);
 				Formula eq = new Equality(new PortVariable(p), new PortVariable(x));
-				if (transition == null)
-					transition = eq;
-				else
-					transition = new Conjunction(Arrays.asList(transition, eq));
+				transition = new Conjunction(Arrays.asList(transition, eq));
 			}
 			rules.add(new Rule(map, transition));
 		}
@@ -361,12 +364,12 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				r.substitute(rename);
 			}
 
-			Map<Term, Term> init = new HashMap<>(A.getInitials());
-			for (Term t : init.keySet()) {
-				if (t instanceof MemoryVariable) {
-					A.getInitials().put(new MemoryVariable(rename.get(((MemoryVariable) t).getName()),
-							((MemoryVariable) t).hasPrime()), A.getInitials().get(t));
-				}
+			Map<MemoryVariable, Term> init = new HashMap<>(A.getInitials());
+			for (Map.Entry<MemoryVariable, Term> e : init.entrySet()) {
+				String newName = rename.get(e.getKey().getName());
+				if (newName == null)
+					newName = e.getKey().getName();
+				A.getInitials().put(new MemoryVariable(newName, e.getKey().hasPrime()), e.getValue());
 			}
 
 			newList.add(new ConstraintHypergraph(new ArrayList<>(A.getHyperedges()), A.getInitials()));

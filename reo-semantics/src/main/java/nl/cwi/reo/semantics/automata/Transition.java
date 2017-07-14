@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
@@ -161,7 +163,7 @@ public final class Transition<L extends Label<L>> {
 	}
 	
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 	    if (other == null) return false;
 	    if (other == this) return true;
 	    if (!(other instanceof Transition<?>)) return false;

@@ -82,6 +82,7 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 	 * @return a map that assigns each parameter name to an integer value, if
 	 *         these values can be found, and null otherwise.
 	 */
+	@Nullable 
 	public Scope findParamFromSize(int size) {
 		Scope params = new Scope();
 

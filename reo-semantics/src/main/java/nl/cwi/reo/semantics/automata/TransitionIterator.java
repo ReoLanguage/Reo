@@ -77,10 +77,7 @@ public class TransitionIterator<L extends Label<L>> implements Iterator<List<Tra
 			iters.add(iterA);			
 			tuple.add(iterA.next());	
 			
-		}
-		
-		// Skip this first tuple, and initialize the isNext flag.
-		findNext();		
+		}	
 	}
 	
 	/**

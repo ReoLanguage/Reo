@@ -3,6 +3,8 @@ package nl.cwi.reo.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 /**
  * A container for all messages generated during compilation.
  */
@@ -33,7 +35,7 @@ public final class Monitor {
 	 * @param msg
 	 *            message
 	 */
-	public void add(Location location, String msg) {
+	public void add(@Nullable Location location, String msg) {
 		hasErrors = true;
 		messages.add(new Message(MessageType.ERROR, location, msg));
 	}

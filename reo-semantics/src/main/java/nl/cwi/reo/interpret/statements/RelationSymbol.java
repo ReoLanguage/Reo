@@ -25,7 +25,7 @@ public enum RelationSymbol {
 		case GT:
 			return ">";
 		default:
-			return null;
+			return "error";
 		}
 	}
 }

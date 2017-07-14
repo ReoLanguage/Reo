@@ -29,6 +29,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	/**
 	 * Component name.
 	 */
+	@Nullable
 	private final String name;
 
 	/**
@@ -51,7 +52,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * 
 	 * @param atom
 	 *            semantics
-	 */
+	 */	
 	public ReoConnectorAtom(T atom) {
 		this.name = null;
 		this.semantics = atom;
@@ -72,7 +73,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * @param source
 	 *            reference to source code
 	 */
-	public ReoConnectorAtom(String name, T semantics, Reference source) {		
+	public ReoConnectorAtom(@Nullable String name, T semantics, Reference source) {		
 		this.name = name;
 		this.semantics = semantics;
 		this.source = source;
@@ -98,7 +99,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * @param links
 	 *            set of links
 	 */
-	public ReoConnectorAtom(String name, T semantics, Reference source, Map<Port, Port> links) {
+	public ReoConnectorAtom(@Nullable String name, T semantics, Reference source, Map<Port, Port> links) {
 		this.name = name;
 		this.semantics = semantics;
 		this.source = source;

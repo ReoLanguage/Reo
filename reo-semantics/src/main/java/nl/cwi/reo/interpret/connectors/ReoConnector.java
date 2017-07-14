@@ -67,6 +67,8 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	 *            insert replicators
 	 * @param nodeFactory
 	 *            instance of semantics object
+	 * 
+	 * @return connector with nodes inserted.
 	 */
 	public ReoConnector<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory);
 
@@ -97,6 +99,7 @@ public interface ReoConnector<T extends Semantics<T>> extends Expression<ReoConn
 	 * @return connector wherein every port has its inferred type, or null if
 	 *         there is a type conflict.
 	 */
+	@Nullable
 	public ReoConnector<T> propagate(Monitor m);
 
 	/**

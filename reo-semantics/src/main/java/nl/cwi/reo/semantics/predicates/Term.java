@@ -3,6 +3,8 @@ package nl.cwi.reo.semantics.predicates;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 
@@ -50,5 +52,6 @@ public interface Term {
 	 * 
 	 * @return type tag of this term.
 	 */
+	@Nullable
 	public TypeTag getTypeTag();
 }

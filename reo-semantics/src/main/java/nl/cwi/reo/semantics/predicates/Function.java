@@ -13,6 +13,7 @@ import org.stringtemplate.v4.ST;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
@@ -34,25 +35,14 @@ public class Function implements Term {
 	/**
 	 * Value of this function or reference to its implementation.
 	 */
+	@Nullable
 	private Object value;
 
 	/**
 	 * List of arguments of this function.
 	 */
+	@Nullable
 	private final List<Term> args;
-
-	/**
-	 * Constructs a new function from a name and a list of arguments.
-	 *
-	 * @param name
-	 *            name of the function
-	 * @param args
-	 *            list of arguments
-	 */
-	public Function(String name, List<Term> args) {
-		this.name = name;
-		this.args = args;
-	}
 
 	/**
 	 * Constructs a new function from a name, a value, and a list of arguments.
@@ -64,7 +54,7 @@ public class Function implements Term {
 	 * @param args
 	 *            list of arguments
 	 */
-	public Function(String name, Object value, List<Term> args) {
+	public Function(String name, @Nullable Object value, @Nullable List<Term> args) {
 		this.name = name;
 		this.value = value;
 		this.args = args;
@@ -84,9 +74,8 @@ public class Function implements Term {
 	 * 
 	 * @return value of this function.
 	 */
+	@Nullable
 	public Object getValue() {
-		if (value == null)
-			return "null";
 		return value;
 	}
 
@@ -95,6 +84,7 @@ public class Function implements Term {
 	 * 
 	 * @return list of arguments of this function.
 	 */
+	@Nullable
 	public List<Term> getArgs() {
 		return args;
 	}
@@ -106,7 +96,8 @@ public class Function implements Term {
 	public String toString() {
 		ST st = new ST("<name><if(args)>(<args; separator=\", \">)<endif>");
 		st.add("name", name);
-		st.add("args", args);
+		if (args != null)
+			st.add("args", args);
 		return st.render();
 	}
 
@@ -125,8 +116,9 @@ public class Function implements Term {
 	@Override
 	public Term rename(Map<Port, Port> links) {
 		List<Term> list = new ArrayList<Term>();
-		for (Term s : args)
-			list.add(s.rename(links));
+		if (args != null)
+			for (Term s : args)
+				list.add(s.rename(links));
 		return new Function(name, value, list);
 	}
 
@@ -148,10 +140,16 @@ public class Function implements Term {
 	 */
 	public Term evaluate(Scope s, Monitor m) {
 		String valueEval = "";
-		if (value instanceof String && s.get(new Identifier((String) value)) != null) {
-			valueEval = s.get(new Identifier((String) value)).toString();
-		} else
+		if (value instanceof String) {
+			Value v = s.get(new Identifier((String) value));
+			if (v != null) {
+				valueEval = v.toString();
+			} else {
+				m.add("Cannot evaluate this function");
+			}
+		} else {
 			m.add("Cannot evaluate this function");
+		}
 
 		if (valueEval.substring(0, 1).equals("\""))
 			valueEval = valueEval.substring(1, valueEval.length());
@@ -168,9 +166,13 @@ public class Function implements Term {
 	public Set<Variable> getFreeVariables() {
 		Set<Variable> vars = new HashSet<Variable>();
 		if (args != null) {
-			for (Term t : args)
-				if (t != null)
-					vars.addAll(t.getFreeVariables());
+			for (Term t : args) {
+				if (t != null) {
+					Set<Variable> freevars = t.getFreeVariables();
+					if (freevars != null)
+						vars.addAll(freevars);
+				}
+			}
 		}
 		return vars;
 	}
@@ -179,6 +181,7 @@ public class Function implements Term {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public TypeTag getTypeTag() {
 		// TODO infer type tags of functions.
 		return null;

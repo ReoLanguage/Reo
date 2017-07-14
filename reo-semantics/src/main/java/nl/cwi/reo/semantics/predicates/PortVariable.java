@@ -58,6 +58,7 @@ public class PortVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public TypeTag getTypeTag() {
 		return this.p.getTypeTag();
 	}

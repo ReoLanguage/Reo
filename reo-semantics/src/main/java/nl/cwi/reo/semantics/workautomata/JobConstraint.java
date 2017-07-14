@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -160,7 +163,7 @@ public final class JobConstraint implements Comparable<JobConstraint> {
 	 * @return true if the given object represents a JobConstraint equivalent to this job constraint, false otherwise.
 	 */
 	@Override 
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (!(other instanceof JobConstraint)) return false;
 		JobConstraint t = (JobConstraint)other;
 		return t.toString().equals(this.toString());

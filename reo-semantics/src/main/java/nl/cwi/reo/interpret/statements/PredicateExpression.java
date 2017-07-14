@@ -3,6 +3,8 @@ package nl.cwi.reo.interpret.statements;
 import java.util.List;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -23,6 +25,7 @@ public interface PredicateExpression extends Expression<List<Scope>> {
 	 *            message container
 	 * @return list of all possible extensions.
 	 */
+	@Nullable
 	public List<Scope> evaluate(Scope s, Monitor m);
 
 	/**
@@ -40,6 +43,7 @@ public interface PredicateExpression extends Expression<List<Scope>> {
 	 * 
 	 * @return set of defined variables, or null if not all variables are defined.
 	 */
+	@Nullable
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns);
 
 }

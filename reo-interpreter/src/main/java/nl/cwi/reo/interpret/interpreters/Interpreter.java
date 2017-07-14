@@ -152,7 +152,9 @@ public class Interpreter<T extends Semantics<T>> {
 				m.add("There is a cyclic dependency of imports among " + deps.keySet());
 				return null;
 			} 
-			list.add(programs.get(prog));
+			ReoFile<T> rf = programs.get(prog);
+			if (rf != null)
+				list.add(rf);
 			
 			// Remove the program from the dependency graph. 
 			Iterator<Map.Entry<String, Set<String>>> iter = deps.entrySet().iterator();

@@ -3,6 +3,8 @@ package nl.cwi.reo.semantics.automata;
 import java.util.List;
 import java.util.Objects;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 public class State implements Comparable<State> {
 	
 	/**
@@ -44,7 +46,7 @@ public class State implements Comparable<State> {
 	}
 	
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 	    if (other == null) return false;
 	    if (other == this) return true;
 	    if (!(other instanceof State)) return false;

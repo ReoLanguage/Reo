@@ -35,21 +35,26 @@ public final class Reference implements Expression<Reference> {
 		this.values = null;
 	}
 
-	public Reference(String ref, Language language) {
+	public Reference(@Nullable String ref, @Nullable Language language) {
 		this.ref = ref;
 		this.lang = language;
 		this.params = new ArrayList<>();
 		this.values = new ArrayList<>();
 	}
 
-	public Reference(String ref, Language language, List<? extends VariableExpression> params) {
+	public Reference(@Nullable String ref, @Nullable Language language, List<? extends VariableExpression> params) {
+		if (params != null)
+			throw new NullPointerException();
 		this.ref = ref;
 		this.lang = language;
 		this.params = params;
 		this.values = new ArrayList<>();
 	}
 
-	public Reference(String ref, Language language, List<? extends VariableExpression> params, List<Value> values) {
+	public Reference(@Nullable String ref, @Nullable Language language, List<? extends VariableExpression> params,
+			@Nullable List<Value> values) {
+		if (params != null)
+			throw new NullPointerException();
 		this.ref = ref;
 		this.lang = language;
 		this.params = params;
@@ -60,7 +65,8 @@ public final class Reference implements Expression<Reference> {
 	public String getCall() {
 		return ref;
 	}
-	
+
+	@Nullable
 	public List<Value> getValues() {
 		return values;
 	}
@@ -80,8 +86,12 @@ public final class Reference implements Expression<Reference> {
 		List<Value> values = new ArrayList<>();
 		for (VariableExpression v : params) {
 			List<? extends Identifier> ids = v.evaluate(s, m);
-			for (Identifier id : ids)
-				values.add(s.get(id));
+			if (ids != null) {
+				Value x;
+				for (Identifier id : ids)
+					if ((x = s.get(id)) != null)
+						values.add(x);
+			}
 		}
 		return new Reference(ref, lang, params, values);
 	}

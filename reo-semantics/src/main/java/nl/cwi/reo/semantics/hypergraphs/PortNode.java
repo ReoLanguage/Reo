@@ -55,7 +55,9 @@ public class PortNode {
 	 * @return node with new port.
 	 */
 	public PortNode rename(Map<Port, Port> links) {
-		p = p.rename(links.get(p).getName());
+		Port newPort = links.get(p);
+		if (newPort != null)
+			p = p.rename(newPort.getName());
 		return this;
 	}
 

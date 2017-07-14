@@ -234,6 +234,10 @@ public class Conjunction implements Formula {
 		Map<Variable, Integer> map = new HashMap<Variable, Integer>();
 		for (Formula f : clauses) {
 			map.putAll(f.getEvaluation());
+			// propagate the information. for example, (x=y).getEvaluation() is
+			// empty and the value is determined by composition.
+			// TODO this propagation is very restrictive, as is works only for
+			// simple equations like x=y.
 			if (f instanceof Equality) {
 				Equality e = (Equality) f;
 				if (e.getLHS() instanceof Variable && e.getRHS() instanceof Variable) {
@@ -242,7 +246,7 @@ public class Conjunction implements Formula {
 					if (p != null && q == null) {
 						map.put((Variable) e.getRHS(), p);
 					} else if (q != null && p == null) {
-						map.put((Variable) e.getLHS(), p);
+						map.put((Variable) e.getLHS(), q);
 					}
 				}
 			}

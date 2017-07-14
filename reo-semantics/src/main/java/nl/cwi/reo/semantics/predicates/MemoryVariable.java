@@ -81,6 +81,7 @@ public class MemoryVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public TypeTag getTypeTag() {
 		return type;
 	}

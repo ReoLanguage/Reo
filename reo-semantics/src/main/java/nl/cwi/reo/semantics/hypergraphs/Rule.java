@@ -118,18 +118,11 @@ public class Rule {
 	 *         otherwise.
 	 */
 	public boolean canSync(Rule r) {
-		boolean canSync = false;
-		for (Port p : sync.keySet()) {
-			if (sync.get(p)) {
-				if (r.getSyncConstraint().get(p) != null && r.getSyncConstraint().get(p)) {
-					canSync = true;
-				} else if (r.getSyncConstraint().get(p) != null && !r.getSyncConstraint().get(p)) {
+		for (Map.Entry<Port, Boolean> e : sync.entrySet())
+			for (Map.Entry<Port, Boolean> f : r.getSyncConstraint().entrySet())
+				if (e.getKey().equals(f.getKey()) && f.getValue() == !e.getValue())
 					return false;
-				}
-			} else if (r.getSyncConstraint() != null && r.getSyncConstraint().get(p) != null && r.getSyncConstraint().get(p))
-				return false;
-		}
-		return canSync;
+		return true;
 	}
 
 	/**

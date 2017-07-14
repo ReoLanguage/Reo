@@ -50,8 +50,12 @@ public final class Existential implements PredicateExpression {
 		List<Scope> list = membership.evaluate(s, m);
 		if (list == null)
 			return null;
-		for (Scope si : list)
-			scopes.addAll(predicate.evaluate(si, m));
+		for (Scope si : list) {
+			List<Scope> sclist = predicate.evaluate(si, m);
+			if (sclist == null)
+				return null;
+			scopes.addAll(sclist);
+		}
 		for (Scope si : scopes)
 			si.remove(membership.getVariable());
 		return scopes;
@@ -80,11 +84,13 @@ public final class Existential implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
 		Set<Identifier> defnsX = new HashSet<>(defns);
 		defns.add(membership.getVariable());
 		Set<Identifier> newDefs = predicate.getDefinedVariables(defnsX);
-		newDefs.remove(membership.getVariable());
+		if (newDefs != null)
+			newDefs.remove(membership.getVariable());
 		return newDefs;
 	}
 

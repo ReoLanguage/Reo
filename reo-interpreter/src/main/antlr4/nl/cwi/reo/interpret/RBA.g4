@@ -2,8 +2,8 @@ grammar RBA;
 
 import Tokens;
 
-rba      	: 	'#RBA' (rba_initial)? rba_rule* ;
-rba_initial :	rba_term '=' rba_term (';' rba_term '=' rba_term )*;
+rba      	: 	'#RBA' rba_initial* rba_rule* ;
+rba_initial :	'$' ID '=' rba_term ';' ;
 rba_rule 	:	'{' (rba_port (',' rba_port)* )? '}' rba_formula;
 rba_init 	: 	ID ':' 'initial' ;
 rba_tr   	: 	ID '->' ID ':' rba_rule ;
