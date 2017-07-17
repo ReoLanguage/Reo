@@ -5,6 +5,7 @@ import java.util.Map;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 
+// TODO: Auto-generated Javadoc
 /**
  * Result after evaluating a signature expression in a given set of parameter
  * values and ports.

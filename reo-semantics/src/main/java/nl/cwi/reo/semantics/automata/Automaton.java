@@ -21,21 +21,21 @@ import nl.cwi.reo.util.Monitor;
 import java.util.HashMap;
 import java.util.HashSet;
 
+// TODO: Auto-generated Javadoc
 /**
  * A port automaton in which each transition has, besides a synchronization
  * constraint, a generic label of type L. If the transition label type L is
- * immutable, then Automaton<L> is immutable too.
+ * immutable, then Automaton&lt;L&gt; is immutable too.
+ *
+ * @param <L>
+ *            the generic type
  */
 public class Automaton<L extends Label<L>> {
 
-	/**
-	 * Set of states
-	 */
+	/** Set of states. */
 	protected final SortedSet<State> states;
 
-	/**
-	 * Set of ports
-	 */
+	/** Set of ports. */
 	protected final SortedSet<Port> iface;
 
 	/**
@@ -56,9 +56,7 @@ public class Automaton<L extends Label<L>> {
 	/**
 	 * Constructs the identity automaton with respect to composition, which is a
 	 * single state automaton with empty interface and no transitions.
-	 * 
-	 * @param type
-	 *            type of semantics
+	 *
 	 * @param lbl
 	 *            instance of a label
 	 */
@@ -81,7 +79,7 @@ public class Automaton<L extends Label<L>> {
 	/**
 	 * Constructs a new work automaton. If the initial state is not present in
 	 * the set of states, then it is added to the set of states.
-	 * 
+	 *
 	 * @param Q
 	 *            set of states
 	 * @param P
@@ -90,8 +88,6 @@ public class Automaton<L extends Label<L>> {
 	 *            mapping from states to outgoing transitions
 	 * @param q0
 	 *            initial state
-	 * @param type
-	 *            type of semantics
 	 * @param lbl
 	 *            instance of a label
 	 */
@@ -162,9 +158,10 @@ public class Automaton<L extends Label<L>> {
 
 	/**
 	 * Returns a copy of this automaton with given initial state.
-	 * 
+	 *
 	 * @param q0
 	 *            new initial state.
+	 * @return the automaton
 	 */
 	public Automaton<L> setInitial(State q0) {
 		return new Automaton<L>(states, iface, out, q0, lbl);
@@ -265,11 +262,11 @@ public class Automaton<L extends Label<L>> {
 	}
 
 	/**
-	 * Restricts the interface of this automaton
-	 * 
+	 * Restricts the interface of this automaton.
+	 *
 	 * @param intface
 	 *            smaller interface
-	 * @returns Automaton with interface intface.
+	 * @return Automaton with interface intface.
 	 */
 	public Automaton<L> restrict(Collection<? extends Port> intface) {
 		SortedSet<Port> iface = new TreeSet<Port>(intface);
@@ -285,9 +282,10 @@ public class Automaton<L extends Label<L>> {
 
 	/**
 	 * Relabels a name x to a name y, for every key-value pair (x,y) in r.
-	 * 
+	 *
 	 * @param links
 	 *            relabeling function
+	 * @return the automaton
 	 */
 	public Automaton<L> rename(Map<Port, Port> links) {
 
@@ -317,6 +315,8 @@ public class Automaton<L extends Label<L>> {
 
 	/**
 	 * Gets the string representation of this automaton in .dot format.
+	 *
+	 * @return the string
 	 */
 	@Override
 	public String toString() {
@@ -341,9 +341,7 @@ public class Automaton<L extends Label<L>> {
 
 	/**
 	 * Produces a .dot file containing this work automaton.
-	 * 
-	 * @param A
-	 *            work automaton
+	 *
 	 * @param fileName
 	 *            the name of the file without .dot extension
 	 * @return true if file is successfully written.
@@ -375,6 +373,13 @@ public class Automaton<L extends Label<L>> {
 		return true;
 	}
 
+	/**
+	 * Gets the node.
+	 *
+	 * @param node
+	 *            the node
+	 * @return the node
+	 */
 	public Automaton<L> getNode(Set<Port> node) {
 		SortedSet<State> Q = new TreeSet<State>();
 		SortedSet<Port> P = new TreeSet<Port>();
@@ -409,6 +414,15 @@ public class Automaton<L extends Label<L>> {
 		return new Automaton<L>(Q, P, T, q0, lbl);
 	}
 
+	/**
+	 * Evaluate.
+	 *
+	 * @param s
+	 *            the s
+	 * @param m
+	 *            the m
+	 * @return the automaton
+	 */
 	public Automaton<L> evaluate(Scope s, Monitor m) {
 		Map<State, Set<Transition<L>>> out = new HashMap<State, Set<Transition<L>>>();
 		for (Map.Entry<State, Set<Transition<L>>> entry : this.out.entrySet()) {

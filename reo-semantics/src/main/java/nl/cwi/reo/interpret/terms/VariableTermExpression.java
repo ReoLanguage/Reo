@@ -11,6 +11,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a term variable.
  */
@@ -55,10 +56,15 @@ public class VariableTermExpression implements TermExpression {
 		return variable.getVariables();
 	}
 
+	/**
+	 * Gets the indices.
+	 *
+	 * @return the indices
+	 */
 	public List<TermExpression> getIndices() {
 		return variable.getIndices();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

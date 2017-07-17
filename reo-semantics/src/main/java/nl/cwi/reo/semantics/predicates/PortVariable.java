@@ -12,6 +12,7 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 
+// TODO: Auto-generated Javadoc
 /**
  * A variable the represents the data observed at a port.
  */
@@ -48,6 +49,7 @@ public class PortVariable implements Variable {
 
 	/**
 	 * Checks if the port of this variable is an input port.
+	 * 
 	 * @return true if the port is an input port
 	 */
 	public boolean isInput() {
@@ -62,7 +64,7 @@ public class PortVariable implements Variable {
 	public TypeTag getTypeTag() {
 		return this.p.getTypeTag();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

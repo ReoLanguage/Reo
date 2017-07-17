@@ -109,10 +109,10 @@ import nl.cwi.reo.interpret.ReoParser.Term_variableContext;
 import nl.cwi.reo.interpret.ReoParser.TypeContext;
 import nl.cwi.reo.interpret.ReoParser.VarContext;
 
+// TODO: Auto-generated Javadoc
 /**
  * Listens to events triggered by a
- * {@link org.antlr.v4.runtime.tree.ParseTreeWalker}. Returns a
- * {@link nl.cwi.reo.interpret.p}.
+ * {@link org.antlr.v4.runtime.tree.ParseTreeWalker}.
  * 
  * @param <T>
  *            Reo semantics type
@@ -123,58 +123,88 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	// private ParseTreeProperty<Map<String, String>> symbols = new
 	// ParseTreeProperty<Map<String, String>>();
 
+	/** The m. */
 	protected final Monitor m;
 
+	/** The filename. */
 	private String filename = "";
 
+	/** The program. */
 	// File
 	@Nullable
 	private ReoFile<T> program;
+
+	/** The imports. */
 	private Set<String> imports = new HashSet<String>();
+
+	/** The definitions. */
 	private ParseTreeProperty<Relation> definitions = new ParseTreeProperty<Relation>();
 
+	/** The section. */
 	// Section
 	private ParseTreeProperty<String> section = new ParseTreeProperty<String>();
 
+	/** The components. */
 	// Components
 	private ParseTreeProperty<ComponentExpression<T>> components = new ParseTreeProperty<ComponentExpression<T>>();
+
+	/** The componentnames. */
 	private ParseTreeProperty<String> componentnames = new ParseTreeProperty<String>();
 
+	/** The formula. */
 	// Formulas
 	private ParseTreeProperty<PredicateExpression> formula = new ParseTreeProperty<PredicateExpression>();
 
+	/** The instances. */
 	// Instances
 	private ParseTreeProperty<InstanceExpression<T>> instances = new ParseTreeProperty<InstanceExpression<T>>();
 
+	/** The terms. */
 	// Terms
 	private ParseTreeProperty<TermExpression> terms = new ParseTreeProperty<TermExpression>();
 
+	/** The terms list. */
 	// Term lists
 	private ParseTreeProperty<List<TermExpression>> termsList = new ParseTreeProperty<List<TermExpression>>();
 
+	/** The signature expressions. */
 	// Signatures
 	private ParseTreeProperty<SignatureExpression> signatureExpressions = new ParseTreeProperty<SignatureExpression>();
 
+	/** The parameterlists. */
 	// Parameters
 	private ParseTreeProperty<List<ParameterExpression>> parameterlists = new ParseTreeProperty<List<ParameterExpression>>();
+
+	/** The parameters. */
 	private ParseTreeProperty<ParameterExpression> parameters = new ParseTreeProperty<ParameterExpression>();
 
+	/** The nodelists. */
 	// Nodes
 	private ParseTreeProperty<List<NodeExpression>> nodelists = new ParseTreeProperty<List<NodeExpression>>();
+
+	/** The nodes. */
 	private ParseTreeProperty<NodeExpression> nodes = new ParseTreeProperty<NodeExpression>();
 
+	/** The typetags. */
 	// Type tags
 	private ParseTreeProperty<TypeTag> typetags = new ParseTreeProperty<TypeTag>();
 
+	/** The portlists. */
 	// Ports
 	private ParseTreeProperty<List<PortExpression>> portlists = new ParseTreeProperty<List<PortExpression>>();
+
+	/** The ports. */
 	private ParseTreeProperty<PortExpression> ports = new ParseTreeProperty<PortExpression>();
 
+	/** The variables. */
 	// Variables
 	private ParseTreeProperty<VariableExpression> variables = new ParseTreeProperty<VariableExpression>();
 
+	/** The atoms. */
 	// Atoms
 	protected ParseTreeProperty<T> atoms = new ParseTreeProperty<T>();
+
+	/** The sources. */
 	protected ParseTreeProperty<Reference> sources = new ParseTreeProperty<Reference>();
 
 	/**
@@ -199,6 +229,9 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	/**
 	 * Sets the file name, and clears all parse tree properties.
+	 *
+	 * @param filename
+	 *            the new file name
 	 */
 	public void setFileName(String filename) {
 		this.filename = filename;
@@ -222,7 +255,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * File structure
+	 * File structure.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -232,6 +268,12 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		// symbols.put(ctx.component(), s);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitFile(nl.cwi.reo.interpret.
+	 * ReoParser.FileContext)
+	 */
 	@Override
 	public void exitFile(FileContext ctx) {
 		String sec = "";
@@ -245,21 +287,45 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		program = new ReoFile<T>(sec, imports, filename, c, l);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitSecn(nl.cwi.reo.interpret.
+	 * ReoParser.SecnContext)
+	 */
 	@Override
 	public void exitSecn(SecnContext ctx) {
 		section.put(ctx, ctx.name().getText());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitImps(nl.cwi.reo.interpret.
+	 * ReoParser.ImpsContext)
+	 */
 	@Override
 	public void exitImps(ImpsContext ctx) {
 		imports.add(ctx.name().getText());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#enterDefn(nl.cwi.reo.interpret.
+	 * ReoParser.DefnContext)
+	 */
 	@Override
 	public void enterDefn(DefnContext ctx) {
 		componentnames.put(ctx.component(), ctx.ID().getText());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitDefn(nl.cwi.reo.interpret.
+	 * ReoParser.DefnContext)
+	 */
 	@Override
 	public void exitDefn(DefnContext ctx) {
 		VariableExpression e = new VariableExpression(ctx.ID().getText(), new ArrayList<TermExpression>(),
@@ -270,7 +336,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Components
+	 * Components.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -279,6 +348,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		components.put(ctx, new ComponentVariable<T>(var));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitComponent_atomic(nl.cwi.reo.
+	 * interpret.ReoParser.Component_atomicContext)
+	 */
 	@Override
 	public void exitComponent_atomic(Component_atomicContext ctx) {
 		SignatureExpression sign = signatureExpressions.get(ctx.sign());
@@ -317,11 +393,25 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		components.put(ctx, new ComponentDefinition<T>(sign, new SetAtom<T>(name, atom, s)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitSource(nl.cwi.reo.interpret.
+	 * ReoParser.SourceContext)
+	 */
 	@Override
 	public void exitSource(SourceContext ctx) {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterComponent_composite(nl.cwi.reo.
+	 * interpret.ReoParser.Component_compositeContext)
+	 */
 	@Override
 	public void enterComponent_composite(Component_compositeContext ctx) {
 		componentnames.put(ctx.multiset(), componentnames.get(ctx));
@@ -329,6 +419,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 				(SetComposite<T>) instances.get(ctx.multiset())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitComponent_composite(nl.cwi.reo.
+	 * interpret.ReoParser.Component_compositeContext)
+	 */
 	@Override
 	public void exitComponent_composite(Component_compositeContext ctx) {
 		components.put(ctx, new ComponentDefinition<T>(signatureExpressions.get(ctx.sign()),
@@ -336,7 +433,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Sets
+	 * Sets.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -345,6 +445,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		instances.put(ctx, i);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitMultiset_setbuilder(nl.cwi.reo.
+	 * interpret.ReoParser.Multiset_setbuilderContext)
+	 */
 	@Override
 	public void exitMultiset_setbuilder(Multiset_setbuilderContext ctx) {
 		String name = componentnames.get(ctx);
@@ -361,7 +468,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Instances
+	 * Instances.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -378,6 +488,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		instances.put(ctx, new ComponentInstance<T>(cexpr, new ListExpression(list), var));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitInstance_product(nl.cwi.reo.
+	 * interpret.ReoParser.Instance_productContext)
+	 */
 	@Override
 	public void exitInstance_product(Instance_productContext ctx) {
 		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
@@ -386,6 +503,12 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		instances.put(ctx, new ProductInstance<T>(s, i1, i2, new Location(ctx.start, filename)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitInstance_sum(nl.cwi.reo.
+	 * interpret.ReoParser.Instance_sumContext)
+	 */
 	@Override
 	public void exitInstance_sum(Instance_sumContext ctx) {
 		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
@@ -394,6 +517,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		instances.put(ctx, new ProductInstance<T>(s, i1, i2, new Location(ctx.start, filename)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitInstance_semicolon(nl.cwi.reo.
+	 * interpret.ReoParser.Instance_semicolonContext)
+	 */
 	@Override
 	public void exitInstance_semicolon(Instance_semicolonContext ctx) {
 		InstanceExpression<T> i1 = instances.get(ctx.instance(0));
@@ -403,7 +533,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Predicates
+	 * Predicates.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -412,6 +545,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		formula.put(ctx, p);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_componentdefn(nl.cwi.reo
+	 * .interpret.ReoParser.Formula_componentdefnContext)
+	 */
 	@Override
 	public void exitFormula_componentdefn(Formula_componentdefnContext ctx) {
 		List<TermExpression> arguments = Arrays.asList(new VariableTermExpression(variables.get(ctx.var())),
@@ -420,6 +560,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		formula.put(ctx, p);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_structdefn(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_structdefnContext)
+	 */
 	@Override
 	public void exitFormula_structdefn(Formula_structdefnContext ctx) {
 		List<ParameterExpression> params = new ArrayList<>();
@@ -435,6 +582,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		formula.put(ctx, new Relation(RelationSymbol.EQ, Arrays.asList(te1, te2), new Location(ctx.start, filename)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_membership(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_membershipContext)
+	 */
 	@Override
 	public void exitFormula_membership(Formula_membershipContext ctx) {
 		Membership p = new Membership(new Identifier(ctx.ID().toString()),
@@ -442,12 +596,26 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		formula.put(ctx, p);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_variable(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_variableContext)
+	 */
 	@Override
 	public void exitFormula_variable(Formula_variableContext ctx) {
 		StatementVariable p = new StatementVariable(new VariableTermExpression(variables.get(ctx.var())));
 		formula.put(ctx, p);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_binaryrelation(nl.cwi.
+	 * reo.interpret.ReoParser.Formula_binaryrelationContext)
+	 */
 	@Override
 	public void exitFormula_binaryrelation(Formula_binaryrelationContext ctx) {
 		List<TermExpression> l = Arrays.asList(terms.get(ctx.term(0)), terms.get(ctx.term(1)));
@@ -475,11 +643,25 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_negation(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_negationContext)
+	 */
 	@Override
 	public void exitFormula_negation(Formula_negationContext ctx) {
 		formula.put(ctx, new Negation(formula.get(ctx.formula())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_existential(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_existentialContext)
+	 */
 	@Override
 	public void exitFormula_existential(Formula_existentialContext ctx) {
 		// TODO
@@ -488,18 +670,39 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		// formula.put(ctx, new Conjunction(l));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_universal(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_universalContext)
+	 */
 	@Override
 	public void exitFormula_universal(Formula_universalContext ctx) {
 		// TODO
 		// formula.put(ctx, new Conjunction(formula.get(ctx.formula())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_conjunction(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_conjunctionContext)
+	 */
 	@Override
 	public void exitFormula_conjunction(Formula_conjunctionContext ctx) {
 		List<PredicateExpression> l = Arrays.asList(formula.get(ctx.formula(0)), formula.get(ctx.formula(1)));
 		formula.put(ctx, new Conjunction(l));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_disjunction(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_disjunctionContext)
+	 */
 	@Override
 	public void exitFormula_disjunction(Formula_disjunctionContext ctx) {
 		List<PredicateExpression> l = Arrays.asList(formula.get(ctx.formula(0)), formula.get(ctx.formula(1)));
@@ -507,6 +710,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitFormula_implication(nl.cwi.reo.
+	 * interpret.ReoParser.Formula_implicationContext)
+	 */
 	@Override
 	public void exitFormula_implication(Formula_implicationContext ctx) {
 		// TODO interpret P -> Q as !P || Q.
@@ -517,7 +727,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Signatures
+	 * Signatures.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -534,6 +747,13 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		signatureExpressions.put(ctx, new SignatureExpression(parameters, nodes, new Location(ctx.start, filename)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitParams(nl.cwi.reo.interpret.
+	 * ReoParser.ParamsContext)
+	 */
 	@Override
 	public void exitParams(ParamsContext ctx) {
 		List<ParameterExpression> list = new ArrayList<ParameterExpression>();
@@ -542,6 +762,12 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		parameterlists.put(ctx, list);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitParam(nl.cwi.reo.interpret.
+	 * ReoParser.ParamContext)
+	 */
 	@Override
 	public void exitParam(ParamContext ctx) {
 		VariableExpression var = variables.get(ctx.var());
@@ -552,6 +778,12 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		// TODO : add signature option
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitNodes(nl.cwi.reo.interpret.
+	 * ReoParser.NodesContext)
+	 */
 	@Override
 	public void exitNodes(NodesContext ctx) {
 		List<NodeExpression> list = new ArrayList<NodeExpression>();
@@ -560,6 +792,12 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		nodelists.put(ctx, list);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitNode(nl.cwi.reo.interpret.
+	 * ReoParser.NodeContext)
+	 */
 	@Override
 	public void exitNode(NodeContext ctx) {
 		VariableExpression var = variables.get(ctx.var());
@@ -586,7 +824,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Type tags for uninterpreted data
+	 * Type tags for uninterpreted data.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -596,7 +837,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Interface instantiation
+	 * Interface instantiation.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -607,6 +851,12 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		portlists.put(ctx, list);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitPort(nl.cwi.reo.interpret.
+	 * ReoParser.PortContext)
+	 */
 	@Override
 	public void exitPort(PortContext ctx) {
 		PrioType prio = PrioType.NONE;
@@ -616,7 +866,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Variables
+	 * Variables.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -637,7 +890,10 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 	}
 
 	/**
-	 * Term expressions
+	 * Term expressions.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
@@ -645,41 +901,92 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		terms.put(ctx, new IntegerValue(Integer.parseInt(ctx.NAT().getText())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitTerm_boolean(nl.cwi.reo.
+	 * interpret.ReoParser.Term_booleanContext)
+	 */
 	@Override
 	public void exitTerm_boolean(Term_booleanContext ctx) {
 		terms.put(ctx, new BooleanValue(Boolean.parseBoolean(ctx.BOOL().getText())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitTerm_string(nl.cwi.reo.interpret
+	 * .ReoParser.Term_stringContext)
+	 */
 	@Override
 	public void exitTerm_string(Term_stringContext ctx) {
 		terms.put(ctx, new StringValue((ctx.STRING().getText())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitTerm_decimal(nl.cwi.reo.
+	 * interpret.ReoParser.Term_decimalContext)
+	 */
 	@Override
 	public void exitTerm_decimal(Term_decimalContext ctx) {
 		terms.put(ctx, new DecimalValue(Double.parseDouble(ctx.DEC().getText())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitTerm_componentdefn(nl.cwi.reo.
+	 * interpret.ReoParser.Term_componentdefnContext)
+	 */
 	@Override
 	public void exitTerm_componentdefn(Term_componentdefnContext ctx) {
 		terms.put(ctx, new ComponentTermExpression<T>(components.get(ctx.component())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitTerm_variable(nl.cwi.reo.
+	 * interpret.ReoParser.Term_variableContext)
+	 */
 	@Override
 	public void exitTerm_variable(Term_variableContext ctx) {
 		terms.put(ctx, new VariableTermExpression(variables.get(ctx.var())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitTerm_list(nl.cwi.reo.interpret.
+	 * ReoParser.Term_listContext)
+	 */
 	@Override
 	public void exitTerm_list(Term_listContext ctx) {
 		terms.put(ctx, new ListExpression(termsList.get(ctx.list())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitTerm_instance(nl.cwi.reo.
+	 * interpret.ReoParser.Term_instanceContext)
+	 */
 	@Override
 	public void exitTerm_instance(Term_instanceContext ctx) {
 		terms.put(ctx, new InstanceTermExpression<T>(instances.get(ctx.instance())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitTerm_operation(nl.cwi.reo.
+	 * interpret.ReoParser.Term_operationContext)
+	 */
 	@Override
 	public void exitTerm_operation(Term_operationContext ctx) {
 		TermExpression e1 = terms.get(ctx.term(0));
@@ -706,6 +1013,12 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitTerm_exponent(nl.cwi.reo.
+	 * interpret.ReoParser.Term_exponentContext)
+	 */
 	@Override
 	public void exitTerm_exponent(Term_exponentContext ctx) {
 		TermExpression e1 = terms.get(ctx.term(0));
@@ -714,6 +1027,12 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		terms.put(ctx, new FunctionExpression(FunctionSymbol.POW, l, new Location(ctx.start, filename)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitTerm_unarymin(nl.cwi.reo.
+	 * interpret.ReoParser.Term_unaryminContext)
+	 */
 	@Override
 	public void exitTerm_unarymin(Term_unaryminContext ctx) {
 		TermExpression e = terms.get(ctx.term());
@@ -721,18 +1040,34 @@ public class Listener<T extends Semantics<T>> extends ReoBaseListener {
 		terms.put(ctx, new FunctionExpression(FunctionSymbol.MIN, l, new Location(ctx.start, filename)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitTerm_brackets(nl.cwi.reo.
+	 * interpret.ReoParser.Term_bracketsContext)
+	 */
 	@Override
 	public void exitTerm_brackets(Term_bracketsContext ctx) {
 		terms.put(ctx, terms.get(ctx.term()));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitTerm_range(nl.cwi.reo.interpret.
+	 * ReoParser.Term_rangeContext)
+	 */
 	@Override
 	public void exitTerm_range(Term_rangeContext ctx) {
 		terms.put(ctx, new Range(terms.get(ctx.term(0)), terms.get(ctx.term(1))));
 	}
 
 	/**
-	 * List of terms
+	 * List of terms.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override

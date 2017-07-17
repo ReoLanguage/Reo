@@ -1,10 +1,23 @@
 package nl.cwi.reo.interpret.statements;
 
+// TODO: Auto-generated Javadoc
 /**
  * Enumeration of all possible relation symbols.
  */
 public enum RelationSymbol {
-	LT, LEQ, EQ, NEQ, GEQ, GT;
+
+	/** The lt. */
+	LT,
+	/** The leq. */
+	LEQ,
+	/** The eq. */
+	EQ,
+	/** The neq. */
+	NEQ,
+	/** The geq. */
+	GEQ,
+	/** The gt. */
+	GT;
 
 	/**
 	 * {@inheritDoc}

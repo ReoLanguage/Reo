@@ -15,6 +15,7 @@ import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * A component definition.
  * 
@@ -39,8 +40,8 @@ public final class Component<T extends Semantics<T>> implements Value {
 	private final SetExpression<T> set;
 
 	/**
-	 * Constructs a new component definition
-	 * 
+	 * Constructs a new component definition.
+	 *
 	 * @param scope
 	 *            local scope containing dependencies of this component
 	 *            definition
@@ -57,11 +58,13 @@ public final class Component<T extends Semantics<T>> implements Value {
 
 	/**
 	 * Instantiates a Reo connector from this component definition.
-	 * 
+	 *
 	 * @param values
 	 *            parameter values
 	 * @param ports
 	 *            ports in interface
+	 * @param m
+	 *            the m
 	 * @return a list of instances and unifications.
 	 */
 	@Nullable

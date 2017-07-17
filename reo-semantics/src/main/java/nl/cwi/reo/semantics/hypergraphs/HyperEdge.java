@@ -3,6 +3,7 @@ package nl.cwi.reo.semantics.hypergraphs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
 
+// TODO: Auto-generated Javadoc
 /**
  * A hyperedge in a constraint hypergraph that connects a single port node with
  * a set of rule nodes.
@@ -55,7 +57,8 @@ public class HyperEdge {
 		this.port = root;
 		this.rules = new HashSet<>();
 		for (RuleNode r : leaves)
-			r.addToHyperedge(this); // TODO this object is not initialized and cannot be used here 
+			r.addToHyperedge(this); // TODO this object is not initialized and
+									// cannot be used here
 		id = ++N;
 	}
 
@@ -148,8 +151,8 @@ public class HyperEdge {
 
 	/**
 	 * Composes (via conjunction) every rule in the target of this hyperedge
-	 * with a given formula
-	 * 
+	 * with a given formula.
+	 *
 	 * @param f
 	 *            formula
 	 * @return reference to this hyperedge
@@ -283,13 +286,12 @@ public class HyperEdge {
 	@Override
 	public String toString() {
 		String s = "";
-		int i = rules.size();
-		for (RuleNode r : rules) {
-			s = s + r.toString() + (i > 1 ? " || \n " : "");
-			i--;
-		}
+		s += port.getPort() + " \u2192 \u2228{ ";
+		Iterator<RuleNode> iter = rules.iterator();
+		while (iter.hasNext())
+			s += iter.next() + (iter.hasNext() ? ", " : "");
+		s += " }";
 		return s;
-
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import nl.cwi.reo.interpret.values.Value;
 
+// TODO: Auto-generated Javadoc
 /**
  * A list of terms, which is a term in itself.
  */
@@ -17,8 +18,8 @@ public final class Tuple extends ArrayList<List<Term>> implements Value {
 	private static final long serialVersionUID = 886556264207970624L;
 
 	/**
-	 * Constructs a new tuple
-	 * 
+	 * Constructs a new tuple.
+	 *
 	 * @param list
 	 *            list of terms
 	 */

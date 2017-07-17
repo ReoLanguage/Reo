@@ -5,6 +5,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
 
+// TODO: Auto-generated Javadoc
 /**
  * An identifier that is decorated with a port type, a priority type, a type
  * tag, and an indicator for visibility.
@@ -75,11 +76,11 @@ public final class Port extends Identifier implements Comparable<Port> {
 	 * Joins this port to port origin by inheriting, if necessary, the type, tag
 	 * and visibility of port origin. This method is used when ports in a block
 	 * are instantiated via a signature.
-	 * 
+	 *
 	 * @param origin
 	 *            port
-	 * @returns a copy of this port, with possibly its type, tag and visibility
-	 *          inherited from port origin.
+	 * @return a copy of this port, with possibly its type, tag and visibility
+	 *         inherited from port origin.
 	 */
 	public Port join(Port origin) {
 		if (origin == null)
@@ -185,30 +186,35 @@ public final class Port extends Identifier implements Comparable<Port> {
 		return (visible ? "" : "*") + prio + name + type + (tag == null ? "" : tag);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
 	@Override
 	public int compareTo(Port other) {
 		return this.name.compareTo(other.name);
 	}
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public boolean equals(@Nullable Object other) {
-//		if (other == null)
-//			return false;
-//		if (other == this)
-//			return true;
-//		if (!(other instanceof Port))
-//			return false;
-//		Port p = (Port) other;
-//		return (Objects.equals(this.name, p.name));
-//	}
-//
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public int hashCode() {
-//		return Objects.hash(this.name);
-//	}
+	// /**
+	// * {@inheritDoc}
+	// */
+	// @Override
+	// public boolean equals(@Nullable Object other) {
+	// if (other == null)
+	// return false;
+	// if (other == this)
+	// return true;
+	// if (!(other instanceof Port))
+	// return false;
+	// Port p = (Port) other;
+	// return (Objects.equals(this.name, p.name));
+	// }
+	//
+	// /**
+	// * {@inheritDoc}
+	// */
+	// @Override
+	// public int hashCode() {
+	// return Objects.hash(this.name);
+	// }
 }

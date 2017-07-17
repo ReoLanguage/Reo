@@ -1,47 +1,46 @@
 package nl.cwi.reo.interpret.connectors;
 
+// TODO: Auto-generated Javadoc
 /**
  * Enumeration of all compiler supported languages.
  */
 public enum Language {
-	
+
 	/**
 	 * Java language.
 	 */
-	JAVA, 
-	
-	/**
-	 * C11 language
-	 */
+	JAVA,
+
+	/** C11 language. */
 	C11,
-	
-	/**
-	 * Maude language
-	 */
+
+	/** Maude language. */
 	MAUDE,
-	
-	/**
-	 * Proto Runtime
-	 */
-	PRT, 
-	
-	/**
-	 * Pr text
-	 */
+
+	/** Proto Runtime. */
+	PRT,
+
+	/** Pr text. */
 	TEXT;
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		switch(this) {
-		case JAVA: return "Java";
-		case C11: return "C11";
-		case MAUDE: return "Maude";
-		case PRT: return "Proto runtime";
-		case TEXT: return "Text";
-		default: throw new IllegalArgumentException();
+		switch (this) {
+		case JAVA:
+			return "Java";
+		case C11:
+			return "C11";
+		case MAUDE:
+			return "Maude";
+		case PRT:
+			return "Proto runtime";
+		case TEXT:
+			return "Text";
+		default:
+			throw new IllegalArgumentException();
 		}
 	}
 }

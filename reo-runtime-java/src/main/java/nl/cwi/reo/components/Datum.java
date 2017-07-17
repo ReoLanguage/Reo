@@ -4,11 +4,22 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Datum.
+ *
+ * @param <T>
+ *            the generic type
+ */
 public class Datum<T> {
 
 	/**
 	 * Checks if the string <code>string</code> can be converted to an object.
-	 * 
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param string
+	 *            the string
 	 * @return <code>true</code> if <code>string</code> can be converted to an
 	 *         object; <code>false</code> otherwise.
 	 */
@@ -23,7 +34,16 @@ public class Datum<T> {
 			return false;
 		}
 	}
-    
+
+	/**
+	 * Convert to object.
+	 *
+	 * @param <T>
+	 *            the generic type
+	 * @param string
+	 *            the string
+	 * @return the object
+	 */
 	public static <T> Object convertToObject(String string) {
 		T instance = null;
 		if (string == null)
@@ -31,29 +51,26 @@ public class Datum<T> {
 
 		if (string.equals("null"))
 			return null;
-		
-		if(instance instanceof String){
+
+		if (instance instanceof String) {
 			return string;
 		}
-		if(instance instanceof Double){
+		if (instance instanceof Double) {
 			return Double.parseDouble(string);
 		}
-		if(instance instanceof Integer){
+		if (instance instanceof Integer) {
 			return Integer.parseInt(string);
 		}
-		
-		
+
 		String[] tokens = string.split(" ");
 		List<Serializable> list = new ArrayList<Serializable>();
 
 		int nTokens = tokens.length;
-		boolean isArray = tokens[0].startsWith("[")
-				&& tokens[tokens.length - 1].endsWith("]");
+		boolean isArray = tokens[0].startsWith("[") && tokens[tokens.length - 1].endsWith("]");
 
 		if (isArray) {
 			tokens[0] = tokens[0].substring(1);
-			tokens[nTokens - 1] = tokens[nTokens - 1].substring(0,
-					tokens[nTokens - 1].length() - 1);
+			tokens[nTokens - 1] = tokens[nTokens - 1].substring(0, tokens[nTokens - 1].length() - 1);
 		}
 
 		StringBuilder builder = new StringBuilder();
@@ -193,12 +210,10 @@ public class Datum<T> {
 
 			String className = object.getClass().getSimpleName();
 
-			return object == null ? "null" : (object instanceof String ? "\""
-					: "")
-					+ object.toString()
-					+ (object instanceof String ? "\"" : "")
-					+ (className.isEmpty() ? " (anonymous type)" : ":"
-							+ className);
+			return object == null ? "null"
+					: (object instanceof String ? "\"" : "") + object.toString()
+							+ (object instanceof String ? "\"" : "")
+							+ (className.isEmpty() ? " (anonymous type)" : ":" + className);
 		}
 	}
 

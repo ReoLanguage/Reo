@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+// TODO: Auto-generated Javadoc
 /**
  * Implements a vertex in a {@link nl.cwi.reo.graphgames.GameGraph}.
  */

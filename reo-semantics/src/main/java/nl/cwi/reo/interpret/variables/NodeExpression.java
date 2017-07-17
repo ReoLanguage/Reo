@@ -12,6 +12,7 @@ import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a node expression.
  */
@@ -34,19 +35,13 @@ public final class NodeExpression extends VariableExpression {
 
 	/**
 	 * Constructs a new node expression.
-	 * 
+	 *
+	 * @param var
+	 *            the var
 	 * @param type
 	 *            port type: input/output/none
-	 * @param prio
-	 *            priority type: ampersand/plus/none
 	 * @param tag
 	 *            type tag
-	 * @param name
-	 *            node name
-	 * @param indices
-	 *            node indices
-	 * @param location
-	 *            location of node in Reo source file.
 	 */
 	public NodeExpression(VariableExpression var, PortType type, TypeTag tag) {
 		super(var.getName(), var.getIndices(), var.getLocation());

@@ -18,15 +18,13 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
- * Predicate semantics of Reo connectors. The predicate listener
- * {@link nl.cwi.reo.interpret.ListenerP} uses this semantics.
+ * Predicate semantics of Reo connectors.
  */
 public class Predicate implements Semantics<Predicate> {
 
-	/**
-	 * Formula of this predicate
-	 */
+	/** Formula of this predicate. */
 	private final Formula f;
 
 	/**
@@ -110,20 +108,17 @@ public class Predicate implements Semantics<Predicate> {
 				if (!x.equals(p)) {
 					Term t_null = new NullValue();
 					Formula neq = new Negation(new Equality(new PortVariable(x), t_null));
-					if (transition == null)
-						transition = neq;
-					else
-						transition = new Conjunction((Arrays.asList(transition, neq)));
+					transition = Conjunction.conjunction(Arrays.asList(transition, neq));
 				}
 			}
 			for (Port x : outs) {
 				Formula eq = new Equality(new PortVariable(p), new PortVariable(x));
-				transition = new Conjunction(Arrays.asList(transition, eq));
+				transition = Conjunction.conjunction(Arrays.asList(transition, eq));
 			}
 			transitions.add(transition);
 		}
 
-		return new Predicate(new Conjunction(transitions));
+		return new Predicate(Conjunction.conjunction(transitions));
 	}
 
 	/**
@@ -143,7 +138,7 @@ public class Predicate implements Semantics<Predicate> {
 		list.add(this.f);
 		for (Predicate A : components)
 			list.add(A.f);
-		return new Predicate(new Conjunction(list));
+		return new Predicate(Conjunction.conjunction(list));
 	}
 
 	/**

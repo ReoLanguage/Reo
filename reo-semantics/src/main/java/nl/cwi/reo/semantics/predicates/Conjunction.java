@@ -15,6 +15,7 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * A conjunction of a list of formulas.
  */
@@ -55,8 +56,9 @@ public class Conjunction implements Formula {
 	public static Formula conjunction(List<Formula> clauses) {
 		List<Formula> _clauses = new ArrayList<>();
 		for (Formula f : clauses) {
-			if (f instanceof TruthValue && !((TruthValue) f).getBool() == false) {
-				return new TruthValue(false);
+			if (f instanceof TruthValue) {
+				if (((TruthValue) f).getBool() == false)
+					return new TruthValue(false);
 			} else if (f instanceof Conjunction) {
 				_clauses.addAll(((Conjunction) f).getClauses());
 			} else if (!_clauses.contains(f)) {
@@ -139,7 +141,7 @@ public class Conjunction implements Formula {
 					list.add(f);
 				}
 			}
-			clauses.add(new Conjunction(list));
+			clauses.add(Conjunction.conjunction(list));
 		}
 		if (clauses.size() == 1)
 			return clauses.get(0);

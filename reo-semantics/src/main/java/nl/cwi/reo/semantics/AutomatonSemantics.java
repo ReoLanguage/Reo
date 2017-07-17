@@ -7,7 +7,5 @@ package nl.cwi.reo.semantics;
  *            semantics
  */
 public interface AutomatonSemantics<T extends Semantics<T>> extends Semantics<T> {
-	
-	
 
 }

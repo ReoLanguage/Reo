@@ -1,5 +1,6 @@
 package nl.cwi.reo.interpret.ports;
 
+// TODO: Auto-generated Javadoc
 /**
  * Enumerates all possible priority types of an input port.
  */

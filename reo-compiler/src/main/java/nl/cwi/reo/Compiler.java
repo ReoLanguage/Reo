@@ -56,10 +56,14 @@ import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * A compiler for the coordination language Reo.
  */
 public class Compiler {
+
+	/** Version number. */
+	private static String version = "1.0.1";
 
 	/**
 	 * List of provided Reo source files.
@@ -73,10 +77,9 @@ public class Compiler {
 	@Parameter(names = { "-c" }, description = "compiler")
 	public CompilerType compilertype = CompilerType.DEFAULT;
 
-	/**
-	 * List of of directories that contain all necessary Reo components
-	 */
-	@Parameter(names = { "-cp" }, variableArity = true, description = "list of directories that contain all necessary Reo components")
+	/** List of of directories that contain all necessary Reo components. */
+	@Parameter(names = {
+			"-cp" }, variableArity = true, description = "list of directories that contain all necessary Reo components")
 	private List<String> directories = new ArrayList<String>();
 
 	/**
@@ -88,18 +91,15 @@ public class Compiler {
 	/**
 	 * List of parameters for the main component.
 	 */
-	@Parameter(names = { "-p" }, variableArity = true, description = "list of parameters to instantiate the main component")
+	@Parameter(names = {
+			"-p" }, variableArity = true, description = "list of parameters to instantiate the main component")
 	public List<String> params = new ArrayList<String>();
 
-	/**
-	 * Package
-	 */
+	/** Package. */
 	@Parameter(names = { "-pkg" }, description = "target code package")
 	private String packagename;
 
-	/**
-	 * Partitioning
-	 */
+	/** Partitioning. */
 	@Parameter(names = { "-pt" }, description = "synchronous region decomposition")
 	private boolean partitioning = false;
 
@@ -114,22 +114,32 @@ public class Compiler {
 	 */
 	private final Monitor monitor = new Monitor();
 
+	/**
+	 * The main method.
+	 *
+	 * @param args
+	 *            the arguments
+	 */
 	public static void main(String[] args) {
 		Compiler compiler = new Compiler();
 		try {
 			JCommander jc = new JCommander(compiler, args);
 			jc.setProgramName("reo");
 			if (compiler.files.size() == 0) {
-				System.out.println("Reo compiler v1.0.0\nCWI Amsterdam\n");
+				System.out.println("Reo compiler v" + version + "\nDeveloped at CWI, Amsterdam\n");
 				jc.usage();
 			} else {
 				compiler.run();
 			}
 		} catch (Exception e) {
-			System.out.println(new Message(MessageType.ERROR, e.getMessage()));
+			e.printStackTrace();
+			System.out.println(new Message(MessageType.ERROR, e.toString()));
 		}
 	}
 
+	/**
+	 * Run.
+	 */
 	public void run() {
 
 		// Get the root locations of Reo source files and libraries.
@@ -155,6 +165,9 @@ public class Compiler {
 		monitor.print();
 	}
 
+	/**
+	 * Compile.
+	 */
 	private void compile() {
 
 		// Interpret the Reo program
@@ -188,7 +201,7 @@ public class Compiler {
 		Map<Port, Port> r = new HashMap<Port, Port>();
 		for (Map.Entry<Port, Port> link : program.getConnector().getLinks().entrySet()) {
 			Port p = link.getValue();
-			r.put(p, p.rename("_" + i++).hide());
+			r.put(p, p.rename("[" + i++ + "]").hide());
 		}
 		ReoConnector<ConstraintHypergraph> connector = new ReoConnectorComposite<>(null, "", list).rename(r);
 
@@ -206,13 +219,13 @@ public class Compiler {
 		List<ConstraintHypergraph> protocols = new ArrayList<ConstraintHypergraph>();
 		for (ReoConnectorAtom<ConstraintHypergraph> atom : connector.getAtoms()) {
 			if (atom.getSourceCode().getCall() != null) {
-				
+
 				// Add the dual port to the interface of the protocol.
 				for (Port p : atom.getInterface()) {
 					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
 					intface.add(new Port(p.getName(), t, p.getPrioType(), p.getTypeTag(), true));
 				}
-				
+
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
@@ -325,7 +338,8 @@ public class Compiler {
 
 					if ((!tags.containsKey(x) || tags.get(x) == null)
 							&& (!tags.containsKey(x_prime) || tags.get(x_prime) == null)) {
-						Term initialValueLHS = circuit.getInitials().get(new MemoryVariable(m.getKey().getName(), false));
+						Term initialValueLHS = circuit.getInitials()
+								.get(new MemoryVariable(m.getKey().getName(), false));
 						Term initialValueRHS = null;
 						if (m.getValue() instanceof MemoryVariable)
 							initialValueRHS = circuit.getInitials()
@@ -424,6 +438,9 @@ public class Compiler {
 		}
 	}
 
+	/**
+	 * Compile PR.
+	 */
 	private void compilePR() {
 
 		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);

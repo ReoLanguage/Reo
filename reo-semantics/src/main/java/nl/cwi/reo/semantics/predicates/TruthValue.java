@@ -1,13 +1,12 @@
 package nl.cwi.reo.semantics.predicates;
 
+// TODO: Auto-generated Javadoc
 /**
  * An atomic nullary predicate (i.e., a boolean value).
  */
 public class TruthValue extends Relation {
 
-	/**
-	 * Boolean value
-	 */
+	/** Boolean value. */
 	private final boolean b;
 
 	/**
@@ -22,8 +21,8 @@ public class TruthValue extends Relation {
 	}
 
 	/**
-	 * Gets the value of this boolean
-	 * 
+	 * Gets the value of this boolean.
+	 *
 	 * @return the boolean value of this nullary relation.
 	 */
 	public boolean getBool() {

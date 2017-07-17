@@ -11,20 +11,45 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Universal.
+ */
 public class Universal implements Formula {
 
+	/** The x. */
 	private final Variable x;
-	
+
+	/** The f. */
 	private final Formula f;
 
+	/**
+	 * Instantiates a new universal.
+	 *
+	 * @param x
+	 *            the x
+	 * @param f
+	 *            the f
+	 */
 	public Universal(Variable x, Formula f) {
 		this.x = x;
 		this.f = f;
 	}
-	
+
+	/**
+	 * Gets the variable.
+	 *
+	 * @return the variable
+	 */
 	public Variable getVariable() {
 		return x;
 	}
+
+	/**
+	 * Gets the formula.
+	 *
+	 * @return the formula
+	 */
 	public Formula getFormula() {
 		return f;
 	}
@@ -120,9 +145,9 @@ public class Universal implements Formula {
 	 */
 	@Override
 	public String toString() {
-		return  "\u2200" + x + "." + f;  
+		return "\u2200" + x + "." + f;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -134,7 +159,7 @@ public class Universal implements Formula {
 			return true;
 		if (!(other instanceof Universal))
 			return false;
-		Universal u = (Universal)other;
+		Universal u = (Universal) other;
 		return Objects.equals(this.x, u.x) && Objects.equals(this.f, u.f);
 	}
 

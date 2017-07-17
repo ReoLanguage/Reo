@@ -14,6 +14,7 @@ import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of decimal value.
  */
@@ -43,27 +44,79 @@ public final class DecimalValue implements Value, TermExpression {
 		return x;
 	}
 
+	/**
+	 * Adds the.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the decimal value
+	 */
 	public static DecimalValue add(DecimalValue a, DecimalValue b) {
 		return new DecimalValue(a.x + b.x);
 	}
 
+	/**
+	 * Min.
+	 *
+	 * @param a
+	 *            the a
+	 * @return the decimal value
+	 */
 	public static DecimalValue min(DecimalValue a) {
 		return new DecimalValue(-a.x);
 	}
 
+	/**
+	 * Min.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the decimal value
+	 */
 	public static DecimalValue min(DecimalValue a, DecimalValue b) {
 		return new DecimalValue(a.x - b.x);
 	}
 
+	/**
+	 * Mul.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the decimal value
+	 */
 	public static DecimalValue mul(DecimalValue a, DecimalValue b) {
 		return new DecimalValue(a.x * b.x);
 	}
 
+	/**
+	 * Div.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the decimal value
+	 */
 	@Nullable
 	public static DecimalValue div(DecimalValue a, DecimalValue b) {
 		return b.x == 0 ? null : new DecimalValue(a.x / b.x);
 	}
 
+	/**
+	 * Exp.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the decimal value
+	 */
 	public static DecimalValue exp(DecimalValue a, DecimalValue b) {
 		return new DecimalValue(Math.pow(a.x, b.x));
 	}

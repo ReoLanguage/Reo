@@ -1,5 +1,6 @@
 package nl.cwi.reo.interpret.ports;
 
+// TODO: Auto-generated Javadoc
 /**
  * Enumeration of all possible IO types of a port.
  */

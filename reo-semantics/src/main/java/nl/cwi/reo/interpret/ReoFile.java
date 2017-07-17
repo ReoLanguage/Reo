@@ -13,6 +13,7 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a Reo source file.
  * 
@@ -53,15 +54,17 @@ public final class ReoFile<T extends Semantics<T>> {
 
 	/**
 	 * Constructs a new Reo source file.
-	 * 
+	 *
 	 * @param section
 	 *            section name
 	 * @param imports
 	 *            list of imported components
-	 * @param name
-	 *            file name without extension
+	 * @param filename
+	 *            the filename
 	 * @param definitions
 	 *            component definitions
+	 * @param location
+	 *            the location
 	 */
 	public ReoFile(String section, Set<String> imports, String filename, Conjunction definitions, Location location) {
 		if (section == null || imports == null || filename == null || definitions == null || location == null)
@@ -91,7 +94,6 @@ public final class ReoFile<T extends Semantics<T>> {
 	public String getName() {
 		return section.equals("") ? main : section + "." + main;
 	}
-	
 
 	/**
 	 * Gets the location of the main component.
@@ -101,10 +103,11 @@ public final class ReoFile<T extends Semantics<T>> {
 	public Location getMainLocation() {
 		return location;
 	}
-	
+
 	/**
-	 * 
-	 * @return
+	 * Gets the definitions.
+	 *
+	 * @return the definitions
 	 */
 	public Conjunction getDefinitions() {
 		return definitions;
@@ -114,15 +117,17 @@ public final class ReoFile<T extends Semantics<T>> {
 	 * Evaluates this Reo source file and either adds a new component definition
 	 * to the scope, or an error message to the monitor.
 	 * 
-	 * @param s		variable assignment
-	 * @param m		message container
+	 * @param s
+	 *            variable assignment
+	 * @param m
+	 *            message container
 	 */
 	public void evaluate(Scope s, Monitor m) {
 		List<Scope> list = definitions.evaluate(s, m);
 		if (list != null && list.size() == 1) {
 			Value mainComp = list.get(0).get(new Identifier(main));
 
-			if (mainComp != null) 
+			if (mainComp != null)
 				s.put(new Identifier(getName()), mainComp);
 			else
 				m.add(filename + " must define a component " + main + ".");
@@ -136,7 +141,7 @@ public final class ReoFile<T extends Semantics<T>> {
 	public String toString() {
 		ST st = new ST("<section><definitions>");
 		st.add("section", section.equals("") ? "" : "section " + section + ";\n");
-//		st.add("imports", imports);
+		// st.add("imports", imports);
 		st.add("definitions", definitions);
 		return st.render();
 	}

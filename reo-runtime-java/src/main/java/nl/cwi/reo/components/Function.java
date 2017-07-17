@@ -1,4 +1,5 @@
 package nl.cwi.reo.components;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,11 +10,11 @@ import nl.cwi.reo.runtime.Input;
 public class Function {
 
 	public static String add(String a, String b) {
-//		if(a instanceof Integer && b instanceof Integer)
-//			return (Integer)a+(Integer)b;
-		return a+b;
+		// if(a instanceof Integer && b instanceof Integer)
+		// return (Integer)a+(Integer)b;
+		return a + b;
 	}
-	
+
 	public static String majority(Object object) {
 		if (object == null)
 			throw new NullPointerException();
@@ -40,13 +41,12 @@ public class Function {
 		return result;
 	}
 
-	
 	public static void consumer(Input<String> a) {
 		for (int i = 0; i < 300; i++)
 			System.out.println(i + ": " + a.get() + " ");
 		System.exit(0);
 	}
-	
+
 	public static String concatenate(Object object1, Object object2) {
 		if (object1 == null)
 			throw new NullPointerException();

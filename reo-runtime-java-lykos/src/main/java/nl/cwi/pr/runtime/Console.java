@@ -106,8 +106,7 @@ public class Console implements Runnable {
 		Collections.sort(portNames);
 
 		for (String s : portNames)
-			this.portsToNames.put(inputPorts.containsKey(s) ? inputPorts.get(s)
-					: outputPorts.get(s), s);
+			this.portsToNames.put(inputPorts.containsKey(s) ? inputPorts.get(s) : outputPorts.get(s), s);
 
 		for (Port p : inputPorts.values())
 			putThreads.put(p, new IoThread());
@@ -174,8 +173,7 @@ public class Console implements Runnable {
 				if (commands.containsKey(command))
 					terminate = commands.get(command).invokeOrThrow(arguments);
 				else
-					buffer.addControlMessage("I do not know the command \""
-							+ command + "\".");
+					buffer.addControlMessage("I do not know the command \"" + command + "\".");
 
 			} catch (CommandException exception) {
 				buffer.addControlMessage("Error: " + exception.getMessage());
@@ -298,8 +296,7 @@ public class Console implements Runnable {
 		 *             <code>[arguments[i]==null</code> for some <code>i]</code>
 		 *             .
 		 */
-		protected boolean invokeOrThrow(String[] arguments)
-				throws CommandException {
+		protected boolean invokeOrThrow(String[] arguments) throws CommandException {
 
 			if (arguments == null)
 				throw new NullPointerException();
@@ -338,8 +335,7 @@ public class Console implements Runnable {
 		 *             <code>[arguments[i]==null</code> for some <code>i]</code>
 		 *             .
 		 */
-		protected String extractDatumTextOrThrow(String[] arguments,
-				int index1, int index2) throws CommandException {
+		protected String extractDatumTextOrThrow(String[] arguments, int index1, int index2) throws CommandException {
 
 			if (arguments == null)
 				throw new NullPointerException();
@@ -356,8 +352,7 @@ public class Console implements Runnable {
 
 			if (builder.length() == 0)
 				throw new CommandException(
-						"Please specify a datum text (as arguments starting from position "
-								+ index1 + ").");
+						"Please specify a datum text (as arguments starting from position " + index1 + ").");
 
 			return builder.toString().toString().trim();
 		}
@@ -369,6 +364,7 @@ public class Console implements Runnable {
 		 * @param arguments
 		 *            The arguments. Not <code>null</code>.
 		 * @param index
+		 *            The index of the argument.
 		 * @return A port. Never <code>null</code>.
 		 * @throws CommandException
 		 *             If something goes wrong while extracting.
@@ -376,11 +372,10 @@ public class Console implements Runnable {
 		 *             If <code>index&lt;0</code>.
 		 * @throws NullPointerException
 		 *             If <code>arguments==null</code> or
-		 *             <code>[arguments[i]==null</code> for some <code>i]</code>
-		 *             .
+		 *             <code>[arguments[i]==null</code> for some
+		 *             <code>i]</code>.
 		 */
-		protected Port extractPortOrThrow(String[] arguments, int index)
-				throws CommandException {
+		protected Port extractPortOrThrow(String[] arguments, int index) throws CommandException {
 
 			if (arguments == null)
 				throw new NullPointerException();
@@ -397,8 +392,7 @@ public class Console implements Runnable {
 
 			if (arguments.length <= index)
 				throw new CommandException(
-						"Please specify a port name or reference (as an argument at position "
-								+ (index + 1) + ").");
+						"Please specify a port name or reference (as an argument at position " + (index + 1) + ").");
 
 			String portText = arguments[index];
 
@@ -415,10 +409,8 @@ public class Console implements Runnable {
 				if (iterator.hasNext())
 					return iterator.next();
 
-				throw new CommandException(
-						"I failed to parse the argument at position "
-								+ (index + 1)
-								+ " to a port: I failed to dereference the provided reference.");
+				throw new CommandException("I failed to parse the argument at position " + (index + 1)
+						+ " to a port: I failed to dereference the provided reference.");
 			}
 
 			/*
@@ -427,14 +419,10 @@ public class Console implements Runnable {
 
 			catch (NumberFormatException exception) {
 				if (!hasInputPort(portText) && !hasOutputPort(portText))
-					throw new CommandException(
-							"I failed to parse the argument at position "
-									+ (index + 1)
-									+ " to a port: I do not have access to a port named \""
-									+ portText + "\".");
+					throw new CommandException("I failed to parse the argument at position " + (index + 1)
+							+ " to a port: I do not have access to a port named \"" + portText + "\".");
 
-				return hasInputPort(portText) ? getInputPort(portText)
-						: getOutputPort(portText);
+				return hasInputPort(portText) ? getInputPort(portText) : getOutputPort(portText);
 			}
 		}
 	}
@@ -461,8 +449,7 @@ public class Console implements Runnable {
 		 * </p>
 		 */
 		@Override
-		protected boolean invokeOrThrow(String[] arguments)
-				throws CommandException {
+		protected boolean invokeOrThrow(String[] arguments) throws CommandException {
 
 			super.invokeOrThrow(arguments);
 			buffer.addControlMessage("Bye.");
@@ -480,8 +467,7 @@ public class Console implements Runnable {
 		 * </p>
 		 */
 		@Override
-		protected boolean invokeOrThrow(final String[] arguments)
-				throws CommandException {
+		protected boolean invokeOrThrow(final String[] arguments) throws CommandException {
 
 			super.invokeOrThrow(arguments);
 
@@ -493,23 +479,20 @@ public class Console implements Runnable {
 			final String portName = Console.this.portsToNames.get(port);
 
 			if (!Console.this.namesToOutputPorts.containsKey(portName))
-				throw new CommandException("The port named \"" + portName
-						+ "\" is not an output port.");
+				throw new CommandException("The port named \"" + portName + "\" is not an output port.");
 
 			/*
 			 * Get
 			 */
 
-			buffer.addControlMessage("I will attempt to get a datum from the port named \""
-					+ portName + "\".");
+			buffer.addControlMessage("I will attempt to get a datum from the port named \"" + portName + "\".");
 
 			getThreads.get(port).addTask(new IoTask() {
 				@Override
 				public void run() {
 					try {
 						Object datum = ((InputPort) port).get();
-						buffer.addEventMessage("I got the datum "
-								+ Datum.convertToString(datum)
+						buffer.addEventMessage("I got the datum " + Datum.convertToString(datum)
 								+ " from the port named \"" + portName + "\".");
 					}
 
@@ -533,27 +516,21 @@ public class Console implements Runnable {
 		 * </p>
 		 */
 		@Override
-		protected boolean invokeOrThrow(String[] arguments)
-				throws CommandException {
+		protected boolean invokeOrThrow(String[] arguments) throws CommandException {
 
 			super.invokeOrThrow(arguments);
 
 			Port port = extractPortOrThrow(arguments, 0);
-			Collection<IoTask> gets = getThreads.containsKey(port) ? getThreads
-					.get(port).getTasks() : Collections.<IoTask> emptyList();
-			Collection<IoTask> puts = putThreads.containsKey(port) ? putThreads
-					.get(port).getTasks() : Collections.<IoTask> emptyList();
+			Collection<IoTask> gets = getThreads.containsKey(port) ? getThreads.get(port).getTasks()
+					: Collections.<IoTask>emptyList();
+			Collection<IoTask> puts = putThreads.containsKey(port) ? putThreads.get(port).getTasks()
+					: Collections.<IoTask>emptyList();
 
-			StringBuilder builder = new StringBuilder()
-					.append("The port named \"").append(portsToNames.get(port))
-					.append("\" has ")
-					.append(gets.size() == 0 ? "no" : gets.size())
-					.append(" pending get operation")
+			StringBuilder builder = new StringBuilder().append("The port named \"").append(portsToNames.get(port))
+					.append("\" has ").append(gets.size() == 0 ? "no" : gets.size()).append(" pending get operation")
 					.append((gets.size() == 1 ? "" : "s")).append(" and ")
-					.append(puts.size() == 0 ? "no" : "the following")
-					.append(" pending put operation")
-					.append(puts.size() == 1 ? "" : "s")
-					.append(puts.size() == 0 ? "." : ":\n");
+					.append(puts.size() == 0 ? "no" : "the following").append(" pending put operation")
+					.append(puts.size() == 1 ? "" : "s").append(puts.size() == 0 ? "." : ":\n");
 
 			for (IoTask t : puts)
 				builder.append("\n  - " + Datum.convertToString(t.getDatum()));
@@ -573,35 +550,29 @@ public class Console implements Runnable {
 		 * </p>
 		 */
 		@Override
-		protected boolean invokeOrThrow(String[] arguments)
-				throws CommandException {
+		protected boolean invokeOrThrow(String[] arguments) throws CommandException {
 
 			super.invokeOrThrow(arguments);
 
 			StringBuilder builder = new StringBuilder();
-			Iterator<String> iterator = Console.this.portsToNames.values()
-					.iterator();
+			Iterator<String> iterator = Console.this.portsToNames.values().iterator();
 
 			switch (Console.this.portsToNames.size()) {
 			case 0:
 				builder.append("I do not have access to any ports.");
 				break;
 			case 1:
-				builder.append("I have access to the port named \"")
-						.append(iterator.next()).append("\" [0].");
+				builder.append("I have access to the port named \"").append(iterator.next()).append("\" [0].");
 				break;
 			case 2:
-				builder.append("I have access to the ports named \"")
-						.append(iterator.next()).append("\" [0] and \"")
+				builder.append("I have access to the ports named \"").append(iterator.next()).append("\" [0] and \"")
 						.append(iterator.next()).append("\" [1].");
 				break;
 			default:
-				builder.append("I have access to the following ports:\n - \"")
-						.append(iterator.next()).append("\" [0]");
+				builder.append("I have access to the following ports:\n - \"").append(iterator.next()).append("\" [0]");
 				int index = 1;
 				while (iterator.hasNext())
-					builder.append("\n - \"").append(iterator.next())
-							.append("\" [").append(index++).append("]");
+					builder.append("\n - \"").append(iterator.next()).append("\" [").append(index++).append("]");
 			}
 
 			buffer.addControlMessage(builder.toString());
@@ -619,8 +590,7 @@ public class Console implements Runnable {
 		 * </p>
 		 */
 		@Override
-		protected boolean invokeOrThrow(final String[] arguments)
-				throws CommandException {
+		protected boolean invokeOrThrow(final String[] arguments) throws CommandException {
 
 			super.invokeOrThrow(arguments);
 
@@ -632,18 +602,15 @@ public class Console implements Runnable {
 			final String portName = Console.this.portsToNames.get(port);
 
 			if (!Console.this.namesToInputPorts.containsKey(portName))
-				throw new CommandException("The port named \"" + portName
-						+ "\" is not an input port.");
+				throw new CommandException("The port named \"" + portName + "\" is not an input port.");
 
 			/*
 			 * Extract the datum to put
 			 */
-			final String datumText = extractDatumTextOrThrow(arguments, 1,
-					arguments.length);
+			final String datumText = extractDatumTextOrThrow(arguments, 1, arguments.length);
 
 			if (!Datum.canConvertToObject(datumText))
-				throw new CommandException(
-						"I failed to parse the arguments starting from position 2 to a datum.");
+				throw new CommandException("I failed to parse the arguments starting from position 2 to a datum.");
 
 			final Serializable datum = Datum.convertToObject(datumText);
 
@@ -651,16 +618,15 @@ public class Console implements Runnable {
 			 * Put
 			 */
 
-			buffer.addControlMessage("I will attempt to put the datum "
-					+ datumText + " to the port named \"" + portName + "\".");
+			buffer.addControlMessage(
+					"I will attempt to put the datum " + datumText + " to the port named \"" + portName + "\".");
 
 			putThreads.get(port).addTask(new IoTask(datum) {
 				@Override
 				public void run() {
 					try {
 						((OutputPort) port).put(datum);
-						buffer.addEventMessage("I put the datum "
-								+ Datum.convertToString(datum)
+						buffer.addEventMessage("I put the datum " + Datum.convertToString(datum)
 								+ " to the port named \"" + portName + "\".");
 					}
 
@@ -684,8 +650,7 @@ public class Console implements Runnable {
 		 * </p>
 		 */
 		@Override
-		protected boolean invokeOrThrow(final String[] arguments)
-				throws CommandException {
+		protected boolean invokeOrThrow(final String[] arguments) throws CommandException {
 
 			super.invokeOrThrow(arguments);
 			return false;
@@ -766,19 +731,14 @@ public class Console implements Runnable {
 				if (builder.length() > 0 && eventBuffer.isEmpty())
 					return builder.toString();
 
-				builder.append("\n")
-						.append(eventBuffer.isEmpty() ? "No" : "The following")
-						.append(" event")
-						.append(eventBuffer.size() == 1 ? "" : "s")
-						.append(" occurred since our last interaction")
+				builder.append("\n").append(eventBuffer.isEmpty() ? "No" : "The following").append(" event")
+						.append(eventBuffer.size() == 1 ? "" : "s").append(" occurred since our last interaction")
 						.append(eventBuffer.isEmpty() ? "." : ":\n");
 
 				for (Entry<Long, String> e : eventBuffer)
 					builder.append("\n  - [")
-							.append(new SimpleDateFormat(
-									"yyyy-MM-dd HH:mm:ss.SSS").format(new Date(
-									e.getKey()))).append("] ")
-							.append(e.getValue());
+							.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(e.getKey())))
+							.append("] ").append(e.getValue());
 
 				eventBuffer.clear();
 			}

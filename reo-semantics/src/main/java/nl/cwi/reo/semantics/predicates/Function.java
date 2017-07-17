@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
@@ -17,6 +16,7 @@ import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * A function applied to a list of terms.
  */
@@ -94,11 +94,14 @@ public class Function implements Term {
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("<name><if(args)>(<args; separator=\", \">)<endif>");
-		st.add("name", name);
-		if (args != null)
-			st.add("args", args);
-		return st.render();
+		String s = name;
+		if (args != null) {
+			s += "(";
+			for (Term t : args)
+				s += ", " + t;
+			s += ")";
+		}
+		return s;
 	}
 
 	/**

@@ -12,6 +12,7 @@ import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a component variable.
  * 

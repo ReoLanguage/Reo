@@ -14,6 +14,10 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Negation.
+ */
 public class Negation implements Formula {
 
 	/**
@@ -21,14 +25,12 @@ public class Negation implements Formula {
 	 */
 	public static final boolean negation = true;
 
-	/**
-	 * Original predicate
-	 */
+	/** Original predicate. */
 	private final Formula f;
 
 	/**
-	 * Constructs a new negation of an original predicate
-	 * 
+	 * Constructs a new negation of an original predicate.
+	 *
 	 * @param f
 	 *            original predicate
 	 */
@@ -46,6 +48,8 @@ public class Negation implements Formula {
 
 	/**
 	 * Returns the predicate that is negated by this negation.
+	 *
+	 * @return the formula
 	 */
 	public Formula getFormula() {
 		return f;

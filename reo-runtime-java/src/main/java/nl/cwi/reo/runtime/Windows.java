@@ -20,11 +20,29 @@ import javax.swing.JTextField;
 
 import nl.cwi.reo.runtime.Port;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Windows.
+ */
 public class Windows {
+	
+	/** The Constant HEIGHT. */
 	private static final int HEIGHT = 400;
+	
+	/** The Constant OFFSET_INCREMENT. */
 	private static final int OFFSET_INCREMENT = 25;
+	
+	/** The Constant WIDTH. */
 	private static final int WIDTH = 300;
 
+	/**
+	 * Producer.
+	 *
+	 * @param name
+	 *            the name
+	 * @param inputPorts
+	 *            the input ports
+	 */
 	public static void producer(String name, Port<String> inputPorts) {
 
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
@@ -50,6 +68,15 @@ public class Windows {
 		window.setVisible(true);
 	}
 
+	/**
+	 * Open and get output.
+	 *
+	 * @param port
+	 *            the port
+	 * @param portName
+	 *            the port name
+	 * @return the j frame
+	 */
 	public static JFrame openAndGetOutput(final Port<String> port, String portName) {
 		JFrame window = new JFrame("Port: " + portName);
 
@@ -121,6 +148,14 @@ public class Windows {
 		return window;
 	}
 
+	/**
+	 * Consumer.
+	 *
+	 * @param name
+	 *            the name
+	 * @param a
+	 *            the a
+	 */
 	public static void consumer(String name, Port<String> a) {
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 
@@ -145,6 +180,15 @@ public class Windows {
 		window.setVisible(true);
 	}
 
+	/**
+	 * Open and get input.
+	 *
+	 * @param port
+	 *            the port
+	 * @param portName
+	 *            the port name
+	 * @return the j frame
+	 */
 	public static JFrame openAndGetInput(final Port<String> port, String portName) {
 		JFrame window = new JFrame("Port: " + portName);
 

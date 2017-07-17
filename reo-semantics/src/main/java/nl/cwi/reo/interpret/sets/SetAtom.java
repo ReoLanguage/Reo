@@ -14,6 +14,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of an atomic set definition.
  * 
@@ -68,6 +69,12 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	/**
 	 * Evaluates this atomic set to an instance containing an atomic Reo
 	 * connector.
+	 *
+	 * @param s
+	 *            the s
+	 * @param m
+	 *            the m
+	 * @return the instance
 	 */
 	@Override
 	@Nullable
@@ -99,6 +106,11 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 		return st.render();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.sets.SetExpression#canEvaluate(java.util.Set)
+	 */
 	@Override
 	public boolean canEvaluate(Set<Identifier> deps) {
 		return true;

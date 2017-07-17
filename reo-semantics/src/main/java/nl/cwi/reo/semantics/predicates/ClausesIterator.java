@@ -6,20 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+// TODO: Auto-generated Javadoc
 /**
  * Iterates over the Cartesian product of a non-empty list of local clauses.
  * Returns a satisfiable conjunction of local clauses.
  */
 public class ClausesIterator implements Iterator<List<Formula>> {
 
-	/**
-	 * List of conjuncts of clauses
-	 */
+	/** List of conjuncts of clauses. */
 	private final List<List<Formula>> conjuncts;
 
-	/**
-	 * List of iterators of each conjunct
-	 */
+	/** List of iterators of each conjunct. */
 	private final List<Iterator<Formula>> iters;
 
 	/**
@@ -35,9 +32,9 @@ public class ClausesIterator implements Iterator<List<Formula>> {
 	/**
 	 * Constructs an iterator that enumerates all global transitions originating
 	 * from the global initial state.
-	 * 
-	 * @param automata
-	 *            list of automata
+	 *
+	 * @param conjunction
+	 *            the conjunction
 	 * @throws NullPointerException
 	 *             if the list is null or empty, or if the list contains a null
 	 *             automaton.
@@ -62,6 +59,8 @@ public class ClausesIterator implements Iterator<List<Formula>> {
 
 	/**
 	 * Checks if there exists another satisfiable combination of local clauses.
+	 *
+	 * @return true, if successful
 	 */
 	@Override
 	public boolean hasNext() {
@@ -85,6 +84,11 @@ public class ClausesIterator implements Iterator<List<Formula>> {
 		return new ArrayList<Formula>(tuple);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Iterator#remove()
+	 */
 	@Override
 	public void remove() {
 		throw new UnsupportedOperationException();
@@ -138,6 +142,15 @@ public class ClausesIterator implements Iterator<List<Formula>> {
 		}
 	}
 
+	/**
+	 * Satisfiable.
+	 *
+	 * @param f
+	 *            the f
+	 * @param g
+	 *            the g
+	 * @return true, if successful
+	 */
 	private boolean satisfiable(Formula f, Formula g) {
 		Map<Variable, Integer> map = f.getEvaluation();
 		for (Map.Entry<Variable, Integer> entry : g.getEvaluation().entrySet())

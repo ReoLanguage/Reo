@@ -2,11 +2,12 @@ package nl.cwi.reo.interpret.variables;
 
 import nl.cwi.reo.interpret.typetags.TypeTag;
 
+// TODO: Auto-generated Javadoc
 /**
  * An identifier decorated with a parameter type.
  */
 public final class Parameter extends Identifier {
-	
+
 	/**
 	 * Type of this parameter.
 	 */
@@ -14,8 +15,11 @@ public final class Parameter extends Identifier {
 
 	/**
 	 * Constructs a new parameter.
-	 * @param name		parameter name
-	 * @param type		parameter type
+	 * 
+	 * @param name
+	 *            parameter name
+	 * @param type
+	 *            parameter type
 	 */
 	public Parameter(String name, ParameterType type) {
 		super(name);
@@ -24,17 +28,18 @@ public final class Parameter extends Identifier {
 
 	/**
 	 * Gets the type of this parameter.
-	 * @return	parameter type
+	 * 
+	 * @return parameter type
 	 */
 	public ParameterType getType() {
 		return type;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-	    return type instanceof TypeTag ? name + ":" + type : name;
+		return type instanceof TypeTag ? name + ":" + type : name;
 	}
 }

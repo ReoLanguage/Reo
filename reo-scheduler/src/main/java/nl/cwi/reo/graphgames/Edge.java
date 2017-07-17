@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+// TODO: Auto-generated Javadoc
 /**
  * Implements an edge in a {@link nl.cwi.reo.graphgames.GameGraph}.
  */

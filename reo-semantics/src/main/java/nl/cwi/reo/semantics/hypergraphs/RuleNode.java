@@ -22,6 +22,7 @@ import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Constraint hypergraph node that represent a rule.
  */
@@ -67,7 +68,8 @@ public class RuleNode {
 		this.rule = r;
 		this.hyperedges = new HashSet<>();
 		for (HyperEdge h : hyperedge)
-			addToHyperedge(h); // TODO cannot call this.addToHyperedge, because this is not fully initialized.
+			addToHyperedge(h); // TODO cannot call this.addToHyperedge, because
+								// this is not fully initialized.
 		id = ++N;
 	}
 
@@ -185,9 +187,9 @@ public class RuleNode {
 		}
 		Formula formula;
 		if (clauses.size() == 1)
-			formula = new Conjunction(Arrays.asList(rule.getDataConstraint(), clauses.get(0)));
+			formula = Conjunction.conjunction(Arrays.asList(rule.getDataConstraint(), clauses.get(0)));
 		else
-			formula = new Conjunction(Arrays.asList(rule.getDataConstraint(), new Disjunction(clauses)));
+			formula = Conjunction.conjunction(Arrays.asList(rule.getDataConstraint(), new Disjunction(clauses)));
 		rule = new Rule(rule.getSyncConstraint(), formula);
 		return this;
 	}
@@ -215,7 +217,8 @@ public class RuleNode {
 			else
 				r1 = new Rule(map, rule.getDataConstraint());
 		} else {
-			r1 = new Rule(map, new Conjunction(Arrays.asList(rule.getDataConstraint(), r.getRule().getDataConstraint())));
+			r1 = new Rule(map,
+					Conjunction.conjunction(Arrays.asList(rule.getDataConstraint(), r.getRule().getDataConstraint())));
 		}
 
 		Set<HyperEdge> set = new HashSet<>(hyperedges);
@@ -281,10 +284,10 @@ public class RuleNode {
 	 */
 	public RuleNode substitute(Map<String, String> rename) {
 		for (Map.Entry<String, String> entry : rename.entrySet()) {
-			rule = new Rule(rule.getSyncConstraint(), rule.getDataConstraint().substitute(new MemoryVariable(entry.getValue(), false),
-					new MemoryVariable(entry.getKey(), false)));
-			rule = new Rule(rule.getSyncConstraint(), rule.getDataConstraint().substitute(new MemoryVariable(entry.getValue(), true),
-					new MemoryVariable(entry.getKey(), true)));
+			rule = new Rule(rule.getSyncConstraint(), rule.getDataConstraint().substitute(
+					new MemoryVariable(entry.getValue(), false), new MemoryVariable(entry.getKey(), false)));
+			rule = new Rule(rule.getSyncConstraint(), rule.getDataConstraint()
+					.substitute(new MemoryVariable(entry.getValue(), true), new MemoryVariable(entry.getKey(), true)));
 		}
 		return this;
 	}
@@ -297,7 +300,8 @@ public class RuleNode {
 	 * @return reference to this rule node.
 	 */
 	public RuleNode hide(PortNode p) {
-		rule = new Rule(rule.getSyncConstraint(), new Existential(new PortVariable(p.getPort()), rule.getDataConstraint()).QE());
+		rule = new Rule(rule.getSyncConstraint(),
+				new Existential(new PortVariable(p.getPort()), rule.getDataConstraint()).QE());
 		return this;
 	}
 

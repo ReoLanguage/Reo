@@ -18,6 +18,10 @@ import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PRCompiler.
+ */
 public class PRCompiler {
 
 	/**

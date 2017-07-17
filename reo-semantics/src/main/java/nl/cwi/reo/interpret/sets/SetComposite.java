@@ -24,6 +24,7 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a set of constraints.
  * 
@@ -144,7 +145,6 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 * 
 	 * @param partition
 	 *            set of subsets
-	 * @return Returns true, if the set of subsets changed.
 	 */
 	private void simplify(Set<Set<Identifier>> partition) {
 		for (Set<Identifier> x : partition) {
@@ -192,6 +192,11 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 		return st.render();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.sets.SetExpression#canEvaluate(java.util.Set)
+	 */
 	@Override
 	public boolean canEvaluate(Set<Identifier> deps) {
 		Set<Identifier> vars = new HashSet<>();

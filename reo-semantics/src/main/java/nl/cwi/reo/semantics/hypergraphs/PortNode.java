@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.ports.Port;
 
+// TODO: Auto-generated Javadoc
 /**
  * A node in a constraint hypergraph that represents a port.
  */

@@ -6,6 +6,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.terms.Term;
 
+// TODO: Auto-generated Javadoc
 /**
  * A concatenation of a fully qualified name and a sequence of indices.
  */

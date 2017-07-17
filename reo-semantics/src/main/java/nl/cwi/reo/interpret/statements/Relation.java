@@ -29,6 +29,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a relation over terms.
  */
@@ -51,13 +52,13 @@ public final class Relation implements PredicateExpression {
 
 	/**
 	 * Constructs an application of a relation symbol to a list of arguments.
-	 * 
+	 *
 	 * @param symbol
 	 *            name of the function
 	 * @param arguments
 	 *            list of arguments
-	 * @param token
-	 *            location in source
+	 * @param location
+	 *            the location
 	 */
 	public Relation(RelationSymbol symbol, List<TermExpression> arguments, Location location) {
 		this.symbol = symbol;

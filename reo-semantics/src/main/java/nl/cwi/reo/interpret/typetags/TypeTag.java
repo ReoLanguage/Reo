@@ -6,20 +6,34 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.variables.ParameterType;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TypeTag.
+ */
 public final class TypeTag implements ParameterType {
 
+	/** The tag. */
 	private final String tag;
 
+	/**
+	 * Instantiates a new type tag.
+	 */
 	public TypeTag() {
 		this.tag = "";
 	}
 
+	/**
+	 * Instantiates a new type tag.
+	 *
+	 * @param tag
+	 *            the tag
+	 */
 	public TypeTag(String tag) {
 		if (tag == null)
 			throw new NullPointerException();
 		this.tag = tag;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -30,7 +44,7 @@ public final class TypeTag implements ParameterType {
 		TypeTag tag = (TypeTag) t;
 		return this.tag.equals(tag.tag);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

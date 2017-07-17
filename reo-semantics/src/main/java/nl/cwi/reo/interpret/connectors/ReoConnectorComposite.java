@@ -20,6 +20,7 @@ import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * <p>
  * The semantics of Reo connectors specified in .treo files. This class consists
@@ -39,19 +40,13 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 	@Nullable
 	private final String name;
 
-	/**
-	 * Type of composition
-	 */
+	/** Type of composition. */
 	private final String operator;
 
-	/**
-	 * List of components
-	 */
+	/** List of components. */
 	private final List<ReoConnector<T>> components;
 
-	/**
-	 * Set of links
-	 */
+	/** Set of links. */
 	private final Map<Port, Port> links;
 
 	/**
@@ -111,7 +106,9 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 
 	/**
 	 * Composes a list of Reo connectors into a composite Reo connector.
-	 * 
+	 *
+	 * @param <T>
+	 *            the generic type
 	 * @param operator
 	 *            name of product operator
 	 * @param components
@@ -402,11 +399,11 @@ public final class ReoConnectorComposite<T extends Semantics<T>> implements ReoC
 			for (Set<Port> c_part : c_partition) {
 				Set<Port> newpart = new HashSet<Port>();
 				for (Port p : c_part) {
-					Port q = links.get(p); 
+					Port q = links.get(p);
 					if (q != null)
 						newpart.add(q);
 				}
-				
+
 				Set<Set<Port>> newpartition = new HashSet<>();
 				for (Set<Port> part : partition) {
 					if (Collections.disjoint(part, newpart)) {

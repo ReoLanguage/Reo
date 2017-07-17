@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+// TODO: Auto-generated Javadoc
 /**
  * A message generated during compilation.
  */
@@ -27,8 +28,8 @@ public final class Message {
 
 	/**
 	 * Construct a new message of type error with source file location and
-	 * message
-	 * 
+	 * message.
+	 *
 	 * @param location
 	 *            source file location
 	 * @param message
@@ -41,8 +42,8 @@ public final class Message {
 	}
 
 	/**
-	 * Construct a new message of given type with a message
-	 * 
+	 * Construct a new message of given type with a message.
+	 *
 	 * @param type
 	 *            type
 	 * @param message

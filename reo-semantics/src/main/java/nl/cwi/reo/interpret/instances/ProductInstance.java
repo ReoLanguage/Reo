@@ -18,6 +18,13 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ProductInstance.
+ *
+ * @param <T>
+ *            the generic type
+ */
 public final class ProductInstance<T extends Semantics<T>> implements InstanceExpression<T> {
 
 	/**
@@ -42,13 +49,15 @@ public final class ProductInstance<T extends Semantics<T>> implements InstanceEx
 
 	/**
 	 * Constructs a new composition of instances.
-	 * 
+	 *
 	 * @param operator
 	 *            composition operator
 	 * @param first
 	 *            first instance
 	 * @param second
 	 *            second instance
+	 * @param location
+	 *            the location
 	 */
 	public ProductInstance(TermExpression operator, InstanceExpression<T> first, InstanceExpression<T> second,
 			Location location) {
@@ -77,7 +86,7 @@ public final class ProductInstance<T extends Semantics<T>> implements InstanceEx
 
 		if (i1 == null || i2 == null)
 			return null;
-		
+
 		List<ReoConnector<T>> components = Arrays.asList(i1.getConnector(), i2.getConnector());
 		ReoConnector<T> connector = new ReoConnectorComposite<T>(null, operator, components);
 		Set<Set<Identifier>> unifications = new HashSet<Set<Identifier>>(i1.getUnifications());

@@ -12,6 +12,7 @@ import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a range of terms.
  */
@@ -28,8 +29,8 @@ public final class Range implements TermExpression {
 	private final TermExpression t2;
 
 	/**
-	 * Constructs a new range expression
-	 * 
+	 * Constructs a new range expression.
+	 *
 	 * @param t1
 	 *            first term in range
 	 * @param t2
@@ -41,9 +42,11 @@ public final class Range implements TermExpression {
 	}
 
 	/**
-	 * Computes
+	 * Computes.
+	 *
 	 * @param size
-	 * @return
+	 *            the size
+	 * @return the scope
 	 */
 	@Nullable
 	public Scope findParamFromSize(int size) {

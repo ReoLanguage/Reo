@@ -6,6 +6,7 @@ import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a component definition.
  * 

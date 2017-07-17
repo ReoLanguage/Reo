@@ -42,20 +42,58 @@ import nl.cwi.reo.pr.targ.java.autom.JavaPortFactory.JavaPort;
 import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class LykosCompiler.
+ */
 public class LykosCompiler {
 
+	/** The settings. */
 	private final CompilerSettings settings;
+
+	/** The automaton factory. */
 	private AutomatonFactory automatonFactory = null;
+
+	/** The port factory. */
 	private PortFactory portFactory = null;
+
+	/** The program. */
 	private final ReoConnector<PRAutomaton> program;
+
+	/** The defs. */
 	private final Definitions defs = new Definitions();
+
+	/** The counter worker. */
 	private int counterWorker = 0;
 
+	/** The outputpath. */
 	private final String outputpath;
+
+	/** The packagename. */
 	private final String packagename;
+
+	/** The monitor. */
 	private final MyToolErrorAccumulator monitor;
+
+	/** The name. */
 	private final String name;
 
+	/**
+	 * Instantiates a new lykos compiler.
+	 *
+	 * @param program
+	 *            the program
+	 * @param filename
+	 *            the filename
+	 * @param outputpath
+	 *            the outputpath
+	 * @param packagename
+	 *            the packagename
+	 * @param m
+	 *            the m
+	 * @param settings
+	 *            the settings
+	 */
 	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, String packagename,
 			Monitor m, CompilerSettings settings) {
 
@@ -97,6 +135,9 @@ public class LykosCompiler {
 		}
 	}
 
+	/**
+	 * Compile.
+	 */
 	/*
 	 * Take Reo interpreted program and make it understandable for Lykos
 	 */
@@ -209,6 +250,17 @@ public class LykosCompiler {
 				outputPortsOrArrays, portFactory);
 	}
 
+	/**
+	 * Gets the main member signature.
+	 *
+	 * @param name
+	 *            the name
+	 * @param variable
+	 *            the variable
+	 * @param ports
+	 *            the ports
+	 * @return the main member signature
+	 */
 	public MemberSignature getMainMemberSignature(String name, String variable, Set<Port> ports) {
 
 		TypedName typedName = new TypedName(name, Type.FAMILY);
@@ -239,8 +291,8 @@ public class LykosCompiler {
 	}
 
 	/**
-	 * Constructs a new worker signature
-	 * 
+	 * Constructs a new worker signature.
+	 *
 	 * @param atom
 	 *            atomic Reo connector.
 	 * @return signature of a worker.
@@ -277,21 +329,46 @@ public class LykosCompiler {
 		return new WorkerSignature(nameWorker, list);
 	}
 
+	/**
+	 * The Class MyToolErrorAccumulator.
+	 */
 	private final class MyToolErrorAccumulator extends ToolErrorAccumulator {
 
+		/** The m. */
 		private final Monitor m;
 
+		/**
+		 * Instantiates a new my tool error accumulator.
+		 *
+		 * @param sourceFileLocation
+		 *            the source file location
+		 * @param m
+		 *            the m
+		 */
 		public MyToolErrorAccumulator(String sourceFileLocation, Monitor m) {
 			super(sourceFileLocation);
 			this.m = m;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * nl.cwi.reo.pr.misc.ToolErrorAccumulator#newError(java.lang.String)
+		 */
 		@Override
 		protected ToolError newError(String message) {
 			m.add(message);
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * nl.cwi.reo.pr.misc.ToolErrorAccumulator#newError(java.lang.String,
+		 * java.lang.Throwable)
+		 */
 		@Override
 		protected ToolError newError(String message, Throwable cause) {
 			m.add(message);

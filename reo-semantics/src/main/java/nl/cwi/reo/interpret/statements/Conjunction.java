@@ -16,6 +16,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a conjunction.
  */

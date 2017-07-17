@@ -11,6 +11,7 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * A SubComponent is a part of a Connector.
  * 

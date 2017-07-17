@@ -14,6 +14,7 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Rule representation of a predicate, which consists of a map that models a
  * synchronization constraint and a formula the models a data constraint.

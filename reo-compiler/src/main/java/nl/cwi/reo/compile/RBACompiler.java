@@ -21,8 +21,19 @@ import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RBACompiler.
+ */
 public class RBACompiler {
 
+	/**
+	 * Commandify.
+	 *
+	 * @param g
+	 *            the g
+	 * @return the transition
+	 */
 	public static Transition commandify(Formula g) {
 
 		List<Formula> literals = new ArrayList<Formula>();
@@ -93,8 +104,11 @@ public class RBACompiler {
 								guards.add(l);
 								literalsToRemove.add(l);
 							}
-							if ((t1 instanceof PortVariable )){//&& !((Node)t1).getPort().isInput())) {
-								if(allInputPorts.contains(((PortVariable)t1).getPort())) allInputPorts.remove(((PortVariable)t1).getPort());
+							if ((t1 instanceof PortVariable)) {// &&
+																// !((Node)t1).getPort().isInput()))
+																// {
+								if (allInputPorts.contains(((PortVariable) t1).getPort()))
+									allInputPorts.remove(((PortVariable) t1).getPort());
 								guards.add(l);
 								literalsToRemove.add(l);
 							}
@@ -139,10 +153,10 @@ public class RBACompiler {
 								guards.add(l);
 								literalsToRemove.add(l);
 							}
-//							if (t1 instanceof Node) {
-//								guards.add(l);
-//								literalsToRemove.add(l);
-//							}
+							// if (t1 instanceof Node) {
+							// guards.add(l);
+							// literalsToRemove.add(l);
+							// }
 							continue;
 						}
 					}
@@ -172,8 +186,8 @@ public class RBACompiler {
 
 		Formula guard = null;
 		List<Formula> list = new ArrayList<>();
-		for(Formula l : guards){
-			if(!(l instanceof Relation && ((Relation) l).getValue().equals("true")))
+		for (Formula l : guards) {
+			if (!(l instanceof Relation && ((Relation) l).getValue().equals("true")))
 				list.add(l);
 		}
 		guards = list;
@@ -185,7 +199,7 @@ public class RBACompiler {
 			guard = guards.get(0);
 			break;
 		default:
-			guard = new Conjunction(guards);
+			guard = Conjunction.conjunction(guards);
 			break;
 		}
 
@@ -195,8 +209,8 @@ public class RBACompiler {
 
 		assignements = sort(assignements);
 		List<Variable> keys = new ArrayList<>(assignements.keySet());
-		
-//		Collections.reverse(keys);		
+
+		// Collections.reverse(keys);
 		for (Variable v : keys) {
 			if (v instanceof PortVariable) {
 				output.put((PortVariable) v, assignements.get(v));
@@ -207,52 +221,60 @@ public class RBACompiler {
 		}
 
 		/*
-		 * For all ports, in the transition, 
-		 * 	- peek value except for last peek, where it gets the value.
-		 * For all ports at the interface (ie protocol is not consumer and producer),
-		 * 	- transitivity over put and get on same port during the same transition.
+		 * For all ports, in the transition, - peek value except for last peek,
+		 * where it gets the value. For all ports at the interface (ie protocol
+		 * is not consumer and producer), - transitivity over put and get on
+		 * same port during the same transition.
 		 */
 		Map<PortVariable, Term> output_substitution = new HashMap<PortVariable, Term>(output);
-		for(PortVariable n : output.keySet()){
+		for (PortVariable n : output.keySet()) {
 			Set<Variable> s = output.get(n).getFreeVariables();
-			for(Variable v : s){
-				if(output.containsKey(v)){
+			for (Variable v : s) {
+				if (output.containsKey(v)) {
 					output_substitution.put(n, output.get(n).substitute(output.get(v), v));
 				}
-				if(memory.containsKey(v) && !(memory.get(v) instanceof Function && ((Function)memory.get(v)).getName().equals("*")))
+				if (memory.containsKey(v)
+						&& !(memory.get(v) instanceof Function && ((Function) memory.get(v)).getName().equals("*")))
 					output_substitution.put(n, output.get(n).substitute(memory.get(v), v));
 			}
 		}
-		
+
 		Map<MemoryVariable, Term> mem_substitution = new LinkedHashMap<MemoryVariable, Term>(memory);
-		for(MemoryVariable m : memory.keySet()){
+		for (MemoryVariable m : memory.keySet()) {
 			Set<Variable> s = memory.get(m).getFreeVariables();
-			for(Variable v : s){
-				if(output_substitution.containsKey(v)){
+			for (Variable v : s) {
+				if (output_substitution.containsKey(v)) {
 					mem_substitution.put(m, memory.get(m).substitute(output_substitution.get(v), v));
 				}
-				if(memory.containsKey(v) && !(memory.get(v) instanceof Function && ((Function)memory.get(v)).getName().equals("*")))
+				if (memory.containsKey(v)
+						&& !(memory.get(v) instanceof Function && ((Function) memory.get(v)).getName().equals("*")))
 					mem_substitution.put(m, memory.get(v).substitute(memory.get(v), v));
 			}
-//			if(!mem_substitution.containsKey(m))
-//				if(mem_substitution.get(m)!=null)
-//					mem_substitution.put(m, memory.get(m));
+			// if(!mem_substitution.containsKey(m))
+			// if(mem_substitution.get(m)!=null)
+			// mem_substitution.put(m, memory.get(m));
 		}
-//		mem_substitution.putAll(null_mem);
+		// mem_substitution.putAll(null_mem);
 		return new Transition(guard, output_substitution, mem_substitution, allInputPorts);
 	}
-	
-	public static Map<Variable, Term> sort(Map<Variable, Term> assignements ){
-		Map<Variable, Term> assign = new LinkedHashMap<Variable,Term>();
+
+	/**
+	 * Sort.
+	 *
+	 * @param assignements
+	 *            the assignements
+	 * @return the map
+	 */
+	public static Map<Variable, Term> sort(Map<Variable, Term> assignements) {
+		Map<Variable, Term> assign = new LinkedHashMap<Variable, Term>();
 		List<Variable> var = new ArrayList<Variable>();
-		for(Variable v : assignements.keySet()){
-			if(assignements.get(v) instanceof Function && ((Function)assignements.get(v)).getValue().equals("null")){
+		for (Variable v : assignements.keySet()) {
+			if (assignements.get(v) instanceof Function && ((Function) assignements.get(v)).getValue().equals("null")) {
 				var.add(var.size(), v);
-			}
-			else
-				var.add(0,v);
+			} else
+				var.add(0, v);
 		}
-		for(Variable v : var){
+		for (Variable v : var) {
 			assign.put(v, assignements.get(v));
 		}
 		return assign;

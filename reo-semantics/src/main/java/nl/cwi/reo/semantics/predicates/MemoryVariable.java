@@ -11,6 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 
+// TODO: Auto-generated Javadoc
 /**
  * A variable that represents the current or next value of a memory cell.
  */

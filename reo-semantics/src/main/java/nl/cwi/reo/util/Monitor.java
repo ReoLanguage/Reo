@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+// TODO: Auto-generated Javadoc
 /**
  * A container for all messages generated during compilation.
  */
@@ -60,7 +61,7 @@ public final class Monitor {
 	public void add(Message message) {
 		if (message.getType() == MessageType.ERROR)
 			hasErrors = true;
-		if(!messages.contains(message))
+		if (!messages.contains(message))
 			messages.add(message);
 	}
 

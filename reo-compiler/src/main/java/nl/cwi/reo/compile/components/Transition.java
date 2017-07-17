@@ -15,41 +15,45 @@ import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Transition.
+ */
 public final class Transition {
 
-	/**
-	 * Guard
-	 */
+	/** Guard. */
 	private final Formula guard;
 
-	/**
-	 * Set of input ports
-	 */
+	/** Set of input ports. */
 	private final Set<Port> input;
 
-	/**
-	 * Output update
-	 */
+	/** Output update. */
 	private final Map<PortVariable, Term> output;
 
-	/**
-	 * Memory update
-	 */
+	/** Memory update. */
 	private final Map<MemoryVariable, Term> memory;
 
-	
-	/**
-	 * Maude variable
-	 */
+	/** Maude variable. */
 	static int instancecounter = 0;
-	private Map<MemoryVariable,Integer> mapM = new HashMap<>();
 
-	private Map<String,String> mapInM = new HashMap<>();
-	private Map<String,String> mapInP = new HashMap<>();
-	private Map<String,String> mapOutM = new HashMap<>();
-	private Map<String,String> mapOutP = new HashMap<>();
+	/** The map M. */
+	private Map<MemoryVariable, Integer> mapM = new HashMap<>();
+
+	/** The map in M. */
+	private Map<String, String> mapInM = new HashMap<>();
+
+	/** The map in P. */
+	private Map<String, String> mapInP = new HashMap<>();
+
+	/** The map out M. */
+	private Map<String, String> mapOutM = new HashMap<>();
+
+	/** The map out P. */
+	private Map<String, String> mapOutP = new HashMap<>();
+
+	/** The nb. */
 	private int nb;
-	
+
 	/**
 	 * Constructs a new transition.
 	 * 
@@ -74,11 +78,23 @@ public final class Transition {
 		// find all *used* ports in the formula and the terms.
 		this.input = I;
 		instancecounter++;
-		nb=instancecounter;
+		nb = instancecounter;
 	}
-	
 
-	public Transition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory, Set<Port> input) {
+	/**
+	 * Instantiates a new transition.
+	 *
+	 * @param guard
+	 *            the guard
+	 * @param output
+	 *            the output
+	 * @param memory
+	 *            the memory
+	 * @param input
+	 *            the input
+	 */
+	public Transition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory,
+			Set<Port> input) {
 		if (guard == null)
 			throw new IllegalArgumentException("No guard specified.");
 		if (output == null)
@@ -90,7 +106,7 @@ public final class Transition {
 		this.memory = Collections.unmodifiableMap(memory);
 		this.input = Collections.unmodifiableSet(input);
 		instancecounter++;
-		nb=instancecounter;
+		nb = instancecounter;
 	}
 
 	/**
@@ -128,93 +144,122 @@ public final class Transition {
 	public Map<MemoryVariable, Term> getMemory() {
 		return this.memory;
 	}
-	
-	public Map<MemoryVariable,Integer> getMapM() {
+
+	/**
+	 * Gets the map M.
+	 *
+	 * @return the map M
+	 */
+	public Map<MemoryVariable, Integer> getMapM() {
 		Set<MemoryVariable> s = this.memory.keySet();
-		Map<MemoryVariable,Integer> map = new HashMap<>();
-		for(MemoryVariable m : s){
-			map.put(m,Integer.parseInt(m.getName().substring(1)));
+		Map<MemoryVariable, Integer> map = new HashMap<>();
+		for (MemoryVariable m : s) {
+			map.put(m, Integer.parseInt(m.getName().substring(1)));
 		}
-		this.mapM=map;
+		this.mapM = map;
 		return this.mapM;
 	}
-	
-	public Map<String,String> getMapInM() {
+
+	/**
+	 * Gets the map in M.
+	 *
+	 * @return the map in M
+	 */
+	public Map<String, String> getMapInM() {
 		Set<Term> s = new HashSet<>(this.output.values());
 		s.addAll(new HashSet<>(memory.values()));
-		Map<String,String> map = new HashMap<>();
-		for(Term n : s){
-			if(n instanceof MemoryVariable)
-				map.put(((MemoryVariable)n).getName().substring(1),"d_"+((MemoryVariable)n).getName());
+		Map<String, String> map = new HashMap<>();
+		for (Term n : s) {
+			if (n instanceof MemoryVariable)
+				map.put(((MemoryVariable) n).getName().substring(1), "d_" + ((MemoryVariable) n).getName());
 		}
-		for(MemoryVariable m : memory.keySet()){
-			if(!map.containsKey(((MemoryVariable)m).getName().substring(1))){
-				map.put(((MemoryVariable)m).getName().substring(1),"*");				
+		for (MemoryVariable m : memory.keySet()) {
+			if (!map.containsKey(((MemoryVariable) m).getName().substring(1))) {
+				map.put(((MemoryVariable) m).getName().substring(1), "*");
 			}
 		}
-		this.mapInM=map;
+		this.mapInM = map;
 		return this.mapInM;
 	}
-	
-	public Map<String,String> getMapInP() {
+
+	/**
+	 * Gets the map in P.
+	 *
+	 * @return the map in P
+	 */
+	public Map<String, String> getMapInP() {
 		Set<Term> s = new HashSet<>(this.output.values());
 		s.addAll(new HashSet<>(memory.values()));
-		Map<String,String> map = new HashMap<>();
-		for(Term n : s){
-			if(n instanceof PortVariable)
-				map.put(((PortVariable)n).getName().substring(1),"d"+((PortVariable)n).getName());
+		Map<String, String> map = new HashMap<>();
+		for (Term n : s) {
+			if (n instanceof PortVariable)
+				map.put(((PortVariable) n).getName().substring(1), "d" + ((PortVariable) n).getName());
 		}
-		for(PortVariable m : output.keySet()){
-			if(!map.containsKey(((PortVariable)m).getName().substring(1))){
-				map.put(((PortVariable)m).getName().substring(1),"*");				
+		for (PortVariable m : output.keySet()) {
+			if (!map.containsKey(((PortVariable) m).getName().substring(1))) {
+				map.put(((PortVariable) m).getName().substring(1), "*");
 			}
 		}
-		this.mapInP=map;
+		this.mapInP = map;
 		return this.mapInP;
 	}
-	
-	public Map<String,String> getMapOutP() {
-		Map<String,String> map = new HashMap<>();
-		for(PortVariable m : output.keySet()){
-			if(output.get(m) instanceof MemoryVariable)
-				map.put(m.getName().substring(1),"d_"+((MemoryVariable)(output.get(m))).getName());	
-			if(output.get(m) instanceof PortVariable)
-				map.put(m.getName().substring(1),"d"+((PortVariable)output.get(m)).getName());	
+
+	/**
+	 * Gets the map out P.
+	 *
+	 * @return the map out P
+	 */
+	public Map<String, String> getMapOutP() {
+		Map<String, String> map = new HashMap<>();
+		for (PortVariable m : output.keySet()) {
+			if (output.get(m) instanceof MemoryVariable)
+				map.put(m.getName().substring(1), "d_" + ((MemoryVariable) (output.get(m))).getName());
+			if (output.get(m) instanceof PortVariable)
+				map.put(m.getName().substring(1), "d" + ((PortVariable) output.get(m)).getName());
 		}
 		Set<Term> s = new HashSet<>(this.output.values());
 		s.addAll(new HashSet<>(memory.values()));
-		for(Term m : s){
-			if(m instanceof PortVariable)
-				map.put(((PortVariable)m).getName().substring(1),"*");				
+		for (Term m : s) {
+			if (m instanceof PortVariable)
+				map.put(((PortVariable) m).getName().substring(1), "*");
 		}
-		this.mapOutP=map;
+		this.mapOutP = map;
 		return this.mapOutP;
 	}
-	
-	public Map<String,String> getMapOutM() {
-		Map<String,String> map = new HashMap<>();
-		for(MemoryVariable m : memory.keySet()){
-			if(memory.get(m) instanceof MemoryVariable)
-				map.put(m.getName().substring(1),"d_"+((MemoryVariable)(memory.get(m))).getName());	
-			if(memory.get(m) instanceof PortVariable)
-				map.put(m.getName().substring(1),"d"+((PortVariable)memory.get(m)).getName());	
+
+	/**
+	 * Gets the map out M.
+	 *
+	 * @return the map out M
+	 */
+	public Map<String, String> getMapOutM() {
+		Map<String, String> map = new HashMap<>();
+		for (MemoryVariable m : memory.keySet()) {
+			if (memory.get(m) instanceof MemoryVariable)
+				map.put(m.getName().substring(1), "d_" + ((MemoryVariable) (memory.get(m))).getName());
+			if (memory.get(m) instanceof PortVariable)
+				map.put(m.getName().substring(1), "d" + ((PortVariable) memory.get(m)).getName());
 		}
-		
+
 		Set<Term> s = new HashSet<>(this.output.values());
 		s.addAll(new HashSet<>(memory.values()));
-		for(Term m : s){
-			if(m instanceof MemoryVariable)
-				map.put(((MemoryVariable)m).getName().substring(1),"*");				
+		for (Term m : s) {
+			if (m instanceof MemoryVariable)
+				map.put(((MemoryVariable) m).getName().substring(1), "*");
 		}
-		this.mapOutM=map;
+		this.mapOutM = map;
 		return this.mapOutM;
-	}	
-	
-	public int getNb(){
+	}
+
+	/**
+	 * Gets the nb.
+	 *
+	 * @return the nb
+	 */
+	public int getNb() {
 		return nb;
 	}
-	
-	
+
 	/**
 	 * Gets the set of ports that participate in this transition.
 	 * 
@@ -223,12 +268,12 @@ public final class Transition {
 	public Set<Port> getInterface() {
 		Set<Port> ports = new HashSet<Port>(input);
 		for (PortVariable x : output.keySet())
-//			if(!x.isVoid())
-			ports.add(x.getPort());	
-		
+			// if(!x.isVoid())
+			ports.add(x.getPort());
+
 		return ports;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -241,10 +286,8 @@ public final class Transition {
 		if (!(other instanceof Transition))
 			return false;
 		Transition rule = (Transition) other;
-		return Objects.equals(this.guard,rule.getGuard())&&
-				Objects.equals(this.output,rule.getOutput())&&
-				Objects.equals(this.memory,rule.getMemory())&&
-				Objects.equals(this.input,rule.getInput());
+		return Objects.equals(this.guard, rule.getGuard()) && Objects.equals(this.output, rule.getOutput())
+				&& Objects.equals(this.memory, rule.getMemory()) && Objects.equals(this.input, rule.getInput());
 	}
 
 	/**
@@ -252,6 +295,6 @@ public final class Transition {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.guard,this.output,this.memory,this.input);
+		return Objects.hash(this.guard, this.output, this.memory, this.input);
 	}
 }

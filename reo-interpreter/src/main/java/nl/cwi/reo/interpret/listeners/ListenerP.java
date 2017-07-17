@@ -51,91 +51,202 @@ import nl.cwi.reo.semantics.predicates.Universal;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ListenerP.
+ */
 public class ListenerP extends Listener<Predicate> implements PListener {
 
+	/** The predicate. */
 	private ParseTreeProperty<Predicate> predicate = new ParseTreeProperty<Predicate>();
+
+	/** The formulas. */
 	private ParseTreeProperty<Formula> formulas = new ParseTreeProperty<Formula>();
+
+	/** The terms. */
 	private ParseTreeProperty<Term> terms = new ParseTreeProperty<Term>();
+
+	/** The arguments. */
 	private ParseTreeProperty<List<Term>> arguments = new ParseTreeProperty<List<Term>>();
+
+	/** The variables. */
 	private ParseTreeProperty<Variable> variables = new ParseTreeProperty<Variable>();
 
+	/**
+	 * Instantiates a new listener P.
+	 *
+	 * @param m
+	 *            the m
+	 */
 	public ListenerP(Monitor m) {
 		super(m);
 	}
 
 	/**
-	 * Predicates
+	 * Predicates.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	public void exitAtom(AtomContext ctx) {
 		atoms.put(ctx, predicate.get(ctx.p()));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#enterP(nl.cwi.reo.interpret.
+	 * ReoParser.PContext)
+	 */
 	@Override
 	public void enterP(PContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP(nl.cwi.reo.interpret.ReoParser
+	 * .PContext)
+	 */
 	@Override
 	public void exitP(PContext ctx) {
 		predicate.put(ctx, new Predicate(formulas.get(ctx.p_form())));
 	}
 
 	/**
-	 * Formulas
+	 * Formulas.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
 	public void enterP_brackets(P_bracketsContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_brackets(nl.cwi.reo.interpret.
+	 * ReoParser.P_bracketsContext)
+	 */
 	@Override
 	public void exitP_brackets(P_bracketsContext ctx) {
 		formulas.put(ctx, formulas.get(ctx.p_form()));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_exists(nl.cwi.reo.interpret.
+	 * ReoParser.P_existsContext)
+	 */
 	@Override
 	public void enterP_exists(P_existsContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_exists(nl.cwi.reo.interpret.
+	 * ReoParser.P_existsContext)
+	 */
 	@Override
 	public void exitP_exists(P_existsContext ctx) {
 		formulas.put(ctx, new Existential(variables.get(ctx.p_var()), formulas.get(ctx.p_form())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_forall(nl.cwi.reo.interpret.
+	 * ReoParser.P_forallContext)
+	 */
 	@Override
 	public void enterP_forall(P_forallContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_forall(nl.cwi.reo.interpret.
+	 * ReoParser.P_forallContext)
+	 */
 	@Override
 	public void exitP_forall(P_forallContext ctx) {
 		formulas.put(ctx, new Universal(variables.get(ctx.p_var()), formulas.get(ctx.p_form())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_not(nl.cwi.reo.interpret.
+	 * ReoParser.P_notContext)
+	 */
 	@Override
 	public void enterP_not(P_notContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitP_not(nl.cwi.reo.interpret.
+	 * ReoParser.P_notContext)
+	 */
 	@Override
 	public void exitP_not(P_notContext ctx) {
 		formulas.put(ctx, new Negation(formulas.get(ctx.p_form())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_and(nl.cwi.reo.interpret.
+	 * ReoParser.P_andContext)
+	 */
 	@Override
 	public void enterP_and(P_andContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitP_and(nl.cwi.reo.interpret.
+	 * ReoParser.P_andContext)
+	 */
 	@Override
 	public void exitP_and(P_andContext ctx) {
 		List<Formula> list = new ArrayList<Formula>();
 		for (P_formContext x : ctx.p_form())
 			list.add(formulas.get(x));
-		formulas.put(ctx, new Conjunction(list));
+		formulas.put(ctx, Conjunction.conjunction(list));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#enterP_or(nl.cwi.reo.interpret.
+	 * ReoParser.P_orContext)
+	 */
 	@Override
 	public void enterP_or(P_orContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitP_or(nl.cwi.reo.interpret.
+	 * ReoParser.P_orContext)
+	 */
 	@Override
 	public void exitP_or(P_orContext ctx) {
 		List<Formula> list = new ArrayList<Formula>();
@@ -144,129 +255,301 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 		formulas.put(ctx, new Disjunction(list));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_eqs(nl.cwi.reo.interpret.
+	 * ReoParser.P_eqsContext)
+	 */
 	@Override
 	public void enterP_eqs(P_eqsContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitP_eqs(nl.cwi.reo.interpret.
+	 * ReoParser.P_eqsContext)
+	 */
 	@Override
 	public void exitP_eqs(P_eqsContext ctx) {
 		List<Formula> list = new ArrayList<Formula>();
 		for (int i = 0; i < ctx.p_term().size() - 1; i++)
 			list.add(new Equality(terms.get(ctx.p_term(i)), terms.get(ctx.p_term(i + 1))));
-		formulas.put(ctx, new Conjunction(list));
+		formulas.put(ctx, Conjunction.conjunction(list));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_neq(nl.cwi.reo.interpret.
+	 * ReoParser.P_neqContext)
+	 */
 	@Override
 	public void enterP_neq(P_neqContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitP_neq(nl.cwi.reo.interpret.
+	 * ReoParser.P_neqContext)
+	 */
 	@Override
 	public void exitP_neq(P_neqContext ctx) {
 		formulas.put(ctx, new Negation(new Equality(terms.get(ctx.p_term(0)), terms.get(ctx.p_term(1)))));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_relation(nl.cwi.reo.interpret
+	 * .ReoParser.P_relationContext)
+	 */
 	@Override
 	public void enterP_relation(P_relationContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_relation(nl.cwi.reo.interpret.
+	 * ReoParser.P_relationContext)
+	 */
 	@Override
 	public void exitP_relation(P_relationContext ctx) {
 		formulas.put(ctx, new Relation(ctx.getText(), arguments.get(ctx.p_args())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_true(nl.cwi.reo.interpret.
+	 * ReoParser.P_trueContext)
+	 */
 	@Override
 	public void enterP_true(P_trueContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_true(nl.cwi.reo.interpret.
+	 * ReoParser.P_trueContext)
+	 */
 	@Override
 	public void exitP_true(P_trueContext ctx) {
 		formulas.put(ctx, new TruthValue(true));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_false(nl.cwi.reo.interpret.
+	 * ReoParser.P_falseContext)
+	 */
 	@Override
 	public void enterP_false(P_falseContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_false(nl.cwi.reo.interpret.
+	 * ReoParser.P_falseContext)
+	 */
 	@Override
 	public void exitP_false(P_falseContext ctx) {
 		formulas.put(ctx, new TruthValue(false));
 	}
 
 	/**
-	 * Terms
+	 * Terms.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
 	public void enterP_variable(P_variableContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_variable(nl.cwi.reo.interpret.
+	 * ReoParser.P_variableContext)
+	 */
 	@Override
 	public void exitP_variable(P_variableContext ctx) {
 		terms.put(ctx, variables.get(ctx.p_var()));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_null(nl.cwi.reo.interpret.
+	 * ReoParser.P_nullContext)
+	 */
 	@Override
 	public void enterP_null(P_nullContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_null(nl.cwi.reo.interpret.
+	 * ReoParser.P_nullContext)
+	 */
 	@Override
 	public void exitP_null(P_nullContext ctx) {
 		terms.put(ctx, new NullValue());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_natural(nl.cwi.reo.interpret.
+	 * ReoParser.P_naturalContext)
+	 */
 	@Override
 	public void enterP_natural(P_naturalContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_natural(nl.cwi.reo.interpret.
+	 * ReoParser.P_naturalContext)
+	 */
 	@Override
 	public void exitP_natural(P_naturalContext ctx) {
 		terms.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_boolean(nl.cwi.reo.interpret.
+	 * ReoParser.P_booleanContext)
+	 */
 	@Override
 	public void enterP_boolean(P_booleanContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_boolean(nl.cwi.reo.interpret.
+	 * ReoParser.P_booleanContext)
+	 */
 	@Override
 	public void exitP_boolean(P_booleanContext ctx) {
 		terms.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_string(nl.cwi.reo.interpret.
+	 * ReoParser.P_stringContext)
+	 */
 	@Override
 	public void enterP_string(P_stringContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_string(nl.cwi.reo.interpret.
+	 * ReoParser.P_stringContext)
+	 */
 	@Override
 	public void exitP_string(P_stringContext ctx) {
 		terms.put(ctx, new Function(ctx.getText(), ctx.getText(), null));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_decimal(nl.cwi.reo.interpret.
+	 * ReoParser.P_decimalContext)
+	 */
 	@Override
 	public void enterP_decimal(P_decimalContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_decimal(nl.cwi.reo.interpret.
+	 * ReoParser.P_decimalContext)
+	 */
 	@Override
 	public void exitP_decimal(P_decimalContext ctx) {
 		terms.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_function(nl.cwi.reo.interpret
+	 * .ReoParser.P_functionContext)
+	 */
 	@Override
 	public void enterP_function(P_functionContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_function(nl.cwi.reo.interpret.
+	 * ReoParser.P_functionContext)
+	 */
 	@Override
 	public void exitP_function(P_functionContext ctx) {
 		terms.put(ctx, new Function(ctx.getText(), null, arguments.get(ctx.p_args())));
 	}
 
 	/**
-	 * Arguments
+	 * Arguments.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
 	public void enterP_args(P_argsContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_args(nl.cwi.reo.interpret.
+	 * ReoParser.P_argsContext)
+	 */
 	@Override
 	public void exitP_args(P_argsContext ctx) {
 		List<Term> list = new ArrayList<Term>();
@@ -276,31 +559,69 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 	}
 
 	/**
-	 * Variables
+	 * Variables.
+	 *
+	 * @param ctx
+	 *            the ctx
 	 */
 
 	@Override
 	public void enterP_var_port(P_var_portContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_var_port(nl.cwi.reo.interpret.
+	 * ReoParser.P_var_portContext)
+	 */
 	@Override
 	public void exitP_var_port(P_var_portContext ctx) {
 		variables.put(ctx, new PortVariable(new Port(ctx.ID().getText())));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_var_curr(nl.cwi.reo.interpret
+	 * .ReoParser.P_var_currContext)
+	 */
 	@Override
 	public void enterP_var_curr(P_var_currContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_var_curr(nl.cwi.reo.interpret.
+	 * ReoParser.P_var_currContext)
+	 */
 	@Override
 	public void exitP_var_curr(P_var_currContext ctx) {
 		variables.put(ctx, new MemoryVariable(ctx.ID().getText(), false));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterP_var_next(nl.cwi.reo.interpret
+	 * .ReoParser.P_var_nextContext)
+	 */
 	@Override
 	public void enterP_var_next(P_var_nextContext ctx) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitP_var_next(nl.cwi.reo.interpret.
+	 * ReoParser.P_var_nextContext)
+	 */
 	@Override
 	public void exitP_var_next(P_var_nextContext ctx) {
 		variables.put(ctx, new MemoryVariable(ctx.getText(), true));

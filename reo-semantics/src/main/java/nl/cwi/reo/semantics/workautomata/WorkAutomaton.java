@@ -25,19 +25,16 @@ import nl.cwi.reo.util.Monitor;
 
 import java.util.HashMap;
 
+// TODO: Auto-generated Javadoc
 /**
  * A work automaton.
  */
 public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
-	/**
-	 * Set of states
-	 */
+	/** Set of states. */
 	private final Set<String> Q;
 
-	/**
-	 * Set of ports
-	 */
+	/** Set of ports. */
 	private final SortedSet<Port> P;
 
 	/**
@@ -102,6 +99,11 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 		this.q0 = q0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.semantics.Semantics#getNode(java.util.Set)
+	 */
 	@Override
 	public WorkAutomaton getNode(Set<Port> node) {
 		Set<String> Q = new HashSet<String>();
@@ -142,6 +144,8 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Gets the set of states of this work automaton.
+	 *
+	 * @return the states
 	 */
 	public Set<String> getStates() {
 		return this.Q;
@@ -149,6 +153,8 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Gets the set of ports in the interface of this work automaton.
+	 *
+	 * @return the interface
 	 */
 	public SortedSet<Port> getInterface() {
 		return this.P;
@@ -156,6 +162,8 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Gets the set of jobs of the work automaton.
+	 *
+	 * @return the jobs
 	 */
 	public Set<String> getJobs() {
 		return this.J;
@@ -163,9 +171,10 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Gets the invariant condition of a state in the work automaton.
-	 * 
+	 *
 	 * @param q
 	 *            state
+	 * @return the invariant
 	 */
 	public @Nullable JobConstraint getInvariant(String q) {
 		return this.I.get(q);
@@ -184,6 +193,8 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Gets the initial state of the work automaton.
+	 *
+	 * @return the initial
 	 */
 	public String getInitial() {
 		return this.q0;
@@ -191,9 +202,10 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Connects the ports of the work automaton to nodes.
-	 * 
+	 *
 	 * @param links
 	 *            relabeling function
+	 * @return the work automaton
 	 */
 	public WorkAutomaton rename(Map<Port, Port> links) {
 
@@ -226,6 +238,8 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Gets the string representation of this work automaton in .dot format.
+	 *
+	 * @return the string
 	 */
 	public String toDOT() {
 		StringBuilder str = new StringBuilder();
@@ -253,6 +267,8 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 
 	/**
 	 * Gets the string representation of this work automaton.
+	 *
+	 * @return the string
 	 */
 	@Override
 	public String toString() {
@@ -349,7 +365,7 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 					if (x != null)
 						localtransitions.add(new ArrayList<Transition>(x));
 				}
-				
+
 				// Iterate over all *composable* combinations of local
 				// transitions
 				// from s1.
@@ -434,16 +450,32 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 		return s;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.Expression#evaluate(nl.cwi.reo.interpret.Scope,
+	 * nl.cwi.reo.util.Monitor)
+	 */
 	@Override
 	public WorkAutomaton evaluate(Scope s, Monitor m) {
 		return this;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.semantics.Semantics#restrict(java.util.Collection)
+	 */
 	@Override
 	public WorkAutomaton restrict(Collection<? extends Port> intface) {
 		return this;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.semantics.Semantics#getType()
+	 */
 	@Override
 	public SemanticsType getType() {
 		return SemanticsType.WA;

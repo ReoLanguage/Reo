@@ -20,18 +20,29 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PRAutomaton.
+ */
 public class PRAutomaton implements Semantics<PRAutomaton> {
 
+	/** The name. */
 	private final String name;
 
+	/** The parameter. */
 	@Nullable
 	private final Value parameter;
 
+	/** The value. */
 	@Nullable
 	private Value value;
 
+	/** The ports. */
 	private final List<Port> ports;
 
+	/**
+	 * Instantiates a new PR automaton.
+	 */
 	public PRAutomaton() {
 		this.name = "";
 		this.parameter = null;
@@ -39,6 +50,18 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		this.ports = new ArrayList<Port>();
 	}
 
+	/**
+	 * Instantiates a new PR automaton.
+	 *
+	 * @param name
+	 *            the name
+	 * @param variable
+	 *            the variable
+	 * @param value
+	 *            the value
+	 * @param port
+	 *            the port
+	 */
 	public PRAutomaton(String name, @Nullable Value variable, @Nullable Value value, List<Port> port) {
 		this.name = name;
 		if (variable instanceof StringValue)
@@ -49,6 +72,16 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		this.ports = port;
 	}
 
+	/**
+	 * Instantiates a new PR automaton.
+	 *
+	 * @param name
+	 *            the name
+	 * @param variable
+	 *            the variable
+	 * @param port
+	 *            the port
+	 */
 	public PRAutomaton(String name, @Nullable Value variable, List<Port> port) {
 		this.name = name;
 		this.parameter = variable;
@@ -56,15 +89,30 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		this.ports = port;
 	}
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
-	
+
+	/**
+	 * Gets the value.
+	 *
+	 * @return the value
+	 */
 	@Nullable
 	public Value getValue() {
 		return value;
 	}
 
+	/**
+	 * Gets the variable.
+	 *
+	 * @return the variable
+	 */
 	public Value getVariable() {
 		if (name.equals("FifoFull") && parameter instanceof StringValue) {
 			return new StringValue("\"" + parameter.toString() + "\"");

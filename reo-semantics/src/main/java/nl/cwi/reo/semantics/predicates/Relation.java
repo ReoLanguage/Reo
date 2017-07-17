@@ -14,6 +14,7 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Relation of a list of terms.
  */
@@ -193,11 +194,14 @@ public class Relation implements Formula {
 	 */
 	@Override
 	public String toString() {
-		String s = name + "(";
-		if (args != null)
+		String s = name;
+		if (args != null) {
+			s += "(";
 			for (Term t : args)
 				s += ", " + t;
-		return s + ")";
+			s += ")";
+		}
+		return s;
 	}
 
 	/**

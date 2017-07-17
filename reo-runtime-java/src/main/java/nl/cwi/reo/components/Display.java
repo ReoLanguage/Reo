@@ -1,4 +1,5 @@
 package nl.cwi.reo.components;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
@@ -14,7 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import nl.cwi.reo.runtime.Port;
-
 
 public class Display {
 	private final Board board;
