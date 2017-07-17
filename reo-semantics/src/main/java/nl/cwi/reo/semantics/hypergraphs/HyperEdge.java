@@ -286,7 +286,7 @@ public class HyperEdge {
 	@Override
 	public String toString() {
 		String s = "";
-		s += port.getPort() + " \u2192 \u2228{ ";
+		s += port.getPort().getName() + " -> { ";
 		Iterator<RuleNode> iter = rules.iterator();
 		while (iter.hasNext())
 			s += iter.next() + (iter.hasNext() ? ", " : "");

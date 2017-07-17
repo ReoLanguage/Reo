@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Datum.
@@ -44,6 +46,7 @@ public class Datum<T> {
 	 *            the string
 	 * @return the object
 	 */
+	@Nullable
 	public static <T> Object convertToObject(String string) {
 		T instance = null;
 		if (string == null)

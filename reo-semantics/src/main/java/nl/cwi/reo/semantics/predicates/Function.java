@@ -95,7 +95,7 @@ public class Function implements Term {
 	@Override
 	public String toString() {
 		String s = name;
-		if (args != null) {
+		if (args != null && !args.isEmpty()) {
 			s += "(";
 			for (Term t : args)
 				s += ", " + t;

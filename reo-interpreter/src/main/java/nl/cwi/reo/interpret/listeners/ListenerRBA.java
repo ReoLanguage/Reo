@@ -209,7 +209,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 		List<Formula> l = new ArrayList<Formula>();
 		for (Rba_formulaContext f : ctx.rba_formula())
 			l.add(rba_formula.get(f));
-		rba_formula.put(ctx, new Conjunction(l));
+		rba_formula.put(ctx, Conjunction.conjunction(l));
 	}
 
 	/*

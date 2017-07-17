@@ -168,7 +168,7 @@ public class Disjunction implements Formula {
 	public String toString() {
 		String s = "(" + clauses.get(0);
 		for (int i = 1; i < clauses.size(); i++)
-			s = s + "\u2228" + clauses.get(i);
+			s = s + " \u2228 " + clauses.get(i);
 		return s + ")";
 	}
 

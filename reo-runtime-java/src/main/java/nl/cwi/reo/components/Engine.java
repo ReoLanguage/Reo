@@ -51,6 +51,8 @@ public class Engine {
 			public void run() {
 				String line;
 				StringBuilder builder = new StringBuilder();
+				if (reader == null || queue == null)
+					throw new NullPointerException();
 
 				try {
 					while ((line = reader.readLine()) != null) {
@@ -61,9 +63,7 @@ public class Engine {
 							builder = new StringBuilder();
 						}
 					}
-				}
-
-				catch (IOException | InterruptedException e) {
+				} catch (IOException | InterruptedException e) {
 					e.printStackTrace();
 					throw new Error();
 				}

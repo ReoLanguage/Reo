@@ -185,10 +185,11 @@ public final class SetComposite<T extends Semantics<T>> implements SetExpression
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("<operator>{\n  <elements>\n|\n  <predicate>\n}");
+		ST st = new ST("<operator>{\n  <elements; separator=\"\n\">\n<if(predicate)>|\n  <predicate>\n<endif>}");
 		st.add("operator", operator);
 		st.add("elements", elements);
-		st.add("predicate", predicate);
+		if (!(predicate instanceof TruthValue) && !((TruthValue) predicate).equals(new TruthValue(true)))
+			st.add("predicate", predicate);
 		return st.render();
 	}
 

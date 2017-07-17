@@ -7,7 +7,6 @@ package nl.cwi.reo.runtime;
  * @param <T>
  *            the generic type
  */
-@SuppressWarnings("initialization")
 public class SchedulablePort<T> implements Port<T> {
 	
 	/** The prod. */

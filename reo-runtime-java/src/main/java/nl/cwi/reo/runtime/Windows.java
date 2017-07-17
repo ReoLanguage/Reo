@@ -95,7 +95,7 @@ public class Windows {
 			public void run() {
 				while (true) {
 					String datum = null;
-					while (true)
+					while (datum == null)
 						try {
 							datum = queue.take();
 							break;

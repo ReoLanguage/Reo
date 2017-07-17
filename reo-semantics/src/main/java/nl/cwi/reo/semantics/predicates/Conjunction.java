@@ -216,7 +216,7 @@ public class Conjunction implements Formula {
 	public String toString() {
 		String s = "(" + clauses.get(0);
 		for (int i = 1; i < clauses.size(); i++)
-			s = s + "\u2227" + clauses.get(i);
+			s = s + " \u2227 " + clauses.get(i);
 		return s + ")";
 	}
 

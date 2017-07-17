@@ -176,7 +176,7 @@ public class Equality implements Formula {
 	 */
 	@Override
 	public String toString() {
-		return t1 + "=" + t2;
+		return t1 + " = " + t2;
 	}
 
 	/**

@@ -131,16 +131,15 @@ public class Rule {
 	 */
 	@Override
 	public String toString() {
-		String s = "{";
+		String s = "";
 		Iterator<Map.Entry<Port, Boolean>> iter = this.sync.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry<Port, Boolean> pair = iter.next();
-			s += pair.getValue() ? "" : "~";
-			s += pair.getKey() + (iter.hasNext() ? ", " : "");
+			s += pair.getValue() ? "!" : "\u00AC!";
+			s += pair.getKey().getName() + (iter.hasNext() ? " \u2227 " : "");
 		}
-		s += "} ";
 		if (f != null)
-			s += f.toString();
+			s += " \u2227 " + f.toString();
 		return s;
 	}
 

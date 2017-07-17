@@ -32,6 +32,15 @@ public class TruthValue implements PredicateExpression {
 	}
 
 	/**
+	 * Gets the boolean value of the truth value.
+	 * 
+	 * @return boolean value of this truth value.
+	 */
+	public boolean getBool() {
+		return bool;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

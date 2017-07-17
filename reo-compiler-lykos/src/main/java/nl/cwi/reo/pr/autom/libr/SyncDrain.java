@@ -7,11 +7,8 @@ import nl.cwi.reo.pr.autom.Extralogical;
 import nl.cwi.reo.pr.autom.UserDefinedAutomaton;
 import nl.cwi.reo.pr.autom.UserDefinedInitializer;
 import nl.cwi.reo.pr.autom.ConstraintFactory.Constraint;
-import nl.cwi.reo.pr.autom.LiteralFactory.Literal;
 import nl.cwi.reo.pr.autom.StateFactory.State;
-import nl.cwi.reo.pr.misc.TypedName;
 import nl.cwi.reo.pr.misc.PortFactory.Port;
-import nl.cwi.reo.pr.misc.TypedName.Type;
 
 public class SyncDrain extends UserDefinedInitializer {
 

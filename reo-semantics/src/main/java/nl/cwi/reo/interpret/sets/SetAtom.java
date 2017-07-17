@@ -79,9 +79,9 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	@Override
 	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
-		T _atom = atom != null ? atom.evaluate(s, m) : atom;
+		T _atom = atom != null ? atom.evaluate(s, m) : null;
 		Reference _source = source.evaluate(s, m);
-		if (_atom == null || _source == null)
+		if (_source == null)
 			return null;
 		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<>());
 	}
@@ -99,7 +99,7 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("{\n<if(source)>  <source>\n<endif>  <atom>\n}");
+		ST st = new ST("{\n  <source>\n  <atom>\n}");
 		if (atom != null)
 			st.add("atom", atom);
 		st.add("source", source);

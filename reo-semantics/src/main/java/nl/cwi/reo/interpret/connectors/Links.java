@@ -29,7 +29,7 @@ public final class Links {
 			if (w != null) {
 				v = w.join(v);
 			} else {
-				v = v.rename("_" + i++).hide();
+				v = v.rename("$" + i++).hide();
 			}
 			newlinks.put(link.getKey(), v);
 		}

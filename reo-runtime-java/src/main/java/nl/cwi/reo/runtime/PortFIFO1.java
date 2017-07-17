@@ -7,7 +7,6 @@ package nl.cwi.reo.runtime;
  * @param <T>
  *            the generic type
  */
-@SuppressWarnings("initialization")
 public class PortFIFO1<T> implements Port<T> {
 	
 	/** The producer. */

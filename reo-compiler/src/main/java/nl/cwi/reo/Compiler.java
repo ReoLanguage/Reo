@@ -201,7 +201,7 @@ public class Compiler {
 		Map<Port, Port> r = new HashMap<Port, Port>();
 		for (Map.Entry<Port, Port> link : program.getConnector().getLinks().entrySet()) {
 			Port p = link.getValue();
-			r.put(p, p.rename("[" + i++ + "]").hide());
+			r.put(p, p.rename("$" + i++).hide());
 		}
 		ReoConnector<ConstraintHypergraph> connector = new ReoConnectorComposite<>(null, "", list).rename(r);
 
@@ -258,60 +258,11 @@ public class Compiler {
 
 			// Hide all internal ports
 			Formula f = rule.getDataConstraint();
-			// Set<Port> pNegSet = new HashSet<>();
-			for (Port p : rule.getAllPorts()) {
-				if (!intface.contains(p)) {
+			for (Port p : rule.getAllPorts())
+				if (!intface.contains(p))
 					f = new Existential(new PortVariable(p), f).QE();
-
-					// if(!rule.getSync().get(p)){
-					// /*
-					// * This algorithm assumes that there is only one hyperedge
-					// for each variables (ie the Hypergraph is in a distributed
-					// form).
-					// * Given a rule S and a negative port p:
-					// * For all rules R satisfying p fires:
-					// * - if R satisfies pNeg fires and pNeg is in the
-					// interface, add pNeg to the set of port that must block
-					// for S.
-					// * - if pNeg is a negative port in R and S satisfies pNeg
-					// fires, then R and S are mutually exclusives (clear
-					// pNegSet and break this loop)
-					// *
-					// * For each port in pNegSet, add pNeg=* to the guard.
-					// */
-					// HyperEdge h = circuit.getHyperedges(p).get(0);
-					// for(RuleNode ruleNode : h.getLeaves()){
-					// for(Port pNeg : ruleNode.getRule().getAllPorts()){
-					// if(!pNeg.equals(p) &&
-					// ruleNode.getRule().getSync().get(pNeg) &&
-					// rule.getSync().get(pNeg)!=null &&
-					// !rule.getSync().get(pNeg)){
-					// pNegSet.clear();
-					// break;
-					// }
-					// if(intface.contains(pNeg) &&
-					// rule.getSync().get(pNeg)==null)
-					// pNegSet.add(pNeg);
-					// }
-					// }
-					// }
-				}
-				// else{
-				// if(rule.getSync().get(p) &&
-				// !f.getFreeVariables().contains(p))
-				// f = new Conjunction(Arrays.asList(f, new Negation(new
-				// Equality(new Node(p),new Function("*",null)))));
-				// else
-				// f = new Conjunction(Arrays.asList(f, new Equality(new
-				// Node(p),new Function("*",null))));
-				// }
-			}
-			// for(Port pNeg : pNegSet){
-			// f = new Conjunction(Arrays.asList(f, new Equality(new
-			// Node(pNeg),new Function("*",null))));
-			// }
-
-			// Commandify the formula:
+			
+			// Commandify the formula
 			Transition t = RBACompiler.commandify(f);
 
 			if (!(t.getInput().isEmpty() && t.getMemory().isEmpty() && t.getOutput().isEmpty()))

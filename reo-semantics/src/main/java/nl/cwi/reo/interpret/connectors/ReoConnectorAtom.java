@@ -36,11 +36,13 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	/**
 	 * Semantics object.
 	 */
+	@Nullable
 	private final T semantics;
 
 	/**
 	 * Reference to source code.
 	 */
+	@Nullable
 	private final Reference source;
 
 	/**
@@ -74,7 +76,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * @param source
 	 *            reference to source code
 	 */
-	public ReoConnectorAtom(@Nullable String name, T semantics, Reference source) {
+	public ReoConnectorAtom(@Nullable String name, @Nullable T semantics, @Nullable Reference source) {
 		this.name = name;
 		this.semantics = semantics;
 		this.source = source;
@@ -83,8 +85,9 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 			for (Port p : semantics.getInterface())
 				links.put(p, p);
 			this.links = Collections.unmodifiableMap(links);
-		} else
+		} else {
 			this.links = new HashMap<>();
+		}
 	}
 
 	/**
@@ -99,7 +102,8 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * @param links
 	 *            set of links
 	 */
-	public ReoConnectorAtom(@Nullable String name, T semantics, Reference source, Map<Port, Port> links) {
+	public ReoConnectorAtom(@Nullable String name, @Nullable T semantics, @Nullable Reference source,
+			Map<Port, Port> links) {
 		this.name = name;
 		this.semantics = semantics;
 		this.source = source;
@@ -119,6 +123,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * 
 	 * @return Semantics object
 	 */
+	@Nullable
 	public T getSemantics() {
 		return semantics;
 	}
@@ -128,6 +133,7 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	 * 
 	 * @return source code reference.
 	 */
+	@Nullable
 	public Reference getSourceCode() {
 		return source;
 	}
@@ -146,9 +152,11 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 	@Override
 	@Nullable
 	public ReoConnectorAtom<T> evaluate(Scope s, Monitor m) {
-		T semantics = this.semantics.evaluate(s, m);
-		if (semantics == null)
-			return null;
+		if (this.semantics != null) {
+			T semantics = this.semantics.evaluate(s, m);
+			if (semantics == null)
+				return null;
+		}
 		return new ReoConnectorAtom<T>(name, semantics, source);
 	}
 
@@ -197,8 +205,10 @@ public final class ReoConnectorAtom<T extends Semantics<T>> implements ReoConnec
 		for (Map.Entry<Port, Port> link : links.entrySet())
 			renaming.add(link.getKey() + "=" + link.getValue());
 		ST st = new ST("{\n  <semantics>\n  <source>\n}(<renaming; separator=\", \">)");
-		st.add("semantics", semantics);
-		st.add("source", source);
+		if (semantics != null)
+			st.add("semantics", semantics);
+		if (source != null)
+			st.add("source", source);
 		st.add("renaming", renaming);
 		return st.render();
 	}

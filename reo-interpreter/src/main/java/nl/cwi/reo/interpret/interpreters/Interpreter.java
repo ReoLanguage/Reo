@@ -154,9 +154,12 @@ public class Interpreter<T extends Semantics<T>> {
 		List<ReoFile<T>> list = new ArrayList<ReoFile<T>>();
 		while (!deps.isEmpty()) {
 			String prog = null;
-			for (Map.Entry<String, Set<String>> comp : deps.entrySet())
-				if (comp.getValue().isEmpty())
+			for (Map.Entry<String, Set<String>> comp : deps.entrySet()) {
+				if (comp.getValue().isEmpty()) {
 					prog = comp.getKey();
+					break;
+				}
+			}
 			if (prog == null) {
 				m.add("There is a cyclic dependency of imports among " + deps.keySet());
 				return null;

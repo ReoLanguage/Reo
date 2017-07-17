@@ -61,6 +61,7 @@ public class Display {
 		this.position.put("h8", Piece.BLACK_ROOK);
 
 		this.board = new Board();
+		this.board.initialize();
 		this.board.update(position);
 	}
 
@@ -93,6 +94,10 @@ public class Display {
 				throw new Error("invalid move");
 
 			piece = position.remove(from);
+			
+			if (piece == null)
+				throw new Error();
+			
 			position.remove(to);
 			position.put(to, piece);
 
@@ -117,6 +122,10 @@ public class Display {
 				throw new Error("unsupported promotion");
 
 			piece = position.remove(from);
+			
+			if (piece == null)
+				throw new Error();
+			
 			position.remove(to);
 			position.put(to, Piece.promote(piece, promotion));
 			return;
@@ -248,7 +257,7 @@ class Board extends JFrame {
 
 	private ChessLabel[] labels = new ChessLabel[64];
 
-	Board() {
+	public void initialize() {
 		setTitle("Chess");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(640, 640);
