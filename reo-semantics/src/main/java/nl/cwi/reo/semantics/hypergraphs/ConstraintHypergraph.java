@@ -15,6 +15,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.values.BooleanValue;
@@ -24,7 +25,6 @@ import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Existential;
@@ -304,20 +304,17 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	}
 
 	/**
-	 * Gets the default constraint hypgergraph over a set of.
-	 *
-	 * @param ports
-	 *            the ports
-	 * @return the default
+	 * {@inheritDoc}
 	 */
-	public ConstraintHypergraph getDefault(Set<Port> ports) {
+	@Override
+	public ConstraintHypergraph getDefault(Set<Port> iface) {
 
 		Set<Rule> rules = new HashSet<Rule>();
 
-		for (Port p : ports) {
+		for (Port p : iface) {
 			Map<Port, Boolean> map = new HashMap<>();
 			map.put(p, true);
-			for (Port x : ports)
+			for (Port x : iface)
 				if (!x.equals(p))
 					map.put(x, false);
 			Formula guard = new TruthValue(true);
@@ -454,7 +451,8 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				boolean mult = false;
 				for (HyperEdge h : multiEdge) {
 					if (!h.getTarget().isEmpty()) {
-						toDistribute = h.compose(toDistribute);
+//						toDistribute = h.compose(toDistribute);
+						toDistribute.compose(h);
 						mult = true;
 					}
 				}
@@ -493,7 +491,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			Formula g = r.getDataConstraint();
 			for (Port p : r.getFiringPorts())
 				if (!intface.contains(p))
-					g = new Existential(new PortVariable(p), g);
+					g = new Existential(new PortVariable(p), g).QE();
 			setRules.add(new Rule(r.getSyncConstraint(), g));
 		}
 		return new ConstraintHypergraph(setRules, initial);

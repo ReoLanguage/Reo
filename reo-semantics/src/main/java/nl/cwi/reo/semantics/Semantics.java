@@ -2,52 +2,28 @@ package nl.cwi.reo.semantics;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import nl.cwi.reo.interpret.Expression;
+import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.ports.Port;
 
-// TODO: Auto-generated Javadoc
 /**
  * Implementation of a semantics for Reo components.
  * 
  * @param <T>
  *            semantics
  */
-public interface Semantics<T> extends Expression<T> {
+public interface Semantics<T> extends Interpretable<T> {
 
 	/**
-	 * Gets the set of ports in the interface.
+	 * Gets the default semantics with a given interface. A unit has a
+	 * asynchronous action for each port in its interface.
 	 * 
-	 * @return Set of ports.
+	 * @param iface
+	 *            interface of the component
+	 * @return Default semantics with given interface.
 	 */
-	public Set<Port> getInterface();
-
-	/**
-	 * Gets the type of semantics.
-	 * 
-	 * @return Type of semantics.
-	 */
-	public SemanticsType getType();
-
-	/**
-	 * Constructs a new node from a set with given set of ports.
-	 *
-	 * @param node
-	 *            set of ports
-	 * @return Node with interface given by the set of ports.
-	 */
-	public T getNode(Set<Port> node);
-
-	/**
-	 * Renames ports in the interface according to a set of links.
-	 *
-	 * @param links
-	 *            renaming mapping
-	 * @return Component with interface renamed according to the set of links.
-	 */
-	public T rename(Map<Port, Port> links);
+	public T getDefault(Set<Port> iface);
 
 	/**
 	 * Composes a list of components into a single component.

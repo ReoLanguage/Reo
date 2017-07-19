@@ -18,9 +18,9 @@ import java.util.TreeSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.AutomatonSemantics;
-import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
 import java.util.HashMap;
@@ -479,5 +479,11 @@ public final class WorkAutomaton implements AutomatonSemantics<WorkAutomaton> {
 	@Override
 	public SemanticsType getType() {
 		return SemanticsType.WA;
+	}
+
+	@Override
+	public WorkAutomaton getDefault(Set<Port> iface) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
