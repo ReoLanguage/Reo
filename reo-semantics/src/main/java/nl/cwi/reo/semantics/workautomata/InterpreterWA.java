@@ -6,9 +6,8 @@ import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class InterpreterWA.
+ * The work automaton interpreter.
  */
 public class InterpreterWA extends Interpreter<WorkAutomaton> {
 
