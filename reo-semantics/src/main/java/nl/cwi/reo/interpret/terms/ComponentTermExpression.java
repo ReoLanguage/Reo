@@ -13,6 +13,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a component definition expression as a term.
  * 
@@ -27,8 +28,8 @@ public class ComponentTermExpression<T extends Semantics<T>> implements TermExpr
 	private ComponentExpression<T> component;
 
 	/**
-	 * Constructs a new component definition term
-	 * 
+	 * Constructs a new component definition term.
+	 *
 	 * @param component
 	 *            component definition
 	 */

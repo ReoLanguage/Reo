@@ -15,6 +15,7 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a disjunction.
  */
@@ -49,14 +50,15 @@ public final class Disjunction implements PredicateExpression {
 
 		while (!queue.isEmpty()) {
 			P = queue.poll();
-			List<Scope> list = P.evaluate(s, m);
-			if (list == null)
-				m.add("error in predicate");
-			else if (list.equals(s))
-				continue;
-			else
-				extension.addAll(list);
-
+			if (P != null) {
+				List<Scope> list = P.evaluate(s, m);
+				if (list == null)
+					m.add("error in predicate");
+				else if (list.equals(s))
+					continue;
+				else
+					extension.addAll(list);
+			}
 			if (!extension.isEmpty()) {
 				scopes = extension;
 			}
@@ -90,6 +92,7 @@ public final class Disjunction implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
 
 		Set<Identifier> vars = new HashSet<>(defns);
@@ -98,13 +101,15 @@ public final class Disjunction implements PredicateExpression {
 
 		while (!queue.isEmpty()) {
 			P = queue.poll();
-			Set<Identifier> defsP = P.getDefinedVariables(vars);
-			if (defsP == null)
-				return null;
-			else
-				vars.addAll(defsP);
+			if (P != null) {
+				Set<Identifier> defsP = P.getDefinedVariables(vars);
+				if (defsP == null)
+					return null;
+				else
+					vars.addAll(defsP);
+			}
 		}
-		
+
 		return vars;
 	}
 }

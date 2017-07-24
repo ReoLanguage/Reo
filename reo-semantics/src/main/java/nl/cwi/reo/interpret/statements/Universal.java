@@ -11,6 +11,7 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a bounded universal quantification of a Reo predicate over
  * a finite list.
@@ -63,10 +64,12 @@ public final class Universal implements PredicateExpression {
 			return null;
 		for (Scope si : list) {
 			List<Scope> e = predicate.evaluate(si, m);
-			if (e.isEmpty()) {
-				return new ArrayList<Scope>();
-			} else {
-				scopes.addAll(e);
+			if (e != null) {
+				if (e.isEmpty()) {
+					return new ArrayList<Scope>();
+				} else {
+					scopes.addAll(e);
+				}
 			}
 		}
 		for (Scope si : scopes)
@@ -86,11 +89,13 @@ public final class Universal implements PredicateExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
 		Set<Identifier> defnsX = new HashSet<>(defns);
 		defns.add(membership.getVariable());
 		Set<Identifier> newDefs = predicate.getDefinedVariables(defnsX);
-		newDefs.remove(membership.getVariable());
+		if (newDefs != null)
+			newDefs.remove(membership.getVariable());
 		return newDefs;
 	}
 

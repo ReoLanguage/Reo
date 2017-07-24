@@ -2,8 +2,8 @@ grammar RBA;
 
 import Tokens;
 
-rba      	: 	'#RBA' (rba_initial)? rba_rule* ;
-rba_initial :	rba_term '=' rba_term (';' rba_term '=' rba_term )*;
+rba      	: 	'#RBA' rba_initial* rba_rule* ;
+rba_initial :	'$' ID '=' rba_term ';' ;
 rba_rule 	:	'{' (rba_port (',' rba_port)* )? '}' rba_formula;
 rba_init 	: 	ID ':' 'initial' ;
 rba_tr   	: 	ID '->' ID ':' rba_rule ;
@@ -15,6 +15,7 @@ rba_formula : 'true'									#rba_true
 			| 'false' 									#rba_false
 			| rba_formula (',' rba_formula)+			#rba_conjunction
 			| '(' rba_formula ')' 						#rba_def
+// TODO          	| ID '(' rba_term (',' rba_term)* ')'		#rba_relation
 			| rba_term '=' rba_term						#rba_equality
 			| rba_term '!=' rba_term					#rba_inequality ;
 			

@@ -5,18 +5,20 @@ import java.util.Map;
 
 import nl.cwi.reo.interpret.ports.Port;
 
+// TODO: Auto-generated Javadoc
 /**
  * This class provides two operations on sets of links.
  */
 public final class Links {
 
 	/**
-	 * Renames the external ports, and hides all internal ports
-	 * 
+	 * Renames the external ports, and hides all internal ports.
+	 *
 	 * @param links
 	 *            set of links.
 	 * @param r
 	 *            renaming map.
+	 * @return the map
 	 */
 	public static Map<Port, Port> rename(Map<Port, Port> links, Map<Port, Port> r) {
 		int i = 1;
@@ -27,7 +29,7 @@ public final class Links {
 			if (w != null) {
 				v = w.join(v);
 			} else {
-				v = v.rename("_" + i++).hide();
+				v = v.rename("$" + i++).hide();
 			}
 			newlinks.put(link.getKey(), v);
 		}

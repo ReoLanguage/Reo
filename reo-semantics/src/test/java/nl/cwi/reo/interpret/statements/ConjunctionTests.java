@@ -19,8 +19,15 @@ import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ConjunctionTests.
+ */
 public class ConjunctionTests {
 
+	/**
+	 * Evaluate original has no types.
+	 */
 	@Test
 	public void evaluate_OriginalHasNoTypes() {
 
@@ -60,6 +67,9 @@ public class ConjunctionTests {
 		assertEquals(scopes.get(2).get(x), new IntegerValue(3));
 	}
 
+	/**
+	 * Evaluate predicate.
+	 */
 	@Test
 	public void evaluate_Predicate() {
 

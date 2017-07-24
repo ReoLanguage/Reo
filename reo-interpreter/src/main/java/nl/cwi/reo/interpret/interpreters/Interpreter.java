@@ -40,6 +40,7 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpreter of Reo source files, for given generic semantics.
  * 
@@ -75,9 +76,17 @@ public class Interpreter<T extends Semantics<T>> {
 
 	/**
 	 * Constructs a Reo interpreter.
-	 * 
+	 *
+	 * @param semantics
+	 *            the semantics
+	 * @param listener
+	 *            the listener
 	 * @param dirs
 	 *            list of directories of Reo components
+	 * @param params
+	 *            the params
+	 * @param monitor
+	 *            the monitor
 	 */
 	public Interpreter(SemanticsType semantics, Listener<T> listener, List<String> dirs, List<String> params,
 			Monitor monitor) {
@@ -104,7 +113,7 @@ public class Interpreter<T extends Semantics<T>> {
 
 		// Set of parsed Reo source files.
 		Map<String, ReoFile<T>> programs = new HashMap<String, ReoFile<T>>();
-		
+
 		// Dependency graph of parsed component definitions.
 		Map<String, Set<String>> deps = new HashMap<String, Set<String>>();
 
@@ -119,7 +128,7 @@ public class Interpreter<T extends Semantics<T>> {
 		if (mainFile != null) {
 			programs.put(mainFile.getName(), mainFile);
 			name = mainFile.getName();
-			Set<String> imports = new HashSet<String>(mainFile.getImports()); 
+			Set<String> imports = new HashSet<String>(mainFile.getImports());
 			todo.addAll(imports);
 			deps.putIfAbsent(mainFile.getName(), imports);
 		}
@@ -131,7 +140,7 @@ public class Interpreter<T extends Semantics<T>> {
 				ReoFile<T> reoFile = findComponent(component);
 				if (reoFile != null) {
 					programs.put(reoFile.getName(), reoFile);
-					Set<String> imports = new HashSet<String>(reoFile.getImports()); 
+					Set<String> imports = new HashSet<String>(reoFile.getImports());
 					todo.addAll(imports);
 					deps.putIfAbsent(reoFile.getName(), imports);
 				} else {
@@ -145,25 +154,30 @@ public class Interpreter<T extends Semantics<T>> {
 		List<ReoFile<T>> list = new ArrayList<ReoFile<T>>();
 		while (!deps.isEmpty()) {
 			String prog = null;
-			for (Map.Entry<String, Set<String>> comp : deps.entrySet())
-				if (comp.getValue().isEmpty())
+			for (Map.Entry<String, Set<String>> comp : deps.entrySet()) {
+				if (comp.getValue().isEmpty()) {
 					prog = comp.getKey();
+					break;
+				}
+			}
 			if (prog == null) {
 				m.add("There is a cyclic dependency of imports among " + deps.keySet());
 				return null;
-			} 
-			list.add(programs.get(prog));
-			
-			// Remove the program from the dependency graph. 
+			}
+			ReoFile<T> rf = programs.get(prog);
+			if (rf != null)
+				list.add(rf);
+
+			// Remove the program from the dependency graph.
 			Iterator<Map.Entry<String, Set<String>>> iter = deps.entrySet().iterator();
 			while (iter.hasNext()) {
-			    Map.Entry<String, Set<String>> entry = iter.next();
-			    entry.getValue().remove(prog);
-			    if (entry.getKey().equals(prog))
-			    	iter.remove();
+				Map.Entry<String, Set<String>> entry = iter.next();
+				entry.getValue().remove(prog);
+				if (entry.getKey().equals(prog))
+					iter.remove();
 			}
 		}
-		
+
 		// Evaluate all component expressions.
 		Scope scope = new Scope();
 		for (ReoFile<T> f : list)
@@ -173,9 +187,9 @@ public class Interpreter<T extends Semantics<T>> {
 		Value main = scope.get(new Identifier(name));
 		if (main instanceof Component<?>) {
 			@SuppressWarnings("unchecked")
-			Instance<T> i = ((Component<T>)main).instantiate(params, null, m);
+			Instance<T> i = ((Component<T>) main).instantiate(params, null, m);
 			String[] namesplit = name.split("\\.");
-			if (i != null)			
+			if (i != null)
 				return new ReoProgram<T>(namesplit[namesplit.length - 1], file, i.getConnector());
 		}
 
@@ -201,7 +215,7 @@ public class Interpreter<T extends Semantics<T>> {
 		String cp1 = directory + name + "." + semantics + ".treo";
 		String cp2 = directory + name + ".treo";
 		String directory1 = component.substring(0, k).replace('.', '/');
-		String r1 =  "/" + directory1 + name + "." + semantics + ".treo";
+		String r1 = "/" + directory1 + name + "." + semantics + ".treo";
 		String r2 = "/" + directory1 + name + ".treo";
 
 		search: for (String dir : dirs) {
@@ -303,11 +317,11 @@ public class Interpreter<T extends Semantics<T>> {
 	/**
 	 * Parses a source file using ANTLR4, and walks over the parse tree to
 	 * interpret this source file as a Java object.
-	 * 
+	 *
 	 * @param is
 	 *            input stream
-	 * @param path
-	 *            location of the file
+	 * @param file
+	 *            the file
 	 * @return an interpreted source file, or null in case of an error.
 	 */
 	@Nullable

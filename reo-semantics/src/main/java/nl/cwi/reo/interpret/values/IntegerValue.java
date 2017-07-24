@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of integer value.
  */
@@ -41,30 +44,93 @@ public final class IntegerValue implements Value, TermExpression {
 		return x;
 	}
 
+	/**
+	 * Adds the.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the integer value
+	 */
 	public static IntegerValue add(IntegerValue a, IntegerValue b) {
 		return new IntegerValue(a.x + b.x);
 	}
 
+	/**
+	 * Min.
+	 *
+	 * @param a
+	 *            the a
+	 * @return the integer value
+	 */
 	public static IntegerValue min(IntegerValue a) {
 		return new IntegerValue(-a.x);
 	}
 
+	/**
+	 * Min.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the integer value
+	 */
 	public static IntegerValue min(IntegerValue a, IntegerValue b) {
 		return new IntegerValue(a.x - b.x);
 	}
 
+	/**
+	 * Mul.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the integer value
+	 */
 	public static IntegerValue mul(IntegerValue a, IntegerValue b) {
 		return new IntegerValue(a.x * b.x);
 	}
 
+	/**
+	 * Div.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the integer value
+	 */
+	@Nullable
 	public static IntegerValue div(IntegerValue a, IntegerValue b) {
 		return b.x == 0 ? null : new IntegerValue(a.x / b.x);
 	}
 
+	/**
+	 * Mod.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the integer value
+	 */
+	@Nullable
 	public static IntegerValue mod(IntegerValue a, IntegerValue b) {
 		return b.x == 0 ? null : new IntegerValue(a.x % b.x);
 	}
 
+	/**
+	 * Exp.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the integer value
+	 */
 	public static IntegerValue exp(IntegerValue a, IntegerValue b) {
 		return new IntegerValue((int) Math.pow(a.x, b.x));
 	}
@@ -97,7 +163,7 @@ public final class IntegerValue implements Value, TermExpression {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (other == null)
 			return false;
 		if (other == this)

@@ -12,14 +12,13 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a predicate that represents a truth value.
  */
 public class TruthValue implements PredicateExpression {
 
-	/**
-	 * Boolean value
-	 */
+	/** Boolean value. */
 	private boolean bool;
 
 	/**
@@ -30,6 +29,15 @@ public class TruthValue implements PredicateExpression {
 	 */
 	public TruthValue(boolean bool) {
 		this.bool = bool;
+	}
+
+	/**
+	 * Gets the boolean value of the truth value.
+	 * 
+	 * @return boolean value of this truth value.
+	 */
+	public boolean getBool() {
+		return bool;
 	}
 
 	/**

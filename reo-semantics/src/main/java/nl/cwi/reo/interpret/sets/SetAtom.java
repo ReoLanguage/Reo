@@ -14,6 +14,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of an atomic set definition.
  * 
@@ -49,7 +50,7 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 * @param source
 	 *            reference to source code
 	 */
-	public SetAtom(String name, T atom, Reference source) {
+	public SetAtom(@Nullable String name, @Nullable T atom, Reference source) {
 		if (source == null)
 			throw new NullPointerException();
 		this.name = name;
@@ -68,15 +69,21 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	/**
 	 * Evaluates this atomic set to an instance containing an atomic Reo
 	 * connector.
+	 *
+	 * @param s
+	 *            the s
+	 * @param m
+	 *            the m
+	 * @return the instance
 	 */
 	@Override
 	@Nullable
 	public Instance<T> evaluate(Scope s, Monitor m) {
-		T _atom = atom != null ? atom.evaluate(s, m) : atom;
+		T _atom = atom != null ? atom.evaluate(s, m) : null;
 		Reference _source = source.evaluate(s, m);
-		if ( _source == null)
+		if (_source == null)
 			return null;
-		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<Set<Identifier>>());
+		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<>());
 	}
 
 	/**
@@ -92,12 +99,18 @@ public final class SetAtom<T extends Semantics<T>> implements SetExpression<T> {
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("{\n  <atom>\n|\n  <source>\n}");
-		st.add("atom", atom);
+		ST st = new ST("{\n  <source>\n  <atom>\n}");
+		if (atom != null)
+			st.add("atom", atom);
 		st.add("source", source);
 		return st.render();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.sets.SetExpression#canEvaluate(java.util.Set)
+	 */
 	@Override
 	public boolean canEvaluate(Set<Identifier> deps) {
 		return true;

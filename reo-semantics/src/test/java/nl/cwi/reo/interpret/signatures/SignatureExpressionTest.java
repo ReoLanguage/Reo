@@ -25,8 +25,15 @@ import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SignatureExpressionTest.
+ */
 public class SignatureExpressionTest {
 
+	/**
+	 * Evaluate no parameters and explicit nodes ports inherit type.
+	 */
 	@Test
 	public void evaluate_NoParametersAndExplicitNodes_PortsInheritType() {
 
@@ -68,6 +75,9 @@ public class SignatureExpressionTest {
 		assertEquals(sign.getInterface().get(new Port("c")), z);
 	}
 
+	/**
+	 * Evaluate parameter with indices error.
+	 */
 	@Test
 	public void evaluate_ParameterWithIndices_Error() {
 
@@ -101,6 +111,9 @@ public class SignatureExpressionTest {
 		assertTrue(!m.getMessages().isEmpty());
 	}
 
+	/**
+	 * Evaluate no parameters and node ranges.
+	 */
 	@Test
 	public void evaluate_NoParametersAndNodeRanges() {
 
@@ -135,7 +148,7 @@ public class SignatureExpressionTest {
 		Port y = new Port("y", PortType.IN, PrioType.NONE, new TypeTag("int"), false);
 		Port z = new Port("z", PortType.IN, PrioType.NONE, new TypeTag("int"), false);
 
-//		assertTrue(m.getMessages().isEmpty());
+		// assertTrue(m.getMessages().isEmpty());
 		assertEquals(sign.getAssignments().get(new Identifier("k")), new IntegerValue(3));
 		assertEquals(sign.getInterface().get(new Port("a[1]")), x);
 		assertEquals(sign.getInterface().get(new Port("a[2]")), y);

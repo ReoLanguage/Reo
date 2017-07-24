@@ -9,31 +9,40 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Interface Formula.
+ */
 public interface Formula {
 
 	/**
-	 * Computes the condition on input ports by existentially quantifying over
-	 * output ports.
+	 * Evaluates each abstract function/relation symbol to a concrete
+	 * function/relation.
 	 * 
-	 * @return existential quantification of this constraint over all output
-	 *         ports.
+	 * @param s
+	 *            scope
+	 * @param m
+	 *            monitor
+	 * @return Formula with concrete functions/relations, or null if not all
+	 *         function/relation symbols are defined in the scope.
 	 */
-	@Deprecated
-	public Formula getGuard();
-
-	/**
-	 * Computes an assignment of data terms to output ports that satisfies this
-	 * data constraint.
-	 * 
-	 * @return Assignment of data terms to output ports.
-	 */
-	@Deprecated
-	public Map<Variable, Term> getAssignment();
-
 	public @Nullable Formula evaluate(Scope s, Monitor m);
 
+	/**
+	 * Returns the set of node variables in the formula, and casts them to
+	 * ports.
+	 * 
+	 * @return set of port variables.
+	 */
 	public Set<Port> getInterface();
 
+	/**
+	 * Renames the free port variables in the formula.
+	 * 
+	 * @param links
+	 *            assignment from old to new port variables.
+	 * @return Formula with renamed port variables.
+	 */
 	public Formula rename(Map<Port, Port> links);
 
 	/**
@@ -67,7 +76,7 @@ public interface Formula {
 	 *            free variable
 	 * @return substituted formula.
 	 */
-	public Formula Substitute(Term t, Variable x);
+	public Formula substitute(Term t, Variable x);
 
 	/**
 	 * Gets the set of all free variables in this formula.

@@ -7,42 +7,45 @@ import java.util.TreeSet;
 
 import nl.cwi.reo.interpret.ports.Port;
 
+// TODO: Auto-generated Javadoc
 /**
- * Implements a {@link nl.cwi.reo.graphgames.Vertex} used in the scheduling game. 
+ * Implements a {@link nl.cwi.reo.graphgames.Vertex} used in the scheduling
+ * game.
  */
 public class SGVertex extends Vertex {
 
 	/**
 	 * Progress of jobs.
 	 */
-	public final Map<String, Integer> p; 
+	public final Map<String, Integer> p;
 
 	/**
 	 * State of the WorkAutomaton.
 	 */
-	public final String q; 
+	public final String q;
 
-	/**
-	 * Synchronization constraint of last action
-	 */
-	public final Set<Port> N; 
+	/** Synchronization constraint of last action. */
+	public final Set<Port> N;
 
-	/**
-	 * Progress of jobs during last action
-	 */
+	/** Progress of jobs during last action. */
 	public final Map<String, Integer> d;
 
 	/**
 	 * Scheduled jobs.
 	 */
-	public final Set<String> s; 
+	public final Set<String> s;
 
 	/**
 	 * Constructs a SGVertex owned by the scheduler.
-	 * @param p		progress of jobs
-	 * @param q		state of the work automaton
-	 * @param N		synchronization constraint of last action
-	 * @param d		progress of jobs during last action
+	 * 
+	 * @param p
+	 *            progress of jobs
+	 * @param q
+	 *            state of the work automaton
+	 * @param N
+	 *            synchronization constraint of last action
+	 * @param d
+	 *            progress of jobs during last action
 	 */
 	public SGVertex(Map<String, Integer> p, String q, Set<Port> N, Map<String, Integer> d) {
 		super(name(p, q, N, d, new TreeSet<String>(), 0), 0);
@@ -55,9 +58,13 @@ public class SGVertex extends Vertex {
 
 	/**
 	 * Constructs a SGVertex owned by the application.
-	 * @param p		progress of jobs
-	 * @param q		state of the work automaton
-	 * @param s		scheduled jobs
+	 * 
+	 * @param p
+	 *            progress of jobs
+	 * @param q
+	 *            state of the work automaton
+	 * @param s
+	 *            scheduled jobs
 	 */
 	public SGVertex(Map<String, Integer> p, String q, Set<String> s) {
 		super(name(p, q, new TreeSet<Port>(), new TreeMap<String, Integer>(), s, 1), 1);
@@ -66,25 +73,35 @@ public class SGVertex extends Vertex {
 		this.N = new TreeSet<Port>();
 		this.d = new TreeMap<String, Integer>();
 		this.s = s;
-	}	
+	}
 
 	/**
 	 * String representation of a SGVertex.
-	 * @param p		progress of jobs
-	 * @param q		state of the work automaton
-	 * @param N		synchronization constraint of last action
-	 * @param d		progress of jobs during last action
-	 * @param s		scheduled jobs
+	 *
+	 * @param p
+	 *            progress of jobs
+	 * @param q
+	 *            state of the work automaton
+	 * @param N
+	 *            synchronization constraint of last action
+	 * @param d
+	 *            progress of jobs during last action
+	 * @param s
+	 *            scheduled jobs
+	 * @param owner
+	 *            the owner
+	 * @return the string
 	 */
-	private static String name(Map<String, Integer> p, String q, Set<Port> N, Map<String, Integer> d, Set<String> s, int owner) { 
+	private static String name(Map<String, Integer> p, String q, Set<Port> N, Map<String, Integer> d, Set<String> s,
+			int owner) {
 		String nm = "";
-		for(Map.Entry<String, Integer> entry : p.entrySet()) 
+		for (Map.Entry<String, Integer> entry : p.entrySet())
 			nm += entry.getValue();
 		nm += q.toString();
 		if (owner == 0) {
-			for (Map.Entry<String, Integer> entry : d.entrySet()) 
+			for (Map.Entry<String, Integer> entry : d.entrySet())
 				nm += entry.getValue();
-			for (Port x : N) 
+			for (Port x : N)
 				nm += x;
 		} else {
 			for (Map.Entry<String, Integer> entry : p.entrySet()) {

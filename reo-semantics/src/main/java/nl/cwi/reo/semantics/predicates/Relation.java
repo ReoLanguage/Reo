@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -8,54 +9,103 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * Relation of a list of terms.
+ */
 public class Relation implements Formula {
 
+	/**
+	 * Flag for string template.
+	 */
 	public static final boolean relation = true;
 
+	/**
+	 * Name of this relation.
+	 */
 	private final String name;
 
+	/**
+	 * Value of this relation or reference to its implementation.
+	 */
+	@Nullable
 	private String value;
 
+	/**
+	 * List of arguments of this relation.
+	 */
 	@Nullable
 	private final List<Term> args;
 
-	public Relation(String name, List<Term> args) {
+	/**
+	 * Constructs a new relation with a given name and a given list of
+	 * arguments.
+	 * 
+	 * @param name
+	 *            name of the relation
+	 * @param args
+	 *            list of arguments
+	 */
+	public Relation(String name, @Nullable List<Term> args) {
 		this.name = name;
+		this.value = null;
 		this.args = args;
 	}
 
-	public Relation(String name, String value, List<Term> args) {
+	/**
+	 * Constructs a new relation with a given name, a given value, and a given
+	 * list of arguments.
+	 * 
+	 * @param name
+	 *            name of the relation
+	 * @param value
+	 *            value of this relation or reference to its implementation
+	 * @param args
+	 *            list of arguments
+	 */
+	public Relation(String name, @Nullable String value, @Nullable List<Term> args) {
 		this.name = name;
 		this.value = value;
 		this.args = args;
 	}
 
+	/**
+	 * Gets the name of this relation.
+	 * 
+	 * @return name of this relation.
+	 */
 	public String getName() {
 		return name;
 	}
 
-	public Object getValue() {
+	/**
+	 * Gets the value of this relation.
+	 * 
+	 * @return value of this relation.
+	 */
+	@Nullable
+	public String getValue() {
 		return value;
 	}
 
+	/**
+	 * Gets the list of arguments of this relation.
+	 * 
+	 * @return list of arguments of this relation.
+	 */
+	@Nullable
 	public List<Term> getArgs() {
 		return args;
 	}
 
-	@Override
-	public String toString() {
-		ST st = new ST("<name><if(args)>(<args; separator=\", \">)<endif>");
-		st.add("name", name);
-		st.add("args", args);
-		return st.render();
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
 		Set<Variable> vars = new HashSet<Variable>();
@@ -65,50 +115,60 @@ public class Relation implements Formula {
 		return vars;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Formula getGuard() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Map<Variable, Term> getAssignment() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public @Nullable Formula evaluate(Scope s, Monitor m) {
+	@Nullable
+	public Formula evaluate(Scope s, Monitor m) {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<Port> getInterface() {
-		return null;
+		return new HashSet<>();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula rename(Map<Port, Port> links) {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula NNF() {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula DNF() {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula QE() {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Formula Substitute(Term t, Variable x) {
+	public Formula substitute(Term t, Variable x) {
 		if (args == null)
 			return this;
 		List<Term> listTerms = new ArrayList<Term>();
@@ -121,9 +181,27 @@ public class Relation implements Formula {
 		return new Relation(this.name, this.value, listTerms);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
-		return null;
+		return new HashMap<>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		String s = name;
+		if (args != null) {
+			s += "(";
+			for (Term t : args)
+				s += ", " + t;
+			s += ")";
+		}
+		return s;
 	}
 
 	/**

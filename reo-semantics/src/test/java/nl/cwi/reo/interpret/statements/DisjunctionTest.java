@@ -19,8 +19,15 @@ import nl.cwi.reo.interpret.variables.VariableExpression;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class DisjunctionTest.
+ */
 public class DisjunctionTest {
 
+	/**
+	 * Evaluate original has no types.
+	 */
 	@Test
 	public void evaluate_OriginalHasNoTypes() {
 

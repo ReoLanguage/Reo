@@ -8,6 +8,7 @@ import java.util.Set;
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
 
+// TODO: Auto-generated Javadoc
 /**
  * Implementation of a semantics for Reo components.
  * 
@@ -15,7 +16,7 @@ import nl.cwi.reo.interpret.ports.Port;
  *            semantics
  */
 public interface Semantics<T> extends Expression<T> {
-	
+
 	/**
 	 * Gets the set of ports in the interface.
 	 * 
@@ -31,18 +32,17 @@ public interface Semantics<T> extends Expression<T> {
 	public SemanticsType getType();
 
 	/**
-	 * Constructs a new node from a set with given set of ports
-	 * 
+	 * Constructs a new node from a set with given set of ports.
+	 *
 	 * @param node
 	 *            set of ports
 	 * @return Node with interface given by the set of ports.
 	 */
 	public T getNode(Set<Port> node);
 
-	
 	/**
-	 * Renames ports in the interface according to a set of links
-	 * 
+	 * Renames ports in the interface according to a set of links.
+	 *
 	 * @param links
 	 *            renaming mapping
 	 * @return Component with interface renamed according to the set of links.

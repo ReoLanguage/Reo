@@ -16,6 +16,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * An application of a function symbol to a list of arguments.
  */
@@ -63,7 +64,7 @@ public final class FunctionExpression implements TermExpression {
 
 		List<Iterator<Term>> iters = new ArrayList<Iterator<Term>>();
 		for (TermExpression arg : arguments) {
-			List<Term> terms = arg.evaluate(s, null);
+			List<Term> terms = arg.evaluate(s, new Monitor());
 			if (terms == null)
 				return null;
 			iters.add(terms.iterator());

@@ -249,13 +249,15 @@ Future work
 
 Since this is a young project, many features are yet to be implemented:
 
- - Syntax highlighting of Reo specifications in Eclipse
- - Autocompletion or Reo specifications
- - Bundling of source code into packages to avoid name conflicts
- - Generating an MCRL2 specification from a Reo connector to enable model checking
- - Generation of propositional formulas with linear arithmetic from Timed Constraint Automata, for use in bounded model checking 
- - Develop a graphical editor that is synchronized with a textual representation
- - Implement dynamic reconfiguration of connectors using algebraic graph transformations
+ - Animation
+ - Autocompletion of code
+ - Dynamic reconfiguration (by graph transformations)
+ - Exports (to BIP, ect.)
+ - Graphical editor
+ - Imports (from BPEL, UML sequence sequence diagrams)
+ - Model checking (via Vereofy and MCRL2)
+ - Simulation (of stochastic Reo connectors)
+ - Syntax highlighting
  
  
 References

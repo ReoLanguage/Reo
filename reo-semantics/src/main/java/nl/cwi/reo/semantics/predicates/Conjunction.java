@@ -15,6 +15,10 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * A conjunction of a list of formulas.
+ */
 public class Conjunction implements Formula {
 
 	/**
@@ -22,29 +26,48 @@ public class Conjunction implements Formula {
 	 */
 	public static final boolean conjunction = true;
 
+	/**
+	 * List of formulas in this conjunction.
+	 */
 	private final List<Formula> clauses;
 
-	private final Set<Formula> clausesSet;
-
-	
+	/**
+	 * Constructs the conjunction of a list of formulas.
+	 * 
+	 * @param clauses
+	 *            list of formulas
+	 */
 	public Conjunction(List<Formula> clauses) {
 		this.clauses = clauses;
-		this.clausesSet = new HashSet<>(clauses);
 	}
-	
+
+	/**
+	 * Constructs and simplifies the conjunction of a list of formulas. Because
+	 * this method simplifies the conjunction, this method is preferred over the
+	 * constructor method of a formula. The simplification 1) removes
+	 * duplicates, 2) removes conjunctions with true, 3) shortcuts conjunctions
+	 * with false, 4) unifies conjunctions of conjunctions, and 5) avoids
+	 * conjunctions with a single clause.
+	 * 
+	 * @param clauses
+	 *            list of formulas
+	 * @return simplified conjunction of the list of formulas.
+	 */
 	public static Formula conjunction(List<Formula> clauses) {
 		List<Formula> _clauses = new ArrayList<>();
 		for (Formula f : clauses) {
-			if (f instanceof Relation) {
-				if (!((Relation) f).getValue().equals("true"))
-					_clauses.add(f);
+			if (f instanceof TruthValue) {
+				if (((TruthValue) f).getBool() == false)
+					return new TruthValue(false);
+			} else if (f instanceof Conjunction) {
+				_clauses.addAll(((Conjunction) f).getClauses());
 			} else if (!_clauses.contains(f)) {
 				_clauses.add(f);
 			}
 		}
 		switch (_clauses.size()) {
 		case 0:
-			return new Relation("true", "true", null);
+			return new TruthValue(true);
 		case 1:
 			return _clauses.get(0);
 		default:
@@ -52,38 +75,18 @@ public class Conjunction implements Formula {
 		}
 	}
 
-	public List<Formula> getFormula() {
+	/**
+	 * Returns the list of clauses in this conjunction.
+	 * 
+	 * @return list of clauses of this conjunction.
+	 */
+	public List<Formula> getClauses() {
 		return clauses;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public Formula getGuard() {
-		List<Formula> h = new ArrayList<Formula>();
-		for (Formula f : clauses)
-			h.add(f.getGuard());
-		return new Conjunction(h);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Map<Variable, Term> getAssignment() {
-		Map<Variable, Term> assignment = new HashMap<Variable, Term>();
-		for (Formula f : clauses) {
-			Map<Variable, Term> assignment1 = f.getAssignment();
-			if (assignment1 == null)
-				return null;
-			for (Map.Entry<Variable, Term> pair : assignment1.entrySet())
-				if (assignment.put(pair.getKey(), pair.getValue()) != null)
-					return null;
-		}
-		return assignment;
-	}
-
 	@Override
 	public Formula rename(Map<Port, Port> links) {
 		List<Formula> h = new ArrayList<Formula>();
@@ -92,6 +95,9 @@ public class Conjunction implements Formula {
 		return new Conjunction(h);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> P = new HashSet<Port>();
@@ -101,24 +107,20 @@ public class Conjunction implements Formula {
 		return P;
 	}
 
-	public String toString() {
-		String s = clauses.get(0).toString();
-		for (int i = 1; i < clauses.size(); i++) {
-			s = s + " & " + clauses.get(i).toString();
-		}
-		return s;
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula DNF() {
 		List<List<Formula>> c = new ArrayList<List<Formula>>();
-		// List<Map<Variable, Integer>> var = new ArrayList<Map<Variable,
-		// Integer>>();
 		for (Formula f : clauses) {
 			Formula g = f.DNF();
 			if (g instanceof Disjunction) {
@@ -126,14 +128,12 @@ public class Conjunction implements Formula {
 			} else {
 				c.add(Arrays.asList(g));
 			}
-
 		}
 		ClausesIterator iter = new ClausesIterator(c);
 		List<Formula> clauses = new ArrayList<Formula>();
 		while (iter.hasNext()) {
 			List<Formula> list = new ArrayList<Formula>();
 			List<Formula> tuple = iter.next();
-			Map<Variable, Integer> var = tuple.get(0).getEvaluation();
 			for (Formula f : tuple) {
 				if (f instanceof Conjunction) {
 					list.addAll(((Conjunction) f).getClauses());
@@ -141,104 +141,18 @@ public class Conjunction implements Formula {
 					list.add(f);
 				}
 			}
-			clauses.add(new Conjunction(list));
+			clauses.add(Conjunction.conjunction(list));
 		}
 		if (clauses.size() == 1)
 			return clauses.get(0);
 		if (clauses.isEmpty())
-			return new Relation("constant", "true", null);
+			return new TruthValue(true);
 		return new Disjunction(clauses);
-
-		// Queue<Formula> queue = new LinkedList<Formula>(clauses);
-		//
-		// Formula dnf = queue.poll();
-		//
-		// while(!queue.isEmpty()){
-		// if(dnf instanceof Conjunction){
-		// List<Formula> newConjunction = new ArrayList<Formula>();
-		// for(Formula g : queue){
-		// if(g instanceof Conjunction){
-		// queue.remove(g);
-		// newConjunction.add(g);
-		// }
-		// }
-		// queue.add(new Conjunction(newConjunction));
-		// dnf=queue.poll();
-		// }
-		// if(dnf instanceof Disjunction){
-		// Formula f = queue.poll();
-		// List<Formula> disjunctFormula = new ArrayList<Formula>();
-		// if(f instanceof Disjunction){
-		// // TODO : optimize this part
-		// for(Formula formulas : ((Disjunction) dnf).getClauses()){
-		// if(formulas instanceof Conjunction){
-		// for(Formula form : ((Disjunction) f).getClauses()){
-		// if(form instanceof Conjunction){
-		// List<Formula> c = new ArrayList<Formula>();
-		// c.addAll(((Conjunction) formulas).getFormula());
-		// c.addAll(((Conjunction) form).getFormula());
-		// Set<Synchron> p = new HashSet<Synchron>();
-		// if(new Conjunction(c).canSynchronize(p)!=null)
-		// disjunctFormula.add(new Conjunction(c));
-		// }
-		// }
-		// }
-		// else
-		// throw new UnsupportedOperationException();
-		//
-		// }
-		// }
-		// dnf=new Disjunction(disjunctFormula);
-		// }
-		// }
-
-		// for(Formula f : g){
-		// if(f instanceof Disjunction){
-		//
-		// }
-		// }
-		// return dnf;
 	}
 
-	// public Set<Synchron> canSynchronize(Set<Synchron> p){
-	// boolean canSync=true;
-	// for(Formula f : clauses){
-	// if(f instanceof Synchron){
-	// for(Synchron port : p){
-	// if((port.getPort().getName().equals(((Synchron)
-	// f).getPort().getName()))){
-	// if((port.isSync())&&!((Synchron)f).isSync()||!(port.isSync())&&((Synchron)f).isSync()){
-	// return null;
-	// }
-	// }
-	// }
-	// p.add(((Synchron) f));
-	// }
-	// if(f instanceof Conjunction){
-	// if(((Conjunction) f).canSynchronize(p)!=null)
-	// p.addAll(((Conjunction) f).canSynchronize(p));
-	// else
-	// return null;
-	// }
-	//
-	// }
-	// if(canSync)
-	// return p;
-	// else
-	// return null;
-	// }
-
-	public List<Formula> getClauses() {
-		List<Formula> clauses = new ArrayList<Formula>();
-		for (Formula f : this.clauses) {
-			if (f instanceof Conjunction)
-				clauses.addAll(((Conjunction) f).getClauses());
-			else
-				clauses.add(f);
-		}
-		return clauses;
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula NNF() {
 		List<Formula> list = new ArrayList<Formula>();
@@ -248,6 +162,9 @@ public class Conjunction implements Formula {
 		return new Conjunction(list);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula QE() {
 		List<Formula> list = new ArrayList<Formula>();
@@ -256,15 +173,20 @@ public class Conjunction implements Formula {
 		return new Conjunction(list);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Formula Substitute(Term t, Variable x) {
+	public Formula substitute(Term t, Variable x) {
 		List<Formula> list = new ArrayList<Formula>();
 		for (Formula f : clauses)
-			if(!(f instanceof Relation && ((Relation) f).getValue().equals("true")))
-				list.add(f.Substitute(t, x));
+			list.add(f.substitute(t, x));
 		return new Conjunction(list);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
 		Set<Variable> vars = new HashSet<Variable>();
@@ -272,11 +194,7 @@ public class Conjunction implements Formula {
 			vars.addAll(f.getFreeVariables());
 		return vars;
 	}
-	
-	public Set<Formula> getClausesSet(){
-		return this.clausesSet;
-	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -288,12 +206,18 @@ public class Conjunction implements Formula {
 			return true;
 		if (!(other instanceof Conjunction))
 			return false;
-//		Set<Formula> s = new HashSet<>(this.getClauses());
-//		Set<Formula> s2 = new HashSet<>(((Conjunction)other).getClauses());
-//		
-//		return Objects.equals(s, s2);
-		
-		return Objects.equals(this.getClausesSet(), ((Conjunction)other).getClausesSet());
+		return Objects.equals(this.getClauses(), ((Conjunction) other).getClauses());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		String s = "(" + clauses.get(0);
+		for (int i = 1; i < clauses.size(); i++)
+			s = s + " \u2227 " + clauses.get(i);
+		return s + ")";
 	}
 
 	/**
@@ -304,12 +228,18 @@ public class Conjunction implements Formula {
 		return Objects.hash(clauses);
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
 		Map<Variable, Integer> map = new HashMap<Variable, Integer>();
 		for (Formula f : clauses) {
 			map.putAll(f.getEvaluation());
+			// propagate the information. for example, (x=y).getEvaluation() is
+			// empty and the value is determined by composition.
+			// TODO this propagation is very restrictive, as is works only for
+			// simple equations like x=y.
 			if (f instanceof Equality) {
 				Equality e = (Equality) f;
 				if (e.getLHS() instanceof Variable && e.getRHS() instanceof Variable) {
@@ -318,7 +248,7 @@ public class Conjunction implements Formula {
 					if (p != null && q == null) {
 						map.put((Variable) e.getRHS(), p);
 					} else if (q != null && p == null) {
-						map.put((Variable) e.getLHS(), p);
+						map.put((Variable) e.getLHS(), q);
 					}
 				}
 			}

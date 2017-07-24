@@ -36,7 +36,7 @@ public class SimpleLykos {
 
 	private CompilerSettings settings;
 	private AutomatonFactory automatonFactory;
-	
+
 	private final String outputpath;
 	private final String packagename;
 	private int counterWorkerName = 0;
@@ -108,6 +108,9 @@ public class SimpleLykos {
 	/**
 	 * Generates the main class.
 	 * 
+	 * @param mainCompiler
+	 *            main compiler
+	 * 
 	 * @return Map assigning Java code to a file name
 	 */
 	private Map<String, String> generateMain(MainCompiler<?> mainCompiler) {
@@ -131,7 +134,7 @@ public class SimpleLykos {
 		String mainCode = "";
 
 		// Generate header
-		if (!packagename.equals("")) 
+		if (!packagename.equals(""))
 			mainHeaderTemplate.add("packageName", packagename);
 		mainCode += mainHeaderTemplate.render();
 
@@ -149,6 +152,9 @@ public class SimpleLykos {
 	/**
 	 * Generates the protocol classes.
 	 * 
+	 * @param c
+	 *            protocol compiler
+	 *            
 	 * @return Map assigning Java code to a file name
 	 */
 	private Map<String, String> generateProtocols(ProtocolCompiler<?> c) {
@@ -182,7 +188,7 @@ public class SimpleLykos {
 		StringBuilder code = new StringBuilder();
 
 		// Generate header
-		if (!packagename.equals("")) 
+		if (!packagename.equals(""))
 			headerTemplate.add("packageName", packagename);
 		code.append(headerTemplate.render());
 
@@ -263,6 +269,9 @@ public class SimpleLykos {
 	/**
 	 * Generates the worker classes.
 	 * 
+	 * @param w
+	 *            worker compiler
+	 *            
 	 * @return Map assigning Java code to a file name
 	 */
 	private Map<String, String> generateWorkers(WorkerCompiler<?> w) {
@@ -272,11 +281,10 @@ public class SimpleLykos {
 		String[] identifiers = workerSignature.getName().split("\\.");
 		String workerSimpleClassName = identifiers[identifiers.length - 1];
 		String workerClassName = "Worker_" + workerSimpleClassName.substring(0, 1).toUpperCase()
-				+ workerSimpleClassName.substring(1)+"_"+counterWorkerName;
+				+ workerSimpleClassName.substring(1) + "_" + counterWorkerName;
 
 		counterWorkerName++;
 
-		
 		STGroupFile workerTemplates = new STGroupFile(
 				eclipse ? "src/main/resources/java-worker.stg" : "java-worker.stg");
 		String workerCode = "";
@@ -285,7 +293,7 @@ public class SimpleLykos {
 
 		// Generate header
 		ST workerHeaderTemplate = workerTemplates.getInstanceOf("header");
-		if (!packagename.equals("")) 
+		if (!packagename.equals(""))
 			workerHeaderTemplate.add("packageName", packagename);
 		workerCode += workerHeaderTemplate.render();
 

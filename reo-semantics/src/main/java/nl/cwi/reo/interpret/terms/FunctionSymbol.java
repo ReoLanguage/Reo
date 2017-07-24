@@ -1,5 +1,6 @@
 package nl.cwi.reo.interpret.terms;
 
+// TODO: Auto-generated Javadoc
 /**
  * Enumeration of all possible function symbols.
  */

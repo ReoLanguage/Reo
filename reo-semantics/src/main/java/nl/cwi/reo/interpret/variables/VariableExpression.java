@@ -18,6 +18,7 @@ import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a variable expression.
  */
@@ -65,10 +66,20 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 		return location;
 	}
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Gets the indices.
+	 *
+	 * @return the indices
+	 */
 	public List<TermExpression> getIndices() {
 		return indices;
 	}
@@ -82,6 +93,7 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 	 * @return a map that assigns each parameter name to an integer value, if
 	 *         these values can be found, and null otherwise.
 	 */
+	@Nullable
 	public Scope findParamFromSize(int size) {
 		Scope params = new Scope();
 
@@ -125,7 +137,7 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 					if (t instanceof IntegerValue) {
 						temp.add(new Identifier(x.name + "[" + t.toString() + "]"));
 					} else {
-						m.add(location,"Variable " + this.toString() + " cannot be evaluated.");
+						m.add(location, "Variable " + this.toString() + " cannot be evaluated.");
 						return null;
 					}
 				}
@@ -145,7 +157,7 @@ public class VariableExpression implements Expression<List<? extends Identifier>
 	public Set<Identifier> getVariables() {
 		Set<Identifier> vars = new HashSet<Identifier>();
 		// TODO Check if this works
-		if (indices.isEmpty()) 
+		if (indices.isEmpty())
 			vars.add(new Identifier(name));
 		return vars;
 	}

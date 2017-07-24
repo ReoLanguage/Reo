@@ -15,6 +15,7 @@ import nl.cwi.reo.interpret.values.BooleanValue;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a predicate variable.
  */
@@ -58,7 +59,7 @@ public class StatementVariable implements PredicateExpression {
 		vars.addAll(variable.getVariables());
 		return vars;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -67,10 +68,17 @@ public class StatementVariable implements PredicateExpression {
 		return variable.toString();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.statements.PredicateExpression#getDefinedVariables(
+	 * java.util.Set)
+	 */
 	@Override
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
 		// TODO Take care of this!
 		return defns;
 	}
-	
+
 }

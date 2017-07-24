@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of string value.
  */
@@ -41,6 +44,15 @@ public final class StringValue implements Value, TermExpression {
 		return x;
 	}
 
+	/**
+	 * Concat.
+	 *
+	 * @param a
+	 *            the a
+	 * @param b
+	 *            the b
+	 * @return the string value
+	 */
 	public static StringValue concat(StringValue a, StringValue b) {
 		return new StringValue(a.x + b.x);
 	}
@@ -66,15 +78,14 @@ public final class StringValue implements Value, TermExpression {
 	 */
 	@Override
 	public String toString() {
-//		return "\""+x+"\"";
 		return x;
-		}
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (other == null)
 			return false;
 		if (other == this)

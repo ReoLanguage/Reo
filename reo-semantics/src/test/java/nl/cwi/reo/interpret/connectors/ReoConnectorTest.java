@@ -17,8 +17,15 @@ import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.plain.Plain;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ReoConnectorTest.
+ */
 public class ReoConnectorTest {
 
+	/**
+	 * Flatten composite connector bla.
+	 */
 	@Test
 	public void flatten_CompositeConnector_bla() {
 
@@ -59,7 +66,7 @@ public class ReoConnectorTest {
 		ReoConnector<Plain> connector = new ReoConnectorComposite<Plain>("connector", "", Arrays.asList(abc, cd));
 
 		ReoConnector<Plain> flat = connector.flatten().integrate();
-		
+
 		List<ReoConnectorAtom<Plain>> list = flat.getAtoms();
 
 		Set<Port> ports_ab = new HashSet<Port>(Arrays.asList(a_i, b_o));

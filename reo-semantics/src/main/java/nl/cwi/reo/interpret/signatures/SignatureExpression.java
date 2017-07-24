@@ -29,6 +29,7 @@ import nl.cwi.reo.interpret.variables.ParameterType;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a component signature.
  */
@@ -74,6 +75,11 @@ public final class SignatureExpression implements ParameterType {
 		return this.params;
 	}
 
+	/**
+	 * Gets the params.
+	 *
+	 * @return the params
+	 */
 	public Set<Identifier> getParams() {
 		Set<Identifier> l = new HashSet<Identifier>();
 		for (ParameterExpression exp : params) {
@@ -151,54 +157,58 @@ public final class SignatureExpression implements ParameterType {
 			} else if (v instanceof String) {
 				String t = "";
 				if (x.getType() instanceof TypeTag)
-					t = ((TypeTag)x.getType()).toString();
+					t = ((TypeTag) x.getType()).toString();
 				if (t.equals("int") || t.equals("Integer"))
-					s.put(x, new IntegerValue(Integer.parseInt((String)v)));
+					s.put(x, new IntegerValue(Integer.parseInt((String) v)));
 				else if (t.equals("double") || t.equals("Double"))
-					s.put(x, new DecimalValue(Double.parseDouble((String)v)));
+					s.put(x, new DecimalValue(Double.parseDouble((String) v)));
 				else if (t.equals("string") || t.equals("String"))
-					s.put(x, new StringValue((String)v));
-				else 
+					s.put(x, new StringValue((String) v));
+				else
 					m.add(location, "Failed to cast parameter " + s + " to " + t);
 			} else {
 				m.add(location, "Term " + v + " has undefined type.");
 				return null;
 			}
-			
-//			if (x.getType() instanceof TypeTag) {
-//				String t = ((TypeTag) x.getType()).toString();
-//				
-//				if (v instanceof Value) {
-//					Value val = (Value) v;
-//					if ((t.equals("int") || t.equals("Integer")) && val instanceof IntegerValue)
-//						s.put(x, val);
-//					else if ((t.equals("double") || t.equals("Double")) && val instanceof DecimalValue)
-//						s.put(x, new DecimalValue(Double.parseDouble((String) v)));
-//					else if ((t.equals("string") || t.equals("String")) && val instanceof StringValue)
-//						s.put(x, new StringValue(v.toString()));
-//					else {
-//						m.add(location, "Value assigned to " + x + " is of wrong type.");
-//						return null;
-//					}
-//				} else if (v instanceof String) {
-//					String str = (String) v;
-//					if (t.equals("int") || t.equals("Integer"))
-//						s.put(x, new IntegerValue(Integer.parseInt(str)));
-//					else if (t.equals("double") || t.equals("Double"))
-//						s.put(x, new DecimalValue(Double.parseDouble(str)));
-//					else if (t.equals("string") || t.equals("String"))
-//						s.put(x, new StringValue(str));
-//					else {
-//						m.add(location, "Failed to cast parameter " + x + " to " + t + ".");
-//						return null;
-//					}
-//				} else {
-//					m.add(location, "Term " + v + " has undefined type.");
-//					return null;
-//				}
-//			} else if (x.getType() instanceof SignatureExpression) {
-//				//TODO type-checking for component values
-//			}
+
+			// if (x.getType() instanceof TypeTag) {
+			// String t = ((TypeTag) x.getType()).toString();
+			//
+			// if (v instanceof Value) {
+			// Value val = (Value) v;
+			// if ((t.equals("int") || t.equals("Integer")) && val instanceof
+			// IntegerValue)
+			// s.put(x, val);
+			// else if ((t.equals("double") || t.equals("Double")) && val
+			// instanceof DecimalValue)
+			// s.put(x, new DecimalValue(Double.parseDouble((String) v)));
+			// else if ((t.equals("string") || t.equals("String")) && val
+			// instanceof StringValue)
+			// s.put(x, new StringValue(v.toString()));
+			// else {
+			// m.add(location, "Value assigned to " + x + " is of wrong type.");
+			// return null;
+			// }
+			// } else if (v instanceof String) {
+			// String str = (String) v;
+			// if (t.equals("int") || t.equals("Integer"))
+			// s.put(x, new IntegerValue(Integer.parseInt(str)));
+			// else if (t.equals("double") || t.equals("Double"))
+			// s.put(x, new DecimalValue(Double.parseDouble(str)));
+			// else if (t.equals("string") || t.equals("String"))
+			// s.put(x, new StringValue(str));
+			// else {
+			// m.add(location, "Failed to cast parameter " + x + " to " + t +
+			// ".");
+			// return null;
+			// }
+			// } else {
+			// m.add(location, "Term " + v + " has undefined type.");
+			// return null;
+			// }
+			// } else if (x.getType() instanceof SignatureExpression) {
+			// //TODO type-checking for component values
+			// }
 		}
 
 		// Find the links of the interface.

@@ -1,6 +1,5 @@
 package nl.cwi.reo.interpret.components;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -12,6 +11,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of an atomic component definition.
  * 
@@ -49,11 +49,11 @@ public final class ComponentDefinition<T extends Semantics<T>> implements Compon
 	@Override
 	@Nullable
 	public Component<T> evaluate(Scope s, Monitor m) {
-		Set<Identifier> deps = new HashSet<Identifier>(s.getKeys());
+		Set<Identifier> deps = s.getKeys();
 		deps.addAll(sign.getParams());
-		if (!set.canEvaluate(deps))
-			return null;
-		return new Component<T>(s, sign, set);
+		if (set.canEvaluate(deps))
+			return new Component<T>(s, sign, set);
+		return null;
 	}
 
 	/**

@@ -13,6 +13,7 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * A work automaton.
  */
@@ -30,8 +31,8 @@ public final class Plain implements Semantics<Plain> {
 
 	/**
 	 * Constructs a plain Reo component with given component name and ports
-	 * names in the interface
-	 * 
+	 * names in the interface.
+	 *
 	 * @param name
 	 *            component name
 	 * @param ports
@@ -44,10 +45,11 @@ public final class Plain implements Semantics<Plain> {
 			list.add(new Port(ports[i]));
 		this.ports = list;
 	}
-	
+
 	/**
 	 * Constructs a plain Reo component with a given component name and ports
-	 * names in the interface 
+	 * names in the interface .
+	 *
 	 * @param name
 	 *            component name
 	 * @param ports
@@ -57,7 +59,7 @@ public final class Plain implements Semantics<Plain> {
 		this.name = name;
 		this.ports = new ArrayList<Port>(ports);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -84,7 +86,7 @@ public final class Plain implements Semantics<Plain> {
 			Port q = null;
 			if ((q = links.get(p)) != null)
 				list.add(q);
-			else 
+			else
 				list.add(p);
 		}
 		return new Plain(name, list);

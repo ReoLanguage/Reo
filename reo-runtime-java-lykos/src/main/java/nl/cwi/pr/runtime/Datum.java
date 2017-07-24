@@ -9,6 +9,9 @@ public class Datum {
 	/**
 	 * Checks if the string <code>string</code> can be converted to an object.
 	 * 
+	 * @param string
+	 *            string
+	 * 
 	 * @return <code>true</code> if <code>string</code> can be converted to an
 	 *         object; <code>false</code> otherwise.
 	 */
@@ -44,13 +47,11 @@ public class Datum {
 		List<Serializable> list = new ArrayList<Serializable>();
 
 		int nTokens = tokens.length;
-		boolean isArray = tokens[0].startsWith("[")
-				&& tokens[tokens.length - 1].endsWith("]");
+		boolean isArray = tokens[0].startsWith("[") && tokens[tokens.length - 1].endsWith("]");
 
 		if (isArray) {
 			tokens[0] = tokens[0].substring(1);
-			tokens[nTokens - 1] = tokens[nTokens - 1].substring(0,
-					tokens[nTokens - 1].length() - 1);
+			tokens[nTokens - 1] = tokens[nTokens - 1].substring(0, tokens[nTokens - 1].length() - 1);
 		}
 
 		StringBuilder builder = new StringBuilder();
@@ -190,12 +191,10 @@ public class Datum {
 
 			String className = object.getClass().getSimpleName();
 
-			return object == null ? "null" : (object instanceof String ? "\""
-					: "")
-					+ object.toString()
-					+ (object instanceof String ? "\"" : "")
-					+ (className.isEmpty() ? " (anonymous type)" : ":"
-							+ className);
+			return object == null ? "null"
+					: (object instanceof String ? "\"" : "") + object.toString()
+							+ (object instanceof String ? "\"" : "")
+							+ (className.isEmpty() ? " (anonymous type)" : ":" + className);
 		}
 	}
 

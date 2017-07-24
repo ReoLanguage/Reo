@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 
+// TODO: Auto-generated Javadoc
 /**
  * A finite set of assignments.
  */
@@ -57,33 +59,77 @@ public final class Scope {
 		return new Scope(s);
 	}
 
+	/**
+	 * Gets the.
+	 *
+	 * @param k
+	 *            the k
+	 * @return the value
+	 */
 	@Nullable
 	public Value get(Identifier k) {
 		return assignments.get(k);
 	}
 
+	/**
+	 * Removes the.
+	 *
+	 * @param k
+	 *            the k
+	 * @return the value
+	 */
 	@Nullable
 	public Value remove(Identifier k) {
 		return assignments.remove(k);
 	}
 
+	/**
+	 * Put.
+	 *
+	 * @param k
+	 *            the k
+	 * @param v
+	 *            the v
+	 * @return the value
+	 */
 	@Nullable
 	public Value put(Identifier k, Value v) {
 		return assignments.put(k, v);
 	}
 
+	/**
+	 * Put all.
+	 *
+	 * @param s
+	 *            the s
+	 */
 	public void putAll(Scope s) {
 		assignments.putAll(s.assignments);
 	}
 
+	/**
+	 * Checks if is empty.
+	 *
+	 * @return true, if is empty
+	 */
 	public boolean isEmpty() {
 		return assignments.isEmpty();
 	}
-	
+
+	/**
+	 * Gets the keys.
+	 *
+	 * @return the keys
+	 */
 	public Set<Identifier> getKeys() {
-		return assignments.keySet();
+		return new HashSet<>(assignments.keySet());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return assignments.toString();

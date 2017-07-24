@@ -1,11 +1,10 @@
 package nl.cwi.reo.components;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -32,8 +31,7 @@ public class Engine {
 		else
 			stockfish = "stockfish-6-linux-64";
 
-		String path = "src/main/java/"
-				+ stockfish;
+		String path = "src/main/java/" + stockfish;
 
 		Process process = null;
 		try {
@@ -45,30 +43,27 @@ public class Engine {
 			throw new Error();
 		}
 
-		this.reader = new BufferedReader(new InputStreamReader(
-				process.getInputStream()));
-		this.writer = new BufferedWriter(new OutputStreamWriter(
-				process.getOutputStream()));
+		this.reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		this.writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
 		new Thread() {
 			@Override
 			public void run() {
 				String line;
 				StringBuilder builder = new StringBuilder();
+				if (reader == null || queue == null)
+					throw new NullPointerException();
 
 				try {
 					while ((line = reader.readLine()) != null) {
 						builder.append(line + "\n");
-						if (line.startsWith("uciok")
-								|| line.startsWith("bestmove")) {
-	
+						if (line.startsWith("uciok") || line.startsWith("bestmove")) {
+
 							queue.put(builder.toString());
 							builder = new StringBuilder();
 						}
 					}
-				}
-
-				catch (IOException | InterruptedException e) {
+				} catch (IOException | InterruptedException e) {
 					e.printStackTrace();
 					throw new Error();
 				}
@@ -111,4 +106,3 @@ public class Engine {
 
 	}
 }
-

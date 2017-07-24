@@ -29,6 +29,7 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interpretation of a relation over terms.
  */
@@ -51,13 +52,13 @@ public final class Relation implements PredicateExpression {
 
 	/**
 	 * Constructs an application of a relation symbol to a list of arguments.
-	 * 
+	 *
 	 * @param symbol
 	 *            name of the function
 	 * @param arguments
 	 *            list of arguments
-	 * @param token
-	 *            location in source
+	 * @param location
+	 *            the location
 	 */
 	public Relation(RelationSymbol symbol, List<TermExpression> arguments, Location location) {
 		this.symbol = symbol;
@@ -87,19 +88,22 @@ public final class Relation implements PredicateExpression {
 					TermExpression t1 = ((VariableTermExpression) arg).getIndices().get(0);
 					if (t1 instanceof Range) {
 						Scope scope = ((Range) t1).findParamFromSize(size);
-						s.putAll(scope);
+						if (scope != null)
+							s.putAll(scope);
+						else
+							return null;
 					}
 				}
 			}
 			List<Term> terms = arg.evaluate(s, m);
-			if (terms == null) {
+			if (terms != null) {
+				iters.add(terms.iterator());
+				counter = 0;
+			} else {
 				counter++;
 				queue.add(arg);
-			} else {
-				counter = 0;
-				iters.add(terms.iterator());
 			}
-			if (arg instanceof ListExpression)
+			if (arg instanceof ListExpression && terms != null)
 				size = terms.size();
 			if (counter > queue.size())
 				return null;
@@ -257,7 +261,11 @@ public final class Relation implements PredicateExpression {
 				: "" + symbol + arguments;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
+	@Nullable
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
 		if (symbol == RelationSymbol.EQ) {
 			Set<Identifier> defnsA1 = arguments.get(0).getVariables();
