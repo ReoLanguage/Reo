@@ -29,6 +29,12 @@
       <version>4.0.8</version>
     </dependency>
 
+    <dependency>
+      <groupId>nl.cwi.reo</groupId>
+      <artifactId>reo-interpreter</artifactId>
+      <version>1.0</version>
+    </dependency>
+
   </dependencies>
 
 </project>

@@ -12,10 +12,10 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -176,6 +176,12 @@ public class Predicate implements Semantics<Predicate> {
 	@Override
 	public int hashCode() {
 		return Objects.hash(f);
+	}
+
+	@Override
+	public Predicate getDefault(Set<Port> iface) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

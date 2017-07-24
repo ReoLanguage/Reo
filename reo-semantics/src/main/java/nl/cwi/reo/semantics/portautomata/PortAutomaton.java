@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.AutomatonSemantics;
-import nl.cwi.reo.semantics.SemanticsType;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.automata.Automaton;
 import nl.cwi.reo.semantics.automata.State;
 import nl.cwi.reo.semantics.automata.Transition;
@@ -19,7 +19,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * The Class PortAutomaton.
  */
-public class PortAutomaton extends Automaton<NullLabel> implements AutomatonSemantics<PortAutomaton> {
+public class PortAutomaton extends Automaton<NullLabel> implements Semantics<PortAutomaton> {
 
 	/** The label. */
 	private static NullLabel label = new NullLabel();
@@ -118,5 +118,11 @@ public class PortAutomaton extends Automaton<NullLabel> implements AutomatonSema
 	@Override
 	public PortAutomaton evaluate(Scope s, Monitor m) {
 		return new PortAutomaton(super.evaluate(s, m));
+	}
+
+	@Override
+	public PortAutomaton getDefault(Set<Port> iface) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

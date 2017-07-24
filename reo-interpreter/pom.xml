@@ -16,9 +16,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>nl.cwi.reo</groupId>
-      <artifactId>reo-semantics</artifactId>
-      <version>1.0</version>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
+      <version>4.3</version>
     </dependency>
   </dependencies>
 

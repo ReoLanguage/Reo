@@ -25,19 +25,19 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.listeners.Listener;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
-import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -47,7 +47,7 @@ import nl.cwi.reo.util.Monitor;
  * @param <T>
  *            Reo semantics type
  */
-public class Interpreter<T extends Semantics<T>> {
+public class Interpreter<T extends Interpretable<T>> {
 
 	/**
 	 * Type of semantics.

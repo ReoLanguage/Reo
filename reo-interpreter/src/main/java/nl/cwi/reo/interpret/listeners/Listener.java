@@ -51,9 +51,9 @@ import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.NodeExpression;
 import nl.cwi.reo.interpret.variables.ParameterExpression;
 import nl.cwi.reo.interpret.variables.VariableExpression;
-import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.util.Location;
 import nl.cwi.reo.util.Monitor;
+import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.ReoBaseListener;
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoParser;
@@ -117,7 +117,7 @@ import nl.cwi.reo.interpret.ReoParser.VarContext;
  * @param <T>
  *            Reo semantics type
  */
-public class Listener<T extends Semantics<T>> extends ReoBaseListener {
+public class Listener<T extends Interpretable<T>> extends ReoBaseListener {
 
 	// Symbol table
 	// private ParseTreeProperty<Map<String, String>> symbols = new

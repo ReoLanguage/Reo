@@ -10,6 +10,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
@@ -17,7 +18,6 @@ import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Parameter;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -221,6 +221,12 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	 */
 	@Override
 	public PRAutomaton restrict(Collection<? extends Port> intface) {
+		return null;
+	}
+
+	@Override
+	public PRAutomaton getDefault(Set<Port> iface) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -119,9 +119,9 @@ public class Rule {
 	 *         otherwise.
 	 */
 	public boolean canSync(Rule r) {
-		for (Map.Entry<Port, Boolean> e : sync.entrySet())
-			for (Map.Entry<Port, Boolean> f : r.getSyncConstraint().entrySet())
-				if (e.getKey().equals(f.getKey()) && f.getValue() == !e.getValue())
+		for (Map.Entry<Port, Boolean> e : sync.entrySet()) 
+			if (r.getSyncConstraint().containsKey(e.getKey()))
+				if (e.getValue() != r.getSyncConstraint().get(e.getKey()))
 					return false;
 		return true;
 	}

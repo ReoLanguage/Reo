@@ -102,11 +102,8 @@ public class HyperEdge {
 	 *            rule
 	 * @return reference to this hyperedge.
 	 */
-	public HyperEdge addLeave(RuleNode r) {
-		rules = new HashSet<>(rules); // TODO this seems unnecessary and
-										// expensive
+	public void addLeave(RuleNode r) {
 		rules.add(r);
-		return this;
 	}
 
 	/**
@@ -116,11 +113,8 @@ public class HyperEdge {
 	 *            list of rules
 	 * @return reference to this hyperedge.
 	 */
-	public HyperEdge addLeaves(List<RuleNode> r) {
-		rules = new HashSet<>(rules); // TODO this seems unnecessary and
-										// expensive
+	public void addLeaves(List<RuleNode> r) {
 		rules.addAll(r);
-		return this;
 	}
 
 	/**
@@ -130,10 +124,9 @@ public class HyperEdge {
 	 *            set of rules
 	 * @return reference to this hyperedge.
 	 */
-	public HyperEdge rmLeaves(Set<RuleNode> r) {
+	public void rmLeaves(Set<RuleNode> r) {
 		for (RuleNode rule : r)
 			rule.rmFromHyperedge(this);
-		return this;
 	}
 
 	/**
@@ -141,12 +134,9 @@ public class HyperEdge {
 	 * 
 	 * @param r
 	 *            rule
-	 * @return reference to this rule.
 	 */
-	public HyperEdge rmLeave(RuleNode r) {
-		rules = new HashSet<>(rules); // TODO this seems unnecessary
+	public void rmLeave(RuleNode r) {
 		rules.remove(r);
-		return this;
 	}
 
 	/**
@@ -157,11 +147,9 @@ public class HyperEdge {
 	 *            formula
 	 * @return reference to this hyperedge
 	 */
-	public HyperEdge compose(Formula f) {
-		rules = new HashSet<>(rules); // TODO this seems unnecessary
+	public void compose(Formula f) {
 		for (RuleNode r : rules)
 			r.compose(f);
-		return this;
 	}
 
 	/**
@@ -184,7 +172,7 @@ public class HyperEdge {
 	 * @throws IllegalArgumentException
 	 *             if the hyperedges have different source ports.
 	 */
-	public HyperEdge compose(HyperEdge h) {
+	public void compose(HyperEdge h) {
 
 		if (!port.getPort().equals(h.getSource().getPort()))
 			new IllegalArgumentException("Hyperedges must have the same source.");
@@ -235,8 +223,6 @@ public class HyperEdge {
 				if (!areEqual.contains(r))
 					r.erase();
 		}
-
-		return this;
 	}
 
 	/**
@@ -247,12 +233,11 @@ public class HyperEdge {
 	 *            port node
 	 * @return reference to this hyperedge.
 	 */
-	public HyperEdge hide(PortNode p) {
+	public void hide(PortNode p) {
 		for (RuleNode r : rules)
 			r.hide(p);
 		// TODO shouldn't we also hide the source of the transition, if it
 		// equals p?
-		return this;
 	}
 
 	/**
@@ -267,9 +252,7 @@ public class HyperEdge {
 		if (!(other instanceof HyperEdge))
 			return false;
 		HyperEdge p = (HyperEdge) other;
-		return Objects.equals(this.port, p.port) && Objects.equals(this.rules, p.rules);
-		// TODO what relation should hold between the implementation of equals
-		// and hashCode?
+		return Objects.equals(this.id, p.id);
 	}
 
 	/**
