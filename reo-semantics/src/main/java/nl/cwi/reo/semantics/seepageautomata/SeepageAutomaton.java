@@ -8,7 +8,7 @@ import java.util.Set;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.AutomatonSemantics;
+import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.automata.Automaton;
 import nl.cwi.reo.util.Monitor;
 
@@ -16,7 +16,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * The Class SeepageAutomaton.
  */
-public class SeepageAutomaton extends Automaton<SeepageFunction> implements AutomatonSemantics<SeepageAutomaton> {
+public class SeepageAutomaton extends Automaton<SeepageFunction> implements Semantics<SeepageAutomaton> {
 
 	/** The label. */
 	private static SeepageFunction label = new SeepageFunction();

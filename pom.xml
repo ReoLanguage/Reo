@@ -29,7 +29,8 @@ Application designers can use Reo as a "glue code" language for compositional co
 
     <module>reo-semantics</module>
     <module>reo-interpreter</module>
-    <!--<module>reo-runtime-c</module>-->
+    <module>reo-runtime-c</module>
+    <!--<module>reo-runtime-c-lykos</module>-->
     <module>reo-runtime-java</module>
     <module>reo-runtime-java-lykos</module>
     <module>reo-scheduler</module>
