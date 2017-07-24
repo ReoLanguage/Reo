@@ -1,11 +1,8 @@
-package nl.cwi.reo.components;
+package nl.cwi.reo.runtime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import nl.cwi.reo.runtime.Input;
-import nl.cwi.reo.runtime.Output;
 
 public class Function {
 

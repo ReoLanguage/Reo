@@ -15,8 +15,8 @@ import reo.fifofull;
 *	}
 */
 
-chess = (){
-	fifofull<"">(x,WhiteI)
+chess(){
+	fifofull<>(x,WhiteI)
 	Engine1(WhiteI,WhiteO)
 	Engine2(BlackI,BlackO)
 	visualize(WhiteI,WhiteO,Display1,BlackI)
@@ -25,17 +25,14 @@ chess = (){
 }
 
 Engine1(a?String,b!String){
-	#RBA {a,b} true
 	Java:"Workers.Engine"
 }
 
 Engine2(a?String,b!String){
-	#RBA {a,b} true
 	Java:"Workers.Engine"
 }
 
 Display(a?String,b?String){
-	#RBA {a,b} true
 	Java:"Workers.Display"
 }
 
@@ -50,8 +47,8 @@ visualize(C?String,R?String,M!String,O!String){
 	//
 
 	fifo1(C,k)
-      	transformer<"Function.parse">(R,M)
-	binop<"Function.concatenate">(k,M,O)
+      	transformer<Function.parse>(R,M)
+	binop<Function.concatenate>(k,M,O)
 
 }
 
