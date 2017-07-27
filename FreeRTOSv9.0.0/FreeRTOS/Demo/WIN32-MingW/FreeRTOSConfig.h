@@ -157,6 +157,6 @@ extern void vAssertCalled( unsigned long ulLine, const char * const pcFileName )
 /* Include the FreeRTOS+Trace FreeRTOS trace macro definitions. */
 #define TRACE_ENTER_CRITICAL_SECTION() portENTER_CRITICAL()
 #define TRACE_EXIT_CRITICAL_SECTION() portEXIT_CRITICAL()
-#include "trcKernelPort.h"
+#include "../../../FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace/include/trcKernelPort.h"
 
 #endif /* FREERTOS_CONFIG_H */

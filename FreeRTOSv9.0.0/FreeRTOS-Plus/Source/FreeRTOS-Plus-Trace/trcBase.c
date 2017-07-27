@@ -37,7 +37,7 @@
  * www.percepio.com
  ******************************************************************************/
 
-#include "trcBase.h"
+#include "include/trcBase.h"
 
 #if (USE_TRACEALYZER_RECORDER == 1)
 

@@ -1,14 +1,10 @@
-<<<<<<< HEAD:reo-runtime-java/src/main/java/nl/cwi/reo/runtime/Workers.java
 package nl.cwi.reo.runtime;
 import nl.cwi.reo.components.Display;
 import nl.cwi.reo.components.Engine;
-=======
-package nl.cwi.reo.components;
 
 import nl.cwi.reo.runtime.Input;
 import nl.cwi.reo.runtime.Output;
 import nl.cwi.reo.runtime.Port;
->>>>>>> e50a35dacf71adbb00dc785733842572571ebe7a:reo-runtime-java/src/main/java/nl/cwi/reo/components/Workers.java
 
 public class Workers {
 

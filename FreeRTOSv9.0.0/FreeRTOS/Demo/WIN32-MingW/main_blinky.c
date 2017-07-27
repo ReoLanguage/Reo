@@ -221,6 +221,8 @@ const TickType_t xBlockTime = pdMS_TO_TICKS( mainQUEUE_SEND_FREQUENCY_MS );
 		xQueueSend( xQueue, &ulValueToSend, 0U );
 	}
 }
+
+
 /*-----------------------------------------------------------*/
 
 static void prvQueueReceiveTask( void *pvParameters )
@@ -254,5 +256,6 @@ unsigned long ulReceivedValue;
 		}
 	}
 }
+
 /*-----------------------------------------------------------*/
 

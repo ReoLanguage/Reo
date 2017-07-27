@@ -143,17 +143,7 @@ public class Function implements Term {
 	 */
 	public Term evaluate(Scope s, Monitor m) {
 		String valueEval = "";
-<<<<<<< HEAD
-		
-		if(value instanceof String){
-			if( s.get(new Identifier((String)value))!=null){
-				valueEval = s.get(new Identifier((String)value)).toString();
-			}
-			else
-				valueEval = value.toString();
-		}
-		else
-=======
+
 		if (value instanceof String) {
 			Value v = s.get(new Identifier((String) value));
 			if (v != null) {
@@ -162,7 +152,6 @@ public class Function implements Term {
 				m.add("Cannot evaluate this function");
 			}
 		} else {
->>>>>>> e50a35dacf71adbb00dc785733842572571ebe7a
 			m.add("Cannot evaluate this function");
 		}
 

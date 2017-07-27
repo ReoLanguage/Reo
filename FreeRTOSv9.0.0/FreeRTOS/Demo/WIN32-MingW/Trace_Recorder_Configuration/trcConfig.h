@@ -77,7 +77,7 @@
 	#define SELECTED_PORT PORT_NOT_SET
 
 	#if (SELECTED_PORT == PORT_NOT_SET)
-		#error "You need to define SELECTED_PORT here!"
+		#define SELECTED_PORT PORT_HWIndependent
 	#endif
 #else
 	// For Win32 demo projects this is set automatically

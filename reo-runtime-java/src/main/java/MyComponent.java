@@ -1,4 +1,4 @@
-import nl.cwi.reo.components.Workers;
+import nl.cwi.reo.runtime.Workers;
 import nl.cwi.reo.runtime.Component;
 import nl.cwi.reo.runtime.Port;
 

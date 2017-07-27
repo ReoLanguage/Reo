@@ -1,19 +1,12 @@
-<<<<<<< HEAD:reo-runtime-java/src/main/java/nl/cwi/reo/runtime/Function.java
 package nl.cwi.reo.runtime;
-=======
-package nl.cwi.reo.components;
 
->>>>>>> e50a35dacf71adbb00dc785733842572571ebe7a:reo-runtime-java/src/main/java/nl/cwi/reo/components/Function.java
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
-<<<<<<< HEAD:reo-runtime-java/src/main/java/nl/cwi/reo/runtime/Function.java
-=======
 import nl.cwi.reo.runtime.Input;
 
->>>>>>> e50a35dacf71adbb00dc785733842572571ebe7a:reo-runtime-java/src/main/java/nl/cwi/reo/components/Function.java
 public class Function {
 
 	public static String add(String a, String b) {
