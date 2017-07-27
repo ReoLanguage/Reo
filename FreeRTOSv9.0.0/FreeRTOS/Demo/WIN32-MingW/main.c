@@ -124,6 +124,7 @@ appropriate choice. */
  * main_blinky() is used when mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is set to 1.
  * main_full() is used when mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is set to 0.
  */
+extern void main_reo( void );
 extern void main_blinky( void );
 extern void main_full( void );
 
@@ -169,8 +170,9 @@ static portBASE_TYPE xTraceRunning = pdTRUE;
 
 /*-----------------------------------------------------------*/
 
-int main( void )
+int main1( void )
 {
+
 	/* This demo uses heap_5.c, so start by defining some heap regions.  This
 	is only done to provide an example as this demo could easily create one
 	large heap region instead of multiple smaller heap regions - in which case
@@ -193,7 +195,8 @@ int main( void )
 	of this file. */
 	#if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY == 1 )
 	{
-		main_blinky();
+		main_reo();
+		//main_blinky();
 	}
 	#else
 	{

@@ -1,37 +1,35 @@
 #ifndef __REO_H__
 #define __REO_H__
 
+#define NULL ((void *) 0)
+
 /**
  * Port for single producer single consumer
  */
 typedef struct {
-	unsigned int get_request : 1;
-	void *put_request;
+	volatile unsigned int get_request :1;
+	volatile void *put_request;
 	void (*signal_producer)();
 	void (*signal_consumer)();
-} Port;
+} port;
 
 /**
- * Perform a put operation
- *
- * This is a blocking call
+ * Offers a datum on a given port and blocks until it is accepted.
  *
  * @memberof Port
- * @param port Pointer to port
+ * @param port Reo port
  * @param datum Pointer to datum
  * @return 1 if datum is a null pointer, and 0 otherwise.
  */
-int Port_put(Port *port, void *datum);
+int put(port *port, void *datum);
 
 /**
- * Perform a get operation
- *
- * This is a blocking call
+ * Requests a datum from a given port and blocks until it is available.
  *
  * @memberof Port
- * @param port Pointer to port
+ * @param port Reo port
  * @return Datum offered by the port.
  */
-void* Port_get(Port *port);
+void* get(port *port);
 
 #endif // __REO_H__
