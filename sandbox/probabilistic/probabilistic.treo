@@ -4,21 +4,21 @@ import reo.lossy;
 import reo.syncdrain;
 
 probabilistic(in, out) {
-//	sync(in, C)
-//	sync(in, I)
-//	lossy(C, I) sync(C, A) fifo1(C, E)
-//	lossy(F, C)
-//	fifo1(I, H)
-//	faultyfifo1<0.05>(A, B)
-//	sync(G, E)
-//	fifo1(E, F)
-//	sync(H, G)
-//	sync(B, out)
-//	syncdrain(B, G)
+	sync(in, C)
+	sync(in, I)
+	lossy(C, I) sync(C, A) fifo1(C, E)
+	lossy(F, C)
+	fifo1(I, H)
+	faultyfifo1<0.05>(A, B)
+	sync(G, E)
+	fifo1(E, F)
+	sync(H, G)
+	sync(B, out)
+	syncdrain(B, G)
 }
 
-//faultyfifo1<tau:float>(a?, b!) {
-//	#RBA
-//	{a, ~b} m = null, m' = [tau : a, 1-tau : null];
-//	{~a, b} m = b, m' = null;
-//}
+faultyfifo1<tau:float>(a?, b!) {
+	#RBA
+	{a, ~b} m = null, m' = [tau : a, 1-tau : null];
+	{~a, b} m = b, m' = null;
+}

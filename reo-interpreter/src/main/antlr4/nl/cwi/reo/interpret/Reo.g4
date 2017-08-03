@@ -18,7 +18,7 @@ ref       : '#JAVA' STRING                                        # ref_java
 
 // Multisets
 multiset  : instance                                              # multiset_constraint
-          | term? '{' multiset* ('|' formula)? '}'                # multiset_setbuilder
+          | ('|' term)? '{' multiset* ('|' formula)? '}'                # multiset_setbuilder
           | 'for' ID '=' term '..' term multiset                  # multiset_iteration
           | 'if' formula multiset ('else' formula multiset)* 
           ('else' multiset)?                                      # multiset_condition ;
@@ -88,7 +88,7 @@ type      : '$'? ID | '(' type ')' | type '*' type | <assoc=right> type '^' type
 
 // Ports
 ports     : '(' ')' | '(' port (',' port)* ')' ;
-port      : prio=(ADD | AND)? var ;
+port      : prio=(ADD | AMP)? var ;
 
 // Variables
 var       : name ('[' term ']')* ;
