@@ -7,11 +7,11 @@ import reo.fifofull;
 * For this exercise, you can use some workers accessible by the class Workers.java
 * You can link to a Java code source in an atomic file by :
 *
-* 	Name = (*interface*){ #PR
-*
+* 	Name = (*interface*){
+*       #PR
 *		identity(*ports*;)
-*	|
-*		Java:"Workers.**** "
+*	
+*		#Java "Workers.**** "
 *	}
 */
 

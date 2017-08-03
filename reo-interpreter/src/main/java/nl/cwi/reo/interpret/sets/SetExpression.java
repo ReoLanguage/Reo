@@ -4,18 +4,14 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.instances.InstanceExpression;
 import nl.cwi.reo.interpret.variables.Identifier;
 
 // TODO: Auto-generated Javadoc
 /**
  * Interpretation of an atomic/composite set definition.
- * 
- * @param <T>
- *            Reo semantics type
  */
-public interface SetExpression<T extends Interpretable<T>> extends InstanceExpression<T> {
+public interface SetExpression extends InstanceExpression {
 
 	/**
 	 * Gets the component.

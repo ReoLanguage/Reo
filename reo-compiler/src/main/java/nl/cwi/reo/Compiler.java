@@ -26,7 +26,9 @@ import nl.cwi.reo.compile.components.Component;
 import nl.cwi.reo.compile.components.Protocol;
 import nl.cwi.reo.compile.components.ReoTemplate;
 import nl.cwi.reo.compile.components.Transition;
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ReoProgram;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.Reference;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
@@ -43,10 +45,10 @@ import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
-import nl.cwi.reo.semantics.hypergraphs.InterpreterRBA;
+import nl.cwi.reo.semantics.hypergraphs.ListenerRBA;
 import nl.cwi.reo.semantics.hypergraphs.Rule;
-import nl.cwi.reo.semantics.prautomata.InterpreterPR;
-import nl.cwi.reo.semantics.prautomata.PRAutomaton;
+import nl.cwi.reo.semantics.prautomata.ListenerPR;
+import nl.cwi.reo.semantics.prba.ListenerPRBA;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
@@ -100,6 +102,10 @@ public class Compiler {
 	/** Partitioning. */
 	@Parameter(names = { "-pt" }, description = "synchronous region decomposition")
 	private boolean partitioning = false;
+
+	/** Scheduling. */
+	@Parameter(names = { "-sch" }, description = "generate custom scheduling policy")
+	private boolean scheduling = false;
 
 	/**
 	 * Target language.
@@ -165,8 +171,9 @@ public class Compiler {
 	 */
 	private void compilePR() {
 
-		Interpreter<PRAutomaton> interpreter = new InterpreterPR(directories, params, monitor);
-		ReoProgram<PRAutomaton> program = interpreter.interpret(files.get(0));
+		ListenerPR listener = new ListenerPR(monitor);
+		Interpreter interpreter = new Interpreter(SemanticsType.PR, listener, directories, params, monitor);
+		ReoProgram program = interpreter.interpret(files.get(0));
 
 		if (program == null)
 			return;
@@ -191,31 +198,56 @@ public class Compiler {
 	 */
 	private void compile() {
 
-		Interpreter<ConstraintHypergraph> interpreter = new InterpreterRBA(directories, params, monitor);
+		Interpreter interpreter = getInterpreter(lang);
 
-		ReoProgram<ConstraintHypergraph> program;
+		ReoProgram program;
 		if ((program = interpreter.interpret(files.get(0))) == null)
 			return;
 
-		ReoConnector<ConstraintHypergraph> connector;
-		connector = addPortWindows(program.getConnector(), new ConstraintHypergraph());
+		ReoConnector connector = addPortWindows(program.getConnector(), lang);
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();
 		connector = connector.insertNodes(true, false, new ConstraintHypergraph());
 		connector = connector.integrate();
 
-		List<Component> components = buildAtomics(connector);
+		List<Component> components = buildAtomics(connector, lang);
+		
+		Set<Port> intface = getDualInterface(components);
+		
+		List<ConstraintHypergraph> protocol = getProtocol(connector, lang, ConstraintHypergraph.class);
+		
+		ConstraintHypergraph composition = new ConstraintHypergraph().compose(protocol).restrict(intface);
 
-		ConstraintHypergraph protocol = composeProtocol(connector, new ConstraintHypergraph());
-
-		Set<Transition> transitions = buildTransitions(protocol);
+		Set<Transition> transitions = buildTransitions(composition);
 
 		Set<Set<Transition>> partition = partition(transitions);
 
-		Set<Port> intface = getDualInterface(components);
-		components.addAll(buildProtocols(protocol, partition, intface));
+		List<Component> protocols = buildProtocols(composition, partition, intface);
+		
+		components.addAll(protocols);
 
-		generateCode(new ReoTemplate(program.getFile(), packagename, program.getName(), components));
+		generateCode(new ReoTemplate(program.getFile(), version, packagename, program.getName(), components));
+	}
+	
+	private Interpreter getInterpreter(Language lang) {
+		switch (lang) {
+		case PRISM:
+			ListenerPRBA listenerPRBA = new ListenerPRBA(monitor);
+			return new Interpreter(SemanticsType.CH, listenerPRBA, directories, params, monitor);
+		case JAVA:
+		case C11:
+			ListenerRBA listenerRBA = new ListenerRBA(monitor);
+			return new Interpreter(SemanticsType.CH, listenerRBA, directories, params, monitor);
+		case MAUDE:
+			break;
+		case PRT:
+			break;
+		case TEXT:
+			break;
+		default:
+			break;
+		}
+		return null;
 	}
 
 	/**
@@ -227,25 +259,29 @@ public class Compiler {
 	 *            instance of semantics
 	 * @return Connector with all ports hidden.
 	 */
-	private <T extends Semantics<T>> ReoConnector<T> addPortWindows(ReoConnector<T> connector, T x) {
-		List<ReoConnector<T>> list = new ArrayList<>();
+	private ReoConnector addPortWindows(ReoConnector connector, Language lang) {
+		if (lang != Language.JAVA)
+			return  connector;
+		List<ReoConnector> list = new ArrayList<>();
 		list.add(connector);
 		for (Port p : connector.getInterface()) {
 			if (!p.isHidden()) {
-				String name = "PortWindow";
-				Value v = new StringValue(p.getName().toString());
+
+				Value v = new StringValue(p.getName());
 				List<Value> values = Arrays.asList(v);
 				String call = p.isInput() ? "Windows.producer" : "Windows.consumer";
-				Reference src = new Reference(call, Language.JAVA, null, values);
+				Reference ref = new Reference(call, Language.JAVA, new ArrayList<>(), values);
+
 				PortType t = p.isInput() ? PortType.OUT : PortType.IN;
 				Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
-				Set<Port> iface = new HashSet<Port>(Arrays.asList(q));
-				T atom = x.getDefault(iface);
-				ReoConnectorAtom<T> window = new ReoConnectorAtom<>(name, atom, src);
+				Map<Port, Port> links = new HashMap<>();
+				links.put(q, q);
+
+				ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
 				list.add(window);
 			}
 		}
-		return new ReoConnectorComposite<>(null, "", list).rename(new HashMap<>());
+		return new ReoConnectorComposite(null, "", list).rename(new HashMap<>());
 	}
 
 	/**
@@ -253,14 +289,17 @@ public class Compiler {
 	 * 
 	 * @param connector
 	 *            connector
+	 * @param lang
+	 *            target language
 	 * @return list of atomic component templates
 	 */
-	private <T extends Semantics<T>> List<Component> buildAtomics(ReoConnector<T> connector) {
+	private List<Component> buildAtomics(ReoConnector connector, Language lang) {
 		List<Component> components = new ArrayList<>();
 		int n_atom = 1;
-		for (ReoConnectorAtom<T> atom : connector.getAtoms()) {
-			String call = atom.getSourceCode().getCall();
-			if (call != null) {
+		for (ReoConnectorAtom atom : connector.getAtoms()) {
+			Reference r = atom.getReference(lang);
+			if (r != null) {
+				String call = r.getCall();
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
@@ -268,7 +307,7 @@ public class Compiler {
 				// TODO the string representation of parameter values is target
 				// language dependent.
 				List<String> params = new ArrayList<>();
-				for (Value v : atom.getSourceCode().getValues()) {
+				for (Value v : r.getValues()) {
 					if (v instanceof BooleanValue) {
 						params.add(((BooleanValue) v).getValue() ? "true" : "false");
 					} else if (v instanceof StringValue) {
@@ -304,28 +343,36 @@ public class Compiler {
 	}
 
 	/**
-	 * Composes all protocol connector in a given connector.
+	 * Composes all protocol connector in a given connector. The protocol
+	 * consists of all components without a reference to code in a given target
+	 * language.
 	 * 
 	 * @param connector
 	 *            connector
+	 * @param lang
+	 *            target language
 	 * @param unit
 	 *            unit
 	 * @return Composition of all protocol connectors.
 	 */
-	private <T extends Semantics<T>> T composeProtocol(ReoConnector<T> connector, T unit) {
+	private <T extends Semantics<T>> List<T> getProtocol(ReoConnector connector, Language lang, Class<T> type) {
 		List<T> protocols = new ArrayList<>();
-		Set<Port> intface = new HashSet<>();
-		for (ReoConnectorAtom<T> atom : connector.getAtoms()) {
-			if (atom.getSourceCode().getCall() == null) {
-				protocols.add(atom.getSemantics());
-			} else {
-				for (Port p : atom.getInterface()) {
-					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-					intface.add(new Port(p.getName(), t, p.getPrioType(), p.getTypeTag(), true));
+		for (ReoConnectorAtom atom : connector.getAtoms()) {
+			Reference r = atom.getReference(lang);
+			if (r == null) {
+				T semantics = null;
+				for (Atom x : atom.getSemantics())
+					if (type.isInstance(x))
+						semantics = type.cast(x);
+				if (semantics == null) {
+						monitor.add("Not all components have semantics.");
+					return new ArrayList<>();
 				}
-			}
+				protocols.add(semantics);
+			} 
 		}
-		return unit.compose(protocols).restrict(intface);
+		
+		return protocols;
 	}
 
 	private Set<Transition> buildTransitions(ConstraintHypergraph protocol) {
@@ -439,10 +486,17 @@ public class Compiler {
 	private Set<Set<Transition>> partition(Set<Transition> transitions) {
 		Set<Set<Transition>> partition = new HashSet<>();
 
-		// TODO Partition the set of transitions
-		if (!transitions.isEmpty())
+		if (!transitions.isEmpty()) {
+//			for (Transition t : transitions) {
+//				Set<Set<Transition>> newPartition = new HashSet<>();
+//				newPartition.add(new HashSet<>(Arrays.asList(t)));
+//				for (Set<Transition> part : partition) {
+//					
+//				}
+//			}
 			partition.add(transitions);
-
+		}
+		
 		return partition;
 	}
 

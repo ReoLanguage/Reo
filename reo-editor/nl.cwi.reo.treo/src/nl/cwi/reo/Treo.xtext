@@ -1,0 +1,13 @@
+grammar nl.cwi.reo.Treo with org.eclipse.xtext.xbase.Xbase
+
+generate treo "http://reo.project.cwi.nl/reo/Treo"
+
+Heros:
+	heros+=SuperHero*;
+	
+SuperHero:
+	'hero' name=ID 'can' abilities+=Ability (someCode=XBlockExpression)?;
+	
+enum Ability :
+	FLY | SUPERPOWER | FIRE | ICE
+;

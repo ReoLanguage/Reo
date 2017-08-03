@@ -6,22 +6,18 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Expression;
-import nl.cwi.reo.interpret.Interpretable;
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * A SubComponent is a part of a Connector.
  * 
  * A SubComponent is an immutable object.
  * 
- * @param <T>
- *            type of semantics objects
  * @see ReoConnectorComposite
  */
-public interface ReoConnector<T extends Interpretable<T>> extends Expression<ReoConnector<T>> {
+public interface ReoConnector {
 
 	/**
 	 * Gets the component.
@@ -55,7 +51,7 @@ public interface ReoConnector<T extends Interpretable<T>> extends Expression<Reo
 	 *            renaming map
 	 * @return a copy of this block with reconnected links
 	 */
-	public ReoConnector<T> rename(Map<Port, Port> r);
+	public ReoConnector rename(Map<Port, Port> r);
 
 	/**
 	 * Inserts, if necessary, a merger and/or replicator at every node in this
@@ -71,7 +67,7 @@ public interface ReoConnector<T extends Interpretable<T>> extends Expression<Reo
 	 * 
 	 * @return connector with nodes inserted.
 	 */
-	public ReoConnector<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory);
+	public ReoConnector insertNodes(boolean mergers, boolean replicators, Atom nodeFactory);
 
 	/**
 	 * Flattens the nested block structure of this connector, and erases any
@@ -80,7 +76,7 @@ public interface ReoConnector<T extends Interpretable<T>> extends Expression<Reo
 	 * 
 	 * @return connector wherein every sub-connector is atomic.
 	 */
-	public ReoConnector<T> flatten();
+	public ReoConnector flatten();
 
 	/**
 	 * Integrates the links of this connector by renaming the interfaces of the
@@ -89,7 +85,7 @@ public interface ReoConnector<T extends Interpretable<T>> extends Expression<Reo
 	 * @return connector wherein every atomic component has links that map port
 	 *         x to port x.
 	 */
-	public ReoConnector<T> integrate();
+	public ReoConnector integrate();
 
 	/**
 	 * Propagates type tags of ports that must have the same type.
@@ -101,7 +97,7 @@ public interface ReoConnector<T extends Interpretable<T>> extends Expression<Reo
 	 *         there is a type conflict.
 	 */
 	@Nullable
-	public ReoConnector<T> propagate(Monitor m);
+	public ReoConnector propagate(Monitor m);
 
 	/**
 	 * Gets a partitioning of all ports of this connector, where each part
@@ -123,6 +119,6 @@ public interface ReoConnector<T extends Interpretable<T>> extends Expression<Reo
 	 * 
 	 * @return all atomic sub-connectors in this connector
 	 */
-	public List<ReoConnectorAtom<T>> getAtoms();
+	public List<ReoConnectorAtom> getAtoms();
 
 }

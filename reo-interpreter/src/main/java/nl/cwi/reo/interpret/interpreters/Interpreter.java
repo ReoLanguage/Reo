@@ -25,7 +25,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoLexer;
 import nl.cwi.reo.interpret.ReoParser;
@@ -34,20 +33,19 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.instances.Instance;
-import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * Interpreter of Reo source files, for given generic semantics.
  * 
  * @param <T>
  *            Reo semantics type
  */
-public class Interpreter<T extends Interpretable<T>> {
+public class Interpreter {
 
 	/**
 	 * Type of semantics.
@@ -57,7 +55,7 @@ public class Interpreter<T extends Interpretable<T>> {
 	/**
 	 * ANTLR listener.
 	 */
-	private final Listener<T> listener;
+	private final BaseListener listener;
 
 	/**
 	 * Component paths: base directories of component files.
@@ -88,10 +86,8 @@ public class Interpreter<T extends Interpretable<T>> {
 	 * @param monitor
 	 *            the monitor
 	 */
-	public Interpreter(SemanticsType semantics, Listener<T> listener, List<String> dirs, List<String> params,
+	public Interpreter(SemanticsType semantics, BaseListener listener, List<String> dirs, List<String> params,
 			Monitor monitor) {
-		if (semantics == null || listener == null || dirs == null || params == null)
-			throw new NullPointerException();
 		this.semantics = semantics;
 		this.listener = listener;
 		this.dirs = Collections.unmodifiableList(dirs);
@@ -109,10 +105,10 @@ public class Interpreter<T extends Interpretable<T>> {
 	 *         file, or null, if the main component could not be interpreted.
 	 */
 	@Nullable
-	public ReoProgram<T> interpret(String file) {
+	public ReoProgram interpret(String file) {
 
 		// Set of parsed Reo source files.
-		Map<String, ReoFile<T>> programs = new HashMap<String, ReoFile<T>>();
+		Map<String, ReoFile> programs = new HashMap<>();
 
 		// Dependency graph of parsed component definitions.
 		Map<String, Set<String>> deps = new HashMap<String, Set<String>>();
@@ -124,7 +120,7 @@ public class Interpreter<T extends Interpretable<T>> {
 		Queue<String> todo = new LinkedList<String>();
 
 		// Parse the provided source file.
-		ReoFile<T> mainFile = parse(file);
+		ReoFile mainFile = parse(file);
 		if (mainFile != null) {
 			programs.put(mainFile.getName(), mainFile);
 			name = mainFile.getName();
@@ -137,7 +133,7 @@ public class Interpreter<T extends Interpretable<T>> {
 		String component = null;
 		while ((component = todo.poll()) != null) {
 			if (!deps.containsKey(component)) {
-				ReoFile<T> reoFile = findComponent(component);
+				ReoFile reoFile = findComponent(component);
 				if (reoFile != null) {
 					programs.put(reoFile.getName(), reoFile);
 					Set<String> imports = new HashSet<String>(reoFile.getImports());
@@ -151,7 +147,7 @@ public class Interpreter<T extends Interpretable<T>> {
 		}
 
 		// Find the correct order to evaluate the parsed programs.
-		List<ReoFile<T>> list = new ArrayList<ReoFile<T>>();
+		List<ReoFile> list = new ArrayList<>();
 		while (!deps.isEmpty()) {
 			String prog = null;
 			for (Map.Entry<String, Set<String>> comp : deps.entrySet()) {
@@ -164,7 +160,7 @@ public class Interpreter<T extends Interpretable<T>> {
 				m.add("There is a cyclic dependency of imports among " + deps.keySet());
 				return null;
 			}
-			ReoFile<T> rf = programs.get(prog);
+			ReoFile rf = programs.get(prog);
 			if (rf != null)
 				list.add(rf);
 
@@ -180,17 +176,16 @@ public class Interpreter<T extends Interpretable<T>> {
 
 		// Evaluate all component expressions.
 		Scope scope = new Scope();
-		for (ReoFile<T> f : list)
+		for (ReoFile f : list)
 			f.evaluate(scope, m);
 
 		// Instantiate the main component
 		Value main = scope.get(new Identifier(name));
-		if (main instanceof Component<?>) {
-			@SuppressWarnings("unchecked")
-			Instance<T> i = ((Component<T>) main).instantiate(params, null, m);
+		if (main instanceof Component) {
+			Instance i = ((Component) main).instantiate(params, null, m);
 			String[] namesplit = name.split("\\.");
 			if (i != null)
-				return new ReoProgram<T>(namesplit[namesplit.length - 1], file, i.getConnector());
+				return new ReoProgram(namesplit[namesplit.length - 1], file, i.getConnector());
 		}
 
 		return null;
@@ -205,9 +200,9 @@ public class Interpreter<T extends Interpretable<T>> {
 	 *         null, if this path is not found.
 	 */
 	@Nullable
-	private ReoFile<T> findComponent(String component) {
+	private ReoFile findComponent(String component) {
 
-		ReoFile<T> prog = null;
+		ReoFile prog = null;
 
 		int k = component.lastIndexOf('.') + 1;
 		String name = component.substring(k);
@@ -325,7 +320,7 @@ public class Interpreter<T extends Interpretable<T>> {
 	 * @return an interpreted source file, or null in case of an error.
 	 */
 	@Nullable
-	private ReoFile<T> parse(InputStream is, String file) {
+	private ReoFile parse(InputStream is, String file) {
 		try {
 			return parse(new ANTLRInputStream(is), file);
 		} catch (IOException e) {
@@ -343,7 +338,7 @@ public class Interpreter<T extends Interpretable<T>> {
 	 * @return an interpreted source file, or null in case of an error.
 	 */
 	@Nullable
-	private ReoFile<T> parse(String path) {
+	private ReoFile parse(String path) {
 		try {
 			return parse(new ANTLRFileStream(path), path);
 		} catch (IOException e) {
@@ -363,7 +358,7 @@ public class Interpreter<T extends Interpretable<T>> {
 	 * @return an interpreted source file, or null in case of an error.
 	 */
 	@Nullable
-	private ReoFile<T> parse(CharStream c, String path) {
+	private ReoFile parse(CharStream c, String path) {
 		ReoLexer lexer = new ReoLexer(c);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		ReoParser parser = new ReoParser(tokens);

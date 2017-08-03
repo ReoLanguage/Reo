@@ -17,6 +17,9 @@ public enum Language {
 	/** Maude language. */
 	MAUDE,
 
+	/** PRISM language for probabilistic model checking. */
+	PRISM,
+
 	/** Proto Runtime. */
 	PRT,
 
@@ -35,6 +38,8 @@ public enum Language {
 			return "C11";
 		case MAUDE:
 			return "Maude";
+		case PRISM:
+			return "PRISM";
 		case PRT:
 			return "Proto runtime";
 		case TEXT:

@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: nl.cwi.reo.treo.ide
+Bundle-SymbolicName: nl.cwi.reo.treo.ide;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: nl.cwi.reo.ide.contentassist.antlr,
+ nl.cwi.reo.ide.contentassist.antlr.internal
+Require-Bundle: org.antlr.runtime,
+ org.eclipse.xtext.xbase.lib,
+ nl.cwi.reo.treo,
+ org.eclipse.xtext.ide,
+ org.eclipse.xtext.xbase.ide
+

@@ -1,27 +1,27 @@
 package nl.cwi.reo.interpret.sets;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 
-import nl.cwi.reo.interpret.Interpretable;
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
-import nl.cwi.reo.interpret.connectors.Reference;
 import nl.cwi.reo.interpret.instances.Instance;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * Interpretation of an atomic set definition.
- * 
- * @param <T>
- *            Reo semantics type
  */
-public final class SetAtom<T extends Interpretable<T>> implements SetExpression<T> {
+public final class SetAtom implements SetExpression {
 
 	/**
 	 * Component name.
@@ -32,30 +32,19 @@ public final class SetAtom<T extends Interpretable<T>> implements SetExpression<
 	/**
 	 * Reo semantics object.
 	 */
-	@Nullable
-	private final T atom;
-
-	/**
-	 * Reference to source code.
-	 */
-	private final Reference source;
+	private final List<Atom> atoms;
 
 	/**
 	 * Constructs a new atomic set.
 	 * 
 	 * @param name
 	 *            component name
-	 * @param atom
-	 *            semantics object
-	 * @param source
-	 *            reference to source code
+	 * @param atoms
+	 *            semantics objects
 	 */
-	public SetAtom(@Nullable String name, @Nullable T atom, Reference source) {
-		if (source == null)
-			throw new NullPointerException();
+	public SetAtom(@Nullable String name, List<Atom> atoms) {
 		this.name = name;
-		this.atom = atom;
-		this.source = source;
+		this.atoms = atoms;
 	}
 
 	/**
@@ -67,23 +56,20 @@ public final class SetAtom<T extends Interpretable<T>> implements SetExpression<
 	}
 
 	/**
-	 * Evaluates this atomic set to an instance containing an atomic Reo
-	 * connector.
-	 *
-	 * @param s
-	 *            the s
-	 * @param m
-	 *            the m
-	 * @return the instance
+	 * {@inheritDoc}
 	 */
 	@Override
 	@Nullable
-	public Instance<T> evaluate(Scope s, Monitor m) {
-		T _atom = atom != null ? atom.evaluate(s, m) : null;
-		Reference _source = source.evaluate(s, m);
-		if (_source == null)
-			return null;
-		return new Instance<T>(new ReoConnectorAtom<T>(name, _atom, _source), new HashSet<>());
+	public Instance evaluate(Scope s, Monitor m) {
+		List<Atom> _atoms = new ArrayList<>();
+		Map<Port, Port> links = new HashMap<>();
+		for (Atom x : this.atoms) {
+			Atom y = x.evaluate(s, m);
+			_atoms.add(y);
+			for (Port p : y.getInterface())
+				links.put(p, p);
+		}
+		return new Instance(new ReoConnectorAtom(name, _atoms, links), new HashSet<>());
 	}
 
 	/**
@@ -99,17 +85,13 @@ public final class SetAtom<T extends Interpretable<T>> implements SetExpression<
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("{\n  <source>\n  <atom>\n}");
-		if (atom != null)
-			st.add("atom", atom);
-		st.add("source", source);
+		ST st = new ST("{\n  <atoms;separator=\"\n\">\n}");
+		st.add("atoms", atoms);
 		return st.render();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.sets.SetExpression#canEvaluate(java.util.Set)
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean canEvaluate(Set<Identifier> deps) {

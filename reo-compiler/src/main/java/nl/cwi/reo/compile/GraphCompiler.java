@@ -1,7 +1,6 @@
 package nl.cwi.reo.compile;
 
 import nl.cwi.reo.interpret.ReoProgram;
-import nl.cwi.reo.semantics.prautomata.PRAutomaton;
 
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
@@ -19,7 +18,7 @@ public class GraphCompiler {
 	 * @param program
 	 *            Reo program
 	 */
-	public static void visualize(ReoProgram<PRAutomaton> program) {
+	public static void visualize(ReoProgram program) {
 		Graph graph = new SingleGraph("Tutorial 1");
 		graph.addNode("A");
 		graph.addNode("B");

@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret.connectors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,8 +14,7 @@ import java.util.TreeSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 
-import nl.cwi.reo.interpret.Interpretable;
-import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
@@ -28,11 +28,8 @@ import nl.cwi.reo.util.Monitor;
  * 
  * <p>
  * This class is immutable.
- * 
- * @param <T>
- *            semantics object type
  */
-public final class ReoConnectorComposite<T extends Interpretable<T>> implements ReoConnector<T> {
+public final class ReoConnectorComposite implements ReoConnector {
 
 	/**
 	 * Component name.
@@ -44,7 +41,7 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	private final String operator;
 
 	/** List of components. */
-	private final List<ReoConnector<T>> components;
+	private final List<ReoConnector> components;
 
 	/** Set of links. */
 	private final Map<Port, Port> links;
@@ -55,7 +52,7 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	public ReoConnectorComposite() {
 		this.name = null;
 		this.operator = "";
-		this.components = Collections.unmodifiableList(new ArrayList<ReoConnector<T>>());
+		this.components = Collections.unmodifiableList(new ArrayList<ReoConnector>());
 		this.links = Collections.unmodifiableMap(new HashMap<Port, Port>());
 	}
 
@@ -69,12 +66,12 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	 * @param components
 	 *            list of subcomponents
 	 */
-	public ReoConnectorComposite(@Nullable String name, String operator, List<ReoConnector<T>> components) {
+	public ReoConnectorComposite(@Nullable String name, String operator, List<ReoConnector> components) {
 		this.name = name;
 		this.operator = operator;
 		this.components = Collections.unmodifiableList(components);
 		Map<Port, Port> links = new HashMap<Port, Port>();
-		for (ReoConnector<T> C : components)
+		for (ReoConnector C : components)
 			for (Map.Entry<Port, Port> link : C.getLinks().entrySet())
 				links.put(link.getValue(), link.getValue());
 		this.links = Collections.unmodifiableMap(links);
@@ -92,10 +89,10 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	 * @param links
 	 *            set of links mapping local ports to global ports
 	 */
-	public ReoConnectorComposite(@Nullable String name, String operator, List<ReoConnector<T>> components,
+	public ReoConnectorComposite(@Nullable String name, String operator, List<ReoConnector> components,
 			Map<Port, Port> links) {
 		this.name = name;
-		for (ReoConnector<T> X : components)
+		for (ReoConnector X : components)
 			for (Port p : X.getInterface())
 				if (!links.containsKey(p))
 					throw new IllegalArgumentException("Port " + p + " must be linked.");
@@ -115,11 +112,10 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	 *            list of subcomponents
 	 * @return Composite Reo connector
 	 */
-	public static <T extends Interpretable<T>> ReoConnectorComposite<T> compose(String operator,
-			List<ReoConnector<T>> components) {
+	public static ReoConnectorComposite compose(String operator, List<ReoConnector> components) {
 		int i = 1;
-		List<ReoConnector<T>> comps = new ArrayList<ReoConnector<T>>();
-		for (ReoConnector<T> C : components) {
+		List<ReoConnector> comps = new ArrayList<>();
+		for (ReoConnector C : components) {
 			Map<Port, Port> r = new HashMap<Port, Port>();
 			for (Map.Entry<Port, Port> link : C.getLinks().entrySet()) {
 				Port p = link.getValue();
@@ -127,7 +123,7 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 			}
 			comps.add(C.rename(r));
 		}
-		return new ReoConnectorComposite<T>(null, operator, comps);
+		return new ReoConnectorComposite(null, operator, comps);
 	}
 
 	/**
@@ -154,7 +150,7 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	 * 
 	 * @return list of subconnectors.
 	 */
-	public List<ReoConnector<T>> getComponents() {
+	public List<ReoConnector> getComponents() {
 		return components;
 	}
 
@@ -162,11 +158,11 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<ReoConnectorAtom<T>> getAtoms() {
-		List<ReoConnectorAtom<T>> atoms = new ArrayList<ReoConnectorAtom<T>>();
-		for (ReoConnector<T> c : components)
-			if (c instanceof ReoConnectorAtom<?>)
-				atoms.add((ReoConnectorAtom<T>) c);
+	public List<ReoConnectorAtom> getAtoms() {
+		List<ReoConnectorAtom> atoms = new ArrayList<ReoConnectorAtom>();
+		for (ReoConnector c : components)
+			if (c instanceof ReoConnectorAtom)
+				atoms.add((ReoConnectorAtom) c);
 			else
 				atoms.addAll(c.getAtoms());
 		return atoms;
@@ -180,60 +176,60 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 		return links;
 	}
 
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public ReoConnectorComposite evaluate(Scope s, Monitor m) {
+//		List<ReoConnector> newcomps = new ArrayList<>();
+//		for (ReoConnector comp : components) {
+//			ReoConnector e = comp.evaluate(s, m);
+//			if (e != null)
+//				newcomps.add(e);
+//		}
+//		return new ReoConnectorComposite(name, operator, newcomps);
+//	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnectorComposite<T> evaluate(Scope s, Monitor m) {
-		List<ReoConnector<T>> newcomps = new ArrayList<ReoConnector<T>>();
-		for (ReoConnector<T> comp : components) {
-			ReoConnector<T> e = comp.evaluate(s, m);
-			if (e != null)
-				newcomps.add(e);
-		}
-		return new ReoConnectorComposite<T>(name, operator, newcomps);
+	public ReoConnectorComposite rename(Map<Port, Port> joins) {
+		return new ReoConnectorComposite(name, operator, components, Links.rename(links, joins));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnectorComposite<T> rename(Map<Port, Port> joins) {
-		return new ReoConnectorComposite<T>(name, operator, components, Links.rename(links, joins));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ReoConnectorComposite<T> flatten() {
-		List<ReoConnector<T>> list = new ArrayList<ReoConnector<T>>();
-		for (ReoConnector<T> comp : components) {
-			ReoConnector<T> rc = comp.rename(links).flatten();
-			if (rc instanceof ReoConnectorComposite<?>)
-				list.addAll(((ReoConnectorComposite<T>) rc).components);
+	public ReoConnectorComposite flatten() {
+		List<ReoConnector> list = new ArrayList<>();
+		for (ReoConnector comp : components) {
+			ReoConnector rc = comp.rename(links).flatten();
+			if (rc instanceof ReoConnectorComposite)
+				list.addAll(((ReoConnectorComposite) rc).components);
 			else
 				list.add(rc);
 		}
 		Map<Port, Port> links = new HashMap<Port, Port>();
-		for (ReoConnector<T> X : list)
+		for (ReoConnector X : list)
 			for (Port p : X.getInterface())
 				links.put(p, p);
-		return new ReoConnectorComposite<T>(name, "", list, links);
+		return new ReoConnectorComposite(name, "", list, links);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnectorComposite<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory) {
+	public ReoConnectorComposite insertNodes(boolean mergers, boolean replicators, Atom nodeFactory) {
 
-		List<ReoConnector<T>> newcomponents = new ArrayList<ReoConnector<T>>();
+		List<ReoConnector> newcomponents = new ArrayList<ReoConnector>();
 
 		// Count the number of incoming and outgoing channel ends at each node.
 		Map<Port, Integer> outs = new HashMap<Port, Integer>();
 		Map<Port, Integer> ins = new HashMap<Port, Integer>();
-		for (ReoConnector<T> comp : components) {
+		for (ReoConnector comp : components) {
 			for (Map.Entry<Port, Port> link : comp.getLinks().entrySet()) {
 				Port p = link.getValue();
 				Integer out = outs.get(p);
@@ -256,7 +252,7 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 		// Split shared ports in every atom in main, and insert a node
 		Map<Port, SortedSet<Port>> nodes = new HashMap<Port, SortedSet<Port>>();
 
-		for (ReoConnector<T> comp : components) {
+		for (ReoConnector comp : components) {
 
 			Map<Port, Port> links = new HashMap<Port, Port>();
 
@@ -306,22 +302,28 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 		}
 
 		// Insert new instances of nodes in this list.
-		for (Map.Entry<Port, SortedSet<Port>> node : nodes.entrySet())
-			if (node.getValue().size() > 1)
-				newcomponents.add(new ReoConnectorAtom<T>(nodeFactory.getNode(node.getValue())));
+		for (Map.Entry<Port, SortedSet<Port>> node : nodes.entrySet()) {
+			if (node.getValue().size() > 1) {
+				Atom atomnode = nodeFactory.getNode(node.getValue());
+				Map<Port, Port> links = new HashMap<Port, Port>();
+				for (Port p : atomnode.getInterface()) 
+					links.put(p, p);				
+				newcomponents.add(new ReoConnectorAtom("node", Arrays.asList(atomnode), links));
+			}
+		}
 
-		return new ReoConnectorComposite<T>(name, operator, newcomponents);
+		return new ReoConnectorComposite(name, operator, newcomponents);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnector<T> integrate() {
-		List<ReoConnector<T>> list = new ArrayList<ReoConnector<T>>();
-		for (ReoConnector<T> comp : components)
+	public ReoConnector integrate() {
+		List<ReoConnector> list = new ArrayList<>();
+		for (ReoConnector comp : components)
 			list.add(comp.integrate());
-		return new ReoConnectorComposite<T>(name, operator, list, links);
+		return new ReoConnectorComposite(name, operator, list, links);
 	}
 
 	/**
@@ -364,7 +366,7 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	 */
 	@Override
 	@Nullable
-	public ReoConnector<T> propagate(Monitor m) {
+	public ReoConnector propagate(Monitor m) {
 
 		Map<Port, Port> r = new HashMap<Port, Port>();
 
@@ -384,7 +386,7 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 				r.put(p, p.setTag(tag));
 		}
 
-		return new ReoConnectorComposite<T>(name, operator, components, Links.rename(links, r));
+		return new ReoConnectorComposite(name, operator, components, Links.rename(links, r));
 	}
 
 	/**
@@ -394,7 +396,7 @@ public final class ReoConnectorComposite<T extends Interpretable<T>> implements 
 	public Set<Set<Port>> getTypePartition() {
 		Set<Set<Port>> partition = new HashSet<Set<Port>>();
 
-		for (ReoConnector<T> c : components) {
+		for (ReoConnector c : components) {
 			Set<Set<Port>> c_partition = c.getTypePartition();
 			for (Set<Port> c_part : c_partition) {
 				Set<Port> newpart = new HashSet<Port>();

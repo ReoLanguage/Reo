@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/nl.cwi.reo.treo.sdk_0.0.0.jar" id="nl.cwi.reo.treo.sdk" version="0.0.0">
+      <category name="nl.cwi.reo.treo"/>
+   </feature>
+   <category-def name="nl.cwi.reo.treo" label="Treo"/>
+</site>

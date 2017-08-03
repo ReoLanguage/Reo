@@ -8,12 +8,11 @@ import java.util.Map;
 import java.util.Set;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
-import nl.cwi.reo.interpret.ReoParser.Rba_trContext;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.RbaContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_boolContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_trueContext;
-import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.ReoParser.Rba_falseContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_conjunctionContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_decimalContext;
@@ -50,25 +49,25 @@ import nl.cwi.reo.util.Monitor;
 /**
  * The Class ListenerRBA.
  */
-public class ListenerRBA extends Listener<ConstraintHypergraph> {
+public class ListenerRBA extends BaseListener {
 
 	/** The automaton. */
-	private ParseTreeProperty<ConstraintHypergraph> automaton = new ParseTreeProperty<>();
+	protected ParseTreeProperty<ConstraintHypergraph> automaton = new ParseTreeProperty<>();
 
 	/** The rba formula. */
-	private ParseTreeProperty<Formula> rba_formula = new ParseTreeProperty<>();
+	protected ParseTreeProperty<Formula> rba_formula = new ParseTreeProperty<>();
 
 	/** The term. */
-	private ParseTreeProperty<Term> term = new ParseTreeProperty<>();
+	protected ParseTreeProperty<Term> term = new ParseTreeProperty<>();
 
 	/** The rules. */
-	private ParseTreeProperty<Rule> rules = new ParseTreeProperty<>();
+	protected ParseTreeProperty<Rule> rules = new ParseTreeProperty<>();
 
 	/** The map ports. */
-	private Map<Port, Boolean> mapPorts = new HashMap<>();
+	protected Map<Port, Boolean> mapPorts = new HashMap<>();
 
 	/** The initial. */
-	private Map<MemoryVariable, Term> initial = new HashMap<>();
+	protected Map<MemoryVariable, Term> initial = new HashMap<>();
 
 	/**
 	 * Instantiates a new listener RBA.
@@ -86,6 +85,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitAtom(nl.cwi.reo.interpret.
 	 * ReoParser.AtomContext)
 	 */
+	@Override
 	public void exitAtom(AtomContext ctx) {
 		atoms.put(ctx, automaton.get(ctx.rba()));
 	}
@@ -96,14 +96,11 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#enterAtom(nl.cwi.reo.interpret.
 	 * ReoParser.AtomContext)
 	 */
+	@Override
 	public void enterAtom(AtomContext ctx) {
 		initial = new HashMap<>();
 		mapPorts = new HashMap<>();
 	}
-
-	/*
-	 * Rule Based Automaton:
-	 */
 
 	/*
 	 * (non-Javadoc)
@@ -111,6 +108,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba(nl.cwi.reo.interpret.
 	 * ReoParser.RbaContext)
 	 */
+	@Override
 	public void exitRba(RbaContext ctx) {
 		Set<Rule> s = new HashSet<Rule>();
 		for (Rba_ruleContext rbaContext : ctx.rba_rule()) {
@@ -120,36 +118,13 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	}
 
 	/*
-	 * State based rule :
-	 */
-
-	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_tr(nl.cwi.reo.interpret.
-	 * ReoParser.Rba_trContext)
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterRba_rule(nl.cwi.reo.interpret.
+	 * ReoParser.Rba_ruleContext)
 	 */
-	public void exitRba_tr(Rba_trContext ctx) {
-		// Rule r = rules.get(ctx.rba_rule());
-		// rules.put(ctx, new Rule(r.getSync(), new
-		// Conjunction(r.getFormula(),new Equality(new
-		// MemCell(ctx.ID(0).getText(),false),new
-		// MemCell(ctx.ID(0).getText(),true)));
-		// State q1 = new State(ctx.ID(0).getText());
-		// State q2 = new State(ctx.ID(1).getText());
-		// SortedSet<Port> sc = scs.get(ctx.pa_sc());
-		// transitions.put(ctx, new Transition<NullLabel>(q1, q2, sc, new
-		// NullLabel()));
-	}
-
-	/**
-	 * Rules.
-	 *
-	 * @param ctx
-	 *            the ctx
-	 */
-
+	@Override
 	public void enterRba_rule(Rba_ruleContext ctx) {
 		mapPorts = new HashMap<>();
 	}
@@ -176,13 +151,13 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 		initial.put(new MemoryVariable(ctx.ID().getText(), false), term.get(ctx.rba_term()));
 	}
 
-	/**
-	 * Synchronisation constraints.
-	 *
-	 * @param ctx
-	 *            the ctx
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_syncFire(nl.cwi.reo.
+	 * interpret.ReoParser.Rba_syncFireContext)
 	 */
-
+	@Override
 	public void exitRba_syncFire(Rba_syncFireContext ctx) {
 		mapPorts.put(new Port(ctx.ID().getText()), true);
 	}
@@ -197,13 +172,13 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 		mapPorts.put(new Port(ctx.ID().getText()), false);
 	}
 
-	/**
-	 * Data constraints.
-	 *
-	 * @param ctx
-	 *            the ctx
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_conjunction(nl.cwi.reo.
+	 * interpret.ReoParser.Rba_conjunctionContext)
 	 */
-
+	@Override
 	public void exitRba_conjunction(Rba_conjunctionContext ctx) {
 		List<Formula> l = new ArrayList<Formula>();
 		for (Rba_formulaContext f : ctx.rba_formula())
@@ -218,6 +193,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_def(nl.cwi.reo.interpret.
 	 * ReoParser.Rba_defContext)
 	 */
+	@Override
 	public void exitRba_def(Rba_defContext ctx) {
 		rba_formula.put(ctx, rba_formula.get(ctx.rba_formula()));
 	}
@@ -228,6 +204,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_equality(nl.cwi.reo.
 	 * interpret.ReoParser.Rba_equalityContext)
 	 */
+	@Override
 	public void exitRba_equality(Rba_equalityContext ctx) {
 		rba_formula.put(ctx, new Equality(term.get(ctx.rba_term(0)), term.get(ctx.rba_term(1))));
 	}
@@ -238,6 +215,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_inequality(nl.cwi.reo.
 	 * interpret.ReoParser.Rba_inequalityContext)
 	 */
+	@Override
 	public void exitRba_inequality(Rba_inequalityContext ctx) {
 		rba_formula.put(ctx, new Negation(new Equality(term.get(ctx.rba_term(0)), term.get(ctx.rba_term(1)))));
 	}
@@ -249,6 +227,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_true(nl.cwi.reo.interpret.
 	 * ReoParser.Rba_trueContext)
 	 */
+	@Override
 	public void exitRba_true(Rba_trueContext ctx) {
 		rba_formula.put(ctx, new TruthValue(true));
 	}
@@ -264,13 +243,14 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 		rba_formula.put(ctx, new TruthValue(false));
 	}
 
-	/**
-	 * Terms.
-	 *
-	 * @param ctx
-	 *            the ctx
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_nat(nl.cwi.reo.interpret.
+	 * ReoParser.Rba_natContext)
 	 */
-
+	@Override
 	public void exitRba_nat(Rba_natContext ctx) {
 		term.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null));
 	}
@@ -282,6 +262,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_bool(nl.cwi.reo.interpret.
 	 * ReoParser.Rba_boolContext)
 	 */
+	@Override
 	public void exitRba_bool(Rba_boolContext ctx) {
 		term.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null));
 	}
@@ -293,6 +274,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_string(nl.cwi.reo.interpret.
 	 * ReoParser.Rba_stringContext)
 	 */
+	@Override
 	public void exitRba_string(Rba_stringContext ctx) {
 		term.put(ctx, new Function(ctx.getText(), ctx.getText(), null));
 	}
@@ -304,6 +286,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_decimal(nl.cwi.reo.interpret
 	 * .ReoParser.Rba_decimalContext)
 	 */
+	@Override
 	public void exitRba_decimal(Rba_decimalContext ctx) {
 		term.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null));
 	}
@@ -314,6 +297,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_function(nl.cwi.reo.
 	 * interpret.ReoParser.Rba_functionContext)
 	 */
+	@Override
 	public void exitRba_function(Rba_functionContext ctx) {
 		List<Term> args = new ArrayList<Term>();
 		for (Rba_termContext arg : ctx.rba_term()) {
@@ -328,6 +312,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_parameter(nl.cwi.reo.
 	 * interpret.ReoParser.Rba_parameterContext)
 	 */
+	@Override
 	public void exitRba_parameter(Rba_parameterContext ctx) {
 		term.put(ctx, new PortVariable(new Port(ctx.ID().getText())));
 	}
@@ -339,6 +324,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_memorycellIn(nl.cwi.reo.
 	 * interpret.ReoParser.Rba_memorycellInContext)
 	 */
+	@Override
 	public void exitRba_memorycellIn(Rba_memorycellInContext ctx) {
 		term.put(ctx, new MemoryVariable(ctx.ID().getText(), false));
 	}
@@ -350,6 +336,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_memorycellOut(nl.cwi.reo.
 	 * interpret.ReoParser.Rba_memorycellOutContext)
 	 */
+	@Override
 	public void exitRba_memorycellOut(Rba_memorycellOutContext ctx) {
 		term.put(ctx, new MemoryVariable(ctx.ID().getText(), true));
 	}
@@ -361,6 +348,7 @@ public class ListenerRBA extends Listener<ConstraintHypergraph> {
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_null(nl.cwi.reo.interpret.
 	 * ReoParser.Rba_nullContext)
 	 */
+	@Override
 	public void exitRba_null(Rba_nullContext ctx) {
 		term.put(ctx, new NullValue());
 	}

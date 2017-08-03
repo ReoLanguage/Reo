@@ -12,7 +12,6 @@ import nl.cwi.reo.interpret.ReoParser.WaContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_exprContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_invariantContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_jc_andContext;
-import nl.cwi.reo.interpret.ReoParser.Wa_jc_boolContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_jc_bracketsContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_jc_eqContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_jc_geqContext;
@@ -20,7 +19,9 @@ import nl.cwi.reo.interpret.ReoParser.Wa_jc_leqContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_jc_orContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_setContext;
 import nl.cwi.reo.interpret.ReoParser.Wa_transitionContext;
-import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_falseContext;
+import nl.cwi.reo.interpret.ReoParser.Wa_jc_trueContext;
+import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
@@ -32,7 +33,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
  * Listens to events triggered by a
  * {@link org.antlr.v4.runtime.tree.ParseTreeWalker}. 
  */
-public class ListenerWA extends Listener<WorkAutomaton> {
+public class ListenerWA extends BaseListener {
 
 	/** The workautomata. */
 	private ParseTreeProperty<WorkAutomaton> workautomata = new ParseTreeProperty<WorkAutomaton>();
@@ -351,23 +352,46 @@ public class ListenerWA extends Listener<WorkAutomaton> {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * nl.cwi.reo.interpret.ReoBaseListener#enterWa_jc_bool(nl.cwi.reo.interpret
-	 * .ReoParser.Wa_jc_boolContext)
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterWa_jc_true(nl.cwi.reo.interpret
+	 * .ReoParser.Wa_jc_trueContext)
 	 */
 	@Override
-	public void enterWa_jc_bool(Wa_jc_boolContext ctx) {
+	public void enterWa_jc_true(Wa_jc_trueContext ctx) {
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * nl.cwi.reo.interpret.ReoBaseListener#exitWa_jc_bool(nl.cwi.reo.interpret.
-	 * ReoParser.Wa_jc_boolContext)
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitWa_jc_true(nl.cwi.reo.interpret.
+	 * ReoParser.Wa_jc_trueContext)
 	 */
 	@Override
-	public void exitWa_jc_bool(Wa_jc_boolContext ctx) {
-		wa_jobconstraints.put(ctx, new JobConstraint(Boolean.parseBoolean(ctx.getText())));
+	public void exitWa_jc_true(Wa_jc_trueContext ctx) {
+		wa_jobconstraints.put(ctx, new JobConstraint(true));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterWa_jc_false(nl.cwi.reo.interpret
+	 * .ReoParser.Wa_jc_falseContext)
+	 */
+	@Override
+	public void enterWa_jc_false(Wa_jc_falseContext ctx) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitWa_jc_false(nl.cwi.reo.interpret.
+	 * ReoParser.Wa_jc_falseContext)
+	 */
+	@Override
+	public void exitWa_jc_false(Wa_jc_falseContext ctx) {
+		wa_jobconstraints.put(ctx, new JobConstraint(false));
 	}
 
 	/*

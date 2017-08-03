@@ -9,7 +9,7 @@ import nl.cwi.reo.interpret.connectors.ReoConnector;
  * @param <T>
  *            the generic type
  */
-public final class ReoProgram<T extends Interpretable<T>> {
+public final class ReoProgram {
 
 	/** The name. */
 	private final String name;
@@ -18,7 +18,7 @@ public final class ReoProgram<T extends Interpretable<T>> {
 	private final String reofile;
 
 	/** The connector. */
-	private final ReoConnector<T> connector;
+	private final ReoConnector connector;
 
 	/**
 	 * Instantiates a new reo program.
@@ -30,7 +30,7 @@ public final class ReoProgram<T extends Interpretable<T>> {
 	 * @param connector
 	 *            the connector
 	 */
-	public ReoProgram(String name, String reofile, ReoConnector<T> connector) {
+	public ReoProgram(String name, String reofile, ReoConnector connector) {
 		this.name = name;
 		this.reofile = reofile;
 		this.connector = connector;
@@ -59,7 +59,7 @@ public final class ReoProgram<T extends Interpretable<T>> {
 	 *
 	 * @return the connector
 	 */
-	public ReoConnector<T> getConnector() {
+	public ReoConnector getConnector() {
 		return connector;
 	}
 }

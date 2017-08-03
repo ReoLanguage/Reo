@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import nl.cwi.reo.interpret.ReoParser.Pr_paramContext;
-import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.PrContext;
 import nl.cwi.reo.interpret.ports.Port;
@@ -20,7 +20,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * The Class ListenerPR.
  */
-public class ListenerPR extends Listener<PRAutomaton> {
+public class ListenerPR extends BaseListener {
 
 	/** The primitives. */
 	private ParseTreeProperty<PRAutomaton> primitives = new ParseTreeProperty<PRAutomaton>();

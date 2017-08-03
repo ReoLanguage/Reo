@@ -6,9 +6,9 @@ import reo.fifo1;
 main(a,b,c) { red(a) green(b) blue(c) alternator(a,b,c) }
 
 // The atomic components
-red(a!String) { Java: "Processes.Red" }
-green(a!String) { Java: "Processes.Green" }
-blue(a?String) { Java: "Processes.Blue" }
+red(a!String) { #Java "Processes.Red" }
+green(a!String) { #Java "Processes.Green" }
+blue(a?String) { #Java "Processes.Blue" }
 
 // The alternator protocol
 alternator(a,b,c) { syncdrain(a, b) sync(b, x) fifo1(x, c) sync(a, c) }

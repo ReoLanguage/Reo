@@ -26,17 +26,17 @@ chess = (){
 
 Engine1(a?String,b!String){
 	#RBA {a,b} true
-	Java:"Workers.Engine"
+	#Java "Workers.Engine"
 }
 
 Engine2(a?String,b!String){
 	#RBA {a,b} true
-	Java:"Workers.Engine"
+	#Java "Workers.Engine"
 }
 
 Display(a?String,b?String){
 	#RBA {a,b} true
-	Java:"Workers.Display"
+	#Java "Workers.Display"
 }
 
 visualize(C?String,R?String,M!String,O!String){

@@ -113,7 +113,7 @@ public class MemoryVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hadOutputs() {
+	public boolean hasOutputPorts() {
 		return false;
 	}
 

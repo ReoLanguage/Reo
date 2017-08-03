@@ -19,7 +19,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * Interpretation of a predicate variable.
  */
-public class StatementVariable implements PredicateExpression {
+public class PredicateVariable implements PredicateExpression {
 
 	/**
 	 * Variable.
@@ -32,7 +32,7 @@ public class StatementVariable implements PredicateExpression {
 	 * @param variable
 	 *            variable
 	 */
-	public StatementVariable(VariableTermExpression variable) {
+	public PredicateVariable(VariableTermExpression variable) {
 		this.variable = variable;
 	}
 

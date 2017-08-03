@@ -1,7 +1,0 @@
-section reo;
-
-syncdrain(a?, b?) {
-	#PA 
-	q0 -> q0 	: {a, b}
-}
-

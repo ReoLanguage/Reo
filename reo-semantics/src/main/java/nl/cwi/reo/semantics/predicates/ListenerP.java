@@ -32,7 +32,7 @@ import nl.cwi.reo.interpret.PParser.P_var_nextContext;
 import nl.cwi.reo.interpret.PParser.P_var_portContext;
 import nl.cwi.reo.interpret.PParser.P_variableContext;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
-import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
@@ -40,7 +40,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * The Class ListenerP.
  */
-public class ListenerP extends Listener<Predicate> implements PListener {
+public class ListenerP extends BaseListener implements PListener {
 
 	/** The predicate. */
 	private ParseTreeProperty<Predicate> predicate = new ParseTreeProperty<Predicate>();

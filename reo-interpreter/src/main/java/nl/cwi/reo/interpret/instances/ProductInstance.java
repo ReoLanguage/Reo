@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
@@ -25,7 +24,7 @@ import nl.cwi.reo.util.Monitor;
  * @param <T>
  *            the generic type
  */
-public final class ProductInstance<T extends Interpretable<T>> implements InstanceExpression<T> {
+public final class ProductInstance implements InstanceExpression {
 
 	/**
 	 * Composition operator name.
@@ -35,12 +34,12 @@ public final class ProductInstance<T extends Interpretable<T>> implements Instan
 	/**
 	 * First instance.
 	 */
-	private final InstanceExpression<T> first;
+	private final InstanceExpression first;
 
 	/**
 	 * Second instance.
 	 */
-	private final InstanceExpression<T> second;
+	private final InstanceExpression second;
 
 	/**
 	 * Location of this instance in Reo source file.
@@ -59,7 +58,7 @@ public final class ProductInstance<T extends Interpretable<T>> implements Instan
 	 * @param location
 	 *            the location
 	 */
-	public ProductInstance(TermExpression operator, InstanceExpression<T> first, InstanceExpression<T> second,
+	public ProductInstance(TermExpression operator, InstanceExpression first, InstanceExpression second,
 			Location location) {
 		this.operator = operator;
 		this.first = first;
@@ -72,7 +71,7 @@ public final class ProductInstance<T extends Interpretable<T>> implements Instan
 	 */
 	@Override
 	@Nullable
-	public Instance<T> evaluate(Scope s, Monitor m) {
+	public Instance evaluate(Scope s, Monitor m) {
 
 		List<Term> t = this.operator.evaluate(s, m);
 		if (t == null || t.isEmpty() || !(t.get(0) instanceof StringValue)) {
@@ -81,18 +80,18 @@ public final class ProductInstance<T extends Interpretable<T>> implements Instan
 		}
 
 		String operator = ((StringValue) t.get(0)).getValue();
-		Instance<T> i1 = first.evaluate(s, m);
-		Instance<T> i2 = second.evaluate(s, m);
+		Instance i1 = first.evaluate(s, m);
+		Instance i2 = second.evaluate(s, m);
 
 		if (i1 == null || i2 == null)
 			return null;
 
-		List<ReoConnector<T>> components = Arrays.asList(i1.getConnector(), i2.getConnector());
-		ReoConnector<T> connector = new ReoConnectorComposite<T>(null, operator, components);
+		List<ReoConnector> components = Arrays.asList(i1.getConnector(), i2.getConnector());
+		ReoConnector connector = new ReoConnectorComposite(null, operator, components);
 		Set<Set<Identifier>> unifications = new HashSet<Set<Identifier>>(i1.getUnifications());
 		unifications.addAll(i1.getUnifications());
 
-		return new Instance<T>(connector, unifications);
+		return new Instance(connector, unifications);
 	}
 
 	/**

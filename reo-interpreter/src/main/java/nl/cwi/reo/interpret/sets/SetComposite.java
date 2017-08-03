@@ -8,7 +8,6 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorComposite;
@@ -28,10 +27,10 @@ import nl.cwi.reo.util.Monitor;
 /**
  * Interpretation of a set of constraints.
  * 
- * @param <T>
+ * @param 
  *            Reo semantics type
  */
-public final class SetComposite<T extends Interpretable<T>> implements SetExpression<T> {
+public final class SetComposite implements SetExpression {
 
 	/**
 	 * Component name.
@@ -47,7 +46,7 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 	/**
 	 * Elements of this set.
 	 */
-	private List<InstanceExpression<T>> elements;
+	private List<InstanceExpression> elements;
 
 	/**
 	 * Predicate of this set.
@@ -66,7 +65,7 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 	public SetComposite() {
 		this.name = null;
 		this.operator = new StringValue("");
-		this.elements = new ArrayList<InstanceExpression<T>>();
+		this.elements = new ArrayList<InstanceExpression>();
 		this.predicate = new TruthValue(true);
 		this.location = null;
 	}
@@ -85,7 +84,7 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 	 * @param location
 	 *            location in Reo source file
 	 */
-	public SetComposite(@Nullable String name, TermExpression operator, List<InstanceExpression<T>> elements,
+	public SetComposite(@Nullable String name, TermExpression operator, List<InstanceExpression> elements,
 			PredicateExpression predicate, @Nullable Location location) {
 		if (operator == null || elements == null || predicate == null)
 			throw new NullPointerException();
@@ -109,7 +108,7 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 	 */
 	@Override
 	@Nullable
-	public Instance<T> evaluate(Scope s, Monitor m) {
+	public Instance evaluate(Scope s, Monitor m) {
 
 		List<Term> t = this.operator.evaluate(s, m);
 		if (t == null || t.isEmpty() || !(t.get(0) instanceof StringValue)) {
@@ -118,7 +117,7 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 		}
 
 		String operator = ((StringValue) t.get(0)).getValue();
-		List<ReoConnector<T>> components = new ArrayList<ReoConnector<T>>();
+		List<ReoConnector> components = new ArrayList<ReoConnector>();
 		Set<Set<Identifier>> unifications = new HashSet<Set<Identifier>>();
 
 		List<Scope> scopes = predicate.evaluate(s, m);
@@ -126,8 +125,8 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 			return null;
 
 		for (Scope si : scopes) {
-			for (InstanceExpression<T> e : elements) {
-				Instance<T> i = e.evaluate(si, m);
+			for (InstanceExpression e : elements) {
+				Instance i = e.evaluate(si, m);
 				if (i != null) {
 					components.add(i.getConnector());
 					unifications.addAll(i.getUnifications());
@@ -137,7 +136,7 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 
 		simplify(unifications);
 
-		return new Instance<T>(ReoConnectorComposite.compose(operator, components), unifications);
+		return new Instance(ReoConnectorComposite.compose(operator, components), unifications);
 	}
 
 	/**
@@ -163,7 +162,7 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 	@Override
 	public Set<Identifier> getVariables() {
 		Set<Identifier> vars = new HashSet<Identifier>();
-		for (InstanceExpression<T> I : elements)
+		for (InstanceExpression I : elements)
 			vars.addAll(I.getVariables());
 		if (predicate instanceof Relation) {
 			for (Identifier i : ((Relation) predicate).getLocalVariables())
@@ -188,7 +187,9 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 		ST st = new ST("<operator>{\n  <elements; separator=\"\n\">\n<if(predicate)>|\n  <predicate>\n<endif>}");
 		st.add("operator", operator);
 		st.add("elements", elements);
-		if (!(predicate instanceof TruthValue) && !((TruthValue) predicate).equals(new TruthValue(true)))
+		if (predicate instanceof TruthValue && ((TruthValue) predicate).equals(new TruthValue(true)))
+			st.add("predicate", null);
+		else
 			st.add("predicate", predicate);
 		return st.render();
 	}
@@ -201,7 +202,7 @@ public final class SetComposite<T extends Interpretable<T>> implements SetExpres
 	@Override
 	public boolean canEvaluate(Set<Identifier> deps) {
 		Set<Identifier> vars = new HashSet<>();
-		for (InstanceExpression<T> I : elements) {
+		for (InstanceExpression I : elements) {
 			Set<Identifier> varsI = I.getVariables();
 			if (varsI != null)
 				vars.addAll(varsI);

@@ -13,12 +13,13 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
+import nl.cwi.reo.semantics.predicates.NullValue;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.TruthValue;
 import nl.cwi.reo.semantics.predicates.Variable;
 
 // TODO: Auto-generated Javadoc
@@ -28,10 +29,10 @@ import nl.cwi.reo.semantics.predicates.Variable;
 public class RBACompiler {
 
 	/**
-	 * Commandify.
+	 * Commandifies the formula.
 	 *
 	 * @param g
-	 *            the g
+	 *            the formula
 	 * @return the transition
 	 */
 	public static Transition commandify(Formula g) {
@@ -60,109 +61,96 @@ public class RBACompiler {
 		}
 		literalsToRemove.clear();
 
-		// Build set of input ports and known variables (memory cell without
-		// prime and input ports)
-		Set<Variable> doneVariables = new HashSet<Variable>();
+		// The set of variables in the formula whose value is known.
+		Set<Variable> knownVariables = new HashSet<Variable>();
+
 		Set<Port> allInputPorts = new HashSet<Port>();
 
+		// Add all input port variables and current memory cell variables to the
+		// set of known variables.
 		for (Variable v : g.getFreeVariables()) {
 			if (v instanceof PortVariable && ((PortVariable) v).isInput()) {
 				allInputPorts.add(((PortVariable) v).getPort());
-				doneVariables.add(v);
+				knownVariables.add(v);
 			}
 			if (v instanceof MemoryVariable && !((MemoryVariable) v).hasPrime())
-				doneVariables.add(v);
+				knownVariables.add(v);
 		}
 
-		Map<Variable, Term> assignements = new LinkedHashMap<Variable, Term>();
+		Map<Variable, Term> assignements = new LinkedHashMap<>();
 		List<Formula> guards = new ArrayList<Formula>();
 
 		int nDoneVariables = -1;
-		while (nDoneVariables < doneVariables.size()) {
-			nDoneVariables = doneVariables.size();
+		while (nDoneVariables < knownVariables.size()) {
+			nDoneVariables = knownVariables.size();
 			for (Formula l : literals) {
-
 				if (l instanceof Equality) {
+
+					// If the literal is an equality, then we may learn the
+					// value of a different variable.
 					Equality equality = (Equality) l;
 					Term t1 = equality.getLHS();
 					Term t2 = equality.getRHS();
 
-					if (t1 instanceof Variable && doneVariables.containsAll(t2.getFreeVariables())) {
-						if (!(t2 instanceof Function
-								&& (((Function) t2).getName() == "*" || ((Function) t2).getValue() == null))) {
-							assignements.put((Variable) t1, t2);
-							literalsToRemove.add(l);
-							doneVariables.add((Variable) t1);
-							continue;
-						} else {
+					if (t1 instanceof Variable && knownVariables.containsAll(t2.getFreeVariables())) {
+						if (t2 instanceof NullValue) {
 							if ((t1 instanceof MemoryVariable && ((MemoryVariable) t1).hasPrime())) {
 								assignements.put((Variable) t1, t2);
 								literalsToRemove.add(l);
-								doneVariables.add((Variable) t1);
+								knownVariables.add((Variable) t1);
 							}
 							if ((t1 instanceof MemoryVariable && !((MemoryVariable) t1).hasPrime())) {
 								guards.add(l);
 								literalsToRemove.add(l);
 							}
-							if ((t1 instanceof PortVariable)) {// &&
-																// !((Node)t1).getPort().isInput()))
-																// {
+							if ((t1 instanceof PortVariable)) {
 								if (allInputPorts.contains(((PortVariable) t1).getPort()))
 									allInputPorts.remove(((PortVariable) t1).getPort());
 								guards.add(l);
 								literalsToRemove.add(l);
 							}
 							continue;
+						} else {
+							assignements.put((Variable) t1, t2);
+							literalsToRemove.add(l);
+							knownVariables.add((Variable) t1);
+							continue;
 						}
 
-					}
-					if (t2 instanceof Variable && doneVariables.containsAll(t1.getFreeVariables())) {
-						if (!(t1 instanceof Function
-								&& (((Function) t1).getName() == "*" || ((Function) t1).getValue() == null))) {
-							assignements.put((Variable) t2, t1);
-							literalsToRemove.add(l);
-							doneVariables.add((Variable) t2);
-							continue;
-						} else {
+					} else if (t2 instanceof Variable && knownVariables.containsAll(t1.getFreeVariables())) {
+						if (t1 instanceof NullValue) {
 							if ((t2 instanceof MemoryVariable && ((MemoryVariable) t2).hasPrime())) {
 								assignements.put((Variable) t2, t1);
 								literalsToRemove.add(l);
-								doneVariables.add((Variable) t2);
+								knownVariables.add((Variable) t2);
 							}
 							if (t2 instanceof MemoryVariable && !((MemoryVariable) t2).hasPrime()) {
 								guards.add(l);
 								literalsToRemove.add(l);
 							}
 							continue;
+						} else {
+							assignements.put((Variable) t2, t1);
+							literalsToRemove.add(l);
+							knownVariables.add((Variable) t2);
+							continue;
 						}
 					}
-				}
-
-				/*
-				 * Add a guarded command
-				 */
-
-				if (l instanceof Negation && ((Negation) l).getFormula() instanceof Equality) {
+				} else if (l instanceof Negation && ((Negation) l).getFormula() instanceof Equality) {
 					Equality equality = (Equality) ((Negation) l).getFormula();
 					Term t1 = equality.getLHS();
 					Term t2 = equality.getRHS();
-					if (t1 instanceof Variable && doneVariables.containsAll(t2.getFreeVariables())) {
-						if ((t2 instanceof Function
-								&& (((Function) t2).getName() == "*" || ((Function) t2).getValue() == null))) {
+					if (t1 instanceof Variable && knownVariables.containsAll(t2.getFreeVariables())) {
+						if (t2 instanceof NullValue) {
 							if (t1 instanceof MemoryVariable && !((MemoryVariable) t1).hasPrime()) {
 								guards.add(l);
 								literalsToRemove.add(l);
 							}
-							// if (t1 instanceof Node) {
-							// guards.add(l);
-							// literalsToRemove.add(l);
-							// }
 							continue;
 						}
 					}
-					if (t2 instanceof Variable && doneVariables.containsAll(t1.getFreeVariables())) {
-						if ((t1 instanceof Function
-								&& (((Function) t1).getName() == "*" || ((Function) t1).getValue() == null))) {
+					if (t2 instanceof Variable && knownVariables.containsAll(t1.getFreeVariables())) {
+						if (t1 instanceof NullValue) {
 							if (t2 instanceof MemoryVariable && !((MemoryVariable) t2).hasPrime()) {
 								guards.add(l);
 								literalsToRemove.add(l);
@@ -172,14 +160,14 @@ public class RBACompiler {
 					}
 				}
 
-				if (doneVariables.containsAll(l.getFreeVariables())) {
+				if (knownVariables.containsAll(l.getFreeVariables())) {
 					guards.add(l);
 					literalsToRemove.add(l);
 				}
 			}
-			for (Formula l : literalsToRemove) {
+
+			for (Formula l : literalsToRemove)
 				literals.remove(l);
-			}
 			literalsToRemove.clear();
 
 		}
@@ -193,7 +181,7 @@ public class RBACompiler {
 		guards = list;
 		switch (guards.size()) {
 		case 0:
-			guard = new Relation("true", "true", null);
+			guard = new TruthValue(true);
 			break;
 		case 1:
 			guard = guards.get(0);
@@ -230,11 +218,9 @@ public class RBACompiler {
 		for (PortVariable n : output.keySet()) {
 			Set<Variable> s = output.get(n).getFreeVariables();
 			for (Variable v : s) {
-				if (output.containsKey(v)) {
+				if (output.containsKey(v))
 					output_substitution.put(n, output.get(n).substitute(output.get(v), v));
-				}
-				if (memory.containsKey(v)
-						&& !(memory.get(v) instanceof Function && ((Function) memory.get(v)).getName().equals("*")))
+				if (memory.containsKey(v) && !(memory.get(v) instanceof NullValue))
 					output_substitution.put(n, output.get(n).substitute(memory.get(v), v));
 			}
 		}
@@ -243,18 +229,12 @@ public class RBACompiler {
 		for (MemoryVariable m : memory.keySet()) {
 			Set<Variable> s = memory.get(m).getFreeVariables();
 			for (Variable v : s) {
-				if (output_substitution.containsKey(v)) {
+				if (output_substitution.containsKey(v))
 					mem_substitution.put(m, memory.get(m).substitute(output_substitution.get(v), v));
-				}
-				if (memory.containsKey(v)
-						&& !(memory.get(v) instanceof Function && ((Function) memory.get(v)).getName().equals("*")))
+				if (memory.containsKey(v) && !(memory.get(v) instanceof NullValue))
 					mem_substitution.put(m, memory.get(v).substitute(memory.get(v), v));
 			}
-			// if(!mem_substitution.containsKey(m))
-			// if(mem_substitution.get(m)!=null)
-			// mem_substitution.put(m, memory.get(m));
 		}
-		// mem_substitution.putAll(null_mem);
 		return new Transition(guard, output_substitution, mem_substitution, allInputPorts);
 	}
 
@@ -269,7 +249,7 @@ public class RBACompiler {
 		Map<Variable, Term> assign = new LinkedHashMap<Variable, Term>();
 		List<Variable> var = new ArrayList<Variable>();
 		for (Variable v : assignements.keySet()) {
-			if (assignements.get(v) instanceof Function && ((Function) assignements.get(v)).getValue().equals("null")) {
+			if (assignements.get(v) instanceof NullValue) {
 				var.add(var.size(), v);
 			} else
 				var.add(0, v);

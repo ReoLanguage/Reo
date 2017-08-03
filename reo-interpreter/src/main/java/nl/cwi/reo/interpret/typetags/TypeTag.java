@@ -29,8 +29,6 @@ public final class TypeTag implements ParameterType {
 	 *            the tag
 	 */
 	public TypeTag(String tag) {
-		if (tag == null)
-			throw new NullPointerException();
 		this.tag = tag;
 	}
 

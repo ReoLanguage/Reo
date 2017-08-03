@@ -19,7 +19,7 @@ public interface Term {
 	 * 
 	 * @return true if this term contains an outpout port variable.
 	 */
-	public boolean hadOutputs();
+	public boolean hasOutputPorts();
 
 	/**
 	 * Renames the port variables in this term.

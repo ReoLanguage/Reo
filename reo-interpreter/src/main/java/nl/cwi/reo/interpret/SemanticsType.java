@@ -1,10 +1,14 @@
 package nl.cwi.reo.interpret;
 
-// TODO: Auto-generated Javadoc
 /**
  * Enumerates all implemented semantics for Reo.
  */
 public enum SemanticsType {
+
+	/**
+	 * Reference to component defined in the target language.
+	 */
+	REF,
 
 	/**
 	 * Constraint automata with memory.

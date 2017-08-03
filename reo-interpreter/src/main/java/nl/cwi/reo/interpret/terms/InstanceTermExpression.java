@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.instances.InstanceExpression;
@@ -17,15 +16,15 @@ import nl.cwi.reo.util.Monitor;
 /**
  * Interpretation of an instance as a term.
  * 
- * @param <T>
+ * @param 
  *            Reo semantics type
  */
-public class InstanceTermExpression<T extends Interpretable<T>> implements TermExpression {
+public class InstanceTermExpression implements TermExpression {
 
 	/**
 	 * Component instance.
 	 */
-	private InstanceExpression<T> instance;
+	private InstanceExpression instance;
 
 	/**
 	 * Constructs a new component instance term.
@@ -33,7 +32,7 @@ public class InstanceTermExpression<T extends Interpretable<T>> implements TermE
 	 * @param instance
 	 *            component instance
 	 */
-	public InstanceTermExpression(InstanceExpression<T> instance) {
+	public InstanceTermExpression(InstanceExpression instance) {
 		this.instance = instance;
 	}
 
@@ -43,7 +42,7 @@ public class InstanceTermExpression<T extends Interpretable<T>> implements TermE
 	@Override
 	@Nullable
 	public List<Term> evaluate(Scope s, Monitor m) {
-		Instance<T> inst = this.instance.evaluate(s, m);
+		Instance inst = this.instance.evaluate(s, m);
 		if (inst == null)
 			return null;
 		return Arrays.asList(inst);

@@ -36,7 +36,7 @@ public class Function implements Term {
 	 * Value of this function or reference to its implementation.
 	 */
 	@Nullable
-	private Object value;
+	protected Object value;
 
 	/**
 	 * List of arguments of this function.
@@ -108,7 +108,7 @@ public class Function implements Term {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hadOutputs() {
+	public boolean hasOutputPorts() {
 		// TODO Auto-generated method stub
 		return false;
 	}

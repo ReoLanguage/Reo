@@ -4,7 +4,6 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.sets.SetExpression;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
@@ -13,11 +12,8 @@ import nl.cwi.reo.util.Monitor;
 
 /**
  * Interpretation of an atomic component definition.
- * 
- * @param <T>
- *            Reo semantics type
  */
-public final class ComponentDefinition<T extends Interpretable<T>> implements ComponentExpression<T> {
+public final class ComponentDefinition implements ComponentExpression {
 
 	/**
 	 * Parameters and nodes of this component definition.
@@ -27,7 +23,7 @@ public final class ComponentDefinition<T extends Interpretable<T>> implements Co
 	/**
 	 * Set of this component definition.
 	 */
-	private final SetExpression<T> set;
+	private final SetExpression set;
 
 	/**
 	 * Constructs a new component definition.
@@ -37,7 +33,7 @@ public final class ComponentDefinition<T extends Interpretable<T>> implements Co
 	 * @param set
 	 *            composite definition.
 	 */
-	public ComponentDefinition(SignatureExpression sign, SetExpression<T> set) {
+	public ComponentDefinition(SignatureExpression sign, SetExpression set) {
 		this.sign = sign;
 		this.set = set;
 	}
@@ -47,11 +43,11 @@ public final class ComponentDefinition<T extends Interpretable<T>> implements Co
 	 */
 	@Override
 	@Nullable
-	public Component<T> evaluate(Scope s, Monitor m) {
+	public Component evaluate(Scope s, Monitor m) {
 		Set<Identifier> deps = s.getKeys();
 		deps.addAll(sign.getParams());
 		if (set.canEvaluate(deps))
-			return new Component<T>(s, sign, set);
+			return new Component(s, sign, set);
 		return null;
 	}
 

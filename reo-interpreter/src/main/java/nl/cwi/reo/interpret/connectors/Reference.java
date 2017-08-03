@@ -1,12 +1,17 @@
 package nl.cwi.reo.interpret.connectors;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Expression;
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
+import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
@@ -16,42 +21,29 @@ import nl.cwi.reo.util.Monitor;
 /**
  * Reference to an atomic component that is specified in a different language.
  */
-public final class Reference implements Expression<Reference> {
+public final class Reference implements Atom {
 
-	/** The ref. */
-	@Nullable
+	/** The reference */
 	private final String ref;
 
-	/** The lang. */
-	@Nullable
+	/** The target language */
 	private final Language lang;
 
-	/** The params. */
+	/** The parameters */
 	private final List<? extends VariableExpression> params;
 
-	/** The values. */
-	@Nullable
+	/** The parameter values */
 	private List<Value> values;
-
-	/**
-	 * Instantiates a new reference.
-	 */
-	public Reference() {
-		this.ref = null;
-		this.lang = null;
-		this.params = new ArrayList<>();
-		this.values = null;
-	}
 
 	/**
 	 * Instantiates a new reference.
 	 *
 	 * @param ref
-	 *            the ref
+	 *            the reference
 	 * @param language
-	 *            the language
+	 *            the target language
 	 */
-	public Reference(@Nullable String ref, @Nullable Language language) {
+	public Reference(String ref, Language language) {
 		this.ref = ref;
 		this.lang = language;
 		this.params = new ArrayList<>();
@@ -62,15 +54,13 @@ public final class Reference implements Expression<Reference> {
 	 * Instantiates a new reference.
 	 *
 	 * @param ref
-	 *            the ref
+	 *            the reference
 	 * @param language
-	 *            the language
+	 *            the target language
 	 * @param params
-	 *            the params
+	 *            the parameters
 	 */
-	public Reference(@Nullable String ref, @Nullable Language language, List<? extends VariableExpression> params) {
-		if (params == null)
-			throw new NullPointerException();
+	public Reference(String ref, Language language, List<? extends VariableExpression> params) {
 		this.ref = ref;
 		this.lang = language;
 		this.params = params;
@@ -81,18 +71,15 @@ public final class Reference implements Expression<Reference> {
 	 * Instantiates a new reference.
 	 *
 	 * @param ref
-	 *            the ref
+	 *            the reference
 	 * @param language
-	 *            the language
+	 *            the target language
 	 * @param params
-	 *            the params
+	 *            the parameters
 	 * @param values
-	 *            the values
+	 *            the parameter values
 	 */
-	public Reference(@Nullable String ref, @Nullable Language language, List<? extends VariableExpression> params,
-			@Nullable List<Value> values) {
-		if (params == null)
-			throw new NullPointerException();
+	public Reference(String ref, Language language, List<? extends VariableExpression> params, List<Value> values) {
 		this.ref = ref;
 		this.lang = language;
 		this.params = params;
@@ -104,7 +91,6 @@ public final class Reference implements Expression<Reference> {
 	 *
 	 * @return the call
 	 */
-	@Nullable
 	public String getCall() {
 		return ref;
 	}
@@ -114,7 +100,6 @@ public final class Reference implements Expression<Reference> {
 	 *
 	 * @return the values
 	 */
-	@Nullable
 	public List<Value> getValues() {
 		return values;
 	}
@@ -124,7 +109,6 @@ public final class Reference implements Expression<Reference> {
 	 *
 	 * @return the language
 	 */
-	@Nullable
 	public Language getLanguage() {
 		return lang;
 	}
@@ -146,7 +130,7 @@ public final class Reference implements Expression<Reference> {
 	 * nl.cwi.reo.util.Monitor)
 	 */
 	@Override
-	public @Nullable Reference evaluate(Scope s, Monitor m) {
+	public @Nullable Atom evaluate(Scope s, Monitor m) {
 		List<Value> values = new ArrayList<>();
 		for (VariableExpression v : params) {
 			List<? extends Identifier> ids = v.evaluate(s, m);
@@ -158,5 +142,37 @@ public final class Reference implements Expression<Reference> {
 			}
 		}
 		return new Reference(ref, lang, params, values);
+	}
+
+	/* (non-Javadoc)
+	 * @see nl.cwi.reo.interpret.Atom#getType()
+	 */
+	@Override
+	public SemanticsType getType() {
+		return SemanticsType.REF;
+	}
+
+	/* (non-Javadoc)
+	 * @see nl.cwi.reo.interpret.Atom#getInterface()
+	 */
+	@Override
+	public Set<Port> getInterface() {
+		return new HashSet<>();
+	}
+
+	/* (non-Javadoc)
+	 * @see nl.cwi.reo.interpret.Atom#rename(java.util.Map)
+	 */
+	@Override
+	public Atom rename(Map<Port, Port> links) {
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see nl.cwi.reo.interpret.Atom#getNode(java.util.Set)
+	 */
+	@Override
+	public Atom getNode(Set<Port> node) {
+		return null;
 	}
 }

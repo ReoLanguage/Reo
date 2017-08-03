@@ -69,7 +69,7 @@ public class PortVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hadOutputs() {
+	public boolean hasOutputPorts() {
 		return p.getType() == PortType.OUT;
 	}
 
