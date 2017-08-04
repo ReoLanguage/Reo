@@ -47,7 +47,8 @@ public class ErrorListener extends BaseErrorListener {
 	public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
 			String msg, RecognitionException e) {
 		hasError = true;
-		String source = new File(recognizer.getInputStream().getSourceName()).getName();
+		String sourceName = recognizer.getInputStream().getSourceName();
+		String source = sourceName != null ? new File(sourceName).getName() : "<unknown>";
 		Location location = new Location(source, line, charPositionInLine);
 		m.add(location, msg);
 	}

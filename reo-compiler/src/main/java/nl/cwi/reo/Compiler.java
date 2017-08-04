@@ -524,7 +524,7 @@ public class Compiler {
 			extension = ".maude";
 			break;
 		case PRISM:
-			group = new STGroupFile("PRISM.stg");
+			group = new STGroupFile("Prism.stg");
 			extension = ".prism";
 			break;
 		default:
