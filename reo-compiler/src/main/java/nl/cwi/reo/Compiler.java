@@ -521,6 +521,10 @@ public class Compiler {
 			group = new STGroupFile("Maude.stg");
 			extension = ".maude";
 			break;
+		case PRISM:
+			group = new STGroupFile("Prism.stg");
+			extension = ".prism";
+			break;
 		default:
 			break;
 		}

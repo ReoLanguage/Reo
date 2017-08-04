@@ -18,24 +18,33 @@ atomic(c) ::= <<
 >>
 
 protocol(c) ::= <<
-module <c.name> 
+module <c.name>
+    <c:variables(); separator="\n">
+
     <c.transitions:command(); separator="\n">
 endmodule
 >>
 
+variables(c) ::= <<
+<c.initial.keys:{m | <m.name> : bool init <if(c.initial.(m))>true<else>false<endif>;}; separator="\n">
+>>
+
 command(t) ::= <<
-[<t.action>] (<formula(t)>) -> <update(t)>;
+[] <t.guard:guard()> -> <t:update()>;
 >>
 
-update(t) ::= <<
-<m.memory.keys:{p | <if(m.memory.(p).distribution)><m.memory.(p).terms.keys:{x | <m.memory.(p).terms.(x)> : (<p.name>' = <term(x)>)}; separator=" + "><else><p.name> = <m.memory.(p):term()>}; separator=" & ">
+guard(f) ::= <<
+<if(f.negation)>!(<f.formula:guard()>)<elseif(f.equality)><f:equality()><elseif(f.conjunction)>(<f.clauses:guard(); separator=" & ">)<elseif(f.disjunction)>(<f.clauses:guard(); separator=" | ">)<endif>
 >>
 
-formula(f) ::= <<
-<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)><f.LHS:term()>=<f.RHS:term()><elseif(f.conjunction)>(<f.clauses:formula(); separator=" & ">)<elseif(f.disjunction)>(<f.clauses:formula(); separator=" | ">)<endif>
+update(m) ::= <<
+<m.memory.keys:{p | (<p.name>' = <m.memory.(p):term()>)}; separator=" & ">
+>>
+
+equality(f) ::= <<
+<if(f.LHS.node)><if(!f.RHS.constant.value)>!<f.LHS.name>.hasGet()<else><f.LHS:term()> = <f.RHS:term()><endif><else><f.LHS:term()> = <f.RHS:term()><endif>
 >>
 
 term(t) ::= <<
-<if(function)><t.value><if(t.args)><f.args:term(); separator="<t.name>"><endif><elseif(t.memory)><t.name><endif>
+<if(t.function)>false<elseif(t.constant)><t.name><elseif(t.node)>true<elseif(t.memory)><t.name><else><t.name><endif>
 >>
-
