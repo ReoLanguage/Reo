@@ -102,13 +102,11 @@ public class Equality implements Formula {
 	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		Term t_1 = t1;
-		Term t_2 = t2;
-		if (t1 instanceof Function)
-			t_1 = ((Function) t1).evaluate(s, m);
-		if (t2 instanceof Function)
-			t_2 = ((Function) t2).evaluate(s, m);
-		return new Equality(t_1, t_2);
+		Term u1 = t1.evaluate(s, m);
+		Term u2 = t2.evaluate(s, m);
+		if (u1 == null || u2 == null)
+			return null;
+		return new Equality(u1, u2);
 	}
 
 	/**
@@ -143,7 +141,7 @@ public class Equality implements Formula {
 		Term t_1 = t1.substitute(t, x);
 		Term t_2 = t2.substitute(t, x);
 		if (t_1.equals(t_2))
-			return new Relation("true", "true", null);
+			return new TruthValue(true);
 		return new Equality(t_1, t_2);
 	}
 

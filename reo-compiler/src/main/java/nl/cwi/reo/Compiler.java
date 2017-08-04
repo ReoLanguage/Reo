@@ -44,15 +44,15 @@ import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
-import nl.cwi.reo.semantics.hypergraphs.ListenerRBA;
-import nl.cwi.reo.semantics.hypergraphs.Rule;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.rba.ConstraintHypergraph;
+import nl.cwi.reo.semantics.rba.ListenerRBA;
+import nl.cwi.reo.semantics.rba.Rule;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
@@ -216,7 +216,8 @@ public class Compiler {
 		
 		List<ConstraintHypergraph> protocol = getProtocol(connector, lang, ConstraintHypergraph.class);
 		
-		ConstraintHypergraph composition = new ConstraintHypergraph().compose(protocol).restrict(intface);
+		ConstraintHypergraph composition = new ConstraintHypergraph().compose(protocol);
+		composition = composition.restrict(intface);
 
 		Set<Transition> transitions = buildTransitions(composition);
 
@@ -226,7 +227,8 @@ public class Compiler {
 		
 		components.addAll(protocols);
 
-		generateCode(new ReoTemplate(program.getFile(), version, packagename, program.getName(), components));
+		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
+		generateCode(template);
 	}
 	
 	private Interpreter getInterpreter(Language lang) {
@@ -466,7 +468,7 @@ public class Compiler {
 					Term initialValue = protocol.getInitials().get(new MemoryVariable(m.getKey().getName(), false));
 					if (initialValue instanceof Function && ((Function) initialValue).getValue() instanceof Integer)
 						initialValue = (initialValue != null ? new Function(((Function) initialValue).getName(),
-								((Function) initialValue).getValue().toString(), new ArrayList<Term>()) : null);
+								((Function) initialValue).getValue().toString(), new ArrayList<Term>(), false) : null);
 					initial.put(m.getKey().setType(tags.get(m.getKey())), initialValue);
 				}
 			}
@@ -521,8 +523,12 @@ public class Compiler {
 			group = new STGroupFile("Maude.stg");
 			extension = ".maude";
 			break;
-		default:
+		case PRISM:
+			group = new STGroupFile("PRISM.stg");
+			extension = ".prism";
 			break;
+		default:
+			return;
 		}
 
 		ST stringtemplate = group.getInstanceOf("main");

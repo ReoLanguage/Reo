@@ -8,9 +8,14 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.values.DecimalValue;
+import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -138,5 +143,18 @@ public class PortVariable implements Variable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.p);
+	}
+
+	/**
+	 * Evaluates this port variable. Currently, it updates only if a decimal
+	 * value is assigned.
+	 */
+	@Override
+	public @Nullable Term evaluate(Scope s, Monitor m) {
+		Value v = s.get(new Identifier(p.getName()));
+		if (v instanceof DecimalValue)
+			return new DecimalTerm(((DecimalValue) v).getValue());
+		// TODO include other data types.
+		return this;
 	}
 }

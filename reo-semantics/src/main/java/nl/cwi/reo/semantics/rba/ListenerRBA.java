@@ -1,17 +1,20 @@
-package nl.cwi.reo.semantics.hypergraphs;
+package nl.cwi.reo.semantics.rba;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.RbaContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_boolContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_trueContext;
+import nl.cwi.reo.interpret.ReoParser.Rba_unaryminContext;
 import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.ReoParser.Rba_falseContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_conjunctionContext;
@@ -25,6 +28,7 @@ import nl.cwi.reo.interpret.ReoParser.Rba_memorycellInContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_memorycellOutContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_natContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_nullContext;
+import nl.cwi.reo.interpret.ReoParser.Rba_operationContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_parameterContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_ruleContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_initialContext;
@@ -137,7 +141,9 @@ public class ListenerRBA extends BaseListener {
 	 * ReoParser.Rba_ruleContext)
 	 */
 	public void exitRba_rule(Rba_ruleContext ctx) {
-		rules.put(ctx, new Rule(mapPorts, rba_formula.get(ctx.rba_formula())));
+		Formula f = rba_formula.get(ctx.rba_formula());
+		if (f != null)
+			rules.put(ctx, new Rule(mapPorts, f));
 	}
 
 	/*
@@ -206,7 +212,10 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_equality(Rba_equalityContext ctx) {
-		rba_formula.put(ctx, new Equality(term.get(ctx.rba_term(0)), term.get(ctx.rba_term(1))));
+		Term t0 = term.get(ctx.rba_term(0));
+		Term t1 = term.get(ctx.rba_term(1));
+		if (t0 != null && t1 != null)
+			rba_formula.put(ctx, new Equality(t0, t1));
 	}
 
 	/*
@@ -217,7 +226,10 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_inequality(Rba_inequalityContext ctx) {
-		rba_formula.put(ctx, new Negation(new Equality(term.get(ctx.rba_term(0)), term.get(ctx.rba_term(1)))));
+		Term t0 = term.get(ctx.rba_term(0));
+		Term t1 = term.get(ctx.rba_term(1));
+		if (t0 != null && t1 != null)
+			rba_formula.put(ctx, new Negation(new Equality(t0, t1)));
 	}
 
 	/*
@@ -252,7 +264,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_nat(Rba_natContext ctx) {
-		term.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null));
+		term.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null, false));
 	}
 
 	/*
@@ -264,7 +276,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_bool(Rba_boolContext ctx) {
-		term.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null));
+		term.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null, false));
 	}
 
 	/*
@@ -276,7 +288,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_string(Rba_stringContext ctx) {
-		term.put(ctx, new Function(ctx.getText(), ctx.getText(), null));
+		term.put(ctx, new Function(ctx.getText(), ctx.getText(), null, false));
 	}
 
 	/*
@@ -288,7 +300,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_decimal(Rba_decimalContext ctx) {
-		term.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null));
+		term.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null, false));
 	}
 
 	/*
@@ -303,7 +315,7 @@ public class ListenerRBA extends BaseListener {
 		for (Rba_termContext arg : ctx.rba_term()) {
 			args.add(term.get(arg));
 		}
-		term.put(ctx, new Function(ctx.ID().getText(), null, args));
+		term.put(ctx, new Function(ctx.ID().getText(), null, args, false));
 	}
 
 	/*
@@ -351,6 +363,22 @@ public class ListenerRBA extends BaseListener {
 	@Override
 	public void exitRba_null(Rba_nullContext ctx) {
 		term.put(ctx, new NullValue());
+	}
+	
+	/* (non-Javadoc)
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_unarymin(nl.cwi.reo.interpret.ReoParser.Rba_unaryminContext)
+	 */
+	@Override 
+	public void exitRba_unarymin(Rba_unaryminContext ctx) { 
+		term.put(ctx, new Function("-", null, Arrays.asList(term.get(ctx.rba_term())), false));		
+	}
+
+	/* (non-Javadoc)
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_operation(nl.cwi.reo.interpret.ReoParser.Rba_operationContext)
+	 */
+	@Override 
+	public void exitRba_operation(Rba_operationContext ctx) { 
+		term.put(ctx, new Function(ctx.op.getText(), null, Arrays.asList(term.get(ctx.rba_term(0)), term.get(ctx.rba_term(1))), true));		
 	}
 
 }

@@ -5,12 +5,12 @@ package nl.cwi.reo.semantics.predicates;
  * Constant that represents absence of data. This value is used to encode
  * synchronization constraints and empty memory cells.
  */
-public class DecimalValue extends Function {
+public class DecimalTerm extends Function {
  
 	/**
 	 * Constructs an null value.
 	 */
-	public DecimalValue(double d) {
-		super("" + d, new Double(d), null);
+	public DecimalTerm(double d) {
+		super("" + d, new Double(d), null, false);
 	}
 }

@@ -76,7 +76,14 @@ public class Disjunction implements Formula {
 	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		return this;
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses) {
+			Formula g = f.evaluate(s, m);
+			if (g == null)
+				return null;
+			_clauses.add(g);
+		}
+		return new Conjunction(_clauses);
 	}
 
 	/**

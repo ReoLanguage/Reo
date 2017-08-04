@@ -89,7 +89,7 @@ public class Conjunction implements Formula {
 	 */
 	@Override
 	public Formula rename(Map<Port, Port> links) {
-		List<Formula> h = new ArrayList<Formula>();
+		List<Formula> h = new ArrayList<>();
 		for (Formula f : clauses)
 			h.add(f.rename(links));
 		return new Conjunction(h);
@@ -112,7 +112,14 @@ public class Conjunction implements Formula {
 	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		return this;
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses) {
+			Formula g = f.evaluate(s, m);
+			if (g == null)
+				return null;
+			_clauses.add(g);
+		}
+		return new Conjunction(_clauses);
 	}
 
 	/**

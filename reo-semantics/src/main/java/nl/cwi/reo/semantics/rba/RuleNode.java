@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.hypergraphs;
+package nl.cwi.reo.semantics.rba;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -312,11 +312,9 @@ public class RuleNode {
 	 *            scope
 	 * @param m
 	 *            monitor
-	 * @return reference to this rule node
 	 */
-	public RuleNode evaluate(Scope s, Monitor m) {
+	public void evaluate(Scope s, Monitor m) {
 		rule = rule.evaluate(s, m);
-		return this;
 	}
 
 	/**

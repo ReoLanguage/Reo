@@ -39,6 +39,16 @@ public final class Scope {
 	}
 
 	/**
+	 * Constructs a copy of a scope.
+	 * 
+	 * @param s
+	 *            original scope
+	 */
+	public Scope(Scope s) {
+		this.assignments = new HashMap<>(s.assignments);
+	}
+
+	/**
 	 * Extends this scope with a new key value pair, or returns this scope if
 	 * this key has already a value.
 	 * 

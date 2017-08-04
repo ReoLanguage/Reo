@@ -5,27 +5,13 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.util.Monitor;
 
 /**
  * The Interface Formula.
  */
-public interface Formula {
-
-	/**
-	 * Evaluates each abstract function/relation symbol to a concrete
-	 * function/relation.
-	 * 
-	 * @param s
-	 *            scope
-	 * @param m
-	 *            monitor
-	 * @return Formula with concrete functions/relations, or null if not all
-	 *         function/relation symbols are defined in the scope.
-	 */
-	public @Nullable Formula evaluate(Scope s, Monitor m);
+public interface Formula extends Expression<Formula> {
 
 	/**
 	 * Returns the set of node variables in the formula, and casts them to
@@ -61,9 +47,9 @@ public interface Formula {
 	/**
 	 * Tries to eliminate quantifiers via substitution.
 	 * 
-	 * @return equivalent formula, possibly without any quantifiers.
+	 * @return a formula without quantifiers, or null if it failed to remove quantifiers.
 	 */
-	public Formula QE();
+	public @Nullable Formula QE();
 
 	/**
 	 * Substitutes a term t for every free occurrence of a variable x in this

@@ -104,4 +104,12 @@ public final class Atomic implements Component {
 	public String getCall() {
 		return call;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "atomic: " + call + params + ports;
+	}
 }

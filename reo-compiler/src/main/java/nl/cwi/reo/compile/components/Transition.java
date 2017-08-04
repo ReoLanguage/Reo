@@ -1,8 +1,10 @@
 package nl.cwi.reo.compile.components;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -10,7 +12,9 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.prba.Distribution;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
@@ -144,6 +148,48 @@ public final class Transition {
 	public Map<MemoryVariable, Term> getMemory() {
 		return this.memory;
 	}
+	
+	/**
+	 * Computes 
+	 * @return
+	 */
+	public Map<Map<MemoryVariable, Term>, Term> getPRISMUpdate() {
+		Map<Map<MemoryVariable, Term>, Term> update = new HashMap<>();
+		
+		// Flatten the distribution terms in the memory update
+		Map<MemoryVariable, Term> mem2 = new HashMap<>();
+		for (Map.Entry<MemoryVariable, Term> entry : memory.entrySet())
+			mem2.put(entry.getKey(), Transition.flattenDistribution(entry.getValue()));
+		
+		
+		
+		return null;
+	}
+	
+//	private static Map<Map<MemoryVariable, Term>, Term> invert(Map<MemoryVariable, Term> memory) {
+//		Iterator<Map.Entry<Term, Term>> iter = memory.entrySet().iterator();
+//		Term m = 
+//		return null;
+//	}
+	
+	private static Term flattenDistribution(Term t) {
+		if (t instanceof Distribution) {
+			Map<Term, Term> newDistr = new HashMap<>(); 
+			Distribution d = (Distribution) t;
+			for (Map.Entry<Term, Term> entry : d.getDistribution().entrySet()) {
+				Term f = flattenDistribution(entry.getKey());
+				if (f instanceof Distribution)  {
+					for (Map.Entry<Term, Term> ef : ((Distribution) f).getDistribution().entrySet())
+						newDistr.put(ef.getKey(), new Function("*", null, Arrays.asList(entry.getValue(), ef.getValue()), false));
+				} else {
+					newDistr.put(f, entry.getValue());
+				}
+			}
+			return new Distribution(newDistr);
+		}
+		return t;
+	}
+	
 
 	/**
 	 * Gets the map M.
@@ -296,5 +342,13 @@ public final class Transition {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.guard, this.output, this.memory, this.input);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return input + " " + guard + " -> " + output + ", " + memory;
 	}
 }

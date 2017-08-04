@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.hypergraphs;
+package nl.cwi.reo.semantics.rba;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,18 +18,11 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.values.BooleanValue;
-import nl.cwi.reo.interpret.values.DecimalValue;
-import nl.cwi.reo.interpret.values.IntegerValue;
-import nl.cwi.reo.interpret.values.StringValue;
-import nl.cwi.reo.interpret.values.Value;
-import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
@@ -216,30 +209,20 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	@Nullable
 	public ConstraintHypergraph evaluate(Scope s, Monitor m) {
+		
 		for (RuleNode r : getRuleNodes())
 			r.evaluate(s, m);
 
-		// TODO Evaluation of the initial values should be a recursive call to
-		// an evaluate function in of terms.
+		Map<MemoryVariable, Term> _initial = new HashMap<>();
+
 		for (Map.Entry<MemoryVariable, Term> init : initial.entrySet()) {
-			if (s.get(new Identifier(init.getValue().toString())) != null) {
-				Value v = s.get(new Identifier(init.getValue().toString()));
-				if (v instanceof StringValue)
-					initial.put(init.getKey(),
-							new Function("constant", ((StringValue) v).getValue(), new ArrayList<Term>()));
-				if (v instanceof BooleanValue)
-					initial.put(init.getKey(),
-							new Function("constant", ((BooleanValue) v).getValue(), new ArrayList<Term>()));
-				if (v instanceof IntegerValue)
-					initial.put(init.getKey(),
-							new Function("constant", ((IntegerValue) v).getValue(), new ArrayList<Term>()));
-				if (v instanceof DecimalValue)
-					initial.put(init.getKey(),
-							new Function("constant", ((DecimalValue) v).getValue(), new ArrayList<Term>()));
-			}
+			Term t = init.getValue().evaluate(s, m);
+			if (t == null)
+				return null;
+			_initial.put(init.getKey(), t);
 		}
 
-		return new ConstraintHypergraph(getRules(), initial);
+		return new ConstraintHypergraph(new ArrayList<>(hyperedges), _initial);
 	}
 
 	/**
@@ -317,8 +300,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			for (Port x : iface)
 				if (!x.equals(p))
 					map.put(x, false);
-			Formula guard = new TruthValue(true);
-			rules.add(new Rule(map, guard));
+			rules.add(new Rule(map, new TruthValue(true)));
 		}
 
 		return new ConstraintHypergraph(rules);
@@ -489,9 +471,13 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		Set<Rule> setRules = new HashSet<Rule>();
 		for (Rule r : getRules()) {
 			Formula g = r.getDataConstraint();
-			for (Port p : r.getFiringPorts())
-				if (!intface.contains(p))
-					g = new Existential(new PortVariable(p), g).QE();
+			for (Port p : r.getFiringPorts()) {
+				if (!intface.contains(p)) {
+					Formula h = new Existential(new PortVariable(p), g).QE();
+					if (h != null)
+						g = h;
+				}
+			}
 			setRules.add(new Rule(r.getSyncConstraint(), g));
 		}
 		return new ConstraintHypergraph(setRules, initial);

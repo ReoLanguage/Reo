@@ -108,4 +108,15 @@ public final class ReoTemplate {
 	public List<Component> getComponents() {
 		return components;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		String s = name + ports + "\n";
+		for (Component c : components)
+			s += c.toString() + "\n";
+		return s;
+	}
 }

@@ -23,8 +23,10 @@ rba_term	: NAT 										#rba_nat
           	| STRING									#rba_string
           	| DEC   									#rba_decimal
           	| ID '(' rba_term (',' rba_term)* ')'		#rba_function
-          	| '[' rba_term ':' rba_term ('+' rba_term ':' rba_term)* ']'	#rba_distribution
+          	| '[' rba_term ':' rba_term (',' rba_term ':' rba_term)* ']'	#rba_distribution
           	| '$' ID  									#rba_memorycellIn
           	| '$' ID '\''	 							#rba_memorycellOut
           	| 'null' 									#rba_null 
-          	| ID										#rba_parameter ;
+          	| ID										#rba_parameter
+            | MIN rba_term                                        # rba_unarymin
+            | rba_term op=(MUL | DIV | MOD | ADD | MIN) rba_term  # rba_operation ;

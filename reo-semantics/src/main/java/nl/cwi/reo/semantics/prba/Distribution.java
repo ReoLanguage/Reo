@@ -3,15 +3,18 @@ package nl.cwi.reo.semantics.prba;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.util.Monitor;
 
 /**
  * A Distribution over a set of terms.
@@ -24,7 +27,7 @@ public class Distribution implements Term {
 	public static final boolean distribution = true;
 	
 	/** The distribution. */
-	private Map<Term, Double> distr;
+	private Map<Term, Term> distr;
 	
 	/**
 	 * Instantiates a new distribution.
@@ -32,7 +35,7 @@ public class Distribution implements Term {
 	 * @param distr
 	 *            the distribution
 	 */
-	public Distribution(Map<Term, Double> distr) {
+	public Distribution(Map<Term, Term> distr) {
 		this.distr = Collections.unmodifiableMap(distr);
 	}
 	
@@ -41,7 +44,7 @@ public class Distribution implements Term {
 	 *
 	 * @return the distribution
 	 */
-	public Map<Term, Double> getDistribution() {
+	public Map<Term, Term> getDistribution() {
 		return distr;
 	}
 
@@ -61,8 +64,8 @@ public class Distribution implements Term {
 	 */
 	@Override
 	public Term rename(Map<Port, Port> links) {
-		Map<Term, Double> _distr = new HashMap<>();
-		for(Map.Entry<Term, Double> entry : distr.entrySet())
+		Map<Term, Term> _distr = new HashMap<>();
+		for(Map.Entry<Term, Term> entry : distr.entrySet())
 			_distr.put(entry.getKey().rename(links), entry.getValue());
 		return new Distribution(_distr);
 	}
@@ -72,8 +75,8 @@ public class Distribution implements Term {
 	 */
 	@Override
 	public Term substitute(Term t, Variable x) {
-		Map<Term, Double> _distr = new HashMap<>();
-		for(Map.Entry<Term, Double> entry : distr.entrySet())
+		Map<Term, Term> _distr = new HashMap<>();
+		for(Map.Entry<Term, Term> entry : distr.entrySet())
 			_distr.put(entry.getKey().substitute(t, x), entry.getValue());
 		return new Distribution(_distr);
 	}
@@ -95,6 +98,38 @@ public class Distribution implements Term {
 	@Override
 	public @Nullable TypeTag getTypeTag() {
 		return null;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		String s = "[";
+		Iterator<Map.Entry<Term, Term>> iter = distr.entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry<Term, Term> entry = iter.next();
+			s = s + entry.getValue() + ":" + entry.getKey();
+			if (iter.hasNext())
+				s += ", ";
+		}
+		return s + "]";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public @Nullable Term evaluate(Scope s, Monitor m) {
+		Map<Term, Term> _distr = new HashMap<>();
+		for (Map.Entry<Term, Term> entry : distr.entrySet()) {
+			Term u = entry.getKey().evaluate(s, m);
+			Term v = entry.getValue().evaluate(s, m);
+			if (u == null || v == null)
+				return null;
+			_distr.put(u, v);
+		}
+		return new Distribution(_distr);
 	}
 
 }
