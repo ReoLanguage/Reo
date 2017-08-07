@@ -9,6 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -83,7 +84,12 @@ public class Universal implements Formula {
 	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		return null;
+		Scope s1 = new Scope(s);
+		s1.remove(new Identifier(x.getName()));
+		Formula g = f.evaluate(s1, m);
+		if (g == null)
+			return null;
+		return new Universal(x, g);
 	}
 
 	/**

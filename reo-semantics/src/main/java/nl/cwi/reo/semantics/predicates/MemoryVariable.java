@@ -8,8 +8,10 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -113,7 +115,7 @@ public class MemoryVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hadOutputs() {
+	public boolean hasOutputPorts() {
 		return false;
 	}
 
@@ -172,5 +174,13 @@ public class MemoryVariable implements Variable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.getName(), this.prime);
+	}
+
+	/**
+	 * A memory cell is never updated.
+	 */
+	@Override
+	public @Nullable Term evaluate(Scope s, Monitor m) {
+		return this;
 	}
 }

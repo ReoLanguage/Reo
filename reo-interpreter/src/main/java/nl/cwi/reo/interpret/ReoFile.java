@@ -15,11 +15,8 @@ import nl.cwi.reo.util.Monitor;
 // TODO: Auto-generated Javadoc
 /**
  * Interpretation of a Reo source file.
- * 
- * @param <T>
- *            Reo semantics type
  */
-public final class ReoFile<T extends Interpretable<T>> {
+public final class ReoFile {
 
 	/**
 	 * File name.
@@ -138,9 +135,9 @@ public final class ReoFile<T extends Interpretable<T>> {
 	 */
 	@Override
 	public String toString() {
-		ST st = new ST("<section><definitions>");
+		ST st = new ST("<section><imports:{ imp | import <imp>;\n }><definitions>");
 		st.add("section", section.equals("") ? "" : "section " + section + ";\n");
-		// st.add("imports", imports);
+		st.add("imports", imports);
 		st.add("definitions", definitions);
 		return st.render();
 	}

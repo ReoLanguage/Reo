@@ -14,64 +14,52 @@ connector(a[1..9]?,b!){
 cons(a?) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.cons"
+	#Java "Components.cons"
 }
-
 prod_H(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_H"
+	#Java "Components.prod_H"
 }
 prod_E(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_E"
+	#Java "Components.prod_E"
 }
 prod_L(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_L"
+	#Java "Components.prod_L"
 }
 prod_O(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_O"
+	#Java "Components.prod_O"
 }
 prod_W(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_W"
+	#Java "Components.prod_W"
 }
 prod_R(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_R"
+	#Java "Components.prod_R"
 }
-
 prod_D(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_D"
+	#Java "Components.prod_D"
 }
 prod_e(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_e"
+	#Java "Components.prod_e"
 }
 prod_s(a!) {
 	#PR 
 	identity(a;)
-	|
-	Java:"Components.prod_s"
+	#Java "Components.prod_s"
 }
 
 

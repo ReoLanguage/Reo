@@ -36,6 +36,7 @@ Application designers can use Reo as a "glue code" language for compositional co
     <module>reo-compiler-lykos</module>
     <module>reo-compiler</module>
     <module>reo-installer</module>
+    <!--<module>reo-editor</module>-->
 
   </modules>
 

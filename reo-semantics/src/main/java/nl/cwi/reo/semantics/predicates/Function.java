@@ -2,6 +2,7 @@ package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,13 +37,20 @@ public class Function implements Term {
 	 * Value of this function or reference to its implementation.
 	 */
 	@Nullable
-	private Object value;
+	protected Object value;
 
 	/**
 	 * List of arguments of this function.
 	 */
 	@Nullable
 	private final List<Term> args;
+
+	/**
+	 * Defines whether the function symbol can be used with infix notation. For
+	 * example, infix can be a+b, while prefix can be +(a,b).
+	 */
+	@Nullable
+	private final boolean infix;
 
 	/**
 	 * Constructs a new function from a name, a value, and a list of arguments.
@@ -53,11 +61,14 @@ public class Function implements Term {
 	 *            value of this function
 	 * @param args
 	 *            list of arguments
+	 * @param infix
+	 *            infix notation
 	 */
-	public Function(String name, @Nullable Object value, @Nullable List<Term> args) {
+	public Function(String name, @Nullable Object value, @Nullable List<Term> args, boolean infix) {
 		this.name = name;
 		this.value = value;
 		this.args = args;
+		this.infix = infix;
 	}
 
 	/**
@@ -97,8 +108,12 @@ public class Function implements Term {
 		String s = name;
 		if (args != null && !args.isEmpty()) {
 			s += "(";
-			for (Term t : args)
-				s += ", " + t;
+			Iterator<Term> iter = args.iterator();
+			while (iter.hasNext()) {
+				s += iter.next().toString();
+				if (iter.hasNext())
+					s += ", ";
+			}
 			s += ")";
 		}
 		return s;
@@ -108,7 +123,7 @@ public class Function implements Term {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hadOutputs() {
+	public boolean hasOutputPorts() {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -122,7 +137,7 @@ public class Function implements Term {
 		if (args != null)
 			for (Term s : args)
 				list.add(s.rename(links));
-		return new Function(name, value, list);
+		return new Function(name, value, list, infix);
 	}
 
 	/**
@@ -135,32 +150,35 @@ public class Function implements Term {
 			for (Term s : args)
 				list.add(s.substitute(t, x));
 		}
-		return new Function(name, value, list);
+		return new Function(name, value, list, infix);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Term evaluate(Scope s, Monitor m) {
-		String valueEval = "";
 
-		if (value instanceof String) {
-			Value v = s.get(new Identifier((String) value));
-			if (v != null) {
-				valueEval = v.toString();
-			} else {
-				m.add("Cannot evaluate this function");
+
+		// Evaluate the symbol
+		String _name = name;
+		Value v = s.get(new Identifier(name));
+		if (v != null)
+			_name = v.toString();
+
+		// Evaluate the arguments
+		List<Term> _args = null;
+		if (args != null) {
+			_args = new ArrayList<>();
+			for (Term t : args) {
+				Term u = t.evaluate(s, m);
+				if (u == null)
+					return null;
+				_args.add(u);
 			}
-		} else {
-			m.add("Cannot evaluate this function");
 		}
 
-		if (valueEval.substring(0, 1).equals("\""))
-			valueEval = valueEval.substring(1, valueEval.length());
-		if (valueEval.substring(valueEval.length() - 1, valueEval.length()).equals("\""))
-			valueEval = valueEval.substring(0, valueEval.length() - 1);
-
-		return new Function(name, valueEval, args);
+		return new Function(_name, value, _args, infix);
 	}
 
 	/**
@@ -213,6 +231,12 @@ public class Function implements Term {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.name, this.value, this.args);
+	}
+
+	@Override
+	public nl.cwi.reo.semantics.predicates.TypeTag getTypeTag() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

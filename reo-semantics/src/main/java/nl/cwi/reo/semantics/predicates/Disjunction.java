@@ -14,7 +14,6 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * Disjunction of a list of formulas.
  */
@@ -77,7 +76,14 @@ public class Disjunction implements Formula {
 	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		return this;
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses) {
+			Formula g = f.evaluate(s, m);
+			if (g == null)
+				return null;
+			_clauses.add(g);
+		}
+		return new Conjunction(_clauses);
 	}
 
 	/**

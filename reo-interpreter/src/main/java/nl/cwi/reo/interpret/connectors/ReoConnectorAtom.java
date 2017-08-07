@@ -12,20 +12,15 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 
-import nl.cwi.reo.interpret.Interpretable;
-import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * An atomic Reo component consisting of its Reo semantics together with an
  * optional reference to source code.
- * 
- * @param <T>
- *            Reo semantics type
  */
-public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoConnector<T> {
+public final class ReoConnectorAtom implements ReoConnector {
 
 	/**
 	 * Component name.
@@ -36,14 +31,7 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 	/**
 	 * Semantics object.
 	 */
-	@Nullable
-	private final T semantics;
-
-	/**
-	 * Reference to source code.
-	 */
-	@Nullable
-	private final Reference source;
+	private final List<Atom> semantics;
 
 	/**
 	 * Set of links.
@@ -53,60 +41,16 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 	/**
 	 * Constructs a new atomic component.
 	 * 
-	 * @param atom
-	 *            semantics
-	 */
-	public ReoConnectorAtom(T atom) {
-		this.name = null;
-		this.semantics = atom;
-		this.source = new Reference();
-		Map<Port, Port> links = new HashMap<Port, Port>();
-		for (Port p : semantics.getInterface())
-			links.put(p, p);
-		this.links = Collections.unmodifiableMap(links);
-	}
-
-	/**
-	 * Constructs a new atomic component.
-	 * 
 	 * @param name
 	 *            component name
 	 * @param semantics
-	 *            semantics
-	 * @param source
-	 *            reference to source code
-	 */
-	public ReoConnectorAtom(@Nullable String name, @Nullable T semantics, @Nullable Reference source) {
-		this.name = name;
-		this.semantics = semantics;
-		this.source = source;
-		if (semantics != null) {
-			Map<Port, Port> links = new HashMap<Port, Port>();
-			for (Port p : semantics.getInterface())
-				links.put(p, p);
-			this.links = Collections.unmodifiableMap(links);
-		} else {
-			this.links = new HashMap<>();
-		}
-	}
-
-	/**
-	 * Constructs a new atomic component.
-	 * 
-	 * @param name
-	 *            component name
-	 * @param semantics
-	 *            semantics
-	 * @param source
-	 *            reference to source code
+	 *            list of semantics
 	 * @param links
 	 *            set of links
 	 */
-	public ReoConnectorAtom(@Nullable String name, @Nullable T semantics, @Nullable Reference source,
-			Map<Port, Port> links) {
+	public ReoConnectorAtom(@Nullable String name, List<Atom> semantics, Map<Port, Port> links) {
 		this.name = name;
 		this.semantics = semantics;
-		this.source = source;
 		this.links = Collections.unmodifiableMap(links);
 	}
 
@@ -119,23 +63,29 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 	}
 
 	/**
-	 * Gets the semantics object of this atomic component.
+	 * Gets the semantics objects of this atomic component.
 	 * 
-	 * @return Semantics object
+	 * @return List of semantics objects
 	 */
-	@Nullable
-	public T getSemantics() {
+	public List<Atom> getSemantics() {
 		return semantics;
 	}
 
 	/**
-	 * Gets the source code reference.
+	 * Gets the first reference of this component in a given target language, if
+	 * it exists.
 	 * 
-	 * @return source code reference.
+	 * @param lang
+	 *            target language
+	 * @return The first reference in the list of semantics in the target
+	 *         language, if it exists, and null otherwise.
 	 */
 	@Nullable
-	public Reference getSourceCode() {
-		return source;
+	public Reference getReference(Language lang) {
+		for (Atom x : semantics)
+			if (x instanceof Reference && ((Reference) x).getLanguage().equals(lang))
+				return (Reference) x;
+		return null;
 	}
 
 	/**
@@ -150,31 +100,17 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	@Nullable
-	public ReoConnectorAtom<T> evaluate(Scope s, Monitor m) {
-		if (this.semantics != null) {
-			T semantics = this.semantics.evaluate(s, m);
-			if (semantics == null)
-				return null;
-		}
-		return new ReoConnectorAtom<T>(name, semantics, source);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ReoConnector<T> rename(Map<Port, Port> joins) {
+	public ReoConnector rename(Map<Port, Port> joins) {
 		if (links.isEmpty())
-			return new ReoConnectorAtom<T>(name, semantics, source, joins);
-		return new ReoConnectorAtom<T>(name, semantics, source, Links.rename(links, joins));
+			return new ReoConnectorAtom(name, semantics, joins);
+		return new ReoConnectorAtom(name, semantics, Links.rename(links, joins));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnector<T> flatten() {
+	public ReoConnector flatten() {
 		return this;
 	}
 
@@ -182,7 +118,7 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnector<T> insertNodes(boolean mergers, boolean replicators, T nodeFactory) {
+	public ReoConnector insertNodes(boolean mergers, boolean replicators, Atom nodeFactory) {
 		return this;
 	}
 
@@ -190,10 +126,14 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnector<T> integrate() {
-		if (semantics != null)
-			return new ReoConnectorAtom<T>(name, semantics.rename(links), source);
-		return new ReoConnectorAtom<T>(name, semantics, source, links);
+	public ReoConnector integrate() {
+		List<Atom> _semantics = new ArrayList<>();
+		for (Atom x : semantics)
+			_semantics.add(x.rename(links));
+		Map<Port, Port> _links = new HashMap<>();
+		for (Map.Entry<Port, Port> link : links.entrySet())
+			_links.put(link.getValue(), link.getValue());
+		return new ReoConnectorAtom(name, _semantics, _links);
 	}
 
 	/**
@@ -204,9 +144,8 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 		List<String> renaming = new ArrayList<String>();
 		for (Map.Entry<Port, Port> link : links.entrySet())
 			renaming.add(link.getKey() + "=" + link.getValue());
-		ST st = new ST("{\n<if(semantics)>  <semantics>\n<endif><if(source)>  <source>\n<endif>}(<renaming; separator=\", \">)");
+		ST st = new ST("{\n  <semantics:{ x | <x>\n }>}(<renaming; separator=\", \">)");
 		st.add("semantics", semantics);
-		st.add("source", source);
 		st.add("renaming", renaming);
 		return st.render();
 	}
@@ -231,7 +170,7 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<ReoConnectorAtom<T>> getAtoms() {
+	public List<ReoConnectorAtom> getAtoms() {
 		return Arrays.asList(this);
 	}
 
@@ -239,7 +178,7 @@ public final class ReoConnectorAtom<T extends Interpretable<T>> implements ReoCo
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ReoConnector<T> propagate(Monitor m) {
+	public ReoConnector propagate(Monitor m) {
 		return this;
 	}
 

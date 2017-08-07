@@ -2,7 +2,7 @@ section reo;
 
 fifofull<k:String>(a?String,b!String) {
 	#RBA
-	$m=k
+	$m=k;
 	{a, ~b} $m = null, $m' = a
 	{~a, b} $m != null, b = $m, $m' = null
 }

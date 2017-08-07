@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import nl.cwi.reo.interpret.Interpretable;
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ports.Port;
 
 /**
@@ -13,7 +13,7 @@ import nl.cwi.reo.interpret.ports.Port;
  * @param <T>
  *            semantics
  */
-public interface Semantics<T> extends Interpretable<T> {
+public interface Semantics<T> extends Atom {
 
 	/**
 	 * Gets the default semantics with a given interface. A unit has a

@@ -10,7 +10,10 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ReoProgram;
+import nl.cwi.reo.interpret.connectors.Language;
+import nl.cwi.reo.interpret.connectors.Reference;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
 import nl.cwi.reo.interpret.ports.Port;
@@ -31,10 +34,9 @@ public class PRCompiler {
 	 *            Reo program
 	 * @return FOCAML code equivalent to the Reo program
 	 */
-	public static String toPR(ReoProgram<PRAutomaton> program) {
+	public static String toPR(ReoProgram program) {
 
-		ReoConnector<PRAutomaton> rc = program.getConnector().flatten().insertNodes(true, true, new PRAutomaton())
-				.integrate();
+		ReoConnector rc = program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate();
 
 		Map<String, Object> c = new HashMap<String, Object>();
 		c.put("name", program.getName());
@@ -44,19 +46,29 @@ public class PRCompiler {
 		List<Map<String, Object>> instances = new ArrayList<Map<String, Object>>();
 		List<Map<String, Object>> workers = new ArrayList<Map<String, Object>>();
 
-		for (ReoConnectorAtom<PRAutomaton> atom : rc.getAtoms()) {
+		for (ReoConnectorAtom atom : rc.getAtoms()) {
 
+			// Get the interface of the atomic component
 			List<String> inputs = new ArrayList<String>();
 			List<String> outputs = new ArrayList<String>();
-			for (Port p : atom.getSemantics().getInterface())
+			for (Port p : atom.getInterface())
 				if (p.isInput())
 					inputs.add(p.getName());
 				else
 					outputs.add(p.getName());
+			
+			PRAutomaton X = null;
+			for (Atom x : atom.getSemantics())
+				if (x instanceof PRAutomaton)
+					X = (PRAutomaton) x;
 
-			if (atom.getSemantics().getName().equals("identity")) {
+			if (X == null) {
+				Reference r = atom.getReference(Language.JAVA);
+				if (r == null)
+					return "there is a component without PR semantics and without a Java reference";
+				
 				Map<String, Object> worker = new HashMap<String, Object>();
-				defs.add("WORKER" + ++i + " = " + atom.getSourceCode().getCall().toString().replace("\"", ""));
+				defs.add("WORKER" + ++i + " = \"" + r.getCall() + "\"");
 				worker.put("ref", "WORKER" + i);
 				worker.put("inputs", inputs);
 				worker.put("outputs", outputs);
@@ -65,11 +77,11 @@ public class PRCompiler {
 			}
 
 			Map<String, Object> I = new HashMap<String, Object>();
-			I.put("name", atom.getSemantics().getName());
+			I.put("name", X.getName());
 			I.put("inputs", inputs);
 			I.put("outputs", outputs);
 
-			Value pv = atom.getSemantics().getVariable();
+			Value pv = X.getVariable();
 			String param = null;
 			if (pv != null)
 				param = pv instanceof StringValue ? "\"" + pv.toString() + "\"" : pv.toString();

@@ -1,6 +1,6 @@
 grammar Reo;
 
-import Tokens, PA, WA, CAM, SA, PR, P, RBA;
+import Tokens, WA, CAM, SA, P, PR, RBA;
 
 // Reo File
 file      : secn? imps* defn* EOF;
@@ -8,16 +8,17 @@ secn      : 'section' name ';' ;
 imps      : 'import' name ';' ;
 defn      : ID '='? component ;
 
-// Components
+// Components	
 component : var                                                   # component_variable
-          | sign '{' (atom | source | source atom) '}'            # component_atomic
+          | sign '{' atom+ '}'                                    # component_atomic
           | sign multiset                                         # component_composite ;
-atom      : pa | cam | wa | sa | pr | p | rba ;
-source    : lang=(JAVA | C11) ':' STRING;
+atom      : ref | cam | wa | sa | p | pr | rba ;
+ref       : '#JAVA' STRING                                        # ref_java
+          | '#C' STRING                                           # ref_c ;
 
 // Multisets
 multiset  : instance                                              # multiset_constraint
-          | term? '{' multiset* ('|' formula)? '}'                # multiset_setbuilder
+          | ('|' term)? '{' multiset* ('|' formula)? '}'                # multiset_setbuilder
           | 'for' ID '=' term '..' term multiset                  # multiset_iteration
           | 'if' formula multiset ('else' formula multiset)* 
           ('else' multiset)?                                      # multiset_condition ;
@@ -29,7 +30,8 @@ instance  : component list? ports                                 # instance_ato
           | instance ';' instance                                 # instance_semicolon;
 
 // Statements
-formula   : BOOL                                                  # formula_boolean
+formula   : 'true'                                                # formula_true
+          | 'false'                                               # formula_false
           | '(' formula ')'                                       # formula_brackets
           | var component                                         # formula_componentdefn
           | 'struct' ID '{' param (',' param)* '}'                # formula_structdefn
@@ -62,7 +64,6 @@ term      : NAT                                                   # term_natural
           | term op=(MUL | DIV | MOD | ADD | MIN) term            # term_operation ;
 
 // Functions
-
 func      : '{' ('[' term ',' term ']')* '}' ;
 
 // Tuples
@@ -87,7 +88,7 @@ type      : '$'? ID | '(' type ')' | type '*' type | <assoc=right> type '^' type
 
 // Ports
 ports     : '(' ')' | '(' port (',' port)* ')' ;
-port      : prio=(ADD | AND)? var ;
+port      : prio=(ADD | AMP)? var ;
 
 // Variables
 var       : name ('[' term ']')* ;

@@ -11,7 +11,7 @@ public class NullValue extends Function {
 	 * Constructs an null value.
 	 */
 	public NullValue() {
-		super("*", "null", null);
+		super("*", "null", null, false);
 	}
 
 }

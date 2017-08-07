@@ -11,6 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -79,7 +80,12 @@ public class Existential implements Formula {
 	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		return null;
+		Scope s1 = new Scope(s);
+		s1.remove(new Identifier(x.getName()));
+		Formula g = f.evaluate(s1, m);
+		if (g == null)
+			return null;
+		return new Existential(x, g);
 	}
 
 	/**
@@ -102,11 +108,22 @@ public class Existential implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Nullable
 	public Formula QE() {
 		if (!f.getFreeVariables().contains(x))
 			return f.QE();
 		if (f instanceof Existential) {
-			return new Existential(x, f.QE()).QE();
+			Formula g = f.QE();
+			if (g == null)
+				return null;
+			return new Existential(x, g).QE();
+		} else if (f instanceof Equality) {
+			Equality e = (Equality) f;
+			if (e.getLHS().equals(x) || e.getRHS().equals(x)) {
+				return new TruthValue(true);
+			} else {
+				return null;
+			}
 		} else if (f instanceof Disjunction) {
 			List<Formula> list = new ArrayList<Formula>();
 			for (Formula fi : ((Disjunction) f).getClauses())
@@ -140,7 +157,7 @@ public class Existential implements Formula {
 				}
 			}
 		}
-		return this;
+		return null;
 	}
 
 	/**

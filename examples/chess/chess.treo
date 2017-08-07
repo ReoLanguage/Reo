@@ -25,6 +25,7 @@ chess(){
 }
 
 Engine1(a?String,b!String){
+<<<<<<< HEAD
 	Java:"Workers.Engine"
 }
 
@@ -34,6 +35,20 @@ Engine2(a?String,b!String){
 
 Display(a?String,b?String){
 	Java:"Workers.Display"
+=======
+	#RBA {a,b} true
+	#Java "Workers.Engine"
+}
+
+Engine2(a?String,b!String){
+	#RBA {a,b} true
+	#Java "Workers.Engine"
+}
+
+Display(a?String,b?String){
+	#RBA {a,b} true
+	#Java "Workers.Display"
+>>>>>>> 9f2cca6870334b7904a89865a2cb887b09317b04
 }
 
 visualize(C?String,R?String,M!String,O!String){

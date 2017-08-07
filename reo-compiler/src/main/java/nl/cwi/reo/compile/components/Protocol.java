@@ -143,4 +143,15 @@ public final class Protocol implements Component {
 		state.add(s);
 		return state;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		String s = "protocol: " + name + ports + "\n";
+		for (Transition t : transitions)
+			s += "\t" + t.toString() + "\n";
+		return s;
+	}
 }

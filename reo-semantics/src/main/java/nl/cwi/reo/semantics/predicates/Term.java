@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 
@@ -12,14 +13,14 @@ import nl.cwi.reo.interpret.typetags.TypeTag;
 /**
  * A abstract term over the language of constraints that represents a data item.
  */
-public interface Term {
+public interface Term extends Expression<Term> {
 
 	/**
 	 * Checks if this term contains an output port variable.
 	 * 
 	 * @return true if this term contains an outpout port variable.
 	 */
-	public boolean hadOutputs();
+	public boolean hasOutputPorts();
 
 	/**
 	 * Renames the port variables in this term.

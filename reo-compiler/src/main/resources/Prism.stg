@@ -1,0 +1,50 @@
+main(S) ::= <<
+//
+// Generated from <S.file> by Reo <S.version>.
+//
+
+mdp
+
+<S.components:component(); separator="\n\n">
+>>
+
+
+component(c) ::= <<
+<if(c.atomic)><c:atomic()><else><c:protocol()><endif>
+>>
+
+atomic(c) ::= <<
+<c.code>
+>>
+
+protocol(c) ::= <<
+module <c.name>
+    <c:variables(); separator="\n">
+
+    <c.transitions:command(); separator="\n">
+endmodule
+>>
+
+variables(c) ::= <<
+<c.initial.keys:{m | <m.name> : bool init <if(c.initial.(m))>true<else>false<endif>;}; separator="\n">
+>>
+
+command(t) ::= <<
+[] <t.guard:guard()> -> <t:update()>;
+>>
+
+guard(f) ::= <<
+<if(f.negation)>!(<f.formula:guard()>)<elseif(f.equality)><f:equality()><elseif(f.conjunction)>(<f.clauses:guard(); separator=" & ">)<elseif(f.disjunction)>(<f.clauses:guard(); separator=" | ">)<endif>
+>>
+
+update(m) ::= <<
+<m.memory.keys:{p | (<p.name>' = <m.memory.(p):term()>)}; separator=" & ">
+>>
+
+equality(f) ::= <<
+<if(f.LHS.node)><if(!f.RHS.constant.value)>!<f.LHS.name>.hasGet()<else><f.LHS:term()> = <f.RHS:term()><endif><else><f.LHS:term()> = <f.RHS:term()><endif>
+>>
+
+term(t) ::= <<
+<if(t.function)>false<elseif(t.constant)><t.name><elseif(t.node)>true<elseif(t.memory)><t.name><else><t.name><endif>
+>>

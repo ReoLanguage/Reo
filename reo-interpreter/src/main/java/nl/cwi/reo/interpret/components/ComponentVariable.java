@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
@@ -15,11 +14,8 @@ import nl.cwi.reo.util.Monitor;
 // TODO: Auto-generated Javadoc
 /**
  * Interpretation of a component variable.
- * 
- * @param <T>
- *            Reo semantics type
  */
-public final class ComponentVariable<T extends Interpretable<T>> implements ComponentExpression<T> {
+public final class ComponentVariable implements ComponentExpression {
 
 	/**
 	 * Variable.
@@ -39,16 +35,14 @@ public final class ComponentVariable<T extends Interpretable<T>> implements Comp
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("unchecked") // TODO in case of erroneous input, this may
-									// trigger a runtime exception.
 	@Override
 	@Nullable
-	public Component<T> evaluate(Scope s, Monitor m) {
+	public Component evaluate(Scope s, Monitor m) {
 		List<? extends Identifier> ids = variable.evaluate(s, m);
 		if (ids == null || ids.isEmpty())
 			return null;
 		Value v = s.get(ids.get(0));
-		return (v instanceof Component<?> ? (Component<T>) v : null);
+		return (v instanceof Component ? (Component) v : null);
 	}
 
 	/**

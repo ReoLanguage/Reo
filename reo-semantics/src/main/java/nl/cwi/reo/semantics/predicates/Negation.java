@@ -68,7 +68,10 @@ public class Negation implements Formula {
 	 */
 	@Override
 	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		return null;
+		Formula g = f.evaluate(s, m);
+		if (g == null)
+			return null;
+		return new Negation(g);
 	}
 
 	/**

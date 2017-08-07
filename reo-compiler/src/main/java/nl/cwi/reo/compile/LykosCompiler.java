@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.connectors.ReoConnectorAtom;
+import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.connectors.Language;
+import nl.cwi.reo.interpret.connectors.Reference;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
@@ -58,7 +60,7 @@ public class LykosCompiler {
 	private PortFactory portFactory = null;
 
 	/** The program. */
-	private final ReoConnector<PRAutomaton> program;
+	private final ReoConnector program;
 
 	/** The defs. */
 	private final Definitions defs = new Definitions();
@@ -94,9 +96,8 @@ public class LykosCompiler {
 	 * @param settings
 	 *            the settings
 	 */
-	public LykosCompiler(ReoProgram<PRAutomaton> program, String filename, String outputpath, String packagename,
-			Monitor m, CompilerSettings settings) {
-
+	public LykosCompiler(ReoProgram program, String filename, String outputpath, String packagename, Monitor m,
+			CompilerSettings settings) {
 		this.outputpath = outputpath;
 		this.packagename = packagename;
 		this.monitor = new MyToolErrorAccumulator(filename, m);
@@ -116,7 +117,8 @@ public class LykosCompiler {
 
 		// this.program = program.flatten();
 		if (program != null) {
-			this.program = program.getConnector().flatten().insertNodes(true, true, new PRAutomaton()).integrate();
+			this.program = program.getConnector().flatten().insertNodes(true, true, (Atom) new PRAutomaton())
+					.integrate();
 			this.name = program.getName();
 		} else
 			throw new NullPointerException();
@@ -136,9 +138,6 @@ public class LykosCompiler {
 	}
 
 	/**
-	 * Compile.
-	 */
-	/*
 	 * Take Reo interpreted program and make it understandable for Lykos
 	 */
 	public void compile() {
@@ -155,15 +154,21 @@ public class LykosCompiler {
 		// Add primitives to the protocol or to the list of workers
 		// for (ReoConnectorAtom<PRAutomaton> atom : program.insertNodes(true,
 		// true, new PRAutomaton()).integrate().getAtoms()) {
-		for (ReoConnectorAtom<PRAutomaton> atom : program.getAtoms()) {
-			if (atom.getSourceCode() == null || atom.getSourceCode().getCall() == null) {
-				PRAutomaton X = atom.getSemantics();
+		for (ReoConnectorAtom atom : program.getAtoms()) {
+			Reference r = atom.getReference(Language.JAVA);
+			if (r == null) {
+				PRAutomaton X = null;
+				for (Atom x : atom.getSemantics())
+					if (x instanceof PRAutomaton)
+						X = (PRAutomaton) x;
+				if (X == null)
+					return;
 				Primitive pr = new Primitive("nl.cwi.reo.pr.autom.libr." + X.getName(), "");
 				String param = X.getVariable() != null ? X.getVariable().toString() : null;
 				pr.setSignature(getMemberSignature(X.getName(), param, X.getInterface()));
 				c.addChild(pr);
 			} else {
-				workers.add(new InterpretedWorker(getWorkerSignature(atom)));
+				workers.add(new InterpretedWorker(getWorkerSignature(atom.getInterface(), r.getCall())));
 				for (Port p : atom.getInterface()) {
 					if (p.getType() == PortType.IN)
 						P.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), true));
@@ -293,16 +298,18 @@ public class LykosCompiler {
 	/**
 	 * Constructs a new worker signature.
 	 *
-	 * @param atom
-	 *            atomic Reo connector.
+	 * @param intface
+	 *            ports of the interface
+	 * @param call
+	 *            reference to Java code
 	 * @return signature of a worker.
 	 */
-	public WorkerSignature getWorkerSignature(ReoConnectorAtom<PRAutomaton> atom) {
+	public WorkerSignature getWorkerSignature(Set<Port> intface, String call) {
 
 		List<Variable> list = new ArrayList<Variable>();
 
 		String name = "";
-		for (Port p : atom.getSemantics().getInterface()) {
+		for (Port p : intface) {
 			PortSpec pSpec = new PortSpec(p.getName());
 			JavaPort jp = (JavaPort) portFactory.newOrGet(pSpec);
 
@@ -322,11 +329,9 @@ public class LykosCompiler {
 			name = "" + counterWorker++;
 		}
 
-		String nameWorker = atom.getSourceCode().getCall();
+		defs.putWorkerName(new TypedName(name, Type.WORKER_NAME), call, monitor);
 
-		defs.putWorkerName(new TypedName(name, Type.WORKER_NAME), nameWorker, monitor);
-
-		return new WorkerSignature(nameWorker, list);
+		return new WorkerSignature(call, list);
 	}
 
 	/**

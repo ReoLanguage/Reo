@@ -32,7 +32,7 @@ import nl.cwi.reo.interpret.PParser.P_var_nextContext;
 import nl.cwi.reo.interpret.PParser.P_var_portContext;
 import nl.cwi.reo.interpret.PParser.P_variableContext;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
-import nl.cwi.reo.interpret.listeners.Listener;
+import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
@@ -40,7 +40,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * The Class ListenerP.
  */
-public class ListenerP extends Listener<Predicate> implements PListener {
+public class ListenerP extends BaseListener implements PListener {
 
 	/** The predicate. */
 	private ParseTreeProperty<Predicate> predicate = new ParseTreeProperty<Predicate>();
@@ -422,7 +422,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 	 */
 	@Override
 	public void exitP_natural(P_naturalContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null));
+		terms.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null, false));
 	}
 
 	/*
@@ -445,7 +445,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 	 */
 	@Override
 	public void exitP_boolean(P_booleanContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null));
+		terms.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null, false));
 	}
 
 	/*
@@ -468,7 +468,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 	 */
 	@Override
 	public void exitP_string(P_stringContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), ctx.getText(), null));
+		terms.put(ctx, new Function(ctx.getText(), ctx.getText(), null, false));
 	}
 
 	/*
@@ -491,7 +491,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 	 */
 	@Override
 	public void exitP_decimal(P_decimalContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null));
+		terms.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null, false));
 	}
 
 	/*
@@ -514,7 +514,7 @@ public class ListenerP extends Listener<Predicate> implements PListener {
 	 */
 	@Override
 	public void exitP_function(P_functionContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), null, arguments.get(ctx.p_args())));
+		terms.put(ctx, new Function(ctx.getText(), null, arguments.get(ctx.p_args()), false));
 	}
 
 	/**

@@ -15,6 +15,9 @@ public final class ReoTemplate {
 
 	/** The reofile. */
 	private final String reofile;
+	
+	/** The Reo version. */
+	private final String version;
 
 	/** The packagename. */
 	private final String packagename;
@@ -40,8 +43,9 @@ public final class ReoTemplate {
 	 * @param components
 	 *            the components
 	 */
-	public ReoTemplate(String reofile, String packagename, String name, List<Component> components) {
+	public ReoTemplate(String reofile, String version, String packagename, String name, List<Component> components) {
 		this.reofile = reofile;
+		this.version = version;
 		this.packagename = packagename;
 		this.name = name;
 		this.components = Collections.unmodifiableList(components);
@@ -59,7 +63,16 @@ public final class ReoTemplate {
 	public String getFile() {
 		return reofile;
 	}
-
+	
+	/**
+	 * Gets the Reo version.
+	 *
+	 * @return the Reo version
+	 */
+	public String getVersion() {
+		return version;
+	}
+	
 	/**
 	 * Gets the package.
 	 *
@@ -94,5 +107,16 @@ public final class ReoTemplate {
 	 */
 	public List<Component> getComponents() {
 		return components;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		String s = name + ports + "\n";
+		for (Component c : components)
+			s += c.toString() + "\n";
+		return s;
 	}
 }

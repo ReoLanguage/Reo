@@ -12,6 +12,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.values.Value;
+import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -121,7 +123,26 @@ public class Relation implements Formula {
 	@Override
 	@Nullable
 	public Formula evaluate(Scope s, Monitor m) {
-		return this;
+
+		// Evaluate the symbol
+		String _name = name;
+		Value v = s.get(new Identifier(name));
+		if (v != null)
+			_name = v.toString();
+
+		// Evaluate the arguments
+		List<Term> _args = null;
+		if (args != null) {
+			_args = new ArrayList<>();
+			for (Term t : args) {
+				Term u = t.evaluate(s, m);
+				if (u == null)
+					return null;
+				_args.add(u);
+			}
+		}
+		
+		return new Relation(_name, value, _args);
 	}
 
 	/**

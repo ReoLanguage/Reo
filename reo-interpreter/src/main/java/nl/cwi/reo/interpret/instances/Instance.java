@@ -7,24 +7,19 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 
-// TODO: Auto-generated Javadoc
 /**
  * A Reo connector with a set of node unifications.
- * 
- * @param <T>
- *            Reo semantics type
  */
-public final class Instance<T extends Interpretable<T>> implements Value {
+public final class Instance implements Value {
 
 	/**
 	 * A Reo connector.
 	 */
-	private final ReoConnector<T> connector;
+	private final ReoConnector connector;
 
 	/**
 	 * A set of node unifications.
@@ -39,7 +34,7 @@ public final class Instance<T extends Interpretable<T>> implements Value {
 	 * @param unifications
 	 *            node unifications
 	 */
-	public Instance(ReoConnector<T> connector, Set<Set<Identifier>> unifications) {
+	public Instance(ReoConnector connector, Set<Set<Identifier>> unifications) {
 		this.connector = connector;
 		this.unifications = unifications;
 	}
@@ -53,8 +48,8 @@ public final class Instance<T extends Interpretable<T>> implements Value {
 	 *            renaming map
 	 * @return copy of this instance with renamed interface
 	 */
-	public Instance<T> reconnect(Map<Port, Port> joins) {
-		return new Instance<T>(connector.rename(joins), unifications);
+	public Instance reconnect(Map<Port, Port> joins) {
+		return new Instance(connector.rename(joins), unifications);
 	}
 
 	/**
@@ -62,7 +57,7 @@ public final class Instance<T extends Interpretable<T>> implements Value {
 	 * 
 	 * @return connector of this instance
 	 */
-	public ReoConnector<T> getConnector() {
+	public ReoConnector getConnector() {
 		return connector;
 	}
 
@@ -92,9 +87,9 @@ public final class Instance<T extends Interpretable<T>> implements Value {
 			return false;
 		if (other == this)
 			return true;
-		if (!(other instanceof Instance<?>))
+		if (!(other instanceof Instance))
 			return false;
-		Instance<?> p = (Instance<?>) other;
+		Instance p = (Instance) other;
 		return Objects.equals(this.connector, p.connector) && Objects.equals(this.unifications, p.unifications);
 	}
 

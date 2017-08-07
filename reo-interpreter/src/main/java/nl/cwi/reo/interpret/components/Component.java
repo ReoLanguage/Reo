@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import nl.cwi.reo.interpret.Interpretable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.ports.Port;
@@ -17,12 +16,9 @@ import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
 /**
- * A component definition.
- * 
- * @param <T>
- *            Reo semantics type
+ * A Reo component definition.
  */
-public final class Component<T extends Interpretable<T>> implements Value {
+public final class Component implements Value {
 
 	/**
 	 * Dependencies of this component definition.
@@ -37,7 +33,7 @@ public final class Component<T extends Interpretable<T>> implements Value {
 	/**
 	 * Set of this component definition.
 	 */
-	private final SetExpression<T> set;
+	private final SetExpression set;
 
 	/**
 	 * Constructs a new component definition.
@@ -50,14 +46,16 @@ public final class Component<T extends Interpretable<T>> implements Value {
 	 * @param set
 	 *            implementation of this component definition
 	 */
-	public Component(Scope scope, SignatureExpression sign, SetExpression<T> set) {
+	public Component(Scope scope, SignatureExpression sign, SetExpression set) {
 		this.scope = scope;
 		this.sign = sign;
 		this.set = set;
 	}
 
 	/**
-	 * Instantiates a Reo connector from this component definition.
+	 * Instantiates a Reo connector from this component definition. If the list
+	 * of ports is null, then the component is instantiated on the set of ports
+	 * used in the defining interface.
 	 *
 	 * @param values
 	 *            parameter values
@@ -68,12 +66,12 @@ public final class Component<T extends Interpretable<T>> implements Value {
 	 * @return a list of instances and unifications.
 	 */
 	@Nullable
-	public Instance<T> instantiate(List<?> values, @Nullable List<Port> ports, Monitor m) {
+	public Instance instantiate(List<?> values, @Nullable List<Port> ports, Monitor m) {
 		Signature signature = sign.evaluate(values, ports, m);
 		if (signature == null)
 			return null;
 		scope.putAll(signature.getAssignments());
-		Instance<T> i = set.evaluate(scope, m);
+		Instance i = set.evaluate(scope, m);
 		if (i == null)
 			return null;
 		return i.reconnect(signature.getInterface());

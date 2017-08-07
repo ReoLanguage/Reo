@@ -201,11 +201,11 @@ public final class Relation implements PredicateExpression {
 					else if (args.get(0) instanceof StringValue && args.get(0) instanceof StringValue && !Objects
 							.equals(((StringValue) args.get(0)).getValue(), ((StringValue) args.get(1)).getValue()))
 						return Arrays.asList(s);
-					else if (args.get(0) instanceof Component<?> && args.get(0) instanceof Component<?>
-							&& !Objects.equals((Component<?>) args.get(0), ((Component<?>) args.get(1))))
+					else if (args.get(0) instanceof Component && args.get(0) instanceof Component
+							&& !Objects.equals((Component) args.get(0), ((Component) args.get(1))))
 						return Arrays.asList(s);
-					else if (args.get(0) instanceof Instance<?> && args.get(0) instanceof Instance<?>
-							&& !Objects.equals((Instance<?>) args.get(0), ((Instance<?>) args.get(1))))
+					else if (args.get(0) instanceof Instance && args.get(0) instanceof Instance
+							&& !Objects.equals((Instance) args.get(0), ((Instance) args.get(1))))
 						return Arrays.asList(s);
 				} else {
 					m.add(location, "!= takes 2 arguments");
