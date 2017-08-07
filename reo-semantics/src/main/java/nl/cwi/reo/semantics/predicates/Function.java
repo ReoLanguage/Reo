@@ -233,10 +233,5 @@ public class Function implements Term {
 		return Objects.hash(this.name, this.value, this.args);
 	}
 
-	@Override
-	public nl.cwi.reo.semantics.predicates.TypeTag getTypeTag() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }
