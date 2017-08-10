@@ -209,7 +209,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	@Nullable
 	public ConstraintHypergraph evaluate(Scope s, Monitor m) {
-		
+
 		for (RuleNode r : getRuleNodes())
 			r.evaluate(s, m);
 
@@ -221,8 +221,9 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				return null;
 			_initial.put(init.getKey(), t);
 		}
-
-		return new ConstraintHypergraph(new ArrayList<>(hyperedges), _initial);
+		
+		
+		return new ConstraintHypergraph(getRules(), _initial);
 	}
 
 	/**
@@ -488,11 +489,28 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 */
 	@Override
 	public String toString() {
+		
+		Set<Port> variables = new HashSet<>();
+		for (HyperEdge h : hyperedges) {
+			variables.add(h.getSource().getPort());
+		}
 		String s = "";
-		Iterator<HyperEdge> iter = hyperedges.iterator();
-		while (iter.hasNext())
-			s += iter.next() + (iter.hasNext() ? "\n" : "");
+		for (Port var : variables) {
+			s = s + "Root : " + var.toString() + "\n{";
+			int i = getHyperedges(var).size();
+			for (HyperEdge h : getHyperedges(var)) {
+				s = s + h.toString() + (i > 1 ? " && \n" : "");
+				i--;
+			}
+			s = s + "}\n \n";
+		}
 		return s;
+//		
+//		String s = "";
+//		Iterator<HyperEdge> iter = hyperedges.iterator();
+//		while (iter.hasNext())
+//			s += iter.next() + (iter.hasNext() ? "\n" : "");
+//		return s;
 	}
 
 }

@@ -67,10 +67,10 @@ public class RuleNode {
 	public RuleNode(Rule r, Set<HyperEdge> hyperedge) {
 		this.rule = r;
 		this.hyperedges = new HashSet<>();
+		id = ++N;
 		for (HyperEdge h : hyperedge)
 			addToHyperedge(h); // TODO cannot call this.addToHyperedge, because
 								// this is not fully initialized.
-		id = ++N;
 	}
 
 	/**
@@ -337,7 +337,7 @@ public class RuleNode {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.id);
+		return Objects.hash(id);
 	}
 
 	/**

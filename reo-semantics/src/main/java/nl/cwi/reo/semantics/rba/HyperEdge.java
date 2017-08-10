@@ -56,10 +56,10 @@ public class HyperEdge {
 	public HyperEdge(PortNode root, Set<RuleNode> leaves) {
 		this.port = root;
 		this.rules = new HashSet<>();
+		id = ++N;
 		for (RuleNode r : leaves)
 			r.addToHyperedge(this); // TODO this object is not initialized and
 									// cannot be used here
-		id = ++N;
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class HyperEdge {
 	public PortNode getSource() {
 		return port;
 	}
-
+	
 	/**
 	 * Gets the set of rules in the target of this hyperedge.
 	 * 
@@ -179,14 +179,21 @@ public class HyperEdge {
 
 		if (h.getTarget().size() == 1) {
 
-			// Single rule to compose
+			/*
+			 * The hyperedge h is of size 1. Remove its unique rule, and store it in a variable.
+			 */
 			RuleNode h_ruleNode = h.getTarget().iterator().next();
 			h_ruleNode.rmFromHyperedge(h);
 
-			// Compose single rule
+			/*
+			 * Get all rules of "this" hyperedge, and compose all of them with the previous rule stored in h_ruleNode.
+			 */
 			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(rules);
 
 			while (!rulesToCompose.isEmpty()) {
+				/*
+				 * take the next rule to compose
+				 */
 				RuleNode r = rulesToCompose.poll();
 				RuleNode rule = r.compose(h_ruleNode); // TODO r may be null
 				if (rule != null)
@@ -269,12 +276,20 @@ public class HyperEdge {
 	@Override
 	public String toString() {
 		String s = "";
-		s += port.getPort().getName() + " -> { ";
-		Iterator<RuleNode> iter = rules.iterator();
-		while (iter.hasNext())
-			s += iter.next() + (iter.hasNext() ? ", " : "");
-		s += " }";
+		int i = rules.size();
+		for(RuleNode r : rules){
+			s=s+r.toString() + (i>1?" || \n ":"");
+			i--;
+		}
 		return s;
+//
+//		String s = "";
+//		s += port.getPort().getName() + " -> { ";
+//		Iterator<RuleNode> iter = rules.iterator();
+//		while (iter.hasNext())
+//			s += iter.next() + (iter.hasNext() ? ", " : "");
+//		s += " }";
+//		return s;
 	}
 
 }
