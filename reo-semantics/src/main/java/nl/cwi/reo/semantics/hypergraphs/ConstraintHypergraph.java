@@ -208,10 +208,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	@Nullable
 	public ConstraintHypergraph evaluate(Scope s, Monitor m) {
-<<<<<<< HEAD:reo-semantics/src/main/java/nl/cwi/reo/semantics/rba/ConstraintHypergraph.java
 
-=======
->>>>>>> 21ae1367aaf067a9316ae7c996398eea5fd0656d:reo-semantics/src/main/java/nl/cwi/reo/semantics/hypergraphs/ConstraintHypergraph.java
 		for (RuleNode r : getRuleNodes())
 			r.evaluate(s, m);
 
@@ -223,12 +220,6 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				return null;
 			_initial.put(init.getKey(), t);
 		}
-<<<<<<< HEAD:reo-semantics/src/main/java/nl/cwi/reo/semantics/rba/ConstraintHypergraph.java
-		
-		
-=======
-
->>>>>>> 21ae1367aaf067a9316ae7c996398eea5fd0656d:reo-semantics/src/main/java/nl/cwi/reo/semantics/hypergraphs/ConstraintHypergraph.java
 		return new ConstraintHypergraph(getRules(), _initial);
 	}
 

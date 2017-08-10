@@ -39,6 +39,7 @@ import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
 import nl.cwi.reo.semantics.hypergraphs.ListenerCH;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
@@ -250,6 +251,66 @@ public class Compiler {
 		}
 		return null;
 	}
+	
+	/**
+	 * Compile.
+	 */
+	private void compileCH() {
+
+		Interpreter interpreter = getInterpreter(lang);
+
+		ReoProgram program;
+		if ((program = interpreter.interpret(files.get(0))) == null)
+			return;
+
+		ReoConnector connector = addPortWindows(program.getConnector(), lang);
+		connector = connector.propagate(monitor);
+		connector = connector.flatten();
+		connector = connector.insertNodes(true, false, new ConstraintHypergraph());
+		connector = connector.integrate();
+
+		List<Component> components = buildAtomics(connector, lang);
+
+		Set<Port> intface = getDualInterface(components);
+
+		List<ConstraintHypergraph> protocol = getProtocol(connector, lang, ConstraintHypergraph.class);
+
+		ConstraintHypergraph composition = new ConstraintHypergraph().compose(protocol);
+
+		composition = composition.restrict(intface);
+
+		Set<Transition> transitions = buildTransitions(composition);
+
+		Set<Set<Transition>> partition = partition(transitions);
+
+		List<Component> protocols = buildProtocols(composition, partition);
+
+		components.addAll(protocols);
+
+		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
+		generateCode(template);
+	}
+
+	private Interpreter getInterpreter(Language lang) {
+		switch (lang) {
+		case PRISM:
+			ListenerPRBA listenerPRBA = new ListenerPRBA(monitor);
+			return new Interpreter(SemanticsType.CH, listenerPRBA, directories, params, monitor);
+		case JAVA:
+		case C11:
+			ListenerCH listenerRBA = new ListenerCH(monitor);
+			return new Interpreter(SemanticsType.CH, listenerRBA, directories, params, monitor);
+		case MAUDE:
+			break;
+		case PRT:
+			break;
+		case TEXT:
+			break;
+		default:
+			break;
+		}
+		return null;
+	}
 
 	/**
 	 * Closes a given connector by attaching port windows to visible ports.
@@ -376,6 +437,13 @@ public class Compiler {
 		return protocols;
 	}
 
+	private Set<Transition> buildTransitions(ConstraintHypergraph protocol) {
+		Set<Transition> transitions = new HashSet<>();
+		for (Rule rule : protocol.getAllRules())
+			transitions.add(RBACompiler.commandify(rule.getFormula()));
+		return transitions;
+	}
+	
 	private Set<Transition> buildTransitions(RuleBasedAutomaton protocol) {
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : protocol.getAllRules())
