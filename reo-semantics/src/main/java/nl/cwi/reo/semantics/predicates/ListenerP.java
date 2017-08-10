@@ -31,7 +31,6 @@ import nl.cwi.reo.interpret.PParser.P_var_currContext;
 import nl.cwi.reo.interpret.PParser.P_var_nextContext;
 import nl.cwi.reo.interpret.PParser.P_var_portContext;
 import nl.cwi.reo.interpret.PParser.P_variableContext;
-import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
@@ -43,20 +42,17 @@ import nl.cwi.reo.util.Monitor;
  */
 public class ListenerP extends BaseListener implements PListener {
 
-	/** The predicate. */
-	private ParseTreeProperty<Predicate> predicate = new ParseTreeProperty<Predicate>();
-
 	/** The formulas. */
-	private ParseTreeProperty<Formula> formulas = new ParseTreeProperty<Formula>();
+	private ParseTreeProperty<Formula> formulas = new ParseTreeProperty<>();
 
 	/** The terms. */
-	private ParseTreeProperty<Term> terms = new ParseTreeProperty<Term>();
+	private ParseTreeProperty<Term> terms = new ParseTreeProperty<>();
 
 	/** The arguments. */
-	private ParseTreeProperty<List<Term>> arguments = new ParseTreeProperty<List<Term>>();
+	private ParseTreeProperty<List<Term>> arguments = new ParseTreeProperty<>();
 
 	/** The variables. */
-	private ParseTreeProperty<Variable> variables = new ParseTreeProperty<Variable>();
+	private ParseTreeProperty<Variable> variables = new ParseTreeProperty<>();
 
 	/**
 	 * Instantiates a new listener P.
@@ -66,17 +62,6 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	public ListenerP(Monitor m) {
 		super(m);
-	}
-
-	/**
-	 * Predicates.
-	 *
-	 * @param ctx
-	 *            the ctx
-	 */
-
-	public void exitAtom(AtomContext ctx) {
-		atoms.put(ctx, predicate.get(ctx.p()));
 	}
 
 	/*
@@ -98,7 +83,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP(PContext ctx) {
-		predicate.put(ctx, new Predicate(formulas.get(ctx.p_form())));
+		atoms.put(ctx, new Predicate(formulas.get(ctx.p_form())));
 	}
 
 	/**
