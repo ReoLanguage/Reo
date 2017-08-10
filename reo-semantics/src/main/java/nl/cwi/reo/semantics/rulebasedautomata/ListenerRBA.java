@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
-import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.RbaContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_boolContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_trueContext;
@@ -51,14 +50,10 @@ import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.TruthValue;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ListenerRBA.
  */
 public class ListenerRBA extends BaseListener {
-
-	/** The rule-based automata. */
-	protected ParseTreeProperty<RuleBasedAutomaton> automata = new ParseTreeProperty<>();
 
 	/** The transitions. */
 	protected ParseTreeProperty<Rule> transitions = new ParseTreeProperty<>();
@@ -88,17 +83,6 @@ public class ListenerRBA extends BaseListener {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitAtom(nl.cwi.reo.interpret.
-	 * ReoParser.AtomContext)
-	 */
-	@Override
-	public void exitAtom(AtomContext ctx) {
-		atoms.put(ctx, automata.get(ctx.rba()));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba(nl.cwi.reo.interpret.
 	 * ReoParser.RbaContext)
 	 */
@@ -117,7 +101,7 @@ public class ListenerRBA extends BaseListener {
 				initial.putAll(init);
 		}
 		
-		automata.put(ctx, new RuleBasedAutomaton(rules, initial));
+		atoms.put(ctx, new RuleBasedAutomaton(rules, initial));
 	}
 
 	/*

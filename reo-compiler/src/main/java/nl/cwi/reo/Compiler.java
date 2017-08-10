@@ -43,7 +43,10 @@ import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
 import nl.cwi.reo.semantics.hypergraphs.ListenerCH;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
+import nl.cwi.reo.semantics.predicates.Existential;
+import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
@@ -153,6 +156,9 @@ public class Compiler {
 		switch (compilertype) {
 		case LYKOS:
 			compilePR();
+			break;
+		case CH:
+			compileCH();
 			break;
 		case DEFAULT:
 			compile();
@@ -277,10 +283,59 @@ public class Compiler {
 
 		ConstraintHypergraph composition = new ConstraintHypergraph().compose(protocol);
 
-		composition = composition.restrict(intface);
+//		composition = composition.restrict(intface);
 
-		Set<Transition> transitions = buildTransitions(composition);
+//		Set<Transition> transitions = buildTransitions(composition);
+		Set<Transition> transitions = new HashSet<>();
+		for (nl.cwi.reo.semantics.hypergraphs.Rule rule : composition.getRules()) {
 
+			// Hide all internal ports
+			Formula f = rule.getDataConstraint();
+//			Set<Port> pNegSet = new HashSet<>();
+			for (Port p : rule.getAllPorts()){
+				if (!intface.contains(p)){
+//					f = new Existential(new PortVariable(p), f).QE();
+					
+//					if(!rule.getSync().get(p)){
+//						/*
+//						 * This algorithm assumes that there is only one hyperedge for each variables (ie the Hypergraph is in a distributed form).
+//						 * Given a rule S and a negative port p:
+//						 * For all rules R satisfying p fires:
+//						 * 		- if R satisfies pNeg fires and pNeg is in the interface, add pNeg to the set of port that must block for S.
+//						 *  	- if pNeg is a negative port in R and S satisfies pNeg fires, then R and S are mutually exclusives (clear pNegSet and break this loop)
+//						 * 
+//						 * For each port in pNegSet, add pNeg=* to the guard.
+//						 */
+//						HyperEdge h = circuit.getHyperedges(p).get(0);
+//						for(RuleNode ruleNode : h.getLeaves()){
+//							for(Port pNeg : ruleNode.getRule().getAllPorts()){
+//								if(!pNeg.equals(p) && ruleNode.getRule().getSync().get(pNeg) && rule.getSync().get(pNeg)!=null && !rule.getSync().get(pNeg)){
+//									pNegSet.clear();
+//									break;
+//								}
+//								if(intface.contains(pNeg) && rule.getSync().get(pNeg)==null)
+//									pNegSet.add(pNeg);
+//							}
+//						}
+//					}
+				}
+//				else{
+//					if(rule.getSync().get(p) && !f.getFreeVariables().contains(p))
+//						f = new Conjunction(Arrays.asList(f, new Negation(new Equality(new Node(p),new Function("*",null)))));
+//					else
+//						f = new Conjunction(Arrays.asList(f, new Equality(new Node(p),new Function("*",null))));						
+//				}
+			}
+//			for(Port pNeg : pNegSet){
+//				f = new Conjunction(Arrays.asList(f, new Equality(new Node(pNeg),new Function("*",null))));
+//			}
+			
+				// Commandify the formula:
+			Transition t = RBACompiler.commandify(f);			
+			
+			if (!(t.getInput().isEmpty() && t.getMemory().isEmpty() && t.getOutput().isEmpty()))
+				transitions.add(t);
+		}
 		Set<Set<Transition>> partition = partition(transitions);
 
 		List<Component> protocols = buildProtocols(composition, partition);
@@ -289,27 +344,6 @@ public class Compiler {
 
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
-	}
-
-	private Interpreter getInterpreter(Language lang) {
-		switch (lang) {
-		case PRISM:
-			ListenerPRBA listenerPRBA = new ListenerPRBA(monitor);
-			return new Interpreter(SemanticsType.CH, listenerPRBA, directories, params, monitor);
-		case JAVA:
-		case C11:
-			ListenerCH listenerRBA = new ListenerCH(monitor);
-			return new Interpreter(SemanticsType.CH, listenerRBA, directories, params, monitor);
-		case MAUDE:
-			break;
-		case PRT:
-			break;
-		case TEXT:
-			break;
-		default:
-			break;
-		}
-		return null;
 	}
 
 	/**
@@ -439,8 +473,8 @@ public class Compiler {
 
 	private Set<Transition> buildTransitions(ConstraintHypergraph protocol) {
 		Set<Transition> transitions = new HashSet<>();
-		for (Rule rule : protocol.getAllRules())
-			transitions.add(RBACompiler.commandify(rule.getFormula()));
+		for (nl.cwi.reo.semantics.hypergraphs.Rule rule : protocol.getRules())
+			transitions.add(RBACompiler.commandify(rule.getDataConstraint()));
 		return transitions;
 	}
 	
@@ -484,6 +518,34 @@ public class Compiler {
 			Map<MemoryVariable, Object> initial = new HashMap<>();
 			for (Map.Entry<String, TypeTag> e : tags.entrySet())
 				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitial().get(e.getKey()));
+
+			components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
+		}
+		return components;
+	}
+
+	private List<Component> buildProtocols(ConstraintHypergraph protocol, Set<Set<Transition>> partition) {
+		List<Component> components = new ArrayList<>();
+		int n_protocol = 1;
+		for (Set<Transition> part : partition) {
+
+			// Get the interface of this part
+			Set<Port> ports = new HashSet<>();
+			for (Transition t : part)
+				ports.addAll(t.getInterface());
+
+			// Find the type of each memory cell that occurs in this part
+			Map<String, TypeTag> tags = new HashMap<>();
+			for (Map.Entry<MemoryVariable, Term> init : protocol.getInitials().entrySet())
+				tags.put(init.getKey().getName(), init.getValue().getTypeTag());
+			for (Transition t : part)
+				for (Map.Entry<MemoryVariable, Term> upd : t.getMemory().entrySet())
+					tags.put(upd.getKey().getName(), upd.getValue().getTypeTag());
+
+			// Get the initial value of each memory cell
+			Map<MemoryVariable, Object> initial = new HashMap<>();
+			for (Map.Entry<String, TypeTag> e : tags.entrySet())
+				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(e.getKey()));
 
 			components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
 		}
