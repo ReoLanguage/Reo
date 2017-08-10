@@ -21,11 +21,6 @@ import com.beust.jcommander.Parameter;
 import nl.cwi.reo.compile.CompilerType;
 import nl.cwi.reo.compile.LykosCompiler;
 import nl.cwi.reo.compile.RBACompiler;
-import nl.cwi.reo.compile.components.Atomic;
-import nl.cwi.reo.compile.components.Component;
-import nl.cwi.reo.compile.components.Protocol;
-import nl.cwi.reo.compile.components.ReoTemplate;
-import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.SemanticsType;
@@ -44,15 +39,18 @@ import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.Semantics;
+import nl.cwi.reo.semantics.hypergraphs.ListenerCH;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
-import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
-import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
-import nl.cwi.reo.semantics.rba.ConstraintHypergraph;
-import nl.cwi.reo.semantics.rba.ListenerRBA;
-import nl.cwi.reo.semantics.rba.Rule;
+import nl.cwi.reo.semantics.rulebasedautomata.Rule;
+import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
+import nl.cwi.reo.templates.Atomic;
+import nl.cwi.reo.templates.Component;
+import nl.cwi.reo.templates.Protocol;
+import nl.cwi.reo.templates.ReoTemplate;
+import nl.cwi.reo.templates.Transition;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
@@ -207,30 +205,31 @@ public class Compiler {
 		ReoConnector connector = addPortWindows(program.getConnector(), lang);
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();
-		connector = connector.insertNodes(true, false, new ConstraintHypergraph());
+		connector = connector.insertNodes(true, false, new RuleBasedAutomaton());
 		connector = connector.integrate();
 
 		List<Component> components = buildAtomics(connector, lang);
-		
+
 		Set<Port> intface = getDualInterface(components);
-		
-		List<ConstraintHypergraph> protocol = getProtocol(connector, lang, ConstraintHypergraph.class);
-		
-		ConstraintHypergraph composition = new ConstraintHypergraph().compose(protocol);
+
+		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
+
+		RuleBasedAutomaton composition = new RuleBasedAutomaton().compose(protocol);
+
 		composition = composition.restrict(intface);
 
 		Set<Transition> transitions = buildTransitions(composition);
 
 		Set<Set<Transition>> partition = partition(transitions);
 
-		List<Component> protocols = buildProtocols(composition, partition, intface);
-		
+		List<Component> protocols = buildProtocols(composition, partition);
+
 		components.addAll(protocols);
 
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
 	}
-	
+
 	private Interpreter getInterpreter(Language lang) {
 		switch (lang) {
 		case PRISM:
@@ -238,7 +237,7 @@ public class Compiler {
 			return new Interpreter(SemanticsType.CH, listenerPRBA, directories, params, monitor);
 		case JAVA:
 		case C11:
-			ListenerRBA listenerRBA = new ListenerRBA(monitor);
+			ListenerCH listenerRBA = new ListenerCH(monitor);
 			return new Interpreter(SemanticsType.CH, listenerRBA, directories, params, monitor);
 		case MAUDE:
 			break;
@@ -263,7 +262,7 @@ public class Compiler {
 	 */
 	private ReoConnector addPortWindows(ReoConnector connector, Language lang) {
 		if (lang != Language.JAVA)
-			return  connector;
+			return connector;
 		List<ReoConnector> list = new ArrayList<>();
 		list.add(connector);
 		for (Port p : connector.getInterface()) {
@@ -367,20 +366,20 @@ public class Compiler {
 					if (type.isInstance(x))
 						semantics = type.cast(x);
 				if (semantics == null) {
-						monitor.add("Not all components have semantics.");
+					monitor.add("Not all components have semantics.");
 					return new ArrayList<>();
 				}
 				protocols.add(semantics);
-			} 
+			}
 		}
-		
+
 		return protocols;
 	}
 
-	private Set<Transition> buildTransitions(ConstraintHypergraph protocol) {
+	private Set<Transition> buildTransitions(RuleBasedAutomaton protocol) {
 		Set<Transition> transitions = new HashSet<>();
-		for (Rule rule : protocol.getRules())
-			transitions.add(RBACompiler.commandify(rule.getDataConstraint()));
+		for (Rule rule : protocol.getAllRules())
+			transitions.add(RBACompiler.commandify(rule.getFormula()));
 		return transitions;
 	}
 
@@ -392,88 +391,33 @@ public class Compiler {
 	 *            composed protocol
 	 * @param partition
 	 *            partitioned set of transitions
-	 * @param intface
-	 *            interface of the protocols
 	 * 
 	 * @return list of protocol templates
 	 */
-	private List<Component> buildProtocols(ConstraintHypergraph protocol, Set<Set<Transition>> partition,
-			Set<Port> intface) {
+	private List<Component> buildProtocols(RuleBasedAutomaton protocol, Set<Set<Transition>> partition) {
 		List<Component> components = new ArrayList<>();
 		int n_protocol = 1;
 		for (Set<Transition> part : partition) {
-			Map<MemoryVariable, Object> initial = new HashMap<>();
+
+			// Get the interface of this part
 			Set<Port> ports = new HashSet<>();
-
-			Map<MemoryVariable, TypeTag> tags = new HashMap<>();
-			for (Transition t : part) {
-				for (Map.Entry<MemoryVariable, Term> m : t.getMemory().entrySet()) {
-					MemoryVariable x = m.getKey();
-					MemoryVariable x_prime = new MemoryVariable(x.getName(), !x.hasPrime());
-
-					if ((!tags.containsKey(x) || tags.get(x) == null)
-							&& (!tags.containsKey(x_prime) || tags.get(x_prime) == null)) {
-						Term initialValueLHS = protocol.getInitials()
-								.get(new MemoryVariable(m.getKey().getName(), false));
-						Term initialValueRHS = null;
-						if (m.getValue() instanceof MemoryVariable)
-							initialValueRHS = protocol.getInitials()
-									.get(new MemoryVariable(((MemoryVariable) m.getValue()).getName(), false));
-
-						TypeTag tag = m.getValue().getTypeTag();
-						for (PortVariable n : t.getOutput().keySet()) {
-							if (t.getOutput().get(n) instanceof MemoryVariable
-									&& ((MemoryVariable) t.getOutput().get(n)).getName().equals(m.getKey().getName())
-									&& n.getPort().getTypeTag() != null) {
-								tag = new TypeTag(n.getPort().getTypeTag().toString());
-							}
-						}
-						if (initialValueLHS != null && initialValueLHS instanceof Function
-								&& ((Function) initialValueLHS).getValue() instanceof String) {
-							tag = new TypeTag("String");
-						}
-						if (initialValueRHS != null && initialValueRHS instanceof Function
-								&& ((Function) initialValueRHS).getValue() instanceof String) {
-							tag = new TypeTag("String");
-						}
-						if (initialValueLHS != null && initialValueLHS instanceof Function
-								&& ((Function) initialValueLHS).getValue() instanceof Integer) {
-							tag = new TypeTag("Integer");
-						}
-						if (initialValueRHS != null && initialValueRHS instanceof Function
-								&& ((Function) initialValueRHS).getValue() instanceof Integer) {
-							tag = new TypeTag("Integer");
-						}
-						tags.remove(x);
-						tags.remove(x_prime);
-						tags.put(x, tag);
-						tags.put(x_prime, tag);
-
-						if (m.getValue() instanceof MemoryVariable) {
-							tags.remove((MemoryVariable) m.getValue());
-							tags.remove(new MemoryVariable(((MemoryVariable) m.getValue()).getName(),
-									!((MemoryVariable) m.getValue()).hasPrime()));
-							tags.put((MemoryVariable) m.getValue(), tag);
-							tags.put(new MemoryVariable(((MemoryVariable) m.getValue()).getName(),
-									!((MemoryVariable) m.getValue()).hasPrime()), tag);
-						}
-					}
-				}
-			}
-
-			for (Transition t : part) {
+			for (Transition t : part)
 				ports.addAll(t.getInterface());
 
-				for (Map.Entry<MemoryVariable, Term> m : t.getMemory().entrySet()) {
-					Term initialValue = protocol.getInitials().get(new MemoryVariable(m.getKey().getName(), false));
-					if (initialValue instanceof Function && ((Function) initialValue).getValue() instanceof Integer)
-						initialValue = (initialValue != null ? new Function(((Function) initialValue).getName(),
-								((Function) initialValue).getValue().toString(), new ArrayList<Term>(), false) : null);
-					initial.put(m.getKey().setType(tags.get(m.getKey())), initialValue);
-				}
-			}
+			// Find the type of each memory cell that occurs in this part
+			Map<String, TypeTag> tags = new HashMap<>();
+			for (Map.Entry<MemoryVariable, Term> init : protocol.getInitial().entrySet())
+				tags.put(init.getKey().getName(), init.getValue().getTypeTag());
+			for (Transition t : part)
+				for (Map.Entry<MemoryVariable, Term> upd : t.getMemory().entrySet())
+					tags.put(upd.getKey().getName(), upd.getValue().getTypeTag());
 
-			components.add(new Protocol("Protocol" + n_protocol++, intface, part, initial));
+			// Get the initial value of each memory cell
+			Map<MemoryVariable, Object> initial = new HashMap<>();
+			for (Map.Entry<String, TypeTag> e : tags.entrySet())
+				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitial().get(e.getKey()));
+
+			components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
 		}
 		return components;
 	}
@@ -489,16 +433,16 @@ public class Compiler {
 		Set<Set<Transition>> partition = new HashSet<>();
 
 		if (!transitions.isEmpty()) {
-//			for (Transition t : transitions) {
-//				Set<Set<Transition>> newPartition = new HashSet<>();
-//				newPartition.add(new HashSet<>(Arrays.asList(t)));
-//				for (Set<Transition> part : partition) {
-//					
-//				}
-//			}
+			// for (Transition t : transitions) {
+			// Set<Set<Transition>> newPartition = new HashSet<>();
+			// newPartition.add(new HashSet<>(Arrays.asList(t)));
+			// for (Set<Transition> part : partition) {
+			//
+			// }
+			// }
 			partition.add(transitions);
 		}
-		
+
 		return partition;
 	}
 

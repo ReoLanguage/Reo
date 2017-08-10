@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -49,8 +50,17 @@ public class Function implements Term {
 	 * Defines whether the function symbol can be used with infix notation. For
 	 * example, infix can be a+b, while prefix can be +(a,b).
 	 */
-	@Nullable
 	private final boolean infix;
+
+	/**
+	 * Type of returned data.
+	 */
+	private final TypeTag tag;
+	
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs a new function from a name, a value, and a list of arguments.
@@ -63,12 +73,21 @@ public class Function implements Term {
 	 *            list of arguments
 	 * @param infix
 	 *            infix notation
+	 * @param tag
+	 *            type tag
 	 */
-	public Function(String name, @Nullable Object value, @Nullable List<Term> args, boolean infix) {
+	public Function(String name, @Nullable Object value, @Nullable List<Term> args, boolean infix, TypeTag tag) {
 		this.name = name;
 		this.value = value;
 		this.args = args;
 		this.infix = infix;
+		this.tag = tag;
+
+		Set<Variable> vars = new HashSet<Variable>();
+		if (args != null)
+			for (Term t : args)
+				vars.addAll(t.getFreeVariables());
+		this.freeVars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -137,20 +156,21 @@ public class Function implements Term {
 		if (args != null)
 			for (Term s : args)
 				list.add(s.rename(links));
-		return new Function(name, value, list, infix);
+		return new Function(name, value, list, infix, tag);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Term substitute(Term t, Variable x) {
+	public Term substitute(Map<Variable, Term> map) {
+		if (Collections.disjoint(freeVars, map.keySet()))
+			return this;
 		List<Term> list = new ArrayList<Term>();
-		if (args != null) {
+		if (args != null)
 			for (Term s : args)
-				list.add(s.substitute(t, x));
-		}
-		return new Function(name, value, list, infix);
+				list.add(s.substitute(map));
+		return new Function(name, value, list, infix, tag);
 	}
 
 	/**
@@ -178,7 +198,7 @@ public class Function implements Term {
 			}
 		}
 
-		return new Function(_name, value, _args, infix);
+		return new Function(_name, value, _args, infix, tag);
 	}
 
 	/**
@@ -186,27 +206,15 @@ public class Function implements Term {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = new HashSet<Variable>();
-		if (args != null) {
-			for (Term t : args) {
-				if (t != null) {
-					Set<Variable> freevars = t.getFreeVariables();
-					if (freevars != null)
-						vars.addAll(freevars);
-				}
-			}
-		}
-		return vars;
+		return freeVars;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	@Nullable
 	public TypeTag getTypeTag() {
-		// TODO infer type tags of functions.
-		return null;
+		return tag;
 	}
 
 	/**

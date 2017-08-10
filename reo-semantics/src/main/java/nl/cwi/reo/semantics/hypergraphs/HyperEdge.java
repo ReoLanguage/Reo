@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.rba;
+package nl.cwi.reo.semantics.hypergraphs;
 
 import java.util.ArrayList;
 import java.util.HashMap;

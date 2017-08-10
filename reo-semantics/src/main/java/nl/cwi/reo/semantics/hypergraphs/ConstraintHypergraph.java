@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.rba;
+package nl.cwi.reo.semantics.hypergraphs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,10 +19,9 @@ import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
-import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
@@ -209,7 +208,10 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	@Nullable
 	public ConstraintHypergraph evaluate(Scope s, Monitor m) {
+<<<<<<< HEAD:reo-semantics/src/main/java/nl/cwi/reo/semantics/rba/ConstraintHypergraph.java
 
+=======
+>>>>>>> 21ae1367aaf067a9316ae7c996398eea5fd0656d:reo-semantics/src/main/java/nl/cwi/reo/semantics/hypergraphs/ConstraintHypergraph.java
 		for (RuleNode r : getRuleNodes())
 			r.evaluate(s, m);
 
@@ -221,8 +223,12 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				return null;
 			_initial.put(init.getKey(), t);
 		}
+<<<<<<< HEAD:reo-semantics/src/main/java/nl/cwi/reo/semantics/rba/ConstraintHypergraph.java
 		
 		
+=======
+
+>>>>>>> 21ae1367aaf067a9316ae7c996398eea5fd0656d:reo-semantics/src/main/java/nl/cwi/reo/semantics/hypergraphs/ConstraintHypergraph.java
 		return new ConstraintHypergraph(getRules(), _initial);
 	}
 
@@ -279,7 +285,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			for (Port x : outs) {
 				map.put(x, true);
 				Formula eq = new Equality(new PortVariable(p), new PortVariable(x));
-				transition = Conjunction.conjunction(Arrays.asList(transition, eq));
+				transition = Formulas.conjunction(Arrays.asList(transition, eq));
 			}
 			rules.add(new Rule(map, transition));
 		}
@@ -474,9 +480,8 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			Formula g = r.getDataConstraint();
 			for (Port p : r.getFiringPorts()) {
 				if (!intface.contains(p)) {
-					Formula h = new Existential(new PortVariable(p), g).QE();
-					if (h != null)
-						g = h;
+					List<Variable> V = Arrays.asList(new PortVariable(p));
+					g = Formulas.eliminate(g, V);
 				}
 			}
 			setRules.add(new Rule(r.getSyncConstraint(), g));

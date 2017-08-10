@@ -5,7 +5,7 @@ import java.util.Map;
 
 import nl.cwi.reo.interpret.ReoParser.Rba_distributionContext;
 import nl.cwi.reo.semantics.predicates.Term;
-import nl.cwi.reo.semantics.rba.ListenerRBA;
+import nl.cwi.reo.semantics.rulebasedautomata.ListenerRBA;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -30,11 +30,11 @@ public class ListenerPRBA extends ListenerRBA {
 	public void exitRba_distribution(Rba_distributionContext ctx) {
 		Map<Term, Term> distr = new HashMap<>();
 		for (int i = 0; i < ctx.rba_term().size(); i += 2) {
-			Term t1 = term.get(ctx.rba_term(i));
-			Term t2 = term.get(ctx.rba_term(i+1));
+			Term t1 = terms.get(ctx.rba_term(i));
+			Term t2 = terms.get(ctx.rba_term(i+1));
 			distr.put(t2, t1);
 		}
-		term.put(ctx, new Distribution(distr));
+		terms.put(ctx, new Distribution(distr));
 	}
 
 }

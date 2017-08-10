@@ -41,6 +41,11 @@ public enum SemanticsType {
 	PR,
 
 	/**
+	 * Rule-based automata.
+	 */
+	RBA,
+
+	/**
 	 * Seepage automata.
 	 */
 	SA,
@@ -68,6 +73,8 @@ public enum SemanticsType {
 			return "plain";
 		case PR:
 			return "pr";
+		case RBA:
+			return "rba";
 		case SA:
 			return "sa";
 		case WA:

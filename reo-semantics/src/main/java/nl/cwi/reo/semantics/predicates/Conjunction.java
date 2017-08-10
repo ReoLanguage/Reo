@@ -2,6 +2,7 @@ package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +31,11 @@ public class Conjunction implements Formula {
 	 * List of formulas in this conjunction.
 	 */
 	private final List<Formula> clauses;
+	
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs the conjunction of a list of formulas.
@@ -39,40 +45,10 @@ public class Conjunction implements Formula {
 	 */
 	public Conjunction(List<Formula> clauses) {
 		this.clauses = clauses;
-	}
-
-	/**
-	 * Constructs and simplifies the conjunction of a list of formulas. Because
-	 * this method simplifies the conjunction, this method is preferred over the
-	 * constructor method of a formula. The simplification 1) removes
-	 * duplicates, 2) removes conjunctions with true, 3) shortcuts conjunctions
-	 * with false, 4) unifies conjunctions of conjunctions, and 5) avoids
-	 * conjunctions with a single clause.
-	 * 
-	 * @param clauses
-	 *            list of formulas
-	 * @return simplified conjunction of the list of formulas.
-	 */
-	public static Formula conjunction(List<Formula> clauses) {
-		List<Formula> _clauses = new ArrayList<>();
-		for (Formula f : clauses) {
-			if (f instanceof TruthValue) {
-				if (((TruthValue) f).getBool() == false)
-					return new TruthValue(false);
-			} else if (f instanceof Conjunction) {
-				_clauses.addAll(((Conjunction) f).getClauses());
-			} else if (!_clauses.contains(f)) {
-				_clauses.add(f);
-			}
-		}
-		switch (_clauses.size()) {
-		case 0:
-			return new TruthValue(true);
-		case 1:
-			return _clauses.get(0);
-		default:
-			return new Conjunction(_clauses);
-		}
+		Set<Variable> vars = new HashSet<Variable>();
+		for (Formula c : clauses)
+			vars.addAll(c.getFreeVariables());
+		this.freeVars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -148,7 +124,7 @@ public class Conjunction implements Formula {
 					list.add(f);
 				}
 			}
-			clauses.add(Conjunction.conjunction(list));
+			clauses.add(Formulas.conjunction(list));
 		}
 		if (clauses.size() == 1)
 			return clauses.get(0);
@@ -173,21 +149,12 @@ public class Conjunction implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula QE() {
+	public Formula substitute(Map<Variable, Term> map) {
+		if (Collections.disjoint(freeVars, map.keySet()))
+			return this;
 		List<Formula> list = new ArrayList<Formula>();
 		for (Formula f : clauses)
-			list.add(f.QE());
-		return new Conjunction(list);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formula substitute(Term t, Variable x) {
-		List<Formula> list = new ArrayList<Formula>();
-		for (Formula f : clauses)
-			list.add(f.substitute(t, x));
+			list.add(f.substitute(map));
 		return new Conjunction(list);
 	}
 

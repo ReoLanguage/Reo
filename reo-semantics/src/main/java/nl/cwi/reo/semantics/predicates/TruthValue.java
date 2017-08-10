@@ -1,6 +1,5 @@
 package nl.cwi.reo.semantics.predicates;
 
-// TODO: Auto-generated Javadoc
 /**
  * An atomic nullary predicate (i.e., a boolean value).
  */
@@ -16,7 +15,7 @@ public class TruthValue extends Relation {
 	 *            boolean
 	 */
 	public TruthValue(boolean b) {
-		super(b ? "\u22A4" : "\u22A5", b ? "true" : "false", null);
+		super(b ? "true" : "false", null);
 		this.b = b;
 	}
 
@@ -27,6 +26,14 @@ public class TruthValue extends Relation {
 	 */
 	public boolean getBool() {
 		return b;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return b ? "\u22A4" : "\u22A5";
 	}
 
 }

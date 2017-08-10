@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,17 +33,22 @@ public class Relation implements Formula {
 	 */
 	private final String name;
 
-	/**
-	 * Value of this relation or reference to its implementation.
-	 */
-	@Nullable
-	private String value;
+	// /**
+	// * Value of this relation or reference to its implementation.
+	// */
+	// @Nullable
+	// private String value;
 
 	/**
 	 * List of arguments of this relation.
 	 */
 	@Nullable
 	private final List<Term> args;
+
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs a new relation with a given name and a given list of
@@ -55,25 +61,14 @@ public class Relation implements Formula {
 	 */
 	public Relation(String name, @Nullable List<Term> args) {
 		this.name = name;
-		this.value = null;
 		this.args = args;
-	}
 
-	/**
-	 * Constructs a new relation with a given name, a given value, and a given
-	 * list of arguments.
-	 * 
-	 * @param name
-	 *            name of the relation
-	 * @param value
-	 *            value of this relation or reference to its implementation
-	 * @param args
-	 *            list of arguments
-	 */
-	public Relation(String name, @Nullable String value, @Nullable List<Term> args) {
-		this.name = name;
-		this.value = value;
-		this.args = args;
+		Set<Variable> vars = new HashSet<Variable>();
+		if (args != null)
+			for (Term t : args)
+				vars.addAll(t.getFreeVariables());
+		this.freeVars = Collections.unmodifiableSet(vars);
+
 	}
 
 	/**
@@ -83,16 +78,6 @@ public class Relation implements Formula {
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * Gets the value of this relation.
-	 * 
-	 * @return value of this relation.
-	 */
-	@Nullable
-	public String getValue() {
-		return value;
 	}
 
 	/**
@@ -110,11 +95,7 @@ public class Relation implements Formula {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = new HashSet<Variable>();
-		if (args != null)
-			for (Term t : args)
-				vars.addAll(t.getFreeVariables());
-		return vars;
+		return freeVars;
 	}
 
 	/**
@@ -141,8 +122,8 @@ public class Relation implements Formula {
 				_args.add(u);
 			}
 		}
-		
-		return new Relation(_name, value, _args);
+
+		return new Relation(_name, _args);
 	}
 
 	/**
@@ -181,25 +162,13 @@ public class Relation implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula QE() {
-		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formula substitute(Term t, Variable x) {
-		if (args == null)
+	public Formula substitute(Map<Variable, Term> map) {
+		if (args == null || Collections.disjoint(freeVars, map.keySet()))
 			return this;
-		List<Term> listTerms = new ArrayList<Term>();
-		for (Term term : args) {
-			if (term.equals(t))
-				listTerms.add(x);
-			else
-				listTerms.add(term);
-		}
-		return new Relation(this.name, this.value, listTerms);
+		List<Term> _args = new ArrayList<>();
+		for (Term t : args)
+			_args.add(t.substitute(map));
+		return new Relation(this.name, _args);
 	}
 
 	/**
@@ -237,8 +206,7 @@ public class Relation implements Formula {
 		if (!(other instanceof Relation))
 			return false;
 		Relation p = (Relation) other;
-		return Objects.equals(this.name, p.name) && Objects.equals(this.value, p.value)
-				&& Objects.equals(this.args, p.args);
+		return Objects.equals(this.name, p.name) && Objects.equals(this.args, p.args);
 	}
 
 	/**
@@ -246,7 +214,7 @@ public class Relation implements Formula {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.name, this.value, this.args);
+		return Objects.hash(this.name, this.args);
 	}
 
 }

@@ -112,18 +112,13 @@ public class Universal implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula QE() {
-		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formula substitute(Term t, Variable x) {
-		if (this.x.equals(x))
-			return this;
-		return new Universal(x, f.substitute(t, x));
+	public Formula substitute(Map<Variable, Term> map) {
+		Map<Variable, Term> _map = map;
+		if (map.containsKey(x)) {
+			_map = new HashMap<>(map);
+			_map.remove(x);
+		} 
+		return new Universal(x, f.substitute(_map));
 	}
 
 	/**

@@ -1,7 +1,7 @@
 section reo;
 
 import reo.fifo1;
-import reo.fifo1full;
+import reo.fifofull;
 import reo.sync;
 
 sequencer(p[1..n]?) {
@@ -11,7 +11,7 @@ sequencer(p[1..n]?) {
   | 
     i : <1..n>
   }
-  fifo1full<0>(x[1], x[n+1])
+  fifofull<0>(x[1], x[n+1])
 }
 
 

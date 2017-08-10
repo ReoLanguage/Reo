@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +33,11 @@ public class PortVariable implements Variable {
 	 * Flag for string template.
 	 */
 	private final Port p;
+	
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs a new port variable from a given port.
@@ -41,6 +47,7 @@ public class PortVariable implements Variable {
 	 */
 	public PortVariable(Port p) {
 		this.p = p;
+		this.freeVars = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(this)));
 	}
 
 	/**
@@ -100,8 +107,9 @@ public class PortVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Term substitute(Term t, Variable x) {
-		if (this.equals(x))
+	public Term substitute(Map<Variable, Term> map) {
+		Term t = map.get(this);
+		if (t != null)
 			return t;
 		return this;
 	}
@@ -111,7 +119,7 @@ public class PortVariable implements Variable {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		return new HashSet<Variable>(Arrays.asList(this));
+		return freeVars;
 	}
 
 	/**

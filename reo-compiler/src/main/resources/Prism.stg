@@ -46,5 +46,5 @@ equality(f) ::= <<
 >>
 
 term(t) ::= <<
-<if(t.function)>false<elseif(t.constant)><t.name><elseif(t.node)>true<elseif(t.memory)><t.name><else><t.name><endif>
+<if(t.isnonnull)>true<elseif(t.function)>false<elseif(t.constant)><t.name><elseif(t.node)>true<elseif(t.memory)><t.name><else><t.name><endif>
 >>

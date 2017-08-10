@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,11 @@ public class Disjunction implements Formula {
 	 * List of formulas in this disjunction.
 	 */
 	private final List<Formula> clauses;
+	
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs the disjunction of a list of formulas.
@@ -37,6 +43,10 @@ public class Disjunction implements Formula {
 	 */
 	public Disjunction(List<Formula> clauses) {
 		this.clauses = clauses;
+		Set<Variable> vars = new HashSet<Variable>();
+		for (Formula c : clauses)
+			vars.addAll(c.getFreeVariables());
+		this.freeVars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -116,30 +126,14 @@ public class Disjunction implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula QE() {
-		List<Formula> list = new ArrayList<Formula>();
-
-		if (clauses.size() == 1)
-			return clauses.get(0).QE();
-
-		for (Formula f : clauses) {
-			if (f instanceof Equality && ((Equality) f).getLHS().equals(((Equality) f).getRHS()))
-				return new TruthValue(true);
-			list.add(f.QE());
-		}
-		return new Disjunction(list);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formula substitute(Term t, Variable x) {
+	public Formula substitute(Map<Variable, Term> map) {
+		if (Collections.disjoint(freeVars, map.keySet()))
+			return this;
 		List<Formula> list = new ArrayList<Formula>();
 		if (clauses.size() == 1)
-			return clauses.get(0).substitute(t, x);
+			return clauses.get(0).substitute(map);
 		for (Formula f : clauses) {
-			Formula formula = f.substitute(t, x);
+			Formula formula = f.substitute(map);
 			if (formula instanceof TruthValue && ((TruthValue) formula).getBool() == true)
 				return formula;
 			list.add(formula);

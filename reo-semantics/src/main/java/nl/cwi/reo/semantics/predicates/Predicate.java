@@ -108,17 +108,17 @@ public class Predicate implements Semantics<Predicate> {
 				if (!x.equals(p)) {
 					Term t_null = new NullValue();
 					Formula neq = new Negation(new Equality(new PortVariable(x), t_null));
-					transition = Conjunction.conjunction(Arrays.asList(transition, neq));
+					transition = Formulas.conjunction(Arrays.asList(transition, neq));
 				}
 			}
 			for (Port x : outs) {
 				Formula eq = new Equality(new PortVariable(p), new PortVariable(x));
-				transition = Conjunction.conjunction(Arrays.asList(transition, eq));
+				transition = Formulas.conjunction(Arrays.asList(transition, eq));
 			}
 			transitions.add(transition);
 		}
 
-		return new Predicate(Conjunction.conjunction(transitions));
+		return new Predicate(Formulas.conjunction(transitions));
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class Predicate implements Semantics<Predicate> {
 		list.add(this.f);
 		for (Predicate A : components)
 			list.add(A.f);
-		return new Predicate(Conjunction.conjunction(list));
+		return new Predicate(Formulas.conjunction(list));
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +33,6 @@ public class MemoryVariable implements Variable {
 	/**
 	 * Type of this memory cell.
 	 */
-	@Nullable
 	private final TypeTag type;
 
 	/**
@@ -40,6 +40,11 @@ public class MemoryVariable implements Variable {
 	 * (prime is false) or the next value (prime is true) of the memory cell.
 	 */
 	private final boolean prime;
+	
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs a new memory cell variable.
@@ -52,7 +57,8 @@ public class MemoryVariable implements Variable {
 	public MemoryVariable(String name, boolean prime) {
 		this.name = name;
 		this.prime = prime;
-		this.type = null;
+		this.type = new TypeTag("");
+		this.freeVars = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(this)));
 	}
 
 	/**
@@ -69,6 +75,7 @@ public class MemoryVariable implements Variable {
 		this.name = name;
 		this.prime = prime;
 		this.type = type;
+		this.freeVars = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(this)));
 	}
 
 	/**
@@ -84,7 +91,6 @@ public class MemoryVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@Nullable
 	public TypeTag getTypeTag() {
 		return type;
 	}
@@ -131,8 +137,9 @@ public class MemoryVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Term substitute(Term t, Variable x) {
-		if (this.equals(x))
+	public Term substitute(Map<Variable, Term> map) {
+		Term t = map.get(this);
+		if (t != null)
 			return t;
 		return this;
 	}
@@ -142,7 +149,7 @@ public class MemoryVariable implements Variable {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		return new HashSet<Variable>(Arrays.asList(this));
+		return freeVars;
 	}
 
 	/**

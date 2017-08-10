@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.cwi.reo.compile.components;
+package nl.cwi.reo.templates;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.rba;
+package nl.cwi.reo.semantics.hypergraphs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,10 +13,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Disjunction;
-import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Variable;
@@ -187,9 +186,9 @@ public class RuleNode {
 		}
 		Formula formula;
 		if (clauses.size() == 1)
-			formula = Conjunction.conjunction(Arrays.asList(rule.getDataConstraint(), clauses.get(0)));
+			formula = Formulas.conjunction(Arrays.asList(rule.getDataConstraint(), clauses.get(0)));
 		else
-			formula = Conjunction.conjunction(Arrays.asList(rule.getDataConstraint(), new Disjunction(clauses)));
+			formula = Formulas.conjunction(Arrays.asList(rule.getDataConstraint(), new Disjunction(clauses)));
 		rule = new Rule(rule.getSyncConstraint(), formula);
 		return this;
 	}
@@ -218,7 +217,7 @@ public class RuleNode {
 				r1 = new Rule(map, rule.getDataConstraint());
 		} else {
 			r1 = new Rule(map,
-					Conjunction.conjunction(Arrays.asList(rule.getDataConstraint(), r.getRule().getDataConstraint())));
+					Formulas.conjunction(Arrays.asList(rule.getDataConstraint(), r.getRule().getDataConstraint())));
 		}
 
 		Set<HyperEdge> set = new HashSet<>(hyperedges);
@@ -300,8 +299,8 @@ public class RuleNode {
 	 * @return reference to this rule node.
 	 */
 	public RuleNode hide(PortNode p) {
-		rule = new Rule(rule.getSyncConstraint(),
-				new Existential(new PortVariable(p.getPort()), rule.getDataConstraint()).QE());
+		List<Variable> V = Arrays.asList(new PortVariable(p.getPort()));
+		rule = new Rule(rule.getSyncConstraint(), Formulas.eliminate(rule.getDataConstraint(), V));
 		return this;
 	}
 

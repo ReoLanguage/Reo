@@ -1,5 +1,6 @@
 package nl.cwi.reo.semantics.predicates;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,6 +33,11 @@ public class Equality implements Formula {
 	 * Right-hand-side of the equality.
 	 */
 	private final Term t2;
+	
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs an equality of two terms.
@@ -44,6 +50,10 @@ public class Equality implements Formula {
 	public Equality(Term t1, Term t2) {
 		this.t1 = t1;
 		this.t2 = t2;
+
+		Set<Variable> vars = new HashSet<>(t1.getFreeVariables());
+		vars.addAll(t2.getFreeVariables());
+		this.freeVars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -129,17 +139,11 @@ public class Equality implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula QE() {
-		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formula substitute(Term t, Variable x) {
-		Term t_1 = t1.substitute(t, x);
-		Term t_2 = t2.substitute(t, x);
+	public Formula substitute(Map<Variable, Term> map) {
+		if (Collections.disjoint(freeVars, map.keySet()))
+			return this;
+		Term t_1 = t1.substitute(map);
+		Term t_2 = t2.substitute(map);
 		if (t_1.equals(t_2))
 			return new TruthValue(true);
 		return new Equality(t_1, t_2);
@@ -150,9 +154,7 @@ public class Equality implements Formula {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = t1.getFreeVariables();
-		vars.addAll(t2.getFreeVariables());
-		return vars;
+		return freeVars;
 	}
 
 	/**
