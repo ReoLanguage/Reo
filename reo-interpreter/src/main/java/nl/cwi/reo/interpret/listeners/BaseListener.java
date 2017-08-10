@@ -362,6 +362,23 @@ public class BaseListener extends ReoBaseListener {
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitAtom(nl.cwi.reo.interpret.
+	 * ReoParser.AtomContext)
+	 */
+	@Override
+	public void exitAtom(AtomContext ctx) {
+		atoms.put(ctx, atoms.get(ctx.ref()));
+		atoms.put(ctx, atoms.get(ctx.cam()));
+		atoms.put(ctx, atoms.get(ctx.wa()));
+		atoms.put(ctx, atoms.get(ctx.sa()));
+		atoms.put(ctx, atoms.get(ctx.p()));
+		atoms.put(ctx, atoms.get(ctx.pr()));
+		atoms.put(ctx, atoms.get(ctx.rba()));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see
 	 * nl.cwi.reo.interpret.ReoBaseListener#exitRef_java(nl.cwi.reo.interpret.
 	 * ReoParser.Ref_javaContext)
@@ -577,7 +594,8 @@ public class BaseListener extends ReoBaseListener {
 				new Location(ctx.ID().getSymbol(), filename));
 		TermExpression te1 = new VariableTermExpression(var);
 		TermExpression te2 = new ComponentTermExpression(new ComponentDefinition(sign, set));
-		predicates.put(ctx, new Relation(RelationSymbol.EQ, Arrays.asList(te1, te2), new Location(ctx.start, filename)));
+		predicates.put(ctx,
+				new Relation(RelationSymbol.EQ, Arrays.asList(te1, te2), new Location(ctx.start, filename)));
 	}
 
 	/*
