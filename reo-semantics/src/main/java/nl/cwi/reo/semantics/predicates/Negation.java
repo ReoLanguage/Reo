@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,8 +26,15 @@ public class Negation implements Formula {
 	 */
 	public static final boolean negation = true;
 
-	/** Original predicate. */
+	/** 
+	 * Original predicate. 
+	 */
 	private final Formula f;
+	
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs a new negation of an original predicate.
@@ -36,6 +44,7 @@ public class Negation implements Formula {
 	 */
 	public Negation(Formula f) {
 		this.f = f;
+		this.freeVars = f.getFreeVariables();
 	}
 
 	/**
@@ -117,16 +126,10 @@ public class Negation implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula QE() {
-		return new Negation(f.QE());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formula substitute(Term t, Variable x) {
-		return new Negation(f.substitute(t, x));
+	public Formula substitute(Map<Variable, Term> map) {
+		if (Collections.disjoint(freeVars, map.keySet()))
+			return this;
+		return new Negation(f.substitute(map));
 	}
 
 	/**

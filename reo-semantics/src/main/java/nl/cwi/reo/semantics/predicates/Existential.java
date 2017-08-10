@@ -1,8 +1,8 @@
 package nl.cwi.reo.semantics.predicates;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -29,6 +29,11 @@ public class Existential implements Formula {
 	 * Original formula.
 	 */
 	private final Formula f;
+	
+	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs an existential quantification of a variable in a formula.
@@ -41,6 +46,9 @@ public class Existential implements Formula {
 	public Existential(Variable x, Formula f) {
 		this.x = x;
 		this.f = f;
+		Set<Variable> vars = new HashSet<>(f.getFreeVariables());
+		vars.remove(x);
+		this.freeVars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -108,66 +116,15 @@ public class Existential implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@Nullable
-	public Formula QE() {
-		if (!f.getFreeVariables().contains(x))
-			return f.QE();
-		if (f instanceof Existential) {
-			Formula g = f.QE();
-			if (g == null)
-				return null;
-			return new Existential(x, g).QE();
-		} else if (f instanceof Equality) {
-			Equality e = (Equality) f;
-			if (e.getLHS().equals(x) || e.getRHS().equals(x)) {
-				return new TruthValue(true);
-			} else {
-				return null;
-			}
-		} else if (f instanceof Disjunction) {
-			List<Formula> list = new ArrayList<Formula>();
-			for (Formula fi : ((Disjunction) f).getClauses())
-				list.add(new Existential(x, fi));
-			return new Disjunction(list).QE();
-		} else if (f instanceof Conjunction) {
-			List<Formula> list = new ArrayList<Formula>();
-			Term t = null;
-			for (Formula fi : ((Conjunction) f).getClauses()) {
-				if (t == null && fi instanceof Equality) {
-					Equality e = (Equality) fi;
-					if (e.getLHS().equals(x)) {
-						t = e.getRHS();
-					} else if (e.getRHS().equals(x)) {
-						t = e.getLHS();
-					} else {
-						list.add(fi);
-					}
-				} else {
-					list.add(fi);
-				}
-			}
-			if (t != null) {
-				switch (list.size()) {
-				case 0:
-					return new TruthValue(true);
-				case 1:
-					return list.get(0).substitute(t, x);
-				default:
-					return new Conjunction(list).substitute(t, x);
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Formula substitute(Term t, Variable x) {
-		if (this.x.equals(x))
+	public Formula substitute(Map<Variable, Term> map) {
+		if (Collections.disjoint(freeVars, map.keySet()))
 			return this;
-		return new Existential(x, f.substitute(t, x));
+		Map<Variable, Term> _map = map;
+		if (map.containsKey(x)) {
+			_map = new HashMap<>(map);
+			_map.remove(x);
+		} 
+		return new Existential(x, f.substitute(_map));
 	}
 
 	/**

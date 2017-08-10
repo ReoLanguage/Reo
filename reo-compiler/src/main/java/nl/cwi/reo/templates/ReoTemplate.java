@@ -1,4 +1,4 @@
-package nl.cwi.reo.compile.components;
+package nl.cwi.reo.templates;
 
 import java.util.Collections;
 import java.util.HashSet;

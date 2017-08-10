@@ -30,6 +30,11 @@ public class Distribution implements Term {
 	private Map<Term, Term> distr;
 	
 	/**
+	 * Free variables in this formula.
+	 */
+	private final Set<Variable> freeVars;
+	
+	/**
 	 * Instantiates a new distribution.
 	 *
 	 * @param distr
@@ -37,6 +42,12 @@ public class Distribution implements Term {
 	 */
 	public Distribution(Map<Term, Term> distr) {
 		this.distr = Collections.unmodifiableMap(distr);
+		Set<Variable> vars = new HashSet<Variable>();
+		for (Map.Entry<Term, Term> entry : distr.entrySet()) {
+			vars.addAll(entry.getKey().getFreeVariables());
+			vars.addAll(entry.getValue().getFreeVariables());			
+		}
+		this.freeVars = Collections.unmodifiableSet(vars);
 	}
 	
 	/**
@@ -74,10 +85,12 @@ public class Distribution implements Term {
 	 * {@inheritDoc} 
 	 */
 	@Override
-	public Term substitute(Term t, Variable x) {
+	public Term substitute(Map<Variable, Term> map) {
+		if (Collections.disjoint(freeVars, map.keySet()))
+			return this;
 		Map<Term, Term> _distr = new HashMap<>();
 		for(Map.Entry<Term, Term> entry : distr.entrySet())
-			_distr.put(entry.getKey().substitute(t, x), entry.getValue());
+			_distr.put(entry.getKey().substitute(map), entry.getValue());
 		return new Distribution(_distr);
 	}
 
@@ -86,10 +99,7 @@ public class Distribution implements Term {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = new HashSet<>();
-		for (Term t : distr.keySet()) 
-			vars.addAll(t.getFreeVariables());
-		return vars;
+		return freeVars;
 	}
 
 	/**

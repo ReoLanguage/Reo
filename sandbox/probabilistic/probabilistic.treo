@@ -2,9 +2,12 @@ import reo.sync;
 import reo.fifo1;
 import reo.lossy;
 import reo.syncdrain;
+import reo.alternator;
 
-probabilistic(in, out) {
-	oops(in)
+probabilistic(a[1..300],b) {
+alternator(a[1..300], b)
+
+//	oops(in)
 //	faultyfifo1<0.05>(in, out)
 /*	sync(in, C)
 	sync(in, I)

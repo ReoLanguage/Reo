@@ -8,21 +8,25 @@ import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.util.Monitor;
 
 /**
- * Constant that represents absence of data. This value is used to encode
- * synchronization constraints and empty memory cells.
+ * A constant that represents presence of an arbitrary non-null data item.
+ * 
+ * <p>
+ * Although it is formally impossible to represent the presence of an arbitrary
+ * non-null datum by a single datum, we can think of this term as a placeholder
+ * for an arbitrary non-null datum.
  */
-public class NullValue extends Function {
+public class NonNullValue extends Function {
 	
 	/**
 	 * Flag for string template.
 	 */
-	public static final boolean isnull = true;
+	public static final boolean isnonnull = true;
 
 	/**
 	 * Constructs an null value.
 	 */
-	public NullValue() {
-		super("*", "null", null, false, new TypeTag(""));
+	public NonNullValue() {
+		super("!*", "nonnull", null, false, new TypeTag(""));
 	}
 	
 	/**
@@ -30,7 +34,7 @@ public class NullValue extends Function {
 	 */
 	@Override
 	public Term rename(Map<Port, Port> links) {
-		return new NullValue();
+		return new NonNullValue();
 	}
 
 	/**
@@ -38,7 +42,7 @@ public class NullValue extends Function {
 	 */
 	@Override
 	public Term substitute(Term t, Variable x) {
-		return new NullValue();
+		return new NonNullValue();
 	}
 	
 	/**
@@ -46,7 +50,7 @@ public class NullValue extends Function {
 	 */
 	@Override
 	public Term evaluate(Scope s, Monitor m) {
-		return new NullValue();
+		return new NonNullValue();
 	}
 
 }

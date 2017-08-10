@@ -8,19 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nl.cwi.reo.compile.components.Transition;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.NullValue;
 import nl.cwi.reo.semantics.predicates.PortVariable;
-import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
-import nl.cwi.reo.semantics.predicates.TruthValue;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.templates.Transition;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -172,25 +171,8 @@ public class RBACompiler {
 
 		}
 
-		Formula guard = null;
-		List<Formula> list = new ArrayList<>();
-		for (Formula l : guards) {
-			if (!(l instanceof Relation && ((Relation) l).getValue().equals("true")))
-				list.add(l);
-		}
-		guards = list;
-		switch (guards.size()) {
-		case 0:
-			guard = new TruthValue(true);
-			break;
-		case 1:
-			guard = guards.get(0);
-			break;
-		default:
-			guard = Conjunction.conjunction(guards);
-			break;
-		}
-
+		Formula guard = Formulas.conjunction(guards);
+		
 		Map<PortVariable, Term> output = new HashMap<PortVariable, Term>();
 
 		Map<MemoryVariable, Term> memory = new LinkedHashMap<MemoryVariable, Term>();
@@ -198,7 +180,6 @@ public class RBACompiler {
 		assignements = sort(assignements);
 		List<Variable> keys = new ArrayList<>(assignements.keySet());
 
-		// Collections.reverse(keys);
 		for (Variable v : keys) {
 			if (v instanceof PortVariable) {
 				output.put((PortVariable) v, assignements.get(v));

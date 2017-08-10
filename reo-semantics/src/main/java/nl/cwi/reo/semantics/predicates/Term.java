@@ -1,15 +1,13 @@
 package nl.cwi.reo.semantics.predicates;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 
-// TODO: Auto-generated Javadoc
 /**
  * A abstract term over the language of constraints that represents a data item.
  */
@@ -40,7 +38,20 @@ public interface Term extends Expression<Term> {
 	 *            free variable
 	 * @return substituted term.
 	 */
-	public Term substitute(Term t, Variable x);
+	public default Term substitute(Term t, Variable x) {
+		Map<Variable, Term> map = new HashMap<>();
+		map.put(x, t);
+		return substitute(map);
+	}
+	
+	/**
+	 * Substitutes a term t for every occurrence of a variable x in this term.
+	 * 
+	 * @param map
+	 *            assignment of terms to variables 
+	 * @return substituted term.
+	 */
+	public Term substitute(Map<Variable, Term> map);
 
 	/**
 	 * Gets the set of all free variables in this term.
@@ -54,6 +65,5 @@ public interface Term extends Expression<Term> {
 	 * 
 	 * @return type tag of this term.
 	 */
-	@Nullable
 	public TypeTag getTypeTag();
 }

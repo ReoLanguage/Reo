@@ -1,9 +1,8 @@
 package nl.cwi.reo.semantics.predicates;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
@@ -45,23 +44,30 @@ public interface Formula extends Expression<Formula> {
 	public Formula DNF();
 
 	/**
-	 * Tries to eliminate quantifiers via substitution.
-	 * 
-	 * @return a formula without quantifiers, or null if it failed to remove quantifiers.
-	 */
-	public @Nullable Formula QE();
-
-	/**
-	 * Substitutes a term t for every free occurrence of a variable x in this
+	 * Substitutes a term t for every occurrence of a variable x in this
 	 * formula.
 	 * 
 	 * @param t
 	 *            substituted term
 	 * @param x
 	 *            free variable
-	 * @return substituted formula.
+	 * @return substituted term.
 	 */
-	public Formula substitute(Term t, Variable x);
+	public default Formula substitute(Term t, Variable x) {
+		Map<Variable, Term> map = new HashMap<>();
+		map.put(x, t);
+		return substitute(map);
+	}
+
+	/**
+	 * Substitutes a term t for every occurrence of a variable x in this
+	 * formula.
+	 * 
+	 * @param map
+	 *            assignment of terms to variables
+	 * @return substituted term.
+	 */
+	public Formula substitute(Map<Variable, Term> map);
 
 	/**
 	 * Gets the set of all free variables in this formula.

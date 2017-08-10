@@ -1,10 +1,9 @@
-package nl.cwi.reo.compile.components;
+package nl.cwi.reo.templates;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -148,39 +147,42 @@ public final class Transition {
 	public Map<MemoryVariable, Term> getMemory() {
 		return this.memory;
 	}
-	
+
 	/**
-	 * Computes 
+	 * Computes
+	 * 
 	 * @return
 	 */
 	public Map<Map<MemoryVariable, Term>, Term> getPRISMUpdate() {
+
+		// TODO
 		Map<Map<MemoryVariable, Term>, Term> update = new HashMap<>();
-		
+
 		// Flatten the distribution terms in the memory update
 		Map<MemoryVariable, Term> mem2 = new HashMap<>();
 		for (Map.Entry<MemoryVariable, Term> entry : memory.entrySet())
 			mem2.put(entry.getKey(), Transition.flattenDistribution(entry.getValue()));
-		
-		
-		
+
 		return null;
 	}
-	
-//	private static Map<Map<MemoryVariable, Term>, Term> invert(Map<MemoryVariable, Term> memory) {
-//		Iterator<Map.Entry<Term, Term>> iter = memory.entrySet().iterator();
-//		Term m = 
-//		return null;
-//	}
-	
+
+	// private static Map<Map<MemoryVariable, Term>, Term>
+	// invert(Map<MemoryVariable, Term> memory) {
+	// Iterator<Map.Entry<Term, Term>> iter = memory.entrySet().iterator();
+	// Term m =
+	// return null;
+	// }
+
 	private static Term flattenDistribution(Term t) {
 		if (t instanceof Distribution) {
-			Map<Term, Term> newDistr = new HashMap<>(); 
+			Map<Term, Term> newDistr = new HashMap<>();
 			Distribution d = (Distribution) t;
 			for (Map.Entry<Term, Term> entry : d.getDistribution().entrySet()) {
 				Term f = flattenDistribution(entry.getKey());
-				if (f instanceof Distribution)  {
+				if (f instanceof Distribution) {
 					for (Map.Entry<Term, Term> ef : ((Distribution) f).getDistribution().entrySet())
-						newDistr.put(ef.getKey(), new Function("*", null, Arrays.asList(entry.getValue(), ef.getValue()), false));
+						newDistr.put(ef.getKey(), new Function("*", null,
+								Arrays.asList(entry.getValue(), ef.getValue()), false, ef.getValue().getTypeTag()));
 				} else {
 					newDistr.put(f, entry.getValue());
 				}
@@ -189,7 +191,6 @@ public final class Transition {
 		}
 		return t;
 	}
-	
 
 	/**
 	 * Gets the map M.
@@ -314,9 +315,7 @@ public final class Transition {
 	public Set<Port> getInterface() {
 		Set<Port> ports = new HashSet<Port>(input);
 		for (PortVariable x : output.keySet())
-			// if(!x.isVoid())
 			ports.add(x.getPort());
-
 		return ports;
 	}
 
