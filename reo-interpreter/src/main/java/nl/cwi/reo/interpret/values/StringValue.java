@@ -23,7 +23,7 @@ public final class StringValue implements Value, TermExpression {
 	/**
 	 * Value.
 	 */
-	private String x;
+	private final String x;
 
 	/**
 	 * Constructs a new string value.

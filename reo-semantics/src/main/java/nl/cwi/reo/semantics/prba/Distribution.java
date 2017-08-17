@@ -19,21 +19,24 @@ import nl.cwi.reo.util.Monitor;
 /**
  * A Distribution over a set of terms.
  */
-public class Distribution implements Term {
-	
+public final class Distribution implements Term {
+
 	/**
 	 * Flag for string template.
 	 */
 	public static final boolean distribution = true;
-	
-	/** The distribution. */
-	private Map<Term, Term> distr;
+
+	/**
+	 * The distribution that maps each term to a probability that is also
+	 * expressed as a term.
+	 */
+	private final Map<Term, Term> distr;
 	
 	/**
-	 * Free variables in this formula.
+	 * Free variables of this term.
 	 */
-	private final Set<Variable> freeVars;
-	
+	private final Set<Variable> vars;
+
 	/**
 	 * Instantiates a new distribution.
 	 *
@@ -45,11 +48,11 @@ public class Distribution implements Term {
 		Set<Variable> vars = new HashSet<Variable>();
 		for (Map.Entry<Term, Term> entry : distr.entrySet()) {
 			vars.addAll(entry.getKey().getFreeVariables());
-			vars.addAll(entry.getValue().getFreeVariables());			
+			vars.addAll(entry.getValue().getFreeVariables());
 		}
-		this.freeVars = Collections.unmodifiableSet(vars);
+		this.vars = Collections.unmodifiableSet(vars);
 	}
-	
+
 	/**
 	 * Gets the distribution.
 	 *
@@ -60,56 +63,46 @@ public class Distribution implements Term {
 	}
 
 	/**
-	 * {@inheritDoc} 
-	 */
-	@Override
-	public boolean hasOutputPorts() {
-		for (Term t : distr.keySet()) 
-			if (t.hasOutputPorts())
-				return true;
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc} 
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Term rename(Map<Port, Port> links) {
 		Map<Term, Term> _distr = new HashMap<>();
-		for(Map.Entry<Term, Term> entry : distr.entrySet())
+		for (Map.Entry<Term, Term> entry : distr.entrySet())
 			_distr.put(entry.getKey().rename(links), entry.getValue());
 		return new Distribution(_distr);
 	}
 
 	/**
-	 * {@inheritDoc} 
+	 * {@inheritDoc}
 	 */
 	@Override
-	public Term substitute(Map<Variable, Term> map) {
-		if (Collections.disjoint(freeVars, map.keySet()))
-			return this;
+	public Term substitute(Term t, Variable x) {
 		Map<Term, Term> _distr = new HashMap<>();
-		for(Map.Entry<Term, Term> entry : distr.entrySet())
-			_distr.put(entry.getKey().substitute(map), entry.getValue());
+		for (Map.Entry<Term, Term> entry : distr.entrySet()) {
+			Term k = entry.getKey().substitute(t, x);
+			Term v = entry.getValue().substitute(t, x);
+			_distr.put(k, v);
+		}
 		return new Distribution(_distr);
 	}
 
 	/**
-	 * {@inheritDoc} 
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		return freeVars;
+		return vars;
 	}
 
 	/**
-	 * {@inheritDoc} 
+	 * {@inheritDoc}
 	 */
 	@Override
 	public @Nullable TypeTag getTypeTag() {
 		return null;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */

@@ -22,7 +22,7 @@ import nl.cwi.reo.util.Monitor;
 /**
  * Predicate semantics of Reo connectors.
  */
-public class Predicate implements Semantics<Predicate> {
+public final class Predicate implements Semantics<Predicate> {
 
 	/** Formula of this predicate. */
 	private final Formula f;
@@ -71,7 +71,7 @@ public class Predicate implements Semantics<Predicate> {
 	 */
 	@Override
 	public Set<Port> getInterface() {
-		return f.getInterface();
+		return f.getPorts();
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class Predicate implements Semantics<Predicate> {
 			Formula transition = new TruthValue(true);
 			for (Port x : inps) {
 				if (!x.equals(p)) {
-					Term t_null = new NullValue();
+					Term t_null = Terms.Null;
 					Formula neq = new Negation(new Equality(new PortVariable(x), t_null));
 					transition = Formulas.conjunction(Arrays.asList(transition, neq));
 				}
@@ -146,7 +146,7 @@ public class Predicate implements Semantics<Predicate> {
 	 */
 	@Override
 	public Predicate restrict(Collection<? extends Port> intface) {
-		Set<Port> P = f.getInterface();
+		Set<Port> P = f.getPorts();
 		Formula g = f;
 		for (Port p : P)
 			if (!intface.contains(p))

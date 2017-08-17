@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -135,15 +134,15 @@ public class Rule {
 	 */
 	@Override
 	public String toString() {
-		String s = "";
-		Iterator<Map.Entry<Port, Boolean>> iter = this.sync.entrySet().iterator();
-		while (iter.hasNext()) {
-			Map.Entry<Port, Boolean> pair = iter.next();
-			s += pair.getValue() ? "!" : "\u00AC!";
-			s += pair.getKey().getName() + (iter.hasNext() ? " \u2227 " : "");
-		}
-		if (f != null)
-			s += " \u2227 " + f.toString();
-		return s;
+//		String s = "";
+//		Iterator<Map.Entry<Port, Boolean>> iter = this.sync.entrySet().iterator();
+//		while (iter.hasNext()) {
+//			Map.Entry<Port, Boolean> pair = iter.next();
+//			s += pair.getValue() ? "!" : "\u00AC!";
+//			s += pair.getKey().getName() + (iter.hasNext() ? " \u2227 " : "");
+//		}
+//		if (f != null)
+//			s += " \u2227 " + f.toString();
+		return f.toString();
 	}
 }

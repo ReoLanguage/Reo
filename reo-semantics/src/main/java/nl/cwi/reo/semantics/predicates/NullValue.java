@@ -1,17 +1,22 @@
 package nl.cwi.reo.semantics.predicates;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.util.Monitor;
 
 /**
  * Constant that represents absence of data. This value is used to encode
  * synchronization constraints and empty memory cells.
  */
-public class NullValue extends Function {
+public final class NullValue implements Term {
 	
 	/**
 	 * Flag for string template.
@@ -19,18 +24,19 @@ public class NullValue extends Function {
 	public static final boolean isnull = true;
 
 	/**
-	 * Constructs an null value.
+	 * {@inheritDoc}
 	 */
-	public NullValue() {
-		super("*", "null", null, false, new TypeTag(""));
+	@Override
+	public @Nullable Term evaluate(Scope s, Monitor m) {
+		return this;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public Term rename(Map<Port, Port> links) {
-		return new NullValue();
+		return this;
 	}
 
 	/**
@@ -38,15 +44,30 @@ public class NullValue extends Function {
 	 */
 	@Override
 	public Term substitute(Term t, Variable x) {
-		return new NullValue();
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Variable> getFreeVariables() {
+		return new HashSet<>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TypeTag getTypeTag() {
+		return TypeTags.Object;
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Term evaluate(Scope s, Monitor m) {
-		return new NullValue();
+	public String toString() {
+		return "*";
 	}
-
 }

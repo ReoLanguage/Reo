@@ -9,23 +9,33 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
-import nl.cwi.reo.interpret.typetags.TypeTags;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.util.Monitor;
 
 /**
- * A constant that represents presence of an arbitrary non-null data item.
- * 
- * <p>
- * Although it is formally impossible to represent the presence of an arbitrary
- * non-null datum by a single datum, we can think of this term as a placeholder
- * for an arbitrary non-null datum.
+ * Constant that represents absence of data. This value is used to encode
+ * synchronization constraints and empty memory cells.
  */
-public final class NonNullValue implements Term {
+public final class Constant implements Term {
 	
 	/**
-	 * Flag for string template.
+	 * Value of this term.
 	 */
-	public static final boolean isnonnull = true;
+	private final Value v;
+ 
+	/**
+	 * Constructs an constant value.
+	 */
+	public Constant(Value v) {
+		this.v = v;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Value getValue() {
+		return v;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -64,15 +74,14 @@ public final class NonNullValue implements Term {
 	 */
 	@Override
 	public TypeTag getTypeTag() {
-		return TypeTags.Object;
+		return new TypeTag("decimal");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		return "!*";
+		return v.toString();
 	}
-
 }

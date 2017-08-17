@@ -1,9 +1,20 @@
 package nl.cwi.reo.semantics.predicates;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.util.Monitor;
+
 /**
  * An atomic nullary predicate (i.e., a boolean value).
  */
-public class TruthValue extends Relation {
+public final class TruthValue implements Formula {
 
 	/** Boolean value. */
 	private final boolean b;
@@ -15,17 +26,88 @@ public class TruthValue extends Relation {
 	 *            boolean
 	 */
 	public TruthValue(boolean b) {
-		super(b ? "true" : "false", null);
 		this.b = b;
 	}
 
 	/**
 	 * Gets the value of this boolean.
 	 *
-	 * @return the boolean value of this nullary relation.
+	 * @return the boolean value of this boolean value.
 	 */
-	public boolean getBool() {
+	public boolean getValue() {
 		return b;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public @Nullable Formula evaluate(Scope s, Monitor m) {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Variable> getFreeVariables() {
+		return new HashSet<>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Port> getPorts() {
+		return new HashSet<>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isQuantifierFree() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Formula rename(Map<Port, Port> links) {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Formula NNF() {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Formula DNF() {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Formula substitute(Term t, Variable x) {
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Map<Variable, Integer> getEvaluation() {
+		return new HashMap<>();
 	}
 	
 	/**

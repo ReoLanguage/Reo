@@ -1,6 +1,8 @@
 package nl.cwi.reo.semantics.predicates;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -12,29 +14,40 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Universal.
  */
-public class Universal implements Formula {
-
-	/** The x. */
-	private final Variable x;
-
-	/** The f. */
-	private final Formula f;
+public final class Universal implements Formula {
 
 	/**
-	 * Instantiates a new universal.
-	 *
+	 * Quantified variable.
+	 */
+	private final Variable x;
+
+	/**
+	 * Original formula.
+	 */
+	private final Formula f;
+	
+	/**
+	 * Free variables of this term.
+	 */
+	private final Set<Variable> vars;
+
+	/**
+	 * Constructs an universal quantification of a variable in a formula.
+	 * 
 	 * @param x
-	 *            the x
+	 *            variable
 	 * @param f
-	 *            the f
+	 *            formula
 	 */
 	public Universal(Variable x, Formula f) {
 		this.x = x;
 		this.f = f;
+		Set<Variable> vars = new HashSet<>(f.getFreeVariables());
+		vars.remove(x);
+		this.vars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -72,11 +85,19 @@ public class Universal implements Formula {
 	 */
 
 	@Override
-	public Set<Port> getInterface() {
-		Set<Port> P = f.getInterface();
+	public Set<Port> getPorts() {
+		Set<Port> P = f.getPorts();
 		if (x instanceof PortVariable)
 			P.remove(((PortVariable) x).getPort());
 		return P;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isQuantifierFree() {
+		return false;
 	}
 
 	/**
@@ -112,13 +133,10 @@ public class Universal implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula substitute(Map<Variable, Term> map) {
-		Map<Variable, Term> _map = map;
-		if (map.containsKey(x)) {
-			_map = new HashMap<>(map);
-			_map.remove(x);
-		} 
-		return new Universal(x, f.substitute(_map));
+	public Formula substitute(Term t, Variable x) {
+		if (!x.equals(this.x))
+			return new Universal(this.x, f.substitute(t, x));
+		return this;
 	}
 
 	/**
@@ -126,8 +144,6 @@ public class Universal implements Formula {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = f.getFreeVariables();
-		vars.remove(x);
 		return vars;
 	}
 

@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -18,9 +20,10 @@ import org.stringtemplate.v4.STGroupFile;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
+import nl.cwi.reo.commands.Command;
+import nl.cwi.reo.commands.Commands;
 import nl.cwi.reo.compile.CompilerType;
 import nl.cwi.reo.compile.LykosCompiler;
-import nl.cwi.reo.compile.RBACompiler;
 import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.SemanticsType;
@@ -196,20 +199,24 @@ public class Compiler {
 		LykosCompiler c = new LykosCompiler(program, files.get(0), outdir, packagename, monitor, settings);
 
 		c.compile();
-
 	}
 
 	/**
-	 * Compile.
+	 * Default compilation method.
 	 */
 	private void compile() {
 
+		long t0 = System.nanoTime();
+		
 		Interpreter interpreter = getInterpreter(lang);
 
 		ReoProgram program;
 		if ((program = interpreter.interpret(files.get(0))) == null)
 			return;
-
+		
+		long t1 = System.nanoTime();
+		System.out.println("Interpret        : \t" + (t1-t0)/1E9);
+		
 		ReoConnector connector = addPortWindows(program.getConnector(), lang);
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();
@@ -221,12 +228,21 @@ public class Compiler {
 		Set<Port> intface = getDualInterface(components);
 
 		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
+		
+		long t2 = System.nanoTime();
+		System.out.println("Flatten          : \t" + (t2-t1)/1E9);
 
 		RuleBasedAutomaton composition = new RuleBasedAutomaton().compose(protocol);
 
 		composition = composition.restrict(intface);
 
+		long t3 = System.nanoTime();
+		System.out.println("Compose & hide   : \t" + (t3-t2)/1E9);
+
 		Set<Transition> transitions = buildTransitions(composition);
+		
+		long t4 = System.nanoTime();
+		System.out.println("Commandification : \t" + (t4-t3)/1E9);
 
 		Set<Set<Transition>> partition = partition(transitions);
 
@@ -236,6 +252,10 @@ public class Compiler {
 
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
+
+		long t5 = System.nanoTime();
+		System.out.println("Template         : \t" + (t5-t4)/1E9);
+		System.out.println("Total            : \t" + (t5-t1)/1E9);
 	}
 
 	private Interpreter getInterpreter(Language lang) {
@@ -307,8 +327,8 @@ public class Compiler {
 	 * 
 	 * @param connector
 	 *            potentially open connector
-	 * @param x
-	 *            instance of semantics
+	 * @param lang
+	 *            target language
 	 * @return Connector with all ports hidden.
 	 */
 	private ReoConnector addPortWindows(ReoConnector connector, Language lang) {
@@ -436,8 +456,10 @@ public class Compiler {
 	
 	private Set<Transition> buildTransitions(RuleBasedAutomaton protocol) {
 		Set<Transition> transitions = new HashSet<>();
-		for (Rule rule : protocol.getAllRules())
-			transitions.add(RBACompiler.commandify(rule.getFormula()));
+		for (Rule rule : protocol.getAllRules()) {
+			Command cmd = Commands.commandify(rule.getFormula());
+			transitions.add(cmd.toTransition());
+		}
 		return transitions;
 	}
 
@@ -471,7 +493,7 @@ public class Compiler {
 					tags.put(upd.getKey().getName(), upd.getValue().getTypeTag());
 
 			// Get the initial value of each memory cell
-			Map<MemoryVariable, Object> initial = new HashMap<>();
+			SortedMap<MemoryVariable, Object> initial = new TreeMap<>();
 			for (Map.Entry<String, TypeTag> e : tags.entrySet())
 				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitial().get(e.getKey()));
 

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-// TODO: Auto-generated Javadoc
 /**
  * Iterates over the Cartesian product of a non-empty list of local clauses.
  * Returns a satisfiable conjunction of local clauses.

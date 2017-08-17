@@ -14,11 +14,10 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * An existential quantification of a variable in a formula.
  */
-public class Existential implements Formula {
+public final class Existential implements Formula {
 
 	/**
 	 * Quantified variable.
@@ -31,9 +30,9 @@ public class Existential implements Formula {
 	private final Formula f;
 	
 	/**
-	 * Free variables in this formula.
+	 * Free variables of this term.
 	 */
-	private final Set<Variable> freeVars;
+	private final Set<Variable> vars;
 
 	/**
 	 * Constructs an existential quantification of a variable in a formula.
@@ -48,7 +47,7 @@ public class Existential implements Formula {
 		this.f = f;
 		Set<Variable> vars = new HashSet<>(f.getFreeVariables());
 		vars.remove(x);
-		this.freeVars = Collections.unmodifiableSet(vars);
+		this.vars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -76,11 +75,19 @@ public class Existential implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Set<Port> getInterface() {
-		Set<Port> P = f.getInterface();
+	public Set<Port> getPorts() {
+		Set<Port> P = f.getPorts();
 		if (x instanceof PortVariable)
 			P.remove(((PortVariable) x).getPort());
 		return P;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isQuantifierFree() {
+		return false;
 	}
 
 	/**
@@ -116,15 +123,10 @@ public class Existential implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula substitute(Map<Variable, Term> map) {
-		if (Collections.disjoint(freeVars, map.keySet()))
-			return this;
-		Map<Variable, Term> _map = map;
-		if (map.containsKey(x)) {
-			_map = new HashMap<>(map);
-			_map.remove(x);
-		} 
-		return new Existential(x, f.substitute(_map));
+	public Formula substitute(Term t, Variable x) {
+		if (!x.equals(this.x))
+			return new Existential(this.x, f.substitute(t, x));
+		return this;
 	}
 
 	/**
@@ -132,8 +134,6 @@ public class Existential implements Formula {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = f.getFreeVariables();
-		vars.remove(x);
 		return vars;
 	}
 

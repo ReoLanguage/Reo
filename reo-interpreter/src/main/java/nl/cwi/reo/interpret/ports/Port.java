@@ -5,7 +5,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
 
-// TODO: Auto-generated Javadoc
 /**
  * An identifier that is decorated with a port type, a priority type, a type
  * tag, and an indicator for visibility.

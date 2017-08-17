@@ -1,15 +1,14 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
@@ -18,11 +17,10 @@ import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * A function applied to a list of terms.
  */
-public class Function implements Term {
+public final class Function implements Term {
 
 	/**
 	 * Flag for string template.
@@ -35,15 +33,8 @@ public class Function implements Term {
 	private final String name;
 
 	/**
-	 * Value of this function or reference to its implementation.
-	 */
-	@Nullable
-	protected Object value;
-
-	/**
 	 * List of arguments of this function.
 	 */
-	@Nullable
 	private final List<Term> args;
 
 	/**
@@ -56,19 +47,17 @@ public class Function implements Term {
 	 * Type of returned data.
 	 */
 	private final TypeTag tag;
-	
+
 	/**
-	 * Free variables in this formula.
+	 * Free variables of this term.
 	 */
-	private final Set<Variable> freeVars;
+	private final Set<Variable> vars;
 
 	/**
 	 * Constructs a new function from a name, a value, and a list of arguments.
 	 *
 	 * @param name
 	 *            name of the function
-	 * @param value
-	 *            value of this function
 	 * @param args
 	 *            list of arguments
 	 * @param infix
@@ -76,18 +65,15 @@ public class Function implements Term {
 	 * @param tag
 	 *            type tag
 	 */
-	public Function(String name, @Nullable Object value, @Nullable List<Term> args, boolean infix, TypeTag tag) {
+	public Function(String name, List<Term> args, boolean infix, TypeTag tag) {
 		this.name = name;
-		this.value = value;
 		this.args = args;
 		this.infix = infix;
 		this.tag = tag;
-
 		Set<Variable> vars = new HashSet<Variable>();
-		if (args != null)
-			for (Term t : args)
-				vars.addAll(t.getFreeVariables());
-		this.freeVars = Collections.unmodifiableSet(vars);
+		for (Term t : args)
+			vars.addAll(t.getFreeVariables());
+		this.vars = vars;
 	}
 
 	/**
@@ -97,16 +83,6 @@ public class Function implements Term {
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * Gets the value of this function.
-	 * 
-	 * @return value of this function.
-	 */
-	@Nullable
-	public Object getValue() {
-		return value;
 	}
 
 	/**
@@ -120,31 +96,13 @@ public class Function implements Term {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Gets whether this function is written as infix.
+	 * 
+	 * @return true, is the function is written as infix.
 	 */
-	@Override
-	public String toString() {
-		String s = name;
-		if (args != null && !args.isEmpty()) {
-			s += "(";
-			Iterator<Term> iter = args.iterator();
-			while (iter.hasNext()) {
-				s += iter.next().toString();
-				if (iter.hasNext())
-					s += ", ";
-			}
-			s += ")";
-		}
-		return s;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean hasOutputPorts() {
-		// TODO Auto-generated method stub
-		return false;
+	@Nullable
+	public boolean getInfix() {
+		return infix;
 	}
 
 	/**
@@ -153,24 +111,22 @@ public class Function implements Term {
 	@Override
 	public Term rename(Map<Port, Port> links) {
 		List<Term> list = new ArrayList<Term>();
-		if (args != null)
-			for (Term s : args)
-				list.add(s.rename(links));
-		return new Function(name, value, list, infix, tag);
+		for (Term s : args)
+			list.add(s.rename(links));
+		return new Function(name, list, infix, tag);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Term substitute(Map<Variable, Term> map) {
-		if (Collections.disjoint(freeVars, map.keySet()))
+	public Term substitute(Term t, Variable x) {
+		if (!vars.contains(x))
 			return this;
-		List<Term> list = new ArrayList<Term>();
-		if (args != null)
-			for (Term s : args)
-				list.add(s.substitute(map));
-		return new Function(name, value, list, infix, tag);
+		List<Term> _args = new ArrayList<>();
+		for (Term u : args)
+			_args.add(u.substitute(t, x));
+		return new Function(name, _args, infix, tag);
 	}
 
 	/**
@@ -187,18 +143,15 @@ public class Function implements Term {
 			_name = v.toString();
 
 		// Evaluate the arguments
-		List<Term> _args = null;
-		if (args != null) {
-			_args = new ArrayList<>();
-			for (Term t : args) {
-				Term u = t.evaluate(s, m);
-				if (u == null)
-					return null;
-				_args.add(u);
-			}
+		List<Term> _args = new ArrayList<>();
+		for (Term t : args) {
+			Term u = t.evaluate(s, m);
+			if (u == null)
+				return null;
+			_args.add(u);
 		}
 
-		return new Function(_name, value, _args, infix, tag);
+		return new Function(_name, _args, infix, tag);
 	}
 
 	/**
@@ -206,7 +159,7 @@ public class Function implements Term {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		return freeVars;
+		return vars;
 	}
 
 	/**
@@ -221,6 +174,17 @@ public class Function implements Term {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String toString() {
+		ST st = new ST(
+				"<if(s.infix)>(<s.args; separator=s.name>)<else><s.name><if(s.args)>(<s.args; separator=\", \">)<endif><endif>");
+		st.add("s", this);
+		return st.render();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean equals(@Nullable Object other) {
 		if (other == null)
 			return false;
@@ -229,8 +193,7 @@ public class Function implements Term {
 		if (!(other instanceof Function))
 			return false;
 		Function func = (Function) other;
-		return (Objects.equals(this.name, func.name) && Objects.equals(this.value, func.value))
-				&& Objects.equals(this.args, func.args);
+		return Objects.equals(name, func.name) && Objects.equals(args, func.args);
 	}
 
 	/**
@@ -238,7 +201,7 @@ public class Function implements Term {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.name, this.value, this.args);
+		return Objects.hash(name, this.args);
 	}
 
 

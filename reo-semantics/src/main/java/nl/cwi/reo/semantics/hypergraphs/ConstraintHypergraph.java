@@ -348,7 +348,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				String newName = rename.get(e.getKey().getName());
 				if (newName == null)
 					newName = e.getKey().getName();
-				newInit.put(new MemoryVariable(newName, e.getKey().hasPrime()), e.getValue());
+				newInit.put(new MemoryVariable(newName, e.getKey().hasPrime(), e.getKey().getTypeTag()), e.getValue());
 			}
 
 			list.add(new ConstraintHypergraph(new ArrayList<>(A.getHyperedges()), newInit));
@@ -432,7 +432,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 				boolean mult = false;
 				for (HyperEdge h : multiEdge) {
 					if (!h.getTarget().isEmpty()) {
-//						toDistribute = h.compose(toDistribute);
+						// toDistribute = h.compose(toDistribute);
 						toDistribute.compose(h);
 						mult = true;
 					}

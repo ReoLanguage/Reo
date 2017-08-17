@@ -23,7 +23,7 @@ public final class DecimalValue implements Value, TermExpression {
 	/**
 	 * Value.
 	 */
-	private double x;
+	private final double x;
 
 	/**
 	 * Constructs a new integer value.

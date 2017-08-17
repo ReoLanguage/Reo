@@ -361,6 +361,7 @@ public class BaseListener extends ReoBaseListener {
 
 	@Override
 	public void exitAtom(AtomContext ctx) {
+<<<<<<< HEAD
 		Atom a;
 		if((a=atoms.get(ctx.ref()))!=null)
 			atoms.put(ctx, a);
@@ -376,6 +377,22 @@ public class BaseListener extends ReoBaseListener {
 			atoms.put(ctx, a);
 		if((a=atoms.get(ctx.rba()))!=null)
 			atoms.put(ctx, a);
+=======
+		Atom A = atoms.get(ctx.ref());
+		if (A == null)
+			A = atoms.get(ctx.cam());
+		if (A == null)
+			A = atoms.get(ctx.wa());
+		if (A == null)
+			A = atoms.get(ctx.sa());
+		if (A == null)
+			A = atoms.get(ctx.p());
+		if (A == null)
+			A = atoms.get(ctx.pr());
+		if (A == null)
+			A = atoms.get(ctx.rba());
+		atoms.put(ctx, A);
+>>>>>>> 75a3bf212b3945fda06397f74d04d54331620d60
 	}
 
 	/*

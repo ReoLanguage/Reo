@@ -1,7 +1,5 @@
 package nl.cwi.reo.semantics.predicates;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -14,11 +12,10 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * A variable that represents the current or next value of a memory cell.
  */
-public class MemoryVariable implements Variable {
+public final class MemoryVariable implements Variable, Comparable<MemoryVariable> {
 
 	/**
 	 * Flag for string template.
@@ -40,26 +37,6 @@ public class MemoryVariable implements Variable {
 	 * (prime is false) or the next value (prime is true) of the memory cell.
 	 */
 	private final boolean prime;
-	
-	/**
-	 * Free variables in this formula.
-	 */
-	private final Set<Variable> freeVars;
-
-	/**
-	 * Constructs a new memory cell variable.
-	 * 
-	 * @param name
-	 *            name of the memory cell
-	 * @param prime
-	 *            current (false) of next (true) value of the memory cell
-	 */
-	public MemoryVariable(String name, boolean prime) {
-		this.name = name;
-		this.prime = prime;
-		this.type = new TypeTag("");
-		this.freeVars = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(this)));
-	}
 
 	/**
 	 * Constructs a new memory cell variable.
@@ -75,7 +52,6 @@ public class MemoryVariable implements Variable {
 		this.name = name;
 		this.prime = prime;
 		this.type = type;
-		this.freeVars = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(this)));
 	}
 
 	/**
@@ -121,14 +97,6 @@ public class MemoryVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean hasOutputPorts() {
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public Term rename(Map<Port, Port> links) {
 		return this;
 	}
@@ -137,9 +105,8 @@ public class MemoryVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Term substitute(Map<Variable, Term> map) {
-		Term t = map.get(this);
-		if (t != null)
+	public Term substitute(Term t, Variable x) {
+		if (this.equals(x))
 			return t;
 		return this;
 	}
@@ -149,7 +116,17 @@ public class MemoryVariable implements Variable {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		return freeVars;
+		Set<Variable> vars = new HashSet<>();
+		vars.add(this);
+		return vars;
+	}
+
+	/**
+	 * A memory cell is never updated.
+	 */
+	@Override
+	public @Nullable Term evaluate(Scope s, Monitor m) {
+		return this;
 	}
 
 	/**
@@ -172,7 +149,7 @@ public class MemoryVariable implements Variable {
 		if (!(other instanceof MemoryVariable))
 			return false;
 		MemoryVariable p = (MemoryVariable) other;
-		return Objects.equals(this.name, p.name) && Objects.equals(this.prime, p.prime);
+		return Objects.equals(name, p.name) && Objects.equals(prime, p.prime);
 	}
 
 	/**
@@ -184,10 +161,14 @@ public class MemoryVariable implements Variable {
 	}
 
 	/**
-	 * A memory cell is never updated.
+	 * Anti-lexicographically compares a memory cell by name and prime. Memory cells
+	 * with prime are larger than memory cells without. This method is
+	 * consistent with equals.
 	 */
 	@Override
-	public @Nullable Term evaluate(Scope s, Monitor m) {
-		return this;
+	public int compareTo(MemoryVariable m) {
+		if (prime != m.prime)
+			return prime ? 1 : -1;
+		return name.compareTo(m.name);
 	}
 }

@@ -10,15 +10,16 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
 /**
- * Disjunction of a list of formulas.
+ * A disjunction of formulas.
  */
-public class Disjunction implements Formula {
+public final class Disjunction implements Formula {
 
 	/**
 	 * Flag for string template.
@@ -31,9 +32,9 @@ public class Disjunction implements Formula {
 	private final List<Formula> clauses;
 	
 	/**
-	 * Free variables in this formula.
+	 * Free variables of this term.
 	 */
-	private final Set<Variable> freeVars;
+	private final Set<Variable> vars;
 
 	/**
 	 * Constructs the disjunction of a list of formulas.
@@ -42,11 +43,11 @@ public class Disjunction implements Formula {
 	 *            list of formulas
 	 */
 	public Disjunction(List<Formula> clauses) {
-		this.clauses = clauses;
+		this.clauses = Collections.unmodifiableList(new ArrayList<>(clauses));
 		Set<Variable> vars = new HashSet<Variable>();
-		for (Formula c : clauses)
-			vars.addAll(c.getFreeVariables());
-		this.freeVars = Collections.unmodifiableSet(vars);
+		for (Formula f : clauses)
+			vars.addAll(f.getFreeVariables());
+		this.vars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -73,12 +74,23 @@ public class Disjunction implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Set<Port> getInterface() {
+	public Set<Port> getPorts() {
 		Set<Port> P = new HashSet<Port>();
 		for (Formula f : clauses)
 			if (f instanceof Disjunction || f instanceof Conjunction || f instanceof Existential)
-				P.addAll(f.getInterface());
+				P.addAll(f.getPorts());
 		return P;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isQuantifierFree() {
+		for (Formula f : clauses)
+			if (!f.isQuantifierFree())
+				return false;
+		return true;
 	}
 
 	/**
@@ -126,19 +138,13 @@ public class Disjunction implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula substitute(Map<Variable, Term> map) {
-		if (Collections.disjoint(freeVars, map.keySet()))
+	public Formula substitute(Term t, Variable x) {
+		if (!vars.contains(x))
 			return this;
-		List<Formula> list = new ArrayList<Formula>();
-		if (clauses.size() == 1)
-			return clauses.get(0).substitute(map);
-		for (Formula f : clauses) {
-			Formula formula = f.substitute(map);
-			if (formula instanceof TruthValue && ((TruthValue) formula).getBool() == true)
-				return formula;
-			list.add(formula);
-		}
-		return new Disjunction(list);
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses)
+			_clauses.add(f.substitute(t, x));
+		return new Disjunction(_clauses);
 	}
 
 	/**
@@ -146,9 +152,6 @@ public class Disjunction implements Formula {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = new HashSet<Variable>();
-		for (Formula f : clauses)
-			vars.addAll(f.getFreeVariables());
 		return vars;
 	}
 
@@ -157,7 +160,6 @@ public class Disjunction implements Formula {
 	 */
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
-		// TODO Auto-generated method stub
 		return new HashMap<Variable, Integer>();
 	}
 
@@ -166,10 +168,9 @@ public class Disjunction implements Formula {
 	 */
 	@Override
 	public String toString() {
-		String s = "(" + clauses.get(0);
-		for (int i = 1; i < clauses.size(); i++)
-			s = s + " \u2228 " + clauses.get(i);
-		return s + ")";
+		ST st = new ST("(<clauses;separator=\" \u2228 \">)");
+		st.add("clauses", clauses);
+		return st.render();
 	}
 
 	/**
