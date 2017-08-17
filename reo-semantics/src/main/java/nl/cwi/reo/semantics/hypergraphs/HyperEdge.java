@@ -16,6 +16,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -89,8 +90,8 @@ public class HyperEdge {
 		List<Formula> list = new ArrayList<Formula>();
 		Map<Port, Boolean> map = new HashMap<>();
 		for (RuleNode r : rules) {
-			list.add(r.getRule().getDataConstraint());
-			map.putAll(r.getRule().getSyncConstraint());
+			list.add(r.getRule().getFormula());
+			map.putAll(r.getRule().getSync());
 		}
 		return new Rule(map, new Disjunction(list));
 	}
@@ -195,7 +196,7 @@ public class HyperEdge {
 				 * take the next rule to compose
 				 */
 				RuleNode r = rulesToCompose.poll();
-				RuleNode rule = r.compose(h_ruleNode); // TODO r may be null
+				RuleNode rule = r.compose(h_ruleNode); 
 				if (rule != null)
 					r.erase();
 			}

@@ -359,21 +359,23 @@ public class BaseListener extends ReoBaseListener {
 		components.put(ctx, new ComponentDefinition(sign, new SetAtom(name, _atoms)));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitAtom(nl.cwi.reo.interpret.
-	 * ReoParser.AtomContext)
-	 */
 	@Override
 	public void exitAtom(AtomContext ctx) {
-		atoms.put(ctx, atoms.get(ctx.ref()));
-		atoms.put(ctx, atoms.get(ctx.cam()));
-		atoms.put(ctx, atoms.get(ctx.wa()));
-		atoms.put(ctx, atoms.get(ctx.sa()));
-		atoms.put(ctx, atoms.get(ctx.p()));
-		atoms.put(ctx, atoms.get(ctx.pr()));
-		atoms.put(ctx, atoms.get(ctx.rba()));
+		Atom a;
+		if((a=atoms.get(ctx.ref()))!=null)
+			atoms.put(ctx, a);
+		if((a=atoms.get(ctx.cam()))!=null)
+			atoms.put(ctx, a);
+		if((a=atoms.get(ctx.wa()))!=null)
+			atoms.put(ctx, a);
+		if((a=atoms.get(ctx.sa()))!=null)
+			atoms.put(ctx, a);
+		if((a=atoms.get(ctx.p()))!=null)
+			atoms.put(ctx, a);
+		if((a=atoms.get(ctx.pr()))!=null)
+			atoms.put(ctx, a);
+		if((a=atoms.get(ctx.rba()))!=null)
+			atoms.put(ctx, a);
 	}
 
 	/*
