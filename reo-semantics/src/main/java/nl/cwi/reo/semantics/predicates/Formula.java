@@ -1,6 +1,5 @@
 package nl.cwi.reo.semantics.predicates;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,17 +7,33 @@ import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
 
 /**
- * The Interface Formula.
+ * A first-order formula over the language of constraints.
+ * 
+ * <p>
+ * Every implementing class is immutable.
  */
 public interface Formula extends Expression<Formula> {
 
 	/**
-	 * Returns the set of node variables in the formula, and casts them to
-	 * ports.
+	 * Gets the set of all free variables in this formula.
 	 * 
-	 * @return set of port variables.
+	 * @return set of all free variables.
 	 */
-	public Set<Port> getInterface();
+	public Set<Variable> getFreeVariables();
+
+	/**
+	 * Returns the set of ports that occur as a variables in this formula
+	 * 
+	 * @return set of port variables in this formula.
+	 */
+	public Set<Port> getPorts();
+
+	/**
+	 * Checks if this formula contains a quantifier.
+	 * 
+	 * @return true if this formula contains a quantifier.
+	 */
+	public boolean isQuantifierFree();
 
 	/**
 	 * Renames the free port variables in the formula.
@@ -51,30 +66,9 @@ public interface Formula extends Expression<Formula> {
 	 *            substituted term
 	 * @param x
 	 *            free variable
-	 * @return substituted term.
+	 * @return substituted formula.
 	 */
-	public default Formula substitute(Term t, Variable x) {
-		Map<Variable, Term> map = new HashMap<>();
-		map.put(x, t);
-		return substitute(map);
-	}
-
-	/**
-	 * Substitutes a term t for every occurrence of a variable x in this
-	 * formula.
-	 * 
-	 * @param map
-	 *            assignment of terms to variables
-	 * @return substituted term.
-	 */
-	public Formula substitute(Map<Variable, Term> map);
-
-	/**
-	 * Gets the set of all free variables in this formula.
-	 * 
-	 * @return set of all free variables.
-	 */
-	public Set<Variable> getFreeVariables();
+	public Formula substitute(Term t, Variable x);
 
 	/**
 	 * Tries to determine which variables in this formula must evaluate to null

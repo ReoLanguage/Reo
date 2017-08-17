@@ -195,28 +195,30 @@ public class RBACompiler {
 		 * is not consumer and producer), - transitivity over put and get on
 		 * same port during the same transition.
 		 */
-		Map<PortVariable, Term> output_substitution = new HashMap<PortVariable, Term>(output);
-		for (PortVariable n : output.keySet()) {
-			Set<Variable> s = output.get(n).getFreeVariables();
-			for (Variable v : s) {
-				if (output.containsKey(v))
-					output_substitution.put(n, output.get(n).substitute(output.get(v), v));
-				if (memory.containsKey(v) && !(memory.get(v) instanceof NullValue))
-					output_substitution.put(n, output.get(n).substitute(memory.get(v), v));
-			}
-		}
-
-		Map<MemoryVariable, Term> mem_substitution = new LinkedHashMap<MemoryVariable, Term>(memory);
-		for (MemoryVariable m : memory.keySet()) {
-			Set<Variable> s = memory.get(m).getFreeVariables();
-			for (Variable v : s) {
-				if (output_substitution.containsKey(v))
-					mem_substitution.put(m, memory.get(m).substitute(output_substitution.get(v), v));
-				if (memory.containsKey(v) && !(memory.get(v) instanceof NullValue))
-					mem_substitution.put(m, memory.get(v).substitute(memory.get(v), v));
-			}
-		}
-		return new Transition(guard, output_substitution, mem_substitution, allInputPorts);
+//		Map<PortVariable, Term> output_substitution = new HashMap<PortVariable, Term>(output);
+//		for (PortVariable n : output.keySet()) {
+//			Set<Variable> s = output.get(n).getFreeVariables();
+//			for (Variable v : s) {
+//				if (output.containsKey(v)) {
+//					Term t = output.get(n);
+//					output_substitution.put(n, output.get(n).substitute(output.get(v), v));
+//				}
+//				if (memory.containsKey(v) && !(memory.get(v) instanceof NullValue))
+//					output_substitution.put(n, output.get(n).substitute(memory.get(v), v));
+//			}
+//		}
+//
+//		Map<MemoryVariable, Term> mem_substitution = new LinkedHashMap<MemoryVariable, Term>(memory);
+//		for (MemoryVariable m : memory.keySet()) {
+//			Set<Variable> s = memory.get(m).getFreeVariables();
+//			for (Variable v : s) {
+//				if (output_substitution.containsKey(v))
+//					mem_substitution.put(m, memory.get(m).substitute(output_substitution.get(v), v));
+//				if (memory.containsKey(v) && !(memory.get(v) instanceof NullValue))
+//					mem_substitution.put(m, memory.get(v).substitute(memory.get(v), v));
+//			}
+//		}
+		return new Transition(guard, output, memory, allInputPorts);
 	}
 
 	/**

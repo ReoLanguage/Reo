@@ -34,6 +34,7 @@ import nl.cwi.reo.interpret.PParser.P_variableContext;
 import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -293,7 +294,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP_relation(P_relationContext ctx) {
-		formulas.put(ctx, new Relation(ctx.getText(), arguments.get(ctx.p_args())));
+		formulas.put(ctx, new Relation(ctx.getText(), arguments.get(ctx.p_args()), false));
 	}
 
 	/*
@@ -385,7 +386,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP_null(P_nullContext ctx) {
-		terms.put(ctx, new NullValue());
+		terms.put(ctx, Terms.Null);
 	}
 
 	/*
@@ -408,7 +409,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP_natural(P_naturalContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null, false, new TypeTag("int")));
+		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Integer));
 	}
 
 	/*
@@ -431,7 +432,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP_boolean(P_booleanContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null, false, new TypeTag("bool")));
+		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Boolean));
 	}
 
 	/*
@@ -454,7 +455,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP_string(P_stringContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), ctx.getText(), null, false, new TypeTag("string")));
+		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.String));
 	}
 
 	/*
@@ -477,7 +478,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP_decimal(P_decimalContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null, false, new TypeTag("decimal")));
+		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Decimal));
 	}
 
 	/*
@@ -502,7 +503,7 @@ public class ListenerP extends BaseListener implements PListener {
 	public void exitP_function(P_functionContext ctx) {
 		List<Term> args = arguments.get(ctx.p_args());
 		TypeTag tag = args.get(0).getTypeTag();
-		terms.put(ctx, new Function(ctx.getText(), null, args, false, tag));
+		terms.put(ctx, new Function(ctx.getText(), args, false, tag));
 	}
 
 	/**
@@ -574,7 +575,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP_var_curr(P_var_currContext ctx) {
-		variables.put(ctx, new MemoryVariable(ctx.ID().getText(), false));
+		variables.put(ctx, new MemoryVariable(ctx.ID().getText(), false, TypeTags.Object));
 	}
 
 	/*
@@ -597,7 +598,7 @@ public class ListenerP extends BaseListener implements PListener {
 	 */
 	@Override
 	public void exitP_var_next(P_var_nextContext ctx) {
-		variables.put(ctx, new MemoryVariable(ctx.getText(), true));
+		variables.put(ctx, new MemoryVariable(ctx.getText(), true, TypeTags.Object));
 	}
 
 }

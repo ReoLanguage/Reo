@@ -1,7 +1,6 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,11 +14,10 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Negation.
  */
-public class Negation implements Formula {
+public final class Negation implements Formula {
 
 	/**
 	 * Flag for string template.
@@ -30,11 +28,6 @@ public class Negation implements Formula {
 	 * Original predicate. 
 	 */
 	private final Formula f;
-	
-	/**
-	 * Free variables in this formula.
-	 */
-	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs a new negation of an original predicate.
@@ -44,7 +37,6 @@ public class Negation implements Formula {
 	 */
 	public Negation(Formula f) {
 		this.f = f;
-		this.freeVars = f.getFreeVariables();
 	}
 
 	/**
@@ -68,8 +60,16 @@ public class Negation implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Set<Port> getInterface() {
+	public Set<Port> getPorts() {
 		return new HashSet<>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isQuantifierFree() {
+		return f.isQuantifierFree();
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class Negation implements Formula {
 		if (f instanceof Negation) {
 			return f.NNF();
 		} else if (f instanceof TruthValue) {
-			return new TruthValue(!((TruthValue) f).getBool());
+			return new TruthValue(!((TruthValue) f).getValue());
 		} else if (f instanceof Conjunction) {
 			List<Formula> list = new ArrayList<Formula>();
 			for (Formula fi : ((Conjunction) f).getClauses())
@@ -126,10 +126,8 @@ public class Negation implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula substitute(Map<Variable, Term> map) {
-		if (Collections.disjoint(freeVars, map.keySet()))
-			return this;
-		return new Negation(f.substitute(map));
+	public Formula substitute(Term t, Variable x) {
+		return new Negation(f.substitute(t, x));
 	}
 
 	/**

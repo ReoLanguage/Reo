@@ -84,10 +84,10 @@ public final class Protocol implements Component {
 		return name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.compile.components.Component#getPorts()
+	/**
+	 * Gets the port in the interface of this protocol.
+	 *
+	 * @return the port
 	 */
 	public Set<Port> getPorts() {
 		return ports;

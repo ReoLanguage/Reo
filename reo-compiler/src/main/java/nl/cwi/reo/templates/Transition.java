@@ -1,9 +1,13 @@
 package nl.cwi.reo.templates;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -11,7 +15,10 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTags;
+import nl.cwi.reo.interpret.values.IntegerValue;
 import nl.cwi.reo.semantics.prba.Distribution;
+import nl.cwi.reo.semantics.predicates.Constant;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
@@ -57,6 +64,7 @@ public final class Transition {
 	/** The nb. */
 	private int nb;
 
+	public Map<Map<MemoryVariable, Term>, Term> PRISMUpdate;
 	/**
 	 * Constructs a new transition.
 	 * 
@@ -110,6 +118,7 @@ public final class Transition {
 		this.input = Collections.unmodifiableSet(input);
 		instancecounter++;
 		nb = instancecounter;
+		getPRISMUpdate();
 	}
 
 	/**
@@ -153,27 +162,62 @@ public final class Transition {
 	 * 
 	 * @return
 	 */
-	public Map<Map<MemoryVariable, Term>, Term> getPRISMUpdate() {
+	private void getPRISMUpdate() {
 
-		// TODO
 		Map<Map<MemoryVariable, Term>, Term> update = new HashMap<>();
 
-		// Flatten the distribution terms in the memory update
-		Map<MemoryVariable, Term> mem2 = new HashMap<>();
-		for (Map.Entry<MemoryVariable, Term> entry : memory.entrySet())
-			mem2.put(entry.getKey(), Transition.flattenDistribution(entry.getValue()));
+		List<Iterable<Map.Entry<Map<MemoryVariable, Term>, Term>>> iterables = new ArrayList<>();
+		List<Iterator<Map.Entry<Map<MemoryVariable, Term>, Term>>> iterators = new ArrayList<>();
 
-		return null;
+		// Initialize the iterables.
+		for (Map.Entry<MemoryVariable, Term> entry : memory.entrySet()) {
+
+			// Flatten the distribution terms in the memory update
+			Distribution d = Transition.flattenDistribution(entry.getValue());
+			Map<Map<MemoryVariable, Term>, Term> iterable = new LinkedHashMap<>();
+			for (Map.Entry<Term, Term> e : d.getDistribution().entrySet()) {
+				Map<MemoryVariable, Term> upd = new HashMap<>();
+				upd.put(entry.getKey(), e.getKey());
+				iterable.put(upd, e.getValue());
+			}
+			iterables.add(iterable.entrySet());
+		}
+
+		// Initialize this iterators.
+		for (int i = 0; i < iterables.size(); i++)
+			iterators.add(i, iterables.get(i).iterator());
+
+		// Current tuple
+		List<Map.Entry<Map<MemoryVariable, Term>, Term>> tuple = new ArrayList<>();
+		for (int i = 0; i < iterators.size(); i++) 
+			tuple.add(i, iterators.get(i).next());
+
+		while (true) {
+			Map<MemoryVariable, Term> distr = new HashMap<>();
+			List<Term> prod = new ArrayList<>();
+			for (Map.Entry<Map<MemoryVariable, Term>, Term> e : tuple) {
+				distr.putAll(e.getKey());
+				prod.add(e.getValue());
+			}
+			update.put(distr, new Function("*", prod, true, TypeTags.Decimal));
+			
+			int k;
+			for (k = 0; k < iterators.size(); k++)
+				if (iterators.get(k).hasNext())
+					break;
+			if (k == iterators.size())
+				break;
+			tuple.set(k, iterators.get(k).next());
+			for (int i = 0; i < k; i++) {
+				iterators.set(i, iterables.get(i).iterator());
+				tuple.set(i, iterators.get(i).next());
+			}
+		}
+
+		this.PRISMUpdate = update;
 	}
 
-	// private static Map<Map<MemoryVariable, Term>, Term>
-	// invert(Map<MemoryVariable, Term> memory) {
-	// Iterator<Map.Entry<Term, Term>> iter = memory.entrySet().iterator();
-	// Term m =
-	// return null;
-	// }
-
-	private static Term flattenDistribution(Term t) {
+	private static Distribution flattenDistribution(Term t) {
 		if (t instanceof Distribution) {
 			Map<Term, Term> newDistr = new HashMap<>();
 			Distribution d = (Distribution) t;
@@ -181,15 +225,17 @@ public final class Transition {
 				Term f = flattenDistribution(entry.getKey());
 				if (f instanceof Distribution) {
 					for (Map.Entry<Term, Term> ef : ((Distribution) f).getDistribution().entrySet())
-						newDistr.put(ef.getKey(), new Function("*", null,
-								Arrays.asList(entry.getValue(), ef.getValue()), false, ef.getValue().getTypeTag()));
+						newDistr.put(ef.getKey(), new Function("*", Arrays.asList(entry.getValue(), ef.getValue()),
+								true, ef.getValue().getTypeTag()));
 				} else {
 					newDistr.put(f, entry.getValue());
 				}
 			}
 			return new Distribution(newDistr);
 		}
-		return t;
+		Map<Term, Term> trivialDistr = new HashMap<>();
+		trivialDistr.put(t, new Constant(new IntegerValue(1)));
+		return new Distribution(trivialDistr);
 	}
 
 	/**

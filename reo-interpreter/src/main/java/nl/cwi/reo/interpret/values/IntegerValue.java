@@ -23,7 +23,7 @@ public final class IntegerValue implements Value, TermExpression {
 	/**
 	 * Value.
 	 */
-	private int x;
+	private final int x;
 
 	/**
 	 * Constructs a new integer value.

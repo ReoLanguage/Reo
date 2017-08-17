@@ -23,7 +23,7 @@ public final class BooleanValue implements Value, TermExpression {
 	/**
 	 * Value.
 	 */
-	private boolean x;
+	private final boolean x;
 
 	/**
 	 * Constructs a new integer value.

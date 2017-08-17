@@ -13,11 +13,10 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * An equality of two terms.
  */
-public class Equality implements Formula {
+public final class Equality implements Formula {
 
 	/**
 	 * Flag for string template.
@@ -35,9 +34,9 @@ public class Equality implements Formula {
 	private final Term t2;
 	
 	/**
-	 * Free variables in this formula.
+	 * Free variables of this term.
 	 */
-	private final Set<Variable> freeVars;
+	private final Set<Variable> vars;
 
 	/**
 	 * Constructs an equality of two terms.
@@ -50,10 +49,9 @@ public class Equality implements Formula {
 	public Equality(Term t1, Term t2) {
 		this.t1 = t1;
 		this.t2 = t2;
-
 		Set<Variable> vars = new HashSet<>(t1.getFreeVariables());
 		vars.addAll(t2.getFreeVariables());
-		this.freeVars = Collections.unmodifiableSet(vars);
+		this.vars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -79,32 +77,24 @@ public class Equality implements Formula {
 	 */
 	@Override
 	public Formula rename(Map<Port, Port> links) {
-		Term s1 = t1;
-		if (t1 instanceof PortVariable) {
-			Port b = links.get(((PortVariable) t1).getPort());
-			if (b != null)
-				s1 = new PortVariable(b);
-		}
-		if (t1 instanceof Function) {
-			s1 = t1.rename(links);
-		}
-
-		Term s2 = t2;
-		if (t2 instanceof PortVariable) {
-			Port b = links.get(((PortVariable) t2).getPort());
-			if (b != null)
-				s2 = new PortVariable(b);
-		}
-		return new Equality(s1, s2);
+		return new Equality(t1.rename(links), t2.rename(links));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Set<Port> getInterface() {
+	public Set<Port> getPorts() {
 		// TODO Auto-generated method stub
 		return new HashSet<>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isQuantifierFree() {
+		return true;
 	}
 
 	/**
@@ -139,14 +129,10 @@ public class Equality implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula substitute(Map<Variable, Term> map) {
-		if (Collections.disjoint(freeVars, map.keySet()))
+	public Formula substitute(Term t, Variable x) {
+		if (!vars.contains(x))
 			return this;
-		Term t_1 = t1.substitute(map);
-		Term t_2 = t2.substitute(map);
-		if (t_1.equals(t_2))
-			return new TruthValue(true);
-		return new Equality(t_1, t_2);
+		return new Equality(t1.substitute(t, x), t2.substitute(t, x));
 	}
 
 	/**
@@ -154,7 +140,7 @@ public class Equality implements Formula {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		return freeVars;
+		return vars;
 	}
 
 	/**
@@ -163,9 +149,9 @@ public class Equality implements Formula {
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
 		Map<Variable, Integer> map = new HashMap<Variable, Integer>();
-		if (t1 instanceof Function && ((Function) t1).getValue() == null && t2 instanceof Variable) {
+		if (t1 instanceof NullValue && t2 instanceof Variable) {
 			map.put((Variable) t2, 0);
-		} else if (t2 instanceof Function && ((Function) t2).getValue() == null && t1 instanceof Variable) {
+		} else if (t2 instanceof NullValue && t1 instanceof Variable) {
 			map.put((Variable) t1, 0);
 		}
 		return map;

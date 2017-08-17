@@ -29,7 +29,6 @@ import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
-import nl.cwi.reo.semantics.predicates.TruthValue;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -85,15 +84,9 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 		return rules;
 	}
 
+
 	/**
-	 * Gets the type.
-	 *
-	 * @return the type
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.Atom#getType()
+	 * {@inheritDoc}
 	 */
 	@Override
 	public SemanticsType getType() {
@@ -101,14 +94,7 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	}
 
 	/**
-	 * Gets the interface.
-	 *
-	 * @return the interface
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.Atom#getInterface()
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Set<Port> getInterface() {
@@ -120,16 +106,7 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	}
 
 	/**
-	 * Rename.
-	 *
-	 * @param links
-	 *            the links
-	 * @return the atom
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.Atom#rename(java.util.Map)
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Atom rename(Map<Port, Port> links) {
@@ -143,10 +120,8 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 		return new RuleBasedAutomaton(_rules, initial);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.Atom#getNode(java.util.Set)
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public Atom getNode(Set<Port> node) {
@@ -165,7 +140,7 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 
 		Set<Rule> part = new HashSet<>();
 		for (Port p : inps) {
-			Formula f = new TruthValue(true);
+			Formula f = Formulas.True;
 			Map<Port, Boolean> map = new HashMap<>();
 
 			map.put(p, true);
@@ -189,19 +164,7 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	}
 
 	/**
-	 * Evaluate.
-	 *
-	 * @param s
-	 *            the s
-	 * @param m
-	 *            the m
-	 * @return the atom
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.Expression#evaluate(nl.cwi.reo.interpret.Scope,
-	 * nl.cwi.reo.util.Monitor)
+	 * {@inheritDoc}
 	 */
 	@Override
 	public @Nullable Atom evaluate(Scope s, Monitor m) {
@@ -216,22 +179,13 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	}
 
 	/**
-	 * Gets the default.
-	 *
-	 * @param iface
-	 *            the iface
-	 * @return the default
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.semantics.Semantics#getDefault(java.util.Set)
+	 * {@inheritDoc}
 	 */
 	@Override
 	public RuleBasedAutomaton getDefault(Set<Port> iface) {
 		Set<Rule> part = new HashSet<>();
 		for (Port p : iface) {
-			Formula f = new TruthValue(true);
+			Formula f = Formulas.True;
 			Map<Port, Boolean> map = new HashMap<>();
 			map.put(p, true);
 			for (Port x : iface)
@@ -245,43 +199,38 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	}
 
 	/**
-	 * Compose.
-	 *
-	 * @param components
-	 *            the components
-	 * @return the rule based automaton
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.semantics.Semantics#compose(java.util.List)
+	 * {@inheritDoc}
 	 */
 	@Override
 	public RuleBasedAutomaton compose(List<RuleBasedAutomaton> components) {
 
-		List<RuleBasedAutomaton> list = new ArrayList<>();
+		List<RuleBasedAutomaton> list = new ArrayList<>(components);
+		list.add(this);
 
+		// Count the total number of memory cells.
+		int n = 0;
+		for (RuleBasedAutomaton A : list) {
+			Set<String> names = new HashSet<>();
+			for (MemoryVariable m : A.getMemoryCells()) 
+				names.add(m.getName());
+			n += names.size();
+		}
+		int k = 1 + (int) Math.log10(n);
+		
+		// Rename the memory cells.
+		List<RuleBasedAutomaton> renamed = new ArrayList<>();
 		int i = 1;
-
-		Map<String, String> rename = new HashMap<>();
-		for (MemoryVariable m : getMemoryCells())
-			if (!rename.containsKey(m.getName()))
-				rename.putIfAbsent(m.getName(), "m" + i++);
-		list.add(renameMemory(rename));
-
-		for (RuleBasedAutomaton A : components) {
+		for (RuleBasedAutomaton A : list) {
 			Map<String, String> renameA = new HashMap<>();
 			for (MemoryVariable m : A.getMemoryCells())
 				if (!renameA.containsKey(m.getName()))
-					renameA.put(m.getName(), "m" + i++);
-			list.add(A.renameMemory(renameA));
+					renameA.put(m.getName(), "m" + String.format("%0" + k + "d", i++));
+			renamed.add(A.renameMemory(renameA));
 		}
 
 		Set<Set<Rule>> _rules = new HashSet<>();
 		Map<MemoryVariable, Term> _initial = new HashMap<>();
-
-		_rules.addAll(rules);
-		for (RuleBasedAutomaton A : list) {
+		for (RuleBasedAutomaton A : renamed) {
 			_rules.addAll(A.getRules());
 			_initial.putAll(A.getInitial());
 		}
@@ -289,13 +238,6 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 		return new RuleBasedAutomaton(_rules, _initial);
 	}
 
-	/**
-	 * Rename memory.
-	 *
-	 * @param rename
-	 *            the rename
-	 * @return the rule based automaton
-	 */
 	private RuleBasedAutomaton renameMemory(Map<String, String> rename) {
 		Map<MemoryVariable, MemoryVariable> substitution = new HashMap<>();
 		for (MemoryVariable m : getMemoryCells()) {
@@ -308,11 +250,11 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 		Set<Set<Rule>> _rules = new HashSet<>();
 		for (Set<Rule> part : rules) {
 			Set<Rule> _part = new HashSet<>();
-			for (Rule t : part)
+			for (Rule t : part) 
 				_part.add(t.renameMemory(substitution));
 			_rules.add(_part);
 		}
-
+		
 		Map<MemoryVariable, Term> _initial = new HashMap<>();
 		for (Map.Entry<MemoryVariable, Term> init : initial.entrySet()) {
 			String _m = rename.get(init.getKey().getName());
@@ -338,26 +280,15 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	}
 
 	/**
-	 * Restrict.
-	 *
-	 * @param intface
-	 *            the intface
-	 * @return the rule based automaton
-	 */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.semantics.Semantics#restrict(java.util.Collection)
+	 * {@inheritDoc}
 	 */
 	@Override
 	public RuleBasedAutomaton restrict(Collection<? extends Port> intface) {
 
-		long t0 = System.nanoTime();
-
+		long t1 = System.nanoTime();
 		RuleBasedAutomaton A = distribute();
-
-		System.out.println("Distribute() : " + ((double) (System.nanoTime() - t0)) / 1E9);
-
+		long t2 = System.nanoTime();
+		System.out.println("  Distribute     : \t" + (t2-t1)/1E9);
 		Set<Set<Rule>> _rules = new HashSet<>();
 		for (Set<Rule> part : A.getRules()) {
 			Set<Rule> _part = new HashSet<>();
@@ -365,6 +296,8 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 				_part.add(t.restrict(intface));
 			_rules.add(_part);
 		}
+		long t3 = System.nanoTime();
+		System.out.println("  Eliminate      : \t" + (t3-t2)/1E9);
 		return new RuleBasedAutomaton(_rules, initial);
 	}
 
@@ -390,7 +323,7 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 		// Rules that are explored
 		Set<Rule> explored = new HashSet<>();
 
-		final Rule seperator = new Rule(new HashMap<>(), new TruthValue(false));
+		final Rule seperator = new Rule(new HashMap<>(), Formulas.True);
 
 		for (Set<Rule> part : rules) {
 			for (Rule base : part) {
@@ -403,8 +336,6 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 
 				// Ports that possibly extend the current partial transition
 				Set<Port> unExplored = base.getActivePorts();
-
-				long t0 = System.nanoTime();
 
 				while (!partial.isEmpty()) {
 
@@ -457,9 +388,6 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 						}
 					}
 				}
-				double d = ((double) (System.nanoTime() - t0)) / 1E9;
-				if (d > 1)
-					System.out.println("find extensions : " + d);
 			}
 		}
 

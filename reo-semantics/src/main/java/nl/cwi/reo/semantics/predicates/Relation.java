@@ -1,9 +1,11 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,11 +19,10 @@ import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * Relation of a list of terms.
  */
-public class Relation implements Formula {
+public final class Relation implements Formula {
 
 	/**
 	 * Flag for string template.
@@ -33,22 +34,21 @@ public class Relation implements Formula {
 	 */
 	private final String name;
 
-	// /**
-	// * Value of this relation or reference to its implementation.
-	// */
-	// @Nullable
-	// private String value;
-
 	/**
 	 * List of arguments of this relation.
 	 */
-	@Nullable
 	private final List<Term> args;
 
 	/**
-	 * Free variables in this formula.
+	 * Defines whether the function symbol can be used with infix notation. For
+	 * example, infix can be a+b, while prefix can be +(a,b).
 	 */
-	private final Set<Variable> freeVars;
+	private final boolean infix;
+	
+	/**
+	 * Free variables of this term.
+	 */
+	private final Set<Variable> vars;
 
 	/**
 	 * Constructs a new relation with a given name and a given list of
@@ -58,17 +58,17 @@ public class Relation implements Formula {
 	 *            name of the relation
 	 * @param args
 	 *            list of arguments
+	 * @param infix
+	 *            infix notation
 	 */
-	public Relation(String name, @Nullable List<Term> args) {
+	public Relation(String name, Collection<Term> args, boolean infix) {
 		this.name = name;
-		this.args = args;
-
+		this.args = Collections.unmodifiableList(new ArrayList<>(args));
+		this.infix = infix;
 		Set<Variable> vars = new HashSet<Variable>();
-		if (args != null)
-			for (Term t : args)
-				vars.addAll(t.getFreeVariables());
-		this.freeVars = Collections.unmodifiableSet(vars);
-
+		for (Term t : args)
+			vars.addAll(t.getFreeVariables());
+		this.vars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -95,7 +95,23 @@ public class Relation implements Formula {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		return freeVars;
+		return vars;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Port> getPorts() {
+		return new HashSet<>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isQuantifierFree() {
+		return true;
 	}
 
 	/**
@@ -123,15 +139,7 @@ public class Relation implements Formula {
 			}
 		}
 
-		return new Relation(_name, _args);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Set<Port> getInterface() {
-		return new HashSet<>();
+		return new Relation(_name, _args, infix);
 	}
 
 	/**
@@ -162,13 +170,13 @@ public class Relation implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula substitute(Map<Variable, Term> map) {
-		if (args == null || Collections.disjoint(freeVars, map.keySet()))
+	public Formula substitute(Term t, Variable x) {
+		if (!vars.contains(x))
 			return this;
 		List<Term> _args = new ArrayList<>();
-		for (Term t : args)
-			_args.add(t.substitute(map));
-		return new Relation(this.name, _args);
+		for (Term u : args)
+			_args.add(u.substitute(t, x));
+		return new Relation(name, _args, infix);
 	}
 
 	/**
@@ -184,12 +192,25 @@ public class Relation implements Formula {
 	 */
 	@Override
 	public String toString() {
-		String s = name;
-		if (args != null) {
-			s += "(";
-			for (Term t : args)
-				s += ", " + t;
-			s += ")";
+		String s = "";
+		if (infix) {
+			Iterator<Term> iter = args.iterator();
+			while (iter.hasNext()) {
+				s += iter.next().toString();
+				if (iter.hasNext())
+					s += name;
+			}
+		} else {
+			if (args != null && !args.isEmpty()) {
+				s += name + "(";
+				Iterator<Term> iter = args.iterator();
+				while (iter.hasNext()) {
+					s += iter.next().toString();
+					if (iter.hasNext())
+						s += ", ";
+				}
+				s += ")";
+			}
 		}
 		return s;
 	}

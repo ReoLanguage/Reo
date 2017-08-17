@@ -38,15 +38,16 @@ import nl.cwi.reo.interpret.ReoParser.Rba_termContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_syncBlockContext;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
-import nl.cwi.reo.semantics.predicates.NullValue;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Terms;
 import nl.cwi.reo.semantics.predicates.TruthValue;
 import nl.cwi.reo.util.Monitor;
 
@@ -155,7 +156,7 @@ public class ListenerCH extends BaseListener {
 	 * .ReoParser.Rba_initialContext)
 	 */
 	public void exitRba_initial(Rba_initialContext ctx) {
-		initial.put(new MemoryVariable(ctx.ID().getText(), false), term.get(ctx.rba_term()));
+		initial.put(new MemoryVariable(ctx.ID().getText(), false, TypeTags.Object), term.get(ctx.rba_term()));
 	}
 
 	/*
@@ -265,7 +266,7 @@ public class ListenerCH extends BaseListener {
 	 */
 	@Override
 	public void exitRba_nat(Rba_natContext ctx) {
-		term.put(ctx, new Function(ctx.getText(), Integer.parseInt(ctx.getText()), null, false, new TypeTag("int")));
+		term.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Integer));
 	}
 
 	/*
@@ -277,7 +278,7 @@ public class ListenerCH extends BaseListener {
 	 */
 	@Override
 	public void exitRba_bool(Rba_boolContext ctx) {
-		term.put(ctx, new Function(ctx.getText(), Boolean.parseBoolean(ctx.getText()), null, false, new TypeTag("bool")));
+		term.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Boolean));
 	}
 
 	/*
@@ -289,7 +290,7 @@ public class ListenerCH extends BaseListener {
 	 */
 	@Override
 	public void exitRba_string(Rba_stringContext ctx) {
-		term.put(ctx, new Function(ctx.getText(), ctx.getText(), null, false, new TypeTag("string")));
+		term.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.String));
 	}
 
 	/*
@@ -301,7 +302,7 @@ public class ListenerCH extends BaseListener {
 	 */
 	@Override
 	public void exitRba_decimal(Rba_decimalContext ctx) {
-		term.put(ctx, new Function(ctx.getText(), Double.parseDouble(ctx.getText()), null, false, new TypeTag("decimal")));
+		term.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Decimal));
 	}
 
 	/*
@@ -319,7 +320,7 @@ public class ListenerCH extends BaseListener {
 			args.add(t);
 			tag = t.getTypeTag();
 		}
-		term.put(ctx, new Function(ctx.ID().getText(), null, args, false, tag));
+		term.put(ctx, new Function(ctx.ID().getText(), args, false, tag));
 	}
 
 	/*
@@ -342,7 +343,7 @@ public class ListenerCH extends BaseListener {
 	 */
 	@Override
 	public void exitRba_memorycellIn(Rba_memorycellInContext ctx) {
-		term.put(ctx, new MemoryVariable(ctx.ID().getText(), false));
+		term.put(ctx, new MemoryVariable(ctx.ID().getText(), false, TypeTags.Object));
 	}
 
 	/*
@@ -354,7 +355,7 @@ public class ListenerCH extends BaseListener {
 	 */
 	@Override
 	public void exitRba_memorycellOut(Rba_memorycellOutContext ctx) {
-		term.put(ctx, new MemoryVariable(ctx.ID().getText(), true));
+		term.put(ctx, new MemoryVariable(ctx.ID().getText(), true, TypeTags.Object));
 	}
 
 	/*
@@ -366,7 +367,7 @@ public class ListenerCH extends BaseListener {
 	 */
 	@Override
 	public void exitRba_null(Rba_nullContext ctx) {
-		term.put(ctx, new NullValue());
+		term.put(ctx, Terms.Null);
 	}
 	
 	/* (non-Javadoc)
@@ -374,7 +375,7 @@ public class ListenerCH extends BaseListener {
 	 */
 	@Override 
 	public void exitRba_unarymin(Rba_unaryminContext ctx) { 
-		term.put(ctx, new Function("-", null, Arrays.asList(term.get(ctx.rba_term())), false, new TypeTag("int")));		
+		term.put(ctx, new Function("-", Arrays.asList(term.get(ctx.rba_term())), false, new TypeTag("int")));		
 	}
 
 	/* (non-Javadoc)
@@ -383,7 +384,7 @@ public class ListenerCH extends BaseListener {
 	@Override 
 	public void exitRba_operation(Rba_operationContext ctx) { 
 		TypeTag tag = term.get(ctx.rba_term(0)).getTypeTag();
-		term.put(ctx, new Function(ctx.op.getText(), null, Arrays.asList(term.get(ctx.rba_term(0)), term.get(ctx.rba_term(1))), true, tag));		
+		term.put(ctx, new Function(ctx.op.getText(), Arrays.asList(term.get(ctx.rba_term(0)), term.get(ctx.rba_term(1))), true, tag));		
 	}
 
 }

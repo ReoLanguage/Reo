@@ -1,6 +1,5 @@
 package nl.cwi.reo.semantics.predicates;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,15 +9,11 @@ import nl.cwi.reo.interpret.typetags.TypeTag;
 
 /**
  * A abstract term over the language of constraints that represents a data item.
+ * 
+ * <p>
+ * Every implementing class is immutable.
  */
 public interface Term extends Expression<Term> {
-
-	/**
-	 * Checks if this term contains an output port variable.
-	 * 
-	 * @return true if this term contains an outpout port variable.
-	 */
-	public boolean hasOutputPorts();
 
 	/**
 	 * Renames the port variables in this term.
@@ -38,20 +33,7 @@ public interface Term extends Expression<Term> {
 	 *            free variable
 	 * @return substituted term.
 	 */
-	public default Term substitute(Term t, Variable x) {
-		Map<Variable, Term> map = new HashMap<>();
-		map.put(x, t);
-		return substitute(map);
-	}
-	
-	/**
-	 * Substitutes a term t for every occurrence of a variable x in this term.
-	 * 
-	 * @param map
-	 *            assignment of terms to variables 
-	 * @return substituted term.
-	 */
-	public Term substitute(Map<Variable, Term> map);
+	public Term substitute(Term t, Variable x);
 
 	/**
 	 * Gets the set of all free variables in this term.

@@ -1,7 +1,5 @@
 package nl.cwi.reo.semantics.predicates;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -11,18 +9,15 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
-import nl.cwi.reo.interpret.values.DecimalValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * A variable the represents the data observed at a port.
  */
-public class PortVariable implements Variable {
+public final class PortVariable implements Variable {
 
 	/**
 	 * Flag for string template.
@@ -33,11 +28,6 @@ public class PortVariable implements Variable {
 	 * Flag for string template.
 	 */
 	private final Port p;
-	
-	/**
-	 * Free variables in this formula.
-	 */
-	private final Set<Variable> freeVars;
 
 	/**
 	 * Constructs a new port variable from a given port.
@@ -47,7 +37,6 @@ public class PortVariable implements Variable {
 	 */
 	public PortVariable(Port p) {
 		this.p = p;
-		this.freeVars = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(this)));
 	}
 
 	/**
@@ -80,14 +69,6 @@ public class PortVariable implements Variable {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public boolean hasOutputPorts() {
-		return p.getType() == PortType.OUT;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
 	public String getName() {
 		return p.getName();
 	}
@@ -107,9 +88,8 @@ public class PortVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Term substitute(Map<Variable, Term> map) {
-		Term t = map.get(this);
-		if (t != null)
+	public Term substitute(Term t, Variable x) {
+		if (this.equals(x))
 			return t;
 		return this;
 	}
@@ -119,7 +99,9 @@ public class PortVariable implements Variable {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		return freeVars;
+		Set<Variable> vars = new HashSet<>();
+		vars.add(this);
+		return vars;
 	}
 
 	/**
@@ -160,9 +142,8 @@ public class PortVariable implements Variable {
 	@Override
 	public @Nullable Term evaluate(Scope s, Monitor m) {
 		Value v = s.get(new Identifier(p.getName()));
-		if (v instanceof DecimalValue)
-			return new DecimalTerm(((DecimalValue) v).getValue());
-		// TODO include other data types.
+		if (v != null)
+			return new Constant(v);
 		return this;
 	}
 }

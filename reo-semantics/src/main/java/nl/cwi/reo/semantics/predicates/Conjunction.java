@@ -2,6 +2,7 @@ package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,16 +12,16 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * A conjunction of a list of formulas.
  */
-public class Conjunction implements Formula {
+public final class Conjunction implements Formula {
 
 	/**
 	 * Flag for string template.
@@ -33,22 +34,22 @@ public class Conjunction implements Formula {
 	private final List<Formula> clauses;
 	
 	/**
-	 * Free variables in this formula.
+	 * Free variables of this term.
 	 */
-	private final Set<Variable> freeVars;
+	private final Set<Variable> vars;
 
 	/**
 	 * Constructs the conjunction of a list of formulas.
 	 * 
 	 * @param clauses
-	 *            list of formulas
+	 *            collection of formulas
 	 */
-	public Conjunction(List<Formula> clauses) {
-		this.clauses = clauses;
+	public Conjunction(Collection<Formula> clauses) {
+		this.clauses = Collections.unmodifiableList(new ArrayList<>(clauses));
 		Set<Variable> vars = new HashSet<Variable>();
-		for (Formula c : clauses)
-			vars.addAll(c.getFreeVariables());
-		this.freeVars = Collections.unmodifiableSet(vars);
+		for (Formula f : clauses)
+			vars.addAll(f.getFreeVariables());
+		this.vars = Collections.unmodifiableSet(vars);
 	}
 
 	/**
@@ -75,12 +76,23 @@ public class Conjunction implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Set<Port> getInterface() {
+	public Set<Port> getPorts() {
 		Set<Port> P = new HashSet<Port>();
 		for (Formula f : clauses)
-			if (!(f instanceof Equality) && (f.getInterface() != null))
-				P.addAll(f.getInterface());
+			if (!(f instanceof Equality) && (f.getPorts() != null))
+				P.addAll(f.getPorts());
 		return P;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isQuantifierFree() {
+		for (Formula f : clauses)
+			if (!f.isQuantifierFree())
+				return false;
+		return true;
 	}
 
 	/**
@@ -149,13 +161,13 @@ public class Conjunction implements Formula {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Formula substitute(Map<Variable, Term> map) {
-		if (Collections.disjoint(freeVars, map.keySet()))
+	public Formula substitute(Term t, Variable x) {
+		if (!vars.contains(x))
 			return this;
-		List<Formula> list = new ArrayList<Formula>();
+		List<Formula> _clauses = new ArrayList<>();
 		for (Formula f : clauses)
-			list.add(f.substitute(map));
-		return new Conjunction(list);
+			_clauses.add(f.substitute(t, x));
+		return new Conjunction(_clauses);
 	}
 
 	/**
@@ -163,9 +175,6 @@ public class Conjunction implements Formula {
 	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = new HashSet<Variable>();
-		for (Formula f : clauses)
-			vars.addAll(f.getFreeVariables());
 		return vars;
 	}
 
@@ -188,10 +197,9 @@ public class Conjunction implements Formula {
 	 */
 	@Override
 	public String toString() {
-		String s = "(" + clauses.get(0);
-		for (int i = 1; i < clauses.size(); i++)
-			s = s + " \u2227 " + clauses.get(i);
-		return s + ")";
+		ST st = new ST("(<clauses;separator=\" \u2227 \">)");
+		st.add("clauses", clauses);
+		return st.render();
 	}
 
 	/**

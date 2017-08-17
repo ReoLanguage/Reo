@@ -13,6 +13,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Formulas;
@@ -283,10 +284,10 @@ public class RuleNode {
 	 */
 	public RuleNode substitute(Map<String, String> rename) {
 		for (Map.Entry<String, String> entry : rename.entrySet()) {
-			rule = new Rule(rule.getSyncConstraint(), rule.getDataConstraint().substitute(
-					new MemoryVariable(entry.getValue(), false), new MemoryVariable(entry.getKey(), false)));
-			rule = new Rule(rule.getSyncConstraint(), rule.getDataConstraint()
-					.substitute(new MemoryVariable(entry.getValue(), true), new MemoryVariable(entry.getKey(), true)));
+			rule.getDataConstraint().substitute(new MemoryVariable(entry.getValue(), false, TypeTags.Object),
+					new MemoryVariable(entry.getKey(), false, TypeTags.Object));
+			rule.getDataConstraint().substitute(new MemoryVariable(entry.getValue(), true, TypeTags.Object),
+					new MemoryVariable(entry.getKey(), true, TypeTags.Object));
 		}
 		return this;
 	}
