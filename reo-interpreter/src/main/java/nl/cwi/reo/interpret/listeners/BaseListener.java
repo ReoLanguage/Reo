@@ -359,14 +359,9 @@ public class BaseListener extends ReoBaseListener {
 		components.put(ctx, new ComponentDefinition(sign, new SetAtom(name, _atoms)));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitAtom(nl.cwi.reo.interpret.
-	 * ReoParser.AtomContext)
-	 */
 	@Override
 	public void exitAtom(AtomContext ctx) {
+
 		Atom A = atoms.get(ctx.ref());
 		if (A == null)
 			A = atoms.get(ctx.cam());

@@ -1,4 +1,6 @@
-package nl.cwi.reo.components;
+package nl.cwi.reo.runtime;
+import nl.cwi.reo.components.Display;
+import nl.cwi.reo.components.Engine;
 
 import nl.cwi.reo.runtime.Input;
 import nl.cwi.reo.runtime.Output;

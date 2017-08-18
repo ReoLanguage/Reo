@@ -49,6 +49,7 @@ import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Terms;
 import nl.cwi.reo.semantics.predicates.TruthValue;
+import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -91,10 +92,6 @@ public class ListenerCH extends BaseListener {
 	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitAtom(nl.cwi.reo.interpret.
 	 * ReoParser.AtomContext)
 	 */
-	@Override
-	public void exitAtom(AtomContext ctx) {
-		atoms.put(ctx, automaton.get(ctx.rba()));
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -120,7 +117,7 @@ public class ListenerCH extends BaseListener {
 		for (Rba_ruleContext rbaContext : ctx.rba_rule()) {
 			s.add(rules.get(rbaContext));
 		}
-		automaton.put(ctx, new ConstraintHypergraph(s, initial));
+		atoms.put(ctx, new ConstraintHypergraph(s, initial));
 	}
 
 	/*

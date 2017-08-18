@@ -1,4 +1,4 @@
-package nl.cwi.reo.components;
+package nl.cwi.reo.runtime;
 
 import java.util.HashMap;
 import java.util.Map;

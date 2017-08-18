@@ -1,29 +1,31 @@
 #include "Reo.h"
 #include <stdio.h>
-#include <windows.h>
+#include <pthread.h>
 
-static DWORD WINAPI red(void *args);
+static void* red(void *args);
 static void call_red();
 
-static DWORD WINAPI green(void *args);
+static void* green(void *args);
 static void call_green();
 
-static DWORD WINAPI blue(void *args);
+static void* blue(void *args);
 static void call_blue();
 
-static DWORD WINAPI protocol(void *args);
+static void* protocol(void *args);
 static void call_protocol();
 
 static port a = { 0, NULL, &call_red, &call_protocol };
 static port b = { 0, NULL, &call_green, &call_protocol };
 static port c = { 0, NULL, &call_protocol, &call_blue };
 
+pthread_t type_id[4];
+
 int main() {
 
-	HANDLE Tred = CreateThread(NULL, 0, red, NULL, 0, NULL);
-	HANDLE Tgreen = CreateThread(NULL, 0, green, NULL, 0, NULL);
-	HANDLE Tblue = CreateThread(NULL, 0, blue, NULL, 0, NULL);
-	HANDLE Tprotocol = CreateThread(NULL, 0, protocol, NULL, 0, NULL);
+	int Tred = pthread_create(&(type_id[0]), NULL, &red, NULL);
+	int Tgreen = pthread_create(&(type_id[1]), NULL, &green, NULL);
+	int Tblue = pthread_create(&(type_id[2]), NULL, &blue, NULL);
+	int Tprotocol = pthread_create(&(type_id[3]), NULL, &protocol, NULL);
 
 //	if (thread) {
 //		// Optionally do stuff, such as wait on the thread.
@@ -42,7 +44,7 @@ int main() {
 	return 0;
 }
 
-static DWORD WINAPI red(void *args) {
+static void* red(void *args) {
 	for (;;) {
 		for (int i = 0; i < 50; i++)
 			;
@@ -58,11 +60,11 @@ static void call_red() {
 	fflush( stdout);
 }
 
-static DWORD WINAPI green(void *args) {
+static void* green(void *args) {
 	for (;;) {
 		for (int i = 0; i < 50; i++)
 			;
-		printf("put b\n");
+		printf("put b!\n");
 		fflush( stdout);
 		put(&b, (void *) 0x121UL);
 	}
@@ -74,7 +76,7 @@ static void call_green() {
 	fflush( stdout);
 }
 
-static DWORD WINAPI blue(void *args) {
+static void* blue(void *args) {
 	for (;;) {
 		for (int i = 0; i < 40; i++)
 			;
@@ -93,7 +95,7 @@ static void call_blue() {
 	fflush( stdout);
 }
 
-static DWORD WINAPI protocol(void *args) {
+static void* protocol(void *args) {
 	void *m;
 
 	for (;;) {

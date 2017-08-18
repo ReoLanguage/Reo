@@ -135,6 +135,7 @@ public final class Function implements Term {
 	@Override
 	public Term evaluate(Scope s, Monitor m) {
 
+
 		// Evaluate the symbol
 		String _name = name;
 		Value v = s.get(new Identifier(name));
@@ -202,5 +203,6 @@ public final class Function implements Term {
 	public int hashCode() {
 		return Objects.hash(name, this.args);
 	}
+
 
 }

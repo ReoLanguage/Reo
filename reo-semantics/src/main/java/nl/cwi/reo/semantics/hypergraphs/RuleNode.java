@@ -20,6 +20,7 @@ import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -67,10 +68,10 @@ public class RuleNode {
 	public RuleNode(Rule r, Set<HyperEdge> hyperedge) {
 		this.rule = r;
 		this.hyperedges = new HashSet<>();
+		id = ++N;
 		for (HyperEdge h : hyperedge)
 			addToHyperedge(h); // TODO cannot call this.addToHyperedge, because
 								// this is not fully initialized.
-		id = ++N;
 	}
 
 	/**
@@ -175,8 +176,8 @@ public class RuleNode {
 		if (f instanceof Disjunction) {
 			for (Formula clause : ((Disjunction) f).getClauses()) {
 				for (Variable v : clause.getFreeVariables()) {
-					if (v instanceof PortVariable && rule.getSyncConstraint().get(((PortVariable) v).getPort()) != null
-							&& !rule.getSyncConstraint().get(((PortVariable) v).getPort())) {
+					if (v instanceof PortVariable && rule.getSync().get((((PortVariable) v).getPort()) != null
+							&& !rule.getSync().get(((PortVariable) v).getPort()))) {
 						canSync = false;
 					}
 				}
@@ -187,10 +188,10 @@ public class RuleNode {
 		}
 		Formula formula;
 		if (clauses.size() == 1)
-			formula = Formulas.conjunction(Arrays.asList(rule.getDataConstraint(), clauses.get(0)));
+			formula = Formulas.conjunction(Arrays.asList(rule.getFormula(), clauses.get(0)));
 		else
-			formula = Formulas.conjunction(Arrays.asList(rule.getDataConstraint(), new Disjunction(clauses)));
-		rule = new Rule(rule.getSyncConstraint(), formula);
+			formula = Formulas.conjunction(Arrays.asList(rule.getFormula(), new Disjunction(clauses)));
+		rule = new Rule(rule.getSync(), formula);
 		return this;
 	}
 
@@ -204,21 +205,21 @@ public class RuleNode {
 	 *         both node can synchronize, or null otherwise.
 	 */
 	public RuleNode compose(RuleNode r) {
-		if (!rule.canSync(r.getRule()))
+		if (!canSync(rule, r.getRule()))
 			return null;
 
-		Map<Port, Boolean> map = new HashMap<>(rule.getSyncConstraint());
-		map.putAll(r.getRule().getSyncConstraint());
+		Map<Port, Boolean> map = new HashMap<>(rule.getSync());
+		map.putAll(r.getRule().getSync());
 
 		Rule r1;
-		if (rule.getDataConstraint().equals(r.getRule().getDataConstraint())) {
-			if (r.getRule().getSyncConstraint().equals(rule.getSyncConstraint()))
+		if (rule.getFormula().equals(r.getRule().getFormula())) {
+			if (r.getRule().getSync().equals(rule.getSync()))
 				return this;
 			else
-				r1 = new Rule(map, rule.getDataConstraint());
+				r1 = new Rule(map, rule.getFormula());
 		} else {
 			r1 = new Rule(map,
-					Formulas.conjunction(Arrays.asList(rule.getDataConstraint(), r.getRule().getDataConstraint())));
+					Formulas.conjunction(Arrays.asList(rule.getFormula(), r.getRule().getFormula())));
 		}
 
 		Set<HyperEdge> set = new HashSet<>(hyperedges);
@@ -284,14 +285,32 @@ public class RuleNode {
 	 */
 	public RuleNode substitute(Map<String, String> rename) {
 		for (Map.Entry<String, String> entry : rename.entrySet()) {
-			rule.getDataConstraint().substitute(new MemoryVariable(entry.getValue(), false, TypeTags.Object),
-					new MemoryVariable(entry.getKey(), false, TypeTags.Object));
-			rule.getDataConstraint().substitute(new MemoryVariable(entry.getValue(), true, TypeTags.Object),
-					new MemoryVariable(entry.getKey(), true, TypeTags.Object));
+			rule = new Rule(rule.getSync(), rule.getFormula().substitute(
+					new MemoryVariable(entry.getValue(), false), new MemoryVariable(entry.getKey(), false)));
+			rule = new Rule(rule.getSync(), rule.getFormula()
+					.substitute(new MemoryVariable(entry.getValue(), true), new MemoryVariable(entry.getKey(), true)));
 		}
 		return this;
 	}
 
+	public boolean canSync(Rule r1, Rule r2) {
+
+		boolean hasEdge = false;
+		for (Port p : r1.getSync().keySet()) {
+			if (r1.getSync().get(p)) {
+				if (r2.getSync().get(p)!=null && r2.getSync().get(p)) {
+					hasEdge = true;
+				} else if(r2.getSync().get(p)!=null && !r2.getSync().get(p)){ 
+					return false;
+				}
+			}
+			else if(r2.getSync()!=null && r2.getSync().get(p)!=null &&r2.getSync().get(p))
+				return false;
+		}
+		return hasEdge;
+}
+	
+	
 	/**
 	 * Hides a port from this rule via existential quantification.
 	 * 
@@ -301,7 +320,7 @@ public class RuleNode {
 	 */
 	public RuleNode hide(PortNode p) {
 		List<Variable> V = Arrays.asList(new PortVariable(p.getPort()));
-		rule = new Rule(rule.getSyncConstraint(), Formulas.eliminate(rule.getDataConstraint(), V));
+		rule = new Rule(rule.getSync(), Formulas.eliminate(rule.getFormula(), V));
 		return this;
 	}
 
@@ -337,7 +356,7 @@ public class RuleNode {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.id);
+		return Objects.hash(id);
 	}
 
 	/**

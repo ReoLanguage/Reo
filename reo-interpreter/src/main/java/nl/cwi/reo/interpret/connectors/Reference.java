@@ -165,7 +165,7 @@ public final class Reference implements Atom {
 	 */
 	@Override
 	public Atom rename(Map<Port, Port> links) {
-		return null;
+		return this;
 	}
 
 	/* (non-Javadoc)

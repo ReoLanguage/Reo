@@ -180,7 +180,7 @@ int main1( void )
 	required when heap_4.c is used. */
 	prvInitialiseHeap();
 
-	/* Initialise the trace recorder and create the label used to post user
+	/* Initialise the trace recorder and create the label u	sed to post user
 	events to the trace recording on each tick interrupt. */
 	vTraceInitTraceData();
 	xTickTraceUserEvent = xTraceOpenLabel( "tick" );
