@@ -3,8 +3,11 @@ import reo.fifo1;
 import reo.lossy;
 import reo.syncdrain;
 import reo.alternator;
+import reo.xrouter;
 
-probabilistic(in, out) {
+probabilistic(in, out[1..2]) {
+//xrouter(in,out[1..2])
+
 //alternator(in[1..5],out)
 //	oops(in, out)
 //	faultyfifo1<0.05>(in, out)
@@ -13,8 +16,8 @@ probabilistic(in, out) {
 	lossy(C, I) sync(C, A) fifo1(C, E)
 	lossy(F, C)
 	fifo1(I, H)
-//	faultyfifo1<0.95>(A, B)
-	fifo1(A, B)
+	faultyfifo1<0.95>(A, B)
+//	fifo1(A, B)
 	sync(G, E)
 	fifo1(E, F)
 	sync(H, G)

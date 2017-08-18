@@ -47,6 +47,7 @@ import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.rulebasedautomata.ListenerRBA;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
 import nl.cwi.reo.templates.Atomic;
@@ -257,8 +258,8 @@ public class Compiler {
 			return new Interpreter(SemanticsType.CH, listenerPRBA, directories, params, monitor);
 		case JAVA:
 		case C11:
-			ListenerCH listenerRBA = new ListenerCH(monitor);
-			return new Interpreter(SemanticsType.CH, listenerRBA, directories, params, monitor);
+			ListenerRBA listenerRBA = new ListenerRBA(monitor);
+			return new Interpreter(SemanticsType.RBA, listenerRBA, directories, params, monitor);
 		case MAUDE:
 			break;
 		case PRT:
