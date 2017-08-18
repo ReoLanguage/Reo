@@ -24,6 +24,7 @@ import nl.cwi.reo.commands.Command;
 import nl.cwi.reo.commands.Commands;
 import nl.cwi.reo.compile.CompilerType;
 import nl.cwi.reo.compile.LykosCompiler;
+import nl.cwi.reo.compile.RBACompiler;
 import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.SemanticsType;
@@ -43,13 +44,9 @@ import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
-import nl.cwi.reo.semantics.hypergraphs.ListenerCH;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
-import nl.cwi.reo.semantics.predicates.Existential;
-import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
-import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.rulebasedautomata.ListenerRBA;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
@@ -449,8 +446,11 @@ public class Compiler {
 
 	private Set<Transition> buildTransitions(ConstraintHypergraph protocol) {
 		Set<Transition> transitions = new HashSet<>();
-		for (Rule rule : protocol.getRules())
-			transitions.add(RBACompiler.commandify(rule.getFormula()));
+		for (Rule rule : protocol.getRules()){
+			Command cmd = Commands.commandify(rule.getFormula());
+			transitions.add(cmd.toTransition());
+		}
+//			transitions.add(RBACompiler.commandify(rule.getFormula()));
 		return transitions;
 	}
 	

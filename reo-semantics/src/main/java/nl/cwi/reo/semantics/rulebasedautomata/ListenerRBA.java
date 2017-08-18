@@ -101,11 +101,6 @@ public class ListenerRBA extends BaseListener {
 			if (init != null)
 				initial.putAll(init);
 		}
-<<<<<<< HEAD
-		
-=======
-
->>>>>>> 75a3bf212b3945fda06397f74d04d54331620d60
 		atoms.put(ctx, new RuleBasedAutomaton(rules, initial));
 	}
 

@@ -10,6 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -52,6 +53,12 @@ public final class MemoryVariable implements Variable, Comparable<MemoryVariable
 		this.name = name;
 		this.prime = prime;
 		this.type = type;
+	}
+	
+	public MemoryVariable(String name, boolean prime) {
+		this.name = name;
+		this.prime = prime;
+		this.type = TypeTags.Object;
 	}
 
 	/**
