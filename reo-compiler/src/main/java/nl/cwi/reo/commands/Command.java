@@ -5,12 +5,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.templates.MaudeTransition;
+import nl.cwi.reo.templates.PrismTransition;
 import nl.cwi.reo.templates.Transition;
 
 /**
@@ -86,7 +89,7 @@ public class Command {
 		return N;
 	}
 
-	public Transition toTransition() {
+	public Transition toTransition(Language lang) {
 		Map<PortVariable, Term> output = new HashMap<>();
 		Map<MemoryVariable, Term> memory = new HashMap<>();
 		for (Map.Entry<Variable, Term> entry : update.entrySet()) {
@@ -95,7 +98,22 @@ public class Command {
 			if (entry.getKey() instanceof MemoryVariable)
 				memory.put((MemoryVariable) entry.getKey(), entry.getValue());
 		}
-		return new Transition(guard, output, memory, getPorts());
+		switch (lang) {
+		case PRISM:
+			return new PrismTransition(guard, output, memory, getPorts());
+		case JAVA:
+		case C11:
+			return new Transition(guard, output, memory, getPorts());
+		case MAUDE:
+			return new MaudeTransition(guard, output, memory, getPorts());
+		case PRT:
+			break;
+		case TEXT:
+			break;
+		default:
+			break;
+		}
+		return null;				
 	}
 	
 	@Override

@@ -24,7 +24,6 @@ import nl.cwi.reo.commands.Command;
 import nl.cwi.reo.commands.Commands;
 import nl.cwi.reo.compile.CompilerType;
 import nl.cwi.reo.compile.LykosCompiler;
-import nl.cwi.reo.compile.RBACompiler;
 import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.SemanticsType;
@@ -448,9 +447,8 @@ public class Compiler {
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : protocol.getRules()){
 			Command cmd = Commands.commandify(rule.getFormula());
-			transitions.add(cmd.toTransition());
+			transitions.add(cmd.toTransition(lang));
 		}
-//			transitions.add(RBACompiler.commandify(rule.getFormula()));
 		return transitions;
 	}
 	
@@ -458,7 +456,7 @@ public class Compiler {
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : protocol.getAllRules()) {
 			Command cmd = Commands.commandify(rule.getFormula());
-			transitions.add(cmd.toTransition());
+			transitions.add(cmd.toTransition(lang));
 		}
 		return transitions;
 	}
