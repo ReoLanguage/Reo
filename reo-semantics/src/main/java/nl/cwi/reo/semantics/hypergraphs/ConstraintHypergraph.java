@@ -470,7 +470,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		Set<Rule> setRules = new HashSet<Rule>();
 		for (Rule r : getRules()) {
 			Formula g = r.getFormula();
-			for (Port p : r.getActivePorts()) {
+			for (Port p : r.getInterface()) {
 				if (!intface.contains(p)) {
 					List<Variable> V = Arrays.asList(new PortVariable(p));
 					g = Formulas.eliminate(g, V);

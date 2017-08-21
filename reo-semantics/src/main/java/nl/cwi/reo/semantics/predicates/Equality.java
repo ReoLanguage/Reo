@@ -86,7 +86,14 @@ public final class Equality implements Formula {
 	@Override
 	public Set<Port> getPorts() {
 		// TODO Auto-generated method stub
-		return new HashSet<>();
+		Set<Port> portsInFormula = new HashSet<Port>();
+		if (t1 instanceof PortVariable) {
+			portsInFormula.add(((PortVariable) t1).getPort());
+		}
+		if (t2 instanceof PortVariable) {
+			portsInFormula.add(((PortVariable) t2).getPort());
+		}
+		return portsInFormula;
 	}
 
 	/**

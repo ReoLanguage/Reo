@@ -140,20 +140,45 @@ new Rule() {
 >>
 
 guard(t) ::= <<
-<if(t.equality)><endif><t.guard:formula()><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" "><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif>
-<! <if(t.equality)><endif><t.guard:formula()><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif> !>
->>
+<t.guard:formula()><!
+!><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" ">
+<!
+<if(t.input)>	 && <t.input:{p | (<p.name>.peek())!=null}; separator=" && ">
+<endif>
+!> >>
 
 formula(f) ::= <<
-<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)><f:equality()><elseif(f.relation)><f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif><elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(f.disjunction)>(<f.clauses:formula(); separator=" || ">)<endif>
+<if(f.negation)>!(<f.formula:formula()>)<!
+!><elseif(f.equality)><f:equality()><!
+!><elseif(f.relation)><f:relation()><!
+!><elseif(f.conjunction)><f:conjunction()><!
+!><elseif(f.disjunction)><f:disjunction()><!
+!><endif>
+>>
+
+disjunction(f) ::= <<
+(<f.clauses:formula(); separator=" || ">)
+>>
+
+conjunction(f) ::=<<
+(<f.clauses:formula(); separator=" && ">)
+>>
+
+relation(f) ::=<<
+<f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif>
 >>
 
 equality(f) ::= <<
-<if(f.LHS.node)><if(!f.RHS.constant.value)>!<f.LHS.name>.hasGet()<else><f.LHS:term()> == <f.RHS:term()><endif><else><f.LHS:term()> == <f.RHS:term()><endif>
+<f.LHS:term()> == <f.RHS:term()>
 >>
 
 term(t) ::= <<
-<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.peek()<elseif(t.memory)><t.name><else><t.name><endif>
+<if(t.function)><t:function()><!
+!><elseif(t.constant)><t.name><!
+!><elseif(t.node)><t.name>.peek()<!
+!><elseif(t.memory)><t.name><!
+!><elseif(t.isnull)>null<!
+!><else><t.name><endif>
 >>
 
 function(t) ::=<<

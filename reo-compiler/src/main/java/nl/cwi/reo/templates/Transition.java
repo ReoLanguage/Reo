@@ -30,32 +30,7 @@ public class Transition {
 	private final Map<PortVariable, Term> output;
 
 	/** Memory update. */
-	private final Map<MemoryVariable, Term> memory;
-
-	/**
-	 * Constructs a new transition.
-	 * 
-	 * @param guard
-	 *            guard
-	 * @param output
-	 *            output provided at output ports
-	 * @param memory
-	 *            update of the memory cells
-	 */
-	public Transition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory) {
-		if (guard == null)
-			throw new IllegalArgumentException("No guard specified.");
-		if (output == null)
-			throw new IllegalArgumentException("No output values specified.");
-		if (memory == null)
-			throw new IllegalArgumentException("No memory update specified.");
-		this.guard = guard;
-		this.output = Collections.unmodifiableMap(output);
-		this.memory = Collections.unmodifiableMap(memory);
-		Set<Port> I = new HashSet<Port>();
-		// find all *used* ports in the formula and the terms.
-		this.input = I;
-	}
+	private final Map<MemoryVariable, Term> memory;	
 
 	/**
 	 * Instantiates a new transition.

@@ -98,14 +98,20 @@ public class Command {
 			if (entry.getKey() instanceof MemoryVariable)
 				memory.put((MemoryVariable) entry.getKey(), entry.getValue());
 		}
+		Set<Port> inputs = new HashSet<Port>();
+		for(Port p : getPorts()){
+			if(p.isInput()){
+				inputs.add(p);
+			}
+		}
 		switch (lang) {
 		case PRISM:
-			return new PrismTransition(guard, output, memory, getPorts());
+			return new PrismTransition(guard, output, memory, inputs);
 		case JAVA:
 		case C11:
-			return new Transition(guard, output, memory, getPorts());
+			return new Transition(guard, output, memory, inputs);
 		case MAUDE:
-			return new MaudeTransition(guard, output, memory, getPorts());
+			return new MaudeTransition(guard, output, memory, inputs);
 		case PRT:
 			break;
 		case TEXT:
