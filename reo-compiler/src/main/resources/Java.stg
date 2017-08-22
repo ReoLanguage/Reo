@@ -141,11 +141,8 @@ new Rule() {
 
 guard(t) ::= <<
 <t.guard:formula()><!
-!><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" ">
-<!
-<if(t.input)>	 && <t.input:{p | (<p.name>.peek())!=null}; separator=" && ">
-<endif>
-!> >>
+!><t.output.keys:{p | <if(!t.output.(p).isnull)> && <p.name>.hasGet()<endif>}; separator=" ">
+>>
 
 formula(f) ::= <<
 <if(f.negation)>!(<f.formula:formula()>)<!
@@ -188,16 +185,25 @@ function(t) ::=<<
 
 action(t) ::= <<
 <t:output(); separator="\n">
-<t:memory(); separator="\n">
+<t:memoryUpdateNonNull(); separator="\n">
+<t:memoryUpdateNull(); separator="\n">
 <t.input:{p | <p:input()>}; separator="\n">
 >>
 
 output(a) ::= <<
-<a.output.keys:{p | <if(!p.void)><p.name>.put(<a.output.(p):term()>)<else><a.output.(p):term()><endif>;}; separator="\n"> 
+<a.output.keys:{p | <if(!a.output.(p).isnull)><p.name>.put(<a.output.(p):term()>);<endif>}; separator="\n"> 
 >>
 
 memory(m) ::= <<
 <m.memory.keys:{p | <p.name> = <m.memory.(p):term()>;}; separator="\n"> 
+>>
+
+memoryUpdateNonNull(m) ::= <<
+<m.memory.keys:{p | <if(!m.memory.(p).isnull)><p.name> = <m.memory.(p):term()>;<endif>}; separator="\n"> 
+>>
+
+memoryUpdateNull(m) ::= <<
+<m.memory.keys:{p | <if(m.memory.(p).isnull)><p.name> = <m.memory.(p):term()>;<endif>}; separator="\n"> 
 >>
 
 input(p) ::= <<

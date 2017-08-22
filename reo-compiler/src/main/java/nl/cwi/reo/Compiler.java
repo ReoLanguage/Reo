@@ -299,8 +299,9 @@ public class Compiler {
 		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
 		
 		List<ConstraintHypergraph> ch = new ArrayList<>();
-		for(RuleBasedAutomaton rba : protocol)
-			ch.add(new ConstraintHypergraph(rba.getAllRules()));			
+		for(RuleBasedAutomaton rba : protocol){
+			ch.add(new ConstraintHypergraph(rba.getAllRules(),rba.getInitial()));
+		}
 		
 		ConstraintHypergraph composition = new ConstraintHypergraph().compose(ch);
 
@@ -521,7 +522,7 @@ public class Compiler {
 			// Get the initial value of each memory cell
 			Map<MemoryVariable, Object> initial = new HashMap<>();
 			for (Map.Entry<String, TypeTag> e : tags.entrySet())
-				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(e.getKey()));
+				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(new MemoryVariable(e.getKey(),false,e.getValue())));
 
 			components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
 		}

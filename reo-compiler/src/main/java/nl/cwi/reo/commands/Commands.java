@@ -197,7 +197,18 @@ public class Commands {
 			else
 				constraints.add(_g);
 		}
-		Formula guard = Formulas.conjunction(guards);
+		
+		//Add context-sensitivity
+		Set<Formula> _guard = new HashSet<>(guards);
+		for(Formula g : guards){
+			if(g instanceof Equality){
+				if(((Equality) g).getLHS() instanceof PortVariable && ((Equality) g).getRHS() instanceof NullValue){
+					_guard.remove(g);
+				}				
+			}
+		}
+		
+		Formula guard = Formulas.conjunction(_guard);
 		Formula constraint = Formulas.conjunction(constraints);
 
 		return new Command(guard, update, constraint);
