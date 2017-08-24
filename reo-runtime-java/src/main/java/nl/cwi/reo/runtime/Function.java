@@ -66,7 +66,8 @@ public class Function {
 
 	public static String parse(Object object) {
 		if (object == null)
-			throw new NullPointerException();
+			return null;
+//			throw new NullPointerException();
 
 		String result = "nomove";
 		for (String str : ((String) object).split("\\n"))

@@ -161,9 +161,20 @@ public class Commands {
 					if (foundNew) {
 						go = true;
 						update.put(e.getKey(), w);
+
 						for (Term v : e.getValue())
 							if (v != u && !(v instanceof NonNullValue))
 								others.add(new Equality(w, v));
+						
+						// Atomic update with transitivity for functions : if 'a' is updated to 'b' and 'b' is updated to 'c', then 'a' is updated to 'c'
+						
+						for(Variable t : update.keySet()){
+							if(update.get(t).getFreeVariables().contains(e.getKey()))
+								update.put(t, update.get(t).substitute(w, e.getKey()));
+							if(update.get(e.getKey()).getFreeVariables().contains(t))
+								update.put(e.getKey(), update.get(e.getKey()).substitute(update.get(t), t));
+						}
+
 						break;
 					}
 				}
@@ -183,13 +194,11 @@ public class Commands {
 			Formula _g = g;
 			boolean isGuard = g.isQuantifierFree();
 			for (Variable v : g.getFreeVariables()) {
-				if ((v instanceof PortVariable && !((PortVariable) v).isInput())
-						|| (v instanceof MemoryVariable && ((MemoryVariable) v).hasPrime())) {
+				if ((v instanceof PortVariable && ((PortVariable) v).isInput())
+						|| (v instanceof MemoryVariable && !((MemoryVariable) v).hasPrime())) {
 					Term t = update.get(v);
 					if (t != null)
 						_g = g.substitute(t, v);
-					else
-						isGuard = false;
 				}
 			}
 			if (isGuard)
@@ -197,18 +206,8 @@ public class Commands {
 			else
 				constraints.add(_g);
 		}
-		
-		//Add context-sensitivity
-		Set<Formula> _guard = new HashSet<>(guards);
-		for(Formula g : guards){
-			if(g instanceof Equality){
-				if(((Equality) g).getLHS() instanceof PortVariable && ((Equality) g).getRHS() instanceof NullValue){
-					_guard.remove(g);
-				}				
-			}
-		}
-		
-		Formula guard = Formulas.conjunction(_guard);
+	
+		Formula guard = Formulas.conjunction(guards);
 		Formula constraint = Formulas.conjunction(constraints);
 
 		return new Command(guard, update, constraint);

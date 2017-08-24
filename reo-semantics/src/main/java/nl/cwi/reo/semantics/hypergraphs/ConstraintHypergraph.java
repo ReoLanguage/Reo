@@ -468,6 +468,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public ConstraintHypergraph restrict(Collection<? extends Port> intface) {
 		Set<Rule> setRules = new HashSet<Rule>();
+		
 		for (Rule r : getRules()) {
 			Formula g = r.getFormula();
 			for (Port p : r.getInterface()) {

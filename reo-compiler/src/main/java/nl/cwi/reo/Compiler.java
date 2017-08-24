@@ -52,6 +52,7 @@ import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
 import nl.cwi.reo.templates.Atomic;
 import nl.cwi.reo.templates.Component;
+import nl.cwi.reo.templates.MaudeProtocol;
 import nl.cwi.reo.templates.Protocol;
 import nl.cwi.reo.templates.ReoTemplate;
 import nl.cwi.reo.templates.Transition;
@@ -264,7 +265,8 @@ public class Compiler {
 			ListenerRBA listenerRBA = new ListenerRBA(monitor);
 			return new Interpreter(SemanticsType.RBA, listenerRBA, directories, params, monitor);
 		case MAUDE:
-			break;
+			ListenerRBA listenerRba = new ListenerRBA(monitor);
+			return new Interpreter(SemanticsType.RBA, listenerRba, directories, params, monitor);
 		case PRT:
 			break;
 		case TEXT:
@@ -329,25 +331,40 @@ public class Compiler {
 	 * @return Connector with all ports hidden.
 	 */
 	private ReoConnector addPortWindows(ReoConnector connector, Language lang) {
-		if (lang != Language.JAVA)
+		if (lang != Language.JAVA && lang != Language.MAUDE)
 			return connector;
 		List<ReoConnector> list = new ArrayList<>();
 		list.add(connector);
 		for (Port p : connector.getInterface()) {
 			if (!p.isHidden()) {
-
-				Value v = new StringValue(p.getName());
-				List<Value> values = Arrays.asList(v);
-				String call = p.isInput() ? "Windows.producer" : "Windows.consumer";
-				Reference ref = new Reference(call, Language.JAVA, new ArrayList<>(), values);
-
-				PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-				Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
-				Map<Port, Port> links = new HashMap<>();
-				links.put(q, q);
-
-				ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
-				list.add(window);
+				if(lang == Language.JAVA){
+					Value v = new StringValue(p.getName());
+					List<Value> values = Arrays.asList(v);
+					String call = p.isInput() ? "Windows.producer" : "Windows.consumer";
+					Reference ref = new Reference(call, Language.JAVA, new ArrayList<>(), values);
+	
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
+					Map<Port, Port> links = new HashMap<>();
+					links.put(q, q);
+	
+					ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
+					list.add(window);
+				}
+				if(lang == Language.MAUDE){
+					Value v = new StringValue(p.getName());
+					List<Value> values = Arrays.asList(v);
+					String call = p.isInput() ? "prod" : "cons";
+					Reference ref = new Reference(call, Language.MAUDE, new ArrayList<>(), values);
+	
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
+					Map<Port, Port> links = new HashMap<>();
+					links.put(q, q);
+	
+					ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
+					list.add(window);
+				}
 			}
 		}
 		return new ReoConnectorComposite(null, "", list).rename(new HashMap<>());
@@ -524,7 +541,10 @@ public class Compiler {
 			for (Map.Entry<String, TypeTag> e : tags.entrySet())
 				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(new MemoryVariable(e.getKey(),false,e.getValue())));
 
-			components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
+			if(lang == Language.JAVA)
+				components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
+			if(lang == Language.MAUDE)
+				components.add(new MaudeProtocol("Protocol" + n_protocol++, ports, part, initial));
 		}
 		return components;
 	}

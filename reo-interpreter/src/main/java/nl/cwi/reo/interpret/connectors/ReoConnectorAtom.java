@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -130,7 +132,7 @@ public final class ReoConnectorAtom implements ReoConnector {
 		List<Atom> _semantics = new ArrayList<>();
 		for (Atom x : semantics)
 			_semantics.add(x.rename(links));
-		Map<Port, Port> _links = new HashMap<>();
+		Map<Port, Port> _links = new LinkedHashMap<>();
 		for (Map.Entry<Port, Port> link : links.entrySet())
 			_links.put(link.getValue(), link.getValue());
 		return new ReoConnectorAtom(name, _semantics, _links);
@@ -155,7 +157,7 @@ public final class ReoConnectorAtom implements ReoConnector {
 	 */
 	@Override
 	public Set<Port> getInterface() {
-		return new HashSet<Port>(links.values());
+		return new LinkedHashSet<Port>(links.values());
 	}
 
 	/**

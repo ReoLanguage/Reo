@@ -3,19 +3,16 @@
  */
 package nl.cwi.reo.templates;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 
-// TODO: Auto-generated Javadoc
 /**
  * Compiled automaton that is independent of the target language.
  */
-public final class Protocol implements Component {
+public class Protocol implements Component {
 
 	/** The protocol. */
 	public final boolean protocol = true;
@@ -31,12 +28,6 @@ public final class Protocol implements Component {
 
 	/** The initial. */
 	private final Map<MemoryVariable, Object> initial;
-
-	/** The state. */
-	private final Set<String> state = new HashSet<>();
-
-	/** The list port. */
-	private final Map<Port, Integer> listPort = new HashMap<>();
 
 	/**
 	 * Instantiates a new protocol.
@@ -91,57 +82,6 @@ public final class Protocol implements Component {
 	 */
 	public Set<Port> getPorts() {
 		return ports;
-	}
-
-	/**
-	 * Gets the list port.
-	 *
-	 * @return the list port
-	 */
-	public Map<Port, Integer> getListPort() {
-		int i = 0;
-		for (Port p : ports) {
-			listPort.put(p, i);
-			i++;
-		}
-		return listPort;
-	}
-
-	/**
-	 * Gets the mem.
-	 *
-	 * @return the mem
-	 */
-	public Set<MemoryVariable> getMem() {
-		return initial.keySet();
-	}
-
-	/**
-	 * Gets the state.
-	 *
-	 * @return the state
-	 */
-	public Set<String> getState() {
-		String s = "";
-		for (MemoryVariable m : initial.keySet()) {
-			if (initial.get(m) != null)
-				s = s + "m(" + m.getName().substring(1) + "," + initial.get(m).toString() + ") ";
-			else
-				s = s + "m(" + m.getName().substring(1) + "," + "*) ";
-		}
-		s = s + "\n";
-		for (Port p : ports) {
-			if (p.isInput()) {
-				s = s + "out(" + p.getName().substring(1) + ")" + " p(" + p.getName().substring(1) + ",*) \n";
-			} else {
-				s = s + "in(" + p.getName().substring(1) + ")" + " p(" + p.getName().substring(1) + ",*) \n";
-			}
-			s = s + "link(" + p.getName().substring(1) + "," + p.getName().substring(1) + ") q("
-					+ p.getName().substring(1) + ",0,*) \n";
-
-		}
-		state.add(s);
-		return state;
 	}
 	
 	/**

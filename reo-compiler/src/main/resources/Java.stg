@@ -76,7 +76,7 @@ public void activate() {
 }
 
 public void run() {
-	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p | <p.name>}; separator=", ">);
+	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p |<p.name>}; separator=", ">);
 }
 >>
 
@@ -120,8 +120,6 @@ public void run() {
 >>
 
 memorycell(c) ::= <<
-<! <c.initial.keys:{m | private <if(m.type)><m.type><else>Object<endif> <m.name> <if(mem.get(m))> = <mem.get(m)> <endif>}; separator="\n">;  !>
-
 <c.initial.keys:{m | private <if(m.type)><m.type><else>String<endif> <m.name> <if(c.initial.(m))> = <c.initial.(m).value><else> = null <endif>; }; separator = "\n"> 
 >>
 
@@ -140,8 +138,8 @@ new Rule() {
 >>
 
 guard(t) ::= <<
-<t.guard:formula()><!
-!><t.output.keys:{p | <if(!t.output.(p).isnull)> && <p.name>.hasGet()<endif>}; separator=" ">
+<t.output.keys:{p | <if(!t.output.(p).isnull)><p.name>.hasGet() && <endif>}; separator=" "><!
+!><t.guard:formula()>
 >>
 
 formula(f) ::= <<
@@ -170,16 +168,16 @@ equality(f) ::= <<
 >>
 
 term(t) ::= <<
-<if(t.function)><t:function()><!
-!><elseif(t.constant)><t.name><!
+<if(t.constant)><t.name><!
 !><elseif(t.node)><t.name>.peek()<!
 !><elseif(t.memory)><t.name><!
 !><elseif(t.isnull)>null<!
+!><elseif(t.function)><t:function()><!
 !><else><t.name><endif>
 >>
 
 function(t) ::=<<
-<t.value><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
+<t.name><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
 >>
 
 
