@@ -3,9 +3,12 @@ package nl.cwi.reo.commands;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
@@ -52,7 +55,11 @@ public class Commands {
 				Equality e = (Equality) L;
 				if (e.getLHS() instanceof PortVariable) {
 					PortVariable p = (PortVariable) e.getLHS();
-					if (!p.isInput()) {
+					// Remove p=* from commands 
+					if(e.getRHS() instanceof NullValue)
+						continue;
+					
+					if (!p.isInput()) {						
 						Set<Term> set = defs.get(p);
 						if (set == null) {
 							set = new HashSet<>();
@@ -167,12 +174,24 @@ public class Commands {
 								others.add(new Equality(w, v));
 						
 						// Atomic update with transitivity for functions : if 'a' is updated to 'b' and 'b' is updated to 'c', then 'a' is updated to 'c'
-						
 						for(Variable t : update.keySet()){
-							if(update.get(t).getFreeVariables().contains(e.getKey()))
+							if(update.get(t).getFreeVariables().contains(e.getKey())){
 								update.put(t, update.get(t).substitute(w, e.getKey()));
-							if(update.get(e.getKey()).getFreeVariables().contains(t))
+								List<Formula> _others = new ArrayList<>();
+								for(Formula formula : others){
+									_others.add(formula.substitute(w, e.getKey()));
+								}
+								others=_others;
+							}
+							if(update.get(e.getKey()).getFreeVariables().contains(t)){
 								update.put(e.getKey(), update.get(e.getKey()).substitute(update.get(t), t));
+								List<Formula> _others = new ArrayList<>();
+								for(Formula formula : others){
+									_others.add(formula.substitute(update.get(t), t));
+								}
+								others=_others;
+							}
+							
 						}
 
 						break;
@@ -194,8 +213,8 @@ public class Commands {
 			Formula _g = g;
 			boolean isGuard = g.isQuantifierFree();
 			for (Variable v : g.getFreeVariables()) {
-				if ((v instanceof PortVariable && ((PortVariable) v).isInput())
-						|| (v instanceof MemoryVariable && !((MemoryVariable) v).hasPrime())) {
+				if ((v instanceof PortVariable && !((PortVariable) v).isInput())
+						|| (v instanceof MemoryVariable && ((MemoryVariable) v).hasPrime())) {
 					Term t = update.get(v);
 					if (t != null)
 						_g = g.substitute(t, v);
@@ -207,6 +226,16 @@ public class Commands {
 				constraints.add(_g);
 		}
 	
+		// Put the memory cell and port check ahead of the conjunction.
+//		LinkedList<Formula> gh = new LinkedList<>();
+//		for(Formula g : guards){
+//			for(Variable v : g.getFreeVariables()){
+//				if(v instanceof Function){
+//					gh.add(0,g);		
+//				}
+//			}
+//		}
+		
 		Formula guard = Formulas.conjunction(guards);
 		Formula constraint = Formulas.conjunction(constraints);
 
