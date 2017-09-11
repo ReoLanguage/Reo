@@ -5,6 +5,22 @@
   var mode = 'select';
   var id = '0';
   
+  // drawing parameters
+  
+  nodeFillColourSource = '#55f';
+  nodeFillColourDrain  = '#f55';
+  nodeFillColourMixed  = '#ff5';
+  
+  lineFillColour       = '#000';
+  lineStrokeColour     = '#000';
+  lineStrokeWidth      =      5;
+  
+  arrowFactor          =      4;
+  
+  fifoHeight           =     20;
+  fifoWidth            =     20;
+  fifoFillColour       = '#fff';
+  
   document.getElementById("select").onclick = function() {
     document.getElementById(mode).style.border = '2px solid white';
     mode = 'select';
@@ -142,9 +158,9 @@
   function drawSync(x1, y1, x2, y2) {
     // create a line...
     var line = new fabric.Line([x1, y1, x2, y2], {
-      fill: '#000',
-      stroke: '#000',
-      strokeWidth: 5,
+      fill: lineFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -157,10 +173,10 @@
     var a = new fabric.Triangle({
       left: x2,
       top: y2,
-      width: 20,
-      height: 20,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
       angle: calcArrowAngle(x1,y1,x2,y2),
-      fill: '#000',
+      fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -194,10 +210,10 @@
     function drawLossySync(x1, y1, x2, y2) {
     // create a line...
     var line = new fabric.Line([x1, y1, x2, y2], {
-      fill: '#000',
-      stroke: '#000',
+      fill: lineFillColour,
+      stroke: lineStrokeColour,
       strokeDashArray: [10,5],
-      strokeWidth: 5,
+      strokeWidth: lineStrokeWidth,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -210,10 +226,10 @@
     var a = new fabric.Triangle({
       left: x2,
       top: y2,
-      width: 20,
-      height: 20,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
       angle: calcArrowAngle(x1,y1,x2,y2),
-      fill: '#000',
+      fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -242,14 +258,14 @@
     canvas.renderAll();
     
     return line;
-  } //drawLossySync
+  } //drawLossySyncnodeColourDrain
   
   function drawSyncDrain(x1, y1, x2, y2) {
     // create a line...
     var line = new fabric.Line([x1, y1, x2, y2], {
-      fill: '#000',
-      stroke: '#000',
-      strokeWidth: 5,
+      fill: lineFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -262,10 +278,10 @@
     var a = new fabric.Triangle({
       left: x2,
       top: y2,
-      width: 20,
-      height: 20,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
       angle: calcArrowAngle(x1,y1,x2,y2) + 180,
-      fill: '#000',
+      fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -278,10 +294,10 @@
     var b = new fabric.Triangle({
       left: x1,
       top: y1,
-      width: 20,
-      height: 20,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
       angle: calcArrowAngle(x1,y1,x2,y2),
-      fill: '#000',
+      fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -316,9 +332,9 @@
     function drawSyncSpout(x1, y1, x2, y2) {
     // create a line...
     var line = new fabric.Line([x1, y1, x2, y2], {
-      fill: '#000',
-      stroke: '#000',
-      strokeWidth: 5,
+      fill: lineFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -331,10 +347,10 @@
     var a = new fabric.Triangle({
       left: x2,
       top: y2,
-      width: 20,
-      height: 20,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
       angle: calcArrowAngle(x1,y1,x2,y2),
-      fill: '#000',
+      fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -347,10 +363,10 @@
     var b = new fabric.Triangle({
       left: x1,
       top: y1,
-      width: 20,
-      height: 20,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
       angle: calcArrowAngle(x1,y1,x2,y2) + 180,
-      fill: '#000',
+      fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -385,9 +401,9 @@
   function drawFIFO1(x1, y1, x2, y2) {
     // create a line...
     var line = new fabric.Line([x1, y1, x2, y2], {
-      fill: '#000',
-      stroke: '#000',
-      strokeWidth: 5,
+      fill: lineFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -400,10 +416,10 @@
     var a = new fabric.Triangle({
       left: x2,
       top: y2,
-      width: 20,
-      height: 20,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
       angle: calcArrowAngle(x1,y1,x2,y2),
-      fill: '#000',
+      fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -415,11 +431,11 @@
     var rect = new fabric.Rect({
       left: (x1+x2)/2,
       top: (y1+y2)/2,
-      width: 20,
-      height: 20,
-      fill: '#fff',
-      stroke: '#000',
-      strokeWidth: 5,
+      width: fifoWidth,
+      height: fifoHeight,
+      fill: fifoFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
       hasBorders: false,
       hasControls: false,
       selectable: false,
@@ -452,12 +468,12 @@
   function updateNode(node) {
     if (node.linesIn.length) {
       if (node.linesOut.length)
-        node.set({'nodetype':'mixed','fill':'#ff5'});
+        node.set({'nodetype':'mixed','fill':nodeFillColourMixed});
       else
-        node.set({'nodetype':'drain','fill':'#f55'});
+        node.set({'nodetype':'drain','fill':nodeFillColourDrain});
     }
     else
-      node.set({'nodetype':'source','fill':'#55f'});
+      node.set({'nodetype':'source','fill':nodeFillColourSource});
   }
   
   function updateChannel(line, end) {
