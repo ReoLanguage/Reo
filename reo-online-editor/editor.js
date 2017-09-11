@@ -10,15 +10,16 @@
   nodeFillColourSource = '#55f';
   nodeFillColourDrain  = '#f55';
   nodeFillColourMixed  = '#ff5';
+  nodeFactor           =      3;
   
   lineFillColour       = '#000';
   lineStrokeColour     = '#000';
-  lineStrokeWidth      =      5;
+  lineStrokeWidth      =      2;
   
   arrowFactor          =      4;
   
-  fifoHeight           =     20;
-  fifoWidth            =     20;
+  fifoHeight           =     24;
+  fifoWidth            =      8;
   fifoFillColour       = '#fff';
   
   document.getElementById("select").onclick = function() {
@@ -121,10 +122,9 @@
     var c = new fabric.Circle({
       left: left,
       top: top,
-      strokeWidth: 5,
-      radius: 12,
-      fill: '#fff',
-      stroke: '#000',
+      strokeWidth: lineStrokeWidth,
+      radius: nodeFactor * lineStrokeWidth,
+      stroke: lineStrokeColour,
       hasControls: false,
       class: 'node',
       component: main,
@@ -182,14 +182,14 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: 22
+      offset: (nodeFactor + 2) * lineStrokeWidth
     });
     
     // ...and two nodes
     var c1 = createNode(x1,y1);
     var c2 = createNode(x2,y2);
     
-    // ...link them all together
+    // ...link them all together(nodeFactor + 2) * lineStrokeWidth
     line.set({'arrow': a, 'circle1': c1, 'circle2': c2});
     a.set({'line': line});
     c1.linesOut.push(line);
@@ -235,7 +235,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: 22
+      offset: (nodeFactor + 2) * lineStrokeWidth
     });
     
     // ...and two nodes
@@ -287,7 +287,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: 30
+      offset: (nodeFactor + 5) * lineStrokeWidth
     });
     
     // ...another arrowhead...
@@ -303,7 +303,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: 30
+      offset: (nodeFactor + 5) * lineStrokeWidth
     });
     
     // ...and two nodes
@@ -356,7 +356,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: 22
+      offset: (nodeFactor + 2) * lineStrokeWidth
     });
     
     // ...another arrowhead...
@@ -372,7 +372,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: 22
+      offset: (nodeFactor + 2) * lineStrokeWidth
     });
     
     // ...and two nodes
@@ -425,7 +425,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: 22
+      offset: (nodeFactor + 2) * lineStrokeWidth
     });
     
     var rect = new fabric.Rect({
@@ -493,7 +493,7 @@
       // calculate the position of the arrow
       var length = Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
       if (line.channel != 'syncdrain')
-        length = length - 22;
+        length = length - (nodeFactor * lineStrokeWidth); // TODO
       var x = Math.atan(Math.abs(y1-y2)/Math.abs(x1-x2));
       if (end) {
         if (x2 > x1) {
