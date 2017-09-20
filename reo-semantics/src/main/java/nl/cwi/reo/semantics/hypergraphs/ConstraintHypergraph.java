@@ -326,6 +326,58 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	public ConstraintHypergraph compose(List<ConstraintHypergraph> components) {
 
 		// Rename all memory cells and put *all* components into a list.
+		components = renameMemoryCells(components);
+
+		// Compose the list of CHs into a single CH.
+		ConstraintHypergraph composition = new ConstraintHypergraph();
+
+		for (ConstraintHypergraph h : components) {
+			composition.getHyperedges().addAll(h.getHyperedges());
+			composition.getInitials().putAll(h.getInitials());
+		}
+
+		composition.distribute();
+
+		return composition;
+
+	}
+	
+	/**
+	 * Distribute multi rules hyperedges.
+	 */
+	public void distribute() {
+		Set<PortNode> variables = getVariables();
+
+		for (PortNode pn : variables) {
+			Port p = pn.getPort();
+			List<HyperEdge> multiEdge = getHyperedges(p);
+			
+			if (!multiEdge.isEmpty()) {
+				HyperEdge toDistribute = multiEdge.remove(0);
+				boolean mult = false;
+				for (HyperEdge h : multiEdge) {
+					if (!h.getTarget().isEmpty()) {
+						toDistribute.compose(h);
+						mult = true;
+					}
+				}
+				/*
+				 * Remove empty hyperedges
+				 */
+				if (mult) {
+					Set<HyperEdge> s = new HashSet<>(hyperedges);
+					hyperedges.clear();
+					hyperedges.addAll(s);
+				}
+			}
+		}
+	}
+	/**
+	 * Rename all memory cells consistently
+	 * @param components
+	 * @return
+	 */
+	public List<ConstraintHypergraph> renameMemoryCells(List<ConstraintHypergraph> components){
 		List<ConstraintHypergraph> list = new ArrayList<>();
 
 		int i = 1;
@@ -353,98 +405,9 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 
 			list.add(new ConstraintHypergraph(new ArrayList<>(A.getHyperedges()), newInit));
 		}
-
-		// Compose the list of CHs into a single CH.
-		ConstraintHypergraph composition = new ConstraintHypergraph();
-
-		for (ConstraintHypergraph h : list) {
-			composition.getHyperedges().addAll(h.getHyperedges());
-			composition.getInitials().putAll(h.getInitials());
-		}
-
-		composition = composition.distributeSingleEdge();
-		composition.distributeMultiEdge();
-
-		return composition;
-
+		return list;
 	}
 
-	/**
-	 * Distribute single hyperedges.
-	 *
-	 * @return the constraint hypergraph
-	 */
-	public ConstraintHypergraph distributeSingleEdge() {
-		Set<Port> variables = new HashSet<>();
-		for (HyperEdge h : hyperedges) {
-			variables.add(h.getSource().getPort());
-		}
-
-		for (Port p : variables) {
-			List<HyperEdge> singleEdge = new ArrayList<>();
-			List<HyperEdge> multiEdge = new ArrayList<>();
-
-			for (HyperEdge h : getHyperedges(p)) {
-				if (h.getTarget().size() == 1)
-					singleEdge.add(h);
-				else
-					multiEdge.add(h);
-			}
-			if (singleEdge.size() > 1) {
-				HyperEdge e = singleEdge.get(0);
-				singleEdge.remove(0);
-				for (HyperEdge h : singleEdge) {
-					e.compose(h);
-				}
-				singleEdge.clear();
-				singleEdge.add(e);
-			}
-			if (!multiEdge.isEmpty()) {
-				HyperEdge e = multiEdge.get(0);
-				for (HyperEdge h : singleEdge) {
-					e.compose(h);
-
-				}
-				if (!multiEdge.isEmpty()) {
-					hyperedges.removeAll(singleEdge);
-				}
-			}
-		}
-		return new ConstraintHypergraph(new ArrayList<>(hyperedges), initial);
-	}
-
-	/**
-	 * Distribute multi rules hyperedges.
-	 */
-	public void distributeMultiEdge() {
-		Set<Port> variables = new HashSet<>();
-		for (HyperEdge h : hyperedges) {
-			variables.add(h.getSource().getPort());
-		}
-
-		for (Port p : variables) {
-			List<HyperEdge> multiEdge = new ArrayList<>();
-
-			multiEdge.addAll(getHyperedges(p));
-			if (!multiEdge.isEmpty()) {
-				HyperEdge toDistribute = multiEdge.get(0);
-				multiEdge.remove(0);
-				boolean mult = false;
-				for (HyperEdge h : multiEdge) {
-					if (!h.getTarget().isEmpty()) {
-						// toDistribute = h.compose(toDistribute);
-						toDistribute.compose(h);
-						mult = true;
-					}
-				}
-				if (mult) {
-					Set<HyperEdge> s = new HashSet<>(hyperedges);
-					hyperedges.clear();
-					hyperedges.addAll(s);
-				}
-			}
-		}
-	}
 
 	/**
 	 * Removes the empty hyperedge.

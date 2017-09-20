@@ -74,6 +74,9 @@ public final class MaudeTransition extends Transition{
 		
 	}
 	
+	/**
+	 * From a guard to a rewrite rule
+	 */
 	private void guardToRew(){
 		Formula g = getGuard();
 		
@@ -131,7 +134,7 @@ public final class MaudeTransition extends Transition{
 	
 
 	/**
-	 * {@inheritDoc}
+	 * Write the rewrite rule as a string
 	 */
 	public String getRewString() {
 		String RHS = "";
