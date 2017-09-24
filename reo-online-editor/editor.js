@@ -7,19 +7,21 @@
   
   // drawing parameters
   
-  nodeFillColourSource = '#55f';
-  nodeFillColourDrain  = '#f55';
-  nodeFillColourMixed  = '#ff5';
-  nodeFactor           =      3;
+  nodeFillColourSource = '#fff';
+  nodeFillColourDrain  = '#fff';
+  nodeFillColourMixed  = '#000';
+  nodeFactor           =      4;
   
   lineFillColour       = '#000';
   lineStrokeColour     = '#000';
-  lineStrokeWidth      =      2;
+  lineStrokeWidth      =      1;
   
-  arrowFactor          =      4;
+  arrowFactor          =      8;
+  arrowOffsetOut       = lineStrokeWidth * nodeFactor + lineStrokeWidth;
+  arrowOffsetIn        = arrowOffsetOut + 10;
   
-  fifoHeight           =     24;
-  fifoWidth            =      8;
+  fifoHeight           =     30;
+  fifoWidth            =     10;
   fifoFillColour       = '#fff';
   
   document.getElementById("select").onclick = function() {
@@ -182,7 +184,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: (nodeFactor + 2) * lineStrokeWidth
+      offset: arrowOffsetOut
     });
     
     // ...and two nodes
@@ -212,7 +214,7 @@
     var line = new fabric.Line([x1, y1, x2, y2], {
       fill: lineFillColour,
       stroke: lineStrokeColour,
-      strokeDashArray: [10,5],
+      strokeDashArray: [8,8],
       strokeWidth: lineStrokeWidth,
       hasBorders: false,
       hasControls: false,
@@ -235,7 +237,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: (nodeFactor + 2) * lineStrokeWidth
+      offset: arrowOffsetOut
     });
     
     // ...and two nodes
@@ -287,7 +289,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: (nodeFactor + 5) * lineStrokeWidth
+      offset: arrowOffsetIn
     });
     
     // ...another arrowhead...
@@ -303,7 +305,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: (nodeFactor + 5) * lineStrokeWidth
+      offset: arrowOffsetIn
     });
     
     // ...and two nodes
@@ -356,7 +358,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: (nodeFactor + 2) * lineStrokeWidth
+      offset: arrowOffsetOut
     });
     
     // ...another arrowhead...
@@ -372,7 +374,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: (nodeFactor + 2) * lineStrokeWidth
+      offset: arrowOffsetOut
     });
     
     // ...and two nodes
@@ -425,7 +427,7 @@
       selectable: false,
       hoverCursor: 'default',
       class: 'arrow',
-      offset: (nodeFactor + 2) * lineStrokeWidth
+      offset: arrowOffsetOut
     });
     
     var rect = new fabric.Rect({
@@ -1040,4 +1042,6 @@
   id = '0';
   document.getElementById("select").click();
   drawSync(100,100,200,100);
+  drawSyncDrain(100,100,100,200);
+  drawFIFO1(100,200,200,100);
 })();
