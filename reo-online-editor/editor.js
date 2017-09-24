@@ -17,8 +17,8 @@
   lineStrokeWidth      =      1;
   
   arrowFactor          =      8;
-  arrowOffsetOut       = lineStrokeWidth * nodeFactor + lineStrokeWidth;
-  arrowOffsetIn        = arrowOffsetOut + 10;
+  arrowOffsetOut       = lineStrokeWidth * nodeFactor + 4;
+  arrowOffsetIn        = arrowOffsetOut + arrowFactor;
   
   fifoHeight           =     30;
   fifoWidth            =     10;
@@ -1042,6 +1042,8 @@
   id = '0';
   document.getElementById("select").click();
   drawSync(100,100,200,100);
-  drawSyncDrain(100,100,100,200);
-  drawFIFO1(100,200,200,100);
+  drawLossySync(100,200,200,200);
+  drawSyncDrain(100,300,200,300);
+  drawSyncSpout(100,400,200,400);
+  drawFIFO1(100,500,200,500);
 })();
