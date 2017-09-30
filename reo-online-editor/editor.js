@@ -612,13 +612,13 @@
               space3 = ',';
             }
           });
-          s3 += ')';
+          s3 += ')\n{\n\n}';
           s2 += space2 + s3;
           space2 = ' ';
         }
       });
       
-      s1 = s1 + ') {\n  ' + s2 + '\n}';
+      s1 = s1 + ') {\n' + s2 + '\n}';
       document.getElementById('text').innerHTML = s1;
     }
   }
@@ -1046,4 +1046,7 @@
   drawSyncDrain(100,300,200,300);
   drawSyncSpout(100,400,200,400);
   drawFIFO1(100,500,200,500);
+  
+  var csync = this.__canvas = new fabric.Canvas('csync', { selection: false });
+  
 })();
