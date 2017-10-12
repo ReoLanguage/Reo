@@ -1047,6 +1047,4 @@
   drawSyncSpout(100,400,200,400);
   drawFIFO1(100,500,200,500);
   
-  var csync = this.__canvas = new fabric.Canvas('csync', { selection: false });
-  
 })();
