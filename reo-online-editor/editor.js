@@ -975,7 +975,8 @@
         canvas.renderAll();
       }
     }
-    canvas.deactivateAll();
+    if (p.class != 'label')
+      canvas.deactivateAll();
     reorderComponents();
     canvas.renderAll();
   }); //mouse:up
