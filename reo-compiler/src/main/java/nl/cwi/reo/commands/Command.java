@@ -14,6 +14,7 @@ import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.templates.MaudeTransition;
 import nl.cwi.reo.templates.PrismTransition;
+import nl.cwi.reo.templates.PromelaTransition;
 import nl.cwi.reo.templates.Transition;
 
 /**
@@ -114,6 +115,8 @@ public class Command {
 		case PRISM:
 			return new PrismTransition(guard, output, memory, inputs);
 		case JAVA:
+		case PROMELA:
+			return new PromelaTransition(guard, output, memory, inputs);
 		case C11:
 			return new Transition(guard, output, memory, inputs);
 		case MAUDE:

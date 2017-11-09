@@ -27,6 +27,7 @@ rba_term	: NAT 										#rba_nat
           	| '$' ID  									#rba_memorycellIn
           	| '$' ID '\''	 							#rba_memorycellOut
           	| 'null' 									#rba_null 
+          	| '*'										#rba_null_ctxt
           	| ID										#rba_parameter
             | MIN rba_term                                        # rba_unarymin
             | rba_term op=(MUL | DIV | MOD | ADD | MIN) rba_term  # rba_operation ;

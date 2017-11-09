@@ -96,6 +96,8 @@ import nl.cwi.reo.interpret.ReoParser.PortContext;
 import nl.cwi.reo.interpret.ReoParser.PortsContext;
 import nl.cwi.reo.interpret.ReoParser.Ref_cContext;
 import nl.cwi.reo.interpret.ReoParser.Ref_javaContext;
+import nl.cwi.reo.interpret.ReoParser.Ref_maudeContext;
+import nl.cwi.reo.interpret.ReoParser.Ref_promelaContext;
 import nl.cwi.reo.interpret.ReoParser.SecnContext;
 import nl.cwi.reo.interpret.ReoParser.SignContext;
 import nl.cwi.reo.interpret.ReoParser.TermContext;
@@ -389,6 +391,18 @@ public class BaseListener extends ReoBaseListener {
 	public void exitRef_java(Ref_javaContext ctx) {
 		String call = ctx.STRING().getText().replace("\"", "");
 		atoms.put(ctx, new Reference(call, Language.JAVA));
+	}
+	
+	@Override
+	public void exitRef_maude(Ref_maudeContext ctx) {
+		String call = ctx.STRING().getText().replace("\"", "");
+		atoms.put(ctx, new Reference(call, Language.MAUDE));
+	}
+
+	@Override
+	public void exitRef_promela(Ref_promelaContext ctx) {
+		String call = ctx.STRING().getText().replace("\"", "");
+		atoms.put(ctx, new Reference(call, Language.PROMELA));
 	}
 
 	/*

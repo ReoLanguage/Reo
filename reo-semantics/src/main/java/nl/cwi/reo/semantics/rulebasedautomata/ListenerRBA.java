@@ -27,6 +27,7 @@ import nl.cwi.reo.interpret.ReoParser.Rba_memorycellInContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_memorycellOutContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_natContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_nullContext;
+import nl.cwi.reo.interpret.ReoParser.Rba_null_ctxtContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_operationContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_parameterContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_portContext;
@@ -360,6 +361,11 @@ public class ListenerRBA extends BaseListener {
 	@Override
 	public void exitRba_null(Rba_nullContext ctx) {
 		terms.put(ctx, Terms.Null);
+	}
+	
+	@Override
+	public void exitRba_null_ctxt(Rba_null_ctxtContext ctx) {
+		terms.put(ctx, Terms.NullCtxt);
 	}
 
 	/*

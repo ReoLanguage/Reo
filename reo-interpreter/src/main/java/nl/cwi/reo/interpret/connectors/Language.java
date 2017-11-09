@@ -23,6 +23,9 @@ public enum Language {
 	/** Proto Runtime. */
 	PRT,
 
+	/** Proto Runtime. */
+	PROMELA,
+
 	/** Pr text. */
 	TEXT;
 

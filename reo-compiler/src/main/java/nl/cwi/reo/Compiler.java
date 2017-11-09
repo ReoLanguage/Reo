@@ -53,6 +53,8 @@ import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
 import nl.cwi.reo.templates.Atomic;
 import nl.cwi.reo.templates.Component;
 import nl.cwi.reo.templates.MaudeProtocol;
+import nl.cwi.reo.templates.PromelaAtomic;
+import nl.cwi.reo.templates.PromelaProtocol;
 import nl.cwi.reo.templates.Protocol;
 import nl.cwi.reo.templates.ReoTemplate;
 import nl.cwi.reo.templates.Transition;
@@ -264,6 +266,7 @@ public class Compiler {
 		case C11:
 			ListenerRBA listenerRBA = new ListenerRBA(monitor);
 			return new Interpreter(SemanticsType.RBA, listenerRBA, directories, params, monitor);
+		case PROMELA:
 		case MAUDE:
 			ListenerRBA listenerRba = new ListenerRBA(monitor);
 			return new Interpreter(SemanticsType.RBA, listenerRba, directories, params, monitor);
@@ -331,7 +334,7 @@ public class Compiler {
 	 * @return Connector with all ports hidden.
 	 */
 	private ReoConnector addPortWindows(ReoConnector connector, Language lang) {
-		if (lang != Language.JAVA && lang != Language.MAUDE)
+		if (lang != Language.JAVA && lang != Language.MAUDE && lang != Language.PROMELA)
 			return connector;
 		List<ReoConnector> list = new ArrayList<>();
 		list.add(connector);
@@ -363,6 +366,20 @@ public class Compiler {
 					links.put(q, q);
 	
 					ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
+					list.add(window);
+				}
+				if(lang == Language.PROMELA){
+					Value v = new StringValue(p.getName());
+					List<Value> values = Arrays.asList(v);
+					String call = p.isInput() ? "prod" : "cons";
+					Reference ref = new Reference(call, Language.PROMELA, new ArrayList<>(), values);
+	
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
+					Map<Port, Port> links = new HashMap<>();
+					links.put(q, q);
+	
+					ReoConnectorAtom window = new ReoConnectorAtom(call, Arrays.asList(ref), links);
 					list.add(window);
 				}
 			}
@@ -402,8 +419,10 @@ public class Compiler {
 						params.add(Double.toString(((DecimalValue) v).getValue()));
 					}
 				}
-
-				components.add(new Atomic(name + n_atom++, params, atom.getInterface(), call));
+				if(lang == Language.JAVA)
+					components.add(new Atomic(name + n_atom++, params, atom.getInterface(), call));
+				if(lang == Language.PROMELA)
+					components.add(new PromelaAtomic(name + n_atom++, params, atom.getInterface(), call));
 			}
 		}
 		return components;
@@ -545,6 +564,8 @@ public class Compiler {
 				components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
 			if(lang == Language.MAUDE)
 				components.add(new MaudeProtocol("Protocol" + n_protocol++, ports, part, initial));
+			if(lang == Language.PROMELA)
+				components.add(new PromelaProtocol("Protocol" + n_protocol++, ports, part, initial));
 		}
 		return components;
 	}
@@ -593,6 +614,10 @@ public class Compiler {
 		case MAUDE:
 			group = new STGroupFile("Maude.stg");
 			extension = ".maude";
+			break;
+		case PROMELA:
+			group = new STGroupFile("Promela.stg");
+			extension = ".pml";
 			break;
 		case PRISM:
 			group = new STGroupFile("Prism.stg");
