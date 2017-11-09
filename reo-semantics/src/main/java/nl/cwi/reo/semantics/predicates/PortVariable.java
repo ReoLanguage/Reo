@@ -89,8 +89,11 @@ public final class PortVariable implements Variable {
 	 */
 	@Override
 	public Term substitute(Term t, Variable x) {
-		if (this.equals(x))
+		if (this.equals(x)){
+			if(t instanceof PortVariable)
+				return new PortVariable(this.getPort().rename(((PortVariable)t).getName()));	
 			return t;
+		}
 		return this;
 	}
 
