@@ -365,7 +365,7 @@ public class ListenerRBA extends BaseListener {
 	
 	@Override
 	public void exitRba_null_ctxt(Rba_null_ctxtContext ctx) {
-		terms.put(ctx, Terms.NullCtxt);
+		terms.put(ctx, Terms.Null);
 	}
 
 	/*
