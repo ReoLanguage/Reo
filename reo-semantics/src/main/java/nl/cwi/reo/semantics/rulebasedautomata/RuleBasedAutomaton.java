@@ -175,7 +175,17 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 				_part.add(t.evaluate(s, m));
 			_rules.add(_part);
 		}
-		return new RuleBasedAutomaton(_rules, initial);
+		
+		Map<MemoryVariable, Term> _initial = new HashMap<>();
+
+		for (Map.Entry<MemoryVariable, Term> init : initial.entrySet()) {
+			Term t = init.getValue().evaluate(s, m);
+			if (t == null)
+				return null;
+			_initial.put(init.getKey(), t);
+		}
+		
+		return new RuleBasedAutomaton(_rules, _initial);
 	}
 
 	/**

@@ -23,18 +23,20 @@ chess3 = (){
 
 	|
 	
-		Engine=(a?,b!){
-			#RBA {a,b} true
-			Java:"Workers.Engine"
+		Engine=(a?String,b!String){
+//			#RBA 
+//			{a,b} true
+			#JAVA
+			"Workers.Engine"
 		}
 	}
 	
 	{ 
 	Display(whiteM,blackM)
 	|
-	  Display(a?,b?){
-		#RBA {a,b} true
-		Java:"Workers.Display"
+	  Display(a?String,b?String){
+		#JAVA
+		"Workers.Display"
 
 	  }
 	}

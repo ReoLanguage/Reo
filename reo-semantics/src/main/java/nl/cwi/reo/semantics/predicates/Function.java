@@ -82,7 +82,7 @@ public final class Function implements Term {
 	 * @return name of this function.
 	 */
 	public String getName() {
-		return name;
+		return name.substring(1, name.length()-1);
 	}
 
 	/**

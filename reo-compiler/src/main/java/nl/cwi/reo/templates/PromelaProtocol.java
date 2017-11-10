@@ -3,6 +3,7 @@
  */
 package nl.cwi.reo.templates;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,8 +13,13 @@ import nl.cwi.reo.semantics.predicates.MemoryVariable;
 /**
  * Compiled automaton that is independent of the target language.
  */
-public class Protocol implements Component {
+public class PromelaProtocol implements Component {
 
+	/*
+	 * Rule to name ports in template :
+	 * 	- $4 is renamed as p4 for ports and m4 for mem_cells
+	 */
+	
 	/** The protocol. */
 	public final boolean protocol = true;
 
@@ -41,7 +47,7 @@ public class Protocol implements Component {
 	 * @param initial
 	 *            the initial
 	 */
-	public Protocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {
+	public PromelaProtocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {
 		this.name = name;
 		this.ports = ports;
 		this.transitions = transitions;
@@ -81,7 +87,11 @@ public class Protocol implements Component {
 	 * @return the port
 	 */
 	public Set<Port> getPorts() {
-		return ports;
+		Set<Port> setPorts = new HashSet<>();
+		for(Port p : ports){
+			setPorts.add(p.rename("p"+p.getName().substring(1)));
+		}
+		return setPorts;
 	}
 	
 	/**

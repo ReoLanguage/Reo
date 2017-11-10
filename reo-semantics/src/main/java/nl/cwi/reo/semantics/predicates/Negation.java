@@ -61,7 +61,7 @@ public final class Negation implements Formula {
 	 */
 	@Override
 	public Set<Port> getPorts() {
-		return new HashSet<>();
+		return f.getPorts();
 	}
 
 	/**

@@ -141,19 +141,6 @@ public class HyperEdge {
 	}
 
 	/**
-	 * Composes (via conjunction) every rule in the target of this hyperedge
-	 * with a given formula.
-	 *
-	 * @param f
-	 *            formula
-	 * @return reference to this hyperedge
-	 */
-	public void compose(Formula f) {
-		for (RuleNode r : rules)
-			r.compose(f);
-	}
-
-	/**
 	 * Construct a new instance of a hyperedge with the same ports and rules as
 	 * this hyperedge.
 	 * 
@@ -178,16 +165,19 @@ public class HyperEdge {
 		if (!port.getPort().equals(h.getSource().getPort()))
 			new IllegalArgumentException("Hyperedges must have the same source.");
 
+		/*
+		 * Check if the hyperedge has a single leaf or several leaves
+		 */
 		if (h.getTarget().size() == 1) {
 
 			/*
-			 * The hyperedge h is of size 1. Remove its unique rule, and store it in a variable.
+			 * Remove the leaf from the hypergraph, and store it in h_ruleNode.
 			 */
 			RuleNode h_ruleNode = h.getTarget().iterator().next();
 			h_ruleNode.rmFromHyperedge(h);
 
 			/*
-			 * Get all rules of "this" hyperedge, and compose all of them with the previous rule stored in h_ruleNode.
+			 * Get all rules of this.hyperedge, and compose all of them with the previous rule stored in h_ruleNode.
 			 */
 			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(rules);
 
@@ -210,23 +200,39 @@ public class HyperEdge {
 			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(h.getTarget());
 			Set<RuleNode> areEqual = new HashSet<>();
 
+			// Compose This hyperedge with rulesToCompose (where size must be greater than 1).
 			while (!rulesToCompose.isEmpty()) {
+				/*
+				 * Take out r1 from the hypergraph
+				 */
 				RuleNode r1 = rulesToCompose.poll();
 				r1.rmFromHyperedge(h); // TODO r1 may be null
 				Boolean equal = false;
+				/*
+				 * Compose r1 with all the rules of This rules (stored in list).
+				 */
 				for (RuleNode r2 : list) {
+					/*
+					 * compose both rules, and eventually add the new rule to the hypergraph
+					 */
 					RuleNode r = r1.compose(r2);
 					if (r != null && r.equals(r2)) {
 						areEqual.add(r2);
 						equal = true;
 					}
 				}
+				/*
+				 * remove old rules from the hypergraph.
+				 */
 				if (!equal)
 					r1.erase();
 				else
 					r1.rmFromHyperedge(h);
 			}
 
+			/*
+			 * remove duplicates
+			 */
 			for (RuleNode r : list)
 				if (!areEqual.contains(r))
 					r.erase();
@@ -234,7 +240,7 @@ public class HyperEdge {
 	}
 
 	/**
-	 * Hides a given port node from the each rule in the target of this
+	 * Hides a given port node from each rule in the target of this
 	 * hyperedge.
 	 * 
 	 * @param p

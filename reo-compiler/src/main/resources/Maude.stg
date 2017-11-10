@@ -10,26 +10,19 @@ endm
 >>
 
 component(c) ::= <<
-<if(c.protocol)>vars <c:memorycell(); separator=""><S.ports:newVar(); separator=" "> : Data .
-<c:protocol()><endif>
+<if(c.protocol)><c:protocol()><endif>
 >>
 
-newVar(p) ::= <<
-d<p.name>
->>
-
-memorycell(c) ::= <<
-<c.initial.keys:{m |d_<m.name>}; separator = " "> 
->>
 
 protocol(c) ::= <<
+vars <c.variables:{ v | <v> } ; separator=" "> : Data .
+
 <c.transitions:transition(); separator="\n">
 	
-eq startc = <c.state:{p | <p>}; separator=" "> .
+eq start = <c.state:{p | <p>}; separator=" "> .
 >>
 
 
 transition(t) ::= << 
-rl [<t.nb>] : <t.mapInM.keys:{p | m(<p>,<t.mapInM.(p)>)}; separator=" " > <t.mapInP.keys:{p | p(<p>,<t.mapInP.(p)>)}; separator=" " > =>
-<t.mapOutP.keys:{p | p(<p>,<t.mapOutP.(p)>)}; separator=" " > <t.mapOutM.keys:{p | m(<p>,<t.mapOutM.(p)>)}; separator=" " >  .
+<t.rewString>
 >>

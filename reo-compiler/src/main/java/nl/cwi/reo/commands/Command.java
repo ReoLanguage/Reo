@@ -5,12 +5,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.templates.MaudeTransition;
+import nl.cwi.reo.templates.PrismTransition;
+import nl.cwi.reo.templates.PromelaTransition;
 import nl.cwi.reo.templates.Transition;
 
 /**
@@ -79,14 +83,20 @@ public class Command {
 	 * @return the ports
 	 */
 	public Set<Port> getPorts() {
-		Set<Port> N = new HashSet<>(guard.getPorts());
-		for (Variable v : update.keySet())
+		Set<Port> N = new HashSet<>();
+		for (Variable v : update.keySet()){
 			if (v instanceof PortVariable)
 				N.add(((PortVariable) v).getPort());
+			for(Variable _v : update.get(v).getFreeVariables()){
+				if (_v instanceof PortVariable)
+					N.add(((PortVariable) _v).getPort());				
+			}
+			
+		}
 		return N;
 	}
 
-	public Transition toTransition() {
+	public Transition toTransition(Language lang) {
 		Map<PortVariable, Term> output = new HashMap<>();
 		Map<MemoryVariable, Term> memory = new HashMap<>();
 		for (Map.Entry<Variable, Term> entry : update.entrySet()) {
@@ -95,7 +105,30 @@ public class Command {
 			if (entry.getKey() instanceof MemoryVariable)
 				memory.put((MemoryVariable) entry.getKey(), entry.getValue());
 		}
-		return new Transition(guard, output, memory, getPorts());
+		Set<Port> inputs = new HashSet<Port>();
+		for(Port p : getPorts()){
+			if(p.isInput()){
+				inputs.add(p);
+			}
+		}
+		switch (lang) {
+		case PRISM:
+			return new PrismTransition(guard, output, memory, inputs);
+		case JAVA:
+		case PROMELA:
+			return new PromelaTransition(guard, output, memory, inputs);
+		case C11:
+			return new Transition(guard, output, memory, inputs);
+		case MAUDE:
+			return new MaudeTransition(guard, output, memory, inputs);
+		case PRT:
+			break;
+		case TEXT:
+			break;
+		default:
+			break;
+		}
+		return null;				
 	}
 	
 	@Override

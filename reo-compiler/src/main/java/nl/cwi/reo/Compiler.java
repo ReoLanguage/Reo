@@ -24,7 +24,6 @@ import nl.cwi.reo.commands.Command;
 import nl.cwi.reo.commands.Commands;
 import nl.cwi.reo.compile.CompilerType;
 import nl.cwi.reo.compile.LykosCompiler;
-import nl.cwi.reo.compile.RBACompiler;
 import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.ReoProgram;
 import nl.cwi.reo.interpret.SemanticsType;
@@ -53,6 +52,9 @@ import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
 import nl.cwi.reo.templates.Atomic;
 import nl.cwi.reo.templates.Component;
+import nl.cwi.reo.templates.MaudeProtocol;
+import nl.cwi.reo.templates.PromelaAtomic;
+import nl.cwi.reo.templates.PromelaProtocol;
 import nl.cwi.reo.templates.Protocol;
 import nl.cwi.reo.templates.ReoTemplate;
 import nl.cwi.reo.templates.Transition;
@@ -264,8 +266,10 @@ public class Compiler {
 		case C11:
 			ListenerRBA listenerRBA = new ListenerRBA(monitor);
 			return new Interpreter(SemanticsType.RBA, listenerRBA, directories, params, monitor);
+		case PROMELA:
 		case MAUDE:
-			break;
+			ListenerRBA listenerRba = new ListenerRBA(monitor);
+			return new Interpreter(SemanticsType.RBA, listenerRba, directories, params, monitor);
 		case PRT:
 			break;
 		case TEXT:
@@ -300,8 +304,9 @@ public class Compiler {
 		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
 		
 		List<ConstraintHypergraph> ch = new ArrayList<>();
-		for(RuleBasedAutomaton rba : protocol)
-			ch.add(new ConstraintHypergraph(rba.getAllRules()));			
+		for(RuleBasedAutomaton rba : protocol){
+			ch.add(new ConstraintHypergraph(rba.getAllRules(),rba.getInitial()));
+		}
 		
 		ConstraintHypergraph composition = new ConstraintHypergraph().compose(ch);
 
@@ -329,25 +334,54 @@ public class Compiler {
 	 * @return Connector with all ports hidden.
 	 */
 	private ReoConnector addPortWindows(ReoConnector connector, Language lang) {
-		if (lang != Language.JAVA)
+		if (lang != Language.JAVA && lang != Language.MAUDE && lang != Language.PROMELA)
 			return connector;
 		List<ReoConnector> list = new ArrayList<>();
 		list.add(connector);
 		for (Port p : connector.getInterface()) {
 			if (!p.isHidden()) {
-
-				Value v = new StringValue(p.getName());
-				List<Value> values = Arrays.asList(v);
-				String call = p.isInput() ? "Windows.producer" : "Windows.consumer";
-				Reference ref = new Reference(call, Language.JAVA, new ArrayList<>(), values);
-
-				PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-				Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
-				Map<Port, Port> links = new HashMap<>();
-				links.put(q, q);
-
-				ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
-				list.add(window);
+				if(lang == Language.JAVA){
+					Value v = new StringValue(p.getName());
+					List<Value> values = Arrays.asList(v);
+					String call = p.isInput() ? "Windows.producer" : "Windows.consumer";
+					Reference ref = new Reference(call, Language.JAVA, new ArrayList<>(), values);
+	
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
+					Map<Port, Port> links = new HashMap<>();
+					links.put(q, q);
+	
+					ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
+					list.add(window);
+				}
+				if(lang == Language.MAUDE){
+					Value v = new StringValue(p.getName());
+					List<Value> values = Arrays.asList(v);
+					String call = p.isInput() ? "prod" : "cons";
+					Reference ref = new Reference(call, Language.MAUDE, new ArrayList<>(), values);
+	
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
+					Map<Port, Port> links = new HashMap<>();
+					links.put(q, q);
+	
+					ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
+					list.add(window);
+				}
+				if(lang == Language.PROMELA){
+					Value v = new StringValue(p.getName());
+					List<Value> values = Arrays.asList(v);
+					String call = p.isInput() ? "prod" : "cons";
+					Reference ref = new Reference(call, Language.PROMELA, new ArrayList<>(), values);
+	
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
+					Map<Port, Port> links = new HashMap<>();
+					links.put(q, q);
+	
+					ReoConnectorAtom window = new ReoConnectorAtom(call, Arrays.asList(ref), links);
+					list.add(window);
+				}
 			}
 		}
 		return new ReoConnectorComposite(null, "", list).rename(new HashMap<>());
@@ -385,8 +419,10 @@ public class Compiler {
 						params.add(Double.toString(((DecimalValue) v).getValue()));
 					}
 				}
-
-				components.add(new Atomic(name + n_atom++, params, atom.getInterface(), call));
+				if(lang == Language.JAVA)
+					components.add(new Atomic(name + n_atom++, params, atom.getInterface(), call));
+				if(lang == Language.PROMELA)
+					components.add(new PromelaAtomic(name + n_atom++, params, atom.getInterface(), call));
 			}
 		}
 		return components;
@@ -448,9 +484,8 @@ public class Compiler {
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : protocol.getRules()){
 			Command cmd = Commands.commandify(rule.getFormula());
-			transitions.add(cmd.toTransition());
+			transitions.add(cmd.toTransition(lang));
 		}
-//			transitions.add(RBACompiler.commandify(rule.getFormula()));
 		return transitions;
 	}
 	
@@ -458,7 +493,7 @@ public class Compiler {
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : protocol.getAllRules()) {
 			Command cmd = Commands.commandify(rule.getFormula());
-			transitions.add(cmd.toTransition());
+			transitions.add(cmd.toTransition(lang));
 		}
 		return transitions;
 	}
@@ -523,9 +558,14 @@ public class Compiler {
 			// Get the initial value of each memory cell
 			Map<MemoryVariable, Object> initial = new HashMap<>();
 			for (Map.Entry<String, TypeTag> e : tags.entrySet())
-				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(e.getKey()));
+				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(new MemoryVariable(e.getKey(),false,e.getValue())));
 
-			components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
+			if(lang == Language.JAVA)
+				components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
+			if(lang == Language.MAUDE)
+				components.add(new MaudeProtocol("Protocol" + n_protocol++, ports, part, initial));
+			if(lang == Language.PROMELA)
+				components.add(new PromelaProtocol("Protocol" + n_protocol++, ports, part, initial));
 		}
 		return components;
 	}
@@ -574,6 +614,10 @@ public class Compiler {
 		case MAUDE:
 			group = new STGroupFile("Maude.stg");
 			extension = ".maude";
+			break;
+		case PROMELA:
+			group = new STGroupFile("Promela.stg");
+			extension = ".pml";
 			break;
 		case PRISM:
 			group = new STGroupFile("Prism.stg");

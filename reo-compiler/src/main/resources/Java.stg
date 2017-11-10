@@ -76,7 +76,7 @@ public void activate() {
 }
 
 public void run() {
-	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p | <p.name>}; separator=", ">);
+	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p |<p.name>}; separator=", ">);
 }
 >>
 
@@ -120,8 +120,6 @@ public void run() {
 >>
 
 memorycell(c) ::= <<
-<! <c.initial.keys:{m | private <if(m.type)><m.type><else>Object<endif> <m.name> <if(mem.get(m))> = <mem.get(m)> <endif>}; separator="\n">;  !>
-
 <c.initial.keys:{m | private <if(m.type)><m.type><else>String<endif> <m.name> <if(c.initial.(m))> = <c.initial.(m).value><else> = null <endif>; }; separator = "\n"> 
 >>
 
@@ -140,39 +138,70 @@ new Rule() {
 >>
 
 guard(t) ::= <<
-<if(t.equality)><endif><t.guard:formula()><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" "><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif>
-<! <if(t.equality)><endif><t.guard:formula()><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif> !>
+<t.output.keys:{p | <if(!t.output.(p).isnull)><p.name>.hasGet() && <endif>}; separator=" "><!
+!><t.guard:formula()>
 >>
 
 formula(f) ::= <<
-<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)><f:equality()><elseif(f.relation)><f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif><elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(f.disjunction)>(<f.clauses:formula(); separator=" || ">)<endif>
+<if(f.negation)>!(<f.formula:formula()>)<!
+!><elseif(f.equality)><f:equality()><!
+!><elseif(f.relation)><f:relation()><!
+!><elseif(f.conjunction)><f:conjunction()><!
+!><elseif(f.disjunction)><f:disjunction()><!
+!><endif>
+>>
+
+disjunction(f) ::= <<
+(<f.clauses:formula(); separator=" || ">)
+>>
+
+conjunction(f) ::=<<
+(<f.clauses:formula(); separator=" && ">)
+>>
+
+relation(f) ::=<<
+<f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif>
 >>
 
 equality(f) ::= <<
-<if(f.LHS.node)><if(!f.RHS.constant.value)>!<f.LHS.name>.hasGet()<else><f.LHS:term()> == <f.RHS:term()><endif><else><f.LHS:term()> == <f.RHS:term()><endif>
+<f.LHS:term()> == <f.RHS:term()>
 >>
 
 term(t) ::= <<
-<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.peek()<elseif(t.memory)><t.name><else><t.name><endif>
+<if(t.constant)><t.name><!
+!><elseif(t.node)><t.name>.peek()<!
+!><elseif(t.memory)><t.name><!
+!><elseif(t.isnull)>null<!
+!><elseif(t.function)><t:function()><!
+!><else><t.name><endif>
 >>
 
 function(t) ::=<<
-<t.value><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
+<t.name><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
 >>
 
 
 action(t) ::= <<
 <t:output(); separator="\n">
-<t:memory(); separator="\n">
+<t:memoryUpdateNonNull(); separator="\n">
+<t:memoryUpdateNull(); separator="\n">
 <t.input:{p | <p:input()>}; separator="\n">
 >>
 
 output(a) ::= <<
-<a.output.keys:{p | <if(!p.void)><p.name>.put(<a.output.(p):term()>)<else><a.output.(p):term()><endif>;}; separator="\n"> 
+<a.output.keys:{p | <if(!a.output.(p).isnull)><p.name>.put(<a.output.(p):term()>);<endif>}; separator="\n"> 
 >>
 
 memory(m) ::= <<
 <m.memory.keys:{p | <p.name> = <m.memory.(p):term()>;}; separator="\n"> 
+>>
+
+memoryUpdateNonNull(m) ::= <<
+<m.memory.keys:{p | <if(!m.memory.(p).isnull)><p.name> = <m.memory.(p):term()>;<endif>}; separator="\n"> 
+>>
+
+memoryUpdateNull(m) ::= <<
+<m.memory.keys:{p | <if(m.memory.(p).isnull)><p.name> = <m.memory.(p):term()>;<endif>}; separator="\n"> 
 >>
 
 input(p) ::= <<

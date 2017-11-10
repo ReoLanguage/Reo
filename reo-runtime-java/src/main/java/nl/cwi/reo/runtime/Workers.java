@@ -14,7 +14,7 @@ public class Workers {
 
 	public static void Engine(Port<String> inputPort, Port<String> outputPort) {
 		// Input port in the protocol is an output port for the engine
-		new Engine(outputPort, inputPort).run();
+		new Engine(inputPort, outputPort).run();
 	}
 
 	static int N = 100;

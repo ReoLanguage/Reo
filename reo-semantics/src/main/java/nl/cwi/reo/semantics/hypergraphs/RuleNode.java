@@ -163,37 +163,7 @@ public class RuleNode {
 		exclusiveRules.add(n);
 	}
 
-	/**
-	 * Composes the rule of this node with a given formula using conjunction.
-	 * 
-	 * @param f
-	 *            formula
-	 * @return reference to this updated node.
-	 */
-	public RuleNode compose(Formula f) {
-		boolean canSync = true;
-		List<Formula> clauses = new ArrayList<Formula>();
-		if (f instanceof Disjunction) {
-			for (Formula clause : ((Disjunction) f).getClauses()) {
-				for (Variable v : clause.getFreeVariables()) {
-					if (v instanceof PortVariable && rule.getSync().get((((PortVariable) v).getPort()) != null
-							&& !rule.getSync().get(((PortVariable) v).getPort()))) {
-						canSync = false;
-					}
-				}
-				if (canSync) {
-					clauses.add(clause);
-				}
-			}
-		}
-		Formula formula;
-		if (clauses.size() == 1)
-			formula = Formulas.conjunction(Arrays.asList(rule.getFormula(), clauses.get(0)));
-		else
-			formula = Formulas.conjunction(Arrays.asList(rule.getFormula(), new Disjunction(clauses)));
-		rule = new Rule(rule.getSync(), formula);
-		return this;
-	}
+
 
 	/**
 	 * Joins this node with a given rule node by conjunction of the rules and
@@ -205,6 +175,7 @@ public class RuleNode {
 	 *         both node can synchronize, or null otherwise.
 	 */
 	public RuleNode compose(RuleNode r) {
+		// If the two rules can not synchronize, the composition fails.
 		if (!canSync(rule, r.getRule()))
 			return null;
 
@@ -212,6 +183,8 @@ public class RuleNode {
 		map.putAll(r.getRule().getSync());
 
 		Rule r1;
+		// If the two rules are equals, return one this.rule (idempotency)
+		// otherwise, return the conjunction.
 		if (rule.getFormula().equals(r.getRule().getFormula())) {
 			if (r.getRule().getSync().equals(rule.getSync()))
 				return this;
@@ -222,6 +195,7 @@ public class RuleNode {
 					Formulas.conjunction(Arrays.asList(rule.getFormula(), r.getRule().getFormula())));
 		}
 
+		// Add the new rule to the hyperegde.
 		Set<HyperEdge> set = new HashSet<>(hyperedges);
 		for (HyperEdge h : r.getHyperedges()) {
 			if (!h.getTarget().isEmpty())

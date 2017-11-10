@@ -77,7 +77,7 @@ public final class PortVariable implements Variable {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Term rename(Map<Port, Port> links) {
+	public PortVariable rename(Map<Port, Port> links) {
 		Port b = links.get(p);
 		if (b != null)
 			return new PortVariable(b);
