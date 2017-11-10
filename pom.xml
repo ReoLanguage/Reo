@@ -65,6 +65,20 @@ Application designers can use Reo as a "glue code" language for compositional co
      <artifactId>checker-qual</artifactId>
      <version>${checker.version}</version>
    </dependency>
+   
+   <dependency>
+     <groupId>com.pholser</groupId>
+     <artifactId>junit-quickcheck-core</artifactId>
+     <version>0.7</version>
+   </dependency>
+
+   <dependency>
+     <groupId>com.pholser</groupId>
+     <artifactId>junit-quickcheck-generators</artifactId>
+     <version>0.7</version>
+     <scope>test</scope>
+   </dependency>
+
   </dependencies>
 
   <build>
