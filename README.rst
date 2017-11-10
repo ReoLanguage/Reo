@@ -1,4 +1,6 @@
-[![Build Status]https://travis-ci.org/ReoLanguage/Reo.svg?branch=master)](https://travis-ci.org/ReoLanguage/Reo)
+.. image:: https://travis-ci.org/ReoLanguage/Reo.svg?branch=master
+   :target: https://travis-ci.org/ReoLanguage/Reo
+   :alt: Latest Version
 
 Reo
 ===
