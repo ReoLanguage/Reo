@@ -10,9 +10,12 @@ Most general purpose programming languages do not provide syntax for expressing 
 The absence of such syntax requires programmers to implement their protocols by manually via locks and semaphores. 
 Given such implicit implementation of the protocol, it is very hard, if not impossible, to reason about its correctness and efficiency of the protocol.
 
+.. image:: http://reo.project.cwi.nl/reo/raw-attachment/wiki/WikiStart/router.png
+   :align: center
+
 .. _Reo: http://reo.project.cwi.nl/reo/wiki
 
-Reo_, an *exogenous coordination language* designed by prof. dr. F. Arbab at the Centre for Mathematics and Computer Science (​CWI) in Amsterdam, addresses this problem by providing syntax that allows explicit high-level construction of protocols.
+Reo_, an *exogenous coordination language* designed by prof. dr. F. Arbab at the Centre for Mathematics and Computer Science (​CWI) in Amsterdam, addresses this problem by providing syntax that allows explicit high-level construction of protocols. This syntax consists of graph-like structures, such as the figure above.
 It is much easier to develop correct protocols that are free of dead-locks, live-locks and data races.
 The compiler of the coordination language is able to optimize the actual implementation of the protocol.
 
