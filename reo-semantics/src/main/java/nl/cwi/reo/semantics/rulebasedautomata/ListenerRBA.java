@@ -50,6 +50,7 @@ import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Terms;
 import nl.cwi.reo.semantics.predicates.TruthValue;
+import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -71,7 +72,8 @@ public class ListenerRBA extends BaseListener {
 
 	/** The initial value of memory. */
 	protected ParseTreeProperty<Map<MemoryVariable, Term>> initials = new ParseTreeProperty<>();
-
+	
+	
 	/**
 	 * Instantiates a new listener RBA.
 	 *
@@ -80,6 +82,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	public ListenerRBA(Monitor m) {
 		super(m);
+		
 	}
 
 	/*
@@ -208,7 +211,7 @@ public class ListenerRBA extends BaseListener {
 	@Override
 	public void exitRba_equality(Rba_equalityContext ctx) {
 		Term t0 = terms.get(ctx.rba_term(0));
-		Term t1 = terms.get(ctx.rba_term(1));
+		Term t1 = terms.get(ctx.rba_term(1));		
 		if (t0 != null && t1 != null)
 			formulas.put(ctx, new Equality(t0, t1));
 	}

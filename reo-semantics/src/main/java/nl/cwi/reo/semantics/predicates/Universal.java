@@ -188,4 +188,9 @@ public final class Universal implements Formula {
 		return Objects.hash(this.x, this.f);
 	}
 
+	@Override
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+		return f.getTermType(termTypeSet);
+	}
+
 }

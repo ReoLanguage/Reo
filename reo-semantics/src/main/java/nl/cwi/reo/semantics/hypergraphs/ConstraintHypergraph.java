@@ -18,6 +18,8 @@ import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
@@ -425,6 +427,30 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 
 	}
 
+	//TODO : finish this function to propagate types.
+	public ConstraintHypergraph propagateType(Set<Set<Term>> s){
+		Set<Rule> setRules = new HashSet<Rule>();
+		TypeTag _t =  null;
+		for(Set<Term> set : s){
+			Set<Term> _set = new HashSet<>();
+			for(Term t : set){
+				if(t.getTypeTag()!=null && t.getTypeTag()!=TypeTags.Object){
+					_t = t.getTypeTag();
+					break;
+				}
+			}
+//			for(Term t : set){
+//				_set.add(t.)
+//			}
+		}
+		
+		for (Rule r : getRules()) {
+			Formula g = r.getFormula();
+//			g.substitute(t, x)
+		}		
+		return new ConstraintHypergraph(getRules(),initial);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

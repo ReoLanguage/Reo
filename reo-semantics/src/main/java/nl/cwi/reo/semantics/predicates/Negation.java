@@ -176,6 +176,10 @@ public final class Negation implements Formula {
 		return Objects.equals(f, n.getFormula());
 	}
 
+	@Override
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+		return termTypeSet;
+	}
 	/**
 	 * {@inheritDoc}
 	 */

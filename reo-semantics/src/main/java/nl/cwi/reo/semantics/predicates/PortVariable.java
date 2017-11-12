@@ -10,6 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
@@ -112,7 +113,7 @@ public final class PortVariable implements Variable {
 	 */
 	@Override
 	public String toString() {
-		return p.getName();
+		return p.toString();
 	}
 
 	/**
@@ -149,4 +150,15 @@ public final class PortVariable implements Variable {
 			return new Constant(v);
 		return this;
 	}
+
+//	@Override
+//	public Term infereTypeTag(Set<Set<Term>> s) {
+//		for(Set<Term> set : s){
+//			for(Term pv : set){
+//				if(pv.equals(this))
+//					return new PortVariable(pv.setTag(TypeTags.Boolean));
+//			}
+//		}
+//		return null;
+//	}
 }

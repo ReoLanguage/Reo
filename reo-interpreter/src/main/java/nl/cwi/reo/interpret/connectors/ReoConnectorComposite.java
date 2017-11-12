@@ -15,8 +15,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Atom;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
+import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.util.Monitor;
 
@@ -46,6 +48,7 @@ public final class ReoConnectorComposite implements ReoConnector {
 	/** Set of links. */
 	private final Map<Port, Port> links;
 
+	
 	/**
 	 * Constructs and empty connector.
 	 */
@@ -167,7 +170,10 @@ public final class ReoConnectorComposite implements ReoConnector {
 				atoms.addAll(c.getAtoms());
 		return atoms;
 	}
-
+	
+//	public Set<Set<Term>> getType(){
+//		
+//	}
 	/**
 	 * {@inheritDoc}
 	 */

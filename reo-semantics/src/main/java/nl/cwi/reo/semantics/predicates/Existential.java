@@ -170,6 +170,10 @@ public final class Existential implements Formula {
 		return Objects.equals(this.x, e.x) && Objects.equals(this.f, e.f);
 	}
 
+	@Override
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+		return termTypeSet;
+	}
 	/**
 	 * {@inheritDoc}
 	 */

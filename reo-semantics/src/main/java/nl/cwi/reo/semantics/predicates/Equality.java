@@ -11,6 +11,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -188,6 +190,74 @@ public final class Equality implements Formula {
 				|| Objects.equals(this.t1, eq.t2) && Objects.equals(this.t2, eq.t1);
 	}
 
+
+	@Override
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet){
+//			boolean added = false;
+		Set<Set<Term>> _termTypeSet = new HashSet<>(termTypeSet);
+		TypeTag tt = null;
+		
+		if(t1.getTypeTag()!=null && t2.getTypeTag()!=null && !t1.getTypeTag().equals(t2.getTypeTag())){
+			if(t1.getTypeTag()==TypeTags.Object)
+				tt=t2.getTypeTag();
+			else if(t2.getTypeTag()==TypeTags.Object)
+				tt=t1.getTypeTag();
+			else{
+				try {
+					throw new Exception("Type mismatch");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		else if(t1.getTypeTag()!=null && t1.getTypeTag()!=TypeTags.Object && t2.getTypeTag()==null){
+			tt=t1.getTypeTag();
+		}
+		else if(t2.getTypeTag()!=null && t2.getTypeTag()!=TypeTags.Object && t1.getTypeTag()==null){
+			tt=t2.getTypeTag();
+		}
+		
+		
+		Set<Term> terms = new HashSet<>();
+		for(Set<Term> s : _termTypeSet){
+			if((!(t1 instanceof NullValue) && s.contains(t1) || !(t2 instanceof NullValue) && s.contains(t2)) ){
+				if(tt!=null && tt!= TypeTags.Object){
+					for(Term t : s){
+						if(t.getTypeTag()!=null && t.getTypeTag()!=TypeTags.Object && t.getTypeTag()!=tt){
+							try {
+								throw new Exception("Type mismatch");
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						else{
+							termTypeSet.remove(s);
+							terms.addAll(s);
+							terms.add(t1);
+							terms.add(t2);
+							break;
+						}
+					}
+				}
+				else{
+					termTypeSet.remove(s);
+					terms.addAll(s);
+					terms.add(t1);
+					terms.add(t2);					
+				}
+			}
+		}
+		if(terms.isEmpty()){
+			terms.add(t1);
+			terms.add(t2);
+		}
+			
+		termTypeSet.add(terms);
+
+		return termTypeSet;
+	}
 	/**
 	 * {@inheritDoc}
 	 */

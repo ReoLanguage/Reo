@@ -230,6 +230,10 @@ public final class Relation implements Formula {
 		return Objects.equals(this.name, p.name) && Objects.equals(this.args, p.args);
 	}
 
+	@Override
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+		return termTypeSet;
+	}
 	/**
 	 * {@inheritDoc}
 	 */

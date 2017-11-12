@@ -58,6 +58,7 @@ public interface Formula extends Expression<Formula> {
 	 */
 	public Formula DNF();
 
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeList);
 	/**
 	 * Substitutes a term t for every occurrence of a variable x in this
 	 * formula.

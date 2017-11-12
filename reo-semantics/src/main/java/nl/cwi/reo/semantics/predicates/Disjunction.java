@@ -118,6 +118,13 @@ public final class Disjunction implements Formula {
 			list.add(f.DNF());
 		return new Disjunction(list);
 	}
+	
+	@Override
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+		for(Formula f : clauses)
+			termTypeSet=f.getTermType(termTypeSet);
+		return termTypeSet;
+	}
 
 	/**
 	 * {@inheritDoc}

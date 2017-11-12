@@ -42,6 +42,9 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	/** The initial value of memory. */
 	private final Map<MemoryVariable, Term> initial;
 
+	/** Give a unique name for memCell during instantiation */
+	static int memIDCounter=0;
+	
 	/**
 	 * Instantiates an empty rule based automaton.
 	 */
@@ -111,13 +114,24 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	@Override
 	public Atom rename(Map<Port, Port> links) {
 		Set<Set<Rule>> _rules = new HashSet<>();
+		Map<MemoryVariable, Term> _initial = new HashMap<>();
 		for (Set<Rule> part : rules) {
 			Set<Rule> _part = new HashSet<>();
-			for (Rule t : part)
-				_part.add(t.rename(links));
+			Map<MemoryVariable, MemoryVariable> map = new HashMap<>();
+			for (Rule t : part){
+				for(MemoryVariable m : t.getMemoryCells()){
+					map.put(m, new MemoryVariable(m.getName()+memIDCounter,m.hasPrime()));
+					map.put(new MemoryVariable(m.getName(),!m.hasPrime()), new MemoryVariable(m.getName()+memIDCounter,!m.hasPrime()));
+					if(initial.get(m)!=null)
+						_initial.put(new MemoryVariable(m.getName()+memIDCounter,m.hasPrime()), initial.get(m));
+				}
+				Rule r = t.renameMemory(map);
+				_part.add(r.rename(links));
+			}
 			_rules.add(_part);
 		}
-		return new RuleBasedAutomaton(_rules, initial);
+		++memIDCounter;
+		return new RuleBasedAutomaton(_rules, _initial);
 	}
 
 	/**

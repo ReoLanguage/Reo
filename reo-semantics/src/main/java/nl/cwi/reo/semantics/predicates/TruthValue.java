@@ -118,4 +118,9 @@ public final class TruthValue implements Formula {
 		return b ? "\u22A4" : "\u22A5";
 	}
 
+	@Override
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+		return termTypeSet;
+	}
+
 }

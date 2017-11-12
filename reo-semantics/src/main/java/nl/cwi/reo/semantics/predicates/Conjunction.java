@@ -210,6 +210,13 @@ public final class Conjunction implements Formula {
 		return Objects.hash(clauses);
 	}
 
+	@Override
+	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+		for(Formula f : clauses)
+			termTypeSet = f.getTermType(termTypeSet);
+		return termTypeSet;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

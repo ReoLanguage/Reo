@@ -45,7 +45,11 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
+import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Disjunction;
+import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.rulebasedautomata.ListenerRBA;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
@@ -287,7 +291,7 @@ public class Compiler {
 
 		Interpreter interpreter = getInterpreter(lang);
 
-		ReoProgram program;
+		ReoProgram program; 	
 		if ((program = interpreter.interpret(files.get(0))) == null)
 			return;
 
@@ -296,21 +300,33 @@ public class Compiler {
 		connector = connector.flatten();
 		connector = connector.insertNodes(true, false, new RuleBasedAutomaton());
 		connector = connector.integrate();
-
+		
 		List<Component> components = buildAtomics(connector, lang);
-
+		
+		Set<Set<Term>> s = new HashSet<>();
 		Set<Port> intface = getDualInterface(components);
-
+		for(Port p : intface){
+			Set<Term> t = new HashSet<>();
+			t.add(new PortVariable(p));
+			s.add(t);
+		}
+		
 		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
 		
 		List<ConstraintHypergraph> ch = new ArrayList<>();
+
 		for(RuleBasedAutomaton rba : protocol){
 			ch.add(new ConstraintHypergraph(rba.getAllRules(),rba.getInitial()));
+			/* Look at the type of the ports */
+			for( Rule r :rba.getAllRules()){
+				s=r.getFormula().getTermType(s);
+			}
 		}
 		
 		ConstraintHypergraph composition = new ConstraintHypergraph().compose(ch);
 
 		composition = composition.restrict(intface);
+		composition = composition.propagateType(s);
 
 		Set<Transition> transitions = buildTransitions(composition);
 

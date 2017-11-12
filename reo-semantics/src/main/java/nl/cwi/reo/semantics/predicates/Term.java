@@ -48,4 +48,11 @@ public interface Term extends Expression<Term> {
 	 * @return type tag of this term.
 	 */
 	public TypeTag getTypeTag();
+	
+//	/**
+//	 * Infere the type tag of this term from a set of set of terms.
+//	 * 
+//	 * @return this term with infered typetag.
+//	 */
+//	public Term infereTypeTag(Set<Set<Term>> s);
 }
