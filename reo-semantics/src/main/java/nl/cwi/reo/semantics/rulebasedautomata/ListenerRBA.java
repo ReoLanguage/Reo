@@ -185,8 +185,11 @@ public class ListenerRBA extends BaseListener {
 	@Override
 	public void exitRba_conjunction(Rba_conjunctionContext ctx) {
 		List<Formula> l = new ArrayList<Formula>();
-		for (Rba_formulaContext f : ctx.rba_formula())
-			l.add(formulas.get(f));
+		for (Rba_formulaContext f : ctx.rba_formula()) {
+			Formula g = formulas.get(f);
+			if (g != null)
+				l.add(g);
+		}
 		formulas.put(ctx, Formulas.conjunction(l));
 	}
 
