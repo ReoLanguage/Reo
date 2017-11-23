@@ -11,6 +11,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
@@ -189,8 +190,14 @@ public final class Universal implements Formula {
 	}
 
 	@Override
-	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
-		return f.getTermType(termTypeSet);
+	public Set<Set<Term>> inferTermType(Set<Set<Term>> termTypeSet) {
+		return f.inferTermType(termTypeSet);
+	}
+
+	@Override
+	public Formula getTypedFormula(Map<Term, TypeTag> typeMap) {
+		// TODO Auto-generated method stub
+		return this;
 	}
 
 }

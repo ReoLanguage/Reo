@@ -1,4 +1,4 @@
-package nl.cwi.reo.templates;
+package nl.cwi.reo.templates.prism;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +20,7 @@ import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.templates.Transition;
 
 /**
  * The Class Transition.

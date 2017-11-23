@@ -5,6 +5,7 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 
 /**
  * A first-order formula over the language of constraints.
@@ -58,7 +59,23 @@ public interface Formula extends Expression<Formula> {
 	 */
 	public Formula DNF();
 
-	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeList);
+	/**
+	 * Infer type of a term from a set of set of term.
+	 * 
+	 * Each set of term represents terms with the same type.
+	 * @param termTypeList
+	 * @return
+	 */
+	public Set<Set<Term>> inferTermType(Set<Set<Term>> termTypeList);
+
+	/**
+	 * Type the term of the formula according to the termTypedList.
+	 * 
+	 * @param termTypeList
+	 * @return
+	 */
+	public Formula getTypedFormula(Map<Term,TypeTag> typeMap);
+	
 	/**
 	 * Substitutes a term t for every occurrence of a variable x in this
 	 * formula.

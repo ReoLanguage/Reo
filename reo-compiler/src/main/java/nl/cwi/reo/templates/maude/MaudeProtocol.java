@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.cwi.reo.templates;
+package nl.cwi.reo.templates.maude;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +10,8 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.templates.Protocol;
+import nl.cwi.reo.templates.Transition;
 
 /**
  * Maude Protocol template

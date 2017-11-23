@@ -96,8 +96,20 @@ public final class MemoryVariable implements Variable, Comparable<MemoryVariable
 	 *            type tag
 	 * @return new memory cell variable with given type tag.
 	 */
-	public MemoryVariable setType(TypeTag type) {
-		return new MemoryVariable(name, prime, type);
+	public MemoryVariable setTypeTag(TypeTag type) {
+		if(getTypeTag()!=null && getTypeTag()!=TypeTags.Object){
+			if(type!=null && type!=TypeTags.Object && !getTypeTag().equals(type)){
+				try {
+					throw new Exception("type mismatch");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			return this;
+		}
+		else
+			return new MemoryVariable(name, prime, type);
 	}
 
 	/**
@@ -135,7 +147,7 @@ public final class MemoryVariable implements Variable, Comparable<MemoryVariable
 	public @Nullable Term evaluate(Scope s, Monitor m) {
 		return this;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

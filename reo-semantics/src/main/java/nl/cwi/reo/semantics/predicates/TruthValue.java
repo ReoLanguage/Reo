@@ -9,6 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -119,8 +120,15 @@ public final class TruthValue implements Formula {
 	}
 
 	@Override
-	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+	public Set<Set<Term>> inferTermType(Set<Set<Term>> termTypeSet) {
+		// TODO Auto-generated method stub
 		return termTypeSet;
+	}
+
+	@Override
+	public Formula getTypedFormula(Map<Term, TypeTag> typeMap) {
+		// TODO Auto-generated method stub
+		return this;
 	}
 
 }

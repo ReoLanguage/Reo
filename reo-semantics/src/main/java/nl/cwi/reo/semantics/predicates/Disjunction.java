@@ -14,6 +14,7 @@ import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -120,9 +121,9 @@ public final class Disjunction implements Formula {
 	}
 	
 	@Override
-	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
+	public Set<Set<Term>> inferTermType(Set<Set<Term>> termTypeSet) {
 		for(Formula f : clauses)
-			termTypeSet=f.getTermType(termTypeSet);
+			termTypeSet=f.inferTermType(termTypeSet);
 		return termTypeSet;
 	}
 
@@ -151,6 +152,15 @@ public final class Disjunction implements Formula {
 		List<Formula> _clauses = new ArrayList<>();
 		for (Formula f : clauses)
 			_clauses.add(f.substitute(t, x));
+		return new Disjunction(_clauses);
+	}
+	
+
+	@Override
+	public Formula getTypedFormula(Map<Term, TypeTag> typeMap) {
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses)
+			_clauses.add(f.getTypedFormula(typeMap));
 		return new Disjunction(_clauses);
 	}
 

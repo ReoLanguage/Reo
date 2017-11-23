@@ -13,6 +13,7 @@ import org.stringtemplate.v4.ST;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
@@ -82,7 +83,7 @@ public final class Function implements Term {
 	 * @return name of this function.
 	 */
 	public String getName() {
-		return name.substring(1, name.length()-1);
+		return name;
 	}
 
 	/**
@@ -169,7 +170,12 @@ public final class Function implements Term {
 	public TypeTag getTypeTag() {
 		return tag;
 	}
-
+	
+	public Function setTag(TypeTag t) {
+		return new Function(getName(), getArgs(), getInfix(), t);
+	}
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -204,5 +210,22 @@ public final class Function implements Term {
 		return Objects.hash(name, this.args);
 	}
 
+	@Override
+	public Term setTypeTag(TypeTag t) {
+		if(getTypeTag()!=null && getTypeTag()!=TypeTags.Object){
+			if(getTypeTag()!=t){
+				try {
+					throw new Exception("type mismatch");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			return this;
+		}
+		else
+			return setTag(getTypeTag());
+	}
 
 }
+

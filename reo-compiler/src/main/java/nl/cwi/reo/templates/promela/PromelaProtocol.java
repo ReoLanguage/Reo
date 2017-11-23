@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.cwi.reo.templates;
+package nl.cwi.reo.templates.promela;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -9,6 +9,8 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.templates.Component;
+import nl.cwi.reo.templates.Transition;
 
 /**
  * Compiled automaton that is independent of the target language.

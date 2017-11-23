@@ -1,25 +1,17 @@
-package nl.cwi.reo.templates;
+package nl.cwi.reo.templates.maude;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.interpret.typetags.TypeTags;
-import nl.cwi.reo.interpret.values.IntegerValue;
-import nl.cwi.reo.semantics.prba.Distribution;
 import nl.cwi.reo.semantics.predicates.Conjunction;
-import nl.cwi.reo.semantics.predicates.Constant;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.NonNullValue;
@@ -27,21 +19,40 @@ import nl.cwi.reo.semantics.predicates.NullValue;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.templates.Transition;
 
 /**
  * The Class Transition.
  */
 
-public final class PromelaTransition extends Transition{
+public final class MaudeTransition extends Transition{
 
-	/** Guard map */
+
+	/**
+	 * Convention for Maude code generation : 
+	 * 
+	 * 		- a port : p(<it>name</it>, value)
+ 	 * 		- a memory cell : m(<it>name</it>, value)
+ 	 * 		- string port name : "p" + current_port_name.substring(1)  (remove the dollar and add a p)
+ 	 * 		- int mem name : mem_name.substring(1)
+ 	 * 		- empty data : *
+ 	 * 		- data from port: d_ + port_name.substring(1)
+ 	 * 		- data from mem: d_ + mem_name
+	 */
+	
+	/** Rewrite rule counter */
+	static int counter=0;
+	
+	/** Rewrite rule number */
+	private int nb;
+	
+	/** Left Hand Side of the rewrite rule */
 	private Map<Variable, Term> lstate = new HashMap<>();
 	
-	/** Update map */	
+	/** Right Hand Side of the rewrite rule */	
 	private Map<Variable, Term> rstate = new HashMap<>();
 	
-	//Renaming map
-	private Map<Port,Port> m = new HashMap<>();
+	
 	/**
 	 * Instantiates a new transition.
 	 *
@@ -54,26 +65,20 @@ public final class PromelaTransition extends Transition{
 	 * @param input
 	 *            the input
 	 */
-	public PromelaTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory,
+	public MaudeTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory,
 			Set<Port> input) {
 		super(guard, output, memory, input);
-		Set<Port> s = guard.getPorts();
-		s.addAll(super.getInput());
-
-		for(Port p : s)
-			m.put(p, p.rename("p"+p.getName().substring(1)));
-		for(PortVariable pv : output.keySet())
-			m.put(pv.getPort(), pv.getPort().rename("p"+pv.getPort().getName().substring(1)));
-	}
-
-	@Override
-	public Formula getGuard() {	
-		Formula guard = super.getGuard();
-		guard = guard.rename(m);
-		return guard;
+		nb=++counter;
+		guardToRew();
+		rstate.putAll(getOutput());
+		rstate.putAll(getMemory());
+		
 	}
 	
-	public void guardToString(){
+	/**
+	 * From a guard to a rewrite rule
+	 */
+	private void guardToRew(){
 		Formula g = getGuard();
 		
 		if(g instanceof Conjunction){
@@ -126,135 +131,93 @@ public final class PromelaTransition extends Transition{
 			if(lhs instanceof MemoryVariable)
 				lstate.put((MemoryVariable)lhs, rhs);
 		}
-		
 	}
+	
+
 	/**
 	 * Write the rewrite rule as a string
 	 */
-	public String getTransitionString() {
+	public String getRewString() {
 		String RHS = "";
 		String LHS = "";
-		guardToString();
+		
 		//Convert lstate to string :
-		int o=0;
 		for(Variable v : lstate.keySet()){
 			if(v instanceof PortVariable){
-				LHS = LHS + " full(" + v.getName() + ".";
+				LHS = LHS + " p(\"p" + v.getName().substring(1) + "\",";
 				if(lstate.get(v) instanceof NullValue){
-					LHS = LHS + "sync) ";		
+					LHS = LHS + " *) ";		
+					if(!rstate.containsKey(v)){
+						RHS = RHS + "p(\"p" + v.getName().substring(1) + "\", *) ";
+					}
 				}
 				else if(lstate.get(v) instanceof NonNullValue){
-					LHS = LHS + "data)";					
+					LHS = LHS + "d_" + v.getName().substring(1)+")";					
 				}
 			}
 			if(v instanceof MemoryVariable){
+				LHS = LHS + " m(" + v.getName().substring(1) + ",";
 				if(lstate.get(v) instanceof NullValue){
-					LHS = LHS + "empty("+v.getName()+ ")";
+					LHS = LHS + " *) ";
+					MemoryVariable v_prime = new MemoryVariable(v.getName(),!((MemoryVariable) v).hasPrime(),v.getTypeTag());
+					if(!rstate.containsKey(v) && !rstate.containsKey(v_prime)){
+						RHS = RHS + "m(" + v.getName().substring(1) + ", *) ";
+					}
 				}
 				else if(lstate.get(v) instanceof NonNullValue){
-					LHS = LHS + "full("+v.getName()+ ")";
+					LHS = LHS + "d_" + v.getName()+")";					
 				}
 			}
-			if(o!=lstate.size()-1)
-				LHS = LHS + " && ";
-			o++;
 		}
 		
 		//Convert rstate to string :
 		String update = "";
-		rstate.putAll(getOutput());
-		rstate.putAll(getMemory());
 		
 		for(Variable key : rstate.keySet()){
 			if(key instanceof PortVariable){
+//				MemoryVariable v_prime = new MemoryVariable(v.getName(),!((MemoryVariable) v).hasPrime(),v.getTypeTag());
 				if(!lstate.containsKey(key)){
-					LHS = LHS + " && full(" + key.getName() + ".sync)";
+					LHS = LHS + " p(\"p" + key.getName().substring(1) + "\", *) ";
 				}
 				if(rstate.get(key) instanceof PortVariable){
 					PortVariable value = (PortVariable)rstate.get(key);
-					update = update + "take("+value.getName() + "," + value.getName()+"); put("+ key.getName()+",_" +value.getName()+");";
+					update = update + " p(\"p" + key.getName().substring(1) + "\", d_"+ value.getName().substring(1)+")";
+					update = update + " p(\"p" + value.getName().substring(1) + "\", * )";
 				}
 				if(rstate.get(key) instanceof MemoryVariable){
 					MemoryVariable value = (MemoryVariable)rstate.get(key);
-					update = update + value.getName() + "?_" + value.getName()+"; put("+ key.getName()+",_" +value.getName()+");";
-				}
-				if(rstate.get(key) instanceof Function){
-					Function value = (Function)rstate.get(key);
-					value.toString();
-					update = update + getFunctionString(value) + key.getName() + ");";
+					update = update + " p(\"p" + key.getName().substring(1) + "\", d_"+ value.getName()+")";
+					update = update + " m( "+ value.getName().substring(1) + ", * )";
 				}
 			}
 			if(key instanceof MemoryVariable){			
 				MemoryVariable m_prime = new MemoryVariable(key.getName(),!((MemoryVariable) key).hasPrime(),key.getTypeTag());
 				if(!rstate.containsKey(key) && !rstate.containsKey(m_prime)){
-//					RHS = RHS + "m(" + key.getName().substring(1) + ", *) ";
+					RHS = RHS + "m(" + key.getName().substring(1) + ", *) ";
 				}
 				if(rstate.get(key) instanceof PortVariable){
 					PortVariable value = (PortVariable)rstate.get(key);
-					update = update + "take("+ value.getName() + ",_" + value.getName()+");"+ key.getName()+"!_" +value.getName()+";";
+					update = update + " m(" + key.getName().substring(1) + ", d_"+ value.getName().substring(1)+")";
+					update = update + " p(\"p" + value.getName().substring(1) + "\", * )";
 				}
 				if(rstate.get(key) instanceof MemoryVariable){
 					MemoryVariable value = (MemoryVariable)rstate.get(key);
-					update = update + value.getName() + "?_" + value.getName()+";"+ key.getName()+"!_" +value.getName()+";";
-				}
-				if(rstate.get(key) instanceof Function){
-					Function value = (Function)rstate.get(key);
-					update = update +  getFunctionString(value) + key.getName() + ");";
+					update = update + " m(" + key.getName().substring(1) + ", d_"+ value.getName()+")";
+					update = update + " m("+ value.getName().substring(1) + ", * )";
 				}
 			}
 		}
 		RHS = RHS + update;
 		
-		return "("+ LHS + ") -> " + "atomic{"+ RHS +"}" ;
+		return "rl["+nb+"] : " + LHS + " => " + RHS + " .";
 	}
 	
 	/**
-	 * Gets the set of input ports that participate in this transition.
-	 * 
-	 * @return set of input ports
+	 * Get rewrite rule number
 	 */
-	@Override
-	public Set<Port> getInput() {
-		Set<Port> in = super.getInput();
-		Set<Port> inRenamed = new HashSet<>();
-		for(Port p : in)
-			inRenamed.add(p.rename("p"+p.getName().substring(1)));
-		return inRenamed;
-	}
-
-	public String getFunctionString(Function value){
-		String f = value.getName()+"(";
-		for(Term t : value.getArgs()){
-			if(t instanceof MemoryVariable)
-				f = f + ((MemoryVariable)t).getName()+",";
-			if(t instanceof PortVariable)
-				f = f + ((PortVariable)t).getName()+",";
-			if(t instanceof Function)
-				f = f + getFunctionString((Function)t)+","; 
-		}
-		return f;
-	}
-	/**
-	 * Gets the values assigned to the output ports.
-	 * 
-	 * @return assignment of terms to output ports.
-	 */
-	@Override
-	public Map<PortVariable, Term> getOutput() {
-		Map<PortVariable, Term> map = super.getOutput();
-		Map<PortVariable, Term> mapRenamed = new HashMap<>();
-		for(PortVariable pv : map.keySet())
-			mapRenamed.put(pv.rename(m),map.get(pv).rename(m));
-		return mapRenamed;
-	}
 	
-	@Override
-	public Map<MemoryVariable, Term> getMemory() {
-		Map<MemoryVariable, Term> map = super.getMemory();
-		Map<MemoryVariable, Term> mapRenamed = new HashMap<>();
-		for(MemoryVariable pv : map.keySet())
-			mapRenamed.put(pv,map.get(pv).rename(m));
-		return mapRenamed;
+	public int getNb(){
+		return nb;
 	}
 	
 	/**
@@ -265,11 +228,4 @@ public final class PromelaTransition extends Transition{
 		return Objects.hash(this.getGuard(), this.getOutput(), this.getMemory(), this.getInput());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return this.getInput() + " " + this.getGuard() + " -> " + this.getOutput() + ", " + this.getMemory();
-	}
 }

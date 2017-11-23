@@ -92,7 +92,8 @@ public final class PortVariable implements Variable {
 	public Term substitute(Term t, Variable x) {
 		if (this.equals(x)){
 			if(t instanceof PortVariable)
-				return new PortVariable(this.getPort().rename(((PortVariable)t).getName()));	
+//				return new PortVariable(this.getPort().rename(((PortVariable)t).getName()));
+				return new PortVariable(((PortVariable)t).getPort());	
 			return t;
 		}
 		return this;
@@ -151,14 +152,20 @@ public final class PortVariable implements Variable {
 		return this;
 	}
 
-//	@Override
-//	public Term infereTypeTag(Set<Set<Term>> s) {
-//		for(Set<Term> set : s){
-//			for(Term pv : set){
-//				if(pv.equals(this))
-//					return new PortVariable(pv.setTag(TypeTags.Boolean));
-//			}
-//		}
-//		return null;
-//	}
+	@Override
+	public Term setTypeTag(TypeTag t) {
+		if(getTypeTag()!=null && getTypeTag()!=TypeTags.Object){
+			if(getTypeTag()!=p.getTypeTag()){
+				try {
+					throw new Exception("type mismatch");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			return this;
+		}
+		else 
+			return new PortVariable(p.setTag(t));
+	}
 }

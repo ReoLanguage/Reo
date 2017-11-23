@@ -70,4 +70,11 @@ public final class NullValue implements Term {
 	public String toString() {
 		return "*";
 	}
+
+	@Override
+	public Term setTypeTag(TypeTag t) {
+		// TODO Auto-generated method stub
+		return this;
+	}
+
 }

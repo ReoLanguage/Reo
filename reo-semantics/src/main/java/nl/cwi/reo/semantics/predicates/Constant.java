@@ -84,4 +84,9 @@ public final class Constant implements Term {
 	public String toString() {
 		return v.toString();
 	}
+
+	@Override
+	public Term setTypeTag(TypeTag t) {
+		return this;
+	}
 }

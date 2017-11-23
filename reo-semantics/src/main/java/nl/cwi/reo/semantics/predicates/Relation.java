@@ -15,6 +15,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
@@ -231,8 +233,45 @@ public final class Relation implements Formula {
 	}
 
 	@Override
-	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet) {
-		return termTypeSet;
+	public Set<Set<Term>> inferTermType(Set<Set<Term>> termTypeSet) {
+		Set<Set<Term>> _termTypeSet = new HashSet<>(termTypeSet);
+		findset:
+		for(Term t : args){
+			if(!t.getTypeTag().isDefaultType()){
+				TypeTag tt = t.getTypeTag();
+				for(Set<Term> terms : termTypeSet){
+					/*
+					 * Find if 't' has already a type assigned. 
+					 * Loop over all set of termTypeSet
+					 */
+					Set<Term> _terms = new HashSet<>();
+					if(terms.contains(t)){
+						for(Term term : terms){
+							/*
+							 * Either propagate type in this set, or throw exception if type mismatch
+							 */
+							if(term.getTypeTag().isDefaultType()){
+								_terms.add(term.setTypeTag(tt));
+							}
+							else if(term.getTypeTag().equals(tt)){
+								continue findset;
+							}
+							else if(!term.getTypeTag().isDefaultType()&& term.getTypeTag()!=tt){
+								try {
+									throw new Exception("Type mismatch");
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						}
+						_termTypeSet.remove(terms);
+						_termTypeSet.add(_terms);
+					}
+				}
+			}
+		}
+		return _termTypeSet;
 	}
 	/**
 	 * {@inheritDoc}
@@ -240,6 +279,26 @@ public final class Relation implements Formula {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.name, this.args);
+	}
+
+	@Override
+	public Formula getTypedFormula(Map<Term, TypeTag> typeMap) {
+		List<Term> _args = new ArrayList<>();
+		
+		for(Term t : args){
+			if(!t.getTypeTag().isDefaultType() && t.getTypeTag()!=typeMap.get(t)){
+				try {
+					throw new Exception("type mismatch");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else
+				_args.add(t.setTypeTag(typeMap.get(t)));
+		}
+		
+		return null;
 	}
 
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.cwi.reo.templates;
+package nl.cwi.reo.templates.maude;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -11,12 +11,13 @@ import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.PortVariable;
+import nl.cwi.reo.templates.Component;
 
 // TODO: Auto-generated Javadoc
 /**
  * Compiled atomic component that is independent of the target language.
  */
-public final class PromelaAtomic implements Component {
+public final class MaudeAtomic implements Component {
 
 	/**
 	 * Flag for string template.
@@ -50,7 +51,7 @@ public final class PromelaAtomic implements Component {
 	 * @param call
 	 *            the call
 	 */
-	public PromelaAtomic(String name, List<String> params, Set<Port> ports, String call) {
+	public MaudeAtomic(String name, List<String> params, Set<Port> ports, String call) {
 		this.name = name;
 		this.params = params;
 		this.ports = ports;

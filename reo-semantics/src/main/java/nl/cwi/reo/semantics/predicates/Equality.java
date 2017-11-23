@@ -192,16 +192,22 @@ public final class Equality implements Formula {
 
 
 	@Override
-	public Set<Set<Term>> getTermType(Set<Set<Term>> termTypeSet){
+	public Set<Set<Term>> inferTermType(Set<Set<Term>> termTypeSet){
 //			boolean added = false;
 		Set<Set<Term>> _termTypeSet = new HashSet<>(termTypeSet);
 		TypeTag tt = null;
+		Term _t1 = t1;
+		Term _t2 = t2;
 		
 		if(t1.getTypeTag()!=null && t2.getTypeTag()!=null && !t1.getTypeTag().equals(t2.getTypeTag())){
-			if(t1.getTypeTag()==TypeTags.Object)
+			if(t1.getTypeTag()==TypeTags.Object){
 				tt=t2.getTypeTag();
-			else if(t2.getTypeTag()==TypeTags.Object)
+				_t1 = t1.setTypeTag(tt);
+			}
+			else if(t2.getTypeTag()==TypeTags.Object){
 				tt=t1.getTypeTag();
+				_t2 = _t2.setTypeTag(tt);
+			}
 			else{
 				try {
 					throw new Exception("Type mismatch");
@@ -213,9 +219,11 @@ public final class Equality implements Formula {
 		}
 		else if(t1.getTypeTag()!=null && t1.getTypeTag()!=TypeTags.Object && t2.getTypeTag()==null){
 			tt=t1.getTypeTag();
+			_t2 = t2.setTypeTag(tt);
 		}
 		else if(t2.getTypeTag()!=null && t2.getTypeTag()!=TypeTags.Object && t1.getTypeTag()==null){
 			tt=t2.getTypeTag();
+			_t1 = t1.setTypeTag(tt);
 		}
 		
 		
@@ -224,7 +232,8 @@ public final class Equality implements Formula {
 			if((!(t1 instanceof NullValue) && s.contains(t1) || !(t2 instanceof NullValue) && s.contains(t2)) ){
 				if(tt!=null && tt!= TypeTags.Object){
 					for(Term t : s){
-						if(t.getTypeTag()!=null && t.getTypeTag()!=TypeTags.Object && t.getTypeTag()!=tt){
+						if(t.getTypeTag()!=null && t.getTypeTag()!=TypeTags.Object && !t.getTypeTag().equals(tt)){
+							t.getTypeTag().equals(tt);
 							try {
 								throw new Exception("Type mismatch");
 							} catch (Exception e) {
@@ -234,24 +243,39 @@ public final class Equality implements Formula {
 						}
 						else{
 							termTypeSet.remove(s);
-							terms.addAll(s);
-							terms.add(t1);
-							terms.add(t2);
+							for(Term term : s){
+								terms.add(term.setTypeTag(tt));
+							}
+							terms.add(_t1);
+							terms.add(_t2);
 							break;
 						}
 					}
 				}
 				else{
 					termTypeSet.remove(s);
-					terms.addAll(s);
-					terms.add(t1);
-					terms.add(t2);					
+					for(Term term : s){
+						terms.add(term);
+						if(term.equals(t1) && term.getTypeTag()!=null && term.getTypeTag()!=TypeTags.Object){
+							_t1 = _t1.setTypeTag(term.getTypeTag());
+							_t2 = _t2.setTypeTag(term.getTypeTag());
+							tt = term.getTypeTag();
+						}
+						if(term.equals(t2) && term.getTypeTag()!=null && term.getTypeTag()!=TypeTags.Object){
+							_t1 = _t1.setTypeTag(term.getTypeTag());
+							_t2 = _t2.setTypeTag(term.getTypeTag());
+							tt = term.getTypeTag();
+						}
+					}
+					terms.add(_t1);
+					terms.add(_t2);				
 				}
 			}
 		}
 		if(terms.isEmpty()){
-			terms.add(t1);
-			terms.add(t2);
+			terms.add(_t1);
+			terms.add(_t2);
+			
 		}
 			
 		termTypeSet.add(terms);
@@ -264,5 +288,10 @@ public final class Equality implements Formula {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.t1, this.t2);
+	}
+
+	@Override
+	public Formula getTypedFormula(Map<Term,TypeTag> typeMap) {
+		return new Equality(t1.setTypeTag(typeMap.get(t1)),t2.setTypeTag(typeMap.get(t2)));
 	}
 }

@@ -75,4 +75,9 @@ public final class NonNullValue implements Term {
 		return "!*";
 	}
 
+	@Override
+	public Term setTypeTag(TypeTag t) {
+		return this;
+	}
+
 }
