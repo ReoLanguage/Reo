@@ -209,6 +209,7 @@ public class Commands {
 		// Construct the guard and constraint.
 		Set<Formula> guards = new HashSet<>();
 		Set<Formula> constraints = new HashSet<>();
+		other :
 		for (Formula g : others) {
 			Formula _g = g;
 			boolean isGuard = g.isQuantifierFree();
@@ -216,6 +217,16 @@ public class Commands {
 				if ((v instanceof PortVariable && !((PortVariable) v).isInput())
 						|| (v instanceof MemoryVariable && ((MemoryVariable) v).hasPrime())) {
 					Term t = update.get(v);
+					if(t instanceof NonNullValue && g instanceof Equality){
+						Equality e = (Equality) g;
+						Term t1 = e.getLHS();
+						Term t2 = e.getRHS();
+						if(t1.equals(v))
+							update.put(v, t2);
+						if(t2.equals(v))
+							update.put(v, t1);
+						break other;
+					}
 					if (t != null)
 						_g = g.substitute(t, v);
 				}

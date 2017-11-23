@@ -86,6 +86,10 @@ public final class Function implements Term {
 		return name;
 	}
 
+	public String getSTGName() {
+		return name.substring(1,name.length()-1);
+	}
+	
 	/**
 	 * Gets the list of arguments of this function.
 	 * 

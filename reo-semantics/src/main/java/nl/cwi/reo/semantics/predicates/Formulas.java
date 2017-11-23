@@ -216,18 +216,18 @@ public class Formulas {
 			} else if (!_clauses.contains(f)) {
 				if (f instanceof Equality) {
 					Equality E = (Equality) f;
-//					if(E.getLHS() instanceof NonNullValue){
-//						Formula _E = new Negation(new Equality(E.getRHS(),new NullValue()));
-//						if(!_clauses.contains(_E))
-//							_clauses.add(_E);
-//					}
-//					else if (E.getRHS() instanceof NonNullValue){
-//						Formula _E = new Negation(new Equality(E.getLHS(),new NullValue()));
-//						if(!_clauses.contains(_E))
-//							_clauses.add(_E);
-//					}
-//					else if (!E.getLHS().equals(E.getRHS()))
-					if (!E.getLHS().equals(E.getRHS()))
+					if(E.getLHS() instanceof NonNullValue){
+						Formula _E = new Negation(new Equality(E.getRHS(),new NullValue()));
+						if(!_clauses.contains(_E))
+							_clauses.add(_E);
+					}
+					else if (E.getRHS() instanceof NonNullValue){
+						Formula _E = new Negation(new Equality(E.getLHS(),new NullValue()));
+						if(!_clauses.contains(_E))
+							_clauses.add(_E);
+					}
+					else if (!E.getLHS().equals(E.getRHS()))
+//					if (!E.getLHS().equals(E.getRHS()))
 						_clauses.add(f);
 				} else
 					_clauses.add(f);

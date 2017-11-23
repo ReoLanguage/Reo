@@ -177,7 +177,7 @@ term(t) ::= <<
 >>
 
 function(t) ::=<<
-<t.name><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
+<t.STGName><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
 >>
 
 

@@ -43,6 +43,11 @@ public final class TypeTag implements ParameterType {
 		return this.tag.equals(tag.tag);
 	}
 
+	public boolean isDefaultType() {
+		return tag.equals(TypeTags.Object)?true:false;
+	}
+
+	
 	/**
 	 * {@inheritDoc}
 	 */
