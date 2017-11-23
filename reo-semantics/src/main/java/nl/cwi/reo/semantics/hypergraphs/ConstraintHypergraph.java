@@ -338,10 +338,96 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			composition.getInitials().putAll(h.getInitials());
 		}
 
-		composition.distribute();
+//		composition.distribute();
+		composition = composition.distributeSingleEdge();
+		composition.distributeMultiEdge();
+
 
 		return composition;
 
+	}
+	
+
+	/**
+	 * Distribute single hyperedges.
+	 *
+	 * @return the constraint hypergraph
+	 */
+	public ConstraintHypergraph distributeSingleEdge() {
+		Set<Port> variables = new HashSet<>();
+		Set<PortNode> variable = new HashSet<>();
+		variable.addAll(getVariables());
+		for (PortNode pn : getVariables()) {
+			Port p = pn.getPort();
+			variables.add(p);
+		}
+
+		for (PortNode pn : variable) {
+			Port p = pn.getPort();
+//		for (Port p : variables) {
+			List<HyperEdge> singleEdge = new ArrayList<>();
+			List<HyperEdge> multiEdge = new ArrayList<>();
+
+			for (HyperEdge h : getHyperedges(p)) {
+				if (h.getTarget().size() == 1)
+					singleEdge.add(h);
+				else
+					multiEdge.add(h);
+			}
+			if (singleEdge.size() > 1) {
+				HyperEdge e = singleEdge.get(0);
+				singleEdge.remove(0);
+				for (HyperEdge h : singleEdge) {
+					e.compose(h);
+				}
+				singleEdge.clear();
+				singleEdge.add(e);
+			}
+			if (!multiEdge.isEmpty()) {
+				HyperEdge e = multiEdge.get(0);
+				for (HyperEdge h : singleEdge) {
+					e.compose(h);
+
+				}
+				if (!multiEdge.isEmpty()) {
+					hyperedges.removeAll(singleEdge);
+				}
+			}
+		}
+		return new ConstraintHypergraph(new ArrayList<>(hyperedges), initial);
+	}
+
+	/**
+	 * Distribute multi rules hyperedges.
+	 */
+	public void distributeMultiEdge() {
+		Set<Port> variables = new HashSet<>();
+		for (HyperEdge h : hyperedges) {
+			variables.add(h.getSource().getPort());
+		}
+
+		for (Port p : variables) {
+			List<HyperEdge> multiEdge = new ArrayList<>();
+
+			multiEdge.addAll(getHyperedges(p));
+			if (!multiEdge.isEmpty()) {
+				HyperEdge toDistribute = multiEdge.get(0);
+				multiEdge.remove(0);
+				boolean mult = false;
+				for (HyperEdge h : multiEdge) {
+					if (!h.getTarget().isEmpty()) {
+						// toDistribute = h.compose(toDistribute);
+						toDistribute.compose(h);
+						mult = true;
+					}
+				}
+				if (mult) {
+					Set<HyperEdge> s = new HashSet<>(hyperedges);
+					hyperedges.clear();
+					hyperedges.addAll(s);
+				}
+			}
+		}
 	}
 	
 	/**
