@@ -12,10 +12,10 @@ import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
-import nl.cwi.reo.templates.MaudeTransition;
-import nl.cwi.reo.templates.PrismTransition;
-import nl.cwi.reo.templates.PromelaTransition;
 import nl.cwi.reo.templates.Transition;
+import nl.cwi.reo.templates.maude.MaudeTransition;
+import nl.cwi.reo.templates.prism.PrismTransition;
+import nl.cwi.reo.templates.promela.PromelaTransition;
 
 /**
  * A command that represents an atomic action of the system. A command consists
@@ -114,9 +114,9 @@ public class Command {
 		switch (lang) {
 		case PRISM:
 			return new PrismTransition(guard, output, memory, inputs);
-		case JAVA:
 		case PROMELA:
 			return new PromelaTransition(guard, output, memory, inputs);
+		case JAVA:
 		case C11:
 			return new Transition(guard, output, memory, inputs);
 		case MAUDE:

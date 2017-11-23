@@ -56,12 +56,13 @@ import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
 import nl.cwi.reo.templates.Atomic;
 import nl.cwi.reo.templates.Component;
-import nl.cwi.reo.templates.MaudeProtocol;
-import nl.cwi.reo.templates.PromelaAtomic;
-import nl.cwi.reo.templates.PromelaProtocol;
 import nl.cwi.reo.templates.Protocol;
 import nl.cwi.reo.templates.ReoTemplate;
 import nl.cwi.reo.templates.Transition;
+import nl.cwi.reo.templates.maude.MaudeAtomic;
+import nl.cwi.reo.templates.maude.MaudeProtocol;
+import nl.cwi.reo.templates.promela.PromelaAtomic;
+import nl.cwi.reo.templates.promela.PromelaProtocol;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
@@ -302,31 +303,21 @@ public class Compiler {
 		connector = connector.integrate();
 		
 		List<Component> components = buildAtomics(connector, lang);
-		
-		Set<Set<Term>> s = new HashSet<>();
 		Set<Port> intface = getDualInterface(components);
-		for(Port p : intface){
-			Set<Term> t = new HashSet<>();
-			t.add(new PortVariable(p));
-			s.add(t);
-		}
 		
 		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
+
+//		protocol = infereType(protocol, intface);
 		
 		List<ConstraintHypergraph> ch = new ArrayList<>();
 
 		for(RuleBasedAutomaton rba : protocol){
 			ch.add(new ConstraintHypergraph(rba.getAllRules(),rba.getInitial()));
-			/* Look at the type of the ports */
-			for( Rule r :rba.getAllRules()){
-				s=r.getFormula().getTermType(s);
-			}
 		}
 		
 		ConstraintHypergraph composition = new ConstraintHypergraph().compose(ch);
 
 		composition = composition.restrict(intface);
-		composition = composition.propagateType(s);
 
 		Set<Transition> transitions = buildTransitions(composition);
 
@@ -339,6 +330,48 @@ public class Compiler {
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
 	}
+	
+	
+	private List<RuleBasedAutomaton> infereType(List<RuleBasedAutomaton> protocol, Set<Port> intface){
+		Set<Set<Term>> s = new HashSet<>();
+		for(Port p : intface){
+			Set<Term> t = new HashSet<>();
+			t.add(new PortVariable(p));
+			s.add(t);
+		}
+		for(RuleBasedAutomaton rba : protocol){
+			/* Look at the type of the ports */
+			for( Rule r :rba.getAllRules()){
+				s=r.getFormula().inferTermType(s);
+			}
+		}
+		Map<Term,TypeTag> typeMap = new HashMap<>();
+		for(Set<Term> set : s){
+			for(Term t : set)
+				typeMap.put(t, t.getTypeTag());
+		}
+		
+		List<RuleBasedAutomaton> rbaList = new ArrayList<>();
+		for(RuleBasedAutomaton rba : protocol){
+			Set<Set<Rule>> _rba = new HashSet<>();
+			for(Set<Rule> setRule : rba.getRules()){
+				Set<Rule> _setRule = new HashSet<>();
+				for(Rule r : setRule){
+					_setRule.add(new Rule(r.getSync(),r.getFormula().getTypedFormula(typeMap)));
+				}
+				_rba.add(_setRule);
+			}
+			Map<MemoryVariable, Term> _initials = new HashMap<>();
+			for(MemoryVariable mv : rba.getInitial().keySet()){
+				_initials.put(mv.setTypeTag(typeMap.get(mv)), rba.getInitial().get(mv).setTypeTag(typeMap.get(mv)));
+			}
+			rbaList.add(new RuleBasedAutomaton(_rba,_initials));
+		}
+		
+		return rbaList;
+		
+	}
+		
 
 	/**
 	 * Closes a given connector by attaching port windows to visible ports.
@@ -417,14 +450,14 @@ public class Compiler {
 		int n_atom = 1;
 		for (ReoConnectorAtom atom : connector.getAtoms()) {
 			Reference r = atom.getReference(lang);
-			if (r != null) {
+			if (r != null) { 
 				String call = r.getCall();
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
 
-				// TODO the string representation of parameter values is target
-				// language dependent.
+//				 TODO the string representation of parameter values is target
+//				 language dependent.
 				List<String> params = new ArrayList<>();
 				for (Value v : r.getValues()) {
 					if (v instanceof BooleanValue) {
@@ -439,6 +472,8 @@ public class Compiler {
 					components.add(new Atomic(name + n_atom++, params, atom.getInterface(), call));
 				if(lang == Language.PROMELA)
 					components.add(new PromelaAtomic(name + n_atom++, params, atom.getInterface(), call));
+				if(lang == Language.MAUDE)
+					components.add(new MaudeAtomic(name + n_atom++, params, atom.getInterface(), call));
 			}
 		}
 		return components;
@@ -564,17 +599,27 @@ public class Compiler {
 				ports.addAll(t.getInterface());
 
 			// Find the type of each memory cell that occurs in this part
-			Map<String, TypeTag> tags = new HashMap<>();
-			for (Map.Entry<MemoryVariable, Term> init : protocol.getInitials().entrySet())
-				tags.put(init.getKey().getName(), init.getValue().getTypeTag());
-			for (Transition t : part)
-				for (Map.Entry<MemoryVariable, Term> upd : t.getMemory().entrySet())
-					tags.put(upd.getKey().getName(), upd.getValue().getTypeTag());
-
+//			Map<String, TypeTag> tags = new HashMap<>();
+//			for (Map.Entry<MemoryVariable, Term> init : protocol.getInitials().entrySet())
+//				tags.put(init.getKey().getName(), init.getValue().getTypeTag());
+//			for (Transition t : part)
+//				for (Map.Entry<MemoryVariable, Term> upd : t.getMemory().entrySet())
+//					tags.put(upd.getKey().getName(), upd.getValue().getTypeTag());
 			// Get the initial value of each memory cell
+//			Map<MemoryVariable, Object> initial = new HashMap<>();
+//			for (Map.Entry<String, TypeTag> e : tags.entrySet())
+//				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(new MemoryVariable(e.getKey(),false,e.getValue())));
+
+			//Add all memory variables
 			Map<MemoryVariable, Object> initial = new HashMap<>();
-			for (Map.Entry<String, TypeTag> e : tags.entrySet())
-				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(new MemoryVariable(e.getKey(),false,e.getValue())));
+			for (Transition t : part)
+				for (Map.Entry<MemoryVariable, Term> upd : t.getMemory().entrySet()){
+					initial.put(new MemoryVariable(upd.getKey().getName(),false,upd.getKey().getTypeTag()), null);
+				}
+			
+			//Initialize value of some memory cells
+			for (MemoryVariable mv : protocol.getInitials().keySet())
+				initial.put(new MemoryVariable(mv.getName(),false,mv.getTypeTag()), protocol.getInitials().get(mv));
 
 			if(lang == Language.JAVA)
 				components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
