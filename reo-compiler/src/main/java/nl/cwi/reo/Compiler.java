@@ -85,7 +85,7 @@ public class Compiler {
 	 * Compiler type.
 	 */
 	@Parameter(names = { "-c" }, description = "compiler")
-	public CompilerType compilertype = CompilerType.DEFAULT;
+	public CompilerType compilertype = CompilerType.CH;
 
 	/** List of of directories that contain all necessary Reo components. */
 	@Parameter(names = {

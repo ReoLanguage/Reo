@@ -47,6 +47,8 @@ public enum Language {
 			return "Proto runtime";
 		case TEXT:
 			return "Text";
+		case PROMELA:
+			return "Promela";
 		default:
 			throw new IllegalArgumentException();
 		}
