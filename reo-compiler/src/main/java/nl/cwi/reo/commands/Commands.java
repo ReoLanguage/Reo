@@ -19,6 +19,7 @@ import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.NonNullValue;
 import nl.cwi.reo.semantics.predicates.NullValue;
 import nl.cwi.reo.semantics.predicates.PortVariable;
+import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Terms;
 import nl.cwi.reo.semantics.predicates.Variable;
@@ -137,7 +138,6 @@ public class Commands {
 					}
 				}
 			}
-
 			others.add(L);
 		}
 
@@ -212,7 +212,7 @@ public class Commands {
 		other :
 		for (Formula g : others) {
 			Formula _g = g;
-			boolean isGuard = g.isQuantifierFree();
+			boolean isGuard = g.isQuantifierFree();				
 			for (Variable v : g.getFreeVariables()) {
 				if ((v instanceof PortVariable && !((PortVariable) v).isInput())
 						|| (v instanceof MemoryVariable && ((MemoryVariable) v).hasPrime())) {

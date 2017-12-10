@@ -83,6 +83,14 @@ public final class Relation implements Formula {
 	}
 
 	/**
+	 * Name for string template
+	 * @return
+	 */
+	public String getSTGName() {
+		return name.substring(1,name.length()-1);
+	}
+	
+	/**
 	 * Gets the list of arguments of this relation.
 	 * 
 	 * @return list of arguments of this relation.
@@ -149,7 +157,10 @@ public final class Relation implements Formula {
 	 */
 	@Override
 	public Formula rename(Map<Port, Port> links) {
-		return this;
+		List<Term> list = new ArrayList<Term>();
+		for (Term s : args)
+			list.add(s.rename(links));
+		return new Relation(name, list, infix);
 	}
 
 	/**

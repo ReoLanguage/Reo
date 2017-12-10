@@ -159,8 +159,9 @@ conjunction(f) ::=<<
 (<f.clauses:formula(); separator=" && ">)
 >>
 
-relation(f) ::=<<
-<f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif>
+relation(t) ::=<<
+<t.STGName><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif><!
+<f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif>!>
 >>
 
 equality(f) ::= <<

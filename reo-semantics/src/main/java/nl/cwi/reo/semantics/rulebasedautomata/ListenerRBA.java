@@ -31,6 +31,7 @@ import nl.cwi.reo.interpret.ReoParser.Rba_null_ctxtContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_operationContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_parameterContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_portContext;
+import nl.cwi.reo.interpret.ReoParser.Rba_relationContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_ruleContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_initialContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_stringContext;
@@ -47,6 +48,7 @@ import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.PortVariable;
+import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Terms;
 import nl.cwi.reo.semantics.predicates.TruthValue;
@@ -254,6 +256,22 @@ public class ListenerRBA extends BaseListener {
 	 */
 	public void exitRba_false(Rba_falseContext ctx) {
 		formulas.put(ctx, new TruthValue(false));
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_relation(nl.cwi.reo.interpret.
+	 * ReoParser.Rba_relationContext)
+	 */
+	public void exitRba_relation(Rba_relationContext ctx) {
+		List<Term> args = new ArrayList<Term>();
+		for (Rba_termContext arg : ctx.rba_term()) {
+			Term t = terms.get(arg);
+			args.add(t);
+		}
+		formulas.put(ctx, new Relation(ctx.ID().getText(),args,false));
 	}
 
 	/*

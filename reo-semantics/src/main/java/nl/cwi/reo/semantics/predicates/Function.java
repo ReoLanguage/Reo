@@ -86,6 +86,10 @@ public final class Function implements Term {
 		return name;
 	}
 
+	/**
+	 * Name for string template
+	 * @return
+	 */
 	public String getSTGName() {
 		return name.substring(1,name.length()-1);
 	}
