@@ -110,6 +110,7 @@ public class PortWaitNotify<T> implements Port<T> {
 					try {
 						prod.wait();
 					} catch (InterruptedException e) {
+					
 					}
 			}
 	}

@@ -135,4 +135,10 @@ public final class Distribution implements Term {
 		return new Distribution(_distr);
 	}
 
+	@Override
+	public Term setTypeTag(TypeTag t) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
