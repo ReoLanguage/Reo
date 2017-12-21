@@ -14,6 +14,7 @@ rba_formula : 'true'									#rba_true
 			| rba_formula (',' rba_formula)+			#rba_conjunction
 			| '(' rba_formula ')' 						#rba_def
           	| ID '(' rba_term (',' rba_term)* ')'		#rba_relation
+          	| '!' ID '(' rba_term (',' rba_term)* ')'	#rba_notrelation
 			| rba_term '=' rba_term						#rba_equality
 			| rba_term '!=' rba_term					#rba_inequality ;
 			

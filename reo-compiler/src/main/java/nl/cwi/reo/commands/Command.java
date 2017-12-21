@@ -84,6 +84,9 @@ public class Command {
 	 */
 	public Set<Port> getPorts() {
 		Set<Port> N = new HashSet<>();
+		for (Variable v : guard.getFreeVariables())
+			if (v instanceof PortVariable)
+				N.add(((PortVariable) v).getPort());
 		for (Variable v : update.keySet()){
 			if (v instanceof PortVariable)
 				N.add(((PortVariable) v).getPort());
