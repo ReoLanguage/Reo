@@ -24,10 +24,13 @@
   fifoWidth            =     10;
   fifoFillColour       = '#fff';
   
+  buttonBorderOff      = '2px solid white';
+  buttonBorderOn       = '2px solid black';
+  
   document.getElementById("select").onclick = function() {
-    document.getElementById(mode).style.border = '2px solid white';
+    document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'select';
-    this.style.border = '2px solid black';
+    this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component') {
         obj.set({'selectable': true});
@@ -36,9 +39,9 @@
   };
   
   document.getElementById("component").onclick = function() {
-    document.getElementById(mode).style.border = '2px solid white';
+    document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'component';
-    this.style.border = '2px solid black';
+    this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component') {
         obj.set({'selectable': false});
@@ -47,9 +50,9 @@
   };
   
   document.getElementById("sync").onclick = function() {
-    document.getElementById(mode).style.border = '2px solid white';
+    document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'sync';
-    this.style.border = '2px solid black';
+    this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component') {
         obj.set({'selectable': false});
@@ -58,9 +61,9 @@
   };
   
   document.getElementById("lossysync").onclick = function() {
-    document.getElementById(mode).style.border = '2px solid white';
+    document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'lossysync';
-    this.style.border = '2px solid black';
+    this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component') {
         obj.set({'selectable': false});
@@ -69,9 +72,9 @@
   };
   
   document.getElementById("syncdrain").onclick = function() {
-    document.getElementById(mode).style.border = '2px solid white';
+    document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'syncdrain';
-    this.style.border = '2px solid black';
+    this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component') {
         obj.set({'selectable': false});
@@ -80,9 +83,9 @@
   };
   
   document.getElementById("syncspout").onclick = function() {
-    document.getElementById(mode).style.border = '2px solid white';
+    document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'syncspout';
-    this.style.border = '2px solid black';
+    this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component') {
         obj.set({'selectable': false});
@@ -91,9 +94,9 @@
   };
   
   document.getElementById("fifo1").onclick = function() {
-    document.getElementById(mode).style.border = '2px solid white';
+    document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'fifo1';
-    this.style.border = '2px solid black';
+    this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component') {
         obj.set({'selectable': false});
@@ -115,6 +118,8 @@
     a.click();
   };
   
+  // generate a new object ID
+  // ID will only contain letters, i.e. z is followed by aa
   function generateId() {
     id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g,'a');
     return id;
@@ -487,6 +492,7 @@
     line.set({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2});
     
     if (x1 == x2 && y1 == y2) {
+      //alert("p1 == p2!");
       line.arrow.set({'left': line.get('x2'), 'top': line.get('y2')});
       //if (line.arrow2)
       //  line.arrow2.set({'left': line.get('x1'), 'top': line.get('y1')});
@@ -1006,7 +1012,7 @@
       top: top,
       width: width,
       height: height,
-      fill: '#fff',
+      fill: '#eee',
       stroke: '#000',
       strokeWidth: 1,
       hoverCursor: 'default',
