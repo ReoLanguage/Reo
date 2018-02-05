@@ -237,6 +237,7 @@ public class Commands {
 				constraints.add(_g);
 		}
 	
+		
 		// Put the memory cell and port check ahead of the conjunction.
 //		LinkedList<Formula> gh = new LinkedList<>();
 //		for(Formula g : guards){

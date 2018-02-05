@@ -9,6 +9,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
@@ -66,7 +67,22 @@ public class Transition {
 	public Formula getGuard() {
 		return this.guard;
 	}
-
+	
+	/**
+	 * Gets the set of guards sorted by inclusion of domain definition (ie a<f(a))
+	 * 
+	 * @return guard
+	 */
+//	public Formula getSortedGuard() {
+//		if(this.guard instanceof Conjunction){
+//			Conjunction c = (Conjunction) guard;
+//			c.getClauses();
+//			
+//		}
+//		return this.guard;
+//	}
+	
+	
 	/**
 	 * Gets the set of input ports that participate in this transition.
 	 * 
