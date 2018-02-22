@@ -46,7 +46,7 @@ html, body {
   width: 100%;
 }
 
-#toolbar td {
+#toolbar td, input {
   background-color: #eee;
   border-radius: 5px;
   border-spacing: 5px;
@@ -68,4 +68,8 @@ html, body {
 #refresh {
   display: block;
   margin: auto;
+}
+
+input {
+  margin-top: 7px;
 }
