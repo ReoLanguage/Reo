@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Constant;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Formulas;
@@ -54,7 +55,30 @@ public class Commands {
 		for (Formula L : list) {
 			if (L instanceof Equality) {
 				Equality e = (Equality) L;
-				if (e.getLHS() instanceof PortVariable) {
+//				Term lhs = e.getLHS();
+//				Term rhs = e.getRHS();
+				
+//				if(lhs instanceof PortVariable){
+//					PortVariable p = (PortVariable) lhs;
+//					// Remove p=* from commands 
+//					if(rhs instanceof NullValue)
+//						continue;
+//					if (!p.isInput()) {						
+//						Set<Term> set = defs.get(p);
+//						if (set == null) {
+//							set = new HashSet<>();
+//							set.add(rhs);
+//							defs.put(p, set);
+//						}
+//						set.add(rhs);
+//					}
+//				}
+				if(!(e.getRHS() instanceof Variable) && !(e.getLHS() instanceof Variable)){
+					others.add(L);
+					continue;
+				}
+				
+				if(e.getLHS() instanceof PortVariable) {
 					PortVariable p = (PortVariable) e.getLHS();
 					// Remove p=* from commands 
 					if(e.getRHS() instanceof NullValue)
@@ -68,9 +92,40 @@ public class Commands {
 							defs.put(p, set);
 						}
 						set.add(e.getRHS());
+//						continue;
+					}else if((e.getRHS() instanceof PortVariable) && ((PortVariable)e.getRHS()).isInput()){
+						others.add(L);
+						continue;
+					}else if(e.getRHS() instanceof Constant){
+						others.add(L);
 						continue;
 					}
 				}
+				if (e.getRHS() instanceof PortVariable) {
+					PortVariable p = (PortVariable) e.getRHS();
+					
+					if(e.getLHS() instanceof NullValue)
+						continue;
+					
+					if (!p.isInput()) {
+						Set<Term> set = defs.get(p);
+						if (set == null) {
+							set = new HashSet<>();
+							set.add(e.getLHS());
+							defs.put(p, set);
+						}
+						set.add(e.getLHS());
+//						continue;
+					}else if((e.getLHS() instanceof PortVariable) && ((PortVariable)e.getLHS()).isInput()){
+						others.add(L);
+						continue;
+					}else if(e.getLHS() instanceof Constant){
+						others.add(L);
+						continue;
+					}
+					
+				}
+				
 				if (e.getLHS() instanceof MemoryVariable) {
 					MemoryVariable m = (MemoryVariable) e.getLHS();
 					if (m.hasPrime()) {
@@ -81,22 +136,11 @@ public class Commands {
 							defs.put(m, set);
 						}
 						set.add(e.getRHS());
-						continue;
-					}
+//						continue;
+					} else
+						others.add(L);
 				}
-				if (e.getRHS() instanceof PortVariable) {
-					PortVariable p = (PortVariable) e.getRHS();
-					if (!p.isInput()) {
-						Set<Term> set = defs.get(p);
-						if (set == null) {
-							set = new HashSet<>();
-							set.add(e.getLHS());
-							defs.put(p, set);
-						}
-						set.add(e.getLHS());
-						continue;
-					}
-				}
+				
 				if (e.getRHS() instanceof MemoryVariable) {
 					MemoryVariable m = (MemoryVariable) e.getRHS();
 					if (m.hasPrime()) {
@@ -107,11 +151,14 @@ public class Commands {
 							defs.put(m, set);
 						}
 						set.add(e.getLHS());
-						continue;
-					}
+//						continue;
+					}else
+						others.add(L);
 				}
+
 			} else if (L instanceof Negation && ((Negation) L).getFormula() instanceof Equality) {
 				Equality e = (Equality) ((Negation) L).getFormula();
+				
 				if (e.getLHS() instanceof MemoryVariable && e.getRHS() instanceof NullValue) {
 					MemoryVariable m = (MemoryVariable) e.getLHS();
 					if (m.hasPrime()) {
@@ -122,8 +169,12 @@ public class Commands {
 							defs.put(m, set);
 						}
 						set.add(Terms.NonNull);
+//						continue;
+					}else{
+						others.add(L);
 						continue;
 					}
+						
 				} else if (e.getRHS() instanceof MemoryVariable && e.getLHS() instanceof NullValue) {
 					MemoryVariable m = (MemoryVariable) e.getRHS();
 					if (m.hasPrime()) {
@@ -134,11 +185,30 @@ public class Commands {
 							defs.put(m, set);
 						}
 						set.add(Terms.NonNull);
+//						continue;
+					}else{
+						others.add(L);
 						continue;
 					}
+				}else if(e.getLHS() instanceof PortVariable && e.getRHS() instanceof NullValue){
+					if(((PortVariable)e.getLHS()).isInput()){
+						others.add(L);
+					}
+					continue;
+				}else if(e.getRHS() instanceof PortVariable && e.getLHS() instanceof NullValue){
+					if(((PortVariable)e.getRHS()).isInput()){
+						others.add(L);
+					}	
+					continue;
+				}else {
+					others.add(L);
+					continue;
 				}
-			}
-			others.add(L);
+					
+				
+				
+			} else
+				others.add(L);
 		}
 
 		// Express each variable in terms of input and current memory

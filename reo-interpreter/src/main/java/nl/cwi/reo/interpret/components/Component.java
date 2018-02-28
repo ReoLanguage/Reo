@@ -72,6 +72,8 @@ public final class Component implements Value {
 			return null;
 		scope.putAll(signature.getAssignments());
 		Instance i = set.evaluate(scope, m);
+//		if(m.hasErrors())
+//			signature = sign.evaluate(values, ports, m, scope);
 		if (i == null)
 			return null;
 		return i.reconnect(signature.getInterface());

@@ -76,7 +76,8 @@ public final class ReoConnectorComposite implements ReoConnector {
 		Map<Port, Port> links = new HashMap<Port, Port>();
 		for (ReoConnector C : components)
 			for (Map.Entry<Port, Port> link : C.getLinks().entrySet())
-				links.put(link.getValue(), link.getValue());
+				if(links.get(link.getValue())==null || links.get(link.getValue()).getTypeTag()==null)
+					links.put(link.getValue(), link.getValue());
 		this.links = Collections.unmodifiableMap(links);
 	}
 
@@ -220,7 +221,8 @@ public final class ReoConnectorComposite implements ReoConnector {
 		Map<Port, Port> links = new HashMap<Port, Port>();
 		for (ReoConnector X : list)
 			for (Port p : X.getInterface())
-				links.put(p, p);
+				if(links.get(p)==null || links.get(p).getTypeTag()==null)
+					links.put(p, p);
 		return new ReoConnectorComposite(name, "", list, links);
 	}
 
@@ -313,7 +315,8 @@ public final class ReoConnectorComposite implements ReoConnector {
 				Atom atomnode = nodeFactory.getNode(node.getValue());
 				Map<Port, Port> links = new HashMap<Port, Port>();
 				for (Port p : atomnode.getInterface()) 
-					links.put(p, p);				
+					if(links.get(p)==null || links.get(p).getTypeTag()==null)
+						links.put(p, p);				
 				newcomponents.add(new ReoConnectorAtom("node", Arrays.asList(atomnode), links));
 			}
 		}
