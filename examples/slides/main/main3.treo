@@ -8,8 +8,9 @@ import slides.main.green;
 import slides.main.blue;
 import slides.sequencer.seqc;
 
-main3() {
-  red(a) green(b) blue(c) connector3(a, b, c)
+main3(a,b,c) {
+//  red(a) green(b) blue(c) 
+connector3(a, b, c)
 }
 
 connector3(a, b, c) {

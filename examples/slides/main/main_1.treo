@@ -1,0 +1,9 @@
+section slides.main;
+
+import slides.alternator.alternatorN;
+
+main_1(a[1..n],b) {
+  	alternatorN(a[1..n],b)
+  |
+	n=3	
+}

@@ -11,8 +11,9 @@ import slides.main.green;
 import slides.main.blue;
 import slides.sequencer.seqc;
 
-main7() {
-  red(a) green(b) blue(c) connector7(a, b, c)
+main7(a,b,c) {
+  // red(a) green(b) blue(c) 
+	connector7(a, b, c)
 }
 
 connector7(a, b, c) {

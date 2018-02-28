@@ -11,7 +11,7 @@ main10() {
   red(a[1]) /*...*/ green(a[n]) blue(b) 
   connector10<n>(a[1..n], b)
 |
-  n = 2
+  n = 4
 }
 
 connector10<n:int>(a[1..n], b) {
