@@ -1,5 +1,6 @@
 section slides.main;
 
-red(a!String) {
-  Java:"workers.Producer.red"
+red(a!String) 
+{
+  #JAVA "Producer.red"
 }

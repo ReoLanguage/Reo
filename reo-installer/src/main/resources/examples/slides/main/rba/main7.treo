@@ -1,3 +1,5 @@
+// The compiler does not support sync/async partitioning with this example.
+// Compile this file with the option "-pt"
 
 section slides.main;
 
@@ -10,8 +12,7 @@ import slides.main.blue;
 import slides.sequencer.seqc;
 
 main7() {
-   red(a) green(b) blue(c) 
-	connector7(a, b, c)
+  red(a) green(b) blue(c) connector7(a, b, c)
 }
 
 connector7(a, b, c) {

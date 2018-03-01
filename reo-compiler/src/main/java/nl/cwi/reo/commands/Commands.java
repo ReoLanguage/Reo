@@ -306,8 +306,12 @@ public class Commands {
 			else
 				constraints.add(_g);
 		}
-	
-		
+		Set<Variable> s = update.keySet();
+		for(Variable v :s ){
+			if(update.get(v) instanceof NonNullValue){
+				update.remove(v);
+			}
+		}
 		// Put the memory cell and port check ahead of the conjunction.
 //		LinkedList<Formula> gh = new LinkedList<>();
 //		for(Formula g : guards){

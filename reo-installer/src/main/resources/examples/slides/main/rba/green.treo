@@ -1,0 +1,8 @@
+section slides.main.rba;
+
+green(a!String) 
+{
+  #RBA
+ {a} true
+ #Java "Workers2.producer"
+}

@@ -8,15 +8,10 @@ import slides.main.blue;
 import slides.sequencer.seqc;
 
 main10() {
-  {
-    red(a[n])
-    |
-    i:<1..n>
-  } 
-  blue(b) 
+  red(a[1]) /*...*/ green(a[n]) blue(b) 
   connector10<n>(a[1..n], b)
 |
-  n = 4
+  n = 2
 }
 
 connector10<n:int>(a[1..n], b) {

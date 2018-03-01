@@ -1,0 +1,8 @@
+section slides.main.rba;
+
+blue(a?String) 
+{
+  #RBA
+  {a} true
+  #Java  "Workers2.consumer"
+}

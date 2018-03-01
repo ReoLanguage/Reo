@@ -1,0 +1,38 @@
+import reo.sync;
+import reo.binop;
+import reo.fifo1;
+import reo.transformer;
+import reo.syncdrain;
+import reo.filter;
+import reo.fifofull;
+
+/*
+* For this exercise, you can use some workers accessible by the class Workers.java
+* You can link to a Java code source in an atomic file by :
+*
+* 	Name = (*interface*){
+*		#JAVA "Workers.**** "
+*	}
+*/
+
+chess = (){
+
+
+}
+
+visualize(C?,R?,M!,O!){
+	//
+	// This function take :
+	//	the input port of an engine (C?)
+	//	the output port of an engine (R?)
+	//	the port of the display (M)
+	//
+	// display the visualisation of engines playing.
+	//
+
+	fifo1(C,k)
+      	{ transformer<PARSE>(R,M) | PARSE = "Function.parse"}
+	{ binop<CONCATENATE>(k,M,O) | CONCATENATE = "Function.concatenate" }
+
+}
+

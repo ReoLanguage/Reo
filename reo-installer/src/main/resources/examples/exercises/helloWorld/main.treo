@@ -1,0 +1,42 @@
+import reo.syncdrain;
+import reo.sync;
+import reo.fifo1;
+
+main() {
+
+}
+
+connector(H,E,L,O,e,W,R,D,s,b){
+
+}
+
+cons(a?String) {
+	#JAVA "Components.cons"
+}
+prod_H(a!String) {
+	#JAVA "Components.prod_H"
+}
+prod_E(a!String) {
+	#JAVA "Components.prod_E"
+}
+prod_L(a!String) {
+	#JAVA "Components.prod_L"
+}
+prod_O(a!String) {
+	#JAVA "Components.prod_O"
+}
+prod_W(a!String) {
+	#JAVA "Components.prod_W"
+}
+prod_R(a!String) {
+	#JAVA "Components.prod_R"
+}
+prod_D(a!String) {
+	#JAVA "Components.prod_D"
+}
+prod_e(a!String) {
+	#JAVA "Components.prod_e"
+}
+prod_s(a!String) {
+	#JAVA "Components.prod_s"
+}
