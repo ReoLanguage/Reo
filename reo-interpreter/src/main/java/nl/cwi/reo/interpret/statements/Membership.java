@@ -97,7 +97,9 @@ public final class Membership implements PredicateExpression {
 	public Set<Identifier> getDefinedVariables(Set<Identifier> defns) {
 		Set<Identifier> vars = list.getVariables();
 		vars.removeAll(defns);
+		//TODO: What is this doing ??
 		if (vars.isEmpty()) {
+			vars.add(x);
 			defns.addAll(vars);
 			return defns;
 		}

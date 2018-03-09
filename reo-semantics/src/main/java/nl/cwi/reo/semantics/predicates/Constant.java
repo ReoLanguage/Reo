@@ -77,6 +77,11 @@ public final class Constant implements Term {
 		return new TypeTag("decimal");
 	}
 
+	public Value getName() {
+		
+		return v;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
