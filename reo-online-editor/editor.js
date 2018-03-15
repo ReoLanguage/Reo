@@ -1,6 +1,7 @@
 (function() {
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+  fabric.Object.prototype.objectCaching = false;
   var active, isDown, origX, origY, origLeft, origTop;
   var mode = 'select';
   var id = '0';
