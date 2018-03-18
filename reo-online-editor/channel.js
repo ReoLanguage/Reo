@@ -8,6 +8,7 @@
   var active, isDown, origX, origY, origLeft, origTop;
   var mode = 'select';
   var id = '0';
+  var nodes = [];
   
   // drawing parameters
   
@@ -160,6 +161,8 @@
       label.object.set({id: label.text});
     });
     
+    nodes.push(node);
+    
     return node;
 
   } //createNode
@@ -204,6 +207,9 @@
     // create a channel...
     var sync = createChannel(x1, y1, x2, y2);
     
+    sync.end1 = 'source';
+    sync.end2 = 'sink';
+    
     // ...a line...
     var line = new fabric.Line([x1, y1, x2, y2], {
       fill: lineFillColour,
@@ -235,6 +241,7 @@
     sync.components.push(a);
     
     drawChannel(sync);
+    return sync;
   } //createSync
   
   function drawChannel(channel) {
@@ -269,8 +276,8 @@
     var length = Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
     var x = Math.atan(Math.abs(y1 - y2)/Math.abs(x1 - x2));
     
-    for(i = 0; i < channel.components.length; i++) {
-      var c = channel.components[i];
+    for(k = 0; k < channel.components.length; k++) {
+      var c = channel.components[k];
       switch (c.type) {
         case "line":
           c.set({'x1': x1});
@@ -299,6 +306,7 @@
             c.setAngle(c.baseAngle);
           break;
       }
+      c.setCoords();
     }
     canvas.renderAll();
   }
@@ -333,7 +341,7 @@
       origLeft = p.left;
       origTop = p.top;
       return;
-    }    
+    }
     if (mode == 'select') {
       //console.log('Mode is select');
     }
@@ -383,27 +391,31 @@
       if (p.class == 'node') {
         p.label.setCoords();
         p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
-        canvas.forEachObject(function(obj) {
-          if (!obj || obj.get('id') == p.get('id') || (obj.get('class') !== 'node' && obj.get('class') !== 'component'))
-            return;
+        var bin = [];
+        for (i = nodes.length - 1; i >= 0; i--) {
+          if (nodes[i].id == p.id)
+            continue;
+          var obj = nodes[i];
           if (p.intersectsWithObject(obj)) {
-            if (obj.get('class') == 'node') {
-              if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-                for (i = 0; i < p.channels.length; i++) {
-                  p.channels[i].node2 = obj;
-                  obj.channels.push(p.channels[i]);
+            if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+              for (j = 0; j < p.channels.length; j++) {
+                if (p.channels[j].node1.id == p.id) {
+                  p.channels[j].node1 = obj;
                 }
-                for (i = 0; i < p.channels.length; i++) {
-                  p.channels[i].circle1 = obj;
-                  obj.channels.push(p.channels[i]);
+                else {
+                  if (p.channels[j].node2.id == p.id)
+                    p.channels[j].node2 = obj;
+                  else
+                    console.log("Error merging nodes");
                 }
-                canvas.remove(p.label, p);
-                obj.bringToFront();
-                canvas.renderAll();
+                obj.channels.push(p.channels[j]);
               }
+              canvas.remove(p.label, p);
+              obj.bringToFront();
             }
           }
-        });
+        }
+        canvas.renderAll();
         canvas.calcOffset();
       }
       if (p.class == 'label') {
@@ -419,4 +431,5 @@
   id = '0';
   document.getElementById("select").click();
   createSync(100,100,200,100);
+  createSync(300,100,400,100);
 })();
