@@ -220,16 +220,19 @@
       hasControls: false,
       selectable: false,
       hoverCursor: 'default',
+      originX: 'left',
+      originY: 'top',
     });
     sync.components.push(line);
     
     // ...and an arrowhead
     var a = new fabric.Triangle({
-      left: x2,
+      left: x2 - arrowOffsetOut,
       top: y2,
       width: arrowFactor * lineStrokeWidth,
       height: arrowFactor * lineStrokeWidth,
       baseAngle: 90,
+      angle: 90,
       rotate: true,
       fill: lineFillColour,
       hasBorders: false,
@@ -240,6 +243,11 @@
       reference: 'node2'
     });
     sync.components.push(a);
+    
+    var bossTransform = line.calcTransformMatrix();
+    var invertedBossTransform = fabric.util.invertTransform(bossTransform);
+    var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, a.calcTransformMatrix());
+    a.relationship = desiredTransform;
     
     drawChannel(sync);
     return sync;
@@ -317,51 +325,31 @@
     var x2 = channel.node2.get('left');
     var y2 = channel.node2.get('top');
     
-    var length = Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
-    var x = Math.atan(Math.abs(y1 - y2)/Math.abs(x1 - x2));
+    // update the reference line
+    channel.components[0].set({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2});
+    channel.components[0].setCoords();
     
-    for(k = 0; k < channel.components.length; k++) {
-      var c = channel.components[k];
-      switch (c.type) {
-        case "line":
-          c.set({'x1': x1});
-          c.set({'y1': y1});
-          c.set({'x2': x2});
-          c.set({'y2': y2});
-          break;
-        case "triangle":
-          // place the component at the proper coordinates
-          switch (c.reference) {
-            case "node1":
-              if (x2 > x1)
-                c.set({'left': x1 + c.offset * Math.cos(x)});
-              else
-                c.set({'left': x1 - c.offset * Math.cos(x)});
-              if (y2 > y1)
-                c.set({'top': y1 + c.offset * Math.sin(x)});
-              else
-                c.set({'top': y1 - c.offset * Math.sin(x)});
-              break;
-            case "node2":
-              if (x2 > x1)
-                c.set({'left': x2 - c.offset * Math.cos(x)});
-              else
-                c.set({'left': x2 + c.offset * Math.cos(x)});
-              if (y2 > y1)
-                c.set({'top': y2 - c.offset * Math.sin(x)});
-              else
-                c.set({'top': y2 + c.offset * Math.sin(x)});
-              break;
-          }
-          
-          // adjust the rotation if necessary
-          if (c.rotate == true)
-            c.setAngle(calculateAngle(channel, c.baseAngle));
-          else
-            c.setAngle(c.baseAngle);
-          break;
-      }
-      c.setCoords();
+    for(k = 1; k < channel.components.length; k++) {
+      var o = channel.components[k];
+      var relationship = o.relationship;
+      o.set({
+      top: y1,
+      left: x1,
+      });
+      o.setCoords();
+      var newTransform = fabric.util.multiplyTransformMatrices(channel.components[0].calcTransformMatrix(), relationship);
+      opt = fabric.util.qrDecompose(newTransform);
+      o.set({
+        flipX: false,
+        flipY: false,
+      });
+      o.setPositionByOrigin(
+        { x: opt.translateX, y: opt.translateY },
+        'center',
+        'center',
+      );
+      o.set(opt);
+      o.setCoords();
     }
     canvas.renderAll();
   }

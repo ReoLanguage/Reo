@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Transform test</title>
+  </head>
+  <body>
+    <div id="header">
+      <h1>Transform test</h1>
+    </div>
+    <div id="container">
+      <div id="textdiv">
+        <textarea id="text" rows="25" cols="20"></textarea>
+        <input id="refresh" type="button" value="Refresh"/>
+      </div>
+      <div id="toolbar">
+        <table>
+          <tr>
+            <td class="tool" id="select"><a title="Select"><img src="img/cursor.png" alt="Select"></a></td>
+            <td class="tool" id="component"><a title="New component"><img src="img/component.svg" alt="New component"></a></td>
+          </tr>
+        </table>
+        <a id="download"></a>
+        <input type="button" id="downloadsvg" value="Download SVG"><br />
+        <input type="button" id="downloadpng" value="Download PNG"><br />
+        <h2>Channels</h2>
+        <!--<input type="button" id="newchannel" value="New channel"><br />-->
+        <table>
+          <tr>
+            <td class="channel" id="sync">
+              <a title="Lossy sync"><img src="img/sync.svg" alt="Sync"></a><br />
+              Sync
+            </td>
+          </tr>
+          <tr>
+            <td class="channel" id="lossysync">
+              <a title="Lossy sync"><img src="img/lossysync.svg" alt="Lossy sync"></a><br />
+              Lossy sync
+            </td>
+          </tr>
+          <tr>
+            <td class="channel" id="syncdrain">
+              <a title="Sync drain"><img src="img/syncdrain.svg" alt="Sync drain"></a><br />
+              Sync drain
+            </td>
+          </tr>
+          <tr>
+            <td class="channel" id="syncspout">
+              <a title="Sync spout"><img src="img/syncspout.svg" alt="Sync spout"></a><br />
+              Sync spout
+            </td>
+          </tr>
+          <tr>
+            <td class="channel" id="fifo1">
+              <a title="FIFO1"><img src="img/fifo1.svg" alt="FIFO1"></a><br />
+              FIFO1
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="canvas">
+        <canvas id="c" width="800" height="600">Please use a browser that supports canvas.</canvas>
+      </div>
+    </div>
+    <script src="fabric.js-1.7.3/dist/fabric.min.js"></script>
+    <script src="transform.js"></script>
+  </body>
+</html>
