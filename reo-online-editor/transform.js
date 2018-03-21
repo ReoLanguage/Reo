@@ -19,7 +19,7 @@
   
   lineFillColour       = '#000';
   lineStrokeColour     = '#000';
-  lineStrokeWidth      =      1;
+  lineStrokeWidth      =      2;
   
   arrowFactor          =      8;
   arrowOffsetOut       = lineStrokeWidth * nodeFactor + 4;
@@ -138,6 +138,7 @@
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
+      selectable: true,
       class: 'node',
       id: generateId()
     });
@@ -187,6 +188,20 @@
     var channel = {};
     channel.components = [];
     
+    // ...a fake line...
+    channel.components[0] = new fabric.Rect({
+      width: 5,
+      height: 100,
+      left: 100,
+      top: 100,
+      angle: 90,
+      fill: 'red',
+      //visible: false,
+      selectable: false,
+      originX: 'center',
+      originY: 'center',
+    });
+    
     // ...two nodes...
     channel.node1 = createNode(x1,y1);
     channel.node2 = createNode(x2,y2);
@@ -212,7 +227,7 @@
     sync.end2 = 'sink';
     
     // ...a line...
-    var line = new fabric.Line([x1, y1, x2, y2], {
+    var line = new fabric.Line([0, 0, x2-x1, y2-y1], {
       fill: lineFillColour,
       stroke: lineStrokeColour,
       strokeWidth: lineStrokeWidth,
@@ -220,15 +235,22 @@
       hasControls: false,
       selectable: false,
       hoverCursor: 'default',
-      originX: 'left',
-      originY: 'top',
+      originX: 'center',
+      originY: 'center',
     });
     sync.components.push(line);
     
+    line.set({
+      'x1': x1,
+      'x2': x2,
+      'y1': y1,
+      'y2': y2    
+    });
+    
     // ...and an arrowhead
     var a = new fabric.Triangle({
-      left: x2 - arrowOffsetOut,
-      top: y2,
+      left: 0,
+      top: 0,
       width: arrowFactor * lineStrokeWidth,
       height: arrowFactor * lineStrokeWidth,
       baseAngle: 90,
@@ -244,7 +266,10 @@
     });
     sync.components.push(a);
     
-    var bossTransform = line.calcTransformMatrix();
+    a.set({'left': x2 - arrowOffsetOut, 'top': y2});
+    a.setCoords();
+    
+    var bossTransform = sync.components[0].calcTransformMatrix();
     var invertedBossTransform = fabric.util.invertTransform(bossTransform);
     var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, a.calcTransformMatrix());
     a.relationship = desiredTransform;
@@ -325,18 +350,34 @@
     var x2 = channel.node2.get('left');
     var y2 = channel.node2.get('top');
     
-    // update the reference line
-    channel.components[0].set({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2});
+    // update the reference rectangle
+    var diffX = Math.abs(x1-x2) / 2;
+    if (x1 > x2)
+      channel.components[0].set({'left': x2 + diffX});
+    else
+      channel.components[0].set({'left': x1 + diffX});
+    var diffY = Math.abs(y1-y2) / 2;
+    if (y1 > y2)
+      channel.components[0].set({'top': y2 + diffY});
+    else
+      channel.components[0].set({'top': y1 + diffY});
+    channel.components[0].set({'angle': calculateAngle(channel, 90)});
+    
+    var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
+    channel.components[0].set({'height': length});
+    
     channel.components[0].setCoords();
     
-    for(k = 1; k < channel.components.length; k++) {
+    channel.components[1].set({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2});
+    channel.components[1].setCoords();
+    
+    for(k = 2; k < channel.components.length; k++) {
       var o = channel.components[k];
+      if (!o.relationship) {
+        console.log("No relationship found");
+        return;
+      }
       var relationship = o.relationship;
-      o.set({
-      top: y1,
-      left: x1,
-      });
-      o.setCoords();
       var newTransform = fabric.util.multiplyTransformMatrices(channel.components[0].calcTransformMatrix(), relationship);
       opt = fabric.util.qrDecompose(newTransform);
       o.set({
@@ -389,12 +430,12 @@
       //console.log('Mode is select');
     }
     if (mode == 'sync') {
-      canvas.deactivateAll();
+      canvas.discardActiveObject();
       var channel = createSync(pointer.x,pointer.y,pointer.x,pointer.y);
       canvas.setActiveObject(channel.node2);
     }
     if (mode == 'lossysync') {
-      canvas.deactivateAll();
+      canvas.discardActiveObject();
       var channel = createLossySync(pointer.x,pointer.y,pointer.x,pointer.y);
       canvas.setActiveObject(channel.node2);
     }
@@ -439,7 +480,6 @@
       if (p.class == 'node') {
         p.label.setCoords();
         p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
-        var bin = [];
         for (i = nodes.length - 1; i >= 0; i--) {
           if (nodes[i].id == p.id)
             continue;
@@ -471,7 +511,7 @@
         p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});    
       }
       else
-        canvas.deactivateAll();
+        canvas.discardActiveObject();
       canvas.renderAll();
     }
   }); //mouse:up
@@ -479,5 +519,5 @@
   id = '0';
   document.getElementById("select").click();
   createSync(100,100,200,100);
-  createLossySync(300,100,400,100);
+  //createLossySync(300,100,400,100);
 })();
