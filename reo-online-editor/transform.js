@@ -19,7 +19,7 @@
   
   lineFillColour       = '#000';
   lineStrokeColour     = '#000';
-  lineStrokeWidth      =      2;
+  lineStrokeWidth      =      1;
   
   arrowFactor          =      8;
   arrowOffsetOut       = lineStrokeWidth * nodeFactor + 4;
@@ -134,7 +134,9 @@
     var node = new fabric.Circle({
       left: left,
       top: top,
+      angle: 90,
       strokeWidth: lineStrokeWidth,
+      fill: nodeFillColourSource,
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
@@ -185,18 +187,21 @@
   
   function createChannel(x1, y1, x2, y2) {
     // create a channel...
-    var channel = {};
-    channel.components = [];
+    var channel = {
+      class: 'channel',
+      components: [] 
+    };
     
     // ...a fake line...
     channel.components[0] = new fabric.Rect({
       width: 5,
       height: 100,
-      left: 100,
-      top: 100,
+      baseLength: 100,
+      left: x1,
+      top: y1,
       angle: 90,
       fill: 'red',
-      //visible: false,
+      visible: false,
       selectable: false,
       originX: 'center',
       originY: 'center',
@@ -222,12 +227,12 @@
     // create a channel...
     var sync = createChannel(x1, y1, x2, y2);
     
-    sync.name = 'lossysync';
+    sync.name = 'sync';
     sync.end1 = 'source';
     sync.end2 = 'sink';
     
     // ...a line...
-    var line = new fabric.Line([0, 0, x2-x1, y2-y1], {
+    var line = new fabric.Line([x1, y1, x2, y2], {
       fill: lineFillColour,
       stroke: lineStrokeColour,
       strokeWidth: lineStrokeWidth,
@@ -240,41 +245,28 @@
     });
     sync.components.push(line);
     
-    line.set({
-      'x1': x1,
-      'x2': x2,
-      'y1': y1,
-      'y2': y2    
-    });
-    
     // ...and an arrowhead
     var a = new fabric.Triangle({
-      left: 0,
-      top: 0,
+      left: x2 - arrowOffsetOut,
+      top: y2,
       width: arrowFactor * lineStrokeWidth,
       height: arrowFactor * lineStrokeWidth,
       baseAngle: 90,
       angle: 90,
       rotate: true,
+      scale: false,
       fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
       hoverCursor: 'default',
-      offset: arrowOffsetOut,
-      reference: 'node2'
+      referencePoint: 'node2',
+      referenceDistance: arrowOffsetOut,
+      referenceAngle: 270
     });
     sync.components.push(a);
     
-    a.set({'left': x2 - arrowOffsetOut, 'top': y2});
-    a.setCoords();
-    
-    var bossTransform = sync.components[0].calcTransformMatrix();
-    var invertedBossTransform = fabric.util.invertTransform(bossTransform);
-    var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, a.calcTransformMatrix());
-    a.relationship = desiredTransform;
-    
-    drawChannel(sync);
+    initializeChannel(sync);
     return sync;
   } //createSync
   
@@ -290,42 +282,254 @@
     var line = new fabric.Line([x1, y1, x2, y2], {
       fill: lineFillColour,
       stroke: lineStrokeColour,
-      strokeDashArray: [8,8],
       strokeWidth: lineStrokeWidth,
+      strokeDashArray: [8,8],
       hasBorders: false,
       hasControls: false,
       selectable: false,
       hoverCursor: 'default',
+      originX: 'center',
+      originY: 'center',
     });
     lossysync.components.push(line);
     
     // ...and an arrowhead
     var a = new fabric.Triangle({
-      left: x2,
+      left: x2 - arrowOffsetOut,
       top: y2,
       width: arrowFactor * lineStrokeWidth,
       height: arrowFactor * lineStrokeWidth,
       baseAngle: 90,
+      angle: 90,
       rotate: true,
+      scale: false,
       fill: lineFillColour,
       hasBorders: false,
       hasControls: false,
       selectable: false,
       hoverCursor: 'default',
-      offset: arrowOffsetOut,
-      reference: 'node2'
+      referencePoint: 'node2',
+      referenceDistance: arrowOffsetOut,
+      referenceAngle: 270
     });
     lossysync.components.push(a);
     
-    drawChannel(lossysync);
+    initializeChannel(lossysync);
     return lossysync;
   } //createLossySync
   
-  function drawChannel(channel) {
-    for (i = 0; i < channel.components.length; i++)
+  function createSyncDrain(x1, y1, x2, y2) {
+    // create a channel...
+    var syncdrain = createChannel(x1, y1, x2, y2);
+    
+    syncdrain.name = 'syncdrain';
+    syncdrain.end1 = 'source';
+    syncdrain.end2 = 'sink';
+    
+    // ...a line...
+    var line = new fabric.Line([x1, y1, x2, y2], {
+      fill: lineFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default',
+      originX: 'center',
+      originY: 'center',
+    });
+    syncdrain.components.push(line);
+    
+    // ...and an arrowhead
+    var a1 = new fabric.Triangle({
+      left: x1 + arrowOffsetIn,
+      top: y2,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
+      baseAngle: 90,
+      angle: 90,
+      rotate: true,
+      scale: false,
+      fill: lineFillColour,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default',
+      referencePoint: 'node1',
+      referenceDistance: arrowOffsetIn,
+      referenceAngle: 90
+    });
+    syncdrain.components.push(a1);
+    
+    // ...and an arrowhead
+    var a2 = new fabric.Triangle({
+      left: x2 - arrowOffsetIn,
+      top: y2,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
+      baseAngle: 270,
+      angle: 270,
+      rotate: true,
+      scale: false,
+      fill: lineFillColour,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default',
+      referencePoint: 'node2',
+      referenceDistance: arrowOffsetIn,
+      referenceAngle: 270
+    });
+    syncdrain.components.push(a2);
+    
+    initializeChannel(syncdrain);
+    return syncdrain;
+  } //createSyncDrain
+  
+function createSyncSpout(x1, y1, x2, y2) {
+    // create a channel...
+    var syncspout = createChannel(x1, y1, x2, y2);
+    
+    syncspout.name = 'syncspout';
+    syncspout.end1 = 'source';
+    syncspout.end2 = 'sink';
+    
+    // ...a line...
+    var line = new fabric.Line([x1, y1, x2, y2], {
+      fill: lineFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default',
+      originX: 'center',
+      originY: 'center',
+    });
+    syncspout.components.push(line);
+    
+    // ...and an arrowhead
+    var a1 = new fabric.Triangle({
+      left: x1 + arrowOffsetOut,
+      top: y2,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
+      baseAngle: 270,
+      angle: 270,
+      rotate: true,
+      scale: false,
+      fill: lineFillColour,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default',
+      referencePoint: 'node1',
+      referenceDistance: arrowOffsetOut,
+      referenceAngle: 90
+    });
+    syncspout.components.push(a1);
+    
+    // ...and an arrowhead
+    var a2 = new fabric.Triangle({
+      left: x2 - arrowOffsetOut,
+      top: y2,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
+      baseAngle: 90,
+      angle: 90,
+      rotate: true,
+      scale: false,
+      fill: lineFillColour,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default',
+      referencePoint: 'node2',
+      referenceDistance: arrowOffsetOut,
+      referenceAngle: 270
+    });
+    syncspout.components.push(a2);
+    
+    initializeChannel(syncspout);
+    return syncspout;
+  } //createSyncSpout
+  
+  function createFIFO1(x1, y1, x2, y2) {
+    // create a channel...
+    var FIFO1 = createChannel(x1, y1, x2, y2);
+    
+    FIFO1.name = 'sync';
+    FIFO1.end1 = 'source';
+    FIFO1.end2 = 'sink';
+    
+    // ...a line...
+    var line = new fabric.Line([x1, y1, x2, y2], {
+      fill: lineFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default',
+      originX: 'center',
+      originY: 'center',
+    });
+    FIFO1.components.push(line);
+    
+    // ...an arrowhead...
+    var a = new fabric.Triangle({
+      left: x2 - arrowOffsetOut,
+      top: y2,
+      width: arrowFactor * lineStrokeWidth,
+      height: arrowFactor * lineStrokeWidth,
+      baseAngle: 90,
+      angle: 90,
+      rotate: true,
+      scale: false,
+      fill: lineFillColour,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false,
+      hoverCursor: 'default',
+      referencePoint: 'node2',
+      referenceDistance: arrowOffsetOut,
+      referenceAngle: 270
+    });
+    FIFO1.components.push(a);
+    
+    // ...and a rectangle
+    var rect = new fabric.Rect({
+      left: (x1+x2)/2,
+      top: (y1+y2)/2,
+      width: fifoWidth,
+      height: fifoHeight,
+      baseAngle: 90,
+      angle: 90,
+      fill: fifoFillColour,
+      stroke: lineStrokeColour,
+      strokeWidth: lineStrokeWidth,
+      hasBorders: false,
+      hasControls: false,
+      selectable: false
+    });
+    FIFO1.components.push(rect);
+    
+    initializeChannel(FIFO1);
+    return FIFO1;
+  } //createFIFO1
+  
+  function initializeChannel(channel) {
+    canvas.add(channel.components[0]);
+    for (i = 1; i < channel.components.length; i++) {
+      var o = channel.components[i];
+      var bossTransform = channel.components[0].calcTransformMatrix();
+      var invertedBossTransform = fabric.util.invertTransform(bossTransform);
+      var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
+      o.relationship = desiredTransform;
       canvas.add(channel.components[i]);
+    }
     canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
-    updateChannel(channel);
+    //updateChannel(channel);
   }
   
   function calculateAngle(channel, baseAngle) {
@@ -344,52 +548,68 @@
     return ((angle * 180 / Math.PI) + baseAngle) % 360;
   } //calculateAngle
   
-  function updateChannel (channel) {
+  function updateChannel(channel) {
     var x1 = channel.node1.get('left');
     var y1 = channel.node1.get('top');
     var x2 = channel.node2.get('left');
     var y2 = channel.node2.get('top');
+    var diffX = Math.abs(x1-x2);
+    var diffY = Math.abs(y1-y2);
     
     // update the reference rectangle
-    var diffX = Math.abs(x1-x2) / 2;
-    if (x1 > x2)
-      channel.components[0].set({'left': x2 + diffX});
-    else
-      channel.components[0].set({'left': x1 + diffX});
-    var diffY = Math.abs(y1-y2) / 2;
-    if (y1 > y2)
-      channel.components[0].set({'top': y2 + diffY});
-    else
-      channel.components[0].set({'top': y1 + diffY});
+    channel.components[0].set({'left': Math.min(x1,x2) + diffX / 2});
+    channel.components[0].set({'top': Math.min(y1,y2) + diffY / 2});
     channel.components[0].set({'angle': calculateAngle(channel, 90)});
     
+    // convert new size to scaling
     var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
-    channel.components[0].set({'height': length});
+    var scale = length/channel.components[0].baseLength;
+    channel.components[0].set({'scaleX': scale, 'scaleY': scale});
     
     channel.components[0].setCoords();
     
-    channel.components[1].set({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2});
-    channel.components[1].setCoords();
-    
-    for(k = 2; k < channel.components.length; k++) {
+    // update all channel components
+    for (k = 1; k < channel.components.length; k++) {
       var o = channel.components[k];
-      if (!o.relationship) {
-        console.log("No relationship found");
-        return;
+      if (o.type == 'line') {
+        o.set({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2});
       }
-      var relationship = o.relationship;
-      var newTransform = fabric.util.multiplyTransformMatrices(channel.components[0].calcTransformMatrix(), relationship);
-      opt = fabric.util.qrDecompose(newTransform);
-      o.set({
-        flipX: false,
-        flipY: false,
-      });
-      o.setPositionByOrigin(
-        { x: opt.translateX, y: opt.translateY },
-        'center',
-        'center',
-      );
-      o.set(opt);
+      else {
+        if (!o.relationship) {
+          console.log("No relationship found");
+          return;
+        }
+        var relationship = o.relationship;
+        var newTransform = fabric.util.multiplyTransformMatrices(channel.components[0].calcTransformMatrix(), relationship);
+        opt = fabric.util.qrDecompose(newTransform);
+        o.set({
+          flipX: false,
+          flipY: false,
+        });
+        o.setPositionByOrigin(
+          { x: opt.translateX, y: opt.translateY },
+          'center',
+          'center',
+        );
+        o.set(opt);
+        if (o.scale == false)
+          o.set({'scaleX': 1, 'scaleY': 1});
+        if (o.rotate == false)
+          o.set({'angle': o.baseAngle});
+        o.setCoords();
+        if (o.referencePoint == 'node1') {
+          o.set({
+            'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node1.left,
+            'top': o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node1.top
+          });
+        }
+        if (o.referencePoint == 'node2') {
+          o.set({
+            'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node2.left,
+            'top': o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node2.top
+          });
+        }
+      }
       o.setCoords();
     }
     canvas.renderAll();
@@ -519,5 +739,8 @@
   id = '0';
   document.getElementById("select").click();
   createSync(100,100,200,100);
-  //createLossySync(300,100,400,100);
+  createLossySync(100,200,200,200);
+  createSyncDrain(100,300,200,300);
+  createSyncSpout(100,400,200,400);
+  createFIFO1(100,500,200,500);
 })();

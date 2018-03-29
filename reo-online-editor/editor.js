@@ -266,7 +266,7 @@
     canvas.renderAll();
     
     return line;
-  } //drawLossySyncnodeColourDrain
+  } //drawLossySync
   
   function drawSyncDrain(x1, y1, x2, y2) {
     // create a line...
