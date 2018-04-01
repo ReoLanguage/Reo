@@ -192,13 +192,16 @@
       components: [] 
     };
     
-    // ...a fake line...
+    var diffX = Math.abs(x1-x2);
+    var diffY = Math.abs(y1-y2);
+    
+    // ...a reference rectangle...
     channel.components[0] = new fabric.Rect({
       width: 5,
       height: 100,
       baseLength: 100,
-      left: x1,
-      top: y1,
+      left: Math.min(x1,x2) + diffX / 2,
+      top: Math.min(y1,y2) + diffY / 2,
       angle: 90,
       fill: 'red',
       visible: false,
@@ -462,6 +465,9 @@ function createSyncSpout(x1, y1, x2, y2) {
     FIFO1.end1 = 'source';
     FIFO1.end2 = 'sink';
     
+    var diffX = Math.abs(x1-x2);
+    var diffY = Math.abs(y1-y2);
+    
     // ...a line...
     var line = new fabric.Line([x1, y1, x2, y2], {
       fill: lineFillColour,
@@ -499,18 +505,22 @@ function createSyncSpout(x1, y1, x2, y2) {
     
     // ...and a rectangle
     var rect = new fabric.Rect({
-      left: (x1+x2)/2,
-      top: (y1+y2)/2,
+      left: Math.min(x1,x2) + diffX / 2,
+      top: Math.min(y1,y2) + diffY / 2,
       width: fifoWidth,
       height: fifoHeight,
       baseAngle: 90,
       angle: 90,
+      rotate: true,
+      scale: false,
       fill: fifoFillColour,
       stroke: lineStrokeColour,
       strokeWidth: lineStrokeWidth,
       hasBorders: false,
       hasControls: false,
-      selectable: false
+      selectable: false,
+      originX: 'center',
+      originY: 'center'
     });
     FIFO1.components.push(rect);
     
@@ -596,7 +606,6 @@ function createSyncSpout(x1, y1, x2, y2) {
           o.set({'scaleX': 1, 'scaleY': 1});
         if (o.rotate == false)
           o.set({'angle': o.baseAngle});
-        o.setCoords();
         if (o.referencePoint == 'node1') {
           o.set({
             'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node1.left,
