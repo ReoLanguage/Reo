@@ -185,7 +185,7 @@
 
   } //createAnchor
   
-  function createChannel(x1, y1, x2, y2) {
+  function createChannel(name, x1, y1, x2, y2) {
     // create a channel...
     var channel = {
       class: 'channel',
@@ -223,13 +223,46 @@
     channel.node1.channels.push(channel);
     channel.node2.channels.push(channel);
     
+    // TODO: replace with a database search
+    switch(name) {
+      case 'sync':
+        createSync(channel,x1,y1,x2,y2);
+        break;
+      case 'lossysync':
+        createLossySync(channel,x1,y1,x2,y2);
+        break;
+      case 'syncdrain':
+        createSyncDrain(channel,x1,y1,x2,y2);
+        break;
+      case 'syncspout':
+        createSyncSpout(channel,x1,y1,x2,y2);
+        break;
+      case 'fifo1':
+        createFIFO1(channel,x1,y1,x2,y2);
+        break;
+      default:
+        console.log("Invalid channel name");
+        return;
+        break;
+    }
+    
+    canvas.add(channel.components[0]);
+    for (i = 1; i < channel.components.length; i++) {
+      var o = channel.components[i];
+      var bossTransform = channel.components[0].calcTransformMatrix();
+      var invertedBossTransform = fabric.util.invertTransform(bossTransform);
+      var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
+      o.relationship = desiredTransform;
+      canvas.add(channel.components[i]);
+    }
+    canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
+    //updateChannel(channel);
+    
     return channel;
   } //createChannel
 
-  function createSync(x1, y1, x2, y2) {
-    // create a channel...
-    var sync = createChannel(x1, y1, x2, y2);
-    
+  function createSync(sync, x1, y1, x2, y2) {
+    // create a channel...    
     sync.name = 'sync';
     sync.end1 = 'source';
     sync.end2 = 'sink';
@@ -269,14 +302,11 @@
     });
     sync.components.push(a);
     
-    initializeChannel(sync);
     return sync;
   } //createSync
   
-  function createLossySync(x1, y1, x2, y2) {
+  function createLossySync(lossysync, x1, y1, x2, y2) {
     // create a channel...
-    var lossysync = createChannel(x1, y1, x2, y2);
-    
     lossysync.name = 'lossysync';
     lossysync.end1 = 'source';
     lossysync.end2 = 'sink';
@@ -317,14 +347,11 @@
     });
     lossysync.components.push(a);
     
-    initializeChannel(lossysync);
     return lossysync;
   } //createLossySync
   
-  function createSyncDrain(x1, y1, x2, y2) {
+  function createSyncDrain(syncdrain, x1, y1, x2, y2) {
     // create a channel...
-    var syncdrain = createChannel(x1, y1, x2, y2);
-    
     syncdrain.name = 'syncdrain';
     syncdrain.end1 = 'source';
     syncdrain.end2 = 'sink';
@@ -385,14 +412,11 @@
     });
     syncdrain.components.push(a2);
     
-    initializeChannel(syncdrain);
     return syncdrain;
   } //createSyncDrain
   
-function createSyncSpout(x1, y1, x2, y2) {
+function createSyncSpout(syncspout, x1, y1, x2, y2) {
     // create a channel...
-    var syncspout = createChannel(x1, y1, x2, y2);
-    
     syncspout.name = 'syncspout';
     syncspout.end1 = 'source';
     syncspout.end2 = 'sink';
@@ -453,14 +477,11 @@ function createSyncSpout(x1, y1, x2, y2) {
     });
     syncspout.components.push(a2);
     
-    initializeChannel(syncspout);
     return syncspout;
   } //createSyncSpout
   
-  function createFIFO1(x1, y1, x2, y2) {
+  function createFIFO1(FIFO1, x1, y1, x2, y2) {
     // create a channel...
-    var FIFO1 = createChannel(x1, y1, x2, y2);
-    
     FIFO1.name = 'sync';
     FIFO1.end1 = 'source';
     FIFO1.end2 = 'sink';
@@ -524,23 +545,8 @@ function createSyncSpout(x1, y1, x2, y2) {
     });
     FIFO1.components.push(rect);
     
-    initializeChannel(FIFO1);
     return FIFO1;
   } //createFIFO1
-  
-  function initializeChannel(channel) {
-    canvas.add(channel.components[0]);
-    for (i = 1; i < channel.components.length; i++) {
-      var o = channel.components[i];
-      var bossTransform = channel.components[0].calcTransformMatrix();
-      var invertedBossTransform = fabric.util.invertTransform(bossTransform);
-      var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
-      o.relationship = desiredTransform;
-      canvas.add(channel.components[i]);
-    }
-    canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
-    //updateChannel(channel);
-  }
   
   function calculateAngle(channel, baseAngle) {
     var angle = 0;
@@ -658,14 +664,9 @@ function createSyncSpout(x1, y1, x2, y2) {
     if (mode == 'select') {
       //console.log('Mode is select');
     }
-    if (mode == 'sync') {
+    if (mode == 'sync' || mode == 'lossysync' || mode == 'syncdrain' || mode == 'syncspout' || mode == 'fifo1') {
       canvas.discardActiveObject();
-      var channel = createSync(pointer.x,pointer.y,pointer.x,pointer.y);
-      canvas.setActiveObject(channel.node2);
-    }
-    if (mode == 'lossysync') {
-      canvas.discardActiveObject();
-      var channel = createLossySync(pointer.x,pointer.y,pointer.x,pointer.y);
+      var channel = createChannel(mode,pointer.x,pointer.y,pointer.x,pointer.y);
       canvas.setActiveObject(channel.node2);
     }
   }); //mouse:down
@@ -709,26 +710,28 @@ function createSyncSpout(x1, y1, x2, y2) {
       if (p.class == 'node') {
         p.label.setCoords();
         p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
+        
+        // iterator issues after removal of node!
         for (i = nodes.length - 1; i >= 0; i--) {
           if (nodes[i].id == p.id)
             continue;
-          var obj = nodes[i];
-          if (p.intersectsWithObject(obj)) {
-            if(Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
-              for (j = 0; j < p.channels.length; j++) {
-                if (p.channels[j].node1.id == p.id) {
-                  p.channels[j].node1 = obj;
+          if (p.intersectsWithObject(nodes[i])) {
+            if(Math.abs(p.left-nodes[i].left) < 10 && Math.abs(p.top-nodes[i].top) < 10) {
+              for (j = 0; j < nodes[i].channels.length; j++) {
+                if (nodes[i].channels[j].node1.id == nodes[i].id) {
+                  nodes[i].channels[j].node1 = p;
                 }
                 else {
-                  if (p.channels[j].node2.id == p.id)
-                    p.channels[j].node2 = obj;
+                  if (nodes[i].channels[j].node2.id == nodes[i].id)
+                    nodes[i].channels[j].node2 = p;
                   else
                     console.log("Error merging nodes");
                 }
-                obj.channels.push(p.channels[j]);
+                p.channels.push(nodes[i].channels[j]);
               }
-              canvas.remove(p.label, p);
-              obj.bringToFront();
+              canvas.remove(nodes[i].label, nodes[i]);
+              nodes.splice(i,1);
+              p.bringToFront();
             }
           }
         }
@@ -747,9 +750,9 @@ function createSyncSpout(x1, y1, x2, y2) {
   
   id = '0';
   document.getElementById("select").click();
-  createSync(100,100,200,100);
-  createLossySync(100,200,200,200);
-  createSyncDrain(100,300,200,300);
-  createSyncSpout(100,400,200,400);
-  createFIFO1(100,500,200,500);
+  createChannel('sync',100,100,200,100);
+  createChannel('lossysync',100,200,200,200);
+  createChannel('syncdrain',100,300,200,300);
+  createChannel('syncspout',100,400,200,400);
+  createChannel('fifo1',100,500,200,500);
 })();
