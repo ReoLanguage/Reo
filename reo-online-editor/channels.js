@@ -91,7 +91,7 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
   // create a channel...
   syncdrain.name = 'syncdrain';
   syncdrain.end1 = 'source';
-  syncdrain.end2 = 'sink';
+  syncdrain.end2 = 'source';
   
   // ...a line...
   var line = new fabric.Line([x1, y1, x2, y2], {
@@ -155,7 +155,7 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
 function createSyncSpout(syncspout, x1, y1, x2, y2) {
   // create a channel...
   syncspout.name = 'syncspout';
-  syncspout.end1 = 'source';
+  syncspout.end1 = 'sink';
   syncspout.end2 = 'sink';
   
   // ...a line...

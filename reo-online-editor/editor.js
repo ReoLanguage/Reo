@@ -6,6 +6,8 @@
   var mode = 'select';
   var id = '0';
   var nodes = [];
+  var channels = [];
+  var components = [];
   
   // drawing parameters
   
@@ -255,6 +257,7 @@
     canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
     updateChannel(channel);
     
+    channels.push(channel);
     return channel;
   } //createChannel
   
@@ -387,41 +390,59 @@
       var s2 = '';
       var space1 = space2 = '';
       
-      canvas.forEachObject(function(obj) {
-        if (obj.class == 'node') {
-          //console.log('node ' + obj.id + ' in component ' + obj.component.id);
-          if (obj.component.id == 'main' && isBoundaryNode(obj,obj.component)) {
-            s1 += space1 + obj.label.text;
-            space1 = ',';
-          }
+        
+      for (q = 0; q < nodes.length; q++) {
+        var obj = nodes[q];
+        if (obj.component.id == 'main' && isBoundaryNode(obj,obj.component)) {
+          s1 += space1 + obj.label.text;
+          space1 = ',';
         }
-        if (obj.class == 'channel') {
-          if (obj.node1.component === main ||
-              obj.node2.component === main ||
-               (isBoundaryNode(obj.node1,obj.node1.component) &&
-                isBoundaryNode(obj.node2,obj.node2.component) &&
-                obj.node1.component != obj.node2.component
-               )
+      }
+      
+      for (q = 0; q < channels.length; q++) {
+        var obj = channels[q];
+        if (obj.node1.component === main ||
+            obj.node2.component === main ||
+             (isBoundaryNode(obj.node1,obj.node1.component) &&
+              isBoundaryNode(obj.node2,obj.node2.component) &&
+              obj.node1.component != obj.node2.component
              )
-          {
-            s2 += space2 + obj.channel + '(' + obj.node1.label.text + ',' + obj.node2.label.text + ')';
-            space2 = ' ';
-          }
+           )
+        {
+          s2 += space2 + obj.name + '(' + obj.node1.label.text + ',' + obj.node2.label.text + ')';
+          space2 = ' ';
         }
-        if (obj.class == 'component' && obj != main) {
-          var s3 = obj.label.text + '(';
+      }
+      
+      for (q = 0; q < components.length; q++) {
+        var obj = components[q];
+        if (obj != main) {
+          var s3 = '\n' + obj.label.text + '(';
           var space3 = '';
-          canvas.forEachObject(function(obj2) {
-            if (obj2.class == 'node' && obj2.component === obj && isBoundaryNode(obj2, obj2.component)) {
+          
+          for (r = 0; r < nodes.length; r++) {
+            var obj2 = nodes[r];
+            if (obj2.component === obj && isBoundaryNode(obj2, obj2.component)) {
               s3 += space3 + obj2.label.text;
               space3 = ',';
             }
-          });
-          s3 += ')\n{\n\n}';
+          }
+          space3 = '';
+          s3 += ')\n{\n  ';
+          for (r = 0; r < channels.length; r++) {
+            var obj2 = channels[r];
+            if (obj2.node1.component === obj && obj2.node2.component === obj) {
+              s3 += space3 + obj2.name + '(' + obj2.node1.label.text + ',' + obj2.node2.label.text + ')';
+              space3 = ',';
+            }
+          }
+          space3 = '';
+          s3 += '\n}';
           s2 += space2 + s3;
           space2 = ' ';
         }
-      });
+      }
+        
       
       s1 = s1 + ') {\n' + s2 + '\n}';
       document.getElementById('text').innerHTML = s1;
@@ -463,7 +484,7 @@
     node.label.set({'left': node.left + node.labelOffsetX, 'top': node.top + node.labelOffsetY});
     node.label.setCoords();
     for (i = 0; i < node.channels.length; i++) {
-      updateChannel(node.channels);
+      updateChannel(node.channels[i]);
     }
     updateText();
   }
@@ -833,6 +854,7 @@
     rect.setCoords();
     canvas.add(rect,label);
     canvas.requestRenderAll();
+    components.push(rect);
     return rect;
   }
   
