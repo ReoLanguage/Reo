@@ -131,13 +131,11 @@
     var node = new fabric.Circle({
       left: left,
       top: top,
-      angle: 90,
       strokeWidth: lineStrokeWidth,
       fill: nodeFillColourSource,
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
-      selectable: true,
       class: 'node',
       component: main,
       id: generateId()
@@ -157,15 +155,12 @@
     });
     
     node.set({'label': label, 'labelOffsetX': 20, 'labelOffsetY': -20});
-    
     label.on('editing:exited', function(e) {
       label.object.set({id: label.text});
     });
     
     nodes.push(node);
-    
     return node;
-
   } //createNode
   
   function createAnchor(left, top) {
@@ -398,19 +393,18 @@
           if (obj.component.id == 'main' && isBoundaryNode(obj,obj.component)) {
             s1 += space1 + obj.label.text;
             space1 = ',';
-            
           }
         }
         if (obj.class == 'channel') {
-          if (obj.circle1.component === main ||
-              obj.circle2.component === main ||
-               (isBoundaryNode(obj.circle1,obj.circle1.component) &&
-                isBoundaryNode(obj.circle2,obj.circle2.component) &&
-                obj.circle1.component != obj.circle2.component
+          if (obj.node1.component === main ||
+              obj.node2.component === main ||
+               (isBoundaryNode(obj.node1,obj.node1.component) &&
+                isBoundaryNode(obj.node2,obj.node2.component) &&
+                obj.node1.component != obj.node2.component
                )
              )
           {
-            s2 += space2 + obj.channel + '(' + obj.circle1.label.text + ',' + obj.circle2.label.text + ')';
+            s2 += space2 + obj.channel + '(' + obj.node1.label.text + ',' + obj.node2.label.text + ')';
             space2 = ' ';
           }
         }
@@ -515,14 +509,21 @@
     if (obj.class == 'channel') {
       obj2.set({
         'class': obj.class,
-        'channel': obj.channel,
-        'arrow': obj.arrow,
-        'circle1': obj.circle1,
-        'circle2': obj.circle2
+        'name': obj.name,
+        'components': obj.components,
+        'node1': obj.node1,
+        'node2': obj.node2,
+        'anchor1': obj.anchor1,
+        'anchor2': obj.anchor2
       });
-      obj.arrow.line = obj2;
-      obj.circle1.line = obj2;
-      obj.circle2.line = obj2;
+      for (i = 0; i < obj.node1.channels.length; i++) {
+        if (obj.node1.channels[i] == obj)
+          obj.node1.channels[i] = obj2;      
+      }
+      for (j = 0; j < obj.node2.channels.length; j++) {
+        if (obj.node2.channels[j] == obj)
+          obj.node2.channels[j] = obj2;      
+      }
     }
     if (obj.class == 'label') {
       obj2.set({
@@ -608,6 +609,7 @@
     if (mode == 'sync' || mode == 'lossysync' || mode == 'syncdrain' || mode == 'syncspout' || mode == 'fifo1') {
       canvas.discardActiveObject();
       var channel = createChannel(mode,pointer.x,pointer.y,pointer.x,pointer.y);
+      snapToComponent(channel.node1,main);
       canvas.setActiveObject(channel.node2);
     }
   }); //mouse:down
@@ -656,10 +658,8 @@
           }
         }
       });
-      
       for (i = 0; i < p.channels.length; i++)
         updateChannel(p.channels[i]);
-        
       p.label.set({left: p.left + p.labelOffsetX});
       p.label.set({top: p.top + p.labelOffsetY});
       p.label.setCoords();
@@ -685,10 +685,12 @@
         p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
         p.set({'component': main});
         
-        
         for (i = nodes.length - 1; i >= 0; i--) {
+          // prevent comparing the node with itself
           if (nodes[i].id == p.id)
             continue;
+            
+          // merge nodes that overlap
           if (p.intersectsWithObject(nodes[i])) {
             if(Math.abs(p.left-nodes[i].left) < 10 && Math.abs(p.top-nodes[i].top) < 10) {
               for (j = 0; j < nodes[i].channels.length; j++) {
@@ -710,6 +712,40 @@
             }
           }
         }
+        
+        // update the component property of the node
+        canvas.forEachObject(function(obj) {
+          if (p.intersectsWithObject(obj)) {
+            if (obj.get('class') == 'component') {
+              if (obj.size < p.component.size) {
+                p.component = obj;
+              }
+            }
+          }
+        });
+        
+        // ensure that no channel crosses a component boundary
+        for (k = 0; k < p.channels.length; k++) {
+          if (p.channels[k].node1 == p) {
+            if (p.channels[k].node2.component.size < p.component.size)
+              snapOutComponent(p.channels[k].node2,p.channels[k].node2.component,p);
+            else {
+              p.channels[k].node2.component = p.component;
+              snapToComponent(p.channels[k].node2,p.component);
+            }
+          }
+          else if (p.channels[k].node2 == p) {
+            if (p.channels[k].node1.component.size < p.component.size)
+              snapOutComponent(p.channels[k].node1,p.channels[k].node1.component,p);
+            else {
+              p.channels[k].node1.component = p.component;
+              snapToComponent(p.channels[k].node1,p.component);
+            }
+          }
+          else
+            console.log("Broken node reference detected");
+        }
+        
       }
       if (p.class == 'component') {
         p.label.setCoords();
