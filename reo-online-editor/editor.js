@@ -367,7 +367,7 @@
       }
       o.setCoords();
     }
-    canvas.renderAll();
+    canvas.requestRenderAll();
   } //updateChannel
   
   function isBoundaryNode (node, component) {
@@ -539,7 +539,7 @@
     if (e.target && e.target.class == "anchor")
     {
       e.target.set('opacity', '100');
-      canvas.renderAll();
+      canvas.requestRenderAll();
     }
   }); //mouse:over
   
@@ -547,7 +547,7 @@
     if (e.target && e.target.class == "anchor")
     {
       e.target.set('opacity', '0');
-      canvas.renderAll();
+      canvas.requestRenderAll();
     }
   }); //mouse:out
   
@@ -593,7 +593,7 @@
           }
         });*/
         canvas.remove(p);
-        canvas.renderAll();
+        canvas.requestRenderAll();
         canvas.add(group);
         canvas.setActiveObject(group);
         reorderComponents(group);
@@ -672,7 +672,7 @@
       p.label.set({top: p.top + p.labelOffsetY});
       p.label.setCoords();
     }
-    canvas.renderAll();
+    canvas.requestRenderAll();
   }); //mouse:move
   
   canvas.on('mouse:up', function(e){
@@ -725,21 +725,21 @@
         });
         
         // ensure that no channel crosses a component boundary
-        for (k = 0; k < p.channels.length; k++) {
-          if (p.channels[k].node1 == p) {
-            if (p.channels[k].node2.component.size < p.component.size)
-              snapOutComponent(p.channels[k].node2,p.channels[k].node2.component,p);
+        for (m = 0; m < p.channels.length; m++) {
+          if (p.channels[m].node1 == p) {
+            if (p.channels[m].node2.component.size < p.component.size)
+              snapOutComponent(p.channels[m].node2,p.channels[m].node2.component,p);
             else {
-              p.channels[k].node2.component = p.component;
-              snapToComponent(p.channels[k].node2,p.component);
+              p.channels[m].node2.component = p.component;
+              snapToComponent(p.channels[m].node2,p.component);
             }
           }
-          else if (p.channels[k].node2 == p) {
-            if (p.channels[k].node1.component.size < p.component.size)
-              snapOutComponent(p.channels[k].node1,p.channels[k].node1.component,p);
+          else if (p.channels[m].node2 == p) {
+            if (p.channels[m].node1.component.size < p.component.size)
+              snapOutComponent(p.channels[m].node1,p.channels[m].node1.component,p);
             else {
-              p.channels[k].node1.component = p.component;
-              snapToComponent(p.channels[k].node1,p.component);
+              p.channels[m].node1.component = p.component;
+              snapToComponent(p.channels[m].node1,p.component);
             }
           }
           else
@@ -773,10 +773,10 @@
           items[i].set({'component': comp});
           canvas.add(items[i]);
         }
-        canvas.renderAll();
+        canvas.requestRenderAll();
       }
       reorderComponents();
-      canvas.renderAll();
+      canvas.requestRenderAll();
     }
   }); //mouse:up
   
@@ -832,7 +832,7 @@
   
     rect.setCoords();
     canvas.add(rect,label);
-    canvas.renderAll();
+    canvas.requestRenderAll();
     return rect;
   }
   
