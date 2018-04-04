@@ -121,7 +121,15 @@
     a.href = canvas.toDataURL('image/png');
     a.click();
   };
-  
+
+  document.getElementById("downloadCode").onclick = function () {
+      var a = document.getElementById("download");
+      a.download = "reo.treo";
+      var textFileAsBlob = new Blob([document.getElementById("text").value], {type: 'text/plain'});
+      a.href = window.URL.createObjectURL(textFileAsBlob);
+      a.click();
+  };
+
   // generate a new object ID
   // ID will only contain letters, i.e. z is followed by aa
   function generateId() {
