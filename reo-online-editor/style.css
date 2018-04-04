@@ -13,13 +13,13 @@ html, body {
 }
 
 #container {
-  width: 1300px;
+  width: 100%;
   margin: auto;
 }
 
 #textdiv {
   float: left;
-  width: 280px;
+  width: 30%;
   height: 580px;
   padding: 10px;
   background-color: #888;
@@ -27,7 +27,7 @@ html, body {
 
 #canvas {
   height: 600px;
-  margin-left: 300px;
+  margin-left: 30%;
   margin-right: 100px;
   background-color: #eee;
 }
@@ -61,7 +61,7 @@ html, body {
 }
 
 #text {
-  width: 276px;
+  width: 98%;
   height: 540px;
 }
 
