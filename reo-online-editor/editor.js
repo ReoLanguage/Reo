@@ -396,9 +396,8 @@
     if (main) {
       var s1 = main.label.text + '(';
       var s2 = '';
-      var space1 = space2 = '';
-      
-        
+      var space1 = '', space2 = '';
+
       for (q = 0; q < nodes.length; q++) {
         var obj = nodes[q];
         if (obj.component.id == 'main' && isBoundaryNode(obj,obj.component)) {
@@ -417,8 +416,12 @@
              )
            )
         {
-          s2 += space2 + obj.name + '(' + obj.node1.label.text + ',' + obj.node2.label.text + ')';
-          space2 = ' ';
+          var node1 = obj.node1;
+          var node2 = obj.node2;
+          s2 += space2 + obj.name + '(' + node1.label.text + ',' + node2.label.text + ')';
+          s2 += ' /*! ' + 'pos(' + node1.label.text + '): [' + Math.round(node1.top) + ', ' + Math.round(node1.left) + '], ' +
+            'pos(' + node2.label.text + '): [' + Math.round(node2.top) + ', ' + Math.round(node2.left) + ']' + ' !*/';
+          space2 = '\n';
         }
       }
       
