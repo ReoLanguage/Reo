@@ -219,7 +219,7 @@ function createSyncSpout(syncspout, x1, y1, x2, y2) {
 
 function createFIFO1(FIFO1, x1, y1, x2, y2) {
   // create a channel...
-  FIFO1.name = 'sync';
+  FIFO1.name = 'fifo1';
   FIFO1.end1 = 'source';
   FIFO1.end2 = 'sink';
   
