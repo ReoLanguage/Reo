@@ -125,8 +125,7 @@
   document.getElementById("downloadCode").onclick = function () {
       var a = document.getElementById("download");
       a.download = "reo.treo";
-      var textFileAsBlob = new Blob([document.getElementById("text").value], {type: 'text/plain'});
-      a.href = window.URL.createObjectURL(textFileAsBlob);
+      a.href = window.URL.createObjectURL(new Blob([document.getElementById("text").value], {type: 'text/plain'}));
       a.click();
   };
 
@@ -349,7 +348,7 @@
         }
         var relationship = o.relationship;
         var newTransform = fabric.util.multiplyTransformMatrices(channel.components[0].calcTransformMatrix(), relationship);
-        opt = fabric.util.qrDecompose(newTransform);
+        let opt = fabric.util.qrDecompose(newTransform);
         o.set({
           flipX: false,
           flipY: false,
@@ -383,66 +382,61 @@
   } //updateChannel
   
   function isBoundaryNode (node, component) {
-    if (node.left == component.left ||
-        node.top  == component.top  ||
-        node.left == component.left + component.width ||
-        node.top  == component.top  + component.height)
-    {
-      return true;
-    }
-    return false;
+    return node.left === component.left ||
+      node.top === component.top ||
+      node.left === component.left + component.width ||
+      node.top === component.top + component.height;
   }
-  
+
   function updateText() {
     if (main) {
-      var s1 = main.label.text + '(';
-      var s2 = '';
-      var space1 = '', space2 = '';
+      var s1 = main.label.text + '(', s2 = '';
+      var space1 = '', space2 = '', q, obj;
 
-      for (q = 0; q < nodes.length; q++) {
-        var obj = nodes[q];
-        if (obj.component.id == 'main' && isBoundaryNode(obj,obj.component)) {
+      for (q = 0; q < nodes.length; ++q) {
+        obj = nodes[q];
+        if (obj.component.id === 'main' && isBoundaryNode(obj, obj.component)) {
           s1 += space1 + obj.label.text;
           space1 = ',';
         }
       }
-      
-      for (q = 0; q < channels.length; q++) {
-        var obj = channels[q];
+
+      for (q = 0; q < channels.length; ++q) {
+        obj = channels[q];
         if (obj.node1.component === main ||
             obj.node2.component === main ||
              (isBoundaryNode(obj.node1,obj.node1.component) &&
               isBoundaryNode(obj.node2,obj.node2.component) &&
-              obj.node1.component != obj.node2.component
+              obj.node1.component !== obj.node2.component
              )
            )
         {
-          var node1 = obj.node1;
-          var node2 = obj.node2;
+          let node1 = obj.node1;
+          let node2 = obj.node2;
           s2 += space2 + obj.name + '(' + node1.label.text + ',' + node2.label.text + ')';
           s2 += ' /*! ' + 'pos(' + node1.label.text + '): [' + Math.round(node1.top) + ', ' + Math.round(node1.left) + '], ' +
             'pos(' + node2.label.text + '): [' + Math.round(node2.top) + ', ' + Math.round(node2.left) + ']' + ' !*/';
           space2 = '\n';
         }
       }
-      
-      for (q = 0; q < components.length; q++) {
-        var obj = components[q];
-        if (obj != main) {
+
+      for (q = 0; q < components.length; ++q) {
+        obj = components[q];
+        if (obj !== main) {
           var s3 = '\n' + obj.label.text + '(';
-          var space3 = '';
-          
-          for (r = 0; r < nodes.length; r++) {
-            var obj2 = nodes[r];
+          var space3 = '', r, obj2;
+
+          for (r = 0; r < nodes.length; ++r) {
+            obj2 = nodes[r];
             if (obj2.component === obj && isBoundaryNode(obj2, obj2.component)) {
               s3 += space3 + obj2.label.text;
               space3 = ',';
             }
           }
           space3 = '';
-          s3 += ')\n{\n  ';
-          for (r = 0; r < channels.length; r++) {
-            var obj2 = channels[r];
+          s3 += ') {\n  ';
+          for (r = 0; r < channels.length; ++r) {
+            obj2 = channels[r];
             if (obj2.node1.component === obj && obj2.node2.component === obj) {
               s3 += space3 + obj2.name + '(' + obj2.node1.label.text + ',' + obj2.node2.label.text + ')';
               space3 = ',';
@@ -454,13 +448,12 @@
           space2 = ' ';
         }
       }
-        
-      
+
       s1 = s1 + ') {\n' + s2 + '\n}';
       document.getElementById('text').innerHTML = s1;
     }
   }
-  
+
   function snapToComponent(node, comp) {
     var right = comp.left + comp.width;
     var bottom = comp.top + comp.height;
