@@ -1,11 +1,11 @@
 function createSync(sync, x1, y1, x2, y2) {
-  // create a channel...    
+  // create a channel...
   sync.name = 'sync';
   sync.end1 = 'source';
   sync.end2 = 'sink';
-  
+
   // ...a line...
-  var line = new fabric.Line([x1, y1, x2, y2], {
+  let line = new fabric.Line([x1, y1, x2, y2], {
     fill: lineFillColour,
     stroke: lineStrokeColour,
     strokeWidth: lineStrokeWidth,
@@ -17,9 +17,9 @@ function createSync(sync, x1, y1, x2, y2) {
     originY: 'center',
   });
   sync.components.push(line);
-  
+
   // ...and an arrowhead
-  var a = new fabric.Triangle({
+  let a = new fabric.Triangle({
     left: x2 - arrowOffsetOut,
     top: y2,
     width: arrowFactor * lineStrokeWidth,
@@ -38,7 +38,7 @@ function createSync(sync, x1, y1, x2, y2) {
     referenceAngle: 270
   });
   sync.components.push(a);
-  
+
   return sync;
 } //createSync
 
@@ -47,9 +47,9 @@ function createLossySync(lossysync, x1, y1, x2, y2) {
   lossysync.name = 'lossysync';
   lossysync.end1 = 'source';
   lossysync.end2 = 'sink';
-  
+
   // ...a line...
-  var line = new fabric.Line([x1, y1, x2, y2], {
+  let line = new fabric.Line([x1, y1, x2, y2], {
     fill: lineFillColour,
     stroke: lineStrokeColour,
     strokeWidth: lineStrokeWidth,
@@ -62,9 +62,9 @@ function createLossySync(lossysync, x1, y1, x2, y2) {
     originY: 'center',
   });
   lossysync.components.push(line);
-  
+
   // ...and an arrowhead
-  var a = new fabric.Triangle({
+  let a = new fabric.Triangle({
     left: x2 - arrowOffsetOut,
     top: y2,
     width: arrowFactor * lineStrokeWidth,
@@ -83,7 +83,7 @@ function createLossySync(lossysync, x1, y1, x2, y2) {
     referenceAngle: 270
   });
   lossysync.components.push(a);
-  
+
   return lossysync;
 } //createLossySync
 
@@ -92,9 +92,9 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
   syncdrain.name = 'syncdrain';
   syncdrain.end1 = 'source';
   syncdrain.end2 = 'source';
-  
+
   // ...a line...
-  var line = new fabric.Line([x1, y1, x2, y2], {
+  let line = new fabric.Line([x1, y1, x2, y2], {
     fill: lineFillColour,
     stroke: lineStrokeColour,
     strokeWidth: lineStrokeWidth,
@@ -106,9 +106,9 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
     originY: 'center',
   });
   syncdrain.components.push(line);
-  
+
   // ...and an arrowhead
-  var a1 = new fabric.Triangle({
+  let a1 = new fabric.Triangle({
     left: x1 + arrowOffsetIn,
     top: y2,
     width: arrowFactor * lineStrokeWidth,
@@ -127,9 +127,9 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
     referenceAngle: 90
   });
   syncdrain.components.push(a1);
-  
+
   // ...and an arrowhead
-  var a2 = new fabric.Triangle({
+  let a2 = new fabric.Triangle({
     left: x2 - arrowOffsetIn,
     top: y2,
     width: arrowFactor * lineStrokeWidth,
@@ -148,7 +148,7 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
     referenceAngle: 270
   });
   syncdrain.components.push(a2);
-  
+
   return syncdrain;
 } //createSyncDrain
 
@@ -157,9 +157,9 @@ function createSyncSpout(syncspout, x1, y1, x2, y2) {
   syncspout.name = 'syncspout';
   syncspout.end1 = 'sink';
   syncspout.end2 = 'sink';
-  
+
   // ...a line...
-  var line = new fabric.Line([x1, y1, x2, y2], {
+  let line = new fabric.Line([x1, y1, x2, y2], {
     fill: lineFillColour,
     stroke: lineStrokeColour,
     strokeWidth: lineStrokeWidth,
@@ -171,9 +171,9 @@ function createSyncSpout(syncspout, x1, y1, x2, y2) {
     originY: 'center',
   });
   syncspout.components.push(line);
-  
+
   // ...and an arrowhead
-  var a1 = new fabric.Triangle({
+  let a1 = new fabric.Triangle({
     left: x1 + arrowOffsetOut,
     top: y2,
     width: arrowFactor * lineStrokeWidth,
@@ -192,9 +192,9 @@ function createSyncSpout(syncspout, x1, y1, x2, y2) {
     referenceAngle: 90
   });
   syncspout.components.push(a1);
-  
+
   // ...and an arrowhead
-  var a2 = new fabric.Triangle({
+  let a2 = new fabric.Triangle({
     left: x2 - arrowOffsetOut,
     top: y2,
     width: arrowFactor * lineStrokeWidth,
@@ -213,7 +213,7 @@ function createSyncSpout(syncspout, x1, y1, x2, y2) {
     referenceAngle: 270
   });
   syncspout.components.push(a2);
-  
+
   return syncspout;
 } //createSyncSpout
 
@@ -222,12 +222,12 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
   FIFO1.name = 'fifo1';
   FIFO1.end1 = 'source';
   FIFO1.end2 = 'sink';
-  
-  var diffX = Math.abs(x1-x2);
-  var diffY = Math.abs(y1-y2);
-  
+
+  let diffX = Math.abs(x1-x2);
+  let diffY = Math.abs(y1-y2);
+
   // ...a line...
-  var line = new fabric.Line([x1, y1, x2, y2], {
+  let line = new fabric.Line([x1, y1, x2, y2], {
     fill: lineFillColour,
     stroke: lineStrokeColour,
     strokeWidth: lineStrokeWidth,
@@ -239,9 +239,9 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     originY: 'center',
   });
   FIFO1.components.push(line);
-  
+
   // ...an arrowhead...
-  var a = new fabric.Triangle({
+  let a = new fabric.Triangle({
     left: x2 - arrowOffsetOut,
     top: y2,
     width: arrowFactor * lineStrokeWidth,
@@ -260,9 +260,9 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     referenceAngle: 270
   });
   FIFO1.components.push(a);
-  
+
   // ...and a rectangle
-  var rect = new fabric.Rect({
+  let rect = new fabric.Rect({
     left: Math.min(x1,x2) + diffX / 2,
     top: Math.min(y1,y2) + diffY / 2,
     width: fifoWidth,
@@ -281,6 +281,6 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     originY: 'center'
   });
   FIFO1.components.push(rect);
-  
+
   return FIFO1;
 } //createFIFO1
