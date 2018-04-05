@@ -262,10 +262,11 @@
       o.relationship = desiredTransform;
       canvas.add(channel.components[i]);
     }
-    canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
-    updateChannel(channel);
-    
     channels.push(channel);
+    
+    canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
+
+    updateChannel(channel);
     return channel;
   } //createChannel
   
