@@ -8,29 +8,29 @@
   var nodes = [];
   var channels = [];
   var components = [];
-  
+
   // drawing parameters
-  
+
   nodeFillColourSource = '#fff';
   nodeFillColourSink   = '#fff';
   nodeFillColourMixed  = '#000';
   nodeFactor           =      4;
-  
+
   lineFillColour       = '#000';
   lineStrokeColour     = '#000';
   lineStrokeWidth      =      1;
-  
+
   arrowFactor          =      8;
   arrowOffsetOut       = lineStrokeWidth * nodeFactor + 4;
   arrowOffsetIn        = arrowOffsetOut + arrowFactor;
-  
+
   fifoHeight           =     30;
   fifoWidth            =     10;
   fifoFillColour       = '#fff';
-  
+
   buttonBorderOff      = '2px solid white';
   buttonBorderOn       = '2px solid black';
-  
+
   document.getElementById("select").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'select';
@@ -41,7 +41,7 @@
       }
     });
   };
-  
+
   document.getElementById("component").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'component';
@@ -52,7 +52,7 @@
       }
     });
   };
-  
+
   document.getElementById("sync").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'sync';
@@ -63,7 +63,7 @@
       }
     });
   };
-  
+
   document.getElementById("lossysync").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'lossysync';
@@ -74,7 +74,7 @@
       }
     });
   };
-  
+
   document.getElementById("syncdrain").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'syncdrain';
@@ -85,7 +85,7 @@
       }
     });
   };
-  
+
   document.getElementById("syncspout").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'syncspout';
@@ -96,7 +96,7 @@
       }
     });
   };
-  
+
   document.getElementById("fifo1").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = 'fifo1';
@@ -107,14 +107,14 @@
       }
     });
   };
-  
+
   document.getElementById("downloadsvg").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.svg";
     a.href = 'data:image/svg+xml;base64,' + window.btoa(canvas.toSVG());
     a.click();
   };
-  
+
   document.getElementById("downloadpng").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.png";
@@ -123,10 +123,10 @@
   };
 
   document.getElementById("downloadCode").onclick = function () {
-      var a = document.getElementById("download");
-      a.download = "reo.treo";
-      a.href = window.URL.createObjectURL(new Blob([document.getElementById("text").value], {type: 'text/plain'}));
-      a.click();
+    var a = document.getElementById("download");
+    a.download = "reo.treo";
+    a.href = window.URL.createObjectURL(new Blob([document.getElementById("text").value], {type: 'text/plain'}));
+    a.click();
   };
 
   // generate a new object ID
@@ -152,7 +152,7 @@
 
     // these are the channels that are connected to this node
     node.channels = [];
-    
+
     var label = new fabric.IText(node.id, {
       left: left + 20,
       top: top - 20,
@@ -162,16 +162,16 @@
       hasControls: false
       //visible: false
     });
-    
+
     node.set({'label': label, 'labelOffsetX': 20, 'labelOffsetY': -20});
     label.on('editing:exited', function(e) {
       label.object.set({id: label.text});
     });
-    
+
     nodes.push(node);
     return node;
   } //createNode
-  
+
   function createAnchor(left, top) {
     var anchor = new fabric.Circle({
       left: left,
@@ -191,12 +191,12 @@
     // create a channel...
     var channel = {
       class: 'channel',
-      components: [] 
+      components: []
     };
-    
+
     var diffX = Math.abs(x1-x2);
     var diffY = Math.abs(y1-y2);
-    
+
     // ...a reference rectangle...
     channel.components[0] = new fabric.Rect({
       width: 5,
@@ -211,20 +211,20 @@
       originX: 'center',
       originY: 'center',
     });
-    
+
     // ...two nodes...
     channel.node1 = createNode(x1,y1);
     channel.node2 = createNode(x2,y2);
-    
+
     // ...and two anchors
     // TODO
     channel.anchor1 = createAnchor(133,100);
     channel.anchor2 = createAnchor(167,100);
-    
+
     // link the channel to the nodes
     channel.node1.channels.push(channel);
     channel.node2.channels.push(channel);
-    
+
     // currently loaded from a separate file
     // TODO: replace with a database search
     switch(name) {
@@ -248,9 +248,9 @@
         return;
         break;
     }
-    
+
     canvas.add(channel.components[0]);
-    
+
     // calculate the relation matrix between the channel component and the reference rectangle
     // then save it as a channel component property
     for (i = 1; i < channel.components.length; i++) {
@@ -262,13 +262,13 @@
       canvas.add(channel.components[i]);
     }
     channels.push(channel);
-    
+
     canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
 
     updateChannel(channel);
     return channel;
   } //createChannel
-  
+
   function calculateAngle(channel, baseAngle) {
     var angle = 0;
     var x = (channel.node2.get('left') - channel.node1.get('left'));
@@ -281,10 +281,10 @@
     } else {
       angle = (x < 0) ? Math.atan(y / x) + Math.PI : (y < 0) ? Math.atan(y / x) + (2 * Math.PI) : Math.atan(y / x);
     }
-    
+
     return ((angle * 180 / Math.PI) + baseAngle) % 360;
   } //calculateAngle
-  
+
   function updateNode(node) {
     var source = false;
     var sink = false;
@@ -304,7 +304,7 @@
       else
         console.log("Error updating nodes");
     }
-    
+
     if (source) {
       if (sink)
         node.set({'nodetype':'mixed','fill':nodeFillColourMixed});
@@ -314,7 +314,7 @@
     else
       node.set({'nodetype':'sink','fill':nodeFillColourSink});
   }
-  
+
   function updateChannel(channel) {
     var x1 = channel.node1.get('left');
     var y1 = channel.node1.get('top');
@@ -322,19 +322,19 @@
     var y2 = channel.node2.get('top');
     var diffX = Math.abs(x1-x2);
     var diffY = Math.abs(y1-y2);
-    
+
     // update the reference rectangle
     channel.components[0].set({'left': Math.min(x1,x2) + diffX / 2});
     channel.components[0].set({'top': Math.min(y1,y2) + diffY / 2});
     channel.components[0].set({'angle': calculateAngle(channel, 90)});
-    
+
     // convert new size to scaling
     var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
     var scale = length/channel.components[0].baseLength;
     channel.components[0].set({'scaleX': scale, 'scaleY': scale});
-    
+
     channel.components[0].setCoords();
-    
+
     // update all channel components
     for (k = 1; k < channel.components.length; k++) {
       var o = channel.components[k];
@@ -354,7 +354,7 @@
           flipY: false,
         });
         o.setPositionByOrigin(
-          { x: opt.translateX, y: opt.translateY },
+          {x: opt.translateX, y: opt.translateY},
           'center',
           'center',
         );
@@ -380,7 +380,7 @@
     }
     canvas.requestRenderAll();
   } //updateChannel
-  
+
   function isBoundaryNode (node, component) {
     return node.left === component.left ||
       node.top === component.top ||
@@ -473,7 +473,7 @@
     }
     updateText();
   }
-  
+
   function snapOutComponent(node, comp, connectednode) {
     var right = comp.left + comp.width;
     var bottom = comp.top + comp.height;
@@ -497,19 +497,19 @@
   canvas.on('object:moving', function(e) {
     e.target.setCoords();
   }); //object:moving
-  
+
   canvas.on('object:added', function(e) {
     updateText();
   }); //object:added
-  
+
   canvas.on('object:removed', function(e) {
     updateText();
   }); //object:removed
-  
+
   canvas.on('text:changed', function(e) {
     updateText();
   }); //text:editing:exited
-  
+
   function copy(obj) {
     var obj2 = obj.clone();
     if (obj.class == 'component') {
@@ -544,11 +544,11 @@
       });
       for (i = 0; i < obj.node1.channels.length; i++) {
         if (obj.node1.channels[i] == obj)
-          obj.node1.channels[i] = obj2;      
+          obj.node1.channels[i] = obj2;
       }
       for (j = 0; j < obj.node2.channels.length; j++) {
         if (obj.node2.channels[j] == obj)
-          obj.node2.channels[j] = obj2;      
+          obj.node2.channels[j] = obj2;
       }
     }
     if (obj.class == 'label') {
@@ -560,7 +560,7 @@
     }
     return obj2;
   }
-  
+
   canvas.on('mouse:over', function(e) {
     if (e.target && e.target.class == "anchor")
     {
@@ -568,7 +568,7 @@
       canvas.requestRenderAll();
     }
   }); //mouse:over
-  
+
   canvas.on('mouse:out', function(e) {
     if (e.target && e.target.class == "anchor")
     {
@@ -576,7 +576,7 @@
       canvas.requestRenderAll();
     }
   }); //mouse:out
-  
+
   canvas.on('mouse:down', function(e) {
     isDown = true;
     var pointer = canvas.getPointer(e.e);
@@ -587,7 +587,7 @@
       origLeft = p.left;
       origTop = p.top;
       return;
-    }    
+    }
     if (mode == 'select') {
       //console.log('Mode is select');
       if (p && p.class == 'component') {
@@ -639,7 +639,7 @@
       canvas.setActiveObject(channel.node2);
     }
   }); //mouse:down
-  
+
   canvas.on('mouse:move', function(e){
     if (!isDown)
       return;
@@ -700,7 +700,7 @@
     }
     canvas.requestRenderAll();
   }); //mouse:move
-  
+
   canvas.on('mouse:up', function(e){
     isDown = false;
     var p = canvas.getActiveObject();
@@ -710,12 +710,12 @@
         p.label.setCoords();
         p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
         p.set({'component': main});
-        
+
         for (i = nodes.length - 1; i >= 0; i--) {
           // prevent comparing the node with itself
           if (nodes[i].id == p.id)
             continue;
-            
+
           // merge nodes that overlap
           if (p.intersectsWithObject(nodes[i])) {
             if(Math.abs(p.left-nodes[i].left) < 10 && Math.abs(p.top-nodes[i].top) < 10) {
@@ -738,7 +738,7 @@
             }
           }
         }
-        
+
         // update the component property of the node
         canvas.forEachObject(function(obj) {
           if (p.intersectsWithObject(obj)) {
@@ -749,7 +749,7 @@
             }
           }
         });
-        
+
         // ensure that no channel crosses a component boundary
         for (m = 0; m < p.channels.length; m++) {
           if (p.channels[m].node1 == p) {
@@ -771,7 +771,7 @@
           else
             console.log("Broken node reference detected");
         }
-        
+
       }
       if (p.class == 'component') {
         p.label.setCoords();
@@ -782,7 +782,7 @@
       }
       if (p.class == 'label') {
         p.setCoords();
-        p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});    
+        p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});
       }
       else {
         canvas.discardActiveObject();
@@ -805,7 +805,7 @@
       canvas.requestRenderAll();
     }
   }); //mouse:up
-  
+
   /* Reorders the components so that all components are behind the other elements and p is in front of the other components */
   function reorderComponents(p) {
     if (p) {
@@ -819,13 +819,13 @@
       }
     });
   }
-  
+
   function drawComponent(x1,y1,x2,y2) {
     var width = (x2 - x1);
     var height = (y2 - y1);
     var left = x1;
     var top = y1;
-  
+
     var rect = new fabric.Rect({
       left: left,
       top: top,
@@ -844,7 +844,7 @@
       status: 'drawing',
       id: generateId()
     });
-    
+
     var label = new fabric.IText('name', {
       left: left + (width / 2),
       top: top - 15,
@@ -853,16 +853,16 @@
       object: rect,
       hasControls: false
     });
-    
+
     rect.set({'label': label, 'labelOffsetX': left + (width / 2), 'labelOffsetY': -15});
-  
+
     rect.setCoords();
     canvas.add(rect,label);
     canvas.requestRenderAll();
     components.push(rect);
     return rect;
   }
-  
+
   var main = drawComponent(50,50,750,550);
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   main.label.set({'text': 'main'});
