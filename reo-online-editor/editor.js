@@ -129,6 +129,30 @@
     a.click();
   };
 
+  document.getElementById("submit").onclick = async function () {
+    async function sourceLoader(fname) {
+      return new Promise(function (resolve, reject) {
+        var client = new XMLHttpRequest();
+        client.open('GET', fname);
+        client.onreadystatechange = function () {
+          if (client.readyState === 4) {
+            if (this.status !== 200) {
+              return reject(this.status);
+            }
+            return resolve(client.responseText);
+          }
+        };
+        client.send();
+      });
+    }
+    let text = document.getElementById("text").value;
+    let network = new ReoNetwork(sourceLoader);
+    await network.includeSource('reo2tikz/core.treo');
+    await network.parseComponent(text.replace(/\n/g, ''));
+
+    console.log(await network.generateCode());
+  };
+
   // generate a new object ID
   // ID will only contain letters, i.e. z is followed by aa
   function generateId() {

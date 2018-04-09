@@ -1,0 +1,42 @@
+/*!
+shape(sync(a; b)): {
+	\path[draw,decoration={markings},postaction=decorate] (#pos) to #pathtoa; 
+	\path[draw,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (#pos) to #pathtob; 
+},
+
+shape(fifo(a; b)): {
+	\coordinate (chendA) at ($(#pos)-(#angle:0.25)$);
+	\coordinate (chendB) at ($(#pos)+(#angle:0.25)$);
+	\draw ($(chendA)!0.15cm!-90:(chendB)$) -- ($(chendB)!0.15cm!90:(chendA)$) -- ($(chendB)!0.15cm!-90:(chendA)$) -- ($(chendA)!0.15cm!90:(chendB)$) -- cycle;
+	\node at (#pos) {#value};
+	\path[draw,decoration={markings},postaction=decorate] (chendA) to #pathtoa; 
+	\path[draw,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (chendB) to #pathtob; 
+},
+
+shape(syncdrain(a; b)): {
+	\path[draw,decoration={markings, mark=at position 1pt with \arrowstylerev},postaction=decorate] (#pos) to #pathtoa; 
+	\path[draw,decoration={markings, mark=at position 1pt with \arrowstylerev},postaction=decorate] (#pos) to #pathtob; 
+},
+
+shape(lossysync(a; b)): {
+	\path[draw,dash pattern=on 3pt off 3pt,decoration={markings},postaction=decorate] (#pos) to #pathtoa; 
+	\path[draw,dash pattern=on 0pt off 3pt on 3pt off 0pt,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (#pos) to #pathtob; 
+},
+
+shape(xor(a; b, c)): {
+	\node [draw,circle,minimum width=0.25 cm,path picture={
+		\draw[black] (path picture bounding box.south east) -- (path picture bounding box.north west) (path picture bounding box.south west) -- (path picture bounding box.north east);
+	}](xor) at (#pos){}; 
+	\path[draw,decoration={markings, mark=at position 0.0 with \arrowstylerev},postaction=decorate] (xor) to #pathtoa; 
+	\path[draw,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (xor) to #pathtob;
+	\path[draw,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (xor) to #pathtoc; 
+},
+
+shape(filter(a; b)): {
+	\coordinate (chendA) at ($(#pos)-(#angle:0.25)$);
+	\coordinate (chendB) at ($(#pos)+(#angle:0.25)$);
+	\path [decoration={zigzag,pre length=0.01cm,post length=0.01cm,segment length=2,amplitude=1.5,post=lineto,post length=2pt},line join=round] (chendA) edge[decorate] node[auto] {#value} (chendB);
+	\path[draw,decoration={markings},postaction=decorate] (chendA) to #pathtoa; 
+	\path[draw,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (chendB) to #pathtob;
+}
+!*/
