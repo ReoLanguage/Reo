@@ -54,28 +54,6 @@ function genShapeDef(cname, args, shapedef) {
   return {cName: cname, impl: ReoComponentTikz, binding: []};
 }
 
-ReoNetwork.prototype.solveExpression = function (expr, env) {
-  let execstr = "";
-  for (let sym in env) {
-    execstr += "let @@=@@;".format(sym, env[sym]);
-  }
-  return eval(execstr + expr);
-};
-
-ReoNetwork.prototype.parseNumber = function (expr, env) {
-  if (typeof expr === 'number') {
-    return expr;
-  }
-  return this.solveExpression(expr, env);
-};
-
-ReoNetwork.prototype.parseNumberArray = function (arr, env) {
-  for (let i = 0; i < arr.length; i++) {
-    arr[i] = this.parseNumber(arr[i], env);
-  }
-  return arr;
-};
-
 ReoNetwork.prototype.getImplementationFor = async function (cName, binding) {
   // exsts?
   for (let impl of this.componentDefinitions) {

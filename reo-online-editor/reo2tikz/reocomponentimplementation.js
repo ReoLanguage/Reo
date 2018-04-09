@@ -25,7 +25,7 @@ ReoComponentImplementation.prototype.genNodeName = function (ident, env) {
   let m = r.exec(ident);
   let wpname = this.implName + ident;
   if (m) {
-    wpname = this.implName + m[1] + this.network.parseNumber(m[2], env);
+    wpname = this.implName + m[1] + parseNumber(m[2], env);
   }
   return wpname;
 };
@@ -196,12 +196,12 @@ ReoComponentImplementation.prototype.procMeta = async function (s, env) {
   switch (s.key) {
     case 'pos':
       let wpname = this.genNodeName(s.keyarg, env);
-      let coord = this.network.parseNumberArray(s.value, env);
+      let coord = parseNumberArray(s.value, env);
       this.nodes[wpname] = coord;
       this.waypoints[wpname] = coord;
       break;
     case 'bound':
-      this.bound = [this.network.parseNumberArray(s.value[0], env), this.network.parseNumberArray(s.value[1], env)];
+      this.bound = [parseNumberArray(s.value[0], env), parseNumberArray(s.value[1], env)];
       break;
     case 'spacing':
       this.drawNodeSpacing = s.value;
@@ -231,8 +231,8 @@ ReoComponentImplementation.prototype.parseInnerStr = async function (str, env) {
 
     let matchStr = m[0];
     let itrSymbol = m[1];
-    let boundL = this.network.parseNumber(m[2], env);
-    let boundR = this.network.parseNumber(m[3], env);
+    let boundL = parseNumber(m[2], env);
+    let boundR = parseNumber(m[3], env);
     let innerScopeStr = m[4];
 
     for (let itr = parseInt(boundL); itr <= parseInt(boundR); itr++) {
@@ -259,7 +259,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function (str, env) {
     let argsOut = (m[5] || '').split(',').map(function (x) {return x.trim()}).filter(function (x) {return x.length > 0});
 
     let self = this;
-    argsTempl = argsTempl.map(function (x) {return self.network.parseNumber(x, env)});
+    argsTempl = argsTempl.map(function (x) {return parseNumber(x, env)});
     let impl = await this.network.getImplementationFor(cName, argsTempl);
     let usedComponent = new impl.impl();
 
@@ -300,7 +300,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function (str, env) {
             usedComponent.value = s.value;
             break;
           case 'angle':
-            usedComponent.angle = this.network.parseNumber(s.value, env);
+            usedComponent.angle = parseNumber(s.value, env);
             break;
           case 'pos':
             if (!s.keyarg) {
@@ -310,7 +310,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function (str, env) {
               this.nodes[wpname] = coord;
               this.waypoints[wpname] = coord;*/
               // component pos
-              usedComponent.pos = this.network.parseNumberArray(s.value, env);
+              usedComponent.pos = parseNumberArray(s.value, env);
               break;
             }
           // else: fall through
