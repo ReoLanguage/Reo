@@ -13,10 +13,10 @@ function ReoNetwork(sourceLoader) {
 
 ReoNetwork.prototype.includeSource = async function (inclIdent) {
   let src = await this.sourceLoader(inclIdent);
-  await this.procSource(src);
+  await this.processSource(src);
 };
 
-ReoNetwork.prototype.procSource = async function (src) {
+ReoNetwork.prototype.processSource = async function (src) {
   await this.parseComponent(src.replace(/[\n\r]/g, ''));
 };
 
@@ -25,8 +25,8 @@ function genShapeDef(cname, args, shapedef) {
 
   ReoComponentTikz.prototype = Object.create(ReoComponent.prototype);
   ReoComponentTikz.prototype.typeName = cname;
-  ReoComponentTikz.prototype.define = function (definestate, outp) {
-    let argList = '';
+  ReoComponentTikz.prototype.define = function (definestate) {
+    let argList = '', output = '';
     let argmap = {'pos': 1, 'angle': 2, 'value': args.length + 3};
     for (let i = 0; i < args.length; i++) {
       argList += ',#' + (i + 3);
@@ -37,25 +37,27 @@ function genShapeDef(cname, args, shapedef) {
       tikzsrc = tikzsrc.split('#' + k).join('#' + argmap[k]);
     }
     argList += ',#' + (args.length + 3);
-    outp.value += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
-    outp.value += tikzsrc;
-    outp.value += '}\n';
+    output += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
+    output += tikzsrc;
+    output += '}\n';
+    return output
   };
-  ReoComponentTikz.prototype.draw = function (outp) {
-    let argList = '';
+  ReoComponentTikz.prototype.draw = function () {
+    let argList = '', output = '';
     for (let i = 0; i < args.length; i++) {
       argList += ', ' + this.genPath(this.waypointsToPortIndex[i]);
     }
     argList += ', ' + (this.value || '');
-    outp.value += ('  \\coordinate (tmp) at ($(@@,@@)$);\n'.format(this.pos[0], this.pos[1]));
-    outp.value += ('  \\reodraw@@!tmp, @@@@!;\n'.format(this.typeName, this.angle, argList));
+    output += ('  \\coordinate (tmp) at ($(@@,@@)$);\n'.format(this.pos[0], this.pos[1]));
+    output += ('  \\reodraw@@!tmp, @@@@!;\n'.format(this.typeName, this.angle, argList));
+    return output
   };
 
   return {cName: cname, impl: ReoComponentTikz, binding: []};
 }
 
 ReoNetwork.prototype.getImplementationFor = async function (cName, binding) {
-  // exsts?
+  // exists?
   for (let impl of this.componentDefinitions) {
     if (impl.cName === cName && impl.binding.length === binding.length) {
       let err = false;
@@ -92,7 +94,7 @@ ReoNetwork.prototype.parseMeta = function (str) {
     // convert block type to json valid string, replace : with ` because regex isn't powerful enough for this
     mstr = mstr.replace(/{(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)}/g, function (m, a, s) {return JSON.stringify(a.replace(/:/g, '`'))});
     // stringify keys, replace ` back for :
-    let fixedstr = mstr.replace(/([a-z][^\s,\(\)]*|[a-z]+\(.*?\)):/g, '"$1":');
+    let fixedstr = mstr.replace(/([a-z][^\s,()]*|[a-z]+\(.*?\)):/g, '"$1":');
     fixedstr = "{" + fixedstr.replace(/`/g, ':') + "}";
 
     let mdata = JSON.parse(fixedstr);
@@ -114,7 +116,7 @@ ReoNetwork.prototype.parseMeta = function (str) {
 ReoNetwork.prototype.processMeta = async function (s, env) {
   switch (s.key) {
     case 'shape':
-      let m = /^([a-z]+)\((.*?)\)/.exec(s.keyarg);
+      let m = /^([a-z]\w+)\((.*?)\)/.exec(s.keyarg);
       let cname = m[1];
       let args = m[2].replace(';', ',').split(',').map(function (x) {return x.trim()}).filter(function (x) {return x.length > 0});
       this.componentDefinitions.push(genShapeDef(cname, args, s.value));
@@ -137,9 +139,9 @@ ReoNetwork.prototype.parseComponent = async function (str) {
     await this.processMeta(s, {});
   }
 
-  // scope matching: {(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)}     < up to 3 nested
+  // scope matching: {(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)} < up to 3 nested
   // cname<templargs>(inargs, ; outargs, ) { innerscope }
-  let p = /^\s*(\w+)(?:<([^>]*)>)?\(([^\);]*)(;([^\);]+))?\)\s*{(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)}\s*/g;
+  let p = /^\s*(\w+)(?:<([^>]*)>)?\(([^);]*)(;([^);]+))?\)\s*{(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)}\s*/g;
   let m = p.exec(str);
   if (m) {
     // Template definition
@@ -162,24 +164,21 @@ ReoNetwork.prototype.parseComponent = async function (str) {
 };
 
 ReoNetwork.prototype.generateCode = async function () {
-  let outp = {"value": ""}; // pass by reference through this technique
+  let output = '\\begin{tikzpicture}\n' +
+    '\\tikzset{gnode/.style={draw, shape=circle, fill=black, minimum size=3pt, inner sep=0pt, outer sep=0pt,label={90:#1}}};\n' +
+    '\\def \\arrowstyle {\\arrow[scale=1.4]{stealth\'}}\n' +
+    '\\def \\arrowstylerev {\\arrowreversed[scale=1.4]{stealth\'}};\n';
 
-  outp.value += '\\begin{tikzpicture}\n';
-  outp.value += '\\tikzset{gnode/.style={draw, shape=circle, fill=black, minimum size=3pt, inner sep=0pt, outer sep=0pt,label={90:#1}}};\n';
-  outp.value += '\\def \\arrowstyle {\\arrow[scale=1.4]{stealth\'}}\n';
-  outp.value += '\\def \\arrowstylerev {\\arrowreversed[scale=1.4]{stealth\'}};\n';
-
-  //let component = this.componentImplementations['main'];
   let component = await this.getImplementationFor('main', []);
   let mainInstance = new component.impl();
 
   let definesstate = {}; // stores what's already been defined
-  mainInstance.define(definesstate, outp);
+  output += mainInstance.define(definesstate);
 
-  outp.value += '\\reoimpldraw@@!!\n'.format(mainInstance.typeName);
-  outp.value += '\\end{tikzpicture}\n';
+  output += '\\reoimpldraw@@!!\n'.format(mainInstance.typeName);
+  output += '\\end{tikzpicture}\n';
 
-  return outp.value;
+  return output;
 };
 
 if (typeof module !== 'undefined') {

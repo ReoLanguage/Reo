@@ -4,7 +4,7 @@ ReoComponent.prototype.define = function (definestate, outp) {
   throw 'not defined';
 };
 
-ReoComponent.prototype.draw = function (outp) {
+ReoComponent.prototype.draw = function () {
   throw 'not defined';
 };
 

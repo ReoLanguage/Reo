@@ -163,33 +163,35 @@ ReoComponentImplementation.prototype.shift = function (offset) {
   this.bound[1][1] += offset[1];
 };
 
-ReoComponentImplementation.prototype.define = function (drawstate, outp) {
+ReoComponentImplementation.prototype.define = function (drawstate) {
+  let output = '';
   // Define used components
   for (let cidx = 0; cidx < this.innerComponents.length; cidx++) {
     let comp = this.innerComponents[cidx];
     if (!drawstate[comp.typeName]) {
       drawstate[comp.typeName] = true;
-      comp.define(drawstate, outp);
+      output += comp.define(drawstate);
     }
   }
 
-  outp.value += '\\def \\reoimpldraw@@ !!{\n'.format(this.implName);
+  output += '\\def \\reoimpldraw@@ !!{\n'.format(this.implName);
   // Nodes
   for (let n in this.waypoints) {
     if (this.nodes[n]) {
-      outp.value += ('  \\node[gnode=@@] (@@) at (@@,@@) {};\n'.format(this.labels[n] || '', n, this.waypoints[n][0], this.waypoints[n][1]));
+      output += ('  \\node[gnode=@@] (@@) at (@@,@@) {};\n'.format(this.labels[n] || '', n, this.waypoints[n][0], this.waypoints[n][1]));
     } else {
-      outp.value += ('  \\coordinate (@@) at (@@,@@) {};\n'.format(n, this.waypoints[n][0], this.waypoints[n][1]));
+      output += ('  \\coordinate (@@) at (@@,@@) {};\n'.format(n, this.waypoints[n][0], this.waypoints[n][1]));
     }
   }
 
   // Components
   for (let cidx = 0; cidx < this.innerComponents.length; cidx++) {
     let comp = this.innerComponents[cidx];
-    comp.draw(outp);
+    output += comp.draw();
   }
 
-  outp.value += '}\n';
+  output += '}\n';
+  return output
 };
 
 ReoComponentImplementation.prototype.processMeta = async function (s, env) {
