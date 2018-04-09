@@ -18,7 +18,7 @@ ReoComponentImplementation.prototype.genWaypointName = function() {
 	let wpname = this.implName + 'waypoint' + String.fromCharCode(97 + this.generatedWaypointCount);
 	this.generatedWaypointCount++;
 	return wpname;
-}
+};
 
 ReoComponentImplementation.prototype.genNodeName = function(ident, env) {
 	let r = /^(\w+)\[([^\]]+)\]$/g;
@@ -28,7 +28,7 @@ ReoComponentImplementation.prototype.genNodeName = function(ident, env) {
 		wpname = this.implName + m[1] + this.network.parseNumber(m[2], env);
 	}
 	return wpname;
-}
+};
 
 ReoComponentImplementation.prototype.scale = function(sx, sy) {
 	for (let n in this.waypoints) {
@@ -50,7 +50,7 @@ ReoComponentImplementation.prototype.scale = function(sx, sy) {
 		this.bound[1][0] *= sx;
 		this.bound[1][1] *= sy;
 	}
-}
+};
 
 ReoComponentImplementation.prototype.normalizePositions = function() {
 	// normalize coords
@@ -70,7 +70,7 @@ ReoComponentImplementation.prototype.normalizePositions = function() {
 
 	// knowing the nearest pair of nodes, rescale all waypoints
 	this.scale(nearestInCm / nearestNodes, -nearestInCm / nearestNodes);
-}
+};
 
 ReoComponentImplementation.prototype.inferMissingMeta = function() {
 	// if position if a component isn't yet known (not in meta), derive it from paths
@@ -103,7 +103,7 @@ ReoComponentImplementation.prototype.inferMissingMeta = function() {
 			comp.angle = angle;
 		}
 	}
-}
+};
 
 ReoComponentImplementation.prototype.inferBound = function() {
 	this.bound = [
@@ -145,7 +145,7 @@ ReoComponentImplementation.prototype.inferBound = function() {
 	this.bound[0][1] += postPush[0][1];
 	this.bound[1][0] += postPush[1][0];
 	this.bound[1][1] += postPush[1][1];
-}
+};
 
 ReoComponentImplementation.prototype.shift = function(offset) {
 	// shift waypoints (incl nodes), used components and the bound
@@ -161,7 +161,7 @@ ReoComponentImplementation.prototype.shift = function(offset) {
 	this.bound[0][1] += offset[1];
 	this.bound[1][0] += offset[0];
 	this.bound[1][1] += offset[1];
-}
+};
 
 ReoComponentImplementation.prototype.define = function(drawstate, outp) {
 	// Define used components
@@ -190,7 +190,7 @@ ReoComponentImplementation.prototype.define = function(drawstate, outp) {
 	}
 
 	outp.value += '}\n';
-}
+};
 
 ReoComponentImplementation.prototype.procMeta = async function(s, env) {
 	switch (s.key) {
@@ -212,7 +212,7 @@ ReoComponentImplementation.prototype.procMeta = async function(s, env) {
 		default:
 			await this.network.procMeta(s, env);
 	}
-}
+};
 
 ReoComponentImplementation.prototype.parseInnerStr = async function(str, env) {
 	// peek for next keyword
@@ -221,7 +221,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function(str, env) {
 	if (!peekM)
 		return;
 
-	if (peekM[1] == 'for') {
+	if (peekM[1] === 'for') {
 		let p = /^\s*for\s+(\w+)\s*=\s*(.+?)\s*\.\.\s*(.+?)\s*{(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)}\s*/g;
 		let m = p.exec(str);
 
@@ -243,7 +243,6 @@ ReoComponentImplementation.prototype.parseInnerStr = async function(str, env) {
 
 		let nextStr = str.substring(matchStr.length);
 		await this.parseInnerStr(nextStr, env);
-		return;
 	} else {
 		// Parse component def
 		let p = /^\s*(\w+)(?:<([^>]*)>)?\(([^;\)]*)(;([^;\)]+))?\)\s*/g; // compname<templargs, >(inargs, , , ; outargs opt, , ,)
@@ -258,7 +257,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function(str, env) {
 		let argsTempl = (m[2] || '').split(',').map(function(x) { return x.trim(); }).filter(function(x) { return x.length > 0; });
 		let argsIn = m[3].split(',').map(function(x) { return x.trim(); }).filter(function(x) { return x.length > 0; });
 		let argsOut = (m[5] || '').split(',').map(function(x) { return x.trim(); }).filter(function(x) { return x.length > 0; });
-		
+
 		let self = this;
 		argsTempl = argsTempl.map(function(x) { return self.network.parseNumber(x, env); });
 		let impl = await this.network.getImplementationFor(cName, argsTempl);
@@ -281,7 +280,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function(str, env) {
 
 
 		let nextStr = str.substring(matchStr.length);
-		if (nextStr.substring(0, 3) == '/*!') { // Component metadata
+		if (nextStr.substring(0, 3) === '/*!') { // Component metadata
 			let res = this.network.parseMeta(nextStr);
 			nextStr = res[0];
 			let mdata = res[1];
@@ -313,9 +312,8 @@ ReoComponentImplementation.prototype.parseInnerStr = async function(str, env) {
 							// component pos
 							usedComponent.pos = this.network.parseNumberArray(s.value, env);
 							break;
-						} else {
-							// fall thru
 						}
+						// else: fall through
 					default:
 						await this.procMeta(s, env);
 				}
@@ -326,7 +324,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function(str, env) {
 
 		await this.parseInnerStr(nextStr, env);
 	}
-}
+};
 
 if (typeof module !== 'undefined') {
 	module.exports = ReoComponentImplementation;

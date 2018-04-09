@@ -19,7 +19,7 @@ ReoComponentTemplate.prototype.implement = async function(binding) {
 	this.implementationCount++;
 	let component = new ReoComponentImplementation(this.network, this.cName, implName, this.argsIn, this.argsOut);
 
-	if (binding.length != this.argsTempl.length) {
+	if (binding.length !== this.argsTempl.length) {
 		throw 'incorrect amount of template args';
 	}
 
@@ -31,7 +31,7 @@ ReoComponentTemplate.prototype.implement = async function(binding) {
 	// IO set
 	for (let rawIn of this.argsIn) { component.isIO[component.genNodeName(rawIn, env)] = true; }
 	for (let rawOut of this.argsOut) { component.isIO[component.genNodeName(rawOut, env)] = true; }
-	
+
 	let metaDeep = JSON.parse(JSON.stringify(this.mdata));
 	for (let s of metaDeep) {
 		await component.procMeta(s, env);
@@ -89,7 +89,7 @@ ReoComponentTemplate.prototype.implement = async function(binding) {
 		}
 		outp.value += '  \\end{scope}\n';
 		outp.value += '}\n';
-	}
+	};
 	ReoComponentComposition.prototype.draw = function(outp) {
 		let argList = '';
 		for (let i = 0; i < argsIn.length + argsOut.length; i++) {
@@ -97,13 +97,12 @@ ReoComponentTemplate.prototype.implement = async function(binding) {
 		}
 		outp.value += ('  \\coordinate (tmp) at ($(@@,@@)$);\n'.format(this.pos[0], this.pos[1]));
 		outp.value += ('  \\reodraw@@!tmp, @@@@!;\n'.format(this.typeName, this.angle, argList));
-	}
-
+	};
 
 	//this.componentDefinitions[m[1]] = ReoComponentComposition;
 
 	return ReoComponentComposition;
-}
+};
 
 if (typeof module !== 'undefined') {
 	module.exports = ReoComponentTemplate;

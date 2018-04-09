@@ -11,7 +11,7 @@ ReoComponent.prototype.draw = function(outp) {
 };
 
 ReoComponent.prototype.genPath = function(waypoints) {
-	var path = [];
+	let path = [];
 	for (let wp of waypoints) {
 		path.push('(@@)'.format(wp));
 	}
