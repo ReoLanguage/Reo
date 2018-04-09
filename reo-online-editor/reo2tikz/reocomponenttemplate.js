@@ -34,7 +34,7 @@ ReoComponentTemplate.prototype.implement = async function (binding) {
 
   let metaDeep = JSON.parse(JSON.stringify(this.mdata));
   for (let s of metaDeep) {
-    await component.procMeta(s, env);
+    await component.processMeta(s, env);
   }
 
   await component.parseInnerStr(this.innerScopeStr, env); // todo binding

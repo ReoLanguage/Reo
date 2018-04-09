@@ -111,7 +111,7 @@ ReoNetwork.prototype.parseMeta = function (str) {
   return [str, mdataparsed];
 };
 
-ReoNetwork.prototype.procMeta = async function (s, env) {
+ReoNetwork.prototype.processMeta = async function (s, env) {
   switch (s.key) {
     case 'shape':
       let m = /^([a-z]+)\((.*?)\)/.exec(s.keyarg);
@@ -134,7 +134,7 @@ ReoNetwork.prototype.parseComponent = async function (str) {
   let metaRes = this.parseMeta(str);
   str = metaRes[0];
   for (let s of metaRes[1]) {
-    await this.procMeta(s, {});
+    await this.processMeta(s, {});
   }
 
   // scope matching: {(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)}     < up to 3 nested

@@ -192,7 +192,7 @@ ReoComponentImplementation.prototype.define = function (drawstate, outp) {
   outp.value += '}\n';
 };
 
-ReoComponentImplementation.prototype.procMeta = async function (s, env) {
+ReoComponentImplementation.prototype.processMeta = async function (s, env) {
   switch (s.key) {
     case 'pos':
       let wpname = this.genNodeName(s.keyarg, env);
@@ -210,7 +210,7 @@ ReoComponentImplementation.prototype.procMeta = async function (s, env) {
       this.labels[this.genNodeName(s.keyarg, env)] = s.value;
       break;
     default:
-      await this.network.procMeta(s, env);
+      await this.network.processMeta(s, env);
   }
 };
 
@@ -315,7 +315,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function (str, env) {
             }
             // else: fall through
           default:
-            await this.procMeta(s, env);
+            await this.processMeta(s, env);
         }
       }
     }
