@@ -313,7 +313,7 @@ ReoComponentImplementation.prototype.parseInnerStr = async function (str, env) {
               usedComponent.pos = parseNumberArray(s.value, env);
               break;
             }
-          // else: fall through
+            // else: fall through
           default:
             await this.procMeta(s, env);
         }

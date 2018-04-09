@@ -1,6 +1,4 @@
-function ReoComponent() {
-
-}
+function ReoComponent() {}
 
 ReoComponent.prototype.define = function (definestate, outp) {
   throw 'not defined';
@@ -12,9 +10,8 @@ ReoComponent.prototype.draw = function (outp) {
 
 ReoComponent.prototype.genPath = function (waypoints) {
   let path = [];
-  for (let wp of waypoints) {
+  for (let wp of waypoints)
     path.push('(@@)'.format(wp));
-  }
   return path.join(' to ');
 };
 
