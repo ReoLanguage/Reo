@@ -150,7 +150,11 @@
     await network.includeSource('reo2tikz/core.treo');
     await network.parseComponent(text.replace(/\n/g, ''));
 
-    console.log(await network.generateCode());
+    try {
+      console.log(await network.generateCode())
+    } catch (e) {
+      alert(e)
+    }
   };
 
   // generate a new object ID
