@@ -39,18 +39,18 @@ ReoComponentTemplate.prototype.implement = async function (binding) {
 
   await component.parseInnerStr(this.innerScopeStr, env); // todo binding
 
-  component.inferMissingMeta();
-  if (this.network.cfgNormalize) {
-    component.normalizePositions();
-  } else {
-    // just flip Y
-    component.scale(1, -1);
-  }
+  // component.inferMissingMeta();
+  // if (this.network.cfgNormalize) {
+  //   component.normalizePositions();
+  // } else {
+  //   // just flip Y
+  //   component.scale(1, -1);
+  // }
 
-  if (!component.bound) {
-    component.inferBound();
-  }
-  component.shift([(component.bound[0][0] - component.bound[1][0]) * 0.5 - component.bound[0][0], (component.bound[0][1] - component.bound[1][1]) * 0.5 - component.bound[0][1]]);
+  // if (!component.bound) {
+  //   component.inferBound();
+  // }
+  // component.shift([(component.bound[0][0] - component.bound[1][0]) * 0.5 - component.bound[0][0], (component.bound[0][1] - component.bound[1][1]) * 0.5 - component.bound[0][1]]);
 
   for (let comp of component.innerComponents) {
     component.dependencies[comp.typeName] = true;
@@ -74,10 +74,10 @@ ReoComponentTemplate.prototype.implement = async function (binding) {
     output += component.define(definestate);
     let argList = '';
     for (let i = 0; i < argsIn.length + argsOut.length; i++) {
-      argList += ',arg' + (i + 3);
+      argList += 'arg' + (i + 3) + ', ';
     }
     // output += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
-    output += 'function reodraw@@(arg1,arg2@@) {\n'.format(this.typeName, argList);
+    output += 'function reodraw@@(@@) {\n'.format(this.typeName, argList);
     output += '  let @@ = drawComponent(50,50,750,550);\n'.format(this.typeName);
     output += `  ${this.typeName}.label.set({'text': '${this.typeName}'});\n`;
     // output += '  \\begin{scope}[shift=(#1),rotate around={#2:(#1)}]\n';
@@ -98,11 +98,11 @@ ReoComponentTemplate.prototype.implement = async function (binding) {
   ReoComponentComposition.prototype.draw = function () {
     let argList = '', output = '';
     for (let i = 0; i < argsIn.length + argsOut.length; i++) {
-      argList += ', ' + this.genPath(this.waypointsToPortIndex[i]);
+      argList += this.genPath(this.waypointsToPortIndex[i]) + ', ';
     }
     // output += ('  \\coordinate (tmp) at ($(@@,@@)$);\n'.format(this.pos[0], this.pos[1]));
     // output += ('  \\reodraw@@!tmp, @@@@!;\n'.format(this.typeName, this.angle, argList));
-    output += ('  reodraw@@(tmp, @@@@);\n'.format(this.typeName, this.angle, argList));
+    output += '  reodraw@@(@@);\n'.format(this.typeName, argList);
     return output
   };
 

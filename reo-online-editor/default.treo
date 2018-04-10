@@ -1,22 +1,22 @@
 /*!
 shape(sync(a; b)): {
-	createchannel ('sync',#pos,#pathtoa);
+	createChannel ('sync',#pathtoax,#pathtoay,#pathtobx,#pathtoby);
 },
 
 shape(fifo1(a; b)): {
-	createchannel ('fifo1',#pos,#pathtoa);
+	createChannel ('fifo1',#pathtoax,#pathtoay,#pathtobx,#pathtoby);
 },
 
 shape(syncdrain(a; b)): {
-	createchannel ('syncdrain',#pos,#pathtoa);
+	createChannel ('syncdrain',#pathtoax,#pathtoay,#pathtobx,#pathtoby);
 },
 
 shape(lossysync(a; b)): {
-	createchannel ('lossysync',#pos,#pathtoa);
+	createChannel ('lossysync',#pathtoax,#pathtoay,#pathtobx,#pathtoby);
 },
 
 shape(syncspout(a; b)): {
-	createchannel ('syncspout',#pos,#pathtoa);
+	createChannel ('syncspout',#pathtoax,#pathtoay,#pathtobx,#pathtoby);
 },
 
 shape(xor(a; b, c)): {

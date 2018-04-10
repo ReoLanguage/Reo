@@ -27,31 +27,40 @@ function genShapeDef(cname, args, shapedef) {
   ReoComponentTikz.prototype.typeName = cname;
   ReoComponentTikz.prototype.define = function (definestate) {
     let argList = '', output = '';
-    let argmap = {'pos': 1, 'angle': 2, 'value': args.length + 3};
+    // let argmap = {'pos': 1, 'angle': 2, 'value': args.length + 3};
+    let argmap = {};
     for (let i = 0; i < args.length; i++) {
-      argList += ',arg' + (i + 3);
-      argmap['pathto' + args[i]] = i + 3;
+      // argList += ',arg' + (i + 3);
+      // argmap['pathto' + args[i]] = i + 3;
+      argList += 'arg' + (i + 1) + 'x,';
+      argList += 'arg' + (i + 1) + 'y,';
+      argmap['pathto' + args[i]] = i + 1;
     }
     let tikzsrc = shapedef;
     for (let k in argmap) {
       tikzsrc = tikzsrc.split('#' + k).join('arg' + argmap[k]);
     }
-    argList += ',arg' + (args.length + 3);
+    // argList += ',arg' + (args.length + 3);
     // output += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
-    output += 'function reodraw@@(arg1,arg2@@) {\n'.format(this.typeName, argList);
+    output += 'function reodraw@@(@@) {\n'.format(this.typeName, argList);
     output += tikzsrc;
     output += '\n}\n';
     return output
   };
-  ReoComponentTikz.prototype.draw = function () {
+  ReoComponentTikz.prototype.draw = function (nodes) {
     let argList = '', output = '';
-    for (let i = 0; i < args.length; i++) {
-      argList += ', ' + this.genPath(this.waypointsToPortIndex[i]);
+    // for (let i = 0; i < args.length; i++) {
+    //   argList += ', ' + this.genPath(this.waypointsToPortIndex[i]);
+    // }
+    // argList += ', ' + (this.value || '');
+
+    for (let j = 0; j < this.waypointsToPortIndex.length; ++j) {
+      argList += nodes[this.waypointsToPortIndex[j][0]].join(',') + ', '
     }
-    argList += ', ' + (this.value || '');
+
     // output += ('  \\coordinate (tmp) at ($(@@,@@)$);\n'.format(this.pos[0], this.pos[1]));
     // output += ('  \\reodraw@@!tmp, @@@@!;\n'.format(this.typeName, this.angle, argList));
-    output += ('  reodraw@@(tmp, @@@@);\n'.format(this.typeName, this.angle, argList));
+    output += '  reodraw@@(@@);\n'.format(this.typeName, argList);
     return output
   };
 

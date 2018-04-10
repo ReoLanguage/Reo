@@ -72,8 +72,10 @@ ReoComponentImplementation.prototype.normalizePositions = function () {
   this.scale(nearestInCm / nearestNodes, -nearestInCm / nearestNodes);
 };
 
+/**
+ * If position of a component isn't yet known (not in meta), derive it from paths
+ */
 ReoComponentImplementation.prototype.inferMissingMeta = function () {
-  // if position if a component isn't yet known (not in meta), derive it from paths
   for (let cidx = 0; cidx < this.innerComponents.length; cidx++) {
     let comp = this.innerComponents[cidx];
     if (!comp.pos) {
@@ -190,7 +192,7 @@ ReoComponentImplementation.prototype.define = function (drawstate) {
   // Components
   for (let cidx = 0; cidx < this.innerComponents.length; cidx++) {
     let comp = this.innerComponents[cidx];
-    output += comp.draw();
+    output += comp.draw(this.nodes);
   }
 
   output += '}\n';
