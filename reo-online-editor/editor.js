@@ -147,14 +147,16 @@
     }
     let text = document.getElementById("text").value;
     let network = new ReoNetwork(sourceLoader);
-    await network.includeSource('reo2tikz/core.treo');
+    await network.includeSource('default.treo');
     await network.parseComponent(text.replace(/\n/g, ''));
 
-    try {
-      console.log(await network.generateCode())
-    } catch (e) {
-      alert(e)
-    }
+    // try {
+      let output = await network.generateCode();
+      console.log(output);
+      eval(output)
+    // } catch (e) {
+    //   alert(e)
+    // }
   };
 
   // generate a new object ID

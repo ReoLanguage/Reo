@@ -174,15 +174,18 @@ ReoComponentImplementation.prototype.define = function (drawstate) {
     }
   }
 
-  output += '\\def \\reoimpldraw@@ !!{\n'.format(this.implName);
+  // output += '\\def \\reoimpldraw@@ !!{\n'.format(this.implName);
+  output += 'function reoimpldraw@@() {\n'.format(this.implName);
+  // output += `let ${this.implName} = drawComponent(50,50,750,550);\n${this.implName}.label.set({'text': '${this.implName}'});\nid = '0';\n`;
+
   // Nodes
-  for (let n in this.waypoints) {
-    if (this.nodes[n]) {
-      output += ('  \\node[gnode=@@] (@@) at (@@,@@) {};\n'.format(this.labels[n] || '', n, this.waypoints[n][0], this.waypoints[n][1]));
-    } else {
-      output += ('  \\coordinate (@@) at (@@,@@) {};\n'.format(n, this.waypoints[n][0], this.waypoints[n][1]));
-    }
-  }
+  // for (let n in this.waypoints) {
+  //   if (this.nodes[n]) {
+  //     output += ('  \\node[gnode=@@] (@@) at (@@,@@) {};\n'.format(this.labels[n] || '', n, this.waypoints[n][0], this.waypoints[n][1]));
+  //   } else {
+  //     output += ('  \\coordinate (@@) at (@@,@@) {};\n'.format(n, this.waypoints[n][0], this.waypoints[n][1]));
+  //   }
+  // }
 
   // Components
   for (let cidx = 0; cidx < this.innerComponents.length; cidx++) {

@@ -29,17 +29,18 @@ function genShapeDef(cname, args, shapedef) {
     let argList = '', output = '';
     let argmap = {'pos': 1, 'angle': 2, 'value': args.length + 3};
     for (let i = 0; i < args.length; i++) {
-      argList += ',#' + (i + 3);
+      argList += ',arg' + (i + 3);
       argmap['pathto' + args[i]] = i + 3;
     }
     let tikzsrc = shapedef;
     for (let k in argmap) {
-      tikzsrc = tikzsrc.split('#' + k).join('#' + argmap[k]);
+      tikzsrc = tikzsrc.split('#' + k).join('arg' + argmap[k]);
     }
-    argList += ',#' + (args.length + 3);
-    output += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
+    argList += ',arg' + (args.length + 3);
+    // output += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
+    output += 'function reodraw@@(arg1,arg2@@) {\n'.format(this.typeName, argList);
     output += tikzsrc;
-    output += '}\n';
+    output += '\n}\n';
     return output
   };
   ReoComponentTikz.prototype.draw = function () {
@@ -48,8 +49,9 @@ function genShapeDef(cname, args, shapedef) {
       argList += ', ' + this.genPath(this.waypointsToPortIndex[i]);
     }
     argList += ', ' + (this.value || '');
-    output += ('  \\coordinate (tmp) at ($(@@,@@)$);\n'.format(this.pos[0], this.pos[1]));
-    output += ('  \\reodraw@@!tmp, @@@@!;\n'.format(this.typeName, this.angle, argList));
+    // output += ('  \\coordinate (tmp) at ($(@@,@@)$);\n'.format(this.pos[0], this.pos[1]));
+    // output += ('  \\reodraw@@!tmp, @@@@!;\n'.format(this.typeName, this.angle, argList));
+    output += ('  reodraw@@(tmp, @@@@);\n'.format(this.typeName, this.angle, argList));
     return output
   };
 
@@ -164,10 +166,11 @@ ReoNetwork.prototype.parseComponent = async function (str) {
 };
 
 ReoNetwork.prototype.generateCode = async function () {
-  let output = '\\begin{tikzpicture}\n' +
-    '\\tikzset{gnode/.style={draw, shape=circle, fill=black, minimum size=3pt, inner sep=0pt, outer sep=0pt,label={90:#1}}};\n' +
-    '\\def \\arrowstyle {\\arrow[scale=1.4]{stealth\'}}\n' +
-    '\\def \\arrowstylerev {\\arrowreversed[scale=1.4]{stealth\'}};\n';
+  // let output = '\\begin{tikzpicture}\n' +
+  //   '\\tikzset{gnode/.style={draw, shape=circle, fill=black, minimum size=3pt, inner sep=0pt, outer sep=0pt,label={90:#1}}};\n' +
+  //   '\\def \\arrowstyle {\\arrow[scale=1.4]{stealth\'}}\n' +
+  //   '\\def \\arrowstylerev {\\arrowreversed[scale=1.4]{stealth\'}};\n';
+  let output = '//begin{tikzpicture}\n';
 
   let component = await this.getImplementationFor('main', []);
   let mainInstance = new component.impl();
@@ -175,8 +178,10 @@ ReoNetwork.prototype.generateCode = async function () {
   let definesstate = {}; // stores what's already been defined
   output += mainInstance.define(definesstate);
 
-  output += '\\reoimpldraw@@!!\n'.format(mainInstance.typeName);
-  output += '\\end{tikzpicture}\n';
+  // output += '\\reoimpldraw@@!!\n'.format(mainInstance.typeName);
+  output += 'reodraw@@();\n'.format(mainInstance.typeName);
+  // output += '\\end{tikzpicture}\n';
+  output += '//end{tikzpicture}\n';
 
   return output;
 };

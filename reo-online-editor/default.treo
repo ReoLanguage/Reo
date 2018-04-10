@@ -1,0 +1,38 @@
+/*!
+shape(sync(a; b)): {
+	createchannel ('sync',#pos,#pathtoa);
+},
+
+shape(fifo1(a; b)): {
+	createchannel ('fifo1',#pos,#pathtoa);
+},
+
+shape(syncdrain(a; b)): {
+	createchannel ('syncdrain',#pos,#pathtoa);
+},
+
+shape(lossysync(a; b)): {
+	createchannel ('lossysync',#pos,#pathtoa);
+},
+
+shape(syncspout(a; b)): {
+	createchannel ('syncspout',#pos,#pathtoa);
+},
+
+shape(xor(a; b, c)): {
+	\node [draw,circle,minimum width=0.25 cm,path picture={
+		\draw[black] (path picture bounding box.south east) -- (path picture bounding box.north west) (path picture bounding box.south west) -- (path picture bounding box.north east);
+	}](xor) at (#pos){};
+	\path[draw,decoration={markings, mark=at position 0.0 with \arrowstylerev},postaction=decorate] (xor) to #pathtoa;
+	\path[draw,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (xor) to #pathtob;
+	\path[draw,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (xor) to #pathtoc;
+},
+
+shape(filter(a; b)): {
+	\coordinate (chendA) at ($(#pos)-(#angle:0.25)$);
+	\coordinate (chendB) at ($(#pos)+(#angle:0.25)$);
+	\path [decoration={zigzag,pre length=0.01cm,post length=0.01cm,segment length=2,amplitude=1.5,post=lineto,post length=2pt},line join=round] (chendA) edge[decorate] node[auto] {#value} (chendB);
+	\path[draw,decoration={markings},postaction=decorate] (chendA) to #pathtoa;
+	\path[draw,decoration={markings, mark=at position 1.0 with \arrowstyle},postaction=decorate] (chendB) to #pathtob;
+}
+!*/
