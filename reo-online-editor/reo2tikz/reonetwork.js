@@ -179,18 +179,16 @@ ReoNetwork.prototype.generateCode = async function () {
   //   '\\tikzset{gnode/.style={draw, shape=circle, fill=black, minimum size=3pt, inner sep=0pt, outer sep=0pt,label={90:#1}}};\n' +
   //   '\\def \\arrowstyle {\\arrow[scale=1.4]{stealth\'}}\n' +
   //   '\\def \\arrowstylerev {\\arrowreversed[scale=1.4]{stealth\'}};\n';
-  let output = '//begin{tikzpicture}\n';
 
   let component = await this.getImplementationFor('main', []);
   let mainInstance = new component.impl();
 
   let definesstate = {}; // stores what's already been defined
-  output += mainInstance.define(definesstate);
+  let output = mainInstance.define(definesstate);
 
   // output += '\\reoimpldraw@@!!\n'.format(mainInstance.typeName);
   output += 'reodraw@@();\n'.format(mainInstance.typeName);
   // output += '\\end{tikzpicture}\n';
-  output += '//end{tikzpicture}\n';
 
   return output;
 };
