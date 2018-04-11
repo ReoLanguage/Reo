@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.predicates.Constant;
+import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.templates.Protocol;
 import nl.cwi.reo.templates.Transition;
 
@@ -24,9 +27,15 @@ public final class MaudeProtocol extends Protocol {
 	/** Set of variables involved in rew system. */
 	private Set<String> variables = new HashSet<>(); 
 
+	/** Set of threshold variables involved in rew system. */
+	private Set<String> thVar = new HashSet<>(); 
+
 	/** Port renaming */
 	public Map<Port,String> renaming = new HashMap<>();
-	
+
+	/** Counter */
+	int nb =0;
+
 	/**
 	 * Instantiates a new protocol.
 	 *
@@ -52,7 +61,7 @@ public final class MaudeProtocol extends Protocol {
 	public Set<String> getState() {
 		String s = "";
 		for (MemoryVariable m : getInitial().keySet()) {
-			variables.add("d_m"+m.getName().substring(1));
+			variables.add("d_"+m.getName());
 			if (getInitial().get(m) != null){
 				s = s + "m(" + m.getName().substring(1) + "," + getInitial().get(m).toString() + ") ";
 			}
@@ -62,21 +71,51 @@ public final class MaudeProtocol extends Protocol {
 		}
 		s = s + "\n";
 		for (Port p : getPorts()) {
-			variables.add("d_"+p.getName().substring(1));
+			variables.add("d_"+p.getName());
 			if (p.isInput()) {
-				s = s + "in(\"p" + p.getName().substring(1) + "\")" + " p(\"p" + p.getName().substring(1) + "\",*) ";
-				s = s + "link(\"p" + p.getName().substring(1) + "\",\"q" + p.getName().substring(1) + "\") q(\"q"
-						+ p.getName().substring(1) + "\",0,*) \n";
+				s = s + "in(\"" + p.getName() + "\")" + " p(\"" + p.getName() + "\",*) ";
+				s = s + "link(\"" + p.getName() + "\",\"q" + p.getName() + "\") q(\"q"
+						+ p.getName() + "\",0,*) \n";
 			} else {
-				s = s + "out(\"p" + p.getName().substring(1) + "\")" + " p(\"p" + p.getName().substring(1) + "\",*) ";
-				s = s + "link(\"q" + p.getName().substring(1) + "\",\"p" + p.getName().substring(1) + "\") q(\"q"
-						+ p.getName().substring(1) + "\",0,*) \n";
+				s = s + "out(\"" + p.getName() + "\")" + " p(\"" + p.getName() + "\",*) ";
+				s = s + "link(\"q" + p.getName() + "\",\"" + p.getName() + "\") q(\"q"
+						+ p.getName() + "\",0,*) \n";
 			}
 		}
+		
+		Transition t = getTransitions().iterator().next();
+		if(t instanceof MaudeTransition){
+			s=s+thresholdState(((MaudeTransition) t).getTh())+"trace(nil)";
+		}
+		nb=0;
 		state.add(s);
 		return state;
 	}
-
+	
+	public String thresholdState(Term t){
+		String s = "";
+		
+		if(t instanceof Function){
+			for(Term _t : ((Function) t).getArgs()){
+				s=s+thresholdState(_t)+" ";
+			}
+		}
+		
+		else if(t instanceof Constant){
+			s= s+ "th(\"t"+nb +"\", ws("+(((nb&1)==0)?"i":"j")+"))";
+			thVar.add("t"+nb);
+			nb++;
+		}
+		
+		return s;
+	}
+	
+	/** Set of threshold */
+	
+	public Set<String> getThVar(){
+		return thVar;
+	}
+	
 	
 	/**
 	 * Get rewrite system variables

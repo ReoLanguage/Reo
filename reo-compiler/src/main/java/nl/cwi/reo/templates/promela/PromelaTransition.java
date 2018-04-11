@@ -1,4 +1,4 @@
-package nl.cwi.reo.templates.promela;
+ package nl.cwi.reo.templates.promela;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,10 +57,8 @@ public final class PromelaTransition extends Transition{
 	 */
 	public PromelaTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory,
 			Set<Port> input) {
-		super(guard, output, memory, input);
+		super(guard, output, memory);
 		Set<Port> s = guard.getPorts();
-		s.addAll(super.getInput());
-
 		for(Port p : s)
 			m.put(p, p.rename("p"+p.getName().substring(1)));
 		for(PortVariable pv : output.keySet())
@@ -214,9 +212,8 @@ public final class PromelaTransition extends Transition{
 	 * 
 	 * @return set of input ports
 	 */
-	@Override
 	public Set<Port> getInput() {
-		Set<Port> in = super.getInput();
+		Set<Port> in = new HashSet<>();
 		Set<Port> inRenamed = new HashSet<>();
 		for(Port p : in)
 			inRenamed.add(p.rename("p"+p.getName().substring(1)));

@@ -2,6 +2,9 @@ package nl.cwi.reo.templates;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -9,11 +12,17 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.PortVariable;
+import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Variable;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -24,10 +33,7 @@ public class Transition {
 	/** Guard. */
 	private final Formula guard;
 
-	/** Set of input ports. */
-	private final Set<Port> input;
-
-	/** Output update. */
+	/** Ports update. */
 	private final Map<PortVariable, Term> output;
 
 	/** Memory update. */
@@ -45,8 +51,7 @@ public class Transition {
 	 * @param input
 	 *            the input
 	 */
-	public Transition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory,
-			Set<Port> input) {
+	public Transition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory) {
 		if (guard == null)
 			throw new IllegalArgumentException("No guard specified.");
 		if (output == null)
@@ -56,7 +61,6 @@ public class Transition {
 		this.guard = guard;
 		this.output = Collections.unmodifiableMap(output);
 		this.memory = Collections.unmodifiableMap(memory);
-		this.input = Collections.unmodifiableSet(input);
 	}
 
 	/**
@@ -65,7 +69,23 @@ public class Transition {
 	 * @return guard
 	 */
 	public Formula getGuard() {
-		return this.guard;
+		List<Formula> guards = new LinkedList<>();
+		if(guard instanceof Conjunction){
+			List<Formula> _guards = ((Conjunction) guard).getClauses();
+			for(Formula _f : _guards){
+				if(_f instanceof Negation && ((Negation) _f).getFormula() instanceof Equality){
+					Formula f = ((Negation)_f).getFormula();
+					if((((Equality) f).getRHS() instanceof Function || ((Equality) f).getLHS() instanceof Function) 
+						|| f instanceof Relation && !guards.contains(f)){
+						guards.add(guards.size(),_f);
+					}
+					else if(!guards.contains(_f)){
+						guards.add(0,_f);
+					}
+				}
+			}
+		}
+		return new Conjunction(guards);
 	}
 	
 	/**
@@ -82,16 +102,33 @@ public class Transition {
 //		return this.guard;
 //	}
 	
-	
 	/**
-	 * Gets the set of input ports that participate in this transition.
-	 * 
-	 * @return set of input ports
+	 * Gets the set of input port
 	 */
-	public Set<Port> getInput() {
-		return this.input;
+	public Set<Port> getInput(){
+		Set<Port> inputs = new HashSet<Port>();
+		for (PortVariable x : output.keySet()){
+			if(output.get(x) instanceof PortVariable){
+				PortVariable pv = (PortVariable)output.get(x);
+				inputs.add(new Port(pv.getPort().getName(),PortType.IN,pv.getPort().getPrioType(),pv.getPort().getTypeTag(),false));
+			}
+		}
+		for (MemoryVariable x : memory.keySet()){
+			if(memory.get(x) instanceof PortVariable){
+				PortVariable pv = (PortVariable)memory.get(x);
+				inputs.add(new Port(pv.getPort().getName(),PortType.IN,pv.getPort().getPrioType(),pv.getPort().getTypeTag(),false));
+			}
+		}
+		for (Variable x : guard.getFreeVariables()){
+			if(x instanceof PortVariable && ((PortVariable) x).isInput()){
+				PortVariable pv = (PortVariable)x;
+				inputs.add(new Port(pv.getPort().getName(),PortType.IN,pv.getPort().getPrioType(),pv.getPort().getTypeTag(),false));
+			}
+		}
+		
+		return inputs;
 	}
-
+	
 	/**
 	 * Gets the values assigned to the output ports.
 	 * 
@@ -116,9 +153,20 @@ public class Transition {
 	 * @return set of ports that participate in this transition
 	 */
 	public Set<Port> getInterface() {
-		Set<Port> ports = new HashSet<Port>(input);
-		for (PortVariable x : output.keySet())
-			ports.add(x.getPort());
+		Set<Port> ports = new HashSet<Port>(guard.getPorts());
+		for (PortVariable x : output.keySet()){
+			ports.add(new Port(x.getPort().getName(),PortType.OUT,x.getPort().getPrioType(),x.getPort().getTypeTag(),false));
+			if(output.get(x) instanceof PortVariable){
+				PortVariable pv = (PortVariable)output.get(x);
+				ports.add(new Port(pv.getPort().getName(),PortType.IN,pv.getPort().getPrioType(),pv.getPort().getTypeTag(),false));
+			}
+		}
+		for (MemoryVariable x : memory.keySet()){
+			if(memory.get(x) instanceof PortVariable){
+				PortVariable pv = (PortVariable)memory.get(x);
+				ports.add(new Port(pv.getPort().getName(),PortType.IN,pv.getPort().getPrioType(),pv.getPort().getTypeTag(),false));
+			}
+		}
 		return ports;
 	}
 
@@ -135,7 +183,7 @@ public class Transition {
 			return false;
 		Transition rule = (Transition) other;
 		return Objects.equals(this.guard, rule.getGuard()) && Objects.equals(this.output, rule.getOutput())
-				&& Objects.equals(this.memory, rule.getMemory()) && Objects.equals(this.input, rule.getInput());
+				&& Objects.equals(this.memory, rule.getMemory());
 	}
 
 	/**
@@ -143,7 +191,7 @@ public class Transition {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.guard, this.output, this.memory, this.input);
+		return Objects.hash(this.guard, this.output, this.memory);
 	}
 
 	/**
@@ -151,6 +199,6 @@ public class Transition {
 	 */
 	@Override
 	public String toString() {
-		return input + " " + guard + " -> " + output + ", " + memory;
+		return guard + " -> " + output + ", " + memory;
 	}
 }

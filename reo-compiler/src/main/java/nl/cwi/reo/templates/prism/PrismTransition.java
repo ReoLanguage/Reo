@@ -59,7 +59,7 @@ public final class PrismTransition extends Transition{
 	 */
 	public PrismTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory,
 			Set<Port> input) {
-		super(guard, output, memory, input);
+		super(guard, output, memory);
 		getPRISMUpdate();
 	}
 
@@ -149,7 +149,7 @@ public final class PrismTransition extends Transition{
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getGuard(), this.getOutput(), this.getMemory(), this.getInput());
+		return Objects.hash(this.getGuard(), this.getOutput(), this.getMemory());
 	}
 
 	/**
@@ -157,6 +157,6 @@ public final class PrismTransition extends Transition{
 	 */
 	@Override
 	public String toString() {
-		return this.getInput() + " " + this.getGuard() + " -> " + this.getOutput() + ", " + this.getMemory();
+		return this.getGuard() + " -> " + this.getOutput() + ", " + this.getMemory();
 	}
 }

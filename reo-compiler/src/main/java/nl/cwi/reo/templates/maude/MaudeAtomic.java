@@ -106,7 +106,7 @@ public final class MaudeAtomic implements Component {
 	public Set<Port> getRenamedPorts(){
 		LinkedHashSet<Port> l = new LinkedHashSet<>();
 		for(Port p : ports)
-			l.add(p.rename("p"+p.getName().substring(1)));
+			l.add(p.rename("p"+p.getName()));
 		return l;
 	}
 	/**
