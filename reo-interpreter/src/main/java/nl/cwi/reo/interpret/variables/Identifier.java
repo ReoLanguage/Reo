@@ -24,6 +24,10 @@ public class Identifier implements Term {
 	 *            identifier name
 	 */
 	public Identifier(String name) {
+		if(name.contains("[")){
+			name=name.replace("[","_");
+			name=name.replace("]","");
+		}
 		this.name = name;
 	}
 

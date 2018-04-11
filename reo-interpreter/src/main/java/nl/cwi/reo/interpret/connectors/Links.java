@@ -1,6 +1,7 @@
 package nl.cwi.reo.interpret.connectors;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import nl.cwi.reo.interpret.ports.Port;
@@ -28,7 +29,7 @@ public final class Links {
 	 * @return the map
 	 */
 	public static Map<Port, Port> rename(Map<Port, Port> links, Map<Port, Port> r) {
-		Map<Port, Port> newlinks = new HashMap<Port, Port>();
+		Map<Port, Port> newlinks = new LinkedHashMap<Port, Port>();
 		for (Map.Entry<Port, Port> link : links.entrySet()) {
 			Port v = link.getValue();
 			Port w = r.get(v);

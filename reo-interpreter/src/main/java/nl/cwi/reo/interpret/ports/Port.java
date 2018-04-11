@@ -98,6 +98,7 @@ public final class Port extends Identifier implements Comparable<Port> {
 	public String getName() {
 		return name;
 	}
+	
 
 	/**
 	 * Gets the type of this port.
