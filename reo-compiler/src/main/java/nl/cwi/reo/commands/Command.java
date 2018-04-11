@@ -1,15 +1,24 @@
 package nl.cwi.reo.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.Queue;
+
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
+import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.templates.Transition;
@@ -114,6 +123,7 @@ public class Command {
 				inputs.add(p);
 			}
 		}
+		
 		switch (lang) {
 		case PRISM:
 			return new PrismTransition(guard, output, memory, inputs);
@@ -121,9 +131,9 @@ public class Command {
 			return new PromelaTransition(guard, output, memory, inputs);
 		case JAVA:
 		case C11:
-			return new Transition(guard, output, memory, inputs);
+			return new Transition(guard, output, memory);
 		case MAUDE:
-			return new MaudeTransition(guard, output, memory, inputs);
+			return new MaudeTransition(guard, output, memory);
 		case PRT:
 			break;
 		case TEXT:

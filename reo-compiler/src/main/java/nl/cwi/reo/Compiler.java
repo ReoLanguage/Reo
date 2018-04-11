@@ -303,24 +303,22 @@ public class Compiler {
 		connector = connector.integrate();
 		
 		List<Component> components = buildAtomics(connector, lang);
-		Set<Port> intface = getDualInterface(components);
-		
-		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
 
-//		protocol = infereType(protocol, intface);
+		Set<Port> intface = getDualInterface(components);
+		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
 		
 		List<ConstraintHypergraph> ch = new ArrayList<>();
 
 		for(RuleBasedAutomaton rba : protocol){
-			ch.add(new ConstraintHypergraph(rba.getAllRules(),rba.getInitial()));
+			ch.add(new ConstraintHypergraph(rba.getRules(),rba.getInitial()));
 		}
 		
 		ConstraintHypergraph composition = new ConstraintHypergraph().compose(ch);
 
 		composition = composition.restrict(intface);
-
+		
 		Set<Transition> transitions = buildTransitions(composition);
-
+		
 		Set<Set<Transition>> partition = partition(transitions);
 
 		List<Component> protocols = buildProtocols(composition, partition);
@@ -398,7 +396,7 @@ public class Compiler {
 					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
 					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
 					Map<Port, Port> links = new HashMap<>();
-					links.put(q, q);
+					links.put(q.rename(p.getName()), q);
 	
 					ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
 					list.add(window);
@@ -447,6 +445,7 @@ public class Compiler {
 	 */
 	private List<Component> buildAtomics(ReoConnector connector, Language lang) {
 		List<Component> components = new ArrayList<>();
+		Map<Port,Port> renaming = connector.getLinks();
 		int n_atom = 1;
 		for (ReoConnectorAtom atom : connector.getAtoms()) {
 			Reference r = atom.getReference(lang);
@@ -469,14 +468,45 @@ public class Compiler {
 					}
 				}
 				if(lang == Language.JAVA)
-					components.add(new Atomic(name + n_atom++, params, atom.getInterface(), call));
+					components.add(new Atomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
 				if(lang == Language.PROMELA)
-					components.add(new PromelaAtomic(name + n_atom++, params, atom.getInterface(), call));
+					components.add(new PromelaAtomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
 				if(lang == Language.MAUDE)
-					components.add(new MaudeAtomic(name + n_atom++, params, atom.getInterface(), call));
+					components.add(new MaudeAtomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
 			}
 		}
+//		connector.rename(renaming);
 		return components;
+	}
+	
+	private Map<Port,Port> renameNodeInterface(ReoConnector connector) {
+		Map<Port,Port> renaming = new HashMap<>();
+		/*
+		for (ReoConnectorAtom atom : connector.getAtoms()) {
+			Reference r = atom.getReference(lang);
+			if (r != null) { 
+				String s = r.getValues().get(0).toString();
+				renaming.put(atom.getInterface().iterator().next(),atom.getLinks().get(atom.getInterface().iterator().next()).rename(s));
+			}
+		}
+		connector = connector.rename(renaming);
+		connector = connector.integrate();
+		*/
+		
+		for (ReoConnectorAtom atom : connector.getAtoms()) {
+			Reference r = atom.getReference(lang);
+			if (r != null) {
+				String s = "";
+				if(!r.getValues().isEmpty())
+					s = r.getValues().get(0).toString();
+				
+				Port p = atom.getInterface().iterator().next();
+				PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+				renaming.put(new Port(p.getName(), t, p.getPrioType(), p.getTypeTag(), true),new Port(s, t, p.getPrioType(), p.getTypeTag(), true));
+			}
+		}
+		
+		return renaming;
 	}
 
 	/**
@@ -491,9 +521,9 @@ public class Compiler {
 		Set<Port> intface = new HashSet<>();
 		for (Component atom : atomics) {
 			for (Port p : atom.getPorts()) {
-				PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-				intface.add(new Port(p.getName(), t, p.getPrioType(), p.getTypeTag(), true));
-			}
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					intface.add(new Port(p.getName(), t, p.getPrioType(), p.getTypeTag(), true));
+				}
 		}
 		return intface;
 	}
@@ -534,8 +564,10 @@ public class Compiler {
 	private Set<Transition> buildTransitions(ConstraintHypergraph protocol) {
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : protocol.getRules()){
-			Command cmd = Commands.commandify(rule.getFormula());
-			transitions.add(cmd.toTransition(lang));
+			Commands c = new Commands();
+			Command _cmd = c.getCommand(rule.getFormula());
+//			Command cmd = Commands.commandify(rule.getFormula());
+			transitions.add(_cmd.toTransition(lang));
 		}
 		return transitions;
 	}
