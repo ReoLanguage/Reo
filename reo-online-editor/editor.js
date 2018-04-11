@@ -552,57 +552,6 @@
     updateText();
   }); //text:editing:exited
 
-  function copy(obj) {
-    var obj2 = obj.clone();
-    if (obj.class == 'component') {
-      obj2.set({
-        'size': obj.size,
-        'class': obj.class,
-        'status': obj.status,
-        'id': obj.id,
-        'label': obj.label
-      });
-      obj2.label.object = obj2;
-    }
-    if (obj.class == 'node') {
-      obj2.set({
-        'class': obj.class,
-        'component': obj.component,
-        'id': obj.id,
-        'label': obj.label,
-        'channels': obj.channels
-      });
-      obj2.label.object = obj2;
-    }
-    if (obj.class == 'channel') {
-      obj2.set({
-        'class': obj.class,
-        'name': obj.name,
-        'components': obj.components,
-        'node1': obj.node1,
-        'node2': obj.node2,
-        'anchor1': obj.anchor1,
-        'anchor2': obj.anchor2
-      });
-      for (i = 0; i < obj.node1.channels.length; i++) {
-        if (obj.node1.channels[i] == obj)
-          obj.node1.channels[i] = obj2;
-      }
-      for (j = 0; j < obj.node2.channels.length; j++) {
-        if (obj.node2.channels[j] == obj)
-          obj.node2.channels[j] = obj2;
-      }
-    }
-    if (obj.class == 'label') {
-      obj2.set({
-        'class': obj.class,
-        'object': obj.object
-      });
-      obj.object.label = obj2;
-    }
-    return obj2;
-  }
-
   canvas.on('mouse:over', function(e) {
     if (e.target && e.target.class == "anchor")
     {
@@ -633,40 +582,17 @@
     if (mode == 'select') {
       //console.log('Mode is select');
       if (p && p.class == 'component') {
-        //console.log('p is ' + p.type + ' ' + p.id);
-        //console.log('Creating a group');
-        var p2 = copy(p);
-        var group = new fabric.Group([ p2 ], {
-          left: p.left,
-          top: p.top,
-          label: p.label,
-          labelOffsetX: p.labelOffsetX,
-          labelOffsetY: p.labelOffsetY,
-          originX: 'left',
-          originY: 'top',
-          class: 'group'
-        });
-        p.label.set({'object': group});
-        // Temporarily disabled because it is buggy
-        /*canvas.forEachObject(function(obj) {
-          //console.log(obj.id);
-          console.log('Checking object type ' + obj.type + ' with class ' + obj.class + ' and id ' + obj.id);
-          if(obj.type == 'i-text')
-            console.log(' references ' + obj.object.id);
-          if ((obj.class != 'component' && obj.component == p) || (obj.class == 'label' && obj.object.component == p))
-          {
-            var obj2 = copy(obj);
-            group.addWithUpdate(obj2);
-            canvas.remove(obj);
+        canvas.preserveObjectStacking = true;
+        origLeft = p.left;
+        origTop = p.top;
+        p.nodes = [];
+        for (i = 0; i < nodes.length; i++) {
+          if (nodes[i].component == p) {
+            p.nodes.push(nodes[i]);
+            nodes[i].origLeft = nodes[i].left;
+            nodes[i].origTop = nodes[i].top;
           }
-        });*/
-        canvas.remove(p);
-        canvas.requestRenderAll();
-        canvas.add(group);
-        canvas.setActiveObject(group);
-        reorderComponents(group);
-        origLeft = group.left;
-        origTop = group.top;
+        }
       }
     }
     if (mode == 'component') {
@@ -701,6 +627,25 @@
         p.label.set({left: p.left + (p.width/2), top: p.top - 15});
         p.label.setCoords();
       }
+      else {
+        p.set({left: origLeft + pointer.x - origX});
+        p.set({top: origTop + pointer.y - origY});
+        p.setCoords();
+        p.label.set({left: p.left + p.labelOffsetX});
+        p.label.set({top: p.top + p.labelOffsetY});
+        p.label.setCoords();
+        for (i = 0; i < p.nodes.length; i++) {
+          let node = p.nodes[i];
+          node.set({left: node.origLeft + pointer.x - origX});
+          node.set({top: node.origTop + pointer.y - origY});
+          node.setCoords();
+          for (j = 0; j < node.channels.length; j++)
+            updateChannel(node.channels[j]);
+          node.label.set({left: node.left + node.labelOffsetX});
+          node.label.set({top: node.top + node.labelOffsetY});
+          node.label.setCoords();
+        }
+      }
     }
     if (p.class == 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
@@ -728,14 +673,6 @@
       });
       for (i = 0; i < p.channels.length; i++)
         updateChannel(p.channels[i]);
-      p.label.set({left: p.left + p.labelOffsetX});
-      p.label.set({top: p.top + p.labelOffsetY});
-      p.label.setCoords();
-    }
-    if (p.class == 'group') {
-      p.set({left: origLeft + pointer.x - origX});
-      p.set({top: origTop + pointer.y - origY});
-      p.setCoords();
       p.label.set({left: p.left + p.labelOffsetX});
       p.label.set({top: p.top + p.labelOffsetY});
       p.label.setCoords();
@@ -816,6 +753,7 @@
 
       }
       if (p.class == 'component') {
+        canvas.preserveObjectStacking = false;
         p.label.setCoords();
         reorderComponents(p);
         p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
