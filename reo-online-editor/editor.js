@@ -167,7 +167,7 @@
     return id;
   }
 
-  function createNode(left, top) {
+  function createNode(left, top, name) {
     var node = new fabric.Circle({
       left: left,
       top: top,
@@ -184,7 +184,7 @@
     // these are the channels that are connected to this node
     node.channels = [];
 
-    var label = new fabric.IText(node.id, {
+    var label = new fabric.IText(name ? name : node.id, {
       left: left + 20,
       top: top - 20,
       fontSize: 20,
@@ -851,7 +851,7 @@
     });
   }
 
-  function drawComponent(x1,y1,x2,y2) {
+  function drawComponent(x1,y1,x2,y2,name) {
     var width = (x2 - x1);
     var height = (y2 - y1);
     var left = x1;
@@ -876,7 +876,7 @@
       id: generateId()
     });
 
-    var label = new fabric.IText('name', {
+    var label = new fabric.IText(name ? name : 'name', {
       left: left + (width / 2),
       top: top - 15,
       fontSize: 32,
@@ -903,9 +903,8 @@
     main = undefined;
   }
 
-  var main = drawComponent(50,50,750,550);
+  var main = drawComponent(50,50,750,550,'main');
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
-  main.label.set({'text': 'main'});
   id = '0';
   document.getElementById("select").click();
   createChannel('sync',100,100,200,100);
