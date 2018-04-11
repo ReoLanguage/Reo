@@ -127,14 +127,14 @@ public class ListenerRBA extends BaseListener {
 
 		List<Formula> clauses = new ArrayList<>();
 		clauses.add(formulas.get(ctx.rba_formula()));
-
-		for (Map.Entry<Port, Boolean> entry : sync.entrySet()) {
-			Formula eq = new Equality(new PortVariable(entry.getKey()), Terms.Null);
-			if (entry.getValue())
-				clauses.add(new Negation(eq));
-			else
-				clauses.add(eq);
-		}
+//
+//		for (Map.Entry<Port, Boolean> entry : sync.entrySet()) {
+//			Formula eq = new Equality(new PortVariable(entry.getKey()), Terms.Null);
+//			if (entry.getValue())
+//				clauses.add(new Negation(eq));
+//			else
+//				clauses.add(eq);
+//		}
 
 		Formula f = Formulas.conjunction(clauses);
 		transitions.put(ctx, new Rule(sync, f));

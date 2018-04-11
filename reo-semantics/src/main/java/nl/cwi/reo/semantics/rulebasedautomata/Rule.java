@@ -1,9 +1,11 @@
 package nl.cwi.reo.semantics.rulebasedautomata;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -12,10 +14,14 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.PortVariable;
+import nl.cwi.reo.semantics.predicates.Terms;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
 
@@ -36,8 +42,30 @@ public class Rule {
 	 *            the f
 	 */
 	public Rule(Map<Port, Boolean> sync, Formula f) {
-		this.sync = Collections.unmodifiableMap(sync);
+		List<Formula> list = new ArrayList<>();
+		for(Port p : sync.keySet()){
+			if(sync.get(p))
+				list.add(new Negation(new Equality(new PortVariable(p),Terms.Null)));
+			else
+				list.add(new Equality(new PortVariable(p),Terms.Null));
+		}
+		list.add(f);
+		this.f = new Conjunction(list);
+		Map<Port,Boolean> _sync = this.f.getSynchronousMap();
+		if(_sync != null)
+			this.sync = _sync;
+		else
+			this.sync = new HashMap<>();
+		this.hash = Objects.hash(sync, f);
+	}
+	
+	public Rule(Formula f) {
 		this.f = f;
+		Map<Port,Boolean> _sync = this.f.getSynchronousMap();
+		if(_sync != null)
+			this.sync = _sync;
+		else
+			this.sync = new HashMap<>();
 		this.hash = Objects.hash(sync, f);
 	}
 
@@ -62,14 +90,14 @@ public class Rule {
 			_sync.put(p, x.getValue());
 		}
 		Formula _f = f.rename(links);
-		return new Rule(_sync, _f);
+		return new Rule(_f);
 	}
 
 	public @Nullable Rule evaluate(Scope s, Monitor m) {
 		Formula _f = f.evaluate(s, m);
 		if (_f == null)
 			return null;
-		return new Rule(sync, _f);
+		return new Rule( _f);
 	}
 
 	public Set<MemoryVariable> getMemoryCells() {
@@ -84,7 +112,7 @@ public class Rule {
 		Formula _f = f;
 		for (Map.Entry<MemoryVariable, MemoryVariable> entry : rename.entrySet())
 			_f = _f.substitute(entry.getValue(), entry.getKey());
-		return new Rule(sync, _f);
+		return new Rule(_f);
 	}
 
 	public Rule restrict(Collection<? extends Port> intface) {
@@ -94,7 +122,7 @@ public class Rule {
 				if (!intface.contains(((PortVariable) v).getPort()))
 					V.add(v);
 		Formula _f = Formulas.eliminate(f, V);
-		return new Rule(sync, _f);
+		return new Rule(_f);
 	}
 
 	public Set<Port> getActivePorts() {
