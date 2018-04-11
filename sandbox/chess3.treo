@@ -9,23 +9,19 @@ import reo.fifofull;
 chess3 = (){
 
 
-//	fifo1(whiteO,blackC)
-//	fifofull<"">(blackO,whiteC)
-	fifofull<"">(x,whiteC)
+//	fifofull<"0">(x,whiteC)
 	
+      	{ transformer<PARSE>(blackR,blackM) | PARSE = "Function.parse"}
+      	{ transformer<PARSE>(whiteR,whiteM) | PARSE = "Function.parse"}
 
 	{
 		Engine(whiteC,whiteR)	
-		visualize(whiteC,whiteR,whiteM,blackC)	        
-
+		fifofull<"">(whiteR,blackC)
 		Engine(blackC,blackR)
-		visualize(blackC,blackR,blackM,whiteC)	        	
-
+		fifo1(blackR,whiteC)
 	|
 	
 		Engine=(a?String,b!String){
-//			#RBA 
-//			{a,b} true
 			#JAVA
 			"Workers.Engine"
 		}
