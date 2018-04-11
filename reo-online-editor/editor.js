@@ -204,7 +204,7 @@
   } //createNode
 
   function createAnchor(left, top) {
-    var anchor = new fabric.Circle({
+    return new fabric.Circle({
       left: left,
       top: top,
       strokeWidth: lineStrokeWidth,
@@ -214,8 +214,6 @@
       class: 'anchor',
       opacity: 0
     });
-    return anchor;
-
   } //createAnchor
 
   /**
@@ -850,7 +848,9 @@
     }
   }); //mouse:up
 
-  /* Reorders the components so that all components are behind the other elements and p is in front of the other components */
+  /**
+   * Reorders the components so that all components are behind the other elements and p is in front of the other components
+   */
   function reorderComponents(p) {
     if (p) {
       p.label.sendToBack();
