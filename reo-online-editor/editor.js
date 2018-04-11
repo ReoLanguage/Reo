@@ -153,12 +153,7 @@
     try {
       let output = await network.generateCode();
       console.log(output);
-      canvas.clear();
-      id = '0';
-      nodes = [];
-      channels = [];
-      components = [];
-      main = undefined;
+      clearAll();
       eval(output)
     } catch (e) {
       alert(e)
@@ -897,6 +892,15 @@
     canvas.requestRenderAll();
     components.push(rect);
     return rect;
+  }
+
+  function clearAll() {
+    canvas.clear();
+    id = '0';
+    nodes = [];
+    channels = [];
+    components = [];
+    main = undefined;
   }
 
   var main = drawComponent(50,50,750,550);
