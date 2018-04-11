@@ -16,6 +16,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
+import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 
 // TODO: Auto-generated Javadoc
@@ -39,7 +40,7 @@ public class HyperEdge {
 	/**
 	 * The source node of this hyperedge.
 	 */
-	private PortNode port;
+	private Port port;
 
 	/**
 	 * The set of rules in the target of this hyperedge.
@@ -54,7 +55,7 @@ public class HyperEdge {
 	 * @param leaves
 	 *            set of rules
 	 */
-	public HyperEdge(PortNode root, Set<RuleNode> leaves) {
+	public HyperEdge(Port root, Set<RuleNode> leaves) {
 		this.port = root;
 		this.rules = new HashSet<>();
 		id = ++N;
@@ -68,7 +69,7 @@ public class HyperEdge {
 	 * 
 	 * @return source port of this hyperedge.
 	 */
-	public PortNode getSource() {
+	public Port getSource() {
 		return port;
 	}
 	
@@ -88,12 +89,10 @@ public class HyperEdge {
 	 */
 	public Rule getRule() {
 		List<Formula> list = new ArrayList<Formula>();
-		Map<Port, Boolean> map = new HashMap<>();
 		for (RuleNode r : rules) {
 			list.add(r.getRule().getFormula());
-			map.putAll(r.getRule().getSync());
 		}
-		return new Rule(map, new Disjunction(list));
+		return new Rule(new Disjunction(list));
 	}
 
 	/**
@@ -161,8 +160,7 @@ public class HyperEdge {
 	 *             if the hyperedges have different source ports.
 	 */
 	public void compose(HyperEdge h) {
-
-		if (!port.getPort().equals(h.getSource().getPort()))
+		if (!port.equals(h.getSource()))
 			new IllegalArgumentException("Hyperedges must have the same source.");
 
 		/*
@@ -180,18 +178,26 @@ public class HyperEdge {
 			 * Get all rules of this.hyperedge, and compose all of them with the previous rule stored in h_ruleNode.
 			 */
 			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(rules);
-
+			Boolean equal =false;
 			while (!rulesToCompose.isEmpty()) {
 				/*
 				 * take the next rule to compose
 				 */
 				RuleNode r = rulesToCompose.poll();
-				RuleNode rule = r.compose(h_ruleNode); 
-				if (rule != null)
-					r.erase();
+//				if(!r.equals(h_ruleNode)){
+					RuleNode rule = r.composeF(h_ruleNode); 
+					if (rule!=null){
+						if(!rule.equals(r))
+							r.erase();
+						else
+							equal=true;
+					}
+					if(rule==null)
+						r.erase();
+//				}
 			}
-
-			h_ruleNode.erase();
+			if(!equal)
+				h_ruleNode.erase();
 
 		} else {
 
@@ -215,7 +221,7 @@ public class HyperEdge {
 					/*
 					 * compose both rules, and eventually add the new rule to the hypergraph
 					 */
-					RuleNode r = r1.compose(r2);
+					RuleNode r = r1.composeF(r2);
 					if (r != null && r.equals(r2)) {
 						areEqual.add(r2);
 						equal = true;
@@ -247,7 +253,7 @@ public class HyperEdge {
 	 *            port node
 	 * @return reference to this hyperedge.
 	 */
-	public void hide(PortNode p) {
+	public void hide(Port p) {
 		for (RuleNode r : rules)
 			r.hide(p);
 		// TODO shouldn't we also hide the source of the transition, if it
