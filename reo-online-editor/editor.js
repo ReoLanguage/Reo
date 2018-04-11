@@ -218,23 +218,36 @@
 
   } //createAnchor
 
-  function createChannel(name, x1, y1, x2, y2) {
+  /**
+   *
+   * @param {string} type - type of channel to be created
+   * @param {Object} node1
+   * @param {string} [node1.name] - optional name of the first node
+   * @param {number} node1.x
+   * @param {number} node1.y
+   * @param {Object} node2
+   * @param {string} [node2.name] - optional name of the second node
+   * @param {number} node2.x
+   * @param {number} node2.y
+   * @returns {{class: string, components: Array}}
+   */
+  function createChannel(type, node1, node2) {
     // create a channel...
     var channel = {
       class: 'channel',
       components: []
     };
 
-    var diffX = Math.abs(x1-x2);
-    var diffY = Math.abs(y1-y2);
+    var diffX = Math.abs(node1.x-node2.x);
+    var diffY = Math.abs(node1.y-node2.y);
 
     // ...a reference rectangle...
     channel.components[0] = new fabric.Rect({
       width: 5,
       height: 100,
       baseLength: 100,
-      left: Math.min(x1,x2) + diffX / 2,
-      top: Math.min(y1,y2) + diffY / 2,
+      left: Math.min(node1.x,node2.x) + diffX / 2,
+      top: Math.min(node1.y,node2.y) + diffY / 2,
       angle: 90,
       fill: 'red',
       visible: false,
@@ -244,8 +257,8 @@
     });
 
     // ...two nodes...
-    channel.node1 = createNode(x1,y1);
-    channel.node2 = createNode(x2,y2);
+    channel.node1 = createNode(node1.x,node1.y,node1.name);
+    channel.node2 = createNode(node2.x,node2.y,node2.name);
 
     // ...and two anchors
     // TODO
@@ -258,21 +271,21 @@
 
     // currently loaded from a separate file
     // TODO: replace with a database search
-    switch(name) {
+    switch(type) {
       case 'sync':
-        createSync(channel,x1,y1,x2,y2);
+        createSync(channel,node1.x,node1.y,node2.x,node2.y);
         break;
       case 'lossysync':
-        createLossySync(channel,x1,y1,x2,y2);
+        createLossySync(channel,node1.x,node1.y,node2.x,node2.y);
         break;
       case 'syncdrain':
-        createSyncDrain(channel,x1,y1,x2,y2);
+        createSyncDrain(channel,node1.x,node1.y,node2.x,node2.y);
         break;
       case 'syncspout':
-        createSyncSpout(channel,x1,y1,x2,y2);
+        createSyncSpout(channel,node1.x,node1.y,node2.x,node2.y);
         break;
       case 'fifo1':
-        createFIFO1(channel,x1,y1,x2,y2);
+        createFIFO1(channel,node1.x,node1.y,node2.x,node2.y);
         break;
       default:
         console.log("Invalid channel name");
@@ -907,9 +920,9 @@
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
   document.getElementById("select").click();
-  createChannel('sync',100,100,200,100);
-  createChannel('lossysync',100,200,200,200);
-  createChannel('syncdrain',100,300,200,300);
-  createChannel('syncspout',100,400,200,400);
-  createChannel('fifo1',100,500,200,500);
+  createChannel('sync',{x: 100, y: 100},{x: 200, y: 100});
+  createChannel('lossysync',{x: 100, y: 200},{x: 200, y: 200});
+  createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
+  createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
+  createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
 })();
