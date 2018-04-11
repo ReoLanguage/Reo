@@ -576,8 +576,17 @@
     if (mode == 'select') {
       //console.log('Mode is select');
       if (p && p.class == 'component') {
+        canvas.preserveObjectStacking = true;
         origLeft = p.left;
         origTop = p.top;
+        p.nodes = [];
+        for (i = 0; i < nodes.length; i++) {
+          if (nodes[i].component == p) {
+            p.nodes.push(nodes[i]);
+            nodes[i].origLeft = nodes[i].left;
+            nodes[i].origTop = nodes[i].top;
+          }
+        }
       }
     }
     if (mode == 'component') {
@@ -619,6 +628,17 @@
         p.label.set({left: p.left + p.labelOffsetX});
         p.label.set({top: p.top + p.labelOffsetY});
         p.label.setCoords();
+        for (i = 0; i < p.nodes.length; i++) {
+          let node = p.nodes[i];
+          node.set({left: node.origLeft + pointer.x - origX});
+          node.set({top: node.origTop + pointer.y - origY});
+          node.setCoords();
+          for (j = 0; j < node.channels.length; j++)
+            updateChannel(node.channels[j]);
+          node.label.set({left: node.left + node.labelOffsetX});
+          node.label.set({top: node.top + node.labelOffsetY});
+          node.label.setCoords();
+        }
       }
     }
     if (p.class == 'node') {
@@ -727,6 +747,7 @@
 
       }
       if (p.class == 'component') {
+        canvas.preserveObjectStacking = false;
         p.label.setCoords();
         reorderComponents(p);
         p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
