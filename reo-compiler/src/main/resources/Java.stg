@@ -139,7 +139,7 @@ new Rule() {
 
 guard(t) ::= <<
 <t.output.keys:{p | <if(!t.output.(p).isnull)><p.name>.hasGet() && <endif>}; separator=" "><!
-!><t.input:{p | !(<p.name>.peek() == null) && }; separator=" "><!
+<t.input:{p | !(<p.name>.peek() == null) && }; separator=" ">
 !><t.guard:formula()>
 >>
 

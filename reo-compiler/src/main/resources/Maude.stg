@@ -4,7 +4,9 @@ main(S) ::= <<
 
 mod CONNECTOR is 
 		inc SIGNATURE .
-		
+        inc CONSTRAINT-SEMIRING .
+
+	
 	<S.components:component(); separator="\n\n">
 endm
 >>
@@ -15,11 +17,20 @@ component(c) ::= <<
 
 
 protocol(c) ::= <<
+subsort String \< Data .
 vars <c.variables:{ v | <v> } ; separator=" "> : Data .
+vars <c.thVar:{ v | <v> } ; separator=" "> : Value .
+op th : String Value -> Fact .
+var sl : StepSetList .
+op m : Nat Data* -> Fact [ctor] .
+op sv : Value -> Step [ctor] .
 
 <c.transitions:transition(); separator="\n">
-	
-eq start = <c.state:{p | <p>}; separator=" "> .
+
+op makestart : Nat Nat -> Facts .
+vars i j : Nat .
+
+eq makestart(i,j) = <c.state:{p | <p>}; separator=" "> .
 >>
 
 
