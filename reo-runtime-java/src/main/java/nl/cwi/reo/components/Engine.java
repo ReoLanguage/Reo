@@ -16,7 +16,7 @@ public class Engine {
 	private final BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 	private final BufferedReader reader;
 	private final BufferedWriter writer;
-	private final int moveTime = 1000;
+	private final int moveTime = 500;
 
 	public Engine(Port<String> inputPort, Port<String> outputPort) {
 		this.inputPort = inputPort;

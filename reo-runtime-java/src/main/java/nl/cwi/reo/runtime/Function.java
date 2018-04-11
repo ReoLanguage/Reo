@@ -14,6 +14,10 @@ public class Function {
 		// return (Integer)a+(Integer)b;
 		return a + b;
 	}
+	
+	public static boolean lowerEqual(int a,int b) {
+		return a<=b;
+	}
 
 	public static String majority(Object object) {
 		if (object == null)
@@ -47,7 +51,7 @@ public class Function {
 		System.exit(0);
 	}
 
-	public static String concatenate(Object object1, Object object2) {
+	public static String pair(Object object1, Object object2) {
 		if (object1 == null)
 			throw new NullPointerException();
 		if (object2 == null)
@@ -57,7 +61,24 @@ public class Function {
 		if (!(object2 instanceof String))
 			throw new IllegalArgumentException();
 
-		String string = (((String) object1) + " " + ((String) object2)).trim();
+		String string = ("("+((String) object1) + "," + ((String) object2)+")").trim();
+		if (string.length() > 10000)
+			string = "";
+
+		return string;
+	}
+	
+	public static String concatenate(Object object1, Object object2) {
+		if (object1 == null)
+			throw new NullPointerException();
+		if (object2 == null)
+			throw new NullPointerException();
+//		if (!(object1 instanceof String))
+//			throw new IllegalArgumentException();
+//		if (!(object2 instanceof String))
+//			throw new IllegalArgumentException();
+
+		String string = (object1.toString() + " " + object2.toString()).trim();
 		if (string.length() > 10000)
 			string = "";
 
