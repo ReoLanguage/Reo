@@ -187,4 +187,12 @@ public final class Existential implements Formula {
 	public Formula getTypedFormula(Map<Term, TypeTag> typeMap) {
 		return new Existential(this.getVariable(),f.getTypedFormula(typeMap));
 	}
+
+	@Override
+	public Map<Port, Boolean> getSynchronousMap() {
+		Map<Port, Boolean> map = new HashMap<>();
+		map = f.getSynchronousMap();
+		map.remove(x);
+		return map;
+	}
 }

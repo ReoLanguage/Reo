@@ -193,4 +193,15 @@ public final class Negation implements Formula {
 	public Formula getTypedFormula(Map<Term, TypeTag> typeMap) {
 		return new Negation(f.getTypedFormula(typeMap));
 	}
+
+	@Override
+	public Map<Port, Boolean> getSynchronousMap() {
+		Map<Port, Boolean> map = new HashMap<>();
+		Map<Port, Boolean> _map = new HashMap<>();
+		map = f.getSynchronousMap();
+		for(Port p : map.keySet()){
+			_map.put(p, !map.get(p));
+		}
+		return _map;
+	}
 }

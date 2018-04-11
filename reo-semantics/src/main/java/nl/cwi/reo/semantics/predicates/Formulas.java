@@ -58,7 +58,6 @@ public class Formulas {
 	 *         or null, if not all variables could be eliminated.
 	 */
 	public static Formula eliminate(Formula f, Collection<? extends Variable> V) {
-
 		if (Collections.disjoint(V, f.getFreeVariables()))
 			return f;
 
@@ -131,7 +130,7 @@ public class Formulas {
 					List<Formula> list = new ArrayList<>();
 					for (Integer i : Cv)
 						list.add(clauses.get(i));
-					clauses.add(new Existential(v, conjunction(list)));
+					clauses.add(new Existential(v, new Conjunction(list)));
 					for (Integer i : Cv)
 						clauses.set(i, True);
 					Set<Variable> vars = new HashSet<>();
@@ -159,7 +158,7 @@ public class Formulas {
 				}
 			}
 
-			return conjunction(clauses);
+			return new Conjunction(clauses);
 		}
 
 		if (f instanceof Equality)
@@ -176,22 +175,6 @@ public class Formulas {
 		return f;
 	}
 	
-	public static Formula order(Formula f){
-		
-		if(f instanceof Disjunction){
-			
-		}
-		
-		if(f instanceof Conjunction){
-			
-		}
-		
-		if(f instanceof Disjunction){
-			
-		}
-
-		return f;
-	}
 
 	/**
 	 * Constructs and simplifies the conjunction of a list of formulas. Because
@@ -205,15 +188,21 @@ public class Formulas {
 	 *            list of formulas
 	 * @return simplified conjunction of the list of formulas.
 	 */
-	public static Formula conjunction(Collection<Formula> clauses) {
+	public static Formula conjunction(Collection<Formula> clausesList) {
 		List<Formula> _clauses = new ArrayList<>();
+		List<Formula> clauses = new ArrayList<>();
+		for(Formula f : clausesList){
+			if (f instanceof Conjunction)
+				clauses.addAll(((Conjunction) f).getClauses());
+			else
+				clauses.add(f);
+		}
 		for (Formula f : clauses) {
 			if (f instanceof TruthValue) {
 				if (((TruthValue) f).getValue() == false)
 					return new TruthValue(false);
-			} else if (f instanceof Conjunction) {
-				_clauses.addAll(((Conjunction) f).getClauses());
-			} else if (!_clauses.contains(f)) {
+			}
+			else if (!_clauses.contains(f)) {
 				if (f instanceof Equality) {
 					Equality E = (Equality) f;
 					if(E.getLHS() instanceof NonNullValue){

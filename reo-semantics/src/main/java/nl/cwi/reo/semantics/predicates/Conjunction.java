@@ -59,7 +59,13 @@ public final class Conjunction implements Formula {
 	 * @return list of clauses of this conjunction.
 	 */
 	public List<Formula> getClauses() {
-		return clauses;
+		List<Formula> listF = new ArrayList<>();
+		for(Formula f : clauses)
+			if(f instanceof Conjunction)
+				listF.addAll(((Conjunction) f).getClauses());
+			else
+				listF.add(f);
+		return listF;
 	}
 
 	/**
@@ -254,6 +260,16 @@ public final class Conjunction implements Formula {
 					}
 				}
 			}
+		}
+		return map;
+	}
+
+	@Override
+	public Map<Port, Boolean> getSynchronousMap() {
+		Map<Port, Boolean> map = new HashMap<>();
+		for(Formula g : getClauses()){
+			if(g.getSynchronousMap()!=null)
+				map.putAll(g.getSynchronousMap());
 		}
 		return map;
 	}

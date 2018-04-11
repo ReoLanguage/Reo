@@ -200,4 +200,10 @@ public final class Universal implements Formula {
 		return this;
 	}
 
+	@Override
+	public Map<Port, Boolean> getSynchronousMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

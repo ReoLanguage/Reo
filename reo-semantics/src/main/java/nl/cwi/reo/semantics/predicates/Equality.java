@@ -294,4 +294,26 @@ public final class Equality implements Formula {
 	public Formula getTypedFormula(Map<Term,TypeTag> typeMap) {
 		return new Equality(t1.setTypeTag(typeMap.get(t1)),t2.setTypeTag(typeMap.get(t2)));
 	}
+
+	@Override
+	public Map<Port, Boolean> getSynchronousMap() {
+		Map<Port, Boolean> map = new HashMap<>();
+		if(t1 instanceof PortVariable){
+			if(t2 instanceof NullValue){
+				map.put(((PortVariable)t1).getPort(), false);
+			}
+			if(t2 instanceof NonNullValue){
+				map.put(((PortVariable)t1).getPort(), true);
+			}
+		}
+		if(t2 instanceof PortVariable){
+			if(t1 instanceof NullValue){
+				map.put(((PortVariable)t2).getPort(), false);
+			}
+			if(t1 instanceof NonNullValue){
+				map.put(((PortVariable)t2).getPort(), true);
+			}
+		}
+		return map;
+	}
 }

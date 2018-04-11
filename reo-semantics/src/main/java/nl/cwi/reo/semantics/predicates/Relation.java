@@ -312,4 +312,15 @@ public final class Relation implements Formula {
 		return null;
 	}
 
+	@Override
+	public Map<Port, Boolean> getSynchronousMap() {
+		Map<Port, Boolean> map = new HashMap<>();
+		for(Variable v: this.vars){
+			if(v instanceof PortVariable){
+				map.put(((PortVariable) v).getPort(), true);
+			}
+		}
+		return map;
+	}
+
 }
