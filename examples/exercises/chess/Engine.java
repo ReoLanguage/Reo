@@ -1,26 +1,23 @@
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import nl.cwi.pr.runtime.api.InputPort;
-import nl.cwi.pr.runtime.api.OutputPort;
+import nl.cwi.reo.runtime.Port;
 
 public class Engine {
-	private final InputPort inputPort;
-	private final OutputPort outputPort;
+	private final Port<String> inputPort;
+	private final Port<String> outputPort;
 	private final BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
 	private final BufferedReader reader;
 	private final BufferedWriter writer;
-	private final int moveTime = 1000;
+	private final int moveTime = 500;
 
-	public Engine(InputPort inputPort, OutputPort outputPort) {
+	public Engine(Port<String> inputPort, Port<String> outputPort) {
 		this.inputPort = inputPort;
 		this.outputPort = outputPort;
 
@@ -33,8 +30,7 @@ public class Engine {
 		else
 			stockfish = "stockfish-6-linux-64";
 
-		String path = "./"
-				+ stockfish;
+		String path = "./" + stockfish;
 
 		Process process = null;
 		try {
@@ -46,30 +42,27 @@ public class Engine {
 			throw new Error();
 		}
 
-		this.reader = new BufferedReader(new InputStreamReader(
-				process.getInputStream()));
-		this.writer = new BufferedWriter(new OutputStreamWriter(
-				process.getOutputStream()));
+		this.reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		this.writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
 		new Thread() {
 			@Override
 			public void run() {
 				String line;
 				StringBuilder builder = new StringBuilder();
+				if (reader == null || queue == null)
+					throw new NullPointerException();
 
 				try {
 					while ((line = reader.readLine()) != null) {
 						builder.append(line + "\n");
-						if (line.startsWith("uciok")
-								|| line.startsWith("bestmove")) {
-	
+						if (line.startsWith("uciok") || line.startsWith("bestmove")) {
+
 							queue.put(builder.toString());
 							builder = new StringBuilder();
 						}
 					}
-				}
-
-				catch (IOException | InterruptedException e) {
+				} catch (IOException | InterruptedException e) {
 					e.printStackTrace();
 					throw new Error();
 				}
@@ -90,7 +83,7 @@ public class Engine {
 
 	public void run() {
 		while (true) {
-			String moves = (String) inputPort.getUninterruptibly();
+			String moves = (String) inputPort.get();
 			System.out.println(moves);
 			String result = "";
 
@@ -107,9 +100,8 @@ public class Engine {
 				throw new Error();
 			}
 
-			outputPort.putUninterruptibly(result);
+			outputPort.put(result);
 		}
 
 	}
 }
-

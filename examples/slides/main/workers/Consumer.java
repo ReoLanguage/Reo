@@ -1,13 +1,11 @@
-package workers;
-
-import nl.cwi.pr.runtime.api.InputPort;
-import nl.cwi.pr.runtime.api.OutputPort;
+import nl.cwi.reo.runtime.Input;
+import nl.cwi.reo.runtime.Output;
 
 public class Consumer {
 
-        public static void blue(InputPort port) {
-                for (int i = 0; i < 10; i++) {
-                        System.out.print(port.getUninterruptibly());
+        public static void blue(Input<String> port) {
+                while(true) {
+                        System.out.print(port.get());
                 }
         }
 }

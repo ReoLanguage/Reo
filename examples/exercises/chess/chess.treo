@@ -1,6 +1,9 @@
+import reo.sync;
 import reo.binop;
 import reo.fifo1;
 import reo.transformer;
+import reo.syncdrain;
+import reo.filter;
 import reo.fifofull;
 
 /*
@@ -8,10 +11,7 @@ import reo.fifofull;
 * You can link to a Java code source in an atomic file by :
 *
 * 	Name = (*interface*){
-*       #PR
-*		identity(*ports*;)
-*	
-*		#Java "Workers.**** "
+*		#JAVA "Workers.**** "
 *	}
 */
 
@@ -31,8 +31,8 @@ visualize(C?,R?,M!,O!){
 	//
 
 	fifo1(C,k)
-      	{ transformer<PARSE>(R,M) | PARSE = "Functions.parse"}
-	{ binop<CONCATENATE>(k,M,O) | CONCATENATE = "Functions.concatenate" }
+      	{ transformer<PARSE>(R,M) | PARSE = "Function.parse"}
+	{ binop<CONCATENATE>(k,M,O) | CONCATENATE = "Function.concatenate" }
 
 }
 

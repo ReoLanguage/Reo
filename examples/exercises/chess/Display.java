@@ -12,15 +12,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import nl.cwi.pr.runtime.api.InputPort;
+import nl.cwi.reo.runtime.Port;
 
 public class Display {
 	private final Board board;
 	private final Map<String, Piece> position;
-	private final InputPort blackPort;
-	private final InputPort whitePort;
+	private final Port<String> blackPort;
+	private final Port<String> whitePort;
 
-	public Display(InputPort whitePort, InputPort blackPort) {
+	public Display(Port<String> whitePort, Port<String> blackPort) {
 		this.blackPort = blackPort;
 		this.whitePort = whitePort;
 
@@ -59,19 +59,20 @@ public class Display {
 		this.position.put("h8", Piece.BLACK_ROOK);
 
 		this.board = new Board();
+		this.board.initialize();
 		this.board.update(position);
 	}
 
 	public void run() {
 		String move = null;
 		while (true) {
-			move = (String) whitePort.getUninterruptibly();
+			move = (String) whitePort.get();
 			move(move);
 			board.update(position);
 			System.out.println("white: " + move);
 			sleep();
 
-			move = (String) blackPort.getUninterruptibly();
+			move = (String) blackPort.get();
 			move(move);
 			board.update(position);
 			System.out.println("black: " + move);
@@ -91,6 +92,10 @@ public class Display {
 				throw new Error("invalid move");
 
 			piece = position.remove(from);
+			
+			if (piece == null)
+				throw new Error();
+			
 			position.remove(to);
 			position.put(to, piece);
 
@@ -115,6 +120,10 @@ public class Display {
 				throw new Error("unsupported promotion");
 
 			piece = position.remove(from);
+			
+			if (piece == null)
+				throw new Error();
+			
 			position.remove(to);
 			position.put(to, Piece.promote(piece, promotion));
 			return;
@@ -246,7 +255,7 @@ class Board extends JFrame {
 
 	private ChessLabel[] labels = new ChessLabel[64];
 
-	Board() {
+	public void initialize() {
 		setTitle("Chess");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(640, 640);

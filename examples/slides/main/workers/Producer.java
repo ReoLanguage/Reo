@@ -1,20 +1,19 @@
-package workers;
 
-import nl.cwi.pr.runtime.api.InputPort;
-import nl.cwi.pr.runtime.api.OutputPort;
+import nl.cwi.reo.runtime.Input;
+import nl.cwi.reo.runtime.Output;
 
 public class Producer {
 	
-        public static void red(OutputPort port) {
+        public static void red(Output<String> a) {
                 for (int i = 1; i < 100; i++) {
-                        port.putUninterruptibly(i + ") Hello, ");
+                        a.put(i + ") Hello, ");
                 }
 		System.out.println("Red finished.");
         }
 
-        public static void green(OutputPort port) {
+        public static void green(Output<String> a) {
                 for (int i = 1; i < 100; i++) {
-                        port.putUninterruptibly("world!\n");
+                        a.put("world!\n");
                 }
 		System.out.println("Green finished.");
         }
