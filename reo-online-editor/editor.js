@@ -456,8 +456,8 @@
           let node1 = obj.node1;
           let node2 = obj.node2;
           s2 += space2 + obj.name + '(' + node1.label.text + ',' + node2.label.text + ')';
-          s2 += ' /*! ' + 'pos(' + node1.label.text + '): [' + Math.round(node1.left) + ', ' + Math.round(node1.top) + '], ' +
-            'pos(' + node2.label.text + '): [' + Math.round(node2.left) + ', ' + Math.round(node2.top) + ']' + ' !*/';
+          s2 += ' /*! pos(' + node1.label.text + '): [' + Math.round(node1.left) + ', ' + Math.round(node1.top) +
+            '], pos(' + node2.label.text + '): [' + Math.round(node2.left) + ', ' + Math.round(node2.top) + '] !*/';
           space2 = '\n';
         }
       }
