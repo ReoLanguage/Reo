@@ -476,12 +476,17 @@
             }
           }
           space3 = '';
-          s3 += ') {\n  ';
+          s3 += ') { ';
+          s3 += '/*! pos: [' + Math.round(obj.top) + ', ' + Math.round(obj.left) + '] !*/\n';
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
-            if (obj2.node1.component === obj && obj2.node2.component === obj) {
-              s3 += space3 + obj2.name + '(' + obj2.node1.label.text + ',' + obj2.node2.label.text + ')';
-              space3 = ',';
+            let node1 = obj2.node1;
+            let node2 = obj2.node2;
+            if (node1.component === obj && node2.component === obj) {
+              s3 += space3 + obj2.name + '(' + node1.label.text + ',' + node2.label.text + ')';
+              s3 += ' /*! pos(' + node1.label.text + '): [' + Math.round(node1.left) + ', ' + Math.round(node1.top) +
+                '], pos(' + node2.label.text + '): [' + Math.round(node2.left) + ', ' + Math.round(node2.top) + '] !*/';
+              space3 = '\n';
             }
           }
           space3 = '';
