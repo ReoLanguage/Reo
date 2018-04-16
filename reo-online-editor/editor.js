@@ -602,7 +602,7 @@
     }
     if (mode == 'sync' || mode == 'lossysync' || mode == 'syncdrain' || mode == 'syncspout' || mode == 'fifo1') {
       canvas.discardActiveObject();
-      var channel = createChannel(mode,pointer.x,pointer.y,pointer.x,pointer.y);
+      var channel = createChannel(mode,{x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
       snapToComponent(channel.node1,main);
       canvas.setActiveObject(channel.node2);
     }
