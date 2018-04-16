@@ -788,6 +788,7 @@
       }
       reorderComponents();
       canvas.requestRenderAll();
+      updateText();
     }
   }); //mouse:up
 
