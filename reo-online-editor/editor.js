@@ -174,6 +174,7 @@
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
+      selectable: false,
       class: 'node',
       component: main,
       id: generateId()
