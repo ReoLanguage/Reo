@@ -32,8 +32,7 @@ function genShapeDef(cname, args, shapedef) {
     for (let i = 0; i < args.length; i++) {
       // argList += ',arg' + (i + 3);
       // argmap['pathto' + args[i]] = i + 3;
-      argList += 'arg' + (i + 1) + 'x,';
-      argList += 'arg' + (i + 1) + 'y,';
+      argList += 'arg' + (i + 1) + ',';
       argmap['pathto' + args[i]] = i + 1;
     }
     let tikzsrc = shapedef;
@@ -55,7 +54,9 @@ function genShapeDef(cname, args, shapedef) {
     // argList += ', ' + (this.value || '');
 
     for (let j = 0; j < this.waypointsToPortIndex.length; ++j) {
-      argList += nodes[this.waypointsToPortIndex[j][0]].join(',') + ', '
+      argList += '{x:' + nodes[this.waypointsToPortIndex[j][0]][0] +
+        ',y:' + nodes[this.waypointsToPortIndex[j][0]][1] +
+        ',name:"' + this.waypointsToPortIndex[j][0] + '"},'
     }
 
     // output += ('  \\coordinate (tmp) at ($(@@,@@)$);\n'.format(this.pos[0], this.pos[1]));

@@ -202,7 +202,8 @@ ReoComponentImplementation.prototype.define = function (drawstate) {
 ReoComponentImplementation.prototype.processMeta = async function (s, env) {
   switch (s.key) {
     case 'pos':
-      let wpname = this.genNodeName(s.keyarg, env);
+      // let wpname = this.genNodeName(s.keyarg, env);
+      let wpname = s.keyarg;
       let coord = parseNumberArray(s.value, env);
       this.nodes[wpname] = coord;
       this.waypoints[wpname] = coord;
@@ -271,8 +272,8 @@ ReoComponentImplementation.prototype.parseInnerStr = async function (str, env) {
     let usedComponent = new impl.impl();
 
     // prefix args with [cName] to ensure unique names
-    argsIn = argsIn.map(function (x) {return self.genNodeName(x, env)});
-    argsOut = argsOut.map(function (x) {return self.genNodeName(x, env)});
+    // argsIn = argsIn.map(function (x) {return self.genNodeName(x, env)});
+    // argsOut = argsOut.map(function (x) {return self.genNodeName(x, env)});
 
     usedComponent.argsIn = argsIn;
     usedComponent.argsOut = argsOut;
