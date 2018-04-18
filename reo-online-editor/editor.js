@@ -36,9 +36,8 @@
     mode = 'select';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component') {
+      if (obj.class === 'component' || obj.class === 'node') {
         obj.set({'selectable': true});
-        console.log('component ' + obj.id + ' is selectable');
       }
     });
   };
@@ -48,7 +47,7 @@
     mode = 'component';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component') {
+      if (obj.class === 'component' || obj.class === 'node') {
         obj.set({'selectable': false});
       }
     });
@@ -59,7 +58,7 @@
     mode = 'sync';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component') {
+      if (obj.class === 'component' || obj.class === 'node') {
         obj.set({'selectable': false});
       }
     });
@@ -70,7 +69,7 @@
     mode = 'lossysync';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component') {
+      if (obj.class === 'component' || obj.class === 'node') {
         obj.set({'selectable': false});
       }
     });
@@ -81,7 +80,7 @@
     mode = 'syncdrain';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component') {
+      if (obj.class === 'component' || obj.class === 'node') {
         obj.set({'selectable': false});
       }
     });
@@ -92,7 +91,7 @@
     mode = 'syncspout';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component')
+      if (obj.class === 'component' || obj.class === 'node')
         obj.set({'selectable': false})
     })
   };
@@ -102,7 +101,7 @@
     mode = 'fifo1';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component')
+      if (obj.class === 'component' || obj.class === 'node')
         obj.set({'selectable': false})
     })
   };
@@ -571,12 +570,9 @@
     origY = pointer.y;
     var p = canvas.getActiveObject();
     if (p && mode !== 'select') {
-      origLeft = p.left;
-      origTop = p.top;
-      return;
+      canvas.discardActiveObject();
     }
     if (mode == 'select') {
-      //console.log('Mode is select');
       if (p && p.class == 'component') {
         origLeft = p.left;
         origRight = p.left + p.width;
@@ -601,6 +597,38 @@
       canvas.discardActiveObject();
       var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
       snapToComponent(channel.node1,main);
+      
+      p = channel.node1;
+      // place node on nearby edge of component
+      for (i = 0; i < components.length; i++) {
+        if (Math.abs(p.left - components[i].left) < 10)
+          p.set({'left': components[i].left});
+        if (Math.abs(p.top - components[i].top) < 10)
+          p.set({'top': components[i].top});
+        if (Math.abs(p.left - (components[i].left + components[i].width)) < 10)
+          p.set({'left': obj.left + components[i].width});
+        if (Math.abs(p.top - (components[i].top + components[i].height)) < 10)
+          p.set({'top': components[i].top + components[i].height});
+        p.setCoords();
+      }
+
+      for (i = 0; i < p.channels.length; ++i)
+        updateChannel(p.channels[i])
+      p.label.set({left: p.left + p.labelOffsetX});
+      p.label.set({top: p.top + p.labelOffsetY});
+      p.label.setCoords();
+      
+      // merge with existing nodes, except node2 of the same channel
+      for (i = nodes.length - 1; i >= 0; --i) {
+        if (nodes[i] === p || nodes[i] === channel.node2)
+          continue;
+        if (p.intersectsWithObject(nodes[i])) {
+          if(Math.abs(p.left-nodes[i].left) < 10 && Math.abs(p.top-nodes[i].top) < 10) {
+            mergeNodes(nodes[i], p);
+          }
+        }
+      }
+      
       canvas.setActiveObject(channel.node2)
     }
   }); //mouse:down
@@ -706,32 +734,14 @@
         p.label.setCoords();
         p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
         p.set({'component': main});
-
         for (i = nodes.length - 1; i >= 0; --i) {
           // prevent comparing the node with itself
-          if (nodes[i].id === p.id)
+          if (nodes[i] === p)
             continue;
-
           // merge nodes that overlap
           if (p.intersectsWithObject(nodes[i])) {
-            if(Math.abs(p.left-nodes[i].left) < 10 && Math.abs(p.top-nodes[i].top) < 10) {
-              for (let j = 0; j < nodes[i].channels.length; j++) {
-                if (nodes[i].channels[j].node1.id === nodes[i].id) {
-                  nodes[i].channels[j].node1 = p;
-                }
-                else {
-                  if (nodes[i].channels[j].node2.id === nodes[i].id)
-                    nodes[i].channels[j].node2 = p;
-                  else
-                    console.log("Error merging nodes");
-                }
-                p.channels.push(nodes[i].channels[j]);
-              }
-              canvas.remove(nodes[i].label, nodes[i]);
-              nodes.splice(i,1);
-              updateNode(p);
-              p.bringToFront();
-            }
+            if(Math.abs(p.left-nodes[i].left) < 10 && Math.abs(p.top-nodes[i].top) < 10)
+              mergeNodes(p, nodes[i]);
           }
         }
 
@@ -739,9 +749,8 @@
         canvas.forEachObject(function(obj) {
           if (p.intersectsWithObject(obj)) {
             if (obj.get('class') === 'component') {
-              if (obj.size < p.component.size) {
+              if (obj.size < p.component.size)
                 p.component = obj;
-              }
             }
           }
         });
@@ -770,7 +779,6 @@
 
       }
       if (p.class == 'component') {
-        console.log('mode is ' + mode);
         p.label.setCoords();
         reorderComponents(p);
         p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
@@ -788,6 +796,29 @@
       updateText();
     }
   }); //mouse:up
+  
+  function mergeNodes(destination, source) {
+    for (let j = 0; j < source.channels.length; j++) {
+      if (source.channels[j].node1.id === source.id) {
+        source.channels[j].node1 = destination;
+      }
+      else {
+        if (source.channels[j].node2.id === source.id)
+          source.channels[j].node2 = destination;
+        else
+          console.log("Error merging nodes");
+      }
+      destination.channels.push(source.channels[j]);
+    }
+    for (let k = 0; k < nodes.length; k++)
+      if (nodes[k] == source) {
+        nodes.splice(k,1);
+        break;
+      }
+    canvas.remove(source.label, source);
+    updateNode(destination);
+    destination.bringToFront();
+  }
 
   /**
    * Reorders the components so that all components are behind the other elements and p is in front of the other components
@@ -822,8 +853,6 @@
       hoverCursor: 'default',
       originX: 'left',
       originY: 'top',
-      //hasBorders: false,
-      //hasControls: false,
       hasRotatingPoint: false,
       size: width * height,
       class: 'component',

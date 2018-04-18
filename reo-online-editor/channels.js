@@ -277,6 +277,7 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     hasBorders: false,
     hasControls: false,
     selectable: false,
+    hoverCursor: 'default',
     originX: 'center',
     originY: 'center'
   });
