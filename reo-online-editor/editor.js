@@ -499,7 +499,7 @@
   }
 
   function snapToComponent(node, comp) {
-    var right = comp.left + comp.width, bottom = comp.top + comp.height, i;
+    var right = comp.left + comp.scaleX * comp.width, bottom = comp.top + comp.scaleY * comp.height, i;
     if (node.left > right) // right side
       node.set({'left': right});
     if (node.left < comp.left) // left side
@@ -642,12 +642,7 @@
             if (node.origTop == origBottom) {
               node.set({'top': p.top + p.scaleY * p.height});
             }
-            node.setCoords();
-            for (j = 0; j < node.channels.length; j++)
-              updateChannel(node.channels[j]);
-            node.label.set({left: node.left + node.labelOffsetX});
-            node.label.set({top: node.top + node.labelOffsetY});
-            node.label.setCoords();
+            snapToComponent(node, node.component);
           }
         }
         else {
