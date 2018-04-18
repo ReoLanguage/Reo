@@ -248,7 +248,7 @@
       angle: 90,
       fill: 'red',
       visible: false,
-      selectable: false,
+      evented: false,
       originX: 'center',
       originY: 'center'
     });
@@ -591,13 +591,13 @@
     }
     if (mode === 'component') {
       canvas.discardActiveObject();
-      var comp = drawComponent(pointer.x, pointer.y, pointer.x, pointer.y);
+      var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
       canvas.setActiveObject(comp);
     }
     if (mode === 'sync' || mode === 'lossysync' || mode === 'syncdrain' || mode === 'syncspout' || mode === 'fifo1') {
       canvas.discardActiveObject();
       var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
-      snapToComponent(channel.node1,main);
+      snapToComponent(channel.node1,channel.node1.component);
       
       p = channel.node1;
       // place node on nearby edge of component
@@ -758,20 +758,20 @@
 
         // ensure that no channel crosses a component boundary
         for (i = 0; i < p.channels.length; ++i) {
-          if (p.channels[i].node1 === p) {
-            if (p.channels[i].node2.component.size < p.component.size)
+          if (p === p.channels[i].node1) {
+            if (p.component.size > p.channels[i].node2.component.size)
               snapOutComponent(p.channels[i].node2,p.channels[i].node2.component,p);
             else {
               p.channels[i].node2.component = p.component;
-              snapToComponent(p.channels[i].node2,p.component);
+              snapToComponent(p.channels[i].node2,p.channels[i].node2.component);
             }
           }
-          else if (p.channels[i].node2 === p) {
-            if (p.channels[i].node1.component.size < p.component.size)
+          else if (p === p.channels[i].node2) {
+            if (p.component.size > p.channels[i].node1.component.size)
               snapOutComponent(p.channels[i].node1,p.channels[i].node1.component,p);
             else {
               p.channels[i].node1.component = p.component;
-              snapToComponent(p.channels[i].node1,p.component);
+              snapToComponent(p.channels[i].node1,p.channels[i].node1.component);
             }
           }
           else
@@ -779,19 +779,19 @@
         }
 
       }
-      if (p.class == 'component') {
+      if (p.class === 'component') {
         p.label.setCoords();
         reorderComponents(p);
         p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
         p.set({'width': p.scaleX * p.width, 'height': p.scaleY * p.height, scaleX: 1, scaleY: 1});
-        if (mode != 'select')
+        if (mode !== 'select')
           p.set({selectable: false});
       }
       if (p.class === 'label') {
         p.setCoords();
         p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});
       }
-      if (p.class != 'label' && p.class != 'component')
+      if (p.class !== 'label' && p.class !== 'component')
         canvas.discardActiveObject();
       canvas.requestRenderAll();
       updateText();
@@ -800,11 +800,11 @@
   
   function mergeNodes(destination, source) {
     for (let j = 0; j < source.channels.length; j++) {
-      if (source.channels[j].node1.id === source.id) {
+      if (source.channels[j].node1 === source) {
         source.channels[j].node1 = destination;
       }
       else {
-        if (source.channels[j].node2.id === source.id)
+        if (source.channels[j].node2 === source)
           source.channels[j].node2 = destination;
         else
           console.log("Error merging nodes");
@@ -837,7 +837,7 @@
     })
   }
 
-  function drawComponent(x1,y1,x2,y2,name) {
+  function createComponent(x1,y1,x2,y2,name) {
     var width = (x2 - x1);
     var height = (y2 - y1);
     var left = x1;
@@ -855,6 +855,7 @@
       originX: 'left',
       originY: 'top',
       hasRotatingPoint: false,
+      selectable: false,
       size: width * height,
       class: 'component',
       status: 'drawing',
@@ -876,7 +877,10 @@
     rect.setCoords();
     canvas.add(rect,label);
     canvas.requestRenderAll();
-    components.push(rect);
+    var i = 0;
+    while (i < components.length && rect.size < components[i].size)
+      i++;
+    components.slice(i, 0, rect);
     return rect
   }
 
@@ -889,13 +893,13 @@
     main = undefined
   }
 
-  var main = drawComponent(50,50,750,550,'main');
+  var main = createComponent(50,50,750,550,'main');
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
-  document.getElementById("select").click();
   createChannel('sync',{x: 100, y: 100},{x: 200, y: 100});
   createChannel('lossysync',{x: 100, y: 200},{x: 200, y: 200});
   createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
   createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
-  createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500})
+  createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
+  document.getElementById("select").click()
 })();
