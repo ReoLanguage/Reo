@@ -28,8 +28,8 @@
   fifoWidth            =     10;
   fifoFillColour       = '#fff';
 
-  buttonBorderOff      = '2px solid white';
-  buttonBorderOn       = '2px solid black';
+  buttonBorderOff      = '0.5vmin solid white';
+  buttonBorderOn       = '0.5vmin solid black';
 
   document.getElementById("select").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
