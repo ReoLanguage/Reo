@@ -30,6 +30,8 @@
 
   buttonBorderOff      = '0.5vmin solid white';
   buttonBorderOn       = '0.5vmin solid black';
+  
+  mergeDistance        =     20;
 
   document.getElementById("select").onclick = function() {
     document.getElementById(mode).style.border = buttonBorderOff;
@@ -420,11 +422,11 @@
     canvas.requestRenderAll()
   } //updateChannel
 
-  function isBoundaryNode (node, component) {
-    return node.left === component.left ||
-      node.top === component.top ||
-      node.left === component.left + component.width ||
-      node.top === component.top + component.height
+  function isBoundaryNode (node) {
+    return node.left === node.component.left ||
+      node.top === node.component.top ||
+      node.left === node.component.left + node.component.width ||
+      node.top === node.component.top + node.component.height
   }
 
   function updateText() {
@@ -434,7 +436,7 @@
 
       for (q = 0; q < nodes.length; ++q) {
         obj = nodes[q];
-        if (obj.component.id === 'main' && isBoundaryNode(obj, obj.component)) {
+        if (obj.component.id === 'main' && isBoundaryNode(obj)) {
           s1 += space1 + obj.label.text;
           space1 = ',';
         }
@@ -444,8 +446,8 @@
         obj = channels[q];
         if (obj.node1.component === main ||
             obj.node2.component === main ||
-             (isBoundaryNode(obj.node1,obj.node1.component) &&
-              isBoundaryNode(obj.node2,obj.node2.component) &&
+             (isBoundaryNode(obj.node1) &&
+              isBoundaryNode(obj.node2) &&
               obj.node1.component !== obj.node2.component
              )
            )
@@ -467,7 +469,7 @@
 
           for (r = 0; r < nodes.length; ++r) {
             obj2 = nodes[r];
-            if (obj2.component === obj && isBoundaryNode(obj2, obj2.component)) {
+            if (obj2.component === obj && isBoundaryNode(obj2)) {
               s3 += space3 + obj2.label.text;
               space3 = ',';
             }
@@ -602,13 +604,13 @@
       p = channel.node1;
       // place node on nearby edge of component
       for (i = 0; i < components.length; i++) {
-        if (Math.abs(p.left - components[i].left) < 10)
+        if (Math.abs(p.left - components[i].left) < mergeDistance)
           p.set({'left': components[i].left});
-        if (Math.abs(p.top - components[i].top) < 10)
+        if (Math.abs(p.top - components[i].top) < mergeDistance)
           p.set({'top': components[i].top});
-        if (Math.abs(p.left - (components[i].left + components[i].width)) < 10)
+        if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
           p.set({'left': obj.left + components[i].width});
-        if (Math.abs(p.top - (components[i].top + components[i].height)) < 10)
+        if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
           p.set({'top': components[i].top + components[i].height});
         p.setCoords();
       }
@@ -624,7 +626,7 @@
         if (nodes[i] === p || nodes[i] === channel.node2)
           continue;
         if (p.intersectsWithObject(nodes[i])) {
-          if(Math.abs(p.left-nodes[i].left) < 10 && Math.abs(p.top-nodes[i].top) < 10) {
+          if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
             mergeNodes(nodes[i], p);
           }
         }
@@ -699,19 +701,19 @@
       canvas.forEachObject(function(obj) {
         if (obj !== p && p.intersectsWithObject(obj)) {
           if (obj.class === 'node') {
-            if (Math.abs(p.left-obj.left) < 10 && Math.abs(p.top-obj.top) < 10) {
+            if (Math.abs(p.left-obj.left) < mergeDistance && Math.abs(p.top-obj.top) < mergeDistance) {
               p.set({'left': obj.left, 'top': obj.top});
               p.setCoords();
             }
           }
           else if (obj.class === 'component') {
-            if (Math.abs(p.left - obj.left) < 10)
+            if (Math.abs(p.left - obj.left) < mergeDistance)
               p.set({'left': obj.left});
-            if (Math.abs(p.top - obj.top) < 10)
+            if (Math.abs(p.top - obj.top) < mergeDistance)
               p.set({'top': obj.top});
-            if (Math.abs(p.left - (obj.left + obj.width)) < 10)
+            if (Math.abs(p.left - (obj.left + obj.width)) < mergeDistance)
               p.set({'left': obj.left + obj.width});
-            if (Math.abs(p.top - (obj.top + obj.height)) < 10)
+            if (Math.abs(p.top - (obj.top + obj.height)) < mergeDistance)
               p.set({'top': obj.top + obj.height});
             p.setCoords();
           }
@@ -741,20 +743,18 @@
             continue;
           // merge nodes that overlap
           if (p.intersectsWithObject(nodes[i])) {
-            if(Math.abs(p.left-nodes[i].left) < 10 && Math.abs(p.top-nodes[i].top) < 10)
+            if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
               mergeNodes(p, nodes[i]);
           }
         }
 
         // update the component property of the node
-        canvas.forEachObject(function(obj) {
-          if (p.intersectsWithObject(obj)) {
-            if (obj.get('class') === 'component') {
-              if (obj.size < p.component.size)
-                p.component = obj;
-            }
+        for (i = components.length - 1; i >= 0; --i) {
+          if (p.intersectsWithObject(components[i])) {
+            if (components[i].size < p.component.size)
+              p.component = components[i];
           }
-        });
+        }
 
         // ensure that no channel crosses a component boundary
         for (i = 0; i < p.channels.length; ++i) {
@@ -762,16 +762,20 @@
             if (p.component.size > p.channels[i].node2.component.size)
               snapOutComponent(p.channels[i].node2,p.channels[i].node2.component,p);
             else {
-              p.channels[i].node2.component = p.component;
-              snapToComponent(p.channels[i].node2,p.channels[i].node2.component);
+              if (!isBoundaryNode(p)) {
+                p.channels[i].node2.component = p.component;
+                snapToComponent(p.channels[i].node2,p.channels[i].node2.component);
+              }
             }
           }
           else if (p === p.channels[i].node2) {
             if (p.component.size > p.channels[i].node1.component.size)
               snapOutComponent(p.channels[i].node1,p.channels[i].node1.component,p);
             else {
-              p.channels[i].node1.component = p.component;
-              snapToComponent(p.channels[i].node1,p.channels[i].node1.component);
+              if (!isBoundaryNode(p)) {
+                p.channels[i].node1.component = p.component;
+                snapToComponent(p.channels[i].node1,p.channels[i].node1.component);
+              }
             }
           }
           else
@@ -880,7 +884,7 @@
     var i = 0;
     while (i < components.length && rect.size < components[i].size)
       i++;
-    components.slice(i, 0, rect);
+    components.splice(i, 0, rect);
     return rect
   }
 
