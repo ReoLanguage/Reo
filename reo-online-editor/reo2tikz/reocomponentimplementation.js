@@ -178,7 +178,7 @@ ReoComponentImplementation.prototype.define = function (drawstate) {
 
   // output += '\\def \\reoimpldraw@@ !!{\n'.format(this.implName);
   output += 'function reoimpldraw@@() {\n'.format(this.implName);
-  // output += `let ${this.implName} = drawComponent(50,50,750,550);\n${this.implName}.label.set({'text': '${this.implName}'});\nid = '0';\n`;
+  // output += `let ${this.implName} = createComponent(50,50,750,550);\n${this.implName}.label.set({'text': '${this.implName}'});\nid = '0';\n`;
 
   // Nodes
   // for (let n in this.waypoints) {

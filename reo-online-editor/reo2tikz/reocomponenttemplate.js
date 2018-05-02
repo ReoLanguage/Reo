@@ -78,7 +78,7 @@ ReoComponentTemplate.prototype.implement = async function (binding) {
     }
     // output += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
     output += 'function reodraw@@(@@) {\n'.format(this.typeName, argList);
-    output += '  let @@ = drawComponent(50,50,750,550,"@@");\n'.format(this.typeName, this.typeName);
+    output += '  let @@ = createComponent(50,50,750,550,"@@");\n'.format(this.typeName, this.typeName);
     output += `  ${this.typeName}.set({id: '${this.typeName}', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});\n`;
     output += "  id = '0';\n";
     // output += '  \\begin{scope}[shift=(#1),rotate around={#2:(#1)}]\n';

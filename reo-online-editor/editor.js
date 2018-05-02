@@ -176,7 +176,7 @@
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
-      selectable: false,
+      selectable: mode == 'select',
       class: 'node',
       component: main,
       id: generateId()
@@ -201,6 +201,8 @@
     });
 
     nodes.push(node);
+    // to be included later but currently throws an error when generating graphics from text
+    //updateNode(node);
     return node
   } //createNode
 
@@ -328,6 +330,59 @@
 
   function updateNode(node) {
     var source = false, sink = false, i;
+    
+    // set coordinates and component reference
+    node.label.setCoords();
+    node.set({labelOffsetX: node.label.left - node.left, labelOffsetY: node.label.top - node.top});
+    console.log(main);
+    node.set({'component': main});
+    console.log(node);
+    for (i = nodes.length - 1; i >= 0; --i) {
+      // prevent comparing the node with itself
+      if (nodes[i] === node)
+        continue;
+      // merge nodes that overlap
+      if (node.intersectsWithObject(nodes[i])) {
+        if(Math.abs(node.left-nodes[i].left) < mergeDistance && Math.abs(node.top-nodes[i].top) < mergeDistance)
+          mergeNodes(node, nodes[i]);
+      }
+    }
+
+    // update the component property of the node
+    for (i = components.length - 1; i >= 0; --i) {
+      if (node.intersectsWithObject(components[i])) {
+        if (components[i].size < node.component.size)
+          node.component = components[i];
+      }
+    }
+
+    // ensure that no channel crosses a component boundary
+    for (i = 0; i < node.channels.length; ++i) {
+      if (node === node.channels[i].node1) {
+        if (node.component.size > node.channels[i].node2.component.size)
+          snapOutComponent(node.channels[i].node2,node.channels[i].node2.component,node);
+        else {
+          if (!isBoundaryNode(node)) {
+            node.channels[i].node2.component = node.component;
+            snapToComponent(node.channels[i].node2,node.channels[i].node2.component);
+          }
+        }
+      }
+      else if (node === node.channels[i].node2) {
+        if (node.component.size > node.channels[i].node1.component.size)
+          snapOutComponent(node.channels[i].node1,node.channels[i].node1.component,node);
+        else {
+          if (!isBoundaryNode(node)) {
+            node.channels[i].node1.component = node.component;
+            snapToComponent(node.channels[i].node1,node.channels[i].node1.component);
+          }
+        }
+      }
+      else
+        console.log("Broken node reference detected");
+    }    
+    
+    // update nodetype and colouring
     for (i = 0; i < node.channels.length; i++) {
       if (node.channels[i].node1 === node) {
         if (node.channels[i].end1 === 'source')
@@ -734,54 +789,7 @@
     if (p) {
       p.setCoords();
       if (p.class === 'node') {
-        p.label.setCoords();
-        p.set({labelOffsetX: p.label.left - p.left, labelOffsetY: p.label.top - p.top});
-        p.set({'component': main});
-        for (i = nodes.length - 1; i >= 0; --i) {
-          // prevent comparing the node with itself
-          if (nodes[i] === p)
-            continue;
-          // merge nodes that overlap
-          if (p.intersectsWithObject(nodes[i])) {
-            if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
-              mergeNodes(p, nodes[i]);
-          }
-        }
-
-        // update the component property of the node
-        for (i = components.length - 1; i >= 0; --i) {
-          if (p.intersectsWithObject(components[i])) {
-            if (components[i].size < p.component.size)
-              p.component = components[i];
-          }
-        }
-
-        // ensure that no channel crosses a component boundary
-        for (i = 0; i < p.channels.length; ++i) {
-          if (p === p.channels[i].node1) {
-            if (p.component.size > p.channels[i].node2.component.size)
-              snapOutComponent(p.channels[i].node2,p.channels[i].node2.component,p);
-            else {
-              if (!isBoundaryNode(p)) {
-                p.channels[i].node2.component = p.component;
-                snapToComponent(p.channels[i].node2,p.channels[i].node2.component);
-              }
-            }
-          }
-          else if (p === p.channels[i].node2) {
-            if (p.component.size > p.channels[i].node1.component.size)
-              snapOutComponent(p.channels[i].node1,p.channels[i].node1.component,p);
-            else {
-              if (!isBoundaryNode(p)) {
-                p.channels[i].node1.component = p.component;
-                snapToComponent(p.channels[i].node1,p.channels[i].node1.component);
-              }
-            }
-          }
-          else
-            console.log("Broken node reference detected");
-        }
-
+        updateNode(p);
       }
       if (p.class === 'component') {
         p.label.setCoords();
