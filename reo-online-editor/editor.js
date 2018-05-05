@@ -1,4 +1,44 @@
 (function() {
+  var c = document.getElementById("c");
+  var container = document.getElementById("canvas");
+
+  function resizeCanvas() {
+    console.log("Resizing...");
+    c.width = container.clientWidth;
+    c.height = container.clientHeight;
+    // Check if the Fabric.js canvas object has been initialized
+    if (canvas) {
+      canvas.setWidth(container.clientWidth);
+      canvas.setHeight(container.clientHeight);
+      canvas.calcOffset();
+
+      // Redraw the main component
+      var x1 = 50;
+      var y1 = 50;
+      var x2 = container.clientWidth - 50;
+      var y2 = container.clientHeight - 50;
+      main.set({
+        'width': x2 - x1,
+        'height': y2 - y1,
+        'left': x1,
+        'top': y1
+      });
+
+      // Reset the label position
+      main.set({'labelOffsetX': x1 + ((x2-x1) / 2), 'labelOffsetY': -15});
+      main.label.set({left: main.left + main.labelOffsetX});
+      main.label.set({top: main.top + main.labelOffsetY});
+      main.label.setCoords();
+      canvas.requestRenderAll();
+      console.log(main.left);
+      console.log(main.left + main.width);
+      console.log((main.left + main.left + main.width) / 2);
+      console.log(main.label.left);
+    }
+  }
+  document.body.onresize = function() {resizeCanvas()};
+
+  resizeCanvas();
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false, preserveObjectStacking: true });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   fabric.Object.prototype.objectCaching = false;
@@ -905,7 +945,7 @@
     main = undefined
   }
 
-  var main = createComponent(50,50,750,550,'main');
+  var main = createComponent(50,50,container.clientWidth-50,container.clientHeight-50,'main');
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
   createChannel('sync',{x: 100, y: 100},{x: 200, y: 100});

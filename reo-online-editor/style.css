@@ -33,7 +33,10 @@ h2 {
 }
 
 #textdiv {
-  float: left;
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 10vh;
   width: 30vw;
   height: 90vh;
   padding: 0.5vw;
@@ -42,14 +45,20 @@ h2 {
 }
 
 #canvas {
-  float: left;
+  display: block;
+  position: absolute;
+  left: 30vw;
+  top: 10vh;
   width: 58vw;
   height: 90vh;
   background-color: #eee;
 }
 
 #toolbar {
-  float: left;
+  display: block;
+  position: absolute;
+  left: 88vw;
+  top: 10vh;
   width: 12vw;
   height: 90vh;
   padding: 0.5vw;
@@ -111,17 +120,21 @@ h2 {
   }
   
   #textdiv {
-    width: 100%;
-    clear: both;
+    width: 100vw;
+    height: 100vh;
   }
 
   #canvas {
-    width: 100%;
-    clear: both;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 110vh;
   }
 
   #toolbar {
-    width: 100%;
-    clear: both;
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 210vh;
   }
 }
