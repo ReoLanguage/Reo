@@ -78,7 +78,7 @@
     mode = 'select';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' || obj.class === 'node') {
+      if (obj.class === 'component' || obj.class === 'node' || obj.class === 'label') {
         obj.set({'selectable': true});
       }
     });
@@ -89,9 +89,7 @@
     mode = 'component';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' || obj.class === 'node') {
-        obj.set({'selectable': false});
-      }
+      obj.set({'selectable': false});
     });
   };
 
@@ -100,9 +98,7 @@
     mode = 'sync';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' || obj.class === 'node') {
-        obj.set({'selectable': false});
-      }
+      obj.set({'selectable': false});
     });
   };
 
@@ -111,9 +107,7 @@
     mode = 'lossysync';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' || obj.class === 'node') {
-        obj.set({'selectable': false});
-      }
+      obj.set({'selectable': false});
     });
   };
 
@@ -122,9 +116,7 @@
     mode = 'syncdrain';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' || obj.class === 'node') {
-        obj.set({'selectable': false});
-      }
+      obj.set({'selectable': false});
     });
   };
 
@@ -133,8 +125,7 @@
     mode = 'syncspout';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' || obj.class === 'node')
-        obj.set({'selectable': false})
+      obj.set({'selectable': false})
     })
   };
 
@@ -143,8 +134,7 @@
     mode = 'fifo1';
     this.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' || obj.class === 'node')
-        obj.set({'selectable': false})
+      obj.set({'selectable': false})
     })
   };
 
@@ -836,8 +826,7 @@
         reorderComponents(p);
         p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
         p.set({'width': p.scaleX * p.width, 'height': p.scaleY * p.height, scaleX: 1, scaleY: 1});
-        if (mode !== 'select')
-          p.set({selectable: false});
+        p.set({selectable: mode == 'select'});
         for (j = 0; j < nodes.length; j++) {
           // update the component property of the node
           for (i = components.length - 1; i >= 0; --i) {
@@ -863,7 +852,7 @@
         p.setCoords();
         p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});
       }
-      if (p.class !== 'label' && p.class !== 'component')
+      if (mode !== 'select')
         canvas.discardActiveObject();
       canvas.requestRenderAll();
       updateText();
@@ -927,7 +916,7 @@
       originX: 'left',
       originY: 'top',
       hasRotatingPoint: false,
-      selectable: false,
+      selectable: mode == 'select',
       size: width * height,
       class: 'component',
       status: 'drawing',
@@ -941,7 +930,8 @@
       fontSize: 32,
       class: 'label',
       object: rect,
-      hasControls: false
+      hasControls: false,
+      selectable: mode == 'select'
     });
 
     rect.set({'label': label, 'labelOffsetX': left + (width / 2), 'labelOffsetY': -15});
