@@ -613,16 +613,16 @@
     updateText()
   }
 
-  function snapOutComponent(node, comp, connectedNode) {
-    var right = comp.left + comp.width, bottom = comp.top + comp.height, i;
+  function snapOutComponent(node, component, connectedNode) {
+    var right = component.left + component.width, bottom = component.top + component.height, i;
     if (connectedNode.left > right) // right side
       node.set({left: right});
-    if (connectedNode.left < comp.left) // left side
-      node.set({left: comp.left});
+    if (connectedNode.left < component.left) // left side
+      node.set({left: component.left});
     if (connectedNode.top > bottom) // bottom side
       node.set({top: bottom});
-    if (connectedNode.top < comp.top) // top side
-      node.set({top: comp.top});
+    if (connectedNode.top < component.top) // top side
+      node.set({top: component.top});
     node.setCoords();
     node.label.set({'left': node.left + node.labelOffsetX, 'top': node.top + node.labelOffsetY});
     node.label.setCoords();
@@ -838,6 +838,26 @@
         p.set({'width': p.scaleX * p.width, 'height': p.scaleY * p.height, scaleX: 1, scaleY: 1});
         if (mode !== 'select')
           p.set({selectable: false});
+        for (j = 0; j < nodes.length; j++) {
+          // update the component property of the node
+          for (i = components.length - 1; i >= 0; --i) {
+            if (nodes[j].intersectsWithObject(components[i])) {
+              if (components[i].size < nodes[j].component.size)
+                nodes[j].component = components[i];
+            }
+          }
+          // ensure that no channel crosses a component boundary
+          for (i = 0; i < nodes[j].channels.length; ++i) {
+            if (p.intersectsWithObject(p)) {
+              if (nodes[j] === nodes[j].channels[i].node1)
+                snapOutComponent(nodes[j], nodes[j].component, nodes[j].channels[i].node2);
+              else if (nodes[j] === nodes[j].channels[i].node2)
+                snapOutComponent(nodes[j], nodes[j].component, nodes[j].channels[i].node1);
+              else
+                console.log("Broken node reference detected");
+            }
+          }
+        }
       }
       if (p.class === 'label') {
         p.setCoords();
