@@ -3,7 +3,6 @@
   var container = document.getElementById("canvas");
 
   function resizeCanvas() {
-    console.log("Resizing...");
     c.width = container.clientWidth;
     c.height = container.clientHeight;
     // Check if the Fabric.js canvas object has been initialized
@@ -30,10 +29,6 @@
       main.label.set({top: main.top + main.labelOffsetY});
       main.label.setCoords();
       canvas.requestRenderAll();
-      console.log(main.left);
-      console.log(main.left + main.width);
-      console.log((main.left + main.left + main.width) / 2);
-      console.log(main.label.left);
     }
   }
   document.body.onresize = function() {resizeCanvas()};
@@ -337,7 +332,9 @@
     }
     channels.push(channel);
 
-    canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
+    // Anchors disabled for now
+    // canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
+    canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label);
 
     updateChannel(channel);
     return channel
@@ -364,9 +361,7 @@
     // set coordinates and component reference
     node.label.setCoords();
     node.set({labelOffsetX: node.label.left - node.left, labelOffsetY: node.label.top - node.top});
-    console.log(main);
     node.set({'component': main});
-    console.log(node);
     for (i = nodes.length - 1; i >= 0; --i) {
       // prevent comparing the node with itself
       if (nodes[i] === node)
@@ -438,7 +433,7 @@
     }
     else
       node.set({'nodetype':'sink','fill':nodeFillColourSink})
-  }
+  } //updateNode
 
   function updateChannel(channel) {
     var x1 = channel.node1.get('left'),
@@ -637,6 +632,7 @@
     updateText()
   }); //text:editing:exited
 
+/* Anchors disabled for now
   canvas.on('mouse:over', function(e) {
     if (e.target && e.target.class === "anchor") {
       e.target.set('opacity', '100');
@@ -650,6 +646,7 @@
       canvas.requestRenderAll()
     }
   }); //mouse:out
+*/
 
   canvas.on('mouse:down', function(e) {
     isDown = true;
@@ -660,7 +657,7 @@
     if (p && mode !== 'select') {
       canvas.discardActiveObject();
     }
-    if (mode == 'select') {
+    if (mode === 'select') {
       if (p && p.class == 'component') {
         origLeft = p.left;
         origRight = p.left + p.width;
@@ -711,12 +708,10 @@
         if (nodes[i] === p || nodes[i] === channel.node2)
           continue;
         if (p.intersectsWithObject(nodes[i])) {
-          if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
+          if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
             mergeNodes(nodes[i], p);
-          }
         }
       }
-      
       canvas.setActiveObject(channel.node2)
     }
   }); //mouse:down
@@ -860,6 +855,7 @@
   }); //mouse:up
   
   function mergeNodes(destination, source) {
+    console.log("Merging nodes " + destination.id + " and " + source.id);
     for (let j = 0; j < source.channels.length; j++) {
       if (source.channels[j].node1 === source) {
         source.channels[j].node1 = destination;
@@ -878,7 +874,6 @@
         break;
       }
     canvas.remove(source.label, source);
-    updateNode(destination);
     destination.bringToFront();
   }
 
