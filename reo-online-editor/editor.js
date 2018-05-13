@@ -471,9 +471,10 @@
               space3 = ',';
             }
           }
+          let top = Math.round(obj.top), left = Math.round(obj.left), bottom = top + obj.height, right = left + obj.width;
           space3 = '';
           s3 += ') { ';
-          s3 += '/*! pos: [' + Math.round(obj.top) + ', ' + Math.round(obj.left) + '] !*/\n';
+          s3 += '/*! pos: [' + left + ', ' + top + ', ' + right + ', ' + bottom + '] !*/\n';
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
             let node1 = obj2.node1;
