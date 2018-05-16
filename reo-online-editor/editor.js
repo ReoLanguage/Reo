@@ -192,8 +192,55 @@
     return id
   }
 
+  // Extend the default Fabric.js object type to include additional positional parameters
+  fabric.Object.prototype.toObject = (function (toObject) {
+    return function () {
+      return fabric.util.object.extend(toObject.call(this), {
+        referenceAngle:    this.referenceAngle,
+        referenceDistance: this.referenceDistance,
+        referencePoint:    this.referencePoint,
+        rotate:            this.rotate,
+        scale:             this.scale
+      });
+    };
+  })(fabric.Object.prototype.toObject);
+
+  var Node = fabric.util.createClass(fabric.Circle, {
+    type: 'node',
+
+    initialize: function(options) {
+      options || (options = { });
+      this.callSuper('initialize', options);
+      this.set({
+        'label': options.label || '',
+        'channels': options.channels || [], // these are the channels that are connected to this node
+        'labelOffsetX': options.labelOffSetX || 20,
+        'labelOffsetY': options.labelOffSetY || -20,
+        'class': 'node',
+        'component': options.component || main,
+        'id': options.id || generateId()
+      });
+    },
+
+    toObject: function() {
+      return fabric.util.object.extend(this.callSuper('toObject'), {
+        label: this.get('label'),
+        //channels: this.set('channels'),
+        labelOffsetX: this.get('labelOffsetX'),
+        labelOffsetY: this.get('labelOffsetY'),
+        class: this.get('class'),
+        //component: this.get('component'),
+        id: this.get('id')
+      });
+    },
+
+    _render: function(ctx) {
+      this.callSuper('_render', ctx);
+    }
+  }); // Node
+
   function createNode(left, top, name) {
-    var node = new fabric.Circle({
+    var node = new Node({
       left: left,
       top: top,
       strokeWidth: lineStrokeWidth,
@@ -201,14 +248,8 @@
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
-      selectable: mode == 'select',
-      class: 'node',
-      component: main,
-      id: generateId()
+      selectable: mode == 'select'
     });
-
-    // these are the channels that are connected to this node
-    node.channels = [];
 
     var label = new fabric.IText(name ? name : node.id, {
       left: left + 20,
@@ -288,8 +329,8 @@
 
     // ...and two anchors
     // TODO
-    channel.anchor1 = createAnchor(133,100);
-    channel.anchor2 = createAnchor(167,100);
+    //channel.anchor1 = createAnchor(133,100);
+    //channel.anchor2 = createAnchor(167,100);
 
     // link the channel to the nodes
     channel.node1.channels.push(channel);
@@ -337,6 +378,7 @@
     canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label);
 
     updateChannel(channel);
+    //console.log(channel);
     return channel
   } //createChannel
 
@@ -904,7 +946,7 @@
       top: top,
       width: width,
       height: height,
-      fill: '#eee',
+      fill: 'transparent',
       stroke: '#000',
       strokeWidth: 1,
       hoverCursor: 'default',
@@ -958,5 +1000,6 @@
   createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
   createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
   createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
-  document.getElementById("select").click()
+  document.getElementById("select").click();
+  //document.getElementById("text").innerHTML = JSON.stringify(nodes[0].channels[0]);
 })();
