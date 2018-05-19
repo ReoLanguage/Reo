@@ -68,70 +68,24 @@
   
   mergeDistance        =     20;
 
-  document.getElementById("select").onclick = function() {
+  function buttonClick(button) {
     document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'select';
-    this.style.border = buttonBorderOn;
+    mode = button.id;
+    button.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component' || obj.class === 'node' || obj.class === 'label') {
-        obj.set({'selectable': true});
+        obj.set({'selectable': mode === 'select'});
       }
     });
-  };
-
-  document.getElementById("component").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'component';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false});
-    });
-  };
-
-  document.getElementById("sync").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'sync';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false});
-    });
-  };
-
-  document.getElementById("lossysync").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'lossysync';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false});
-    });
-  };
-
-  document.getElementById("syncdrain").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'syncdrain';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false});
-    });
-  };
-
-  document.getElementById("syncspout").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'syncspout';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false})
-    })
-  };
-
-  document.getElementById("fifo1").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'fifo1';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false})
-    })
-  };
+  }
+  
+  document.getElementById("select").onclick =    function() {buttonClick(document.getElementById("select"))}
+  document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))}
+  document.getElementById("sync").onclick =      function() {buttonClick(document.getElementById("sync"))}
+  document.getElementById("lossysync").onclick = function() {buttonClick(document.getElementById("lossysync"))}
+  document.getElementById("syncdrain").onclick = function() {buttonClick(document.getElementById("syncdrain"))}
+  document.getElementById("syncspout").onclick = function() {buttonClick(document.getElementById("syncspout"))}
+  document.getElementById("fifo1").onclick =     function() {buttonClick(document.getElementById("fifo1"))}
 
   document.getElementById("downloadsvg").onclick = function () {
     var a = document.getElementById("download");
@@ -1027,10 +981,10 @@
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
   createChannel('sync',{x: 100, y: 100},{x: 200, y: 100});
-  //createChannel('lossysync',{x: 100, y: 200},{x: 200, y: 200});
-  //createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
-  //createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
-  //createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
+  createChannel('lossysync',{x: 100, y: 200},{x: 200, y: 200});
+  createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
+  createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
+  createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
   document.getElementById("select").click();
   //document.getElementById("text").innerHTML = JSON.stringify(nodes[0].channels[0]);
 })();
