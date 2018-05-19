@@ -256,7 +256,7 @@
       "class":"node",
       "id":"b"
    },
-   "name":"sync",
+   "name":"Sync",
    "end1":"source",
    "end2":"sink"
 }

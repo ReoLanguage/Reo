@@ -340,7 +340,7 @@
     // TODO: replace with a database search
     switch(type) {
       case 'sync':
-        createSync(channel,node1.x,node1.y,node2.x,node2.y);
+        //createSync(channel,node1.x,node1.y,node2.x,node2.y);
         break;
       case 'lossysync':
         createLossySync(channel,node1.x,node1.y,node2.x,node2.y);
@@ -357,6 +357,20 @@
       default:
         console.log("Invalid channel name");
         return;
+    }
+    
+    if (type === 'sync') {
+      var xhttp = new XMLHttpRequest();
+      xhttp.overrideMimeType("application/json");
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          // Typical action to be performed when the document is ready:
+          document.getElementById("text").innerHTML = xhttp.responseText;
+          newChannelType(xhttp.responseText);
+        }
+      };
+      xhttp.open("GET", "channels/sync1.js", true);
+      xhttp.send();
     }
 
     canvas.add(channel.components[0]);
@@ -381,6 +395,23 @@
     //console.log(channel);
     return channel
   } //createChannel
+  
+  function newChannelType(response) {
+    var channel = JSON.parse(response);
+    var img = document.createElement("img");
+    img.setAttribute("src","img/sync.svg");
+    img.setAttribute("alt",channel.name);
+    var a = document.createElement("a");
+    a.setAttribute("title",channel.name);
+    a.appendChild(img);
+    var span = document.createElement("span");
+    span.setAttribute("id",channel.name);
+    span.setAttribute("class",channel.class);
+    span.appendChild(a);
+    span.appendChild(document.createElement("br"));
+    span.appendChild(document.createTextNode(channel.name));
+    document.getElementById("channels").appendChild(span);
+  } //newChannelType
 
   function calculateAngle(channel, baseAngle) {
     var angle = 0;
@@ -996,10 +1027,10 @@
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
   createChannel('sync',{x: 100, y: 100},{x: 200, y: 100});
-  createChannel('lossysync',{x: 100, y: 200},{x: 200, y: 200});
-  createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
-  createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
-  createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
+  //createChannel('lossysync',{x: 100, y: 200},{x: 200, y: 200});
+  //createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
+  //createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
+  //createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
   document.getElementById("select").click();
   //document.getElementById("text").innerHTML = JSON.stringify(nodes[0].channels[0]);
 })();
