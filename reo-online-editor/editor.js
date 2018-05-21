@@ -769,29 +769,28 @@
         p.set({width:Math.abs(origX - pointer.x)});
         p.set({height:Math.abs(origY - pointer.y)});
         p.setCoords();
-        p.label.set({left: p.left + (p.width/2), top: p.top - 15});
+        p.header.set({left: p.left, top: p.top, width: p.width});
+        p.header.setCoords();
+        p.label.set({left: p.left + (p.width/2), top: p.top + 15});
         p.label.setCoords();
       }
       else {
-        p.label.set({left: p.left + p.labelOffsetX});
-        p.label.set({top: p.top + p.labelOffsetY});
-        p.label.setCoords();
         p.setCoords();
+        p.header.set({left: p.left, top: p.top, width: p.width});
+        p.header.setCoords();
+        p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
+        p.label.setCoords();
         if (p.__corner != 0) {
           for (i = 0; i < p.nodes.length; i++) {
             let node = p.nodes[i];
-            if (node.origLeft == origLeft) {
+            if (node.origLeft == origLeft)
               node.set({'left': p.left});
-            }
-            if (node.origLeft == origRight) {
+            if (node.origLeft == origRight)
               node.set({'left': p.left + p.scaleX * p.width});
-            }
-            if (node.origTop == origTop) {
+            if (node.origTop == origTop)
               node.set({'top': p.top});
-            }
-            if (node.origTop == origBottom) {
+            if (node.origTop == origBottom)
               node.set({'top': p.top + p.scaleY * p.height});
-            }
             snapToComponent(node, node.component);
           }
         }
@@ -809,7 +808,6 @@
             node.label.setCoords();
             for (j = 0; j < node.channels.length; j++)
               updateChannel(node.channels[j]);
-            
           }
         }
       }
@@ -858,7 +856,7 @@
       if (p.class === 'component') {
         p.label.setCoords();
         reorderComponents(p);
-        p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
+        p.set({status: 'design'});
         p.set({'width': p.scaleX * p.width, 'height': p.scaleY * p.height, scaleX: 1, scaleY: 1});
         p.set({selectable: mode == 'select'});
         for (j = 0; j < nodes.length; j++) {
@@ -957,21 +955,35 @@
       nodes: [],
       id: generateId()
     });
+    
+    var header = new fabric.Rect({
+      left: left,
+      top: top,
+      width: width,
+      height: 30,
+      fill: 'transparent',
+      stroke: '#000',
+      strokeWidth: 1,
+      hoverCursor: 'default',
+      originX: 'left',
+      originY: 'top',
+      evented: false
+    });
 
     var label = new fabric.IText(name ? name : 'name', {
       left: left + (width / 2),
-      top: top - 15,
-      fontSize: 32,
-      class: 'label',
+      top: top + 15,
+      fontSize: 24,
+      class: 'title',
       object: rect,
       hasControls: false,
       selectable: mode == 'select'
     });
 
-    rect.set({'label': label, 'labelOffsetX': left + (width / 2), 'labelOffsetY': -15});
+    rect.set({'label': label, 'header': header});
 
     rect.setCoords();
-    canvas.add(rect,label);
+    canvas.add(rect, header, label);
     canvas.requestRenderAll();
     var i = 0;
     while (i < components.length && rect.size < components[i].size)
@@ -992,11 +1004,11 @@
   var main = createComponent(50,50,container.clientWidth-50,container.clientHeight-50,'main');
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
-  createChannel('sync',{x: 100, y: 100},{x: 200, y: 100});
-  createChannel('lossysync',{x: 100, y: 200},{x: 200, y: 200});
-  createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
-  createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
-  createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
+  createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
+  createChannel('lossysync',{x: 100, y: 250},{x: 200, y: 250});
+  createChannel('syncdrain',{x: 100, y: 350},{x: 200, y: 350});
+  createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
+  createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
   //document.getElementById("text").innerHTML = JSON.stringify(nodes[0].channels[0]);
 })();
