@@ -1,4 +1,4 @@
-{
+[{
    "class":"channel",
    "components":[
       {
@@ -259,4 +259,4 @@
    "name":"Sync",
    "end1":"source",
    "end2":"sink"
-}
+}]

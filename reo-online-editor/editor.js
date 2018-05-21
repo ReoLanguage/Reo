@@ -32,8 +32,8 @@
     }
   }
   document.body.onresize = function() {resizeCanvas()};
-
   resizeCanvas();
+
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false, preserveObjectStacking: true });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   fabric.Object.prototype.objectCaching = false;
@@ -294,7 +294,7 @@
     // TODO: replace with a database search
     switch(type) {
       case 'sync':
-        //createSync(channel,node1.x,node1.y,node2.x,node2.y);
+        createSync(channel,node1.x,node1.y,node2.x,node2.y);
         break;
       case 'lossysync':
         createLossySync(channel,node1.x,node1.y,node2.x,node2.y);
@@ -311,20 +311,6 @@
       default:
         console.log("Invalid channel name");
         return;
-    }
-    
-    if (type === 'sync') {
-      var xhttp = new XMLHttpRequest();
-      xhttp.overrideMimeType("application/json");
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          // Typical action to be performed when the document is ready:
-          document.getElementById("text").innerHTML = xhttp.responseText;
-          newChannelType(xhttp.responseText);
-        }
-      };
-      xhttp.open("GET", "channels/sync1.js", true);
-      xhttp.send();
     }
 
     canvas.add(channel.components[0]);
@@ -350,22 +336,50 @@
     return channel
   } //createChannel
   
-  function newChannelType(response) {
-    var channel = JSON.parse(response);
-    var img = document.createElement("img");
-    img.setAttribute("src","img/sync.svg");
-    img.setAttribute("alt",channel.name);
-    var a = document.createElement("a");
-    a.setAttribute("title",channel.name);
-    a.appendChild(img);
-    var span = document.createElement("span");
-    span.setAttribute("id",channel.name);
-    span.setAttribute("class",channel.class);
-    span.appendChild(a);
-    span.appendChild(document.createElement("br"));
-    span.appendChild(document.createTextNode(channel.name));
-    document.getElementById("channels").appendChild(span);
-  } //newChannelType
+  function loadChannels() {
+    if (typeof(Storage) === "undefined")
+      console.log("Please use a browser that supports HTML Web Storage.");
+    else {
+      if (!localStorage.getItem("channels")) {
+        console.log("Storage contains no channel array");
+        var xhttp = new XMLHttpRequest();
+        xhttp.overrideMimeType("application/json");
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            // Typical action to be performed when the document is ready:
+            document.getElementById("text").innerHTML = xhttp.responseText;
+            localStorage.setItem("channels",xhttp.responseText);
+            addChannelsToInterface();
+          }
+        };
+        xhttp.open("GET", "channels/sync1.js", true);
+        xhttp.send();
+      }
+      else {
+        addChannelsToInterface();
+      }
+    }
+  }
+
+  function addChannelsToInterface() {
+    var channels = JSON.parse(localStorage.getItem("channels"));
+    for (var i = 0; i < channels.length; i++) {
+      var img = document.createElement("img");
+      img.setAttribute("src","img/sync.svg");
+      img.setAttribute("alt",channels[i].name);
+      var a = document.createElement("a");
+      a.setAttribute("title",channels[i].name);
+      a.appendChild(img);
+      var span = document.createElement("span");
+      span.setAttribute("id",channels[i].name);
+      span.setAttribute("class",channels[i].class);
+      span.appendChild(a);
+      span.appendChild(document.createElement("br"));
+      span.appendChild(document.createTextNode(channels[i].name));
+      document.getElementById("channels").appendChild(span);
+      span.onclick = function() {buttonClick(span)};
+    }
+  } //addChannelsToInterface
 
   function calculateAngle(channel, baseAngle) {
     var angle = 0;
@@ -700,13 +714,11 @@
         }
       }
     }
-    if (mode === 'component') {
-      canvas.discardActiveObject();
+    else if (mode === 'component') {
       var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
       canvas.setActiveObject(comp);
     }
-    if (mode === 'sync' || mode === 'lossysync' || mode === 'syncdrain' || mode === 'syncspout' || mode === 'fifo1') {
-      canvas.discardActiveObject();
+    else {
       var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
       snapToComponent(channel.node1,channel.node1.component);
       
