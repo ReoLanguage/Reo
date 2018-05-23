@@ -171,6 +171,7 @@
         'labelOffsetX': options.labelOffSetX || 20,
         'labelOffsetY': options.labelOffSetY || -20,
         'class': 'node',
+        'nodetype': 'undefined',
         'component': options.component || main,
         'id': options.id || generateId()
       });
@@ -179,11 +180,9 @@
     toObject: function() {
       return fabric.util.object.extend(this.callSuper('toObject'), {
         label: this.get('label'),
-        //channels: this.set('channels'),
         labelOffsetX: this.get('labelOffsetX'),
         labelOffsetY: this.get('labelOffsetY'),
         class: this.get('class'),
-        //component: this.get('component'),
         id: this.get('id')
       });
     },
@@ -543,11 +542,12 @@
     canvas.requestRenderAll()
   } //updateChannel
 
-  function isBoundaryNode (node) {
-    return node.left === node.component.left ||
-      node.top === node.component.top ||
-      node.left === node.component.left + node.component.width ||
-      node.top === node.component.top + node.component.height
+  function isBoundaryNode(node) {
+    return node.nodetype !== 'mixed' &&
+      (node.left === node.component.left ||
+       node.top  === node.component.top  ||
+       node.left === node.component.left + node.component.width ||
+       node.top  === node.component.top  + node.component.height)
   }
 
   function updateText() {
@@ -815,27 +815,67 @@
     if (p.class === 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
       p.setCoords();
-      canvas.forEachObject(function(obj) {
-        if (obj !== p && p.intersectsWithObject(obj)) {
-          if (obj.class === 'node') {
-            if (Math.abs(p.left-obj.left) < mergeDistance && Math.abs(p.top-obj.top) < mergeDistance) {
-              p.set({'left': obj.left, 'top': obj.top});
-              p.setCoords();
-            }
+      for (i = 0; i < nodes.length; i++) {
+        if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
+          p.set({'left': nodes[i].left, 'top': nodes[i].top});
+          p.setCoords();
+        }
+      }
+      for (i = 0; i < components.length; i++) {
+        // Check if the node is near any component boundaries
+        let left = false, top = false, right = false, bottom = false;
+        if (Math.abs(p.left - components[i].left) < mergeDistance)
+          left = true;
+        if (Math.abs(p.top - components[i].top) < mergeDistance)
+          top = true;
+        if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
+          right = true;
+        if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
+          bottom = true;
+        // Check if the node is inside or close to the component
+        if (left   && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
+            top    && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance ||
+            right  && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
+            bottom && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance)
+        {
+          // Ensure that mixed nodes are visually separated from component boundaries
+          if (p.nodetype === 'mixed') {
+            if (left)
+              if (p.left < components[i].left)
+                p.set({'left': components[i].left - mergeDistance});
+              else
+                p.set({'left': components[i].left + mergeDistance});
+            if (top)
+              if (p.top < components[i].top)
+                p.set({'top': components[i].top - mergeDistance});
+              else
+                p.set({'top': components[i].top + mergeDistance});
+            if (right)
+              if (p.left < components[i].left + components[i].width)
+                p.set({'left': components[i].left + components[i].width - mergeDistance});
+              else
+                p.set({'left': components[i].left + components[i].width + mergeDistance});
+            if (bottom)
+              if (p.top < components[i].top + components[i].height)
+                p.set({'top': components[i].top + components[i].height - mergeDistance});
+              else
+                p.set({'top': components[i].top + components[i].height + mergeDistance});
+            p.setCoords();
           }
-          else if (obj.class === 'component') {
-            if (Math.abs(p.left - obj.left) < mergeDistance)
-              p.set({'left': obj.left});
-            if (Math.abs(p.top - obj.top) < mergeDistance)
-              p.set({'top': obj.top});
-            if (Math.abs(p.left - (obj.left + obj.width)) < mergeDistance)
-              p.set({'left': obj.left + obj.width});
-            if (Math.abs(p.top - (obj.top + obj.height)) < mergeDistance)
-              p.set({'top': obj.top + obj.height});
+          // Put source or sink nodes on the component boundary
+          else {
+            if (left)
+              p.set({'left': components[i].left});
+            if (top)
+              p.set({'top': components[i].top});
+            if (right)
+              p.set({'left': components[i].left + components[i].width});
+            if (bottom)
+              p.set({'top': components[i].top + components[i].height});
             p.setCoords();
           }
         }
-      });
+      }
       for (i = 0; i < p.channels.length; ++i)
         updateChannel(p.channels[i])
       p.label.set({left: p.left + p.labelOffsetX});
@@ -892,7 +932,6 @@
   }); //mouse:up
   
   function mergeNodes(destination, source) {
-    console.log("Merging nodes " + destination.id + " and " + source.id);
     for (let j = 0; j < source.channels.length; j++) {
       if (source.channels[j].node1 === source) {
         source.channels[j].node1 = destination;
