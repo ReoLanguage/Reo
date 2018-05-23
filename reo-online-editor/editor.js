@@ -17,16 +17,15 @@
       var x2 = container.clientWidth - 50;
       var y2 = container.clientHeight - 50;
       main.set({
-        'width': x2 - x1,
-        'height': y2 - y1,
         'left': x1,
-        'top': y1
+        'top': y1 + 30,
+        'width': x2 - x1,
+        'height': y2 - y1
       });
 
       // Reset the label position
-      main.set({'labelOffsetX': x1 + ((x2-x1) / 2), 'labelOffsetY': -15});
-      main.label.set({left: main.left + main.labelOffsetX});
-      main.label.set({top: main.top + main.labelOffsetY});
+      main.label.set({left: x1 + (x2 - x1) / 2});
+      main.label.set({top: y1 + 15});
       main.label.setCoords();
       canvas.requestRenderAll();
     }
