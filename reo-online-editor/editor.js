@@ -18,7 +18,7 @@
       var y2 = container.clientHeight - 50;
       main.set({
         'left': x1,
-        'top': y1 + 30,
+        'top': y1,
         'width': x2 - x1,
         'height': y2 - y1
       });
@@ -66,6 +66,7 @@
   buttonBorderOn       = '0.5vmin solid black';
   
   mergeDistance        =     20;
+  headerHeight         =     30;
 
   function buttonClick(button) {
     document.getElementById(mode).style.border = buttonBorderOff;
@@ -768,14 +769,14 @@
         p.set({width: Math.abs(origX - pointer.x)});
         p.set({height: Math.abs(origY - pointer.y)});
         p.setCoords();
-        p.header.set({x1: p.left, y1: p.top + 30, x2: p.left + p.width, y2: p.top + 30});
+        p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
         p.header.setCoords();
         p.label.set({left: p.left + (p.width/2), top: p.top + 15});
         p.label.setCoords();
       }
       else {
         p.setCoords();
-        p.header.set({x1: p.left, y1: p.top + 30, x2: p.left + p.scaleX * p.width, y2: p.top + 30});
+        p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
         p.header.setCoords();
         p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
         p.label.setCoords();
@@ -994,7 +995,7 @@
       id: generateId()
     });
     
-    var header = new fabric.Line([x1, y1 + 30, x2, y1 + 30], {
+    var header = new fabric.Line([x1, y1 + headerHeight, x2, y1 + headerHeight], {
     fill: '#000',
     stroke: '#000',
     strokeWidth: 1,
