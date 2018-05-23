@@ -730,7 +730,7 @@
         if (Math.abs(p.top - components[i].top) < mergeDistance)
           p.set({'top': components[i].top});
         if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
-          p.set({'left': obj.left + components[i].width});
+          p.set({'left': components[i].left + components[i].width});
         if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
           p.set({'top': components[i].top + components[i].height});
         p.setCoords();
@@ -976,7 +976,10 @@
       fontSize: 24,
       class: 'title',
       object: rect,
+      hoverCursor: 'text',
       hasControls: false,
+      lockMovementX: true,
+      lockMovementY: true,
       selectable: mode == 'select'
     });
 
