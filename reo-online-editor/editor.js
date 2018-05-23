@@ -764,20 +764,20 @@
         if (origX > pointer.x)
           p.set({left: pointer.x});
         if (origY > pointer.y)
-          p.set({top: pointer.y + 30});
+          p.set({top: pointer.y});
         p.set({width: Math.abs(origX - pointer.x)});
-        p.set({height: Math.abs(origY - pointer.y) - 30 > 0 ? Math.abs(origY - pointer.y) - 30 : 0});
+        p.set({height: Math.abs(origY - pointer.y)});
         p.setCoords();
-        p.header.set({left: p.left, top: p.top - 30, width: p.width});
+        p.header.set({x1: p.left, y1: p.top + 30, x2: p.left + p.width, y2: p.top + 30});
         p.header.setCoords();
-        p.label.set({left: p.left + (p.width/2), top: p.top - 15});
+        p.label.set({left: p.left + (p.width/2), top: p.top + 15});
         p.label.setCoords();
       }
       else {
         p.setCoords();
-        p.header.set({left: p.left, top: p.top - 30, width: p.scaleX * p.width});
+        p.header.set({x1: p.left, y1: p.top + 30, x2: p.left + p.scaleX * p.width, y2: p.top + 30});
         p.header.setCoords();
-        p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top - 15});
+        p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
         p.label.setCoords();
         if (p.__corner != 0) {
           for (i = 0; i < p.nodes.length; i++) {
@@ -795,7 +795,7 @@
         }
         else {
           p.set({left: origLeft + pointer.x - origX});
-          p.set({top: origTop + pointer.y - origY} + 30);
+          p.set({top: origTop + pointer.y - origY});
           p.setCoords();
           for (i = 0; i < p.nodes.length; i++) {
             let node = p.nodes[i];
@@ -976,9 +976,9 @@
 
     var rect = new fabric.Rect({
       left: left,
-      top: top + 30,
+      top: top,
       width: width,
-      height: height - 30 > 0 ? height - 30 : 0,
+      height: height,
       fill: 'transparent',
       stroke: '#000',
       strokeWidth: 1,
@@ -994,19 +994,12 @@
       id: generateId()
     });
     
-    var header = new fabric.Rect({
-      left: left,
-      top: top,
-      width: width,
-      height: 30,
-      fill: 'transparent',
-      stroke: '#000',
-      strokeWidth: 1,
-      hoverCursor: 'default',
-      originX: 'left',
-      originY: 'top',
-      evented: false
-    });
+    var header = new fabric.Line([x1, y1 + 30, x2, y1 + 30], {
+    fill: '#000',
+    stroke: '#000',
+    strokeWidth: 1,
+    evented: false,
+  });
 
     var label = new fabric.IText(name ? name : 'name', {
       left: left + (width / 2),
