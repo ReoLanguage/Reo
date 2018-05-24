@@ -17,23 +17,22 @@
       var x2 = container.clientWidth - 50;
       var y2 = container.clientHeight - 50;
       main.set({
-        'width': x2 - x1,
-        'height': y2 - y1,
         'left': x1,
-        'top': y1
+        'top': y1,
+        'width': x2 - x1,
+        'height': y2 - y1
       });
 
       // Reset the label position
-      main.set({'labelOffsetX': x1 + ((x2-x1) / 2), 'labelOffsetY': -15});
-      main.label.set({left: main.left + main.labelOffsetX});
-      main.label.set({top: main.top + main.labelOffsetY});
+      main.label.set({left: x1 + (x2 - x1) / 2});
+      main.label.set({top: y1 + 15});
       main.label.setCoords();
       canvas.requestRenderAll();
     }
   }
   document.body.onresize = function() {resizeCanvas()};
-
   resizeCanvas();
+
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false, preserveObjectStacking: true });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   fabric.Object.prototype.objectCaching = false;
@@ -67,71 +66,26 @@
   buttonBorderOn       = '0.5vmin solid black';
   
   mergeDistance        =     20;
+  headerHeight         =     30;
 
-  document.getElementById("select").onclick = function() {
+  function buttonClick(button) {
     document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'select';
-    this.style.border = buttonBorderOn;
+    mode = button.id;
+    button.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component' || obj.class === 'node' || obj.class === 'label') {
-        obj.set({'selectable': true});
+        obj.set({'selectable': mode === 'select'});
       }
     });
-  };
-
-  document.getElementById("component").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'component';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false});
-    });
-  };
-
-  document.getElementById("sync").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'sync';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false});
-    });
-  };
-
-  document.getElementById("lossysync").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'lossysync';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false});
-    });
-  };
-
-  document.getElementById("syncdrain").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'syncdrain';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false});
-    });
-  };
-
-  document.getElementById("syncspout").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'syncspout';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false})
-    })
-  };
-
-  document.getElementById("fifo1").onclick = function() {
-    document.getElementById(mode).style.border = buttonBorderOff;
-    mode = 'fifo1';
-    this.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      obj.set({'selectable': false})
-    })
-  };
+  }
+  
+  document.getElementById("select").onclick =    function() {buttonClick(document.getElementById("select"))}
+  document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))}
+  document.getElementById("sync").onclick =      function() {buttonClick(document.getElementById("sync"))}
+  document.getElementById("lossysync").onclick = function() {buttonClick(document.getElementById("lossysync"))}
+  document.getElementById("syncdrain").onclick = function() {buttonClick(document.getElementById("syncdrain"))}
+  document.getElementById("syncspout").onclick = function() {buttonClick(document.getElementById("syncspout"))}
+  document.getElementById("fifo1").onclick =     function() {buttonClick(document.getElementById("fifo1"))}
 
   document.getElementById("downloadsvg").onclick = function () {
     var a = document.getElementById("download");
@@ -217,6 +171,7 @@
         'labelOffsetX': options.labelOffSetX || 20,
         'labelOffsetY': options.labelOffSetY || -20,
         'class': 'node',
+        'nodetype': 'undefined',
         'component': options.component || main,
         'id': options.id || generateId()
       });
@@ -225,11 +180,9 @@
     toObject: function() {
       return fabric.util.object.extend(this.callSuper('toObject'), {
         label: this.get('label'),
-        //channels: this.set('channels'),
         labelOffsetX: this.get('labelOffsetX'),
         labelOffsetY: this.get('labelOffsetY'),
         class: this.get('class'),
-        //component: this.get('component'),
         id: this.get('id')
       });
     },
@@ -381,6 +334,51 @@
     //console.log(channel);
     return channel
   } //createChannel
+  
+  function loadChannels() {
+    if (typeof(Storage) === "undefined")
+      console.log("Please use a browser that supports HTML Web Storage.");
+    else {
+      if (!localStorage.getItem("channels")) {
+        console.log("Storage contains no channel array");
+        var xhttp = new XMLHttpRequest();
+        xhttp.overrideMimeType("application/json");
+        xhttp.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            // Typical action to be performed when the document is ready:
+            document.getElementById("text").innerHTML = xhttp.responseText;
+            localStorage.setItem("channels",xhttp.responseText);
+            addChannelsToInterface();
+          }
+        };
+        xhttp.open("GET", "channels/sync1.js", true);
+        xhttp.send();
+      }
+      else {
+        addChannelsToInterface();
+      }
+    }
+  }
+
+  function addChannelsToInterface() {
+    var channels = JSON.parse(localStorage.getItem("channels"));
+    for (var i = 0; i < channels.length; i++) {
+      var img = document.createElement("img");
+      img.setAttribute("src","img/sync.svg");
+      img.setAttribute("alt",channels[i].name);
+      var a = document.createElement("a");
+      a.setAttribute("title",channels[i].name);
+      a.appendChild(img);
+      var span = document.createElement("span");
+      span.setAttribute("id",channels[i].name);
+      span.setAttribute("class",channels[i].class);
+      span.appendChild(a);
+      span.appendChild(document.createElement("br"));
+      span.appendChild(document.createTextNode(channels[i].name));
+      document.getElementById("channels").appendChild(span);
+      span.onclick = function() {buttonClick(span)};
+    }
+  } //addChannelsToInterface
 
   function calculateAngle(channel, baseAngle) {
     var angle = 0;
@@ -544,11 +542,12 @@
     canvas.requestRenderAll()
   } //updateChannel
 
-  function isBoundaryNode (node) {
-    return node.left === node.component.left ||
-      node.top === node.component.top ||
-      node.left === node.component.left + node.component.width ||
-      node.top === node.component.top + node.component.height
+  function isBoundaryNode(node) {
+    return node.nodetype !== 'mixed' &&
+      (node.left === node.component.left ||
+       node.top  === node.component.top  ||
+       node.left === node.component.left + node.component.width ||
+       node.top  === node.component.top  + node.component.height)
   }
 
   function updateText() {
@@ -716,13 +715,11 @@
         }
       }
     }
-    if (mode === 'component') {
-      canvas.discardActiveObject();
+    else if (mode === 'component') {
       var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
       canvas.setActiveObject(comp);
     }
-    if (mode === 'sync' || mode === 'lossysync' || mode === 'syncdrain' || mode === 'syncspout' || mode === 'fifo1') {
-      canvas.discardActiveObject();
+    else {
       var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
       snapToComponent(channel.node1,channel.node1.component);
       
@@ -734,7 +731,7 @@
         if (Math.abs(p.top - components[i].top) < mergeDistance)
           p.set({'top': components[i].top});
         if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
-          p.set({'left': obj.left + components[i].width});
+          p.set({'left': components[i].left + components[i].width});
         if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
           p.set({'top': components[i].top + components[i].height});
         p.setCoords();
@@ -767,35 +764,34 @@
     if (p.class === 'component') {
       if (p.status === 'drawing') {
         if (origX > pointer.x)
-          p.set({left:pointer.x});
+          p.set({left: pointer.x});
         if (origY > pointer.y)
-          p.set({top:pointer.y});
-        p.set({width:Math.abs(origX - pointer.x)});
-        p.set({height:Math.abs(origY - pointer.y)});
+          p.set({top: pointer.y});
+        p.set({width: Math.abs(origX - pointer.x)});
+        p.set({height: Math.abs(origY - pointer.y)});
         p.setCoords();
-        p.label.set({left: p.left + (p.width/2), top: p.top - 15});
+        p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
+        p.header.setCoords();
+        p.label.set({left: p.left + (p.width/2), top: p.top + 15});
         p.label.setCoords();
       }
       else {
-        p.label.set({left: p.left + p.labelOffsetX});
-        p.label.set({top: p.top + p.labelOffsetY});
-        p.label.setCoords();
         p.setCoords();
+        p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
+        p.header.setCoords();
+        p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
+        p.label.setCoords();
         if (p.__corner != 0) {
           for (i = 0; i < p.nodes.length; i++) {
             let node = p.nodes[i];
-            if (node.origLeft == origLeft) {
+            if (node.origLeft == origLeft)
               node.set({'left': p.left});
-            }
-            if (node.origLeft == origRight) {
+            if (node.origLeft == origRight)
               node.set({'left': p.left + p.scaleX * p.width});
-            }
-            if (node.origTop == origTop) {
+            if (node.origTop == origTop)
               node.set({'top': p.top});
-            }
-            if (node.origTop == origBottom) {
+            if (node.origTop == origBottom)
               node.set({'top': p.top + p.scaleY * p.height});
-            }
             snapToComponent(node, node.component);
           }
         }
@@ -813,7 +809,6 @@
             node.label.setCoords();
             for (j = 0; j < node.channels.length; j++)
               updateChannel(node.channels[j]);
-            
           }
         }
       }
@@ -821,27 +816,67 @@
     if (p.class === 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
       p.setCoords();
-      canvas.forEachObject(function(obj) {
-        if (obj !== p && p.intersectsWithObject(obj)) {
-          if (obj.class === 'node') {
-            if (Math.abs(p.left-obj.left) < mergeDistance && Math.abs(p.top-obj.top) < mergeDistance) {
-              p.set({'left': obj.left, 'top': obj.top});
-              p.setCoords();
-            }
+      for (i = 0; i < nodes.length; i++) {
+        if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
+          p.set({'left': nodes[i].left, 'top': nodes[i].top});
+          p.setCoords();
+        }
+      }
+      for (i = 0; i < components.length; i++) {
+        // Check if the node is near any component boundaries
+        let left = false, top = false, right = false, bottom = false;
+        if (Math.abs(p.left - components[i].left) < mergeDistance)
+          left = true;
+        if (Math.abs(p.top - components[i].top) < mergeDistance)
+          top = true;
+        if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
+          right = true;
+        if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
+          bottom = true;
+        // Check if the node is inside or close to the component
+        if (left   && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
+            top    && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance ||
+            right  && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
+            bottom && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance)
+        {
+          // Ensure that mixed nodes are visually separated from component boundaries
+          if (p.nodetype === 'mixed') {
+            if (left)
+              if (p.left < components[i].left)
+                p.set({'left': components[i].left - mergeDistance});
+              else
+                p.set({'left': components[i].left + mergeDistance});
+            if (top)
+              if (p.top < components[i].top)
+                p.set({'top': components[i].top - mergeDistance});
+              else
+                p.set({'top': components[i].top + mergeDistance});
+            if (right)
+              if (p.left < components[i].left + components[i].width)
+                p.set({'left': components[i].left + components[i].width - mergeDistance});
+              else
+                p.set({'left': components[i].left + components[i].width + mergeDistance});
+            if (bottom)
+              if (p.top < components[i].top + components[i].height)
+                p.set({'top': components[i].top + components[i].height - mergeDistance});
+              else
+                p.set({'top': components[i].top + components[i].height + mergeDistance});
+            p.setCoords();
           }
-          else if (obj.class === 'component') {
-            if (Math.abs(p.left - obj.left) < mergeDistance)
-              p.set({'left': obj.left});
-            if (Math.abs(p.top - obj.top) < mergeDistance)
-              p.set({'top': obj.top});
-            if (Math.abs(p.left - (obj.left + obj.width)) < mergeDistance)
-              p.set({'left': obj.left + obj.width});
-            if (Math.abs(p.top - (obj.top + obj.height)) < mergeDistance)
-              p.set({'top': obj.top + obj.height});
+          // Put source or sink nodes on the component boundary
+          else {
+            if (left)
+              p.set({'left': components[i].left});
+            if (top)
+              p.set({'top': components[i].top});
+            if (right)
+              p.set({'left': components[i].left + components[i].width});
+            if (bottom)
+              p.set({'top': components[i].top + components[i].height});
             p.setCoords();
           }
         }
-      });
+      }
       for (i = 0; i < p.channels.length; ++i)
         updateChannel(p.channels[i])
       p.label.set({left: p.left + p.labelOffsetX});
@@ -862,7 +897,7 @@
       if (p.class === 'component') {
         p.label.setCoords();
         reorderComponents(p);
-        p.set({'labelOffsetX': p.label.left - p.left, 'labelOffsetY': p.label.top - p.top, status: 'design'});
+        p.set({status: 'design'});
         p.set({'width': p.scaleX * p.width, 'height': p.scaleY * p.height, scaleX: 1, scaleY: 1});
         p.set({selectable: mode == 'select'});
         for (j = 0; j < nodes.length; j++) {
@@ -898,7 +933,6 @@
   }); //mouse:up
   
   function mergeNodes(destination, source) {
-    console.log("Merging nodes " + destination.id + " and " + source.id);
     for (let j = 0; j < source.channels.length; j++) {
       if (source.channels[j].node1 === source) {
         source.channels[j].node1 = destination;
@@ -961,21 +995,31 @@
       nodes: [],
       id: generateId()
     });
+    
+    var header = new fabric.Line([x1, y1 + headerHeight, x2, y1 + headerHeight], {
+    fill: '#000',
+    stroke: '#000',
+    strokeWidth: 1,
+    evented: false,
+  });
 
     var label = new fabric.IText(name ? name : 'name', {
       left: left + (width / 2),
-      top: top - 15,
-      fontSize: 32,
-      class: 'label',
+      top: top + 15,
+      fontSize: 24,
+      class: 'title',
       object: rect,
+      hoverCursor: 'text',
       hasControls: false,
+      lockMovementX: true,
+      lockMovementY: true,
       selectable: mode == 'select'
     });
 
-    rect.set({'label': label, 'labelOffsetX': left + (width / 2), 'labelOffsetY': -15});
+    rect.set({'label': label, 'header': header});
 
     rect.setCoords();
-    canvas.add(rect,label);
+    canvas.add(rect, header, label);
     canvas.requestRenderAll();
     var i = 0;
     while (i < components.length && rect.size < components[i].size)
@@ -996,11 +1040,11 @@
   var main = createComponent(50,50,container.clientWidth-50,container.clientHeight-50,'main');
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
-  createChannel('sync',{x: 100, y: 100},{x: 200, y: 100});
-  createChannel('lossysync',{x: 100, y: 200},{x: 200, y: 200});
-  createChannel('syncdrain',{x: 100, y: 300},{x: 200, y: 300});
-  createChannel('syncspout',{x: 100, y: 400},{x: 200, y: 400});
-  createChannel('fifo1',{x: 100, y: 500},{x: 200, y: 500});
+  createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
+  createChannel('lossysync',{x: 100, y: 250},{x: 200, y: 250});
+  createChannel('syncdrain',{x: 100, y: 350},{x: 200, y: 350});
+  createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
+  createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
   //document.getElementById("text").innerHTML = JSON.stringify(nodes[0].channels[0]);
 })();
