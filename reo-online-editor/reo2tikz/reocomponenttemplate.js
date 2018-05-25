@@ -77,8 +77,8 @@ ReoComponentTemplate.prototype.implement = async function (binding) {
       argList += 'arg' + (i + 3) + ', ';
     }
     // output += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
-    output += 'function reodraw@@(@@) {\n'.format(this.typeName, argList);
-    output += '  let @@ = createComponent(50,50,750,550,"@@");\n'.format(this.typeName, this.typeName);
+    // output += 'function reodraw@@(@@) {\n'.format(this.typeName, argList);
+    output += `  ${this.typeName} = createComponent(50,50,container.clientWidth-50,container.clientHeight-50,"${this.typeName}");\n`;
     output += `  ${this.typeName}.set({id: '${this.typeName}', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});\n`;
     output += "  id = '0';\n";
     // output += '  \\begin{scope}[shift=(#1),rotate around={#2:(#1)}]\n';
@@ -93,7 +93,7 @@ ReoComponentTemplate.prototype.implement = async function (binding) {
     //   output += '    \\path[draw,decoration={markings, mark=at position 1.0 with \\arrowstyle},postaction=decorate] (@@) to #@@;\n'.format(component.genNodeName(argsOut[i], env), i + argsIn.length + 3);
     // }
     // output += '  \\end{scope}\n';
-    output += '}\n';
+    // output += '}\n';
     return output
   };
   ReoComponentComposition.prototype.draw = function () {

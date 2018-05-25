@@ -188,7 +188,7 @@ ReoNetwork.prototype.generateCode = async function () {
   let output = mainInstance.define(definesstate);
 
   // output += '\\reoimpldraw@@!!\n'.format(mainInstance.typeName);
-  output += 'reodraw@@();\n'.format(mainInstance.typeName);
+  // output += 'reodraw@@();\n'.format(mainInstance.typeName);
   // output += '\\end{tikzpicture}\n';
 
   return output;

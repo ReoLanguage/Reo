@@ -346,7 +346,7 @@
         xhttp.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             // Typical action to be performed when the document is ready:
-            document.getElementById("text").innerHTML = xhttp.responseText;
+            document.getElementById("text").value = xhttp.responseText;
             localStorage.setItem("channels",xhttp.responseText);
             addChannelsToInterface();
           }
@@ -618,7 +618,7 @@
       }
 
       s1 = s1 + ') {\n' + s2 + '\n}';
-      document.getElementById('text').innerHTML = s1
+      document.getElementById('text').value = s1;
     }
   }
 
@@ -1046,5 +1046,5 @@
   createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
   createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
-  //document.getElementById("text").innerHTML = JSON.stringify(nodes[0].channels[0]);
+  //document.getElementById("text").value = JSON.stringify(nodes[0].channels[0]);
 })();
