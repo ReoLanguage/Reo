@@ -36,7 +36,7 @@
   var canvas = this.__canvas = new fabric.Canvas('c', { selection: false, preserveObjectStacking: true });
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   fabric.Object.prototype.objectCaching = false;
-  var active, isDown, origX, origY, origLeft, origTop;
+  var active, isDown, origX, origY, origLeft, origTop, origRight, origBottom;
   var mode = 'select';
   var id = '0';
   var nodes = [];
@@ -713,12 +713,10 @@
           }
         }
       }
-    }
-    else if (mode === 'component') {
+    } else if (mode === 'component') {
       var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
       canvas.setActiveObject(comp);
-    }
-    else {
+    } else {
       var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
       snapToComponent(channel.node1,channel.node1.component);
 
@@ -773,23 +771,22 @@
         p.header.setCoords();
         p.label.set({left: p.left + (p.width/2), top: p.top + 15});
         p.label.setCoords();
-      }
-      else {
+      } else {
         p.setCoords();
         p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
         p.header.setCoords();
         p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
         p.label.setCoords();
-        if (p.__corner != 0) {
+        if (p.__corner !== 0) {
           for (i = 0; i < p.nodes.length; i++) {
             let node = p.nodes[i];
-            if (node.origLeft == origLeft)
+            if (node.origLeft === origLeft)
               node.set({'left': p.left});
-            if (node.origLeft == origRight)
+            if (node.origLeft === origRight)
               node.set({'left': p.left + p.scaleX * p.width});
-            if (node.origTop == origTop)
+            if (node.origTop === origTop)
               node.set({'top': p.top});
-            if (node.origTop == origBottom)
+            if (node.origTop === origBottom)
               node.set({'top': p.top + p.scaleY * p.height});
             snapToComponent(node, node.component);
           }
@@ -996,11 +993,11 @@
     });
 
     var header = new fabric.Line([x1, y1 + headerHeight, x2, y1 + headerHeight], {
-    fill: '#000',
-    stroke: '#000',
-    strokeWidth: 1,
-    evented: false,
-  });
+      fill: '#000',
+      stroke: '#000',
+      strokeWidth: 1,
+      evented: false
+    });
 
     var label = new fabric.IText(name ? name : 'name', {
       left: left + (width / 2),
