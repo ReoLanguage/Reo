@@ -64,7 +64,7 @@
 
   buttonBorderOff      = '0.5vmin solid white';
   buttonBorderOn       = '0.5vmin solid black';
-  
+
   mergeDistance        =     20;
   headerHeight         =     30;
 
@@ -78,7 +78,7 @@
       }
     });
   }
-  
+
   document.getElementById("select").onclick =    function() {buttonClick(document.getElementById("select"))}
   document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))}
   document.getElementById("sync").onclick =      function() {buttonClick(document.getElementById("sync"))}
@@ -111,14 +111,13 @@
   document.getElementById("submit").onclick = async function () {
     async function sourceLoader(fname) {
       return new Promise(function (resolve, reject) {
-        var client = new XMLHttpRequest();
+        let client = new XMLHttpRequest();
         client.open('GET', fname);
         client.onreadystatechange = function () {
-          if (client.readyState === 4) {
-            if (this.status !== 200) {
+          if (this.readyState === 4) {
+            if (this.status !== 200)
               return reject(this.status);
-            }
-            return resolve(client.responseText);
+            return resolve(this.responseText);
           }
         };
         client.send();
@@ -131,10 +130,11 @@
 
     try {
       let output = await network.generateCode();
-      console.log(output);
+      // console.log(output);
       clearAll();
       eval(output)
     } catch (e) {
+      console.log(e);
       alert(e)
     }
   };
@@ -163,7 +163,7 @@
     type: 'node',
 
     initialize: function(options) {
-      options || (options = { });
+      options || (options = {});
       this.callSuper('initialize', options);
       this.set({
         'label': options.label || '',
@@ -334,9 +334,9 @@
     //console.log(channel);
     return channel
   } //createChannel
-  
+
   function loadChannels() {
-    if (typeof(Storage) === "undefined")
+    if (typeof Storage === "undefined")
       console.log("Please use a browser that supports HTML Web Storage.");
     else {
       if (!localStorage.getItem("channels")) {
@@ -344,7 +344,7 @@
         var xhttp = new XMLHttpRequest();
         xhttp.overrideMimeType("application/json");
         xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
+          if (this.readyState === 4 && this.status === 200) {
             // Typical action to be performed when the document is ready:
             document.getElementById("text").value = xhttp.responseText;
             localStorage.setItem("channels",xhttp.responseText);
@@ -353,8 +353,7 @@
         };
         xhttp.open("GET", "channels/sync1.js", true);
         xhttp.send();
-      }
-      else {
+      } else {
         addChannelsToInterface();
       }
     }
@@ -397,7 +396,7 @@
 
   function updateNode(node) {
     var source = false, sink = false, i;
-    
+
     // set coordinates and component reference
     node.label.setCoords();
     node.set({labelOffsetX: node.label.left - node.left, labelOffsetY: node.label.top - node.top});
@@ -445,8 +444,8 @@
       }
       else
         console.log("Broken node reference detected");
-    }    
-    
+    }
+
     // update nodetype and colouring
     for (i = 0; i < node.channels.length; i++) {
       if (node.channels[i].node1 === node) {
@@ -722,7 +721,7 @@
     else {
       var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
       snapToComponent(channel.node1,channel.node1.component);
-      
+
       p = channel.node1;
       // place node on nearby edge of component
       for (i = 0; i < components.length; i++) {
@@ -742,7 +741,7 @@
       p.label.set({left: p.left + p.labelOffsetX});
       p.label.set({top: p.top + p.labelOffsetY});
       p.label.setCoords();
-      
+
       // merge with existing nodes, except node2 of the same channel
       for (i = nodes.length - 1; i >= 0; --i) {
         if (nodes[i] === p || nodes[i] === channel.node2)
@@ -931,7 +930,7 @@
       updateText();
     }
   }); //mouse:up
-  
+
   function mergeNodes(destination, source) {
     for (let j = 0; j < source.channels.length; j++) {
       if (source.channels[j].node1 === source) {
@@ -995,7 +994,7 @@
       nodes: [],
       id: generateId()
     });
-    
+
     var header = new fabric.Line([x1, y1 + headerHeight, x2, y1 + headerHeight], {
     fill: '#000',
     stroke: '#000',
