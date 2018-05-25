@@ -281,7 +281,7 @@
     channel.node2 = createNode(node2.x, node2.y, node2.name);
 
     // ...and two anchors
-    // TODO
+    // TODO Anchors
     //channel.anchor1 = createAnchor(133,100);
     //channel.anchor2 = createAnchor(167,100);
 
@@ -326,8 +326,8 @@
     }
     channels.push(channel);
 
-    // Anchors disabled for now
-    // canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label, channel.anchor1, channel.anchor2);
+    // TODO Anchors
+    // canvas.add(channel.anchor1, channel.anchor2);
     canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label);
 
     updateChannel(channel);
@@ -673,21 +673,52 @@
     updateText()
   }); //text:editing:exited
 
-/* Anchors disabled for now
-  canvas.on('mouse:over', function(e) {
-    if (e.target && e.target.class === "anchor") {
-      e.target.set('opacity', '100');
-      canvas.requestRenderAll()
+  /*canvas.on('mouse:over', function(e) {
+    if (e.target) {
+      switch (e.target.class) {
+        case "anchor":
+          // TODO Anchors
+          e.target.set('opacity', 100);
+          break;
+        case 'options':
+          e.target.component.balloon.animate('opacity', 100, {
+            onChange: canvas.renderAll.bind(canvas),
+            duration: 1000
+          });
+          break;
+        case 'balloon':
+          e.target.set('opacity', 100);
+          e.target.set('isHover', true);
+      }
+      canvas.requestRenderAll();
     }
   }); //mouse:over
 
   canvas.on('mouse:out', function(e) {
-    if (e.target && e.target.class === "anchor") {
-      e.target.set('opacity', '0');
-      canvas.requestRenderAll()
+    if (e.target) {
+      switch (e.target.class) {
+        case "anchor":
+          // TODO Anchors
+          e.target.set('opacity', 0);
+          break;
+        case 'options':
+          e.target.component.balloon.animate('opacity', 0, {
+            onChange: canvas.renderAll.bind(canvas),
+            duration: 1000,
+            onComplete: (e) => {
+              let balloon = e.target.component.balloon;
+              if (balloon.isHover)
+                balloon.set('opacity', 100)
+            }
+          });
+          break;
+        case 'balloon':
+          e.target.set('opacity', 0);
+          e.target.set('isHover', false);
+      }
+      canvas.requestRenderAll();
     }
-  }); //mouse:out
-*/
+  }); //mouse:out*/
 
   canvas.on('mouse:down', function(e) {
     isDown = true;
@@ -718,6 +749,9 @@
       case 'component':
         var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
         canvas.setActiveObject(comp);
+        break;
+      case 'compactSwitch':
+        // TODO change component to compact mode
         break;
       default:
         var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
@@ -780,6 +814,12 @@
         p.header.setCoords();
         p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
         p.label.setCoords();
+        // p.options.set({left: p.left + 15, top: p.top + 15});
+        // p.options.setCoords();
+        // p.balloon.set({left: p.left - 40, top: p.top - 40});
+        // p.balloon.setCoords();
+        p.compactSwitch.set({left: p.left + 15, top: p.top + 15});
+        p.compactSwitch.setCoords();
         if (p.__corner !== 0) {
           for (i = 0; i < p.nodes.length; i++) {
             let node = p.nodes[i];
@@ -1014,6 +1054,50 @@
       lockMovementY: true,
       selectable: mode == 'select'
     });
+
+    if (name !== 'main') {
+      var compactSwitch = new fabric.Circle({
+        left: left + 15,
+        top: top + 15,
+        radius: nodeFactor * 2,
+        hasControls: false,
+        selectable: false,
+        component: rect,
+        class: 'compactSwitch'
+      });
+
+      rect.set('compactSwitch', compactSwitch);
+      canvas.add(compactSwitch);
+    }
+
+    /*var options = new fabric.Circle({
+      left: left + 15,
+      top: top + 15,
+      radius: nodeFactor * 2,
+      hasControls: false,
+      selectable: false,
+      component: rect,
+      class: 'options'
+    });
+
+    var balloon = new fabric.Rect({
+      left: left - 40,
+      top: top - 40,
+      width: 50,
+      height: headerHeight,
+      fill: '#FFF',
+      stroke: '#000',
+      strokeWidth: 1,
+      originX: 'left',
+      originY: 'top',
+      selectable: false,
+      class: 'balloon',
+      isHover: false,
+      opacity: 0
+    });
+
+    rect.set({options: options, balloon: balloon});
+    canvas.add(options, balloon);*/
 
     rect.set({'label': label, 'header': header});
 
