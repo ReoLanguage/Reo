@@ -594,10 +594,10 @@
               space3 = ',';
             }
           }
-          let top = Math.round(obj.top), left = Math.round(obj.left), bottom = top + obj.height, right = left + obj.width;
+          let top = Math.round(obj.top), left = Math.round(obj.left);
           space3 = '';
           s3 += ') { ';
-          s3 += '/*! pos: [' + left + ', ' + top + ', ' + right + ', ' + bottom + '] !*/\n';
+          s3 += '/*! pos: [' + left + ', ' + top + ', ' + Math.round(left + obj.width) + ', ' + Math.round(top + obj.height) + '] !*/\n';
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
             let node1 = obj2.node1;
@@ -699,7 +699,7 @@
       canvas.discardActiveObject();
     }
     if (mode === 'select') {
-      if (p && p.class == 'component') {
+      if (p && p.class === 'component') {
         origLeft = p.left;
         origRight = p.left + p.width;
         origTop = p.top;
@@ -1018,8 +1018,7 @@
     canvas.add(rect, header, label);
     canvas.requestRenderAll();
     var i = 0;
-    while (i < components.length && rect.size < components[i].size)
-      i++;
+    while (i < components.length && rect.size < components[i].size) ++i;
     components.splice(i, 0, rect);
     return rect
   }
