@@ -698,58 +698,61 @@
     if (p && mode !== 'select') {
       canvas.discardActiveObject();
     }
-    if (mode === 'select') {
-      if (p && p.class === 'component') {
-        origLeft = p.left;
-        origRight = p.left + p.width;
-        origTop = p.top;
-        origBottom = p.top + p.height;
-        p.nodes = [];
-        for (i = 0; i < nodes.length; ++i) {
-          if (nodes[i].component === p) {
-            p.nodes.push(nodes[i]);
-            nodes[i].origLeft = nodes[i].left;
-            nodes[i].origTop = nodes[i].top;
+    switch (mode) {
+      case 'select':
+        if (p && p.class === 'component') {
+          origLeft = p.left;
+          origRight = p.left + p.width;
+          origTop = p.top;
+          origBottom = p.top + p.height;
+          p.nodes = [];
+          for (i = 0; i < nodes.length; ++i) {
+            if (nodes[i].component === p) {
+              p.nodes.push(nodes[i]);
+              nodes[i].origLeft = nodes[i].left;
+              nodes[i].origTop = nodes[i].top;
+            }
           }
         }
-      }
-    } else if (mode === 'component') {
-      var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
-      canvas.setActiveObject(comp);
-    } else {
-      var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
-      snapToComponent(channel.node1,channel.node1.component);
+        break;
+      case 'component':
+        var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
+        canvas.setActiveObject(comp);
+        break;
+      default:
+        var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
+        snapToComponent(channel.node1,channel.node1.component);
 
-      p = channel.node1;
-      // place node on nearby edge of component
-      for (i = 0; i < components.length; i++) {
-        if (Math.abs(p.left - components[i].left) < mergeDistance)
-          p.set({'left': components[i].left});
-        if (Math.abs(p.top - components[i].top) < mergeDistance)
-          p.set({'top': components[i].top});
-        if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
-          p.set({'left': components[i].left + components[i].width});
-        if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
-          p.set({'top': components[i].top + components[i].height});
-        p.setCoords();
-      }
-
-      for (i = 0; i < p.channels.length; ++i)
-        updateChannel(p.channels[i])
-      p.label.set({left: p.left + p.labelOffsetX});
-      p.label.set({top: p.top + p.labelOffsetY});
-      p.label.setCoords();
-
-      // merge with existing nodes, except node2 of the same channel
-      for (i = nodes.length - 1; i >= 0; --i) {
-        if (nodes[i] === p || nodes[i] === channel.node2)
-          continue;
-        if (p.intersectsWithObject(nodes[i])) {
-          if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
-            mergeNodes(nodes[i], p);
+        p = channel.node1;
+        // place node on nearby edge of component
+        for (i = 0; i < components.length; i++) {
+          if (Math.abs(p.left - components[i].left) < mergeDistance)
+            p.set({'left': components[i].left});
+          if (Math.abs(p.top - components[i].top) < mergeDistance)
+            p.set({'top': components[i].top});
+          if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
+            p.set({'left': components[i].left + components[i].width});
+          if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
+            p.set({'top': components[i].top + components[i].height});
+          p.setCoords();
         }
-      }
-      canvas.setActiveObject(channel.node2)
+
+        for (i = 0; i < p.channels.length; ++i)
+          updateChannel(p.channels[i])
+        p.label.set({left: p.left + p.labelOffsetX});
+        p.label.set({top: p.top + p.labelOffsetY});
+        p.label.setCoords();
+
+        // merge with existing nodes, except node2 of the same channel
+        for (i = nodes.length - 1; i >= 0; --i) {
+          if (nodes[i] === p || nodes[i] === channel.node2)
+            continue;
+          if (p.intersectsWithObject(nodes[i])) {
+            if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
+              mergeNodes(nodes[i], p);
+          }
+        }
+        canvas.setActiveObject(channel.node2)
     }
   }); //mouse:down
 
