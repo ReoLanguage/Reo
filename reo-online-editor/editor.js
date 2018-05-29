@@ -973,16 +973,35 @@
 
   function mergeNodes(destination, source) {
     for (let j = 0; j < source.channels.length; j++) {
+      let loop = false;
       if (source.channels[j].node1 === source) {
         source.channels[j].node1 = destination;
+        if (source.channels[j].node2 === destination)
+          loop = true;
       }
       else {
-        if (source.channels[j].node2 === source)
+        if (source.channels[j].node2 === source) {
           source.channels[j].node2 = destination;
+          if (source.channels[j].node1 === destination)
+            loop = true;
+        }
         else
           console.log("Error merging nodes");
       }
-      destination.channels.push(source.channels[j]);
+      if (loop) {
+        /*var line = channels[j].components[1];
+        console.log(line);
+        var curve = new fabric.Path('M channels[j].node1.left channels[j].node1.top c -100, -80, 100, -80, 0, 0', {
+          stroke: lineStrokeColour,
+          stroke: lineStrokeWidth,
+          evented: false
+        });
+        channels[j].components[1] = curve;
+        canvas.remove(line);
+        canvas.add(curve);*/
+      }
+      else
+        destination.channels.push(source.channels[j]);
     }
     for (let k = 0; k < nodes.length; k++)
       if (nodes[k] == source) {
