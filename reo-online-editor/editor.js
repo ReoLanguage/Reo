@@ -67,6 +67,7 @@
 
   mergeDistance        =     20;
   headerHeight         =     30;
+  loopRadius           =     25;
 
   function buttonClick(button) {
     document.getElementById(mode).style.border = buttonBorderOff;
@@ -317,11 +318,10 @@
     // calculate the relation matrix between the channel component and the reference rectangle
     // then save it as a channel component property
     for (i = 1; i < channel.components.length; i++) {
-      var o = channel.components[i];
       var bossTransform = channel.components[0].calcTransformMatrix();
       var invertedBossTransform = fabric.util.invertTransform(bossTransform);
       var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
-      o.relationship = desiredTransform;
+      channel.components[i].relationship = desiredTransform;
       canvas.add(channel.components[i]);
     }
     channels.push(channel);
@@ -976,29 +976,68 @@
       let loop = false;
       if (source.channels[j].node1 === source) {
         source.channels[j].node1 = destination;
-        if (source.channels[j].node2 === destination)
+        if (source.channels[j].node2 === destination) {
           loop = true;
+        }
       }
       else {
         if (source.channels[j].node2 === source) {
           source.channels[j].node2 = destination;
-          if (source.channels[j].node1 === destination)
+          if (source.channels[j].node1 === destination) {
             loop = true;
+          }
         }
         else
           console.log("Error merging nodes");
       }
       if (loop) {
-        /*var line = channels[j].components[1];
-        console.log(line);
-        var curve = new fabric.Path('M channels[j].node1.left channels[j].node1.top c -100, -80, 100, -80, 0, 0', {
+        var channel = source.channels[j];
+        var line = channel.components[1];
+        var curve = new fabric.Circle({
+          left: line.x1,
+          top: line.y1 - loopRadius,
+          strokeWidth: lineStrokeWidth,
+          fill: 'transparent',
+          radius: loopRadius,
           stroke: lineStrokeColour,
-          stroke: lineStrokeWidth,
           evented: false
         });
-        channels[j].components[1] = curve;
+        channel.components[1] = curve;
+        for (i = 1; i < channel.components.length; i++) {
+          var o = channel.components[i];
+          if (o.referencePoint === 'node1' || o.referencePoint === 'node2') {
+            length = o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180);
+            offset = o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180);
+            console.log("length: " + length + ", offset: " + offset);
+            circumference = 2 * Math.PI * loopRadius;
+            angleA = (length / circumference) * 360;
+            console.log("angleA: " + angleA);
+            o.angle = o.angle + angleA;
+            chord = 2 * loopRadius * Math.sin(length / (2 * loopRadius));
+            console.log("chord: " + chord);
+            o.set({
+              'left': (loopRadius + offset) * Math.cos((angleA + 90) * Math.PI / 180) + curve.left,
+              'top': (loopRadius + offset) * Math.sin((angleA + 90) * Math.PI / 180) + curve.top//,
+              //'referenceDistance': ,
+              //'referenceAngle': 
+            });
+            console.log("left: " + o.left + ", top: " + o.top);
+            diffX = o.left - line.x1;
+            diffY = o.top - line.y1;
+            o.set({
+              'referenceDistance': Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)),
+              'referenceAngle': Math.atan2(diffY, diffX) * 180 / Math.PI + 90
+            });
+            console.log("referenceDistance: " + o.referenceDistance + ", referenceAngle: " + o.referenceAngle);
+          }
+          var bossTransform = channel.components[0].calcTransformMatrix();
+          var invertedBossTransform = fabric.util.invertTransform(bossTransform);
+          var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
+          channel.components[i].relationship = desiredTransform;
+        }
+        
         canvas.remove(line);
-        canvas.add(curve);*/
+        canvas.add(curve);
       }
       else
         destination.channels.push(source.channels[j]);
