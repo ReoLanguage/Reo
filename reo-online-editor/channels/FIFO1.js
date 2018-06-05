@@ -62,8 +62,8 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     originX: 'center',
     originY: 'center',
     referencePoint: 'middle',
-    referenceDistance: 10,
-    referenceAngle: 180
+    referenceDistance: 0,
+    referenceAngle: 0
   });
   FIFO1.components.push(rect);
 

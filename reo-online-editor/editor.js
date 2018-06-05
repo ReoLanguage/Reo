@@ -332,7 +332,6 @@
     canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label);
 
     updateChannel(channel);
-    //console.log(channel);
     return channel
   } //createChannel
 
@@ -542,20 +541,15 @@
               reference = channel.components[0];
             else
               reference = {
-                            left:loopRadius * Math.cos((channel.components[0].angle) * Math.PI / 180) + channel.components[0].left,
-                            top: loopRadius * Math.sin((channel.components[0].angle) * Math.PI / 180) + channel.components[0].top
+                            left:loopRadius * Math.cos((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].left,
+                            top: loopRadius * Math.sin((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].top
                           };
             break;
         }
-        //console.log(reference.left + " " + reference.top);
         o.set({
           'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.left,
           'top':  o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.top
         })
-        //console.log(o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180));
-        //console.log(o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180));
-        //console.log(o.referenceDistance);
-        //console.log(o.left + " " + o.top);;
       }
       o.setCoords();
     }
@@ -1039,11 +1033,9 @@
             length = o.referenceDistance * Math.cos((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
             // calculate the offset from the straight line
             offset = o.referenceDistance * Math.sin((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
-            console.log("length: " + length + " offset: " + offset);
             circumference = 2 * Math.PI * loopRadius;
             // determine where on the circumference the object should be placed
             angleA = (-length / circumference) * 360;
-            console.log("angleA: " + angleA);
             if (o.referencePoint === 'middle')
               angleA += 180;
             // adjust the object's own angle
@@ -1053,16 +1045,20 @@
               'left': (loopRadius + offset) * Math.cos((angleA + 90) * Math.PI / 180) + curve.left,
               'top': (loopRadius + offset) * Math.sin((angleA + 90) * Math.PI / 180) + curve.top
             });
-            console.log("left: " + o.left + ", top: " + o.top);
-            diffX = o.left - line.x1;
-            diffY = o.top - line.y1;
+            if (o.referencePoint === 'middle') {
+              diffX = o.left - curve.left;
+              diffY = o.top - (curve.top - loopRadius);
+            }
+            else {
+              diffX = o.left - line.x1;
+              diffY = o.top - line.y1;
+            }
             // save the new referenceDistance and referenceAngle
             o.set({
               'referenceDistance': Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)),
               'referenceAngle': Math.atan2(diffY, diffX) * 180 / Math.PI + 180
             });
           }
-          console.log("referenceDistance: " + o.referenceDistance + ", referenceAngle: " + o.referenceAngle);
           var bossTransform = curve.calcTransformMatrix();
           var invertedBossTransform = fabric.util.invertTransform(bossTransform);
           var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
