@@ -80,13 +80,13 @@
     });
   }
 
-  document.getElementById("select").onclick =    function() {buttonClick(document.getElementById("select"))}
+  document.getElementById("select").onclick    = function() {buttonClick(document.getElementById("select"))}
   document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))}
-  document.getElementById("sync").onclick =      function() {buttonClick(document.getElementById("sync"))}
+  document.getElementById("sync").onclick      = function() {buttonClick(document.getElementById("sync"))}
   document.getElementById("lossysync").onclick = function() {buttonClick(document.getElementById("lossysync"))}
   document.getElementById("syncdrain").onclick = function() {buttonClick(document.getElementById("syncdrain"))}
   document.getElementById("syncspout").onclick = function() {buttonClick(document.getElementById("syncspout"))}
-  document.getElementById("fifo1").onclick =     function() {buttonClick(document.getElementById("fifo1"))}
+  document.getElementById("fifo1").onclick     = function() {buttonClick(document.getElementById("fifo1"))}
 
   document.getElementById("downloadsvg").onclick = function () {
     var a = document.getElementById("download");
@@ -334,6 +334,18 @@
     updateChannel(channel);
     return channel
   } //createChannel
+  
+  function createLink(node) {
+    var clone = node.clone(function(clonedObj) {
+      canvas.discardActiveObject();
+      clonedObj.set({
+        left: clonedObj.left + 20
+      });
+      canvas.add(clonedObj);
+      canvas.setActiveObject(clonedObj);
+		  canvas.requestRenderAll();
+    });
+  }
 
   function loadChannels() {
     if (typeof Storage === "undefined")
@@ -445,8 +457,11 @@
       else
         console.log("Broken node reference detected");
     }
+    updateNodeColouring(node);
+  } //updateNode
 
-    // update nodetype and colouring
+  function updateNodeColouring(node) {
+    let source = false, sink = false;
     for (i = 0; i < node.channels.length; i++) {
       if (node.channels[i].node1 === node) {
         if (node.channels[i].end1 === 'source')
@@ -472,7 +487,7 @@
     }
     else
       node.set({'nodetype':'sink','fill':nodeFillColourSink});
-  } //updateNode
+  }
 
   function updateChannel(channel) {
     var x1 = channel.node1.get('left'),
@@ -746,6 +761,7 @@
     }
     switch (mode) {
       case 'select':
+        //createLink(p);
         if (p && p.class === 'component') {
           origLeft = p.left;
           origRight = p.left + p.width;
@@ -823,6 +839,12 @@
         p.header.setCoords();
         p.label.set({left: p.left + (p.width/2), top: p.top + 15});
         p.label.setCoords();
+        // p.options.set({left: p.left + 15, top: p.top + 15});
+        // p.options.setCoords();
+        // p.balloon.set({left: p.left - 40, top: p.top - 40});
+        // p.balloon.setCoords();
+        p.compactSwitch.set({left: p.left + 15, top: p.top + 15});
+        p.compactSwitch.setCoords();
       } else {
         p.setCoords();
         p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
@@ -1080,6 +1102,7 @@
       }
     canvas.remove(source.label, source);
     destination.bringToFront();
+    updateNodeColouring(destination);
   }
 
   /**
