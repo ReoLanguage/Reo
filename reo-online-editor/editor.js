@@ -169,7 +169,7 @@
       this.set({
         'label': options.label || '',
         'channels': options.channels || [], // these are the channels that are connected to this node
-        'labelOffsetX': options.labelOffSetX || 20,
+        'labelOffsetX': options.labelOffSetX || 10,
         'labelOffsetY': options.labelOffSetY || -20,
         'class': 'node',
         'nodetype': 'undefined',
@@ -199,6 +199,7 @@
       top: top,
       strokeWidth: lineStrokeWidth,
       fill: nodeFillColourSource,
+      padding: nodeFactor * lineStrokeWidth,
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
@@ -206,7 +207,7 @@
     });
 
     var label = new fabric.IText(name ? name : node.id, {
-      left: left + 20,
+      left: left + 10,
       top: top - 20,
       fontSize: 20,
       object: node,
@@ -215,7 +216,7 @@
       //visible: false
     });
 
-    node.set({'label': label, 'labelOffsetX': 20, 'labelOffsetY': -20});
+    node.set({'label': label, 'labelOffsetX': 10, 'labelOffsetY': -20});
     label.on('editing:exited', function(e) {
       label.object.set({id: label.text})
     });
@@ -471,7 +472,7 @@
         node.set({'nodetype':'source','fill':nodeFillColourSource});
     }
     else
-      node.set({'nodetype':'sink','fill':nodeFillColourSink})
+      node.set({'nodetype':'sink','fill':nodeFillColourSink});
   } //updateNode
 
   function updateChannel(channel) {
@@ -484,16 +485,22 @@
       i;
 
     // update the reference rectangle
-    channel.components[0].set({'left': Math.min(x1,x2) + diffX / 2});
-    channel.components[0].set({'top': Math.min(y1,y2) + diffY / 2});
-    channel.components[0].set({'angle': calculateAngle(channel, 90)});
+    if (channel.components[0].type === 'rect') {
+      channel.components[0].set({'left': Math.min(x1,x2) + diffX / 2});
+      channel.components[0].set({'top': Math.min(y1,y2) + diffY / 2});
+      channel.components[0].set({'angle': calculateAngle(channel, 90)});
 
-    // convert new size to scaling
-    var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
-    var scale = length/channel.components[0].baseLength;
-    channel.components[0].set({'scaleX': scale, 'scaleY': scale});
-
-    channel.components[0].setCoords();
+      // convert new size to scaling
+      var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
+      var scale = length/channel.components[0].baseLength;
+      channel.components[0].set({'scaleX': scale, 'scaleY': scale});
+      channel.components[0].setCoords();
+    }
+    else if (channel.components[0].type === 'circle') {
+      channel.components[0].set({'left': x1});
+      channel.components[0].set({'top': y1 - loopRadius});
+      channel.components[0].setCoords();
+    }
 
     // update all channel components
     for (i = 1; i < channel.components.length; i++) {
@@ -523,18 +530,32 @@
           o.set({'scaleX': 1, 'scaleY': 1});
         if (o.rotate === false)
           o.set({'angle': o.baseAngle});
-        if (o.referencePoint === 'node1') {
-          o.set({
-            'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node1.left,
-            'top': o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node1.top
-          });
+        switch (o.referencePoint) {
+          case 'node1':
+            reference = channel.node1;
+            break;
+          case 'node2':
+            reference = channel.node2;
+            break;
+          default:
+            if (channel.components[0].type === 'rect')
+              reference = channel.components[0];
+            else
+              reference = {
+                            left:loopRadius * Math.cos((channel.components[0].angle) * Math.PI / 180) + channel.components[0].left,
+                            top: loopRadius * Math.sin((channel.components[0].angle) * Math.PI / 180) + channel.components[0].top
+                          };
+            break;
         }
-        if (o.referencePoint === 'node2') {
-          o.set({
-            'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node2.left,
-            'top': o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + channel.node2.top
-          });
-        }
+        //console.log(reference.left + " " + reference.top);
+        o.set({
+          'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.left,
+          'top':  o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.top
+        })
+        //console.log(o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180));
+        //console.log(o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180));
+        //console.log(o.referenceDistance);
+        //console.log(o.left + " " + o.top);;
       }
       o.setCoords();
     }
@@ -991,59 +1012,73 @@
           console.log("Error merging nodes");
       }
       if (loop) {
+        // if the source node is equal to the destination node, create a loop and update the position of all channel components
         var channel = source.channels[j];
+        var rect = channel.components[0];
         var line = channel.components[1];
+
+        // create a circle to replace the channel line
         var curve = new fabric.Circle({
           left: line.x1,
           top: line.y1 - loopRadius,
+          angle: 0,
           strokeWidth: lineStrokeWidth,
+          strokeDashArray: line.strokeDashArray,
           fill: 'transparent',
           radius: loopRadius,
           stroke: lineStrokeColour,
           evented: false
         });
-        channel.components[1] = curve;
-        for (i = 1; i < channel.components.length; i++) {
+        canvas.add(curve);
+
+        // create a new position for all components based on their original position
+        for (i = 2; i < channel.components.length; i++) {
           var o = channel.components[i];
-          if (o.referencePoint === 'node1' || o.referencePoint === 'node2') {
-            length = o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180);
-            offset = o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180);
-            console.log("length: " + length + ", offset: " + offset);
+          if (o.referencePoint === 'node1' || o.referencePoint === 'node2' || o.referencePoint === 'middle') {
+            // calculate the distance along the straight line
+            length = o.referenceDistance * Math.cos((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
+            // calculate the offset from the straight line
+            offset = o.referenceDistance * Math.sin((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
+            console.log("length: " + length + " offset: " + offset);
             circumference = 2 * Math.PI * loopRadius;
-            angleA = (length / circumference) * 360;
+            // determine where on the circumference the object should be placed
+            angleA = (-length / circumference) * 360;
             console.log("angleA: " + angleA);
+            if (o.referencePoint === 'middle')
+              angleA += 180;
+            // adjust the object's own angle
             o.angle = o.angle + angleA;
-            chord = 2 * loopRadius * Math.sin(length / (2 * loopRadius));
-            console.log("chord: " + chord);
+            // reposition the object
             o.set({
               'left': (loopRadius + offset) * Math.cos((angleA + 90) * Math.PI / 180) + curve.left,
-              'top': (loopRadius + offset) * Math.sin((angleA + 90) * Math.PI / 180) + curve.top//,
-              //'referenceDistance': ,
-              //'referenceAngle': 
+              'top': (loopRadius + offset) * Math.sin((angleA + 90) * Math.PI / 180) + curve.top
             });
             console.log("left: " + o.left + ", top: " + o.top);
             diffX = o.left - line.x1;
             diffY = o.top - line.y1;
+            // save the new referenceDistance and referenceAngle
             o.set({
               'referenceDistance': Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)),
-              'referenceAngle': Math.atan2(diffY, diffX) * 180 / Math.PI + 90
+              'referenceAngle': Math.atan2(diffY, diffX) * 180 / Math.PI + 180
             });
-            console.log("referenceDistance: " + o.referenceDistance + ", referenceAngle: " + o.referenceAngle);
           }
-          var bossTransform = channel.components[0].calcTransformMatrix();
+          console.log("referenceDistance: " + o.referenceDistance + ", referenceAngle: " + o.referenceAngle);
+          var bossTransform = curve.calcTransformMatrix();
           var invertedBossTransform = fabric.util.invertTransform(bossTransform);
           var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
           channel.components[i].relationship = desiredTransform;
+          canvas.remove(o);
+          canvas.add(o);
         }
-        
+        channel.components[0] = curve;
+        channel.components.splice(1,1);
         canvas.remove(line);
-        canvas.add(curve);
       }
       else
         destination.channels.push(source.channels[j]);
     }
     for (let k = 0; k < nodes.length; k++)
-      if (nodes[k] == source) {
+      if (nodes[k] === source) {
         nodes.splice(k,1);
         break;
       }

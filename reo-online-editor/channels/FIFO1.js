@@ -60,7 +60,10 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     selectable: false,
     hoverCursor: 'default',
     originX: 'center',
-    originY: 'center'
+    originY: 'center',
+    referencePoint: 'middle',
+    referenceDistance: 10,
+    referenceAngle: 180
   });
   FIFO1.components.push(rect);
 
