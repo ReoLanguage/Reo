@@ -328,12 +328,12 @@ public class Compiler {
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
 		Long t2 = System.nanoTime();
-		try{
-			PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
-			writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
-			writer.close();
-		} catch (IOException e) { e.printStackTrace();  
-		}
+//		try{
+//			PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
+//			writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
+//			writer.close();
+//		} catch (IOException e) { e.printStackTrace();  
+//		}
 	}
 
 	/**
