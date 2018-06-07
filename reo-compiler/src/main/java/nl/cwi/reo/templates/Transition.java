@@ -1,8 +1,8 @@
 package nl.cwi.reo.templates;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +73,13 @@ public class Transition {
 		if(guard instanceof Conjunction){
 			List<Formula> _guards = ((Conjunction) guard).getClauses();
 			for(Formula _f : _guards){
-				if(_f instanceof Negation && ((Negation) _f).getFormula() instanceof Equality){
+				if(_f instanceof Negation && ((Negation) _f).getFormula() instanceof Relation){
+					guards.add(guards.size(),_f);
+				}
+				else if(_f instanceof Relation){
+					guards.add(guards.size(),_f);
+				}
+				else if(_f instanceof Negation && ((Negation) _f).getFormula() instanceof Equality){
 					Formula f = ((Negation)_f).getFormula();
 					if((((Equality) f).getRHS() instanceof Function || ((Equality) f).getLHS() instanceof Function) 
 						|| f instanceof Relation && !guards.contains(f)){
@@ -83,6 +89,8 @@ public class Transition {
 						guards.add(0,_f);
 					}
 				}
+				else
+					guards.add(0,_f);
 			}
 		}
 		return new Conjunction(guards);
@@ -138,6 +146,23 @@ public class Transition {
 		return this.output;
 	}
 
+	/**
+	 * Gets the values assigned to the output ports.
+	 * 
+	 * @return assignment of terms to output ports.
+	 */
+	public Map<MemoryVariable, Object> getInitial() {
+		Map<MemoryVariable, Object> initial = new HashMap<>();
+		for (Map.Entry<MemoryVariable, Term> upd : getMemory().entrySet()){
+			initial.put(new MemoryVariable(upd.getKey().getName(),false,upd.getKey().getTypeTag()), null);
+		}
+		for(Variable v : getGuard().getFreeVariables()){
+			if(v instanceof MemoryVariable)
+				initial.put(new MemoryVariable(v.getName(),false,v.getTypeTag()), null);			
+		}
+		return initial;
+	}
+	
 	/**
 	 * Retrieves the values assigned to memory cells.
 	 * 

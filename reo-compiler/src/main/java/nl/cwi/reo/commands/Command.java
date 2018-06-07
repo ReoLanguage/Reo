@@ -25,6 +25,7 @@ import nl.cwi.reo.templates.Transition;
 import nl.cwi.reo.templates.maude.MaudeTransition;
 import nl.cwi.reo.templates.prism.PrismTransition;
 import nl.cwi.reo.templates.promela.PromelaTransition;
+import nl.cwi.reo.templates.treo.TreoTransition;
 
 /**
  * A command that represents an atomic action of the system. A command consists
@@ -134,6 +135,8 @@ public class Command {
 			return new Transition(guard, output, memory);
 		case MAUDE:
 			return new MaudeTransition(guard, output, memory);
+		case TREO:
+			return new TreoTransition(guard,output,memory);
 		case PRT:
 			break;
 		case TEXT:

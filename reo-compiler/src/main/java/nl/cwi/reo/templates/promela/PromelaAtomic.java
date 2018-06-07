@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.templates.Component;
 
 // TODO: Auto-generated Javadoc

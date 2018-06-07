@@ -1,9 +1,10 @@
 /**
  * 
  */
-package nl.cwi.reo.templates.maude;
+package nl.cwi.reo.templates.treo;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ import nl.cwi.reo.templates.Component;
 /**
  * Compiled atomic component that is independent of the target language.
  */
-public final class MaudeAtomic implements Component {
+public final class TreoAtomic implements Component {
 
 	/**
 	 * Flag for string template.
@@ -50,7 +51,7 @@ public final class MaudeAtomic implements Component {
 	 * @param call
 	 *            the call
 	 */
-	public MaudeAtomic(String name, List<String> params, Set<Port> ports, String call) {
+	public TreoAtomic(String name, List<String> params, Set<Port> ports, String call) {
 		this.name = name;
 		this.params = params;
 		this.ports = ports;
@@ -64,10 +65,6 @@ public final class MaudeAtomic implements Component {
 	 */
 	public String getName() {
 		return name;
-	}
-	
-	public String getAtomicName(){
-		return name.substring(0, name.length()-1);
 	}
 
 	/**
@@ -101,13 +98,15 @@ public final class MaudeAtomic implements Component {
 	public Set<Port> getPorts() {
 		return ports;
 	}
-
-	public Set<Port> getRenamedPorts(){
-		LinkedHashSet<Port> l = new LinkedHashSet<>();
-		for(Port p : ports)
-			l.add(p.rename("p"+p.getName()));
-		return l;
+	
+	public Set<Port> getRenamedPorts() {
+		Set<Port> set = new HashSet<>();
+		for(Port p :  ports){
+			set.add(p.rename("p"+p.getName().substring(1)));
+		}
+		return set;
 	}
+
 	/**
 	 * Gets the call.
 	 *

@@ -87,21 +87,33 @@ public void activate() {
 	}
 }
 
-interface Rule {
-    void fire();
+public void fire(Integer i){
+	if(guards[i].guard())commands[i].update();;
+};
+
+interface Guard{
+	Boolean guard();
 }
 
-private Rule[] rules = new Rule[] {
-    <c.transitions:transition(); separator="\n">
+interface Command{
+	void update();
+}
+
+private Guard[] guards = new Guard[]{
+	<c.transitions:newGuard();separator="\n">		
+};
+		
+private Command[] commands = new Command[]{
+	<c.transitions:newCommand();separator="\n">		
 };
 
 public void run() {
 	int i = 0;
 	int j = 0;
-	int s = rules.length;
+	int s = guards.length;
 	
 	while (true) {
-		rules[(i+j) % s].fire();			
+		fire((i+j) % s);			
 		
 		i = (i+1) % s;
 		if (i == 0)
@@ -126,6 +138,21 @@ memorycell(c) ::= <<
 check_transition(t) ::= <<
 if (<guard(t); wrap, anchor>) break;
 >>
+
+newGuard(t) ::= <<
+new Guard(){
+	public Boolean guard(){
+		return (<guard(t); wrap, anchor>);
+	}
+},
+>>
+newCommand(t) ::= <<
+new Command(){
+	public void update(){
+		<action(t)>
+	}
+},
+>>	
 
 transition(t) ::= <<
 new Rule() { 
@@ -157,7 +184,7 @@ disjunction(f) ::= <<
 >>
 
 conjunction(f) ::=<<
-(<f.clauses:formula(); separator=" && ">)
+(<f.clauses:formula(); separator=" && \n ">)
 >>
 
 relation(t) ::=<<

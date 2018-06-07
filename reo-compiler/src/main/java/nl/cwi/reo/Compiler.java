@@ -3,6 +3,7 @@ package nl.cwi.reo;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,11 +46,8 @@ import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
-import nl.cwi.reo.semantics.predicates.Conjunction;
-import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
-import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.rulebasedautomata.ListenerRBA;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
@@ -63,6 +61,8 @@ import nl.cwi.reo.templates.maude.MaudeAtomic;
 import nl.cwi.reo.templates.maude.MaudeProtocol;
 import nl.cwi.reo.templates.promela.PromelaAtomic;
 import nl.cwi.reo.templates.promela.PromelaProtocol;
+import nl.cwi.reo.templates.treo.TreoAtomic;
+import nl.cwi.reo.templates.treo.TreoProtocol;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
@@ -248,7 +248,7 @@ public class Compiler {
 		long t4 = System.nanoTime();
 		System.out.println("Commandification : \t" + (t4-t3)/1E9);
 
-		Set<Set<Transition>> partition = partition(transitions);
+		Set<Set<Transition>> partition = partition(transitions,false);
 
 		List<Component> protocols = buildProtocols(composition, partition);
 
@@ -269,10 +269,9 @@ public class Compiler {
 			return new Interpreter(SemanticsType.CH, listenerPRBA, directories, params, monitor);
 		case JAVA:
 		case C11:
-			ListenerRBA listenerRBA = new ListenerRBA(monitor);
-			return new Interpreter(SemanticsType.RBA, listenerRBA, directories, params, monitor);
 		case PROMELA:
 		case MAUDE:
+		case TREO:
 			ListenerRBA listenerRba = new ListenerRBA(monitor);
 			return new Interpreter(SemanticsType.RBA, listenerRba, directories, params, monitor);
 		case PRT:
@@ -290,6 +289,7 @@ public class Compiler {
 	 */
 	private void compileCH() {
 
+		Long t1 = System.nanoTime();
 		Interpreter interpreter = getInterpreter(lang);
 
 		ReoProgram program; 	
@@ -319,7 +319,7 @@ public class Compiler {
 		
 		Set<Transition> transitions = buildTransitions(composition);
 		
-		Set<Set<Transition>> partition = partition(transitions);
+		Set<Set<Transition>> partition = partition(transitions,false);
 
 		List<Component> protocols = buildProtocols(composition, partition);
 
@@ -327,49 +327,14 @@ public class Compiler {
 
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
+		Long t2 = System.nanoTime();
+		try{
+			PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
+			writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
+			writer.close();
+		} catch (IOException e) { e.printStackTrace();  
+		}
 	}
-	
-	
-	private List<RuleBasedAutomaton> infereType(List<RuleBasedAutomaton> protocol, Set<Port> intface){
-		Set<Set<Term>> s = new HashSet<>();
-		for(Port p : intface){
-			Set<Term> t = new HashSet<>();
-			t.add(new PortVariable(p));
-			s.add(t);
-		}
-		for(RuleBasedAutomaton rba : protocol){
-			/* Look at the type of the ports */
-			for( Rule r :rba.getAllRules()){
-				s=r.getFormula().inferTermType(s);
-			}
-		}
-		Map<Term,TypeTag> typeMap = new HashMap<>();
-		for(Set<Term> set : s){
-			for(Term t : set)
-				typeMap.put(t, t.getTypeTag());
-		}
-		
-		List<RuleBasedAutomaton> rbaList = new ArrayList<>();
-		for(RuleBasedAutomaton rba : protocol){
-			Set<Set<Rule>> _rba = new HashSet<>();
-			for(Set<Rule> setRule : rba.getRules()){
-				Set<Rule> _setRule = new HashSet<>();
-				for(Rule r : setRule){
-					_setRule.add(new Rule(r.getSync(),r.getFormula().getTypedFormula(typeMap)));
-				}
-				_rba.add(_setRule);
-			}
-			Map<MemoryVariable, Term> _initials = new HashMap<>();
-			for(MemoryVariable mv : rba.getInitial().keySet()){
-				_initials.put(mv.setTypeTag(typeMap.get(mv)), rba.getInitial().get(mv).setTypeTag(typeMap.get(mv)));
-			}
-			rbaList.add(new RuleBasedAutomaton(_rba,_initials));
-		}
-		
-		return rbaList;
-		
-	}
-		
 
 	/**
 	 * Closes a given connector by attaching port windows to visible ports.
@@ -381,7 +346,7 @@ public class Compiler {
 	 * @return Connector with all ports hidden.
 	 */
 	private ReoConnector addPortWindows(ReoConnector connector, Language lang) {
-		if (lang != Language.JAVA && lang != Language.MAUDE && lang != Language.PROMELA)
+		if (lang != Language.JAVA && lang != Language.MAUDE && lang != Language.PROMELA && lang != Language.TREO)
 			return connector;
 		List<ReoConnector> list = new ArrayList<>();
 		list.add(connector);
@@ -420,6 +385,20 @@ public class Compiler {
 					List<Value> values = Arrays.asList(v);
 					String call = p.isInput() ? "prod" : "cons";
 					Reference ref = new Reference(call, Language.PROMELA, new ArrayList<>(), values);
+	
+					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
+					Map<Port, Port> links = new HashMap<>();
+					links.put(q, q);
+	
+					ReoConnectorAtom window = new ReoConnectorAtom(call, Arrays.asList(ref), links);
+					list.add(window);
+				}
+				if(lang == Language.TREO){
+					Value v = new StringValue(p.getName());
+					List<Value> values = Arrays.asList(v);
+					String call = p.isInput() ? "prod" : "cons";
+					Reference ref = new Reference(call, Language.TREO, new ArrayList<>(), values);
 	
 					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
 					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
@@ -473,40 +452,13 @@ public class Compiler {
 					components.add(new PromelaAtomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
 				if(lang == Language.MAUDE)
 					components.add(new MaudeAtomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
+				if(lang == Language.TREO)
+					components.add(new TreoAtomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
+
 			}
 		}
 //		connector.rename(renaming);
 		return components;
-	}
-	
-	private Map<Port,Port> renameNodeInterface(ReoConnector connector) {
-		Map<Port,Port> renaming = new HashMap<>();
-		/*
-		for (ReoConnectorAtom atom : connector.getAtoms()) {
-			Reference r = atom.getReference(lang);
-			if (r != null) { 
-				String s = r.getValues().get(0).toString();
-				renaming.put(atom.getInterface().iterator().next(),atom.getLinks().get(atom.getInterface().iterator().next()).rename(s));
-			}
-		}
-		connector = connector.rename(renaming);
-		connector = connector.integrate();
-		*/
-		
-		for (ReoConnectorAtom atom : connector.getAtoms()) {
-			Reference r = atom.getReference(lang);
-			if (r != null) {
-				String s = "";
-				if(!r.getValues().isEmpty())
-					s = r.getValues().get(0).toString();
-				
-				Port p = atom.getInterface().iterator().next();
-				PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-				renaming.put(new Port(p.getName(), t, p.getPrioType(), p.getTypeTag(), true),new Port(s, t, p.getPrioType(), p.getTypeTag(), true));
-			}
-		}
-		
-		return renaming;
 	}
 
 	/**
@@ -563,11 +515,10 @@ public class Compiler {
 
 	private Set<Transition> buildTransitions(ConstraintHypergraph protocol) {
 		Set<Transition> transitions = new HashSet<>();
-		for (Rule rule : protocol.getRules()){
-			Commands c = new Commands();
-			Command _cmd = c.getCommand(rule.getFormula());
-//			Command cmd = Commands.commandify(rule.getFormula());
-			transitions.add(_cmd.toTransition(lang));
+		for (Formula f : protocol.getFormulas()){
+			Command _cmd = new Commands().getCommand(f);
+			if(_cmd !=null)
+				transitions.add(_cmd.toTransition(lang));
 		}
 		return transitions;
 	}
@@ -575,7 +526,7 @@ public class Compiler {
 	private Set<Transition> buildTransitions(RuleBasedAutomaton protocol) {
 		Set<Transition> transitions = new HashSet<>();
 		for (Rule rule : protocol.getAllRules()) {
-			Command cmd = Commands.commandify(rule.getFormula());
+			Command cmd = new Commands().getCommand(rule.getFormula());
 			transitions.add(cmd.toTransition(lang));
 		}
 		return transitions;
@@ -644,10 +595,9 @@ public class Compiler {
 
 			//Add all memory variables
 			Map<MemoryVariable, Object> initial = new HashMap<>();
-			for (Transition t : part)
-				for (Map.Entry<MemoryVariable, Term> upd : t.getMemory().entrySet()){
-					initial.put(new MemoryVariable(upd.getKey().getName(),false,upd.getKey().getTypeTag()), null);
-				}
+			for (Transition t : part){
+				initial.putAll(t.getInitial());
+			}
 			
 			//Initialize value of some memory cells
 			for (MemoryVariable mv : protocol.getInitials().keySet())
@@ -659,6 +609,8 @@ public class Compiler {
 				components.add(new MaudeProtocol("Protocol" + n_protocol++, ports, part, initial));
 			if(lang == Language.PROMELA)
 				components.add(new PromelaProtocol("Protocol" + n_protocol++, ports, part, initial));
+			if(lang == Language.TREO)
+				components.add(new TreoProtocol("Protocol" + n_protocol++, ports, part, initial));
 		}
 		return components;
 	}
@@ -670,19 +622,21 @@ public class Compiler {
 	 *            set of transitions
 	 * @return partitioned set of transitions.
 	 */
-	private Set<Set<Transition>> partition(Set<Transition> transitions) {
+	private Set<Set<Transition>> partition(Set<Transition> transitions, Boolean max) {
 		Set<Set<Transition>> partition = new HashSet<>();
 
-		if (!transitions.isEmpty()) {
-			// for (Transition t : transitions) {
-			// Set<Set<Transition>> newPartition = new HashSet<>();
-			// newPartition.add(new HashSet<>(Arrays.asList(t)));
-			// for (Set<Transition> part : partition) {
-			//
-			// }
-			// }
-			partition.add(transitions);
+		if (!transitions.isEmpty() ) {
+			if(max){
+				for(Transition t : transitions){
+					Set<Transition> s = new HashSet<>();
+					s.add(t);
+					partition.add(s);
+				}
+			}
+			else
+				partition.add(transitions);
 		}
+			
 
 		return partition;
 	}
@@ -715,6 +669,10 @@ public class Compiler {
 		case PRISM:
 			group = new STGroupFile("Prism.stg");
 			extension = ".prism";
+			break;
+		case TREO:
+			group = new STGroupFile("Treo.stg");
+			extension = ".treo";
 			break;
 		default:
 			return;
