@@ -23,9 +23,12 @@ public enum Language {
 	/** Proto Runtime. */
 	PRT,
 
-	/** Proto Runtime. */
+	/** Promela language. */
 	PROMELA,
 
+	/** Input language */
+	TREO,
+	
 	/** Pr text. */
 	TEXT;
 
@@ -47,6 +50,8 @@ public enum Language {
 			return "Proto runtime";
 		case TEXT:
 			return "Text";
+		case TREO:
+			return "Treo";
 		case PROMELA:
 			return "Promela";
 		default:

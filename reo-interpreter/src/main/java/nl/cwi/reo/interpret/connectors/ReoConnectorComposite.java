@@ -183,20 +183,6 @@ public final class ReoConnectorComposite implements ReoConnector {
 		return links;
 	}
 
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public ReoConnectorComposite evaluate(Scope s, Monitor m) {
-//		List<ReoConnector> newcomps = new ArrayList<>();
-//		for (ReoConnector comp : components) {
-//			ReoConnector e = comp.evaluate(s, m);
-//			if (e != null)
-//				newcomps.add(e);
-//		}
-//		return new ReoConnectorComposite(name, operator, newcomps);
-//	}
-
 	/**
 	 * {@inheritDoc}
 	 */

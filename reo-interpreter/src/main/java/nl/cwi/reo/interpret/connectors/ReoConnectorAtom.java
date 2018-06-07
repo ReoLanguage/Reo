@@ -84,9 +84,10 @@ public final class ReoConnectorAtom implements ReoConnector {
 	 */
 	@Nullable
 	public Reference getReference(Language lang) {
-		for (Atom x : semantics)
-			if (x instanceof Reference && ((Reference) x).getLanguage().equals(lang))
+		for (Atom x : semantics){
+			if (x instanceof Reference && (((Reference) x).getLanguage().equals(lang) || lang.equals(Language.TREO)))
 				return (Reference) x;
+		}
 		return null;
 	}
 
