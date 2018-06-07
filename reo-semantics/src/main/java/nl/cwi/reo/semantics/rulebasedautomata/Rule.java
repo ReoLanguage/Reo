@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.rulebasedautomata;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.PortVariable;
+import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Terms;
 import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.util.Monitor;
@@ -51,7 +53,24 @@ public class Rule {
 		}
 		list.add(f);
 		this.f = new Conjunction(list);
-		Map<Port,Boolean> _sync = this.f.getSynchronousMap();
+		Set<Set<Term>> __sync = this.f.getSynchronousSet();
+		Map<Port,Boolean>_sync = new HashMap<>();
+		for(Set<Term> set : __sync){
+			if(set.contains(Terms.NonNull)){
+				for(Term t: set){
+					if(t instanceof PortVariable){
+						_sync.put(((PortVariable) t).getPort(), true);
+					}
+				}
+			}
+			if(set.contains(Terms.Null)){
+				for(Term t: set){
+					if(t instanceof PortVariable){
+						_sync.put(((PortVariable) t).getPort(), false);
+					}
+				}
+			}	
+		}
 		if(_sync != null)
 			this.sync = _sync;
 		else
@@ -61,7 +80,24 @@ public class Rule {
 	
 	public Rule(Formula f) {
 		this.f = f;
-		Map<Port,Boolean> _sync = this.f.getSynchronousMap();
+		Set<Set<Term>> __sync = this.f.getSynchronousSet();
+		Map<Port,Boolean>_sync = new HashMap<>();
+		for(Set<Term> set : __sync){
+			if(set.contains(Terms.NonNull)){
+				for(Term t: set){
+					if(t instanceof PortVariable){
+						_sync.put(((PortVariable) t).getPort(), true);
+					}
+				}
+			}
+			if(set.contains(Terms.Null)){
+				for(Term t: set){
+					if(t instanceof PortVariable){
+						_sync.put(((PortVariable) t).getPort(), false);
+					}
+				}
+			}	
+		}
 		if(_sync != null)
 			this.sync = _sync;
 		else
@@ -121,7 +157,7 @@ public class Rule {
 			if (v instanceof PortVariable)
 				if (!intface.contains(((PortVariable) v).getPort()))
 					V.add(v);
-		Formula _f = Formulas.eliminate(f, V);
+		Formula _f = Formulas.eliminate(Arrays.asList(f), V);
 		return new Rule(_f);
 	}
 

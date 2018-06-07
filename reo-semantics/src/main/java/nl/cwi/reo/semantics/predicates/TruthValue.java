@@ -132,7 +132,7 @@ public final class TruthValue implements Formula {
 	}
 
 	@Override
-	public Map<Port, Boolean> getSynchronousMap() {
+	public Set<Set<Term>> getSynchronousSet() {
 		// TODO Auto-generated method stub
 		return null;
 	}

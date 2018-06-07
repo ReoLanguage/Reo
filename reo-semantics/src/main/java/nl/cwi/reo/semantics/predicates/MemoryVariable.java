@@ -24,6 +24,11 @@ public final class MemoryVariable implements Variable, Comparable<MemoryVariable
 	public static final boolean memory = true;
 
 	/**
+	 * Flag for synchronization set.
+	 */
+	public boolean negated = true;
+
+	/**
 	 * Name of this memory cell.
 	 */
 	private final String name;

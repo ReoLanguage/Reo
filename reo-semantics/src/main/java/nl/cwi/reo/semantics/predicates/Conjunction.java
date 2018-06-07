@@ -6,9 +6,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -265,13 +267,37 @@ public final class Conjunction implements Formula {
 	}
 
 	@Override
-	public Map<Port, Boolean> getSynchronousMap() {
-		Map<Port, Boolean> map = new HashMap<>();
+	public Set<Set<Term>> getSynchronousSet() {
+		Set<Set<Term>> set = new HashSet<>();
+		Queue<Set<Term>> _set = new LinkedList<>();
+
 		for(Formula g : getClauses()){
-			if(g.getSynchronousMap()!=null)
-				map.putAll(g.getSynchronousMap());
+			if(g.getSynchronousSet()!=null)
+				_set.addAll(g.getSynchronousSet());
 		}
-		return map;
+
+		while(!_set.isEmpty()){
+			Set<Term> s = _set.poll();
+			Boolean contain = false;
+			for(Set<Term> _s : set){
+				for(Term t : _s){
+					if(t instanceof PortVariable && s.contains(t)){
+						_s.addAll(s);
+						contain=true;
+						break;
+					}
+					if(t instanceof MemoryVariable && s.contains(t)){
+						_s.addAll(s);
+						contain=true;
+						break;
+					}
+				}
+			}
+			if(!contain)
+				set.add(s);
+		}
+
+		return set;
 	}
 
 

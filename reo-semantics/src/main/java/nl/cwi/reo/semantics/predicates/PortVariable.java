@@ -26,6 +26,12 @@ public final class PortVariable implements Variable {
 	public static final boolean node = true;
 
 	/**
+	 * Flag for synchronization set.
+	 */
+	public boolean negated = true;
+
+	
+	/**
 	 * Flag for string template.
 	 */
 	private final Port p;

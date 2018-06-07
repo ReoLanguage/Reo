@@ -57,13 +57,13 @@ public class Formulas {
 	 * @return Quantifier free formula without free variables in <code>V</code>,
 	 *         or null, if not all variables could be eliminated.
 	 */
-	public static Formula eliminate(Formula f, Collection<? extends Variable> V) {
-		if (Collections.disjoint(V, f.getFreeVariables()))
-			return f;
+	public static Formula eliminate(List<Formula> clauses, Collection<? extends Variable> V) {
+//		if (Collections.disjoint(V, f.getFreeVariables()))
+//			return f;
+//
+//		if (f instanceof Conjunction) {
 
-		if (f instanceof Conjunction) {
-
-			List<Formula> clauses = new ArrayList<>(((Conjunction) f).getClauses());
+//			List<Formula> clauses = new ArrayList<>(((Conjunction) f).getClauses());
 			
 			// Determine in which clauses each variable occurs.
 			Map<Variable, Set<Integer>> occur = new HashMap<>();
@@ -159,20 +159,20 @@ public class Formulas {
 			}
 
 			return new Conjunction(clauses);
-		}
+//		}
 
-		if (f instanceof Equality)
-			if (V.contains(((Equality) f).getLHS()) || V.contains(((Equality) f).getRHS()))
-				return True;
+//		if (f instanceof Equality)
+//			if (V.contains(((Equality) f).getLHS()) || V.contains(((Equality) f).getRHS()))
+//				return True;
+//
+//		if (f instanceof Disjunction) {
+//			List<Formula> _clauses = new ArrayList<>();
+//			for (Formula c : ((Disjunction) f).getClauses())
+//				_clauses.add(eliminate(c, V));
+//			return new Disjunction(_clauses);
+//		}
 
-		if (f instanceof Disjunction) {
-			List<Formula> _clauses = new ArrayList<>();
-			for (Formula c : ((Disjunction) f).getClauses())
-				_clauses.add(eliminate(c, V));
-			return new Disjunction(_clauses);
-		}
-
-		return f;
+//		return new Conjunction();
 	}
 	
 

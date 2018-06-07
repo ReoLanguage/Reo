@@ -313,14 +313,16 @@ public final class Relation implements Formula {
 	}
 
 	@Override
-	public Map<Port, Boolean> getSynchronousMap() {
-		Map<Port, Boolean> map = new HashMap<>();
+	public Set<Set<Term>> getSynchronousSet() {
+		Set<Term>  set = new HashSet<>();
 		for(Variable v: this.vars){
 			if(v instanceof PortVariable){
-				map.put(((PortVariable) v).getPort(), true);
+				set.add(((PortVariable) v));
 			}
 		}
-		return map;
+		Set<Set<Term>> s = new HashSet<>();
+		s.add(set);
+		return s;
 	}
 
 }

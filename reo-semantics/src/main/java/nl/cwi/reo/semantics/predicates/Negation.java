@@ -195,13 +195,27 @@ public final class Negation implements Formula {
 	}
 
 	@Override
-	public Map<Port, Boolean> getSynchronousMap() {
-		Map<Port, Boolean> map = new HashMap<>();
-		Map<Port, Boolean> _map = new HashMap<>();
-		map = f.getSynchronousMap();
-		for(Port p : map.keySet()){
-			_map.put(p, !map.get(p));
+	public Set<Set<Term>> getSynchronousSet() {
+		Set<Set<Term>> set = f.getSynchronousSet();
+		for(Set<Term> s : set){
+			if(s.contains(Terms.NonNull)){
+				s.remove(Terms.NonNull);
+				s.add(Terms.Null);
+			}
+			else if(s.contains(Terms.Null)){
+				s.remove(Terms.Null);
+				s.add(Terms.NonNull);
+			}
+			else{
+				for(Term t : s){
+					if(t instanceof PortVariable)
+						((PortVariable) t).negated=!((PortVariable) t).negated;
+					if(t instanceof MemoryVariable)
+						((MemoryVariable) t).negated=!((MemoryVariable) t).negated;
+				}
+			}
+			
 		}
-		return _map;
+		return set;
 	}
 }

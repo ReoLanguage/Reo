@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.hypergraphs;
+package nl.cwi.reo.semantics.rules;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +13,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.predicates.Conjunction;
+import nl.cwi.reo.interpret.typetags.TypeTags;
+import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
@@ -54,14 +55,8 @@ public class RuleNode {
 	/**
 	 * Rule of this node.
 	 */
-	private Set<Rule> rules;
+	private Rule rule;
 
-	/**
-	 * Synchronous set.
-	 */
-	private final Map<Port, Boolean> sync;
-
-	
 	/**
 	 * Constructs a new node from a given rule and a set of adjacent hyperedges.
 	 * 
@@ -70,14 +65,9 @@ public class RuleNode {
 	 * @param hyperedge
 	 *            set of adjacent hyperedges
 	 */
-	public RuleNode(Set<Rule> r, Set<HyperEdge> hyperedge) {
-		this.rules = r;
+	public RuleNode(Rule r, Set<HyperEdge> hyperedge) {
+		this.rule = r;
 		this.hyperedges = new HashSet<>();
-		this.sync = new HashMap<>();
-
-		for(Rule rule : r)
-			sync.putAll(rule.getSync());
-		
 		id = ++N;
 		for (HyperEdge h : hyperedge)
 			addToHyperedge(h); // TODO cannot call this.addToHyperedge, because
@@ -91,23 +81,10 @@ public class RuleNode {
 	 * @param r
 	 *            rule of this node
 	 */
-	public RuleNode(Set<Rule> r) {
-		this.rules = r;
+	public RuleNode(Rule r) {
+		this.rule = r;
 		this.hyperedges = new HashSet<HyperEdge>();
-		this.sync = new HashMap<>();
-		for(Rule rule : r)
-			sync.putAll(rule.getSync());
-		
 		id = ++N;
-	}
-
-	/**
-	 * Gets the set of rules of this node.
-	 * 
-	 * @return rule of this node.
-	 */
-	public Set<Rule> getRules() {
-		return rules;
 	}
 
 	/**
@@ -116,30 +93,7 @@ public class RuleNode {
 	 * @return rule of this node.
 	 */
 	public Rule getRule() {
-		List<Formula> f = new ArrayList<>();
-		for(Rule r : rules)
-			f.add(r.getFormula());
-		return new Rule(new Conjunction(f));
-	}
-	
-	/**
-	 * Get the formula of this node
-	 * @return
-	 */
-	public Formula getFormula() {
-		List<Formula> f = new ArrayList<>();
-		for(Rule r : rules)
-			f.add(r.getFormula());
-		return new Conjunction(f);
-	}
-	
-	/**
-	 * Gets the rule of this node.
-	 * 
-	 * @return rule of this node.
-	 */
-	public Map<Port,Boolean> getSync() {
-		return sync;
+		return rule;
 	}
 
 	/**
@@ -160,9 +114,9 @@ public class RuleNode {
 	 *         exists, and null otherwise.
 	 */
 	@Nullable
-	public HyperEdge getHyperedges(Port p) {
+	public HyperEdge getHyperedges(PortNode p) {
 		for (HyperEdge h : hyperedges)
-			if (h.getSource().equals(p))
+			if (h.getSource().getPort().equals(p.getPort()))
 				return h;
 		return null;
 	}
@@ -220,26 +174,55 @@ public class RuleNode {
 	 * @return conjunction this node with the given rule node, if the rules of
 	 *         both node can synchronize, or null otherwise.
 	 */
+	public RuleNode compose(RuleNode r) {
+		// If the two rules can not synchronize, the composition fails.
+		if (!canSync(rule, r.getRule()))
+			return null;
+
+		Map<Port, Boolean> map = new HashMap<>(rule.getSync());
+		map.putAll(r.getRule().getSync());
+
+		Rule r1;
+		// If the two rules are equals, return one this.rule (idempotency)
+		// otherwise, return the conjunction.
+		if (rule.getFormula().equals(r.getRule().getFormula())) {
+			if (r.getRule().getSync().equals(rule.getSync()))
+				return this;
+			else
+				r1 = new Rule(map, rule.getFormula());
+		} else {
+			r1 = new Rule(map,
+					Formulas.conjunction(Arrays.asList(rule.getFormula(), r.getRule().getFormula())));
+		}
+
+		// Add the new rule to the hyperegde.
+		Set<HyperEdge> set = new HashSet<>(hyperedges);
+		for (HyperEdge h : r.getHyperedges()) {
+			if (!h.getTarget().isEmpty())
+				set.add(h);
+		}
+
+		return new RuleNode(r1, set);
+	}
 	
 	public RuleNode composeF(RuleNode r) {
 		// If the two rules can not synchronize, the composition fails.
-		if (!canSync(sync, r.getSync()))
+		if (!canSync(rule, r.getRule()))
 			return null;
 
-		Map<Port, Boolean> map = new HashMap<>(getSync());
-		map.putAll(r.getSync());
+		Map<Port, Boolean> map = new HashMap<>(rule.getSync());
+		map.putAll(r.getRule().getSync());
 
-		Set<Rule> r1;
+		Rule r1;
 		// If the two rules are equals, return one this.rule (idempotency)
 		// otherwise, return the conjunction.
-		if (rules.equals(r.getRules())) {
-			if (r.getSync().equals(getSync()))
+		if (rule.getFormula().equals(r.getRule().getFormula())) {
+			if (r.getRule().getSync().equals(rule.getSync()))
 				return this;
 			else
-				r1 = new HashSet<>(rules);
+				r1 = new Rule(rule.getFormula());
 		} else {
-			r1 = new HashSet<>(rules);
-			r1.addAll(r.getRules());
+			r1 = new Rule(Formulas.conjunction(Arrays.asList(rule.getFormula(), r.getRule().getFormula())));
 		}
 
 		// Add the new rule to the hyperegde.
@@ -282,7 +265,7 @@ public class RuleNode {
 	 * @return new instance of the this node.
 	 */
 	public RuleNode duplicate() {
-		return new RuleNode(this.getRules(), this.getHyperedges());
+		return new RuleNode(this.getRule(), this.getHyperedges());
 	}
 
 	/**
@@ -293,9 +276,7 @@ public class RuleNode {
 	 * @return node with rule whose port variables are renamed.
 	 */
 	public RuleNode rename(Map<Port, Port> links) {
-		Set<Rule> _rules = new HashSet<>();
-		for(Rule r : rules)
-			_rules.add(r.rename(links));
+		rule = rule.rename(links);
 		return this;
 	}
 
@@ -307,33 +288,27 @@ public class RuleNode {
 	 * @return reference to this node.
 	 */
 	public RuleNode substitute(Map<String, String> rename) {
-		Set<Rule> _rules = new HashSet<>();
 		for (Map.Entry<String, String> entry : rename.entrySet()) {
-			for(Rule r : rules){
-				Rule _r = new Rule(r.getFormula().substitute(
-						new MemoryVariable(entry.getValue(), false), new MemoryVariable(entry.getKey(), false)));
-				_r = new Rule(_r.getFormula().substitute(
-						new MemoryVariable(entry.getValue(), true), new MemoryVariable(entry.getKey(), true)));
-				_rules.add(_r);
-			}
-			rules = new HashSet<>(_rules);
-			_rules.clear();
+			rule = new Rule(rule.getFormula().substitute(
+					new MemoryVariable(entry.getValue(), false), new MemoryVariable(entry.getKey(), false)));
+			rule = new Rule(rule.getFormula()
+					.substitute(new MemoryVariable(entry.getValue(), true), new MemoryVariable(entry.getKey(), true)));
 		}
 		return this;
 	}
 
-	public boolean canSync(Map<Port,Boolean> r1, Map<Port,Boolean> r2) {
+	public boolean canSync(Rule r1, Rule r2) {
 
 		boolean hasEdge = false;
-		for (Port p : r1.keySet()) {
-			if (r1.get(p)) {
-				if (r2.get(p)!=null && r2.get(p)) {
+		for (Port p : r1.getSync().keySet()) {
+			if (r1.getSync().get(p)) {
+				if (r2.getSync().get(p)!=null && r2.getSync().get(p)) {
 					hasEdge = true;
-				} else if(r2.get(p)!=null && !r2.get(p)){ 
+				} else if(r2.getSync().get(p)!=null && !r2.getSync().get(p)){ 
 					return false;
 				}
 			}
-			else if(r2!=null && r2.get(p)!=null &&r2.get(p))
+			else if(r2.getSync()!=null && r2.getSync().get(p)!=null &&r2.getSync().get(p))
 				return false;
 		}
 		return hasEdge;
@@ -347,15 +322,9 @@ public class RuleNode {
 	 *            port node
 	 * @return reference to this rule node.
 	 */
-	public RuleNode hide(Port p) {
-		List<Variable> V = Arrays.asList(new PortVariable(p));
-//		Formula f = this.getRule().getFormula();
-//		rules = new HashSet<>(Arrays.asList(new Rule(Formulas.eliminate(f, V))));
-		List<Formula> list = new ArrayList<>();
-		for(Rule r : rules){
-			list.add(r.getFormula());
-		}
-		rules = new HashSet<>(Arrays.asList(new Rule(Formulas.eliminate(list, V)))); 
+	public RuleNode hide(PortNode p) {
+		List<Variable> V = Arrays.asList(new PortVariable(p.getPort()));
+		rule = new Rule(rule.getSync(), Formulas.eliminate(Arrays.asList(rule.getFormula()), V));
 		return this;
 	}
 
@@ -368,27 +337,7 @@ public class RuleNode {
 	 *            monitor
 	 */
 	public void evaluate(Scope s, Monitor m) {
-		Set<Rule>_rules = new HashSet<>();
-		for(Rule r : rules)
-			_rules.add(r.evaluate(s, m));
-		rules = _rules;
-	}
-	
-	public Set<Port> getActivePorts() {
-		Set<Port> N = new HashSet<>();
-		for (Rule r : rules)
-			N.addAll(r.getActivePorts());
-		return N;
-	}
-
-	
-	public Set<Port> getPorts() {
-		Set<Port> N = new HashSet<>();
-		for (Rule r : rules)
-			for(Variable v :r.getFormula().getFreeVariables())
-				if(v instanceof PortVariable)
-					N.add(((PortVariable) v).getPort());
-		return N;
+		rule = rule.evaluate(s, m);
 	}
 
 	/**
@@ -419,6 +368,6 @@ public class RuleNode {
 	 */
 	@Override
 	public String toString() {
-		return rules.toString();
+		return rule.toString();
 	}
 }

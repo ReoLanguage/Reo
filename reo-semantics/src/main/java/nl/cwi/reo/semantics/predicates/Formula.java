@@ -37,11 +37,11 @@ public interface Formula extends Expression<Formula> {
 	public boolean isQuantifierFree();
 
 	/**
-	 * Get synchronous map.
+	 * Get synchronous set of variables.
 	 * 
 	 * @return map with synchronous information.
 	 */
-	public Map<Port,Boolean> getSynchronousMap();
+	public Set<Set<Term>> getSynchronousSet();
 
 	/**
 	 * Renames the free port variables in the formula.

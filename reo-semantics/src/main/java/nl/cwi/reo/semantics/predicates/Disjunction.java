@@ -216,20 +216,14 @@ public final class Disjunction implements Formula {
 		return Objects.hash(s);
 	}
 
+	
 	@Override
-	public Map<Port, Boolean> getSynchronousMap() {
-		Map<Port, Boolean> map = new HashMap<>();
+	public Set<Set<Term>> getSynchronousSet() {
+		Set<Set<Term>> s = new HashSet<>();
 		for(Formula g : this.getClauses()){
-			for(Port p : g.getSynchronousMap().keySet()){
-				if(map.containsKey(p))
-					if(g.getSynchronousMap().get(p) && map.containsKey(p) && map.get(p) 
-							|| !g.getSynchronousMap().get(p) && map.containsKey(p) && !map.get(p))
-						map.put(p,g.getSynchronousMap().get(p));
-				else
-					map.put(p, g.getSynchronousMap().get(p));
-			}
+			s.addAll(g.getSynchronousSet());
 		}
-		return map;
+		return s;
 	}
 
 }

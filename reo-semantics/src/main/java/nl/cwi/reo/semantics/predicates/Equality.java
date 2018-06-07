@@ -296,24 +296,12 @@ public final class Equality implements Formula {
 	}
 
 	@Override
-	public Map<Port, Boolean> getSynchronousMap() {
-		Map<Port, Boolean> map = new HashMap<>();
-		if(t1 instanceof PortVariable){
-			if(t2 instanceof NullValue){
-				map.put(((PortVariable)t1).getPort(), false);
-			}
-			if(t2 instanceof NonNullValue){
-				map.put(((PortVariable)t1).getPort(), true);
-			}
-		}
-		if(t2 instanceof PortVariable){
-			if(t1 instanceof NullValue){
-				map.put(((PortVariable)t2).getPort(), false);
-			}
-			if(t1 instanceof NonNullValue){
-				map.put(((PortVariable)t2).getPort(), true);
-			}
-		}
-		return map;
+	public Set<Set<Term>> getSynchronousSet() {
+		Set<Term> set = new HashSet<>();
+		set.add(t1);
+		set.add(t2);
+		Set<Set<Term>> _set = new HashSet<>();
+		_set.add(set);
+		return _set;
 	}
 }

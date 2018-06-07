@@ -189,10 +189,13 @@ public final class Existential implements Formula {
 	}
 
 	@Override
-	public Map<Port, Boolean> getSynchronousMap() {
-		Map<Port, Boolean> map = new HashMap<>();
-		map = f.getSynchronousMap();
-		map.remove(x);
-		return map;
+	public Set<Set<Term>> getSynchronousSet() {
+		Set<Set<Term>> set = new HashSet<>();
+		Set<Set<Term>> _set = new HashSet<>(set);
+		set = f.getSynchronousSet();
+		for(Set<Term> s : set)
+			if(s.contains(x))
+				_set.remove(s);
+		return _set;
 	}
 }

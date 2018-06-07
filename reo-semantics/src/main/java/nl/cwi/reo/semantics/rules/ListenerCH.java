@@ -1,4 +1,4 @@
-package nl.cwi.reo.semantics.rulebasedautomata;
+package nl.cwi.reo.semantics.rules;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
-import nl.cwi.reo.interpret.ReoParser.Rba_negationContext;
+import nl.cwi.reo.interpret.ReoParser.AtomContext;
 import nl.cwi.reo.interpret.ReoParser.RbaContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_boolContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_trueContext;
@@ -28,11 +28,8 @@ import nl.cwi.reo.interpret.ReoParser.Rba_memorycellInContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_memorycellOutContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_natContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_nullContext;
-import nl.cwi.reo.interpret.ReoParser.Rba_null_ctxtContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_operationContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_parameterContext;
-import nl.cwi.reo.interpret.ReoParser.Rba_portContext;
-import nl.cwi.reo.interpret.ReoParser.Rba_relationContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_ruleContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_initialContext;
 import nl.cwi.reo.interpret.ReoParser.Rba_stringContext;
@@ -49,42 +46,63 @@ import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.PortVariable;
-import nl.cwi.reo.semantics.predicates.Relation;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Terms;
 import nl.cwi.reo.semantics.predicates.TruthValue;
+import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class ListenerRBA.
  */
-public class ListenerRBA extends BaseListener {
+public class ListenerCH extends BaseListener {
 
-	/** The transitions. */
-	protected ParseTreeProperty<Rule> transitions = new ParseTreeProperty<>();
+	/** The automaton. */
+	protected ParseTreeProperty<ConstraintHypergraph> automaton = new ParseTreeProperty<>();
 
-	/** The formulas. */
-	protected ParseTreeProperty<Formula> formulas = new ParseTreeProperty<>();
+	/** The rba formula. */
+	protected ParseTreeProperty<Formula> rba_formula = new ParseTreeProperty<>();
 
-	/** The terms. */
-	protected ParseTreeProperty<Term> terms = new ParseTreeProperty<>();
+	/** The term. */
+	protected ParseTreeProperty<Term> term = new ParseTreeProperty<>();
 
-	/** The synchronization constraints. */
-	protected ParseTreeProperty<Map<Port, Boolean>> syncs = new ParseTreeProperty<>();
+	/** The rules. */
+	protected ParseTreeProperty<Rule> rules = new ParseTreeProperty<>();
 
-	/** The initial value of memory. */
-	protected ParseTreeProperty<Map<MemoryVariable, Term>> initials = new ParseTreeProperty<>();
-	
-	
+	/** The map ports. */
+	protected Map<Port, Boolean> mapPorts = new HashMap<>();
+
+	/** The initial. */
+	protected Map<MemoryVariable, Term> initial = new HashMap<>();
+
 	/**
 	 * Instantiates a new listener RBA.
 	 *
 	 * @param m
-	 *            the monitor
+	 *            the m
 	 */
-	public ListenerRBA(Monitor m) {
+	public ListenerCH(Monitor m) {
 		super(m);
-		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitAtom(nl.cwi.reo.interpret.
+	 * ReoParser.AtomContext)
+	 */
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#enterAtom(nl.cwi.reo.interpret.
+	 * ReoParser.AtomContext)
+	 */
+	@Override
+	public void enterAtom(AtomContext ctx) {
+		initial = new HashMap<>();
+		mapPorts = new HashMap<>();
 	}
 
 	/*
@@ -95,19 +113,23 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba(RbaContext ctx) {
-		Set<Rule> s = new HashSet<>();
-		for (Rba_ruleContext rule_ctx : ctx.rba_rule())
-			s.add(transitions.get(rule_ctx));
-		Set<Set<Rule>> rules = new HashSet<>();
-		rules.add(s);
-
-		Map<MemoryVariable, Term> initial = new HashMap<>();
-		for (Rba_initialContext initial_ctx : ctx.rba_initial()) {
-			Map<MemoryVariable, Term> init = initials.get(initial_ctx);
-			if (init != null)
-				initial.putAll(init);
+		Set<Rule> s = new HashSet<Rule>();
+		for (Rba_ruleContext rbaContext : ctx.rba_rule()) {
+			s.add(rules.get(rbaContext));
 		}
-		atoms.put(ctx, new RuleBasedAutomaton(rules, initial));
+		atoms.put(ctx, new ConstraintHypergraph(s, initial));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * nl.cwi.reo.interpret.ReoBaseListener#enterRba_rule(nl.cwi.reo.interpret.
+	 * ReoParser.Rba_ruleContext)
+	 */
+	@Override
+	public void enterRba_rule(Rba_ruleContext ctx) {
+		mapPorts = new HashMap<>();
 	}
 
 	/*
@@ -118,26 +140,9 @@ public class ListenerRBA extends BaseListener {
 	 * ReoParser.Rba_ruleContext)
 	 */
 	public void exitRba_rule(Rba_ruleContext ctx) {
-		Map<Port, Boolean> sync = new HashMap<>();
-		for (Rba_portContext port_ctx : ctx.rba_port()) {
-			Map<Port, Boolean> syncp = syncs.get(port_ctx);
-			if (syncp != null)
-				sync.putAll(syncp);
-		}
-
-		List<Formula> clauses = new ArrayList<>();
-		clauses.add(formulas.get(ctx.rba_formula()));
-//
-//		for (Map.Entry<Port, Boolean> entry : sync.entrySet()) {
-//			Formula eq = new Equality(new PortVariable(entry.getKey()), Terms.Null);
-//			if (entry.getValue())
-//				clauses.add(new Negation(eq));
-//			else
-//				clauses.add(eq);
-//		}
-
-		Formula f = Formulas.conjunction(clauses);
-		transitions.put(ctx, new Rule(sync, f));
+		Formula f = rba_formula.get(ctx.rba_formula());
+		if (f != null)
+			rules.put(ctx, new Rule(mapPorts, f));
 	}
 
 	/*
@@ -148,9 +153,7 @@ public class ListenerRBA extends BaseListener {
 	 * .ReoParser.Rba_initialContext)
 	 */
 	public void exitRba_initial(Rba_initialContext ctx) {
-		Map<MemoryVariable, Term> initial = new HashMap<>();
-		initial.put(new MemoryVariable(ctx.ID().getText(), false, TypeTags.Object), terms.get(ctx.rba_term()));
-		initials.put(ctx, initial);
+		initial.put(new MemoryVariable(ctx.ID().getText(), false, TypeTags.Object), term.get(ctx.rba_term()));
 	}
 
 	/*
@@ -161,9 +164,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_syncFire(Rba_syncFireContext ctx) {
-		Map<Port, Boolean> syncp = new HashMap<>();
-		syncp.put(new Port(ctx.ID().getText()), true);
-		syncs.put(ctx, syncp);
+		mapPorts.put(new Port(ctx.ID().getText()), true);
 	}
 
 	/*
@@ -173,9 +174,7 @@ public class ListenerRBA extends BaseListener {
 	 * interpret.ReoParser.Rba_syncBlockContext)
 	 */
 	public void exitRba_syncBlock(Rba_syncBlockContext ctx) {
-		Map<Port, Boolean> syncp = new HashMap<>();
-		syncp.put(new Port(ctx.ID().getText()), false);
-		syncs.put(ctx, syncp);
+		mapPorts.put(new Port(ctx.ID().getText()), false);
 	}
 
 	/*
@@ -187,19 +186,11 @@ public class ListenerRBA extends BaseListener {
 	@Override
 	public void exitRba_conjunction(Rba_conjunctionContext ctx) {
 		List<Formula> l = new ArrayList<Formula>();
-		for (Rba_formulaContext f : ctx.rba_formula()) {
-			Formula g = formulas.get(f);
-			if (g != null)
-				l.add(g);
-		}
-		formulas.put(ctx, Formulas.conjunction(l));
+		for (Rba_formulaContext f : ctx.rba_formula())
+			l.add(rba_formula.get(f));
+		rba_formula.put(ctx, Formulas.conjunction(l));
 	}
 
-
-	public void exitRba_negation(Rba_negationContext ctx) {
-		formulas.put(ctx, new Negation(formulas.get(ctx.rba_formula())));
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -209,7 +200,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_def(Rba_defContext ctx) {
-		formulas.put(ctx, formulas.get(ctx.rba_formula()));
+		rba_formula.put(ctx, rba_formula.get(ctx.rba_formula()));
 	}
 
 	/*
@@ -220,10 +211,10 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_equality(Rba_equalityContext ctx) {
-		Term t0 = terms.get(ctx.rba_term(0));
-		Term t1 = terms.get(ctx.rba_term(1));		
+		Term t0 = term.get(ctx.rba_term(0));
+		Term t1 = term.get(ctx.rba_term(1));
 		if (t0 != null && t1 != null)
-			formulas.put(ctx, new Equality(t0, t1));
+			rba_formula.put(ctx, new Equality(t0, t1));
 	}
 
 	/*
@@ -234,10 +225,10 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_inequality(Rba_inequalityContext ctx) {
-		Term t0 = terms.get(ctx.rba_term(0));
-		Term t1 = terms.get(ctx.rba_term(1));
+		Term t0 = term.get(ctx.rba_term(0));
+		Term t1 = term.get(ctx.rba_term(1));
 		if (t0 != null && t1 != null)
-			formulas.put(ctx, new Negation(new Equality(t0, t1)));
+			rba_formula.put(ctx, new Negation(new Equality(t0, t1)));
 	}
 
 	/*
@@ -249,7 +240,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_true(Rba_trueContext ctx) {
-		formulas.put(ctx, new TruthValue(true));
+		rba_formula.put(ctx, new TruthValue(true));
 	}
 
 	/*
@@ -260,40 +251,8 @@ public class ListenerRBA extends BaseListener {
 	 * ReoParser.Rba_falseContext)
 	 */
 	public void exitRba_false(Rba_falseContext ctx) {
-		formulas.put(ctx, new TruthValue(false));
+		rba_formula.put(ctx, new TruthValue(false));
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_relation(nl.cwi.reo.interpret.
-	 * ReoParser.Rba_relationContext)
-	 */
-	public void exitRba_relation(Rba_relationContext ctx) {
-		List<Term> args = new ArrayList<Term>();
-		for (Rba_termContext arg : ctx.rba_term()) {
-			Term t = terms.get(arg);
-			args.add(t);
-		}
-		formulas.put(ctx, new Relation(ctx.ID().getText(),args,false));
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * nl.cwi.reo.interpret.ReoBaseListener#exitRba_notrelation(nl.cwi.reo.interpret.
-	 * ReoParser.Rba_notrelationContext)
-	 */
-//	public void exitRba_notrelation(Rba_notrelationContext ctx) {
-//		List<Term> args = new ArrayList<Term>();
-//		for (Rba_termContext arg : ctx.rba_term()) {
-//			Term t = terms.get(arg);
-//			args.add(t);
-//		}
-//		formulas.put(ctx, new Negation(new Relation(ctx.ID().getText(),args,false)));
-//	}
 
 	/*
 	 * (non-Javadoc)
@@ -304,7 +263,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_nat(Rba_natContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Integer));
+		term.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Integer));
 	}
 
 	/*
@@ -316,7 +275,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_bool(Rba_boolContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Boolean));
+		term.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Boolean));
 	}
 
 	/*
@@ -328,7 +287,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_string(Rba_stringContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.String));
+		term.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.String));
 	}
 
 	/*
@@ -340,7 +299,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_decimal(Rba_decimalContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Decimal));
+		term.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Decimal));
 	}
 
 	/*
@@ -354,11 +313,11 @@ public class ListenerRBA extends BaseListener {
 		List<Term> args = new ArrayList<Term>();
 		TypeTag tag = null;
 		for (Rba_termContext arg : ctx.rba_term()) {
-			Term t = terms.get(arg);
+			Term t = term.get(arg);
 			args.add(t);
 			tag = t.getTypeTag();
 		}
-		terms.put(ctx, new Function(ctx.ID().getText(), args, false, tag));
+		term.put(ctx, new Function(ctx.ID().getText(), args, false, tag));
 	}
 
 	/*
@@ -369,7 +328,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_parameter(Rba_parameterContext ctx) {
-		terms.put(ctx, new PortVariable(new Port(ctx.ID().getText())));
+		term.put(ctx, new PortVariable(new Port(ctx.ID().getText())));
 	}
 
 	/*
@@ -381,7 +340,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_memorycellIn(Rba_memorycellInContext ctx) {
-		terms.put(ctx, new MemoryVariable(ctx.ID().getText(), false, TypeTags.Object));
+		term.put(ctx, new MemoryVariable(ctx.ID().getText(), false, TypeTags.Object));
 	}
 
 	/*
@@ -393,7 +352,7 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_memorycellOut(Rba_memorycellOutContext ctx) {
-		terms.put(ctx, new MemoryVariable(ctx.ID().getText(), true, TypeTags.Object));
+		term.put(ctx, new MemoryVariable(ctx.ID().getText(), true, TypeTags.Object));
 	}
 
 	/*
@@ -405,36 +364,24 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_null(Rba_nullContext ctx) {
-		terms.put(ctx, Terms.Null);
+		term.put(ctx, Terms.Null);
 	}
 	
-	@Override
-	public void exitRba_null_ctxt(Rba_null_ctxtContext ctx) {
-		terms.put(ctx, Terms.Null);
+	/* (non-Javadoc)
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_unarymin(nl.cwi.reo.interpret.ReoParser.Rba_unaryminContext)
+	 */
+	@Override 
+	public void exitRba_unarymin(Rba_unaryminContext ctx) { 
+		term.put(ctx, new Function("-", Arrays.asList(term.get(ctx.rba_term())), false, new TypeTag("int")));		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_unarymin(nl.cwi.reo.
-	 * interpret.ReoParser.Rba_unaryminContext)
+	/* (non-Javadoc)
+	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_operation(nl.cwi.reo.interpret.ReoParser.Rba_operationContext)
 	 */
-	@Override
-	public void exitRba_unarymin(Rba_unaryminContext ctx) {
-		terms.put(ctx, new Function("-", Arrays.asList(terms.get(ctx.rba_term())), false, new TypeTag("int")));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see nl.cwi.reo.interpret.ReoBaseListener#exitRba_operation(nl.cwi.reo.
-	 * interpret.ReoParser.Rba_operationContext)
-	 */
-	@Override
-	public void exitRba_operation(Rba_operationContext ctx) {
-		TypeTag tag = terms.get(ctx.rba_term(0)).getTypeTag();
-		terms.put(ctx, new Function(ctx.op.getText(),
-				Arrays.asList(terms.get(ctx.rba_term(0)), terms.get(ctx.rba_term(1))), true, tag));
+	@Override 
+	public void exitRba_operation(Rba_operationContext ctx) { 
+		TypeTag tag = term.get(ctx.rba_term(0)).getTypeTag();
+		term.put(ctx, new Function(ctx.op.getText(), Arrays.asList(term.get(ctx.rba_term(0)), term.get(ctx.rba_term(1))), true, tag));		
 	}
 
 }
