@@ -89,7 +89,7 @@ h2 {
 
 #text {
   width: 100%;
-  height: 90%;
+  height: 85%;
 }
 
 #refresh {
@@ -97,16 +97,16 @@ h2 {
   margin: auto;
 }
 
-.tool img {  
-  max-height: 100%;  
-  max-width: 100%; 
+.tool img {
+  max-height: 100%;
+  max-width: 100%;
   width: auto;
   height: auto;
-  position: absolute;  
-  top: 0;  
-  bottom: 0;  
-  left: 0;  
-  right: 0;  
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   margin: auto;
 }
 
@@ -114,11 +114,11 @@ h2 {
   h1 {
     font-size: 1.5em;
   }
-  
+
   h2 {
     font-size: 1.125em;
   }
-  
+
   #textdiv {
     width: 100vw;
     height: 100vh;

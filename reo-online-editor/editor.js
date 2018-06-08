@@ -130,6 +130,7 @@
     await network.parseComponent(text.replace(/\n/g, ''));
 
     try {
+      // TODO generate positions if there were no geometry metadata comments
       let output = await network.generateCode();
       // console.log(output);
       clearAll();
@@ -138,6 +139,10 @@
       console.log(e);
       alert(e)
     }
+  };
+
+  document.getElementById("commentSwitch").onclick = function () {
+    updateText()
   };
 
   // generate a new object ID
@@ -313,6 +318,17 @@
         console.log("Invalid channel name");
         return;
     }
+
+    // code generation function
+    channel.generateCode = function (withComment) {
+      var comment = '',
+        node1 = this.node1, node2 = this.node2,
+        node1Name = node1.label.text, node2Name = node2.label.text;
+      if (withComment) {
+        comment += `/*! pos(${node1Name}): [${Math.round(node1.left)}, ${Math.round(node1.top)}], pos(${node2Name}): [${Math.round(node2.left)}, ${Math.round(node2.top)}] !*/`
+      }
+      return `${this.name}(${node1Name},${node2Name})` + comment
+    };
 
     canvas.add(channel.components[0]);
 
@@ -572,6 +588,7 @@
   }
 
   function updateText() {
+    let commentSwitch = document.getElementById('commentSwitch').checked;
     if (main) {
       var s1 = main.label.text + '(', s2 = '';
       var space1 = '', space2 = '', q, obj;
@@ -596,9 +613,7 @@
         {
           let node1 = obj.node1;
           let node2 = obj.node2;
-          s2 += space2 + obj.name + '(' + node1.label.text + ',' + node2.label.text + ')';
-          s2 += ' /*! pos(' + node1.label.text + '): [' + Math.round(node1.left) + ', ' + Math.round(node1.top) +
-            '], pos(' + node2.label.text + '): [' + Math.round(node2.left) + ', ' + Math.round(node2.top) + '] !*/';
+          s2 += space2 + obj.generateCode(commentSwitch);
           space2 = '\n';
         }
       }
