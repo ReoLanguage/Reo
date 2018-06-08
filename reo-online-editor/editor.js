@@ -334,7 +334,7 @@
     updateChannel(channel);
     return channel
   } //createChannel
-  
+
   function createLink(node) {
     var clone = node.clone(function(clonedObj) {
       canvas.discardActiveObject();
@@ -443,8 +443,7 @@
             snapToComponent(node.channels[i].node2,node.channels[i].node2.component);
           }
         }
-      }
-      else if (node === node.channels[i].node2) {
+      } else if (node === node.channels[i].node2) {
         if (node.component.size > node.channels[i].node1.component.size)
           snapOutComponent(node.channels[i].node1,node.channels[i].node1.component,node);
         else {
@@ -453,30 +452,25 @@
             snapToComponent(node.channels[i].node1,node.channels[i].node1.component);
           }
         }
-      }
-      else
-        console.log("Broken node reference detected");
+      } else console.log("Broken node reference detected");
     }
     updateNodeColouring(node);
   } //updateNode
 
   function updateNodeColouring(node) {
-    let source = false, sink = false;
-    for (i = 0; i < node.channels.length; i++) {
+    let source = false, sink = false, i;
+    for (i = 0; i < node.channels.length; ++i) {
       if (node.channels[i].node1 === node) {
         if (node.channels[i].end1 === 'source')
           source = true;
         else
           sink = true;
-      }
-      else if (node.channels[i].node2 === node) {
+      } else if (node.channels[i].node2 === node) {
         if (node.channels[i].end2 === 'source')
           source = true;
         else
           sink = true;
-      }
-      else
-        console.log("Error updating nodes")
+      } else console.log("Error updating nodes")
     }
 
     if (source) {
@@ -484,9 +478,7 @@
         node.set({'nodetype':'mixed','fill':nodeFillColourMixed});
       else
         node.set({'nodetype':'source','fill':nodeFillColourSource});
-    }
-    else
-      node.set({'nodetype':'sink','fill':nodeFillColourSink});
+    } else node.set({'nodetype':'sink','fill':nodeFillColourSink});
   }
 
   function updateChannel(channel) {
@@ -544,6 +536,7 @@
           o.set({'scaleX': 1, 'scaleY': 1});
         if (o.rotate === false)
           o.set({'angle': o.baseAngle});
+        let reference;
         switch (o.referencePoint) {
           case 'node1':
             reference = channel.node1;
@@ -556,10 +549,9 @@
               reference = channel.components[0];
             else
               reference = {
-                            left:loopRadius * Math.cos((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].left,
-                            top: loopRadius * Math.sin((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].top
-                          };
-            break;
+                left: loopRadius * Math.cos((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].left,
+                top: loopRadius * Math.sin((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].top
+              };
         }
         o.set({
           'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.left,
@@ -964,13 +956,12 @@
 
   canvas.on('mouse:up', function(e){
     isDown = false;
-    var p = canvas.getActiveObject(), i;
+    var p = canvas.getActiveObject(), i, j;
     if (p) {
       p.setCoords();
       if (p.class === 'node') {
         updateNode(p);
-      }
-      if (p.class === 'component') {
+      } else if (p.class === 'component') {
         p.label.setCoords();
         reorderComponents(p);
         p.set({status: 'design'});
@@ -996,8 +987,7 @@
             }
           }
         }
-      }
-      if (p.class === 'label') {
+      } else if (p.class === 'label') {
         p.setCoords();
         p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});
       }
@@ -1009,7 +999,8 @@
   }); //mouse:up
 
   function mergeNodes(destination, source) {
-    for (let j = 0; j < source.channels.length; j++) {
+    var j, i;
+    for (j = 0; j < source.channels.length; j++) {
       let loop = false;
       if (source.channels[j].node1 === source) {
         source.channels[j].node1 = destination;
@@ -1052,12 +1043,12 @@
           var o = channel.components[i];
           if (o.referencePoint === 'node1' || o.referencePoint === 'node2' || o.referencePoint === 'middle') {
             // calculate the distance along the straight line
-            length = o.referenceDistance * Math.cos((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
+            let length = o.referenceDistance * Math.cos((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
             // calculate the offset from the straight line
-            offset = o.referenceDistance * Math.sin((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
-            circumference = 2 * Math.PI * loopRadius;
+            let offset = o.referenceDistance * Math.sin((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
+            let circumference = 2 * Math.PI * loopRadius;
             // determine where on the circumference the object should be placed
-            angleA = (-length / circumference) * 360;
+            let angleA = (-length / circumference) * 360;
             if (o.referencePoint === 'middle')
               angleA += 180;
             // adjust the object's own angle
@@ -1067,11 +1058,11 @@
               'left': (loopRadius + offset) * Math.cos((angleA + 90) * Math.PI / 180) + curve.left,
               'top': (loopRadius + offset) * Math.sin((angleA + 90) * Math.PI / 180) + curve.top
             });
+            let diffX, diffY;
             if (o.referencePoint === 'middle') {
               diffX = o.left - curve.left;
               diffY = o.top - (curve.top - loopRadius);
-            }
-            else {
+            } else {
               diffX = o.left - line.x1;
               diffY = o.top - line.y1;
             }
