@@ -325,7 +325,7 @@
         node1 = this.node1, node2 = this.node2,
         node1Name = node1.label.text, node2Name = node2.label.text;
       if (withComment) {
-        comment += `/*! pos(${node1Name}): [${Math.round(node1.left)}, ${Math.round(node1.top)}], pos(${node2Name}): [${Math.round(node2.left)}, ${Math.round(node2.top)}] !*/`
+        comment += ` /*! pos(${node1Name}): [${Math.round(node1.left)}, ${Math.round(node1.top)}], pos(${node2Name}): [${Math.round(node2.left)}, ${Math.round(node2.top)}] !*/`
       }
       return `${this.name}(${node1Name},${node2Name})` + comment
     };
@@ -603,16 +603,15 @@
 
       for (q = 0; q < channels.length; ++q) {
         obj = channels[q];
-        if (obj.node1.component === main ||
-            obj.node2.component === main ||
-             (isBoundaryNode(obj.node1) &&
-              isBoundaryNode(obj.node2) &&
-              obj.node1.component !== obj.node2.component
+        let node1 = obj.node1, node2 = obj.node2;
+        if (node1.component === main ||
+            node2.component === main ||
+             (isBoundaryNode(node1) &&
+              isBoundaryNode(node2) &&
+              node1.component !== node2.component
              )
            )
         {
-          let node1 = obj.node1;
-          let node2 = obj.node2;
           s2 += space2 + obj.generateCode(commentSwitch);
           space2 = '\n';
         }
@@ -637,12 +636,8 @@
           s3 += '/*! pos: [' + left + ', ' + top + ', ' + Math.round(left + obj.width) + ', ' + Math.round(top + obj.height) + '] !*/\n';
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
-            let node1 = obj2.node1;
-            let node2 = obj2.node2;
-            if (node1.component === obj && node2.component === obj) {
-              s3 += space3 + obj2.name + '(' + node1.label.text + ',' + node2.label.text + ')';
-              s3 += ' /*! pos(' + node1.label.text + '): [' + Math.round(node1.left) + ', ' + Math.round(node1.top) +
-                '], pos(' + node2.label.text + '): [' + Math.round(node2.left) + ', ' + Math.round(node2.top) + '] !*/';
+            if (obj2.node1.component === obj && obj2.node2.component === obj) {
+              s3 += space3 + obj2.generateCode(commentSwitch);
               space3 = '\n';
             }
           }
