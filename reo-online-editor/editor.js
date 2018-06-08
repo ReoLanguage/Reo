@@ -631,14 +631,14 @@
             }
           }
           let top = Math.round(obj.top), left = Math.round(obj.left);
-          space3 = '';
-          s3 += ') { ';
-          s3 += '/*! pos: [' + left + ', ' + top + ', ' + Math.round(left + obj.width) + ', ' + Math.round(top + obj.height) + '] !*/\n';
+          space3 = '\n';
+          s3 += ') {';
+          if (commentSwitch)
+            s3 += ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + obj.width) + ', ' + Math.round(top + obj.height) + '] !*/';
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
             if (obj2.node1.component === obj && obj2.node2.component === obj) {
               s3 += space3 + obj2.generateCode(commentSwitch);
-              space3 = '\n';
             }
           }
           space3 = '';
