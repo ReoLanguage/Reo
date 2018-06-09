@@ -195,6 +195,10 @@
 
     _render: function(ctx) {
       this.callSuper('_render', ctx);
+    },
+
+    positionMetadata: function () {
+      return `pos(${this.label.text}): [${Math.round(this.left)}, ${Math.round(this.top)}]`
     }
   }); // Node
 
@@ -319,15 +323,16 @@
         return;
     }
 
-    // code generation function
+    // code generation functions
+    channel.positionMetadata = function() {
+      return ` /*! ${this.node1.positionMetadata()}, ${this.node2.positionMetadata()} !*/`
+    };
+
     channel.generateCode = function (withComment) {
-      var comment = '',
-        node1 = this.node1, node2 = this.node2,
-        node1Name = node1.label.text, node2Name = node2.label.text;
-      if (withComment) {
-        comment += ` /*! pos(${node1Name}): [${Math.round(node1.left)}, ${Math.round(node1.top)}], pos(${node2Name}): [${Math.round(node2.left)}, ${Math.round(node2.top)}] !*/`
-      }
-      return `${this.name}(${node1Name},${node2Name})` + comment
+      var code = `${this.name}(${this.node1.label.text},${this.node2.label.text})`;
+      if (withComment)
+        code += this.positionMetadata();
+      return code
     };
 
     canvas.add(channel.components[0]);
@@ -630,11 +635,10 @@
               space3 = ',';
             }
           }
-          let top = Math.round(obj.top), left = Math.round(obj.left);
           space3 = '\n';
           s3 += ') {';
           if (commentSwitch)
-            s3 += ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + obj.width) + ', ' + Math.round(top + obj.height) + '] !*/';
+            s3 += obj.positionMetadata();
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
             if (obj2.node1.component === obj && obj2.node2.component === obj) {
@@ -1128,7 +1132,7 @@
     var left = x1;
     var top = y1;
 
-    var rect = new fabric.Rect({
+    var component = new fabric.Rect({
       left: left,
       top: top,
       width: width,
@@ -1160,7 +1164,7 @@
       top: top + 15,
       fontSize: 24,
       class: 'title',
-      object: rect,
+      object: component,
       hoverCursor: 'text',
       hasControls: false,
       lockMovementX: true,
@@ -1175,11 +1179,11 @@
         radius: nodeFactor * 2,
         hasControls: false,
         selectable: false,
-        component: rect,
+        component: component,
         class: 'compactSwitch'
       });
 
-      rect.set('compactSwitch', compactSwitch);
+      component.set('compactSwitch', compactSwitch);
       canvas.add(compactSwitch);
     }
 
@@ -1212,15 +1216,20 @@
     rect.set({options: options, balloon: balloon});
     canvas.add(options, balloon);*/
 
-    rect.set({'label': label, 'header': header});
+    component.positionMetadata = function() {
+      let top = Math.round(this.top), left = Math.round(this.left);
+      return ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + this.width) + ', ' + Math.round(top + this.height) + '] !*/'
+    };
 
-    rect.setCoords();
-    canvas.add(rect, header, label);
+    component.set({'label': label, 'header': header});
+
+    component.setCoords();
+    canvas.add(component, header, label);
     canvas.requestRenderAll();
     var i = 0;
-    while (i < components.length && rect.size < components[i].size) ++i;
-    components.splice(i, 0, rect);
-    return rect
+    while (i < components.length && component.size < components[i].size) ++i;
+    components.splice(i, 0, component);
+    return component
   }
 
   function clearAll() {
