@@ -455,25 +455,22 @@
 
     // ensure that no channel crosses a component boundary
     for (i = 0; i < node.channels.length; ++i) {
-      if (node === node.channels[i].node1) {
-        if (node.component.size > node.channels[i].node2.component.size)
-          snapOutComponent(node.channels[i].node2,node.channels[i].node2.component,node);
-        else {
-          if (!isBoundaryNode(node)) {
-            node.channels[i].node2.component = node.component;
-            snapToComponent(node.channels[i].node2,node.channels[i].node2.component);
-          }
+      var otherNode;
+      if (node === node.channels[i].node1)
+        otherNode = node.channels[i].node2;
+      else if (node === node.channels[i].node2)
+        otherNode = node.channels[i].node1;
+      else
+        throw new Error("Broken node reference detected");
+
+      if (node.component.size > otherNode.component.size)
+        snapOutComponent(otherNode, otherNode.component,node);
+      else {
+        if (!isBoundaryNode(node)) {
+          otherNode.component = node.component;
+          snapToComponent(otherNode, otherNode.component);
         }
-      } else if (node === node.channels[i].node2) {
-        if (node.component.size > node.channels[i].node1.component.size)
-          snapOutComponent(node.channels[i].node1,node.channels[i].node1.component,node);
-        else {
-          if (!isBoundaryNode(node)) {
-            node.channels[i].node1.component = node.component;
-            snapToComponent(node.channels[i].node1,node.channels[i].node1.component);
-          }
-        }
-      } else console.log("Broken node reference detected");
+      }
     }
     updateNodeColouring(node);
   } //updateNode
