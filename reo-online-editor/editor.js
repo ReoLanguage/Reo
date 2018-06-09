@@ -824,7 +824,7 @@
     }
   }); //mouse:down
 
-  canvas.on('mouse:move', function(e){
+  canvas.on('mouse:move', function(e) {
     if (!isDown) return;
     var p = canvas.getActiveObject(), i, j;
     if (!p) return;
@@ -835,25 +835,13 @@
           p.set({left: pointer.x});
         if (origY > pointer.y)
           p.set({top: pointer.y});
-        p.set({width: Math.abs(origX - pointer.x)});
-        p.set({height: Math.abs(origY - pointer.y)});
+        p.set({width: Math.abs(origX - pointer.x), height: Math.abs(origY - pointer.y)});
         p.setCoords();
         p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
-        p.header.setCoords();
         p.label.set({left: p.left + (p.width/2), top: p.top + 15});
-        p.label.setCoords();
-        // p.options.set({left: p.left + 15, top: p.top + 15});
-        // p.options.setCoords();
-        // p.balloon.set({left: p.left - 40, top: p.top - 40});
-        // p.balloon.setCoords();
-        p.compactSwitch.set({left: p.left + 15, top: p.top + 15});
-        p.compactSwitch.setCoords();
       } else {
-        p.setCoords();
         p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
-        p.header.setCoords();
         p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
-        p.label.setCoords();
         // p.options.set({left: p.left + 15, top: p.top + 15});
         // p.options.setCoords();
         // p.balloon.set({left: p.left - 40, top: p.top - 40});
@@ -861,7 +849,7 @@
         p.compactSwitch.set({left: p.left + 15, top: p.top + 15});
         p.compactSwitch.setCoords();
         if (p.__corner !== 0) {
-          for (i = 0; i < p.nodes.length; i++) {
+          for (i = 0; i < p.nodes.length; ++i) {
             let node = p.nodes[i];
             if (node.origLeft === origLeft)
               node.set({'left': p.left});
@@ -873,26 +861,22 @@
               node.set({'top': p.top + p.scaleY * p.height});
             snapToComponent(node, node.component);
           }
-        }
-        else {
-          p.set({left: origLeft + pointer.x - origX});
-          p.set({top: origTop + pointer.y - origY});
+        } else {
+          p.set({left: origLeft + pointer.x - origX, top: origTop + pointer.y - origY});
           p.setCoords();
           for (i = 0; i < p.nodes.length; i++) {
             let node = p.nodes[i];
-            node.set({left: node.origLeft + pointer.x - origX});
-            node.set({top: node.origTop + pointer.y - origY});
+            node.set({left: node.origLeft + pointer.x - origX, top: node.origTop + pointer.y - origY});
             node.setCoords();
-            node.label.set({left: node.left + node.labelOffsetX});
-            node.label.set({top: node.top + node.labelOffsetY});
+            node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
             node.label.setCoords();
-            for (j = 0; j < node.channels.length; j++)
+            for (j = 0; j < node.channels.length; ++j)
               updateChannel(node.channels[j]);
           }
         }
       }
-    }
-    if (p.class === 'node') {
+      p.header.setCoords();
+    } else if (p.class === 'node') {
       p.set({'left': pointer.x, 'top': pointer.y});
       p.setCoords();
       for (i = 0; i < nodes.length; i++) {
@@ -903,65 +887,49 @@
       }
       for (i = 0; i < components.length; i++) {
         // Check if the node is near any component boundaries
-        let left = false, top = false, right = false, bottom = false;
-        if (Math.abs(p.left - components[i].left) < mergeDistance)
-          left = true;
-        if (Math.abs(p.top - components[i].top) < mergeDistance)
-          top = true;
-        if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
-          right = true;
-        if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
-          bottom = true;
+        let near, changingPosition, position, size = 0;
+        if (Math.abs(p.left - components[i].left) < mergeDistance) {
+          changingPosition = near = 'left';
+          position = components[i].left
+        } else if (Math.abs(p.top - components[i].top) < mergeDistance) {
+          changingPosition = near = 'top';
+          position = components[i].top
+        } else if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance) {
+          near = 'right';
+          changingPosition = 'left';
+          position = components[i].left;
+          size = components[i].width
+        } else if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance) {
+          near = 'bottom';
+          changingPosition = 'top';
+          position = components[i].top;
+          size = components[i].height
+        }
         // Check if the node is inside or close to the component
-        if (left   && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
-            top    && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance ||
-            right  && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
-            bottom && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance)
-        {
+        if (
+          (near === 'left' || near === 'right') && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
+          (near === 'top' || near === 'bottom') && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance
+        ) {
+          var newPosition = {};
           // Ensure that mixed nodes are visually separated from component boundaries
           if (p.nodetype === 'mixed') {
-            if (left)
-              if (p.left < components[i].left)
-                p.set({'left': components[i].left - mergeDistance});
-              else
-                p.set({'left': components[i].left + mergeDistance});
-            if (top)
-              if (p.top < components[i].top)
-                p.set({'top': components[i].top - mergeDistance});
-              else
-                p.set({'top': components[i].top + mergeDistance});
-            if (right)
-              if (p.left < components[i].left + components[i].width)
-                p.set({'left': components[i].left + components[i].width - mergeDistance});
-              else
-                p.set({'left': components[i].left + components[i].width + mergeDistance});
-            if (bottom)
-              if (p.top < components[i].top + components[i].height)
-                p.set({'top': components[i].top + components[i].height - mergeDistance});
-              else
-                p.set({'top': components[i].top + components[i].height + mergeDistance});
-            p.setCoords();
+            if (p[changingPosition] < components[i][changingPosition] + size)
+              newPosition[changingPosition] = components[i][changingPosition] + size - mergeDistance;
+            else
+              newPosition[changingPosition] = components[i][changingPosition] + size + mergeDistance;
           }
           // Put source or sink nodes on the component boundary
-          else {
-            if (left)
-              p.set({'left': components[i].left});
-            if (top)
-              p.set({'top': components[i].top});
-            if (right)
-              p.set({'left': components[i].left + components[i].width});
-            if (bottom)
-              p.set({'top': components[i].top + components[i].height});
-            p.setCoords();
-          }
+          else
+            newPosition[changingPosition] = components[i][changingPosition] + size;
+          p.set(newPosition);
+          p.setCoords()
         }
       }
       for (i = 0; i < p.channels.length; ++i)
         updateChannel(p.channels[i])
-      p.label.set({left: p.left + p.labelOffsetX});
-      p.label.set({top: p.top + p.labelOffsetY});
-      p.label.setCoords();
+      p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY});
     }
+    p.label.setCoords();
     canvas.requestRenderAll()
   }); //mouse:move
 
