@@ -174,8 +174,8 @@
       this.set({
         label: options.label || '',
         channels: options.channels || [], // these are the channels that are connected to this node
-        labelOffsetX: options.labelOffSetX || 10,
-        labelOffsetY: options.labelOffSetY || -20,
+        labelOffsetX: options.labelOffsetX || 10,
+        labelOffsetY: options.labelOffsetY || -20,
         class: 'node',
         nodetype: 'undefined',
         component: options.component || main,
