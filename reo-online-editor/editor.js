@@ -17,23 +17,23 @@
       var x2 = container.clientWidth - 50;
       var y2 = container.clientHeight - 50;
       main.set({
-        'left': x1,
-        'top': y1,
-        'width': x2 - x1,
-        'height': y2 - y1
+        left: x1,
+        top: y1,
+        width: x2 - x1,
+        height: y2 - y1
       });
 
       // Reset the label position
       main.label.set({left: x1 + (x2 - x1) / 2});
       main.label.set({top: y1 + 15});
       main.label.setCoords();
-      canvas.requestRenderAll();
+      canvas.requestRenderAll()
     }
   }
   document.body.onresize = function() {resizeCanvas()};
   resizeCanvas();
 
-  var canvas = this.__canvas = new fabric.Canvas('c', { selection: false, preserveObjectStacking: true });
+  var canvas = this.__canvas = new fabric.Canvas('c', {selection: false, preserveObjectStacking: true});
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   fabric.Object.prototype.objectCaching = false;
   var active, isDown, origX, origY, origLeft, origTop, origRight, origBottom;
@@ -75,37 +75,37 @@
     button.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component' || obj.class === 'node' || obj.class === 'label') {
-        obj.set({'selectable': mode === 'select'});
+        obj.set({selectable: mode === 'select'})
       }
-    });
+    })
   }
 
-  document.getElementById("select").onclick    = function() {buttonClick(document.getElementById("select"))}
-  document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))}
-  document.getElementById("sync").onclick      = function() {buttonClick(document.getElementById("sync"))}
-  document.getElementById("lossysync").onclick = function() {buttonClick(document.getElementById("lossysync"))}
-  document.getElementById("syncdrain").onclick = function() {buttonClick(document.getElementById("syncdrain"))}
-  document.getElementById("syncspout").onclick = function() {buttonClick(document.getElementById("syncspout"))}
-  document.getElementById("fifo1").onclick     = function() {buttonClick(document.getElementById("fifo1"))}
+  document.getElementById("select").onclick    = function() {buttonClick(document.getElementById("select"))};
+  document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))};
+  document.getElementById("sync").onclick      = function() {buttonClick(document.getElementById("sync"))};
+  document.getElementById("lossysync").onclick = function() {buttonClick(document.getElementById("lossysync"))};
+  document.getElementById("syncdrain").onclick = function() {buttonClick(document.getElementById("syncdrain"))};
+  document.getElementById("syncspout").onclick = function() {buttonClick(document.getElementById("syncspout"))};
+  document.getElementById("fifo1").onclick     = function() {buttonClick(document.getElementById("fifo1"))};
 
   document.getElementById("downloadsvg").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.svg";
-    a.href = 'data:image/svg+xml;base64,' + window.btoa(canvas.toSVG());
+    a.href = "data:image/svg+xml;base64," + window.btoa(canvas.toSVG());
     a.click()
   };
 
   document.getElementById("downloadpng").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.png";
-    a.href = canvas.toDataURL('image/png');
+    a.href = canvas.toDataURL("image/png");
     a.click()
   };
 
   document.getElementById("downloadCode").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.treo";
-    a.href = window.URL.createObjectURL(new Blob([document.getElementById("text").value], {type: 'text/plain'}));
+    a.href = window.URL.createObjectURL(new Blob([document.getElementById("text").value], {type: "text/plain"}));
     a.click()
   };
 
@@ -118,15 +118,15 @@
           if (this.readyState === 4) {
             if (this.status !== 200)
               return reject(this.status);
-            return resolve(this.responseText);
+            return resolve(this.responseText)
           }
         };
-        client.send();
-      });
+        client.send()
+      })
     }
     let text = document.getElementById("text").value;
     let network = new ReoNetwork(sourceLoader);
-    await network.includeSource('default.treo');
+    await network.includeSource("default.treo");
     await network.parseComponent(text.replace(/\n/g, ''));
 
     try {
@@ -161,8 +161,8 @@
         referencePoint:    this.referencePoint,
         rotate:            this.rotate,
         scale:             this.scale
-      });
-    };
+      })
+    }
   })(fabric.Object.prototype.toObject);
 
   var Node = fabric.util.createClass(fabric.Circle, {
@@ -172,15 +172,15 @@
       options || (options = {});
       this.callSuper('initialize', options);
       this.set({
-        'label': options.label || '',
-        'channels': options.channels || [], // these are the channels that are connected to this node
-        'labelOffsetX': options.labelOffSetX || 10,
-        'labelOffsetY': options.labelOffSetY || -20,
-        'class': 'node',
-        'nodetype': 'undefined',
-        'component': options.component || main,
-        'id': options.id || generateId()
-      });
+        label: options.label || '',
+        channels: options.channels || [], // these are the channels that are connected to this node
+        labelOffsetX: options.labelOffSetX || 10,
+        labelOffsetY: options.labelOffSetY || -20,
+        class: 'node',
+        nodetype: 'undefined',
+        component: options.component || main,
+        id: options.id || generateId()
+      })
     },
 
     toObject: function() {
@@ -190,11 +190,11 @@
         labelOffsetY: this.get('labelOffsetY'),
         class: this.get('class'),
         id: this.get('id')
-      });
+      })
     },
 
     _render: function(ctx) {
-      this.callSuper('_render', ctx);
+      this.callSuper('_render', ctx)
     },
 
     positionMetadata: function () {
@@ -212,7 +212,7 @@
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
-      selectable: mode == 'select'
+      selectable: mode === 'select'
     });
 
     var label = new fabric.IText(name ? name : node.id, {
@@ -222,11 +222,10 @@
       object: node,
       class: 'label',
       hasControls: false
-      //visible: false
     });
 
-    node.set({'label': label, 'labelOffsetX': 10, 'labelOffsetY': -20});
-    label.on('editing:exited', function(e) {
+    node.set({label: label, labelOffsetX: 10, labelOffsetY: -20});
+    label.on('editing:exited', function() {
       label.object.set({id: label.text})
     });
 
@@ -320,7 +319,7 @@
         break;
       default:
         console.log("Invalid channel name");
-        return;
+        return
     }
 
     // code generation functions
@@ -344,7 +343,7 @@
       var invertedBossTransform = fabric.util.invertTransform(bossTransform);
       var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
       channel.components[i].relationship = desiredTransform;
-      canvas.add(channel.components[i]);
+      canvas.add(channel.components[i])
     }
     channels.push(channel);
 
@@ -364,8 +363,8 @@
       });
       canvas.add(clonedObj);
       canvas.setActiveObject(clonedObj);
-		  canvas.requestRenderAll();
-    });
+      canvas.requestRenderAll()
+    })
   }
 
   function loadChannels() {
@@ -381,14 +380,13 @@
             // Typical action to be performed when the document is ready:
             document.getElementById("text").value = xhttp.responseText;
             localStorage.setItem("channels",xhttp.responseText);
-            addChannelsToInterface();
+            addChannelsToInterface()
           }
         };
         xhttp.open("GET", "channels/sync1.js", true);
-        xhttp.send();
-      } else {
-        addChannelsToInterface();
-      }
+        xhttp.send()
+      } else
+        addChannelsToInterface()
     }
   }
 
@@ -408,7 +406,7 @@
       span.appendChild(document.createElement("br"));
       span.appendChild(document.createTextNode(channels[i].name));
       document.getElementById("channels").appendChild(span);
-      span.onclick = function() {buttonClick(span)};
+      span.onclick = function() {buttonClick(span)}
     }
   } //addChannelsToInterface
 
@@ -428,29 +426,27 @@
   } //calculateAngle
 
   function updateNode(node) {
-    var source = false, sink = false, i;
+    var i;
 
     // set coordinates and component reference
     node.label.setCoords();
     node.set({labelOffsetX: node.label.left - node.left, labelOffsetY: node.label.top - node.top});
-    node.set({'component': main});
+    node.set({component: main});
     for (i = nodes.length - 1; i >= 0; --i) {
       // prevent comparing the node with itself
       if (nodes[i] === node)
         continue;
       // merge nodes that overlap
-      if (node.intersectsWithObject(nodes[i])) {
+      if (node.intersectsWithObject(nodes[i]))
         if(Math.abs(node.left-nodes[i].left) < mergeDistance && Math.abs(node.top-nodes[i].top) < mergeDistance)
-          mergeNodes(node, nodes[i]);
-      }
+          mergeNodes(node, nodes[i])
     }
 
     // update the component property of the node
     for (i = components.length - 1; i >= 0; --i) {
-      if (node.intersectsWithObject(components[i])) {
+      if (node.intersectsWithObject(components[i]))
         if (components[i].size < node.component.size)
-          node.component = components[i];
-      }
+          node.component = components[i]
     }
 
     // ensure that no channel crosses a component boundary
@@ -468,11 +464,11 @@
       else {
         if (!isBoundaryNode(node)) {
           otherNode.component = node.component;
-          snapToComponent(otherNode, otherNode.component);
+          snapToComponent(otherNode, otherNode.component)
         }
       }
     }
-    updateNodeColouring(node);
+    updateNodeColouring(node)
   } //updateNode
 
   function updateNodeColouring(node) {
@@ -482,21 +478,21 @@
         if (node.channels[i].end1 === 'source')
           source = true;
         else
-          sink = true;
+          sink = true
       } else if (node.channels[i].node2 === node) {
         if (node.channels[i].end2 === 'source')
           source = true;
         else
-          sink = true;
+          sink = true
       } else console.log("Error updating nodes")
     }
 
     if (source) {
       if (sink)
-        node.set({'nodetype':'mixed','fill':nodeFillColourMixed});
+        node.set({nodetype:'mixed',fill:nodeFillColourMixed});
       else
-        node.set({'nodetype':'source','fill':nodeFillColourSource});
-    } else node.set({'nodetype':'sink','fill':nodeFillColourSink});
+        node.set({nodetype:'source',fill:nodeFillColourSource})
+    } else node.set({nodetype:'sink',fill:nodeFillColourSink})
   }
 
   function updateChannel(channel) {
@@ -510,32 +506,30 @@
 
     // update the reference rectangle
     if (channel.components[0].type === 'rect') {
-      channel.components[0].set({'left': Math.min(x1,x2) + diffX / 2});
-      channel.components[0].set({'top': Math.min(y1,y2) + diffY / 2});
-      channel.components[0].set({'angle': calculateAngle(channel, 90)});
+      channel.components[0].set({left: Math.min(x1,x2) + diffX / 2});
+      channel.components[0].set({top: Math.min(y1,y2) + diffY / 2});
+      channel.components[0].set({angle: calculateAngle(channel, 90)});
 
       // convert new size to scaling
       var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
       var scale = length/channel.components[0].baseLength;
-      channel.components[0].set({'scaleX': scale, 'scaleY': scale});
-      channel.components[0].setCoords();
-    }
-    else if (channel.components[0].type === 'circle') {
-      channel.components[0].set({'left': x1});
-      channel.components[0].set({'top': y1 - loopRadius});
-      channel.components[0].setCoords();
+      channel.components[0].set({scaleX: scale, scaleY: scale});
+      channel.components[0].setCoords()
+    } else if (channel.components[0].type === 'circle') {
+      channel.components[0].set({left: x1});
+      channel.components[0].set({top: y1 - loopRadius});
+      channel.components[0].setCoords()
     }
 
     // update all channel components
     for (i = 1; i < channel.components.length; i++) {
       var o = channel.components[i];
-      if (o.type === 'line') {
-        o.set({'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2});
-      }
+      if (o.type === 'line')
+        o.set({x1: x1, y1: y1, x2: x2, y2: y2});
       else {
         if (!o.relationship) {
           console.log("No relationship found");
-          return;
+          return
         }
         var relationship = o.relationship;
         var newTransform = fabric.util.multiplyTransformMatrices(channel.components[0].calcTransformMatrix(), relationship);
@@ -551,9 +545,9 @@
         );
         o.set(opt);
         if (o.scale === false)
-          o.set({'scaleX': 1, 'scaleY': 1});
+          o.set({scaleX: 1, scaleY: 1});
         if (o.rotate === false)
-          o.set({'angle': o.baseAngle});
+          o.set({angle: o.baseAngle});
         let reference;
         switch (o.referencePoint) {
           case 'node1':
@@ -569,14 +563,14 @@
               reference = {
                 left: loopRadius * Math.cos((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].left,
                 top: loopRadius * Math.sin((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].top
-              };
+              }
         }
         o.set({
-          'left': o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.left,
-          'top':  o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.top
+          left: o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.left,
+          top:  o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.top
         })
       }
-      o.setCoords();
+      o.setCoords()
     }
     canvas.requestRenderAll()
   } //updateChannel
@@ -599,7 +593,7 @@
         obj = nodes[q];
         if (obj.component.id === 'main' && isBoundaryNode(obj)) {
           s1 += space1 + obj.label.text;
-          space1 = ',';
+          space1 = ','
         }
       }
 
@@ -612,10 +606,9 @@
               isBoundaryNode(node2) &&
               node1.component !== node2.component
              )
-           )
-        {
+        ) {
           s2 += space2 + obj.generateCode(commentSwitch);
-          space2 = '\n';
+          space2 = '\n'
         }
       }
 
@@ -629,7 +622,7 @@
             obj2 = nodes[r];
             if (obj2.component === obj && isBoundaryNode(obj2)) {
               s3 += space3 + obj2.label.text;
-              space3 = ',';
+              space3 = ','
             }
           }
           space3 = '\n';
@@ -638,19 +631,18 @@
             s3 += obj.positionMetadata();
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
-            if (obj2.node1.component === obj && obj2.node2.component === obj) {
-              s3 += space3 + obj2.generateCode(commentSwitch);
-            }
+            if (obj2.node1.component === obj && obj2.node2.component === obj)
+              s3 += space3 + obj2.generateCode(commentSwitch)
           }
           space3 = '';
           s3 += '\n}';
           s2 += space2 + s3;
-          space2 = ' ';
+          space2 = ' '
         }
       }
 
       s1 = s1 + ') {\n' + s2 + '\n}';
-      document.getElementById('text').value = s1;
+      document.getElementById('text').value = s1
     }
   }
 
@@ -694,15 +686,15 @@
     e.target.setCoords()
   }); //object:moving
 
-  canvas.on('object:added', function(e) {
+  canvas.on('object:added', function() {
     updateText()
   }); //object:added
 
-  canvas.on('object:removed', function(e) {
+  canvas.on('object:removed', function() {
     updateText()
   }); //object:removed
 
-  canvas.on('text:changed', function(e) {
+  canvas.on('text:changed', function() {
     updateText()
   }); //text:editing:exited
 
@@ -721,9 +713,9 @@
           break;
         case 'balloon':
           e.target.set('opacity', 100);
-          e.target.set('isHover', true);
+          e.target.set('isHover', true)
       }
-      canvas.requestRenderAll();
+      canvas.requestRenderAll()
     }
   }); //mouse:over
 
@@ -747,9 +739,9 @@
           break;
         case 'balloon':
           e.target.set('opacity', 0);
-          e.target.set('isHover', false);
+          e.target.set('isHover', false)
       }
-      canvas.requestRenderAll();
+      canvas.requestRenderAll()
     }
   }); //mouse:out*/
 
@@ -759,9 +751,8 @@
     origX = pointer.x;
     origY = pointer.y;
     var p = canvas.getActiveObject();
-    if (p && mode !== 'select') {
+    if (p && mode !== 'select')
       canvas.discardActiveObject();
-    }
     switch (mode) {
       case 'select':
         //createLink(p);
@@ -775,7 +766,7 @@
             if (nodes[i].component === p) {
               p.nodes.push(nodes[i]);
               nodes[i].origLeft = nodes[i].left;
-              nodes[i].origTop = nodes[i].top;
+              nodes[i].origTop = nodes[i].top
             }
           }
         }
@@ -795,14 +786,14 @@
         // place node on nearby edge of component
         for (i = 0; i < components.length; i++) {
           if (Math.abs(p.left - components[i].left) < mergeDistance)
-            p.set({'left': components[i].left});
+            p.set({left: components[i].left});
           if (Math.abs(p.top - components[i].top) < mergeDistance)
-            p.set({'top': components[i].top});
+            p.set({top: components[i].top});
           if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
-            p.set({'left': components[i].left + components[i].width});
+            p.set({left: components[i].left + components[i].width});
           if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
-            p.set({'top': components[i].top + components[i].height});
-          p.setCoords();
+            p.set({top: components[i].top + components[i].height});
+          p.setCoords()
         }
 
         for (i = 0; i < p.channels.length; ++i)
@@ -815,10 +806,9 @@
         for (i = nodes.length - 1; i >= 0; --i) {
           if (nodes[i] === p || nodes[i] === channel.node2)
             continue;
-          if (p.intersectsWithObject(nodes[i])) {
+          if (p.intersectsWithObject(nodes[i]))
             if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
-              mergeNodes(nodes[i], p);
-          }
+              mergeNodes(nodes[i], p)
         }
         canvas.setActiveObject(channel.node2)
     }
@@ -838,7 +828,7 @@
         p.set({width: Math.abs(origX - pointer.x), height: Math.abs(origY - pointer.y)});
         p.setCoords();
         p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
-        p.label.set({left: p.left + (p.width/2), top: p.top + 15});
+        p.label.set({left: p.left + (p.width/2), top: p.top + 15})
       } else {
         p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
         p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
@@ -852,14 +842,14 @@
           for (i = 0; i < p.nodes.length; ++i) {
             let node = p.nodes[i];
             if (node.origLeft === origLeft)
-              node.set({'left': p.left});
+              node.set({left: p.left});
             if (node.origLeft === origRight)
-              node.set({'left': p.left + p.scaleX * p.width});
+              node.set({left: p.left + p.scaleX * p.width});
             if (node.origTop === origTop)
-              node.set({'top': p.top});
+              node.set({top: p.top});
             if (node.origTop === origBottom)
-              node.set({'top': p.top + p.scaleY * p.height});
-            snapToComponent(node, node.component);
+              node.set({top: p.top + p.scaleY * p.height});
+            snapToComponent(node, node.component)
           }
         } else {
           p.set({left: origLeft + pointer.x - origX, top: origTop + pointer.y - origY});
@@ -871,44 +861,42 @@
             node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
             node.label.setCoords();
             for (j = 0; j < node.channels.length; ++j)
-              updateChannel(node.channels[j]);
+              updateChannel(node.channels[j])
           }
         }
       }
-      p.header.setCoords();
+      p.header.setCoords()
     } else if (p.class === 'node') {
-      p.set({'left': pointer.x, 'top': pointer.y});
+      p.set({left: pointer.x, top: pointer.y});
       p.setCoords();
       for (i = 0; i < nodes.length; i++) {
         if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
-          p.set({'left': nodes[i].left, 'top': nodes[i].top});
-          p.setCoords();
+          p.set({left: nodes[i].left, top: nodes[i].top});
+          p.setCoords()
         }
       }
       for (i = 0; i < components.length; i++) {
         // Check if the node is near any component boundaries
-        let near, changingPosition, position, size = 0;
-        if (Math.abs(p.left - components[i].left) < mergeDistance) {
-          changingPosition = near = 'left';
+        let changingPosition, position, size = 0;
+        if (Math.abs(p.left - components[i].left) < mergeDistance) { // near left boundary
+          changingPosition = 'left';
           position = components[i].left
-        } else if (Math.abs(p.top - components[i].top) < mergeDistance) {
-          changingPosition = near = 'top';
+        } else if (Math.abs(p.top - components[i].top) < mergeDistance) { // near top boundary
+          changingPosition = 'top';
           position = components[i].top
-        } else if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance) {
-          near = 'right';
+        } else if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance) { // near right boundary
           changingPosition = 'left';
           position = components[i].left;
           size = components[i].width
-        } else if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance) {
-          near = 'bottom';
+        } else if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance) { // near bottom boundary
           changingPosition = 'top';
           position = components[i].top;
           size = components[i].height
         }
         // Check if the node is inside or close to the component
         if (
-          (near === 'left' || near === 'right') && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
-          (near === 'top' || near === 'bottom') && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance
+          changingPosition === 'left' && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
+          changingPosition === 'top' && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance
         ) {
           var newPosition = {};
           // Ensure that mixed nodes are visually separated from component boundaries
@@ -916,7 +904,7 @@
             if (p[changingPosition] < components[i][changingPosition] + size)
               newPosition[changingPosition] = components[i][changingPosition] + size - mergeDistance;
             else
-              newPosition[changingPosition] = components[i][changingPosition] + size + mergeDistance;
+              newPosition[changingPosition] = components[i][changingPosition] + size + mergeDistance
           }
           // Put source or sink nodes on the component boundary
           else
@@ -927,32 +915,31 @@
       }
       for (i = 0; i < p.channels.length; ++i)
         updateChannel(p.channels[i])
-      p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY});
+      p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY})
     }
     p.label.setCoords();
     canvas.requestRenderAll()
   }); //mouse:move
 
-  canvas.on('mouse:up', function(e){
+  canvas.on('mouse:up', function(){
     isDown = false;
     var p = canvas.getActiveObject(), i, j;
     if (p) {
       p.setCoords();
-      if (p.class === 'node') {
+      if (p.class === 'node')
         updateNode(p);
-      } else if (p.class === 'component') {
+      else if (p.class === 'component') {
         p.label.setCoords();
         reorderComponents(p);
         p.set({status: 'design'});
-        p.set({'width': p.scaleX * p.width, 'height': p.scaleY * p.height, scaleX: 1, scaleY: 1});
-        p.set({selectable: mode == 'select'});
+        p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
+        p.set({selectable: mode === 'select'});
         for (j = 0; j < nodes.length; j++) {
           // update the component property of the node
           for (i = components.length - 1; i >= 0; --i) {
-            if (nodes[j].intersectsWithObject(components[i])) {
+            if (nodes[j].intersectsWithObject(components[i]))
               if (components[i].size < nodes[j].component.size)
-                nodes[j].component = components[i];
-            }
+                nodes[j].component = components[i]
           }
           // ensure that no channel crosses a component boundary
           for (i = 0; i < nodes[j].channels.length; ++i) {
@@ -962,40 +949,37 @@
               else if (nodes[j] === nodes[j].channels[i].node2)
                 snapOutComponent(nodes[j], nodes[j].component, nodes[j].channels[i].node1);
               else
-                console.log("Broken node reference detected");
+                console.log("Broken node reference detected")
             }
           }
         }
       } else if (p.class === 'label') {
         p.setCoords();
-        p.object.set({'labelOffsetX': p.left - p.object.left, 'labelOffsetY': p.top - p.object.top});
+        p.object.set({labelOffsetX: p.left - p.object.left, labelOffsetY: p.top - p.object.top})
       }
       if (mode !== 'select')
         canvas.discardActiveObject();
       canvas.requestRenderAll();
-      updateText();
+      updateText()
     }
   }); //mouse:up
 
   function mergeNodes(destination, source) {
     var j, i;
-    for (j = 0; j < source.channels.length; j++) {
+    for (j = 0; j < source.channels.length; ++j) {
       let loop = false;
       if (source.channels[j].node1 === source) {
         source.channels[j].node1 = destination;
-        if (source.channels[j].node2 === destination) {
-          loop = true;
-        }
-      }
-      else {
+        if (source.channels[j].node2 === destination)
+          loop = true
+      } else {
         if (source.channels[j].node2 === source) {
           source.channels[j].node2 = destination;
-          if (source.channels[j].node1 === destination) {
-            loop = true;
-          }
+          if (source.channels[j].node1 === destination)
+            loop = true
         }
         else
-          console.log("Error merging nodes");
+          console.log("Error merging nodes")
       }
       if (loop) {
         // if the source node is equal to the destination node, create a loop and update the position of all channel components
@@ -1018,7 +1002,7 @@
         canvas.add(curve);
 
         // create a new position for all components based on their original position
-        for (i = 2; i < channel.components.length; i++) {
+        for (i = 2; i < channel.components.length; ++i) {
           var o = channel.components[i];
           if (o.referencePoint === 'node1' || o.referencePoint === 'node2' || o.referencePoint === 'middle') {
             // calculate the distance along the straight line
@@ -1034,45 +1018,45 @@
             o.angle = o.angle + angleA;
             // reposition the object
             o.set({
-              'left': (loopRadius + offset) * Math.cos((angleA + 90) * Math.PI / 180) + curve.left,
-              'top': (loopRadius + offset) * Math.sin((angleA + 90) * Math.PI / 180) + curve.top
+              left: (loopRadius + offset) * Math.cos((angleA + 90) * Math.PI / 180) + curve.left,
+              top: (loopRadius + offset) * Math.sin((angleA + 90) * Math.PI / 180) + curve.top
             });
             let diffX, diffY;
             if (o.referencePoint === 'middle') {
               diffX = o.left - curve.left;
-              diffY = o.top - (curve.top - loopRadius);
+              diffY = o.top - (curve.top - loopRadius)
             } else {
               diffX = o.left - line.x1;
-              diffY = o.top - line.y1;
+              diffY = o.top - line.y1
             }
             // save the new referenceDistance and referenceAngle
             o.set({
-              'referenceDistance': Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)),
-              'referenceAngle': Math.atan2(diffY, diffX) * 180 / Math.PI + 180
-            });
+              referenceDistance: Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)),
+              referenceAngle: Math.atan2(diffY, diffX) * 180 / Math.PI + 180
+            })
           }
           var bossTransform = curve.calcTransformMatrix();
           var invertedBossTransform = fabric.util.invertTransform(bossTransform);
           var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
           channel.components[i].relationship = desiredTransform;
           canvas.remove(o);
-          canvas.add(o);
+          canvas.add(o)
         }
         channel.components[0] = curve;
         channel.components.splice(1,1);
-        canvas.remove(line);
+        canvas.remove(line)
       }
       else
-        destination.channels.push(source.channels[j]);
+        destination.channels.push(source.channels[j])
     }
-    for (let k = 0; k < nodes.length; k++)
+    for (let k = 0; k < nodes.length; ++k)
       if (nodes[k] === source) {
         nodes.splice(k,1);
-        break;
+        break
       }
     canvas.remove(source.label, source);
     destination.bringToFront();
-    updateNodeColouring(destination);
+    updateNodeColouring(destination)
   }
 
   /**
@@ -1081,7 +1065,7 @@
   function reorderComponents(p) {
     if (p) {
       p.label.sendToBack();
-      p.sendToBack();
+      p.sendToBack()
     }
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component' && obj !== p) {
@@ -1109,7 +1093,7 @@
       originX: 'left',
       originY: 'top',
       hasRotatingPoint: false,
-      selectable: mode == 'select',
+      selectable: mode === 'select',
       size: width * height,
       class: 'component',
       status: 'drawing',
@@ -1134,7 +1118,7 @@
       hasControls: false,
       lockMovementX: true,
       lockMovementY: true,
-      selectable: mode == 'select'
+      selectable: mode === 'select'
     });
 
     if (name !== 'main') {
@@ -1149,7 +1133,7 @@
       });
 
       component.set('compactSwitch', compactSwitch);
-      canvas.add(compactSwitch);
+      canvas.add(compactSwitch)
     }
 
     /*var options = new fabric.Circle({
@@ -1186,7 +1170,7 @@
       return ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + this.width) + ', ' + Math.round(top + this.height) + '] !*/'
     };
 
-    component.set({'label': label, 'header': header});
+    component.set({label: label, header: header});
 
     component.setCoords();
     canvas.add(component, header, label);
@@ -1215,5 +1199,5 @@
   createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
   createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
-  //document.getElementById("text").value = JSON.stringify(nodes[0].channels[0]);
+  //document.getElementById("text").value = JSON.stringify(nodes[0].channels[0])
 })();
