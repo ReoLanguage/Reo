@@ -1,0 +1,97 @@
+group templates;
+
+process(protocols, ports) ::= <<
+sort
+  Data = struct ok;
+  DataFIFO = struct empty | full(e : Data);
+
+act
+
+<ports:{pts|
+		<pts>, <pts>', <pts>'' 
+};separator=", \n">
+
+: Data;
+
+proc
+
+<protocols:{prt|
+<prt.member.primitives:{prm|
+
+<if(prm.signature.name.sync)>
+		Sync<i>= sum d : Data.(
+<[prm.signature.inputPorts]:{ipor|
+		<ipor.betterName>''(d)
+};separator="|\n">
+|
+<[prm.signature.outputPorts]:{opor|
+		<opor.betterName>''(d)
+};separator="|\n">
+
+                ).Sync<i>;
+<endif>
+
+<if(prm.signature.name.syncDrain)>
+		SyncDrain<i>= sum d0 : Data, d1 : Data.(
+<[prm.signature.inputPorts]:{ipor|
+		<ipor.betterName>''(d<i0>)
+};separator="|\n">
+                ).SyncDrain<i>;
+<endif>
+
+
+<if(prm.signature.name.fifo)>
+	FIFO<i>(f : DataFIFO) = sum d : Data.((f==empty) -> (
+<prm.signature.inputPorts:{ipor|
+		<ipor.betterName>''(d)
+};separator="\n">
+	.FIFO<i>(full(d))) \<> (
+<prm.signature.outputPorts:{opor|
+		<opor.betterName>''(e(f))
+};separator="\n">
+	.FIFO<i>(empty)));
+<endif>
+
+<if(prm.signature.name.node)>
+		Node<i>=sum d : Data.(
+<prm.signature.inputPorts:{ipor|
+		<ipor.betterName>'(d) 
+|
+<prm.signature.outputPorts:{opor|
+		<opor.betterName>'(d)
+};separator="|\n">
+};separator="+\n">
+                ).Node<i>;
+<endif>
+
+
+};separator="\n">
+};separator="\n">
+
+>>
+
+workerProcess(signature) ::= <<
+
+<signature.renamedProcessName>
+
+>>
+
+compositionOperator(ports, components) ::= <<
+
+System = block({
+<ports:{pts|
+		<pts>', <pts>''
+};separator=", \n">
+},
+comm({
+<ports:{pts|
+		<pts>' | <pts>'' -> <pts>
+};separator=", \n">
+},
+<components:{cps|
+		<cps>
+};separator="|| \n">
+));
+init
+  System;
+>>
