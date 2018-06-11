@@ -1,6 +1,6 @@
 grammar Reo;
 
-import Tokens, PA, WA, CAM, SA, PR, SBA, P, RBA;
+import Tokens, PA, WA, CAM, SA, PR, SBA, P, RBA, MCRL2;
 
 // Reo File
 file      : secn? imps* defn* EOF;
