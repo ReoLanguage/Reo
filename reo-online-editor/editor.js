@@ -356,15 +356,26 @@
   } //createChannel
 
   function createLink(node) {
-    var clone = node.clone(function(clonedObj) {
-      canvas.discardActiveObject();
-      clonedObj.set({
-        left: clonedObj.left + 20
-      });
-      canvas.add(clonedObj);
-      canvas.setActiveObject(clonedObj);
-      canvas.requestRenderAll()
-    })
+    var clone = createNode(node.left, node.top, node.label.text);
+    var link = new fabric.Line([node.left, node.top, clone.left, clone.top], {
+      fill: 'silver',
+      stroke: 'silver',
+      strokeWidth: 1,
+      hasBorders: false,
+      hasControls: false,
+      evented: false,
+      hoverCursor: 'default',
+      originX: 'center',
+      originY: 'center',
+      nodes: [node, clone]
+    });
+    node.link = link;
+    clone.link = link;
+    canvas.discardActiveObject();
+    canvas.add(link, clone, clone.label);
+    node.bringToFront();
+    canvas.setActiveObject(clone);
+    canvas.requestRenderAll();
   }
 
   function loadChannels() {
@@ -755,7 +766,6 @@
       canvas.discardActiveObject();
     switch (mode) {
       case 'select':
-        //createLink(p);
         if (p && p.class === 'component') {
           origLeft = p.left;
           origRight = p.left + p.width;
@@ -869,6 +879,10 @@
     } else if (p.class === 'node') {
       p.set({left: pointer.x, top: pointer.y});
       p.setCoords();
+      if (p.link) {
+        p.link.set({x1: p.link.nodes[0].left, y1: p.link.nodes[0].top, x2: p.link.nodes[1].left, y2: p.link.nodes[1].top});
+        p.link.setCoords();
+      }
       for (i = 0; i < nodes.length; i++) {
         if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
           p.set({left: nodes[i].left, top: nodes[i].top});
