@@ -943,10 +943,44 @@
       if (p.class === 'node')
         updateNode(p);
       else if (p.class === 'component') {
-        p.label.setCoords();
-        reorderComponents(p);
-        p.set({status: 'design'});
         p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
+        if (p.status === 'drawing') {
+          p.set({status: 'design'});
+
+          // ensure that the component does not cross another components boundary
+          for (i = 0; i < components.length; i++) {
+            if (p !== components[i] && p.intersectsWithObject(components[i]) &&
+                !p.isContainedWithinObject(components[i]) && !components[i].isContainedWithinObject(p)) {
+              console.log("intersection detected");
+              if (origX < components[i].left || origX > components[i].left + components[i].width ||
+                  origY < components[i].top  || origY > components[i].top +  components[i].height) {
+                console.log("Original point outside component");
+              } else {
+                console.log("Original point inside component");
+                if (p.left < components[i].left)
+                  p.set({left: components[i].left + mergeDistance});
+                if (p.top < components[i].top)
+                  p.set({top: components[i].top + mergeDistance});
+                p.setCoords();
+                if (origX + p.width < components[i].left)
+                  p.set({left: components[i].left + mergeDistance});
+                if (origX + p.width > components[i].left + components[i].width)
+                  p.set({width: components[i].left + components[i].width - origX - mergeDistance});
+                if (origY + p.height < components[i].top)
+                  p.set({top: components[i].top + mergeDistance});
+                if (origY + p.height > components[i].top + components[i].height)
+                  p.set({height: components[i].top + components[i].height - origY - mergeDistance});
+              }
+              p.setCoords();
+              p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
+              p.header.setCoords();
+              p.label.set({left: p.left + (p.width/2), top: p.top + 15});
+              p.label.setCoords()
+            }
+          }
+        }
+        reorderComponents(p);
+
         p.set({selectable: mode === 'select'});
         for (j = 0; j < nodes.length; j++) {
           // update the component property of the node
