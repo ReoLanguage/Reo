@@ -944,6 +944,7 @@
         updateNode(p);
       else if (p.class === 'component') {
         p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
+        p.setCoords();
         if (p.status === 'drawing') {
           p.set({status: 'design'});
 
@@ -955,21 +956,37 @@
               if (origX < components[i].left || origX > components[i].left + components[i].width ||
                   origY < components[i].top  || origY > components[i].top +  components[i].height) {
                 console.log("Original point outside component");
+                if (origX < components[i].left)
+                  p.set({width: components[i].left - mergeDistance - p.left});
+                if (origX > components[i].left + components[i].width)
+                  p.set({
+                    left: components[i].left + components[i].width + mergeDistance,
+                    width: origX - components[i].left - components[i].width - mergeDistance
+                  });
+                if (origY < components[i].top)
+                  p.set({height: components[i].top - mergeDistance - p.top});
+                if (origY > components[i].top + components[i].height)
+                  p.set({
+                    top: components[i].top + components[i].height + mergeDistance,
+                    height: origY - components[i].top - components[i].height - mergeDistance
+                  });
               } else {
                 console.log("Original point inside component");
-                if (p.left < components[i].left)
-                  p.set({left: components[i].left + mergeDistance});
-                if (p.top < components[i].top)
-                  p.set({top: components[i].top + mergeDistance});
+                if (p.left <= components[i].left)
+                  p.set({
+                    left: components[i].left + mergeDistance,
+                    width: origX - components[i].left - mergeDistance
+                  });
+                if (p.top <= components[i].top)
+                  p.set({
+                    top: components[i].top + mergeDistance + headerHeight,
+                    height: origY - components[i].top - mergeDistance - headerHeight
+                  });
                 p.setCoords();
-                if (origX + p.width < components[i].left)
-                  p.set({left: components[i].left + mergeDistance});
-                if (origX + p.width > components[i].left + components[i].width)
-                  p.set({width: components[i].left + components[i].width - origX - mergeDistance});
-                if (origY + p.height < components[i].top)
-                  p.set({top: components[i].top + mergeDistance});
-                if (origY + p.height > components[i].top + components[i].height)
-                  p.set({height: components[i].top + components[i].height - origY - mergeDistance});
+                if (p.left + p.width >= components[i].left + components[i].width)
+                  p.set({width: components[i].left - p.left + components[i].width - mergeDistance});
+                if (p.top + p.height >= components[i].top + components[i].height)
+                  p.set({height: components[i].top - p.top + components[i].height - mergeDistance});
               }
               p.setCoords();
               p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
@@ -1146,7 +1163,7 @@
       class: 'component',
       status: 'drawing',
       nodes: [],
-      id: generateId()
+      id: name ? name : generateId()
     });
 
     var header = new fabric.Line([x1, y1 + headerHeight, x2, y1 + headerHeight], {
@@ -1156,7 +1173,7 @@
       evented: false
     });
 
-    var label = new fabric.IText(name ? name : 'name', {
+    var label = new fabric.IText(component.id, {
       left: left + (width / 2),
       top: top + 15,
       fontSize: 24,
