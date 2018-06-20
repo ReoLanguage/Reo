@@ -1084,13 +1084,22 @@
    * Moves component p and all its elements to the top layer
    */
   function bringToFront(p) {
-    if (!p)
+    var i, j;
+    if (!p || p.class !== 'component')
       return;
     p.bringToFront();
     p.header.bringToFront();
     if (p.compactSwitch)
       p.compactSwitch.bringToFront();
     p.label.bringToFront();
+    for (i = 0; i < channels.length; ++i) {
+      for (j = 1; j < channels[i].components.length; ++j)
+        channels[i].components[j].bringToFront();
+      channels[i].node1.bringToFront();
+      channels[i].node1.label.bringToFront();
+      channels[i].node2.bringToFront();
+      channels[i].node2.label.bringToFront();
+    }
   }
 
   function createComponent(x1,y1,x2,y2,name) {
@@ -1192,9 +1201,7 @@
       return ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + this.width) + ', ' + Math.round(top + this.height) + '] !*/'
     };
 
-    var i = 0;
-    while (i < components.length && component.size < components[i].size) ++i;
-    components.splice(i, 0, component);
+    components.push(component);
     return component
   }
 
