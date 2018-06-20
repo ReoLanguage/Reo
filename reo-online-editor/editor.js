@@ -178,7 +178,7 @@
         labelOffsetY: options.labelOffsetY || -20,
         class: 'node',
         nodetype: 'undefined',
-        component: options.component || main,
+        parent: options.parent || main,
         id: options.id || generateId()
       })
     },
@@ -442,7 +442,7 @@
     // set coordinates and component reference
     node.label.setCoords();
     node.set({labelOffsetX: node.label.left - node.left, labelOffsetY: node.label.top - node.top});
-    node.set({component: main});
+    node.set({parent: main});
     for (i = nodes.length - 1; i >= 0; --i) {
       // prevent comparing the node with itself
       if (nodes[i] === node)
@@ -453,11 +453,11 @@
           mergeNodes(node, nodes[i])
     }
 
-    // update the component property of the node
+    // update the parent property of the node
     for (i = components.length - 1; i >= 0; --i) {
       if (node.intersectsWithObject(components[i]))
-        if (components[i].size < node.component.size)
-          node.component = components[i]
+        if (components[i].size < node.parent.size)
+          node.parent = components[i]
     }
 
     // ensure that no channel crosses a component boundary
@@ -470,12 +470,12 @@
       else
         throw new Error("Broken node reference detected");
 
-      if (node.component.size > otherNode.component.size)
-        snapOutComponent(otherNode, otherNode.component,node);
+      if (node.parent.size > otherNode.parent.size)
+        snapOutComponent(otherNode, otherNode.parent, node);
       else {
         if (!isBoundaryNode(node)) {
-          otherNode.component = node.component;
-          snapToComponent(otherNode, otherNode.component)
+          otherNode.parent = node.parent;
+          snapToComponent(otherNode, otherNode.parent)
         }
       }
     }
@@ -588,10 +588,10 @@
 
   function isBoundaryNode(node) {
     return node.nodetype !== 'mixed' &&
-      (node.left === node.component.left ||
-       node.top  === node.component.top  ||
-       node.left === node.component.left + node.component.width ||
-       node.top  === node.component.top  + node.component.height)
+      (node.left === node.parent.left ||
+       node.top  === node.parent.top  ||
+       node.left === node.parent.left + node.parent.width ||
+       node.top  === node.parent.top  + node.parent.height)
   }
 
   function updateText() {
@@ -602,7 +602,7 @@
 
       for (q = 0; q < nodes.length; ++q) {
         obj = nodes[q];
-        if (obj.component.id === 'main' && isBoundaryNode(obj)) {
+        if (obj.parent.id === 'main' && isBoundaryNode(obj)) {
           s1 += space1 + obj.label.text;
           space1 = ','
         }
@@ -611,11 +611,11 @@
       for (q = 0; q < channels.length; ++q) {
         obj = channels[q];
         let node1 = obj.node1, node2 = obj.node2;
-        if (node1.component === main ||
-            node2.component === main ||
+        if (node1.parent === main ||
+            node2.parent === main ||
              (isBoundaryNode(node1) &&
               isBoundaryNode(node2) &&
-              node1.component !== node2.component
+              node1.parent !== node2.parent
              )
         ) {
           s2 += space2 + obj.generateCode(commentSwitch);
@@ -631,7 +631,7 @@
 
           for (r = 0; r < nodes.length; ++r) {
             obj2 = nodes[r];
-            if (obj2.component === obj && isBoundaryNode(obj2)) {
+            if (obj2.parent === obj && isBoundaryNode(obj2)) {
               s3 += space3 + obj2.label.text;
               space3 = ','
             }
@@ -642,7 +642,7 @@
             s3 += obj.positionMetadata();
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
-            if (obj2.node1.component === obj && obj2.node2.component === obj)
+            if (obj2.node1.parent === obj && obj2.node2.parent === obj)
               s3 += space3 + obj2.generateCode(commentSwitch)
           }
           space3 = '';
@@ -717,7 +717,7 @@
           e.target.set('opacity', 100);
           break;
         case 'options':
-          e.target.component.balloon.animate('opacity', 100, {
+          e.target.parent.balloon.animate('opacity', 100, {
             onChange: canvas.renderAll.bind(canvas),
             duration: 1000
           });
@@ -738,11 +738,11 @@
           e.target.set('opacity', 0);
           break;
         case 'options':
-          e.target.component.balloon.animate('opacity', 0, {
+          e.target.parent.balloon.animate('opacity', 0, {
             onChange: canvas.renderAll.bind(canvas),
             duration: 1000,
             onComplete: (e) => {
-              let balloon = e.target.component.balloon;
+              let balloon = e.target.parent.balloon;
               if (balloon.isHover)
                 balloon.set('opacity', 100)
             }
@@ -774,7 +774,7 @@
           origBottom = p.top + p.height;
           p.nodes = [];
           for (i = 0; i < nodes.length; ++i) {
-            if (nodes[i].component === p) {
+            if (nodes[i].parent === p) {
               p.nodes.push(nodes[i]);
               nodes[i].origLeft = nodes[i].left;
               nodes[i].origTop = nodes[i].top
@@ -791,7 +791,7 @@
         break;
       default:
         var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
-        snapToComponent(channel.node1,channel.node1.component);
+        snapToComponent(channel.node1,channel.node1.parent);
 
         p = channel.node1;
         // place node on nearby edge of component
@@ -854,7 +854,7 @@
               node.set({top: p.top});
             if (node.origTop === origBottom)
               node.set({top: p.top + p.scaleY * p.height});
-            snapToComponent(node, node.component)
+            snapToComponent(node, node.parent)
           }
         } else {
           p.set({left: origLeft + pointer.x - origX, top: origTop + pointer.y - origY});
@@ -956,19 +956,19 @@
 
         p.set({selectable: mode === 'select'});
         for (j = 0; j < nodes.length; j++) {
-          // update the component property of the node
+          // update the parent property of the node
           for (i = components.length - 1; i >= 0; --i) {
             if (nodes[j].intersectsWithObject(components[i]))
-              if (components[i].size < nodes[j].component.size)
-                nodes[j].component = components[i]
+              if (components[i].size < nodes[j].parent.size)
+                nodes[j].parent = components[i]
           }
           // ensure that no channel crosses a component boundary
           for (i = 0; i < nodes[j].channels.length; ++i) {
             if (p.intersectsWithObject(p)) {
               if (nodes[j] === nodes[j].channels[i].node1)
-                snapOutComponent(nodes[j], nodes[j].component, nodes[j].channels[i].node2);
+                snapOutComponent(nodes[j], nodes[j].parent, nodes[j].channels[i].node2);
               else if (nodes[j] === nodes[j].channels[i].node2)
-                snapOutComponent(nodes[j], nodes[j].component, nodes[j].channels[i].node1);
+                snapOutComponent(nodes[j], nodes[j].parent, nodes[j].channels[i].node1);
               else
                 console.log("Broken node reference detected")
             }
@@ -1159,7 +1159,7 @@
         radius: nodeFactor * 2,
         hasControls: false,
         selectable: false,
-        component: component,
+        parent: component,
         class: 'compactSwitch'
       });
 
@@ -1173,7 +1173,7 @@
       radius: nodeFactor * 2,
       hasControls: false,
       selectable: false,
-      component: rect,
+      parent: rect,
       class: 'options'
     });
 
