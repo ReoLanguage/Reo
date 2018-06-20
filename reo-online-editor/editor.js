@@ -767,6 +767,7 @@
     switch (mode) {
       case 'select':
         if (p && p.class === 'component') {
+          bringToFront(p);
           origLeft = p.left;
           origRight = p.left + p.width;
           origTop = p.top;
@@ -837,17 +838,11 @@
           p.set({top: pointer.y});
         p.set({width: Math.abs(origX - pointer.x), height: Math.abs(origY - pointer.y)});
         p.setCoords();
-        p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
-        p.label.set({left: p.left + (p.width/2), top: p.top + 15})
       } else {
-        p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
-        p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
         // p.options.set({left: p.left + 15, top: p.top + 15});
         // p.options.setCoords();
         // p.balloon.set({left: p.left - 40, top: p.top - 40});
         // p.balloon.setCoords();
-        p.compactSwitch.set({left: p.left + 15, top: p.top + 15});
-        p.compactSwitch.setCoords();
         if (p.__corner !== 0) {
           for (i = 0; i < p.nodes.length; ++i) {
             let node = p.nodes[i];
@@ -875,7 +870,11 @@
           }
         }
       }
-      p.header.setCoords()
+      p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
+      p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
+      p.header.setCoords();
+      p.compactSwitch.set({left: p.left + 15, top: p.top + 15});
+      p.compactSwitch.setCoords();
     } else if (p.class === 'node') {
       p.set({left: pointer.x, top: pointer.y});
       p.setCoords();
@@ -947,56 +946,13 @@
         p.setCoords();
         if (p.status === 'drawing') {
           p.set({status: 'design'});
-
-          // ensure that the component does not cross another components boundary
-          for (i = 0; i < components.length; i++) {
-            if (p !== components[i] && p.intersectsWithObject(components[i]) &&
-                !p.isContainedWithinObject(components[i]) && !components[i].isContainedWithinObject(p)) {
-              console.log("intersection detected");
-              if (origX < components[i].left || origX > components[i].left + components[i].width ||
-                  origY < components[i].top  || origY > components[i].top +  components[i].height) {
-                console.log("Original point outside component");
-                if (origX < components[i].left)
-                  p.set({width: components[i].left - mergeDistance - p.left});
-                if (origX > components[i].left + components[i].width)
-                  p.set({
-                    left: components[i].left + components[i].width + mergeDistance,
-                    width: origX - components[i].left - components[i].width - mergeDistance
-                  });
-                if (origY < components[i].top)
-                  p.set({height: components[i].top - mergeDistance - p.top});
-                if (origY > components[i].top + components[i].height)
-                  p.set({
-                    top: components[i].top + components[i].height + mergeDistance,
-                    height: origY - components[i].top - components[i].height - mergeDistance
-                  });
-              } else {
-                console.log("Original point inside component");
-                if (p.left <= components[i].left)
-                  p.set({
-                    left: components[i].left + mergeDistance,
-                    width: origX - components[i].left - mergeDistance
-                  });
-                if (p.top <= components[i].top)
-                  p.set({
-                    top: components[i].top + mergeDistance + headerHeight,
-                    height: origY - components[i].top - mergeDistance - headerHeight
-                  });
-                p.setCoords();
-                if (p.left + p.width >= components[i].left + components[i].width)
-                  p.set({width: components[i].left - p.left + components[i].width - mergeDistance});
-                if (p.top + p.height >= components[i].top + components[i].height)
-                  p.set({height: components[i].top - p.top + components[i].height - mergeDistance});
-              }
-              p.setCoords();
-              p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
-              p.header.setCoords();
-              p.label.set({left: p.left + (p.width/2), top: p.top + 15});
-              p.label.setCoords()
-            }
-          }
+          p.setCoords();
+          p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
+          p.header.setCoords();
+          p.label.set({left: p.left + (p.width/2), top: p.top + 15});
+          p.label.setCoords()
         }
-        reorderComponents(p);
+        bringToFront(p);
 
         p.set({selectable: mode === 'select'});
         for (j = 0; j < nodes.length; j++) {
@@ -1125,19 +1081,16 @@
   }
 
   /**
-   * Reorders the components so that all components are behind the other elements and p is in front of the other components
+   * Moves component p and all its elements to the top layer
    */
-  function reorderComponents(p) {
-    if (p) {
-      p.label.sendToBack();
-      p.sendToBack()
-    }
-    canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' && obj !== p) {
-        obj.label.sendToBack();
-        obj.sendToBack()
-      }
-    })
+  function bringToFront(p) {
+    if (!p)
+      return;
+    p.bringToFront();
+    p.header.bringToFront();
+    if (p.compactSwitch)
+      p.compactSwitch.bringToFront();
+    p.label.bringToFront();
   }
 
   function createComponent(x1,y1,x2,y2,name) {
@@ -1151,7 +1104,7 @@
       top: top,
       width: width,
       height: height,
-      fill: 'transparent',
+      fill: '#eee',
       stroke: '#000',
       strokeWidth: 1,
       hoverCursor: 'default',
@@ -1185,6 +1138,10 @@
       lockMovementY: true,
       selectable: mode === 'select'
     });
+
+    component.set({label: label, header: header});
+    canvas.add(component, header, label);
+    canvas.requestRenderAll();
 
     if (name !== 'main') {
       var compactSwitch = new fabric.Circle({
@@ -1235,11 +1192,6 @@
       return ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + this.width) + ', ' + Math.round(top + this.height) + '] !*/'
     };
 
-    component.set({label: label, header: header});
-
-    component.setCoords();
-    canvas.add(component, header, label);
-    canvas.requestRenderAll();
     var i = 0;
     while (i < components.length && component.size < components[i].size) ++i;
     components.splice(i, 0, component);
