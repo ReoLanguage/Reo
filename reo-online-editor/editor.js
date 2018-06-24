@@ -178,7 +178,7 @@
         labelOffsetY: options.labelOffsetY || -20,
         class: 'node',
         nodetype: 'undefined',
-        parent: options.parent || main,
+        parent: main,
         id: options.id || generateId()
       })
     },
@@ -211,6 +211,7 @@
       padding: nodeFactor * lineStrokeWidth,
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
+      class: 'node',
       hasControls: false,
       selectable: mode === 'select'
     });
@@ -230,6 +231,7 @@
     });
 
     nodes.push(node);
+    setParent(node);
     // to be included later but currently throws an error when generating graphics from text
     //updateNode(node);
     return node
@@ -318,7 +320,7 @@
         createFIFO1(channel,node1.x,node1.y,node2.x,node2.y);
         break;
       default:
-        console.log("Invalid channel name");
+        throw new Error("Invalid channel name");
         return
     }
 
@@ -350,7 +352,7 @@
     // TODO Anchors
     // canvas.add(channel.anchor1, channel.anchor2);
     canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label);
-
+    setParent(channel);
     updateChannel(channel);
     return channel
   } //createChannel
@@ -380,7 +382,7 @@
 
   function loadChannels() {
     if (typeof Storage === "undefined")
-      console.log("Please use a browser that supports HTML Web Storage.");
+      throw new Error("Please use a browser that supports HTML Web Storage.");
     else {
       if (!localStorage.getItem("channels")) {
         console.log("Storage contains no channel array");
@@ -436,13 +438,67 @@
     return ((angle * 180 / Math.PI) + baseAngle) % 360
   } //calculateAngle
 
+  // set the parent property of object p
+  // p is either a node, a channel or a component
+  // if p is a component, parent should be defined
+  function setParent(p, parent) {
+    var parentarray, i, j;
+    if (p === main)
+      return;
+    // if a parent is set, remove the reference to p from the parent
+    if (p.parent) {
+      switch(p.class) {
+        case 'node':
+          parentarray = p.parent.nodes;
+          break;
+        case 'channel':
+          parentarray = p.parent.channels;
+          break;
+        case 'component':
+          parentarray = p.parent.components
+      }
+      for (i = 0; i < parentarray.length; ++i) {
+        if (parentarray[i] === p) {
+          parentarray.splice(i,1);
+          break
+        }
+      }
+    }
+
+    switch (p.class) {
+      case 'node':
+        for (i = 0; i < components.length; ++i) {
+          if (p.intersectsWithObject(components[i])) {
+            p.parent = components[i];
+            components[i].nodes.push(p);
+          }
+        }
+        break;
+      case 'channel':
+        if (p.node1.parent === p.node2.parent) {
+          p.parent = p.node1.parent
+        } else {
+          if (p.node1.parent.size > p.node2.parent.size)
+            p.parent = p.node1.parent;
+          else
+            p.parent = p.node2.parent
+        }
+        p.parent.channels.push(p);
+        break;
+      case 'component':
+        if (!parent)
+          throw new Error("Trying to set undefined parent for component");
+        p.parent = parent;
+        parent.components.push(p)
+    }
+  }
+
   function updateNode(node) {
     var i;
 
-    // set coordinates and component reference
+    // set node coordinates
     node.label.setCoords();
     node.set({labelOffsetX: node.label.left - node.left, labelOffsetY: node.label.top - node.top});
-    node.set({parent: main});
     for (i = nodes.length - 1; i >= 0; --i) {
       // prevent comparing the node with itself
       if (nodes[i] === node)
@@ -452,13 +508,7 @@
         if(Math.abs(node.left-nodes[i].left) < mergeDistance && Math.abs(node.top-nodes[i].top) < mergeDistance)
           mergeNodes(node, nodes[i])
     }
-
-    // update the parent property of the node
-    for (i = components.length - 1; i >= 0; --i) {
-      if (node.intersectsWithObject(components[i]))
-        if (components[i].size < node.parent.size)
-          node.parent = components[i]
-    }
+    setParent(node);
 
     // ensure that no channel crosses a component boundary
     for (i = 0; i < node.channels.length; ++i) {
@@ -478,6 +528,7 @@
           snapToComponent(otherNode, otherNode.parent)
         }
       }
+      setParent(node.channels[i]);
     }
     updateNodeColouring(node)
   } //updateNode
@@ -495,7 +546,7 @@
           source = true;
         else
           sink = true
-      } else console.log("Error updating nodes")
+      } else throw new Error("Error updating nodes")
     }
 
     if (source) {
@@ -539,7 +590,7 @@
         o.set({x1: x1, y1: y1, x2: x2, y2: y2});
       else {
         if (!o.relationship) {
-          console.log("No relationship found");
+          throw new Error("No relationship found");
           return
         }
         var relationship = o.relationship;
@@ -587,11 +638,10 @@
   } //updateChannel
 
   function isBoundaryNode(node) {
-    return node.nodetype !== 'mixed' &&
-      (node.left === node.parent.left ||
-       node.top  === node.parent.top  ||
-       node.left === node.parent.left + node.parent.width ||
-       node.top  === node.parent.top  + node.parent.height)
+    return node.left === node.parent.left ||
+           node.top  === node.parent.top  ||
+           node.left === node.parent.left + node.parent.width ||
+           node.top  === node.parent.top  + node.parent.height
   }
 
   function updateText() {
@@ -671,7 +721,7 @@
     node.label.set({'left': node.left + node.labelOffsetX, 'top': node.top + node.labelOffsetY});
     node.label.setCoords();
     for (i = 0; i < node.channels.length; ++i)
-      updateChannel(node.channels[i])
+      updateChannel(node.channels[i]);
     updateText()
   }
 
@@ -766,18 +816,22 @@
       canvas.discardActiveObject();
     switch (mode) {
       case 'select':
-        if (p && p.class === 'component') {
-          bringToFront(p);
-          origLeft = p.left;
-          origRight = p.left + p.width;
-          origTop = p.top;
-          origBottom = p.top + p.height;
-          p.nodes = [];
-          for (i = 0; i < nodes.length; ++i) {
-            if (nodes[i].parent === p) {
-              p.nodes.push(nodes[i]);
-              nodes[i].origLeft = nodes[i].left;
-              nodes[i].origTop = nodes[i].top
+        if (p) {
+          if (p.class === 'node') {
+            bringNodeToFront(p);
+          } else if (p.class === 'component') {
+            bringComponentToFront(p);
+            origLeft = p.left;
+            origRight = p.left + p.width;
+            origTop = p.top;
+            origBottom = p.top + p.height;
+            p.nodes = [];
+            for (i = 0; i < nodes.length; ++i) {
+              if (nodes[i].parent === p) {
+                p.nodes.push(nodes[i]);
+                nodes[i].origLeft = nodes[i].left;
+                nodes[i].origTop = nodes[i].top
+              }
             }
           }
         }
@@ -952,17 +1006,11 @@
           p.label.set({left: p.left + (p.width/2), top: p.top + 15});
           p.label.setCoords()
         }
-        bringToFront(p);
+        bringComponentToFront(p);
 
         p.set({selectable: mode === 'select'});
+        // ensure that no channel crosses a component boundary
         for (j = 0; j < nodes.length; j++) {
-          // update the parent property of the node
-          for (i = components.length - 1; i >= 0; --i) {
-            if (nodes[j].intersectsWithObject(components[i]))
-              if (components[i].size < nodes[j].parent.size)
-                nodes[j].parent = components[i]
-          }
-          // ensure that no channel crosses a component boundary
           for (i = 0; i < nodes[j].channels.length; ++i) {
             if (p.intersectsWithObject(p)) {
               if (nodes[j] === nodes[j].channels[i].node1)
@@ -970,7 +1018,7 @@
               else if (nodes[j] === nodes[j].channels[i].node2)
                 snapOutComponent(nodes[j], nodes[j].parent, nodes[j].channels[i].node1);
               else
-                console.log("Broken node reference detected")
+                throw new Error("Broken node reference detected")
             }
           }
         }
@@ -1000,7 +1048,7 @@
             loop = true
         }
         else
-          console.log("Error merging nodes")
+          throw new Error("Error merging nodes")
       }
       if (loop) {
         // if the source node is equal to the destination node, create a loop and update the position of all channel components
@@ -1081,9 +1129,9 @@
   }
 
   /**
-   * Moves component p and all its elements to the top layer
+   * Moves component p and all its objects to the top layer
    */
-  function bringToFront(p) {
+  function bringComponentToFront(p) {
     var i, j;
     if (!p || p.class !== 'component')
       return;
@@ -1092,14 +1140,33 @@
     if (p.compactSwitch)
       p.compactSwitch.bringToFront();
     p.label.bringToFront();
-    for (i = 0; i < channels.length; ++i) {
-      for (j = 1; j < channels[i].components.length; ++j)
-        channels[i].components[j].bringToFront();
-      channels[i].node1.bringToFront();
-      channels[i].node1.label.bringToFront();
-      channels[i].node2.bringToFront();
-      channels[i].node2.label.bringToFront();
+    for (i = 0; i < p.channels.length; ++i) {
+      for (j = 1; j < p.channels[i].components.length; ++j)
+        p.channels[i].components[j].bringToFront();
     }
+    for (i = 0; i < p.nodes.length; ++i) {
+      p.nodes[i].bringToFront();
+      p.nodes[i].label.bringToFront()
+    }
+    for (i = 0; i < p.components.length; ++i) {
+      bringComponentToFront(p.components[i])
+    }
+  }
+
+  /**
+   * Moves node p and all its connected channels to the top layer
+   */
+  function bringNodeToFront(p) {
+    var i, j;
+    if (!p || p.class !== 'node')
+      return;
+    for (i = 0; i < p.channels.length; ++i) {
+      for (j = 1; j < p.channels[i].components.length; ++j)
+        p.channels[i].components[j].bringToFront();
+      p.channels[i].node1.bringToFront();
+      p.channels[i].node2.bringToFront()
+    }
+    p.label.bringToFront();
   }
 
   function createComponent(x1,y1,x2,y2,name) {
@@ -1125,6 +1192,8 @@
       class: 'component',
       status: 'drawing',
       nodes: [],
+      channels: [],
+      components: [],
       id: name ? name : generateId()
     });
 
