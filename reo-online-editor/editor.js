@@ -1118,9 +1118,14 @@
       else
         destination.channels.push(source.channels[j])
     }
-    for (let k = 0; k < nodes.length; ++k)
-      if (nodes[k] === source) {
-        nodes.splice(k,1);
+    for (i = 0; i < nodes.length; ++i)
+      if (nodes[i] === source) {
+        nodes.splice(i,1);
+        break
+      }
+    for (i = 0; i < source.parent.nodes.length; ++i)
+      if (source.parent.nodes[i] === source) {
+        source.parent.nodes.splice(i,1);
         break
       }
     canvas.remove(source.label, source);
