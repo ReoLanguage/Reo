@@ -1177,7 +1177,7 @@
   function deleteNode(node) {
     var i;
     // delete the connecting channels
-    for (i = 0; i < node.channels.length; ++i)
+    for (i = node.channels.length - 1; i >= 0; --i)
       deleteChannel(node.channels[i]);
     // remove the node from the global nodes array
     for (i = 0; i < nodes.length; ++i)
@@ -1200,14 +1200,14 @@
     for (j = 0; j < channel.node1.channels.length; ++j)
       if (channel.node1.channels[j] === channel) {
         channel.node1.channels.splice(j,1);
-        if (j === 0)
+        if (channel.node1.channels.length === 0)
           deleteNode(channel.node1);
         break
       }
     for (j = 0; j < channel.node2.channels.length; ++j)
       if (channel.node2.channels[j] === channel) {
         channel.node2.channels.splice(j,1);
-        if (j === 0)
+        if (channel.node2.channels.length === 0)
           deleteNode(channel.node2);
         break
       }
