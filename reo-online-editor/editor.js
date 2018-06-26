@@ -1174,6 +1174,105 @@
     p.label.bringToFront();
   }
 
+  function deleteNode(node) {
+    var i;
+    // delete the connecting channels
+    for (i = 0; i < node.channels.length; ++i)
+      deleteChannel(node.channels[i]);
+    // remove the node from the global nodes array
+    for (i = 0; i < nodes.length; ++i)
+      if (nodes[i] === node) {
+        nodes.splice(i,1);
+        break
+      }
+    // remove the node from the parent nodes array
+    for (i = 0; i < node.parent.nodes.length; ++i)
+      if (node.parent.nodes[i] === node) {
+        node.parent.nodes.splice(i,1);
+        break
+      }
+    canvas.remove(node, node.label);
+  }
+
+  function deleteChannel(channel) {
+    var j;
+    // delete the channel reference from the connecting nodes
+    for (j = 0; j < channel.node1.channels.length; ++j)
+      if (channel.node1.channels[j] === channel) {
+        channel.node1.channels.splice(j,1);
+        if (j === 0)
+          deleteNode(channel.node1);
+        break
+      }
+    for (j = 0; j < channel.node2.channels.length; ++j)
+      if (channel.node2.channels[j] === channel) {
+        channel.node2.channels.splice(j,1);
+        if (j === 0)
+          deleteNode(channel.node2);
+        break
+      }
+    // remove the channel from the global channels array
+    for (j = 0; j < channels.length; ++j)
+      if (channels[j] === channel) {
+        channels.splice(j,1);
+        break
+      }
+    // remove the channel from the parent channels array
+    for (j = 0; j < channel.parent.channels.length; ++j)
+      if (channel.parent.channels[j] === channel) {
+        channel.parent.channels.splice(j,1);
+        break
+      }
+    // remove the channel and all its components
+    for (j = 0; j < channel.components.length; ++j)
+      canvas.remove(channel.components[j])
+  }
+
+  /**
+   * Deletes component and all underlying objects, including other components
+   * recursive is for internal use only
+   */
+  function deleteComponent(component, recursive) {
+    var k;
+    // delete underlying components
+    for (k = 0; k < component.components.length; ++k)
+      deleteComponent(component.components[k], true);
+    // delete all nodes that are in this component
+    for (k = 0; k < component.nodes.length; ++k)
+      deleteNode(component.nodes[k]);
+    // remove the component from the global components array
+    for (k = 0; k < components.length; ++k)
+      if (components[k] === component) {
+        components.splice(k,1);
+        break
+      }
+    // remove the component from the parent components array
+    if (component.parent && !recursive)
+      for (k = 0; k < component.parent.components.length; ++k)
+        if (component.parent.components[k] === component) {
+          component.parent.components.splice(k,1);
+          break;
+        }
+    if (component.compactSwitch)
+      canvas.remove(component.compactSwitch);
+    canvas.remove(component, component.header, component.label)
+  }
+
+  document.addEventListener("keydown", function(e) {
+    var p = canvas.getActiveObject();
+    if (e.code === "Delete" && p)
+      switch (p.class) {
+        case 'node':
+          deleteNode(p);
+          break;
+        case 'channel':
+          deleteChannel(p);
+          break;
+        case 'component':
+          deleteComponent(p)
+      }
+  });
+
   function createComponent(x1,y1,x2,y2,name) {
     var width = (x2 - x1);
     var height = (y2 - y1);
@@ -1224,7 +1323,6 @@
 
     component.set({label: label, header: header});
     canvas.add(component, header, label);
-    canvas.requestRenderAll();
 
     if (name !== 'main') {
       var compactSwitch = new fabric.Circle({
