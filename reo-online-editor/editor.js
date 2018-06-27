@@ -202,7 +202,7 @@
     }
   }); // Node
 
-  function createNode(left, top, name) {
+  function createNode(left, top, name, manual) {
     var node = new Node({
       left: left,
       top: top,
@@ -232,8 +232,10 @@
 
     nodes.push(node);
     setParent(node);
+    canvas.add(node, node.label);
     // to be included later but currently throws an error when generating graphics from text
-    //updateNode(node);
+    if (!manual)
+      updateNode(node);
     return node
   } //createNode
 
@@ -261,9 +263,10 @@
    * @param {string} [node2.name] - optional name of the second node
    * @param {number} node2.x
    * @param {number} node2.y
+   * @param {boolean} manual - optional flag to indicate the function was initiated by a user action
    * @returns {{class: string, components: Array}}
    */
-  function createChannel(type, node1, node2) {
+  function createChannel(type, node1, node2, manual) {
     // create a channel...
     var channel = {
       class: 'channel',
@@ -289,8 +292,8 @@
     });
 
     // ...two nodes...
-    channel.node1 = createNode(node1.x, node1.y, node1.name);
-    channel.node2 = createNode(node2.x, node2.y, node2.name);
+    channel.node1 = createNode(node1.x, node1.y, node1.name, manual);
+    channel.node2 = createNode(node2.x, node2.y, node2.name, manual);
 
     // ...and two anchors
     // TODO Anchors
@@ -348,10 +351,11 @@
       canvas.add(channel.components[i])
     }
     channels.push(channel);
+    channel.node1.bringToFront();
+    channel.node2.bringToFront();
 
     // TODO Anchors
     // canvas.add(channel.anchor1, channel.anchor2);
-    canvas.add(channel.node1, channel.node2, channel.node1.label, channel.node2.label);
     setParent(channel);
     updateChannel(channel);
     return channel
@@ -846,7 +850,7 @@
         // TODO change component to compact mode
         break;
       default:
-        var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y});
+        var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y}, true);
         snapToComponent(channel.node1,channel.node1.parent);
 
         p = channel.node1;
@@ -965,10 +969,8 @@
           size = components[i].height
         }
         // Check if the node is inside or close to the component
-        if (
-          changingPosition === 'left' && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
-          changingPosition === 'top' && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width +  mergeDistance
-        ) {
+        if (changingPosition === 'left' && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
+            changingPosition === 'top'  && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width  + mergeDistance) {
           var newPosition = {};
           // Ensure that mixed nodes are visually separated from component boundaries
           if (p.nodetype === 'mixed') {
