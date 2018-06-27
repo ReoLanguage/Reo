@@ -833,6 +833,8 @@
                 nodes[i].origTop = nodes[i].top
               }
             }
+          } else if (p.class === 'delete') {
+            deleteComponent(p.component);
           }
         }
         break;
@@ -927,7 +929,9 @@
       p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
       p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
       p.header.setCoords();
-      p.compactSwitch.set({left: p.left + 15, top: p.top + 15});
+      p.delete.set({left: p.left + 15, top: p.top + 15});
+      p.delete.setCoords();
+      p.compactSwitch.set({left: p.left + 20 + nodeFactor * 4, top: p.top + 15});
       p.compactSwitch.setCoords();
     } else if (p.class === 'node') {
       p.set({left: pointer.x, top: pointer.y});
@@ -1142,8 +1146,10 @@
       return;
     p.bringToFront();
     p.header.bringToFront();
-    if (p.compactSwitch)
+    if (p !== main) {
       p.compactSwitch.bringToFront();
+      p.delete.bringToFront()
+    }
     p.label.bringToFront();
     for (i = 0; i < p.channels.length; ++i) {
       for (j = 1; j < p.channels[i].components.length; ++j)
@@ -1257,8 +1263,8 @@
           component.parent.components.splice(k,1);
           break;
         }
-    if (component.compactSwitch)
-      canvas.remove(component.compactSwitch);
+    if (component !== main)
+      canvas.remove(component.delete, component.compactSwitch);
     canvas.remove(component, component.header, component.label)
   }
 
@@ -1330,7 +1336,7 @@
 
     if (name !== 'main') {
       var compactSwitch = new fabric.Circle({
-        left: left + 15,
+        left: left + 20 + nodeFactor * 4,
         top: top + 15,
         radius: nodeFactor * 2,
         hasControls: false,
@@ -1338,9 +1344,15 @@
         parent: component,
         class: 'compactSwitch'
       });
-
       component.set('compactSwitch', compactSwitch);
-      canvas.add(compactSwitch)
+      canvas.add(compactSwitch);
+
+      fabric.Image.fromURL('img/delete.svg', function(img) {
+        var scale = (nodeFactor * 4) / img.height;
+        var img1 = img.scale(scale).set({left: component.left + 15, top: component.top + 15, class: 'delete', component: component});
+        component.set('delete', img1);
+        canvas.add(img1)
+      });
     }
 
     /*var options = new fabric.Circle({
