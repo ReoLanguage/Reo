@@ -1202,6 +1202,8 @@
         channel.node1.channels.splice(j,1);
         if (channel.node1.channels.length === 0)
           deleteNode(channel.node1);
+        else
+          updateNodeColouring(channel.node1);
         break
       }
     for (j = 0; j < channel.node2.channels.length; ++j)
@@ -1209,6 +1211,8 @@
         channel.node2.channels.splice(j,1);
         if (channel.node2.channels.length === 0)
           deleteNode(channel.node2);
+        else
+          updateNodeColouring(channel.node2);
         break
       }
     // remove the channel from the global channels array
