@@ -16,7 +16,7 @@ function createSyncSpout(syncspout, x1, y1, x2, y2) {
     originX: 'center',
     originY: 'center',
   });
-  syncspout.components.push(line);
+  syncspout.parts.push(line);
 
   // ...and an arrowhead
   let a1 = new fabric.Triangle({
@@ -37,7 +37,7 @@ function createSyncSpout(syncspout, x1, y1, x2, y2) {
     referenceDistance: arrowOffsetOut,
     referenceAngle: 90
   });
-  syncspout.components.push(a1);
+  syncspout.parts.push(a1);
 
   // ...and an arrowhead
   let a2 = new fabric.Triangle({
@@ -58,7 +58,7 @@ function createSyncSpout(syncspout, x1, y1, x2, y2) {
     referenceDistance: arrowOffsetOut,
     referenceAngle: 270
   });
-  syncspout.components.push(a2);
+  syncspout.parts.push(a2);
 
   return syncspout;
 } //createSyncSpout

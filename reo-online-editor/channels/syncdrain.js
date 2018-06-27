@@ -16,7 +16,7 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
     originX: 'center',
     originY: 'center',
   });
-  syncdrain.components.push(line);
+  syncdrain.parts.push(line);
 
   // ...and an arrowhead
   let a1 = new fabric.Triangle({
@@ -37,7 +37,7 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
     referenceDistance: arrowOffsetIn,
     referenceAngle: 90
   });
-  syncdrain.components.push(a1);
+  syncdrain.parts.push(a1);
 
   // ...and an arrowhead
   let a2 = new fabric.Triangle({
@@ -58,7 +58,7 @@ function createSyncDrain(syncdrain, x1, y1, x2, y2) {
     referenceDistance: arrowOffsetIn,
     referenceAngle: 270
   });
-  syncdrain.components.push(a2);
+  syncdrain.parts.push(a2);
 
   return syncdrain;
 } //createSyncDrain

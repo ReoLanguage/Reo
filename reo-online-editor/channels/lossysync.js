@@ -17,7 +17,7 @@ function createLossySync(lossysync, x1, y1, x2, y2) {
     originX: 'center',
     originY: 'center',
   });
-  lossysync.components.push(line);
+  lossysync.parts.push(line);
 
   // ...and an arrowhead
   let a = new fabric.Triangle({
@@ -38,7 +38,7 @@ function createLossySync(lossysync, x1, y1, x2, y2) {
     referenceDistance: arrowOffsetOut,
     referenceAngle: 270
   });
-  lossysync.components.push(a);
+  lossysync.parts.push(a);
 
   return lossysync;
 } //createLossySync

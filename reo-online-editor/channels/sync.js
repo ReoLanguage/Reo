@@ -16,7 +16,7 @@ function createSync(sync, x1, y1, x2, y2) {
     originX: 'center',
     originY: 'center',
   });
-  sync.components.push(line);
+  sync.parts.push(line);
 
   // ...and an arrowhead
   let a = new fabric.Triangle({
@@ -37,7 +37,7 @@ function createSync(sync, x1, y1, x2, y2) {
     referenceDistance: arrowOffsetOut,
     referenceAngle: 270
   });
-  sync.components.push(a);
+  sync.parts.push(a);
 
   return sync;
 } //createSync

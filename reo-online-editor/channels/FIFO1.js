@@ -19,7 +19,7 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     originX: 'center',
     originY: 'center',
   });
-  FIFO1.components.push(line);
+  FIFO1.parts.push(line);
 
   // ...an arrowhead...
   let a = new fabric.Triangle({
@@ -40,7 +40,7 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     referenceDistance: arrowOffsetOut,
     referenceAngle: 270
   });
-  FIFO1.components.push(a);
+  FIFO1.parts.push(a);
 
   // ...and a rectangle
   let rect = new fabric.Rect({
@@ -65,7 +65,7 @@ function createFIFO1(FIFO1, x1, y1, x2, y2) {
     referenceDistance: 0,
     referenceAngle: 0
   });
-  FIFO1.components.push(rect);
+  FIFO1.parts.push(rect);
 
   return FIFO1;
 } //createFIFO1

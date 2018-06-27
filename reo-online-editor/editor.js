@@ -264,20 +264,20 @@
    * @param {number} node2.x
    * @param {number} node2.y
    * @param {boolean} manual - optional flag to indicate the function was initiated by a user action
-   * @returns {{class: string, components: Array}}
+   * @returns {{class: string, parts: Array}}
    */
   function createChannel(type, node1, node2, manual) {
     // create a channel...
     var channel = {
       class: 'channel',
-      components: []
+      parts: []
     }, i;
 
     var diffX = Math.abs(node1.x - node2.x);
     var diffY = Math.abs(node1.y - node2.y);
 
     // ...a reference rectangle...
-    channel.components[0] = new fabric.Rect({
+    channel.parts[0] = new fabric.Rect({
       width: 5,
       height: 100,
       baseLength: 100,
@@ -339,16 +339,16 @@
       return code
     };
 
-    canvas.add(channel.components[0]);
+    canvas.add(channel.parts[0]);
 
     // calculate the relation matrix between the channel component and the reference rectangle
     // then save it as a channel component property
-    for (i = 1; i < channel.components.length; i++) {
-      var bossTransform = channel.components[0].calcTransformMatrix();
+    for (i = 1; i < channel.parts.length; i++) {
+      var bossTransform = channel.parts[0].calcTransformMatrix();
       var invertedBossTransform = fabric.util.invertTransform(bossTransform);
-      var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
-      channel.components[i].relationship = desiredTransform;
-      canvas.add(channel.components[i])
+      var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.parts[i].calcTransformMatrix());
+      channel.parts[i].relationship = desiredTransform;
+      canvas.add(channel.parts[i])
     }
     channels.push(channel);
     channel.node1.bringToFront();
@@ -571,25 +571,25 @@
       i;
 
     // update the reference rectangle
-    if (channel.components[0].type === 'rect') {
-      channel.components[0].set({left: Math.min(x1,x2) + diffX / 2});
-      channel.components[0].set({top: Math.min(y1,y2) + diffY / 2});
-      channel.components[0].set({angle: calculateAngle(channel, 90)});
+    if (channel.parts[0].type === 'rect') {
+      channel.parts[0].set({left: Math.min(x1,x2) + diffX / 2});
+      channel.parts[0].set({top: Math.min(y1,y2) + diffY / 2});
+      channel.parts[0].set({angle: calculateAngle(channel, 90)});
 
       // convert new size to scaling
       var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
-      var scale = length/channel.components[0].baseLength;
-      channel.components[0].set({scaleX: scale, scaleY: scale});
-      channel.components[0].setCoords()
-    } else if (channel.components[0].type === 'circle') {
-      channel.components[0].set({left: x1});
-      channel.components[0].set({top: y1 - loopRadius});
-      channel.components[0].setCoords()
+      var scale = length/channel.parts[0].baseLength;
+      channel.parts[0].set({scaleX: scale, scaleY: scale});
+      channel.parts[0].setCoords()
+    } else if (channel.parts[0].type === 'circle') {
+      channel.parts[0].set({left: x1});
+      channel.parts[0].set({top: y1 - loopRadius});
+      channel.parts[0].setCoords()
     }
 
     // update all channel components
-    for (i = 1; i < channel.components.length; i++) {
-      var o = channel.components[i];
+    for (i = 1; i < channel.parts.length; i++) {
+      var o = channel.parts[i];
       if (o.type === 'line')
         o.set({x1: x1, y1: y1, x2: x2, y2: y2});
       else {
@@ -598,7 +598,7 @@
           return
         }
         var relationship = o.relationship;
-        var newTransform = fabric.util.multiplyTransformMatrices(channel.components[0].calcTransformMatrix(), relationship);
+        var newTransform = fabric.util.multiplyTransformMatrices(channel.parts[0].calcTransformMatrix(), relationship);
         let opt = fabric.util.qrDecompose(newTransform);
         o.set({
           flipX: false,
@@ -623,17 +623,17 @@
             reference = channel.node2;
             break;
           default:
-            if (channel.components[0].type === 'rect')
-              reference = channel.components[0];
+            if (channel.parts[0].type === 'rect')
+              reference = channel.parts[0];
             else
               reference = {
-                left: loopRadius * Math.cos((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].left,
-                top: loopRadius * Math.sin((channel.components[0].angle - 90) * Math.PI / 180) + channel.components[0].top
+                left: loopRadius * Math.cos((channel.parts[0].angle - 90) * Math.PI / 180) + channel.parts[0].left,
+                top: loopRadius * Math.sin((channel.parts[0].angle - 90) * Math.PI / 180) + channel.parts[0].top
               }
         }
         o.set({
-          left: o.referenceDistance * Math.cos((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.left,
-          top:  o.referenceDistance * Math.sin((channel.components[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.top
+          left: o.referenceDistance * Math.cos((channel.parts[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.left,
+          top:  o.referenceDistance * Math.sin((channel.parts[0].angle + o.referenceAngle + 180) * Math.PI / 180) + reference.top
         })
       }
       o.setCoords()
@@ -1057,10 +1057,10 @@
           throw new Error("Error merging nodes")
       }
       if (loop) {
-        // if the source node is equal to the destination node, create a loop and update the position of all channel components
+        // if the source node is equal to the destination node, create a loop and update the position of all channel parts
         var channel = source.channels[j];
-        var rect = channel.components[0];
-        var line = channel.components[1];
+        var rect = channel.parts[0];
+        var line = channel.parts[1];
 
         // create a circle to replace the channel line
         var curve = new fabric.Circle({
@@ -1076,9 +1076,9 @@
         });
         canvas.add(curve);
 
-        // create a new position for all components based on their original position
-        for (i = 2; i < channel.components.length; ++i) {
-          var o = channel.components[i];
+        // create a new position for all parts based on their original position
+        for (i = 2; i < channel.parts.length; ++i) {
+          var o = channel.parts[i];
           if (o.referencePoint === 'node1' || o.referencePoint === 'node2' || o.referencePoint === 'middle') {
             // calculate the distance along the straight line
             let length = o.referenceDistance * Math.cos((rect.angle + o.referenceAngle + 180) * Math.PI / 180);
@@ -1112,13 +1112,13 @@
           }
           var bossTransform = curve.calcTransformMatrix();
           var invertedBossTransform = fabric.util.invertTransform(bossTransform);
-          var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.components[i].calcTransformMatrix());
-          channel.components[i].relationship = desiredTransform;
+          var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.parts[i].calcTransformMatrix());
+          channel.parts[i].relationship = desiredTransform;
           canvas.remove(o);
           canvas.add(o)
         }
-        channel.components[0] = curve;
-        channel.components.splice(1,1);
+        channel.parts[0] = curve;
+        channel.parts.splice(1,1);
         canvas.remove(line)
       }
       else
@@ -1154,8 +1154,8 @@
     }
     p.label.bringToFront();
     for (i = 0; i < p.channels.length; ++i) {
-      for (j = 1; j < p.channels[i].components.length; ++j)
-        p.channels[i].components[j].bringToFront();
+      for (j = 1; j < p.channels[i].parts.length; ++j)
+        p.channels[i].parts[j].bringToFront();
     }
     for (i = 0; i < p.nodes.length; ++i) {
       p.nodes[i].bringToFront();
@@ -1174,8 +1174,8 @@
     if (!p || p.class !== 'node')
       return;
     for (i = 0; i < p.channels.length; ++i) {
-      for (j = 1; j < p.channels[i].components.length; ++j)
-        p.channels[i].components[j].bringToFront();
+      for (j = 1; j < p.channels[i].parts.length; ++j)
+        p.channels[i].parts[j].bringToFront();
       p.channels[i].node1.bringToFront();
       p.channels[i].node2.bringToFront()
     }
@@ -1235,9 +1235,9 @@
         channel.parent.channels.splice(j,1);
         break
       }
-    // remove the channel and all its components
-    for (j = 0; j < channel.components.length; ++j)
-      canvas.remove(channel.components[j])
+    // remove the channel and all its parts
+    for (j = 0; j < channel.parts.length; ++j)
+      canvas.remove(channel.parts[j])
   }
 
   /**
