@@ -72,6 +72,8 @@
   loopRadius           =     25;
 
   function buttonClick(button) {
+    canvas.discardActiveObject();
+    canvas.requestRenderAll();
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = button.id;
     button.style.border = buttonBorderOn;
@@ -481,7 +483,7 @@
   }
 
   function updateNode(node) {
-    var i;
+    var i,j,k;
 
     // set node coordinates
     node.label.setCoords();
@@ -507,7 +509,13 @@
       else
         throw new Error("Broken node reference detected");
 
-      if (node.parent.size > otherNode.parent.size)
+      for (j = 0; j < components.length; ++j)
+        if (components[j] === node.parent)
+          break;
+      for (k = 0; k < components.length; ++k)
+        if (components[k] === otherNode.parent)
+          break;
+      if (j < k)
         snapOutComponent(otherNode, otherNode.parent, node);
       else {
         if (!isBoundaryNode(node)) {
@@ -980,6 +988,8 @@
             }
           }
         }
+        if (mode !== 'select')
+          document.getElementById("select").click()
       } else if (p.class === 'label') {
         p.setCoords();
         p.object.set({labelOffsetX: p.left - p.object.left, labelOffsetY: p.top - p.object.top})
@@ -1101,6 +1111,11 @@
     var i, j;
     if (!p || p.class !== 'component')
       return;
+    /*for (i = 0; i < components.length; ++i)
+      if (components[i] === p) {
+        components.push(components.splice(i,1));
+        break;
+      }*/
     p.bringToFront();
     p.header.bringToFront();
     if (p !== main) {
@@ -1133,6 +1148,8 @@
         p.channels[i].parts[j].bringToFront();
       p.channels[i].node1.bringToFront();
       p.channels[i].node2.bringToFront()
+      console.log("Bringing node " + p.channels[i].node1.id + " to the front");
+      console.log("Bringing node " + p.channels[i].node2.id + " to the front");
     }
     p.label.bringToFront();
   }
