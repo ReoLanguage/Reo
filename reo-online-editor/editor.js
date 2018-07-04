@@ -43,6 +43,8 @@
   var channels = [];
   var components = [];
 
+  loadChannels();
+
   // drawing parameters
 
   nodeFillColourSource = '#fff';
@@ -82,11 +84,6 @@
 
   document.getElementById("select").onclick    = function() {buttonClick(document.getElementById("select"))};
   document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))};
-  document.getElementById("sync").onclick      = function() {buttonClick(document.getElementById("sync"))};
-  document.getElementById("lossysync").onclick = function() {buttonClick(document.getElementById("lossysync"))};
-  document.getElementById("syncdrain").onclick = function() {buttonClick(document.getElementById("syncdrain"))};
-  document.getElementById("syncspout").onclick = function() {buttonClick(document.getElementById("syncspout"))};
-  document.getElementById("fifo1").onclick     = function() {buttonClick(document.getElementById("fifo1"))};
 
   document.getElementById("downloadsvg").onclick = function () {
     var a = document.getElementById("download");
@@ -156,6 +153,7 @@
   fabric.Object.prototype.toObject = (function (toObject) {
     return function () {
       return fabric.util.object.extend(toObject.call(this), {
+        baseAngle:         this.baseAngle,
         referenceAngle:    this.referenceAngle,
         referenceDistance: this.referenceDistance,
         referencePoint:    this.referencePoint,
@@ -233,7 +231,6 @@
     nodes.push(node);
     setParent(node);
     canvas.add(node, node.label);
-    // to be included later but currently throws an error when generating graphics from text
     if (!manual)
       updateNode(node);
     return node
@@ -268,28 +265,29 @@
    */
   function createChannel(type, node1, node2, manual) {
     // create a channel...
-    var channel = {
-      class: 'channel',
-      parts: []
-    }, i;
+    var channel, i, validChannel = false;
 
+    for (i = 0; i < channeltypes.length; ++i)
+      if (channeltypes[i].name === type) {
+        channel = JSON.parse(JSON.stringify(channeltypes[i]));
+        validChannel = true
+      }
+    if (!validChannel)
+      throw new Error("Channel type " + type + " is invalid");
+
+    fabric.util.enlivenObjects(channel.parts, function(objects) {
+      channel.parts = objects;
+      completeChannelCreation(channel, node1, node2, manual)
+    });
+  } //createChannel
+
+  function completeChannelCreation(channel, node1, node2, manual) {
     var diffX = Math.abs(node1.x - node2.x);
     var diffY = Math.abs(node1.y - node2.y);
 
     // ...a reference rectangle...
-    channel.parts[0] = new fabric.Rect({
-      width: 5,
-      height: 100,
-      baseLength: 100,
-      left: Math.min(node1.x,node2.x) + diffX / 2,
-      top: Math.min(node1.y,node2.y) + diffY / 2,
-      angle: 90,
-      fill: 'red',
-      visible: false,
-      evented: false,
-      originX: 'center',
-      originY: 'center'
-    });
+    channel.parts[0].set({left: Math.min(node1.x,node2.x) + diffX / 2, top: Math.min(node1.y,node2.y) + diffY / 2});
+    canvas.add(channel.parts[0]);
 
     // ...two nodes...
     channel.node1 = createNode(node1.x, node1.y, node1.name, manual);
@@ -304,29 +302,6 @@
     channel.node1.channels.push(channel);
     channel.node2.channels.push(channel);
 
-    // currently loaded from a separate file
-    // TODO: replace with a database search
-    switch(type) {
-      case 'sync':
-        createSync(channel,node1.x,node1.y,node2.x,node2.y);
-        break;
-      case 'lossysync':
-        createLossySync(channel,node1.x,node1.y,node2.x,node2.y);
-        break;
-      case 'syncdrain':
-        createSyncDrain(channel,node1.x,node1.y,node2.x,node2.y);
-        break;
-      case 'syncspout':
-        createSyncSpout(channel,node1.x,node1.y,node2.x,node2.y);
-        break;
-      case 'fifo1':
-        createFIFO1(channel,node1.x,node1.y,node2.x,node2.y);
-        break;
-      default:
-        throw new Error("Invalid channel name");
-        return
-    }
-
     // code generation functions
     channel.positionMetadata = function() {
       return ` /*! ${this.node1.positionMetadata()}, ${this.node2.positionMetadata()} !*/`
@@ -339,12 +314,10 @@
       return code
     };
 
-    canvas.add(channel.parts[0]);
-
     // calculate the relation matrix between the channel component and the reference rectangle
     // then save it as a channel component property
+    var bossTransform = channel.parts[0].calcTransformMatrix();
     for (i = 1; i < channel.parts.length; i++) {
-      var bossTransform = channel.parts[0].calcTransformMatrix();
       var invertedBossTransform = fabric.util.invertTransform(bossTransform);
       var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.parts[i].calcTransformMatrix());
       channel.parts[i].relationship = desiredTransform;
@@ -356,10 +329,41 @@
 
     // TODO Anchors
     // canvas.add(channel.anchor1, channel.anchor2);
+
     setParent(channel);
     updateChannel(channel);
-    return channel
-  } //createChannel
+    snapToComponent(channel.node1,channel.node1.parent);
+
+    p = channel.node1;
+    // place node on nearby edge of component
+    for (i = 0; i < components.length; i++) {
+      if (Math.abs(p.left - components[i].left) < mergeDistance)
+        p.set({left: components[i].left});
+      if (Math.abs(p.top - components[i].top) < mergeDistance)
+        p.set({top: components[i].top});
+      if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
+        p.set({left: components[i].left + components[i].width});
+      if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
+        p.set({top: components[i].top + components[i].height});
+      p.setCoords()
+    }
+
+    for (i = 0; i < p.channels.length; ++i)
+      updateChannel(p.channels[i])
+    p.label.set({left: p.left + p.labelOffsetX});
+    p.label.set({top: p.top + p.labelOffsetY});
+    p.label.setCoords();
+
+    // merge with existing nodes, except node2 of the same channel
+    for (i = nodes.length - 1; i >= 0; --i) {
+      if (nodes[i] === p || nodes[i] === channel.node2)
+        continue;
+      if (p.intersectsWithObject(nodes[i]))
+        if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
+          mergeNodes(nodes[i], p)
+    }
+    canvas.setActiveObject(channel.node2)
+  }
 
   function createLink(node) {
     var clone = createNode(node.left, node.top, node.label.text);
@@ -385,47 +389,26 @@
   }
 
   function loadChannels() {
-    if (typeof Storage === "undefined")
-      throw new Error("Please use a browser that supports HTML Web Storage.");
-    else {
-      if (!localStorage.getItem("channels")) {
-        console.log("Storage contains no channel array");
-        var xhttp = new XMLHttpRequest();
-        xhttp.overrideMimeType("application/json");
-        xhttp.onreadystatechange = function() {
-          if (this.readyState === 4 && this.status === 200) {
-            // Typical action to be performed when the document is ready:
-            document.getElementById("text").value = xhttp.responseText;
-            localStorage.setItem("channels",xhttp.responseText);
-            addChannelsToInterface()
-          }
-        };
-        xhttp.open("GET", "channels/sync1.js", true);
-        xhttp.send()
-      } else
-        addChannelsToInterface()
-    }
-  }
+    if (typeof Storage !== "undefined" && localStorage.getItem("channels"))
+      channeltypes = JSON.parse(localStorage.getItem("channels"));
 
-  function addChannelsToInterface() {
-    var channels = JSON.parse(localStorage.getItem("channels"));
-    for (var i = 0; i < channels.length; i++) {
+    for (var i = 0; i < channeltypes.length; ++i) {
       var img = document.createElement("img");
-      img.setAttribute("src","img/sync.svg");
-      img.setAttribute("alt",channels[i].name);
+      img.setAttribute("src","img/" + channeltypes[i].name + ".svg");
+      img.setAttribute("alt",channeltypes[i].name);
       var a = document.createElement("a");
-      a.setAttribute("title",channels[i].name);
+      a.setAttribute("title",channeltypes[i].name);
       a.appendChild(img);
       var span = document.createElement("span");
-      span.setAttribute("id",channels[i].name);
-      span.setAttribute("class",channels[i].class);
+      span.setAttribute("id",channeltypes[i].name);
+      span.setAttribute("class",channeltypes[i].class);
       span.appendChild(a);
       span.appendChild(document.createElement("br"));
-      span.appendChild(document.createTextNode(channels[i].name));
+      span.appendChild(document.createTextNode(channeltypes[i].name));
       document.getElementById("channels").appendChild(span);
-      span.onclick = function() {buttonClick(span)}
+      span.onclick = function() {buttonClick(this)}
     }
-  } //addChannelsToInterface
+  } //loadChannels
 
   function calculateAngle(channel, baseAngle) {
     var angle = 0;
@@ -628,7 +611,7 @@
             else
               reference = {
                 left: loopRadius * Math.cos((channel.parts[0].angle - 90) * Math.PI / 180) + channel.parts[0].left,
-                top: loopRadius * Math.sin((channel.parts[0].angle - 90) * Math.PI / 180) + channel.parts[0].top
+                top:  loopRadius * Math.sin((channel.parts[0].angle - 90) * Math.PI / 180) + channel.parts[0].top
               }
         }
         o.set({
@@ -850,38 +833,7 @@
         // TODO change component to compact mode
         break;
       default:
-        var channel = createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y}, true);
-        snapToComponent(channel.node1,channel.node1.parent);
-
-        p = channel.node1;
-        // place node on nearby edge of component
-        for (i = 0; i < components.length; i++) {
-          if (Math.abs(p.left - components[i].left) < mergeDistance)
-            p.set({left: components[i].left});
-          if (Math.abs(p.top - components[i].top) < mergeDistance)
-            p.set({top: components[i].top});
-          if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
-            p.set({left: components[i].left + components[i].width});
-          if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
-            p.set({top: components[i].top + components[i].height});
-          p.setCoords()
-        }
-
-        for (i = 0; i < p.channels.length; ++i)
-          updateChannel(p.channels[i])
-        p.label.set({left: p.left + p.labelOffsetX});
-        p.label.set({top: p.top + p.labelOffsetY});
-        p.label.setCoords();
-
-        // merge with existing nodes, except node2 of the same channel
-        for (i = nodes.length - 1; i >= 0; --i) {
-          if (nodes[i] === p || nodes[i] === channel.node2)
-            continue;
-          if (p.intersectsWithObject(nodes[i]))
-            if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
-              mergeNodes(nodes[i], p)
-        }
-        canvas.setActiveObject(channel.node2)
+        createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y}, true);
     }
   }); //mouse:down
 
@@ -1072,7 +1024,10 @@
           fill: 'transparent',
           radius: loopRadius,
           stroke: lineStrokeColour,
-          evented: false
+          hasBorders: false,
+          hasControls: false,
+          evented: false,
+          hoverCursor: 'default'
         });
         canvas.add(curve);
 
@@ -1413,5 +1368,4 @@
   createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
   createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
-  //document.getElementById("text").value = JSON.stringify(nodes[0].channels[0])
 })();
