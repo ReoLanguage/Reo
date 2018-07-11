@@ -1,4 +1,10 @@
-(function() {
+require.config({paths: {'vs': 'monaco-editor/min/vs'}});
+require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, reoIMonarchLanguage) {
+  monaco.languages.register({id: 'reo'});
+  monaco.languages.setMonarchTokensProvider('reo', reoIMonarchLanguage.language);
+  monaco.languages.setLanguageConfiguration('reo', reoIMonarchLanguage.conf);
+  var codeEditor = monaco.editor.create(document.getElementById('text'), {language: 'reo'});
+
   var c = document.getElementById("c");
   var container = document.getElementById("canvas");
 
@@ -123,7 +129,7 @@
         client.send()
       })
     }
-    let text = document.getElementById("text").value;
+    let text = codeEditor.getValue();
     let network = new ReoNetwork(sourceLoader);
     await network.includeSource("default.treo");
     await network.parseComponent(text.replace(/\n/g, ''));
@@ -643,7 +649,7 @@
     let commentSwitch = document.getElementById('commentSwitch').checked;
     if (main) {
       var s1 = main.label.text + '(', s2 = '';
-      var space1 = '', space2 = '', q, obj;
+      var space1 = '', space2 = '    ', q, obj;
 
       for (q = 0; q < nodes.length; ++q) {
         obj = nodes[q];
@@ -664,7 +670,7 @@
              )
         ) {
           s2 += space2 + obj.generateCode(commentSwitch);
-          space2 = '\n'
+          space2 = '\n    '
         }
       }
 
@@ -698,7 +704,7 @@
       }
 
       s1 = s1 + ') {\n' + s2 + '\n}';
-      document.getElementById('text').value = s1
+      codeEditor.setValue(s1);
     }
   }
 
@@ -1385,4 +1391,4 @@
   createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
   createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
-})();
+});

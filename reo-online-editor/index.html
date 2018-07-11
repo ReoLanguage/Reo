@@ -12,7 +12,7 @@
     </div>
     <div id="container">
       <div id="textdiv" class="column">
-        <textarea id="text"></textarea>
+        <div id="text" style="text-align: left"></div>
         <input id="submit" type="button" value="Submit Code Changes"/>
         <br>
         <input id="commentSwitch" type="checkbox" checked> Show geometry metadata comments
@@ -35,8 +35,12 @@
     </div>
     <script src="reo2tikz/globalutil.js"></script>
     <script src="fabric.js-2.2.2/dist/fabric.js"></script>
+
+    <script src="monaco-editor/min/vs/loader.js"></script>
+
     <script src="channels.js"></script>
     <script src="editor.js"></script>
+
     <script src="reo2tikz/reonetwork.js"></script>
     <script src="reo2tikz/reocomponent.js"></script>
     <script src="reo2tikz/reocomponenttemplate.js"></script>
