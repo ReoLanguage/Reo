@@ -78,7 +78,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     button.style.border = buttonBorderOn;
     canvas.forEachObject(function(obj) {
       if (obj.class === 'component' || obj.class === 'node' || obj.class === 'label') {
-        obj.set({selectable: mode === 'select'})
+        obj.set('selectable', mode === 'select')
       }
     })
   }
@@ -226,7 +226,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     node.set({label: label, labelOffsetX: 10, labelOffsetY: -20});
     label.on('editing:exited', function() {
-      label.object.set({id: label.text})
+      label.object.set('id', label.text)
     });
 
     nodes.push(node);
@@ -283,8 +283,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   } //createChannel
 
   function completeChannelCreation(channel, node1, node2, manual) {
-    var diffX = Math.abs(node1.x - node2.x);
-    var diffY = Math.abs(node1.y - node2.y);
+    var diffX = Math.abs(node1.x - node2.x), diffY = Math.abs(node1.y - node2.y), i, p;
 
     // ...a reference rectangle...
     channel.parts[0].set({left: Math.min(node1.x,node2.x) + diffX / 2, top: Math.min(node1.y,node2.y) + diffY / 2});
@@ -339,20 +338,19 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     // place node on nearby edge of component
     for (i = 0; i < components.length; i++) {
       if (Math.abs(p.left - components[i].left) < mergeDistance)
-        p.set({left: components[i].left});
+        p.set('left', components[i].left);
       if (Math.abs(p.top - components[i].top) < mergeDistance)
-        p.set({top: components[i].top});
+        p.set('top', components[i].top);
       if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance)
-        p.set({left: components[i].left + components[i].width});
+        p.set('left', components[i].left + components[i].width);
       if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance)
-        p.set({top: components[i].top + components[i].height});
+        p.set('top', components[i].top + components[i].height);
       p.setCoords()
     }
 
     for (i = 0; i < p.channels.length; ++i)
       updateChannel(p.channels[i])
-    p.label.set({left: p.left + p.labelOffsetX});
-    p.label.set({top: p.top + p.labelOffsetY});
+    p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY});
     p.label.setCoords();
 
     // merge with existing nodes, except node2 of the same channel
@@ -545,10 +543,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     if (source) {
       if (sink)
-        node.set({nodetype:'mixed',fill:nodeFillColourMixed});
+        node.set({nodetype: 'mixed', fill: nodeFillColourMixed});
       else
-        node.set({nodetype:'source',fill:nodeFillColourSource})
-    } else node.set({nodetype:'sink',fill:nodeFillColourSink})
+        node.set({nodetype: 'source', fill: nodeFillColourSource})
+    } else node.set({nodetype: 'sink', fill: nodeFillColourSink})
   }
 
   function updateChannel(channel) {
@@ -562,9 +560,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     // update the reference rectangle
     if (channel.parts[0].type === 'rect') {
-      channel.parts[0].set({left: Math.min(x1,x2) + diffX / 2});
-      channel.parts[0].set({top: Math.min(y1,y2) + diffY / 2});
-      channel.parts[0].set({angle: calculateAngle(channel, 90)});
+      channel.parts[0].set({
+        left: Math.min(x1,x2) + diffX / 2,
+        top: Math.min(y1,y2) + diffY / 2,
+        angle: calculateAngle(channel, 90)
+      });
 
       // convert new size to scaling
       var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
@@ -572,8 +572,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       channel.parts[0].set({scaleX: scale, scaleY: scale});
       channel.parts[0].setCoords()
     } else if (channel.parts[0].type === 'circle') {
-      channel.parts[0].set({left: x1});
-      channel.parts[0].set({top: y1 - loopRadius});
+      channel.parts[0].set({left: x1, top: y1 - loopRadius});
       channel.parts[0].setCoords()
     }
 
@@ -603,7 +602,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         if (o.scale === false)
           o.set({scaleX: 1, scaleY: 1});
         if (o.rotate === false)
-          o.set({angle: o.baseAngle});
+          o.set('angle', o.baseAngle);
         let reference;
         switch (o.referencePoint) {
           case 'node1':
@@ -704,15 +703,15 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   function snapToComponent(node, comp) {
     var right = comp.left + comp.scaleX * comp.width, bottom = comp.top + comp.scaleY * comp.height, i;
     if (node.left > right) // right side
-      node.set({'left': right});
+      node.set('left', right);
     if (node.left < comp.left) // left side
-      node.set({'left': comp.left});
+      node.set('left', comp.left);
     if (node.top > bottom) // bottom side
-      node.set({'top': bottom});
+      node.set('top', bottom);
     if (node.top < comp.top) // top side
-      node.set({'top': comp.top});
+      node.set('top', comp.top);
     node.setCoords();
-    node.label.set({'left': node.left + node.labelOffsetX, 'top': node.top + node.labelOffsetY});
+    node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
     node.label.setCoords();
     for (i = 0; i < node.channels.length; ++i)
       updateChannel(node.channels[i]);
@@ -722,15 +721,15 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   function snapOutComponent(node, component, connectedNode) {
     var right = component.left + component.width, bottom = component.top + component.height, i;
     if (connectedNode.left > right) // right side
-      node.set({left: right});
+      node.set('left', right);
     if (connectedNode.left < component.left) // left side
-      node.set({left: component.left});
+      node.set('left', component.left);
     if (connectedNode.top > bottom) // bottom side
-      node.set({top: bottom});
+      node.set('top', bottom);
     if (connectedNode.top < component.top) // top side
-      node.set({top: component.top});
+      node.set('top', component.top);
     node.setCoords();
-    node.label.set({'left': node.left + node.labelOffsetX, 'top': node.top + node.labelOffsetY});
+    node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
     node.label.setCoords();
     for (i = 0; i < node.channels.length; ++i)
       updateChannel(node.channels[i])
@@ -767,8 +766,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           });
           break;
         case 'balloon':
-          e.target.set('opacity', 100);
-          e.target.set('isHover', true)
+          e.target.set({opacity: 100, isHover: true})
       }
       canvas.requestRenderAll()
     }
@@ -793,8 +791,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           });
           break;
         case 'balloon':
-          e.target.set('opacity', 0);
-          e.target.set('isHover', false)
+          e.target.set({opacity: 0, isHover: false})
       }
       canvas.requestRenderAll()
     }
@@ -852,9 +849,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     if (p.class === 'component') {
       if (p.status === 'drawing') {
         if (origX > pointer.x)
-          p.set({left: pointer.x});
+          p.set('left', pointer.x);
         if (origY > pointer.y)
-          p.set({top: pointer.y});
+          p.set('top', pointer.y);
         p.set({width: Math.abs(origX - pointer.x), height: Math.abs(origY - pointer.y)});
         p.setCoords();
       } else {
@@ -866,13 +863,13 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           for (i = 0; i < p.nodes.length; ++i) {
             let node = p.nodes[i];
             if (node.origLeft === origLeft)
-              node.set({left: p.left});
+              node.set('left', p.left);
             if (node.origLeft === origRight)
-              node.set({left: p.left + p.scaleX * p.width});
+              node.set('left', p.left + p.scaleX * p.width);
             if (node.origTop === origTop)
-              node.set({top: p.top});
+              node.set('top', p.top);
             if (node.origTop === origBottom)
-              node.set({top: p.top + p.scaleY * p.height});
+              node.set('top', p.top + p.scaleY * p.height);
             snapToComponent(node, node.parent)
           }
         } else {
@@ -964,7 +961,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
         p.setCoords();
         if (p.status === 'drawing') {
-          p.set({status: 'design'});
+          p.set('status', 'design');
           p.setCoords();
           p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
           p.header.setCoords();
@@ -973,7 +970,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         }
         bringComponentToFront(p);
 
-        p.set({selectable: mode === 'select'});
+        p.set('selectable', mode === 'select');
         // ensure that no channel crosses a component boundary
         for (j = 0; j < nodes.length; j++) {
           for (i = 0; i < nodes[j].channels.length; ++i) {
