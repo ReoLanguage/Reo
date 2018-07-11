@@ -5,8 +5,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   monaco.languages.setLanguageConfiguration('reo', reoIMonarchLanguage.conf);
   var codeEditor = monaco.editor.create(document.getElementById('text'), {language: 'reo'});
 
-  var c = document.getElementById("c");
-  var container = document.getElementById("canvas");
+  var c = document.getElementById("c"), container = document.getElementById("canvas");
 
   function resizeCanvas() {
     c.width = container.clientWidth;
@@ -18,10 +17,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       canvas.calcOffset();
 
       // Redraw the main component
-      var x1 = 50;
-      var y1 = 50;
-      var x2 = container.clientWidth - 50;
-      var y2 = container.clientHeight - 50;
+      var x1 = 50, y1 = 50, x2 = container.clientWidth - 50, y2 = container.clientHeight - 50;
       main.set({
         left: x1,
         top: y1,
@@ -30,8 +26,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       });
 
       // Reset the label position
-      main.label.set({left: x1 + (x2 - x1) / 2});
-      main.label.set({top: y1 + 15});
+      main.label.set({left: x1 + (x2 - x1) / 2, top: y1 + 15});
       main.label.setCoords();
       canvas.requestRenderAll()
     }
@@ -45,9 +40,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   var active, isDown, origX, origY, origLeft, origTop, origRight, origBottom;
   var mode = 'select';
   var id = '0';
-  var nodes = [];
-  var channels = [];
-  var components = [];
+  var nodes = [], channels = [], components = [];
 
   loadChannels();
 
@@ -268,7 +261,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
    * @param {string} [node2.name] - optional name of the second node
    * @param {number} node2.x
    * @param {number} node2.y
-   * @param {boolean} manual - optional flag to indicate the function was initiated by a user action
+   * @param {boolean} [manual] - optional flag to indicate the function was initiated by a user action
    * @returns {{class: string, parts: Array}}
    */
   function createChannel(type, node1, node2, manual) {
