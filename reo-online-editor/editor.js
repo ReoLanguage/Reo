@@ -428,7 +428,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   // p is either a node, a channel or a component
   // if p is a component, parent should be defined
   function setParent(p, parent) {
-    var parentarray, i, j;
+    var parentarray, i, j, k;
     if (p === main)
       return;
     // if a parent is set, remove the reference to p from the parent
@@ -453,10 +453,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     switch (p.class) {
       case 'node':
-        for (i = 0; i < components.length; ++i) {
+        for (i = components.length - 1; i >= 0; --i) {
           if (p.intersectsWithObject(components[i])) {
             p.parent = components[i];
             components[i].nodes.push(p);
+            break;
           }
         }
         break;
@@ -464,7 +465,13 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         if (p.node1.parent === p.node2.parent) {
           p.parent = p.node1.parent
         } else {
-          if (p.node1.parent.size > p.node2.parent.size)
+          for (j = 0; j < components.length; ++j)
+            if (components[j] === p.node1.parent)
+              break;
+          for (k = 0; k < components.length; ++k)
+            if (components[k] === p.node2.parent)
+              break;
+          if (j < k)
             p.parent = p.node1.parent;
           else
             p.parent = p.node2.parent
@@ -516,8 +523,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         snapOutComponent(otherNode, otherNode.parent, node);
       else {
         if (!isBoundaryNode(node)) {
-          otherNode.parent = node.parent; //!!
-          snapToComponent(otherNode, otherNode.parent)
+          snapToComponent(otherNode, node.parent);
+          setParent(otherNode)
         }
       }
       setParent(node.channels[i]);
@@ -930,16 +937,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         if (changingPosition === 'left' && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
             changingPosition === 'top'  && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width  + mergeDistance) {
           var newPosition = {};
-          // Ensure that mixed nodes are visually separated from component boundaries
-          if (p.nodetype === 'mixed') {
-            if (p[changingPosition] < components[i][changingPosition] + size)
-              newPosition[changingPosition] = components[i][changingPosition] + size - mergeDistance;
-            else
-              newPosition[changingPosition] = components[i][changingPosition] + size + mergeDistance
-          }
-          // Put source or sink nodes on the component boundary
-          else
-            newPosition[changingPosition] = components[i][changingPosition] + size;
+          // Put nodes on the component boundary
+          newPosition[changingPosition] = components[i][changingPosition] + size;
           p.set(newPosition);
           p.setCoords()
         }
@@ -1122,17 +1121,15 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       p.delete.bringToFront()
     }
     p.label.bringToFront();
-    for (i = 0; i < p.channels.length; ++i) {
+    for (i = 0; i < p.channels.length; ++i)
       for (j = 1; j < p.channels[i].parts.length; ++j)
         p.channels[i].parts[j].bringToFront();
-    }
     for (i = 0; i < p.nodes.length; ++i) {
       p.nodes[i].bringToFront();
       p.nodes[i].label.bringToFront()
     }
-    for (i = 0; i < p.components.length; ++i) {
+    for (i = 0; i < p.components.length; ++i)
       bringComponentToFront(p.components[i])
-    }
   }
 
   /**
@@ -1147,8 +1144,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         p.channels[i].parts[j].bringToFront();
       p.channels[i].node1.bringToFront();
       p.channels[i].node2.bringToFront()
-      //console.log("Bringing node " + p.channels[i].node1.id + " to the front");
-      //console.log("Bringing node " + p.channels[i].node2.id + " to the front");
     }
     p.label.bringToFront();
   }
