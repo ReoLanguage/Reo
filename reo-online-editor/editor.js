@@ -970,7 +970,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           p.label.set({left: p.left + (p.width/2), top: p.top + 15});
           p.label.setCoords()
         }
-        bringComponentToFront(p);
 
         p.set('selectable', mode === 'select');
         // ensure that no channel crosses a component boundary
@@ -986,6 +985,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
             }
           }
         }
+        bringComponentToFront(p);
         if (mode !== 'select')
           document.getElementById("select").click()
       } else if (p.class === 'label') {
@@ -1109,11 +1109,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     var i, j;
     if (!p || p.class !== 'component')
       return;
-    /*for (i = 0; i < components.length; ++i)
+    for (i = 0; i < components.length; ++i)
       if (components[i] === p) {
-        components.push(components.splice(i,1));
+        components.splice(i,1);
+        components.push(p);
         break;
-      }*/
+      }
     p.bringToFront();
     p.header.bringToFront();
     if (p !== main) {
