@@ -231,6 +231,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     nodes.push(node);
     setParent(node);
+    console.log(node.id + "'s parent is " + node.parent.id);
     canvas.add(node, node.label);
     if (!manual)
       updateNode(node);
@@ -428,7 +429,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   // p is either a node, a channel or a component
   // if p is a component, parent should be defined
   function setParent(p, parent) {
-    var parentarray, i, j, k;
+    var parentarray, i;
     if (p === main)
       return;
     // if a parent is set, remove the reference to p from the parent
@@ -462,20 +463,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         }
         break;
       case 'channel':
-        if (p.node1.parent === p.node2.parent) {
-          p.parent = p.node1.parent
-        } else {
-          for (j = 0; j < components.length; ++j)
-            if (components[j] === p.node1.parent)
-              break;
-          for (k = 0; k < components.length; ++k)
-            if (components[k] === p.node2.parent)
-              break;
-          if (j < k)
-            p.parent = p.node1.parent;
-          else
-            p.parent = p.node2.parent
-        }
+        if (p.node1.parent.index < p.node2.parent.index)
+          p.parent = p.node1.parent;
+        else
+          p.parent = p.node2.parent;
         p.parent.channels.push(p);
         break;
       case 'component':
@@ -487,7 +478,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   function updateNode(node) {
-    var i,j,k;
+    var i;
 
     // set node coordinates
     node.label.setCoords();
@@ -513,13 +504,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       else
         throw new Error("Broken node reference detected");
 
-      for (j = 0; j < components.length; ++j)
-        if (components[j] === node.parent)
-          break;
-      for (k = 0; k < components.length; ++k)
-        if (components[k] === otherNode.parent)
-          break;
-      if (j < k)
+      if (node.parent.index < otherNode.parent.index)
         snapOutComponent(otherNode, otherNode.parent, node);
       else {
         if (!isBoundaryNode(node)) {
@@ -850,16 +835,17 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   canvas.on('mouse:move', function(e) {
     if (!isDown) return;
-    var p = canvas.getActiveObject(), i, j;
+    var p = canvas.getActiveObject(), i, j, x, y;
     if (!p) return;
     var pointer = canvas.getPointer(e.e);
+    x = pointer.x, y = pointer.y;
     if (p.class === 'component') {
       if (p.status === 'drawing') {
-        if (origX > pointer.x)
-          p.set('left', pointer.x);
-        if (origY > pointer.y)
-          p.set('top', pointer.y);
-        p.set({width: Math.abs(origX - pointer.x), height: Math.abs(origY - pointer.y)});
+        if (origX > x)
+          p.set('left', x);
+        if (origY > y)
+          p.set('top', y);
+        p.set({width: Math.abs(origX - x), height: Math.abs(origY - y)});
         p.setCoords();
       } else {
         // p.options.set({left: p.left + 15, top: p.top + 15});
@@ -880,11 +866,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
             snapToComponent(node, node.parent)
           }
         } else {
-          p.set({left: origLeft + pointer.x - origX, top: origTop + pointer.y - origY});
+          p.set({left: origLeft + x - origX, top: origTop + y - origY});
           p.setCoords();
           for (i = 0; i < p.nodes.length; i++) {
             let node = p.nodes[i];
-            node.set({left: node.origLeft + pointer.x - origX, top: node.origTop + pointer.y - origY});
+            node.set({left: node.origLeft + x - origX, top: node.origTop + y - origY});
             node.setCoords();
             node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
             node.label.setCoords();
@@ -903,7 +889,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       p.compactSwitch.set({left: p.left + 20 + nodeFactor * 4, top: p.top + 15});
       p.compactSwitch.setCoords();
     } else if (p.class === 'node') {
-      p.set({left: pointer.x, top: pointer.y});
+      p.set({left: x, top: y});
       p.setCoords();
       if (p.link) {
         p.link.set({x1: p.link.nodes[0].left, y1: p.link.nodes[0].top, x2: p.link.nodes[1].left, y2: p.link.nodes[1].top});
@@ -915,37 +901,21 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           p.setCoords()
         }
       }
-      for (i = 0; i < components.length; i++) {
-        // Check if the node is near any component boundaries
-        let changingPosition, position, size = 0;
-        if (Math.abs(p.left - components[i].left) < mergeDistance) { // near left boundary
-          changingPosition = 'left';
-          position = components[i].left
-        } else if (Math.abs(p.top - components[i].top) < mergeDistance) { // near top boundary
-          changingPosition = 'top';
-          position = components[i].top
-        } else if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance) { // near right boundary
-          changingPosition = 'left';
-          position = components[i].left;
-          size = components[i].width
-        } else if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance) { // near bottom boundary
-          changingPosition = 'top';
-          position = components[i].top;
-          size = components[i].height
-        }
-        // Check if the node is inside or close to the component
-        if (changingPosition === 'left' && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
-            changingPosition === 'top'  && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width  + mergeDistance) {
-          var newPosition = {};
-          // Put nodes on the component boundary
-          newPosition[changingPosition] = components[i][changingPosition] + size;
-          p.set(newPosition);
-          p.setCoords()
-        }
-      }
+
+      // Check if the node is near any component boundaries
+      if (p.left < p.parent.left + mergeDistance) // near left boundary
+        p.set('left', p.parent.left);
+      if (p.top < p.parent.top + mergeDistance) // near top boundary
+        p.set('top', p.parent.top);
+      if (p.left > p.parent.left + p.parent.width - mergeDistance) // near right boundary
+        p.set('left', p.parent.left + p.parent.width);
+      if (p.top > p.parent.top + p.parent.height - mergeDistance) // near bottom boundary
+        p.set('top', p.parent.top + p.parent.height);
+      p.setCoords();
+
+      p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY});
       for (i = 0; i < p.channels.length; ++i)
-        updateChannel(p.channels[i])
-      p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY})
+        updateChannel(p.channels[i]);
     }
     p.label.setCoords();
     canvas.requestRenderAll()
@@ -1111,6 +1081,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     for (i = 0; i < components.length; ++i)
       if (components[i] === p) {
         components.splice(i,1);
+        p.set('index', components.length);
         components.push(p);
         break;
       }
@@ -1357,6 +1328,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       return ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + this.width) + ', ' + Math.round(top + this.height) + '] !*/'
     };
 
+    component.set('index', components.length);
     components.push(component);
     return component
   }
@@ -1373,10 +1345,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   var main = createComponent(50,50,container.clientWidth-50,container.clientHeight-50,'main');
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
-  createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
-  createChannel('lossysync',{x: 100, y: 250},{x: 200, y: 250});
-  createChannel('syncdrain',{x: 100, y: 350},{x: 200, y: 350});
-  createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
-  createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
+  //createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
+  //createChannel('lossysync',{x: 100, y: 250},{x: 200, y: 250});
+  //createChannel('syncdrain',{x: 100, y: 350},{x: 200, y: 350});
+  //createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
+  //createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
 });
