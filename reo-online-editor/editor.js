@@ -231,7 +231,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     nodes.push(node);
     setParent(node);
-    console.log(node.id + "'s parent is " + node.parent.id);
     canvas.add(node, node.label);
     if (!manual)
       updateNode(node);
@@ -363,7 +362,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           mergeNodes(nodes[i], p)
     }
     fromBoundary = isBoundaryNode(channel.node1);
-    console.log("fromBoundary is " + fromBoundary);
     canvas.setActiveObject(channel.node2);
     isDown = true;
   }
@@ -772,11 +770,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               else
                 otherNode = 'node1';
               if (!isBoundaryNode(p.channels[i][otherNode])) {
-                fromBoundary  = false;
+                fromBoundary = false;
                 break
               }
             }
-            console.log("fromBoundary is " + fromBoundary);
           } else if (p.class === 'component') {
             bringComponentToFront(p);
             origLeft = p.left;
@@ -810,7 +807,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   canvas.on('mouse:move', function(e) {
     if (!isDown) return;
-    var p = canvas.getActiveObject(), i, j, x, y, index = -1;
+    var i, j, x, y, p = canvas.getActiveObject(), index = -1;
     if (!p) return;
     var pointer = canvas.getPointer(e.e);
     x = pointer.x, y = pointer.y;
@@ -870,12 +867,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         p.link.set({x1: p.link.nodes[0].left, y1: p.link.nodes[0].top, x2: p.link.nodes[1].left, y2: p.link.nodes[1].top});
         p.link.setCoords();
       }
-      for (i = 0; i < nodes.length; i++) {
+      for (i = 0; i < nodes.length; ++i)
         if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
           p.set({left: nodes[i].left, top: nodes[i].top});
           p.setCoords()
         }
-      }
 
       if (!fromBoundary) {
         // Limit the node position to the parent
@@ -950,7 +946,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     canvas.requestRenderAll()
   }); //mouse:move
 
-  canvas.on('mouse:up', function(){
+  canvas.on('mouse:up', function() {
     isDown = false;
     var p = canvas.getActiveObject(), i, j;
     if (p) {
@@ -982,8 +978,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       canvas.requestRenderAll();
       updateText()
     }
-    for (i = 0; i < components.length; ++i)
-      console.log(components[i].index);
   }); //mouse:up
 
   function mergeNodes(destination, source) {
