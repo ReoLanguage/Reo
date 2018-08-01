@@ -447,23 +447,21 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         case 'component':
           parentarray = p.parent.components
       }
-      for (i = 0; i < parentarray.length; ++i) {
+      for (i = 0; i < parentarray.length; ++i)
         if (parentarray[i] === p) {
           parentarray.splice(i,1);
           break
         }
-      }
     }
 
     switch (p.class) {
       case 'node':
-        for (i = components.length - 1; i >= 0; --i) {
+        for (i = components.length - 1; i >= 0; --i)
           if (p.intersectsWithObject(components[i])) {
             p.parent = components[i];
             components[i].nodes.push(p);
             break;
           }
-        }
         break;
       case 'channel':
         if (p.node1.parent.index < p.node2.parent.index)
@@ -766,6 +764,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       case 'select':
         if (p) {
           if (p.class === 'node') {
+            bringNodeToFront(p);
             fromBoundary = true;
             for (i = 0; i < p.channels.length; ++i) {
               if (p.channels[i].node1 === p)
@@ -983,6 +982,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       canvas.requestRenderAll();
       updateText()
     }
+    for (i = 0; i < components.length; ++i)
+      console.log(components[i].index);
   }); //mouse:up
 
   function mergeNodes(destination, source) {
@@ -1092,16 +1093,22 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
    * Moves component p and all its objects to the top layer
    */
   function bringComponentToFront(p) {
-    var i, j;
+    var i, j, limit = components.length;
     if (!p || p.class !== 'component')
       return;
-    for (i = 0; i < components.length; ++i)
+    // Move p to the end of the array
+    for (i = 0; i < limit; ++i)
       if (components[i] === p) {
         components.splice(i,1);
         p.set('index', components.length);
         components.push(p);
-        break;
+        --i;
+        --limit;
+        break
       }
+    // Update the other index parameters accordingly
+    for (; i < limit; ++i)
+      components[i].set('index', i);
     p.bringToFront();
     p.header.bringToFront();
     if (p !== main) {
@@ -1109,6 +1116,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       p.delete.bringToFront()
     }
     p.label.bringToFront();
+    // Set a new parent for the channels if necessary
+    for (i = p.channels.length - 1; i >= 0; --i)
+      setParent(p.channels[i]);
     for (i = 0; i < p.channels.length; ++i)
       for (j = 1; j < p.channels[i].parts.length; ++j)
         p.channels[i].parts[j].bringToFront();
