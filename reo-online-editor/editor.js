@@ -364,6 +364,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           mergeNodes(nodes[i], p)
     }
     fromBoundary = isBoundaryNode(channel.node1);
+    console.log("fromBoundary is " + fromBoundary);
     canvas.setActiveObject(channel.node2);
     isDown = true;
   }
@@ -794,6 +795,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
                 break
               }
             }
+            console.log("fromBoundary is " + fromBoundary);
           } else if (p.class === 'component') {
             bringComponentToFront(p);
             origLeft = p.left;
@@ -827,7 +829,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   canvas.on('mouse:move', function(e) {
     if (!isDown) return;
-    var p = canvas.getActiveObject(), i, j, x, y;
+    var p = canvas.getActiveObject(), i, j, x, y, index = -1;
     if (!p) return;
     var pointer = canvas.getPointer(e.e);
     x = pointer.x, y = pointer.y;
@@ -904,7 +906,59 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           p.set('left', p.parent.left + p.parent.width);
         if (p.top > p.parent.top + p.parent.height - mergeDistance) // near bottom boundary
           p.set('top', p.parent.top + p.parent.height);
-        p.setCoords();
+        p.setCoords()
+      }
+
+      if (fromBoundary || p.parent === main) {
+        for (i = 0; i < components.length; ++i) {
+          // Check if the node is over an other component
+          if (p.left > components[i].left - mergeDistance &&
+              p.top  > components[i].top  - mergeDistance &&
+              p.left < components[i].left + components[i].width  + mergeDistance &&
+              p.top  < components[i].top  + components[i].height + mergeDistance)
+            index = i;
+        }
+
+        if (index >= 0 && components[index] !== p.parent && components[index] !== main) {
+          // Ensure that the node is inside the component
+          if (p.left < components[index].left) // near left boundary
+            p.set('left', components[index].left);
+          if (p.top < components[index].top) // near top boundary
+            p.set('top', components[index].top);
+          if (p.left > components[index].left + components[index].width) // near right boundary
+            p.set('left', components[index].left + components[index].width);
+          if (p.top > components[index].top + components[index].height) // near bottom boundary
+            p.set('top', components[index].top + components[index].height);
+          p.setCoords();
+
+          // Find the closest boundary
+          let changingPosition, distance, position, size = 0;
+          distance = p.left - components[index].left; // left boundary
+          changingPosition = 'left';
+          position = components[index].left;
+          if (p.top - components[index].top < distance) { // top boundary
+            distance = p.top - components[index].top;
+            changingPosition = 'top';
+            position = components[index].top
+          }
+          if (components[index].left + components[index].width - p.left < distance) { // right boundary
+            distance = components[index].left + components[index].width - p.left;
+            changingPosition = 'left';
+            position = components[index].left;
+            size = components[index].width
+          }
+          if (components[index].top + components[index].height - p.top < distance) { // bottom boundary
+            changingPosition = 'top';
+            position = components[index].top;
+            size = components[index].height
+          }
+
+          // Move the node to the closest boundary
+          var newPosition = {};
+          newPosition[changingPosition] = components[index][changingPosition] + size;
+          p.set(newPosition);
+          p.setCoords()
+        }
       }
 
       p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY});
