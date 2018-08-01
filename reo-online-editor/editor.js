@@ -334,7 +334,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     setParent(channel);
     updateChannel(channel);
-    snapToComponent(channel.node1,channel.node1.parent);
 
     p = channel.node1;
     // place node on nearby edge of component
@@ -481,7 +480,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     }
   }
 
-  function updateNode(node) {
+  function updateNode(node, keepParent) {
     var i;
 
     // set node coordinates
@@ -496,7 +495,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         if(Math.abs(node.left-nodes[i].left) < mergeDistance && Math.abs(node.top-nodes[i].top) < mergeDistance)
           mergeNodes(node, nodes[i])
     }
-    setParent(node);
+    if (!keepParent)
+      setParent(node);
     updateNodeColouring(node)
   } //updateNode
 
@@ -690,24 +690,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     node.label.setCoords();
     for (i = 0; i < node.channels.length; ++i)
       updateChannel(node.channels[i]);
-    updateText()
-  }
-
-  function snapOutComponent(node, component, connectedNode) {
-    var right = component.left + component.width, bottom = component.top + component.height, i;
-    if (connectedNode.left > right) // right side
-      node.set('left', right);
-    if (connectedNode.left < component.left) // left side
-      node.set('left', component.left);
-    if (connectedNode.top > bottom) // bottom side
-      node.set('top', bottom);
-    if (connectedNode.top < component.top) // top side
-      node.set('top', component.top);
-    node.setCoords();
-    node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
-    node.label.setCoords();
-    for (i = 0; i < node.channels.length; ++i)
-      updateChannel(node.channels[i])
     updateText()
   }
 
@@ -975,7 +957,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     if (p) {
       p.setCoords();
       if (p.class === 'node')
-        updateNode(p);
+        updateNode(p, !(fromBoundary || p.parent === main));
       else if (p.class === 'component') {
         p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
         p.setCoords();
@@ -989,19 +971,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         }
 
         p.set('selectable', mode === 'select');
-        // ensure that no channel crosses a component boundary
-        for (j = 0; j < nodes.length; j++) {
-          for (i = 0; i < nodes[j].channels.length; ++i) {
-            if (p.intersectsWithObject(p)) {
-              if (nodes[j] === nodes[j].channels[i].node1)
-                snapOutComponent(nodes[j], nodes[j].parent, nodes[j].channels[i].node2);
-              else if (nodes[j] === nodes[j].channels[i].node2)
-                snapOutComponent(nodes[j], nodes[j].parent, nodes[j].channels[i].node1);
-              else
-                throw new Error("Broken node reference detected")
-            }
-          }
-        }
         bringComponentToFront(p);
         if (mode !== 'select')
           document.getElementById("select").click()
