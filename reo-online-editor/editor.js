@@ -647,14 +647,15 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   function updateText() {
     let commentSwitch = document.getElementById('commentSwitch').checked;
     if (main) {
-      var s1 = main.label.text + '(', s2 = '';
-      var space1 = '', space2 = '    ', q, obj;
+      var textMain = main.label.text + '(', textMainScope = '';
+      var spaceArguments = '', spaceScope = '    ';
+      var q, obj;
 
       for (q = 0; q < nodes.length; ++q) {
         obj = nodes[q];
         if (obj.parent.id === 'main' && isBoundaryNode(obj)) {
-          s1 += space1 + obj.label.text;
-          space1 = ','
+          textMain += spaceArguments + obj.label.text;
+          spaceArguments = ', '
         }
       }
 
@@ -668,42 +669,39 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               node1.parent !== node2.parent
              )
         ) {
-          s2 += space2 + obj.generateCode(commentSwitch);
-          space2 = '\n    '
+          textMainScope += '\n' + spaceScope + obj.generateCode(commentSwitch);
         }
       }
 
       for (q = 0; q < components.length; ++q) {
         obj = components[q];
         if (obj !== main) {
-          var s3 = '\n' + obj.label.text + '(';
-          var space3 = '', r, obj2;
+          var textComponent = '\n' + spaceScope + obj.label.text + '(';
+          var r, obj2;
 
+          spaceArguments = '';
           for (r = 0; r < nodes.length; ++r) {
             obj2 = nodes[r];
             if (obj2.parent === obj && isBoundaryNode(obj2)) {
-              s3 += space3 + obj2.label.text;
-              space3 = ','
+              textComponent += spaceArguments + obj2.label.text;
+              spaceArguments = ', '
             }
           }
-          space3 = '\n';
-          s3 += ') {';
+          textComponent += ') {';
           if (commentSwitch)
-            s3 += obj.positionMetadata();
+            textComponent += obj.positionMetadata();
           for (r = 0; r < channels.length; ++r) {
             obj2 = channels[r];
             if (obj2.node1.parent === obj && obj2.node2.parent === obj)
-              s3 += space3 + obj2.generateCode(commentSwitch)
+              textComponent += '\n' + spaceScope.repeat(2) + obj2.generateCode(commentSwitch)
           }
-          space3 = '';
-          s3 += '\n}';
-          s2 += space2 + s3;
-          space2 = ' '
+          textComponent += '\n' + spaceScope + '}';
+          textMainScope += '\n' + textComponent;
         }
       }
 
-      s1 = s1 + ') {\n' + s2 + '\n}';
-      codeEditor.setValue(s1);
+      textMain += ') {' + textMainScope + '\n}\n';
+      codeEditor.setValue(textMain);
     }
   }
 
