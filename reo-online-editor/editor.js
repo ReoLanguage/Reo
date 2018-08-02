@@ -37,7 +37,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   var canvas = this.__canvas = new fabric.Canvas('c', {selection: false, preserveObjectStacking: true});
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   fabric.Object.prototype.objectCaching = false;
-  var active, isDown, origX, origY, origLeft, origTop, origRight, origBottom;
+  var active, isDown, origX, origY, origLeft, origTop, origRight, origBottom, fromBoundary;
   var mode = 'select';
   var id = '0';
   var nodes = [], channels = [], components = [];
@@ -267,6 +267,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   function createChannel(type, node1, node2, manual) {
     // create a channel...
     var channel, i, validChannel = false;
+    isDown = false;
 
     for (i = 0; i < channeltypes.length; ++i)
       if (channeltypes[i].name === type) {
@@ -332,7 +333,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     setParent(channel);
     updateChannel(channel);
-    snapToComponent(channel.node1,channel.node1.parent);
 
     p = channel.node1;
     // place node on nearby edge of component
@@ -361,7 +361,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
           mergeNodes(nodes[i], p)
     }
-    canvas.setActiveObject(channel.node2)
+    fromBoundary = isBoundaryNode(channel.node1);
+    canvas.setActiveObject(channel.node2);
+    isDown = true;
   }
 
   function createLink(node) {
@@ -428,7 +430,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   // p is either a node, a channel or a component
   // if p is a component, parent should be defined
   function setParent(p, parent) {
-    var parentarray, i, j, k;
+    var parentarray, i;
     if (p === main)
       return;
     // if a parent is set, remove the reference to p from the parent
@@ -443,39 +445,27 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         case 'component':
           parentarray = p.parent.components
       }
-      for (i = 0; i < parentarray.length; ++i) {
+      for (i = 0; i < parentarray.length; ++i)
         if (parentarray[i] === p) {
           parentarray.splice(i,1);
           break
         }
-      }
     }
 
     switch (p.class) {
       case 'node':
-        for (i = components.length - 1; i >= 0; --i) {
+        for (i = components.length - 1; i >= 0; --i)
           if (p.intersectsWithObject(components[i])) {
             p.parent = components[i];
             components[i].nodes.push(p);
             break;
           }
-        }
         break;
       case 'channel':
-        if (p.node1.parent === p.node2.parent) {
-          p.parent = p.node1.parent
-        } else {
-          for (j = 0; j < components.length; ++j)
-            if (components[j] === p.node1.parent)
-              break;
-          for (k = 0; k < components.length; ++k)
-            if (components[k] === p.node2.parent)
-              break;
-          if (j < k)
-            p.parent = p.node1.parent;
-          else
-            p.parent = p.node2.parent
-        }
+        if (p.node1.parent.index < p.node2.parent.index)
+          p.parent = p.node1.parent;
+        else
+          p.parent = p.node2.parent;
         p.parent.channels.push(p);
         break;
       case 'component':
@@ -486,8 +476,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     }
   }
 
-  function updateNode(node) {
-    var i, j, k;
+  function updateNode(node, keepParent) {
+    var i;
 
     // set node coordinates
     node.label.setCoords();
@@ -500,34 +490,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         if(Math.abs(node.left-nodes[i].left) < mergeDistance && Math.abs(node.top-nodes[i].top) < mergeDistance)
           mergeNodes(node, nodes[i])
     }
-    setParent(node);
-
-    // ensure that no channel crosses a component boundary
-    for (i = 0; i < node.channels.length; ++i) {
-      var otherNode;
-      if (node === node.channels[i].node1)
-        otherNode = node.channels[i].node2;
-      else if (node === node.channels[i].node2)
-        otherNode = node.channels[i].node1;
-      else
-        throw new Error("Broken node reference detected");
-
-      for (j = 0; j < components.length; ++j)
-        if (components[j] === node.parent)
-          break;
-      for (k = 0; k < components.length; ++k)
-        if (components[k] === otherNode.parent)
-          break;
-      if (j < k)
-        snapOutComponent(otherNode, otherNode.parent, node);
-      else {
-        if (!isBoundaryNode(node)) {
-          snapToComponent(otherNode, node.parent);
-          setParent(otherNode)
-        }
-      }
-      setParent(node.channels[i]);
-    }
+    if (!keepParent)
+      setParent(node);
     updateNodeColouring(node)
   } //updateNode
 
@@ -723,24 +687,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     updateText()
   }
 
-  function snapOutComponent(node, component, connectedNode) {
-    var right = component.left + component.width, bottom = component.top + component.height, i;
-    if (connectedNode.left > right) // right side
-      node.set('left', right);
-    if (connectedNode.left < component.left) // left side
-      node.set('left', component.left);
-    if (connectedNode.top > bottom) // bottom side
-      node.set('top', bottom);
-    if (connectedNode.top < component.top) // top side
-      node.set('top', component.top);
-    node.setCoords();
-    node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
-    node.label.setCoords();
-    for (i = 0; i < node.channels.length; ++i)
-      updateChannel(node.channels[i])
-    updateText()
-  }
-
   canvas.on('object:moving', function(e) {
     e.target.setCoords()
   }); //object:moving
@@ -804,7 +750,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   canvas.on('mouse:down', function(e) {
     isDown = true;
-    var pointer = canvas.getPointer(e.e), i;
+    var pointer = canvas.getPointer(e.e), i, otherNode;
     origX = pointer.x;
     origY = pointer.y;
     var p = canvas.getActiveObject();
@@ -813,33 +759,35 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     switch (mode) {
       case 'select':
         if (p) {
-          switch (p.class) {
-            case 'node':
-              bringNodeToFront(p);
-              break;
-            case 'component':
-              bringComponentToFront(p);
-              origLeft = p.left;
-              origRight = p.left + p.width;
-              origTop = p.top;
-              origBottom = p.top + p.height;
-              p.nodes = [];
-              for (i = 0; i < nodes.length; ++i) {
-                if (nodes[i].parent === p) {
-                  p.nodes.push(nodes[i]);
-                  nodes[i].origLeft = nodes[i].left;
-                  nodes[i].origTop = nodes[i].top
-                }
+          if (p.class === 'node') {
+            bringNodeToFront(p);
+            fromBoundary = true;
+            for (i = 0; i < p.channels.length; ++i) {
+              if (p.channels[i].node1 === p)
+                otherNode = 'node2';
+              else
+                otherNode = 'node1';
+              if (!isBoundaryNode(p.channels[i][otherNode])) {
+                fromBoundary = false;
+                break
               }
-              break;
-            case 'compactSwitch':
-              console.log('compactSwitch');
-              compactComponent(p.component);
-              break;
-            case 'delete':
-              console.log('delete');
-              deleteComponent(p.component);
-              break;
+            }
+          } else if (p.class === 'component') {
+            bringComponentToFront(p);
+            origLeft = p.left;
+            origRight = p.left + p.width;
+            origTop = p.top;
+            origBottom = p.top + p.height;
+            p.nodes = [];
+            for (i = 0; i < nodes.length; ++i) {
+              if (nodes[i].parent === p) {
+                p.nodes.push(nodes[i]);
+                nodes[i].origLeft = nodes[i].left;
+                nodes[i].origTop = nodes[i].top
+              }
+            }
+          } else if (p.class === 'delete') {
+            deleteComponent(p.component);
           }
         }
         break;
@@ -854,16 +802,17 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   canvas.on('mouse:move', function(e) {
     if (!isDown) return;
-    var p = canvas.getActiveObject(), i, j;
+    var i, j, x, y, p = canvas.getActiveObject(), index = -1;
     if (!p) return;
     var pointer = canvas.getPointer(e.e);
+    x = pointer.x, y = pointer.y;
     if (p.class === 'component') {
       if (p.status === 'drawing') {
-        if (origX > pointer.x)
-          p.set('left', pointer.x);
-        if (origY > pointer.y)
-          p.set('top', pointer.y);
-        p.set({width: Math.abs(origX - pointer.x), height: Math.abs(origY - pointer.y)});
+        if (origX > x)
+          p.set('left', x);
+        if (origY > y)
+          p.set('top', y);
+        p.set({width: Math.abs(origX - x), height: Math.abs(origY - y)});
         p.setCoords();
       } else {
         // p.options.set({left: p.left + 15, top: p.top + 15});
@@ -884,11 +833,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
             snapToComponent(node, node.parent)
           }
         } else {
-          p.set({left: origLeft + pointer.x - origX, top: origTop + pointer.y - origY});
+          p.set({left: origLeft + x - origX, top: origTop + y - origY});
           p.setCoords();
           for (i = 0; i < p.nodes.length; i++) {
             let node = p.nodes[i];
-            node.set({left: node.origLeft + pointer.x - origX, top: node.origTop + pointer.y - origY});
+            node.set({left: node.origLeft + x - origX, top: node.origTop + y - origY});
             node.setCoords();
             node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
             node.label.setCoords();
@@ -909,61 +858,98 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         p.compactSwitch.setCoords();
       }
     } else if (p.class === 'node') {
-      p.set({left: pointer.x, top: pointer.y});
+      p.set({left: x, top: y});
       p.setCoords();
       if (p.link) {
         p.link.set({x1: p.link.nodes[0].left, y1: p.link.nodes[0].top, x2: p.link.nodes[1].left, y2: p.link.nodes[1].top});
         p.link.setCoords();
       }
-      for (i = 0; i < nodes.length; i++) {
+      for (i = 0; i < nodes.length; ++i)
         if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
           p.set({left: nodes[i].left, top: nodes[i].top});
           p.setCoords()
         }
+
+      if (!fromBoundary) {
+        // Limit the node position to the parent
+        if (p.left < p.parent.left + mergeDistance) // near left boundary
+          p.set('left', p.parent.left);
+        if (p.top < p.parent.top + headerHeight) // near top boundary
+          p.set('top', p.parent.top);
+        if (p.left > p.parent.left + p.parent.width - mergeDistance) // near right boundary
+          p.set('left', p.parent.left + p.parent.width);
+        if (p.top > p.parent.top + p.parent.height - mergeDistance) // near bottom boundary
+          p.set('top', p.parent.top + p.parent.height);
+        p.setCoords()
       }
-      for (i = 0; i < components.length; i++) {
-        // Check if the node is near any component boundaries
-        let changingPosition, position, size = 0;
-        if (Math.abs(p.left - components[i].left) < mergeDistance) { // near left boundary
-          changingPosition = 'left';
-          position = components[i].left
-        } else if (Math.abs(p.top - components[i].top) < mergeDistance) { // near top boundary
-          changingPosition = 'top';
-          position = components[i].top
-        } else if (Math.abs(p.left - (components[i].left + components[i].width)) < mergeDistance) { // near right boundary
-          changingPosition = 'left';
-          position = components[i].left;
-          size = components[i].width
-        } else if (Math.abs(p.top - (components[i].top + components[i].height)) < mergeDistance) { // near bottom boundary
-          changingPosition = 'top';
-          position = components[i].top;
-          size = components[i].height
+
+      if (fromBoundary || p.parent === main) {
+        for (i = 0; i < components.length; ++i) {
+          // Check if the node is over an other component
+          if (p.left > components[i].left - mergeDistance &&
+              p.top  > components[i].top  - mergeDistance &&
+              p.left < components[i].left + components[i].width  + mergeDistance &&
+              p.top  < components[i].top  + components[i].height + mergeDistance)
+            index = i;
         }
-        // Check if the node is inside or close to the component
-        if (changingPosition === 'left' && p.top  > components[i].top  - mergeDistance && p.top  < components[i].top  + components[i].height + mergeDistance ||
-            changingPosition === 'top'  && p.left > components[i].left - mergeDistance && p.left < components[i].left + components[i].width  + mergeDistance) {
+
+        if (index >= 0 && components[index] !== p.parent && components[index] !== main) {
+          // Ensure that the node is inside the component
+          if (p.left < components[index].left) // near left boundary
+            p.set('left', components[index].left);
+          if (p.top < components[index].top) // near top boundary
+            p.set('top', components[index].top);
+          if (p.left > components[index].left + components[index].width) // near right boundary
+            p.set('left', components[index].left + components[index].width);
+          if (p.top > components[index].top + components[index].height) // near bottom boundary
+            p.set('top', components[index].top + components[index].height);
+          p.setCoords();
+
+          // Find the closest boundary
+          let changingPosition, distance, position, size = 0;
+          distance = p.left - components[index].left; // left boundary
+          changingPosition = 'left';
+          position = components[index].left;
+          if (p.top - components[index].top < distance) { // top boundary
+            distance = p.top - components[index].top;
+            changingPosition = 'top';
+            position = components[index].top
+          }
+          if (components[index].left + components[index].width - p.left < distance) { // right boundary
+            distance = components[index].left + components[index].width - p.left;
+            changingPosition = 'left';
+            position = components[index].left;
+            size = components[index].width
+          }
+          if (components[index].top + components[index].height - p.top < distance) { // bottom boundary
+            changingPosition = 'top';
+            position = components[index].top;
+            size = components[index].height
+          }
+
+          // Move the node to the closest boundary
           var newPosition = {};
-          // Put nodes on the component boundary
-          newPosition[changingPosition] = components[i][changingPosition] + size;
+          newPosition[changingPosition] = components[index][changingPosition] + size;
           p.set(newPosition);
           p.setCoords()
         }
       }
+
+      p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY});
       for (i = 0; i < p.channels.length; ++i)
-        updateChannel(p.channels[i])
-      p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY})
+        updateChannel(p.channels[i]);
     }
     p.label.setCoords();
     canvas.requestRenderAll()
   }); //mouse:move
 
-  canvas.on('mouse:up', function(){
+  canvas.on('mouse:up', function() {
     isDown = false;
     var p = canvas.getActiveObject(), i, j;
     if (p) {
       p.setCoords();
       if (p.class === 'node')
-        updateNode(p);
+        updateNode(p, !(fromBoundary || p.parent === main));
       else if (p.class === 'component') {
         p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
         p.setCoords();
@@ -977,19 +963,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         }
 
         p.set('selectable', mode === 'select');
-        // ensure that no channel crosses a component boundary
-        for (j = 0; j < nodes.length; j++) {
-          for (i = 0; i < nodes[j].channels.length; ++i) {
-            if (p.intersectsWithObject(p)) {
-              if (nodes[j] === nodes[j].channels[i].node1)
-                snapOutComponent(nodes[j], nodes[j].parent, nodes[j].channels[i].node2);
-              else if (nodes[j] === nodes[j].channels[i].node2)
-                snapOutComponent(nodes[j], nodes[j].parent, nodes[j].channels[i].node1);
-              else
-                throw new Error("Broken node reference detected")
-            }
-          }
-        }
         bringComponentToFront(p);
         if (mode !== 'select')
           document.getElementById("select").click()
@@ -1111,15 +1084,22 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
    * Moves component p and all its objects to the top layer
    */
   function bringComponentToFront(p) {
-    var i, j;
+    var i, j, limit = components.length;
     if (!p || p.class !== 'component')
       return;
-    for (i = 0; i < components.length; ++i)
+    // Move p to the end of the array
+    for (i = 0; i < limit; ++i)
       if (components[i] === p) {
         components.splice(i,1);
+        p.set('index', components.length);
         components.push(p);
-        break;
+        --i;
+        --limit;
+        break
       }
+    // Update the other index parameters accordingly
+    for (; i < limit; ++i)
+      components[i].set('index', i);
     p.bringToFront();
     p.header.bringToFront();
     if (p !== main) {
@@ -1127,6 +1107,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       p.delete.bringToFront()
     }
     p.label.bringToFront();
+    // Set a new parent for the channels if necessary
+    for (i = p.channels.length - 1; i >= 0; --i)
+      setParent(p.channels[i]);
     for (i = 0; i < p.channels.length; ++i)
       for (j = 1; j < p.channels[i].parts.length; ++j)
         p.channels[i].parts[j].bringToFront();
@@ -1136,6 +1119,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     }
     for (i = 0; i < p.components.length; ++i)
       bringComponentToFront(p.components[i])
+    canvas.requestRenderAll();
   }
 
   /**
@@ -1361,6 +1345,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       return ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + this.width) + ', ' + Math.round(top + this.height) + '] !*/'
     };
 
+    component.set('index', components.length);
     components.push(component);
     return component
   }
@@ -1377,10 +1362,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   var main = createComponent(50,50,container.clientWidth-50,container.clientHeight-50,'main');
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
-  createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
-  createChannel('lossysync',{x: 100, y: 250},{x: 200, y: 250});
-  createChannel('syncdrain',{x: 100, y: 350},{x: 200, y: 350});
-  createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
-  createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
+  //createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
+  //createChannel('lossysync',{x: 100, y: 250},{x: 200, y: 250});
+  //createChannel('syncdrain',{x: 100, y: 350},{x: 200, y: 350});
+  //createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
+  //createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
 });

@@ -288,8 +288,7 @@ public class Interpreter<T extends Semantics<T>> {
 								try {
 									if (zipFile != null)
 										zipFile.close();
-								} catch (IOException e) {
-								}
+								} catch (IOException ignored) {}
 							}
 						}
 					}
@@ -306,7 +305,7 @@ public class Interpreter<T extends Semantics<T>> {
 	 * 
 	 * @param is
 	 *            input stream
-	 * @param path
+	 * @param file
 	 *            location of the file
 	 * @return an interpreted source file, or null in case of an error.
 	 */
