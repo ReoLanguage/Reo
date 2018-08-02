@@ -487,15 +487,14 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   function updateNode(node) {
-    var i,j,k;
+    var i, j, k;
 
     // set node coordinates
     node.label.setCoords();
     node.set({labelOffsetX: node.label.left - node.left, labelOffsetY: node.label.top - node.top});
     for (i = nodes.length - 1; i >= 0; --i) {
       // prevent comparing the node with itself
-      if (nodes[i] === node)
-        continue;
+      if (nodes[i] === node) continue;
       // merge nodes that overlap
       if (node.intersectsWithObject(nodes[i]))
         if(Math.abs(node.left-nodes[i].left) < mergeDistance && Math.abs(node.top-nodes[i].top) < mergeDistance)
@@ -718,6 +717,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     node.setCoords();
     node.label.set({left: node.left + node.labelOffsetX, top: node.top + node.labelOffsetY});
     node.label.setCoords();
+    node.label.bringToFront();
     for (i = 0; i < node.channels.length; ++i)
       updateChannel(node.channels[i]);
     updateText()
@@ -1249,7 +1249,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       }
   });
 
-  function createComponent(x1,y1,x2,y2,name) {
+  function createComponent(x1, y1, x2, y2, name) {
     var width = (x2 - x1);
     var height = (y2 - y1);
     var left = x1;
