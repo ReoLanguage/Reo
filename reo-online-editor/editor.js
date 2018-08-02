@@ -813,33 +813,39 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     switch (mode) {
       case 'select':
         if (p) {
-          if (p.class === 'node') {
-            bringNodeToFront(p);
-          } else if (p.class === 'component') {
-            bringComponentToFront(p);
-            origLeft = p.left;
-            origRight = p.left + p.width;
-            origTop = p.top;
-            origBottom = p.top + p.height;
-            p.nodes = [];
-            for (i = 0; i < nodes.length; ++i) {
-              if (nodes[i].parent === p) {
-                p.nodes.push(nodes[i]);
-                nodes[i].origLeft = nodes[i].left;
-                nodes[i].origTop = nodes[i].top
+          switch (p.class) {
+            case 'node':
+              bringNodeToFront(p);
+              break;
+            case 'component':
+              bringComponentToFront(p);
+              origLeft = p.left;
+              origRight = p.left + p.width;
+              origTop = p.top;
+              origBottom = p.top + p.height;
+              p.nodes = [];
+              for (i = 0; i < nodes.length; ++i) {
+                if (nodes[i].parent === p) {
+                  p.nodes.push(nodes[i]);
+                  nodes[i].origLeft = nodes[i].left;
+                  nodes[i].origTop = nodes[i].top
+                }
               }
-            }
-          } else if (p.class === 'delete') {
-            deleteComponent(p.component);
+              break;
+            case 'compactSwitch':
+              console.log('compactSwitch');
+              compactComponent(p.component);
+              break;
+            case 'delete':
+              console.log('delete');
+              deleteComponent(p.component);
+              break;
           }
         }
         break;
       case 'component':
         var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
         canvas.setActiveObject(comp);
-        break;
-      case 'compactSwitch':
-        // TODO change component to compact mode
         break;
       default:
         createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y}, true);
@@ -1234,6 +1240,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     if (component !== main)
       canvas.remove(component.delete, component.compactSwitch);
     canvas.remove(component, component.header, component.label)
+  }
+
+  function compactComponent(component) {
+
   }
 
   document.addEventListener("keydown", function(e) {
