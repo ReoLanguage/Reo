@@ -898,8 +898,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         p.delete.set({left: p.left + 15, top: p.top + 15});
         p.delete.setCoords();
       }
-      p.compactSwitch.set({left: p.left + 20 + nodeFactor * 4, top: p.top + 15});
-      p.compactSwitch.setCoords();
+      if (p.compactSwitch) {
+        p.compactSwitch.set({left: p.left + 30, top: p.top + 15});
+        p.compactSwitch.setCoords();
+      }
     } else if (p.class === 'node') {
       p.set({left: pointer.x, top: pointer.y});
       p.setCoords();
@@ -1301,23 +1303,17 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     canvas.add(component, header, label);
 
     if (name !== 'main') {
-      var compactSwitch = new fabric.Circle({
-        left: left + 20 + nodeFactor * 4,
-        top: top + 15,
-        radius: nodeFactor * 2,
-        hasControls: false,
-        selectable: false,
-        parent: component,
-        class: 'compactSwitch'
+      fabric.Image.fromURL('img/compact.svg', function(img) {
+        var scale = (nodeFactor * 4) / img.height;
+        img.scale(scale).set({left: component.left + 30, top: component.top + 15, class: 'compactSwitch', component: component});
+        component.set('compactSwitch', img);
+        canvas.add(img)
       });
-      component.set('compactSwitch', compactSwitch);
-      canvas.add(compactSwitch);
-
       fabric.Image.fromURL('img/delete.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        var img1 = img.scale(scale).set({left: component.left + 15, top: component.top + 15, class: 'delete', component: component});
-        component.set('delete', img1);
-        canvas.add(img1)
+        img.scale(scale).set({left: component.left + 15, top: component.top + 15, class: 'delete', component: component});
+        component.set('delete', img);
+        canvas.add(img)
       });
     }
 
