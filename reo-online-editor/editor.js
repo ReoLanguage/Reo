@@ -854,7 +854,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         p.delete.setCoords();
       }
       if (p.compactSwitch) {
-        p.compactSwitch.set({left: p.left + 30, top: p.top + 15});
+        p.compactSwitch.set({left: p.left + 35, top: p.top + 15});
         p.compactSwitch.setCoords();
       }
     } else if (p.class === 'node') {
@@ -1299,7 +1299,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     if (name !== 'main') {
       fabric.Image.fromURL('img/compact.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 30, top: component.top + 15, class: 'compactSwitch', component: component});
+        img.scale(scale).set({left: component.left + 35, top: component.top + 15, class: 'compactSwitch', component: component});
         component.set('compactSwitch', img);
         canvas.add(img)
       });
