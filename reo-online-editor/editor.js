@@ -17,7 +17,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       canvas.calcOffset();
 
       // Redraw the main component
-      var x1 = 50, y1 = 50, x2 = container.clientWidth - 50, y2 = container.clientHeight - 50;
+      var x1 = 25, y1 = 25, x2 = container.clientWidth - 25, y2 = container.clientHeight - 25;
       main.set({
         left: x1,
         top: y1,
@@ -1359,7 +1359,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     main = undefined
   }
 
-  var main = createComponent(50,50,container.clientWidth-50,container.clientHeight-50,'main');
+  var main = createComponent(25, 25, container.clientWidth - 25, container.clientHeight - 25,'main');
   main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
   id = '0';
   //createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
