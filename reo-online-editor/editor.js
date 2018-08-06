@@ -28,13 +28,15 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       // Reset the label position
       main.label.set({left: x1 + (x2 - x1) / 2, top: y1 + 15});
       main.label.setCoords();
+      main.header.set({x1: x1, y1: y1 + headerHeight, x2: x2, y2: y1 + headerHeight});
+      main.header.setCoords();
       canvas.requestRenderAll()
     }
   }
   document.body.onresize = function() {resizeCanvas()};
   resizeCanvas();
 
-  var canvas = this.__canvas = new fabric.Canvas('c', {selection: false, preserveObjectStacking: true});
+  var canvas = this.__canvas = new fabric.Canvas('c', {selection: false, preserveObjectStacking: true, backgroundColor: '#eee'});
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   fabric.Object.prototype.objectCaching = false;
   var active, isDown, origX, origY, origLeft, origTop, origRight, origBottom, fromBoundary;
@@ -1360,7 +1362,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   var main = createComponent(25, 25, container.clientWidth - 25, container.clientHeight - 25,'main');
-  main.set({id: 'main', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});
+  main.set({id: 'main', evented: false});
   id = '0';
   //createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
   //createChannel('lossysync',{x: 100, y: 250},{x: 200, y: 250});
