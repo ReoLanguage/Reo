@@ -796,7 +796,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               break;
             case 'compactSwitch':
               compactComponent(p.component);
+              canvas.discardActiveObject();
               break;
+            case 'copy':
+              copyComponent(p.component);
+              canvas.discardActiveObject()
           }
         }
         break;
@@ -866,6 +870,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         if (p.compactSwitch) {
           p.compactSwitch.set({left: p.left + 35, top: p.top + 15});
           p.compactSwitch.setCoords();
+        }
+        if (p.copy) {
+          p.copy.set({left: p.left + 55, top: p.top + 15});
+          p.copy.setCoords();
         }
         break;
       case 'node':
@@ -1119,8 +1127,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     p.bringToFront();
     p.header.bringToFront();
     if (p !== main) {
+      p.delete.bringToFront();
       p.compactSwitch.bringToFront();
-      p.delete.bringToFront()
+      p.copy.bringToFront()
     }
     p.label.bringToFront();
     // Set a new parent for the channels if necessary
@@ -1238,11 +1247,15 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           break;
         }
     if (component !== main)
-      canvas.remove(component.delete, component.compactSwitch);
+      canvas.remove(component.delete, component.compactSwitch, component.copy);
     canvas.remove(component, component.header, component.label)
   }
 
   function compactComponent(component) {
+    console.log(component);
+  }
+
+  function copyComponent(component) {
     console.log(component);
   }
 
@@ -1313,16 +1326,22 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     canvas.add(component, header, label);
 
     if (name !== 'main') {
+      fabric.Image.fromURL('img/delete.svg', function(img) {
+        var scale = (nodeFactor * 4) / img.height;
+        img.scale(scale).set({left: component.left + 15, top: component.top + 15, class: 'delete', component: component});
+        component.set('delete', img);
+        canvas.add(img)
+      });
       fabric.Image.fromURL('img/compact.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
         img.scale(scale).set({left: component.left + 35, top: component.top + 15, class: 'compactSwitch', component: component});
         component.set('compactSwitch', img);
         canvas.add(img)
       });
-      fabric.Image.fromURL('img/delete.svg', function(img) {
+      fabric.Image.fromURL('img/copy.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 15, top: component.top + 15, class: 'delete', component: component});
-        component.set('delete', img);
+        img.scale(scale).set({left: component.left + 55, top: component.top + 15, class: 'copy', component: component});
+        component.set('copy', img);
         canvas.add(img)
       });
     }
