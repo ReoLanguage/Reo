@@ -113,6 +113,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     async function sourceLoader(fname) {
       return new Promise(function (resolve, reject) {
         let client = new XMLHttpRequest();
+        // tell the client that we do not expect XML as response
+        client.overrideMimeType("text/plain");
         client.open('GET', fname);
         client.onreadystatechange = function () {
           if (this.readyState === 4) {
@@ -462,6 +464,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
             components[i].nodes.push(p);
             break;
           }
+        // set a parent for the channels if necessary
+        for (i = 0; i < p.channels.length; ++i)
+          setParent(p.channels[i]);
         break;
       case 'channel':
         if (p.node1.parent.index < p.node2.parent.index)
@@ -518,7 +523,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         node.set({nodetype: 'mixed', fill: nodeFillColourMixed});
       else
         node.set({nodetype: 'source', fill: nodeFillColourSource})
-    } else node.set({nodetype: 'sink', fill: nodeFillColourSink})
+    }
+    else
+      node.set({nodetype: 'sink', fill: nodeFillColourSink});
+    canvas.requestRenderAll();
+    console.log("Node " + node.id + " is " + node.nodetype);
   }
 
   function updateChannel(channel) {
@@ -799,14 +808,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               canvas.discardActiveObject();
               break;
             case 'copy':
-              copyComponent(p.component);
-              canvas.discardActiveObject()
+              copyComponent(p.component)
           }
         }
         break;
       case 'component':
-        var comp = createComponent(pointer.x, pointer.y, pointer.x, pointer.y);
-        canvas.setActiveObject(comp);
+        createComponent(pointer.x, pointer.y, pointer.x, pointer.y, undefined, true);
         break;
       default:
         createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y}, true);
@@ -1002,6 +1009,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }); //mouse:up
 
   function mergeNodes(destination, source) {
+    console.log("Merging nodes " + source.id + " and " + destination.id);
     var j, i;
     for (j = 0; j < source.channels.length; ++j) {
       let loop = false;
@@ -1100,8 +1108,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         break
       }
     canvas.remove(source.label, source);
-    destination.bringToFront();
-    updateNodeColouring(destination)
+    updateNodeColouring(destination);
+    destination.bringToFront()
   }
 
   /**
@@ -1126,11 +1134,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       components[i].set('index', i);
     p.bringToFront();
     p.header.bringToFront();
-    if (p !== main) {
+    if (p.delete)
       p.delete.bringToFront();
+    if (p.compactSwitch)
       p.compactSwitch.bringToFront();
-      p.copy.bringToFront()
-    }
+    if (p.copy)
+      p.copy.bringToFront();
     p.label.bringToFront();
     // Set a new parent for the channels if necessary
     for (i = p.channels.length - 1; i >= 0; --i)
@@ -1255,8 +1264,14 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     console.log(component);
   }
 
-  function copyComponent(component) {
-    console.log(component);
+  function copyComponent(p) {
+    console.log(p);
+    var i, c, component = createComponent(p.left + 20, p.top + 20, p.left + p.width + 20, p.top + p.height + 20, p.id);
+    for (i = 0; i < p.channels.length; ++i) {
+      c = p.channels[i];
+      createChannel(c.name, {x: c.node1.left + 20, y: c.node1.top + 20, name: c.node1.id}, {x: c.node2.left + 20, y: c.node2.top + 20, name: c.node2.id});
+    }
+    console.log(component)
   }
 
   document.addEventListener("keydown", function(e) {
@@ -1274,7 +1289,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       }
   });
 
-  function createComponent(x1, y1, x2, y2, name) {
+  function createComponent(x1, y1, x2, y2, name, manual) {
     var width = (x2 - x1);
     var height = (y2 - y1);
     var left = x1;
@@ -1295,7 +1310,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       selectable: mode === 'select',
       size: width * height,
       class: 'component',
-      status: 'drawing',
+      status: manual ? 'drawing' : 'design',
       nodes: [],
       channels: [],
       components: [],
@@ -1380,6 +1395,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       return ' /*! pos: [' + left + ', ' + top + ', ' + Math.round(left + this.width) + ', ' + Math.round(top + this.height) + '] !*/'
     };
 
+    canvas.setActiveObject(component);
+    console.log("Component " + component.id + " is now active");
     component.set('index', components.length);
     components.push(component);
     return component
