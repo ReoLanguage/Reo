@@ -705,6 +705,25 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     }
   }
 
+  /**
+   * Reposition attached nodes of the component when it's being resized
+   * @param component - The component that is being resized
+   */
+  function repositionNodes(component) {
+    for (var i = 0; i < component.nodes.length; ++i) {
+      let node = component.nodes[i];
+      if (node.origLeft === origLeft)
+        node.set('left', component.left);
+      if (node.origLeft === origRight)
+        node.set('left', component.left + component.scaleX * component.width);
+      if (node.origTop === origTop)
+        node.set('top', component.top);
+      if (node.origTop === origBottom)
+        node.set('top', component.top + component.scaleY * component.height);
+      snapToComponent(node, node.parent)
+    }
+  }
+
   canvas.on('object:moving', function(e) {
     e.target.setCoords()
   }); //object:moving
@@ -841,20 +860,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           p.set({width: Math.abs(origX - x), height: Math.abs(origY - y)});
           p.setCoords()
         } else {
-          if (p.__corner !== 0) {
-            for (i = 0; i < p.nodes.length; ++i) {
-              let node = p.nodes[i];
-              if (node.origLeft === origLeft)
-                node.set('left', p.left);
-              if (node.origLeft === origRight)
-                node.set('left', p.left + p.scaleX * p.width);
-              if (node.origTop === origTop)
-                node.set('top', p.top);
-              if (node.origTop === origBottom)
-                node.set('top', p.top + p.scaleY * p.height);
-              snapToComponent(node, node.parent)
-            }
-          } else {
+          if (p.__corner !== 0)
+            repositionNodes(p);
+          else {
             p.set({left: origLeft + x - origX, top: origTop + y - origY});
             p.setCoords();
             for (i = 0; i < p.nodes.length; ++i) {
