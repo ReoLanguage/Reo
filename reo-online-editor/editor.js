@@ -689,6 +689,22 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     updateText()
   }
 
+  /**
+   * Reposition parts of the component when it's being moved or resized
+   * @param component - The component that is being moved or resized
+   */
+  function repositionParts(component) {
+    component.label.set({left: component.left + (component.scaleX * component.width) / 2, top: component.top + 15});
+    component.header.set({x1: component.left, y1: component.top + headerHeight, x2: component.left + component.scaleX * component.width, y2: component.top + headerHeight});
+    component.header.setCoords();
+    if (component !== main) {
+      component.delete.set({left: component.left + 15, top: component.top + 15});
+      component.delete.setCoords();
+      component.compactSwitch.set({left: component.left + 35, top: component.top + 15});
+      component.compactSwitch.setCoords();
+    }
+  }
+
   canvas.on('object:moving', function(e) {
     e.target.setCoords()
   }); //object:moving
@@ -852,17 +868,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
             }
           }
         }
-        p.label.set({left: p.left + (p.scaleX * p.width) / 2, top: p.top + 15});
-        p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.scaleX * p.width, y2: p.top + headerHeight});
-        p.header.setCoords();
-        if (p.delete) {
-          p.delete.set({left: p.left + 15, top: p.top + 15});
-          p.delete.setCoords();
-        }
-        if (p.compactSwitch) {
-          p.compactSwitch.set({left: p.left + 35, top: p.top + 15});
-          p.compactSwitch.setCoords();
-        }
+        repositionParts(p);
         break;
       case 'node':
         p.set({left: x, top: y});
