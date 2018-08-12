@@ -946,6 +946,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         for (i = 0; i < p.channels.length; ++i)
           updateChannel(p.channels[i]);
         break;
+      default:
+        return
     }
     p.label.setCoords();
     canvas.requestRenderAll()
@@ -1311,8 +1313,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     if (name !== 'main') {
       fabric.Image.fromURL('img/compact.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 35, top: component.top + 15, class: 'compactSwitch', component: component});
-        component.set('compactSwitch', img);
+        img.scale(scale).set({left: component.left + 35, top: component.top + 15, class: 'compactSwitch', component: component,
+          hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+        component.set({compactSwitch: img, compact: false});
         canvas.add(img)
       });
       fabric.Image.fromURL('img/delete.svg', function(img) {
@@ -1379,4 +1382,5 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   //createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
   //createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
+  updateText();
 });
