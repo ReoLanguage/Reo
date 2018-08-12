@@ -1141,8 +1141,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
    */
   function bringNodeToFront(p) {
     var i, j;
-    if (!p || p.class !== 'node')
-      return;
     for (i = 0; i < p.channels.length; ++i) {
       for (j = 1; j < p.channels[i].parts.length; ++j)
         p.channels[i].parts[j].bringToFront();
