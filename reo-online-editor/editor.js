@@ -360,7 +360,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       if (nodes[i] === p || nodes[i] === channel.node2)
         continue;
       if (p.intersectsWithObject(nodes[i]))
-        if(Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
+        if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
           mergeNodes(nodes[i], p)
     }
     fromBoundary = isBoundaryNode(channel.node1);
@@ -489,7 +489,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       if (nodes[i] === node) continue;
       // merge nodes that overlap
       if (node.intersectsWithObject(nodes[i]))
-        if(Math.abs(node.left-nodes[i].left) < mergeDistance && Math.abs(node.top-nodes[i].top) < mergeDistance)
+        if (Math.abs(node.left-nodes[i].left) < mergeDistance && Math.abs(node.top-nodes[i].top) < mergeDistance)
           mergeNodes(node, nodes[i])
     }
     if (!keepParent)
@@ -823,12 +823,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           if (origY > y)
             p.set('top', y);
           p.set({width: Math.abs(origX - x), height: Math.abs(origY - y)});
-          p.setCoords();
+          p.setCoords()
         } else {
-          // p.options.set({left: p.left + 15, top: p.top + 15});
-          // p.options.setCoords();
-          // p.balloon.set({left: p.left - 40, top: p.top - 40});
-          // p.balloon.setCoords();
           if (p.__corner !== 0) {
             for (i = 0; i < p.nodes.length; ++i) {
               let node = p.nodes[i];
@@ -1213,8 +1209,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   /**
-   * Deletes component and all underlying objects, including other components
-   * recursive is for internal use only
+   * Deletes component and all underlying objects, including other components.
+   * recursive is for internal use only.
    */
   function deleteComponent(component, recursive) {
     var k;
@@ -1375,9 +1371,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     main = undefined
   }
 
-  var main = createComponent(25, 25, container.clientWidth - 25, container.clientHeight - 25,'main');
+  var main = createComponent(25, 25, container.clientWidth - 25, container.clientHeight - 25, 'main');
   main.set({id: 'main', evented: false});
-  id = '0';
   //createChannel('sync',{x: 100, y: 150},{x: 200, y: 150});
   //createChannel('lossysync',{x: 100, y: 250},{x: 200, y: 250});
   //createChannel('syncdrain',{x: 100, y: 350},{x: 200, y: 350});
