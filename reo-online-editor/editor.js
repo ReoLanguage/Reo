@@ -1253,7 +1253,13 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   function compactComponent(component) {
-    console.log(component);
+    if (component.compact)
+      component.set({height: component.realHeight, width: component.realWidth});
+    else
+      component.set({realHeight: component.height, realWidth: component.width, height: 90, width: 110});
+    component.compact = !component.compact;
+    repositionParts(component);
+    repositionNodes(component)
   }
 
   document.addEventListener("keydown", function(e) {
