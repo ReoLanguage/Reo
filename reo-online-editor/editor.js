@@ -714,7 +714,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       c.compactSwitch.set({left: c.left + 35, top: c.top + 15});
       c.compactSwitch.setCoords();
     }
-    if (c.copy()) {
+    if (c.copy) {
       c.copy.set({left: c.left + 55, top: c.top + 15});
       c.copy.setCoords();
     }
