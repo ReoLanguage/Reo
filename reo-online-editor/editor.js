@@ -969,7 +969,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   canvas.on('mouse:up', function() {
     isDown = false;
-    var p = canvas.getActiveObject(), i, j;
+    var p = canvas.getActiveObject();
     if (p) {
       p.setCoords();
       switch (p.class) {
@@ -981,7 +981,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           p.setCoords();
           if (p.status === 'drawing') {
             p.set('status', 'design');
-            p.setCoords();
             p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
             p.header.setCoords();
             p.label.set({left: p.left + (p.width/2), top: p.top + 15});
