@@ -700,35 +700,41 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   /**
    * Reposition parts of the component when it's being moved or resized
-   * @param component - The component that is being moved or resized
+   * @param c - The component that is being moved or resized
    */
-  function repositionParts(component) {
-    component.label.set({left: component.left + (component.scaleX * component.width) / 2, top: component.top + 15});
-    component.header.set({x1: component.left, y1: component.top + headerHeight, x2: component.left + component.scaleX * component.width, y2: component.top + headerHeight});
-    component.header.setCoords();
-    if (component !== main) {
-      component.delete.set({left: component.left + 15, top: component.top + 15});
-      component.delete.setCoords();
-      component.compactSwitch.set({left: component.left + 35, top: component.top + 15});
-      component.compactSwitch.setCoords();
+  function repositionParts(c) {
+    c.label.set({left: c.left + (c.scaleX * c.width) / 2, top: c.top + 15});
+    c.header.set({x1: c.left, y1: c.top + headerHeight, x2: c.left + c.scaleX * c.width, y2: c.top + headerHeight});
+    c.header.setCoords();
+    if (c.delete) {
+      c.delete.set({left: c.left + 15, top: c.top + 15});
+      c.delete.setCoords();
+    }
+    if (c.compactSwitch) {
+      c.compactSwitch.set({left: c.left + 35, top: c.top + 15});
+      c.compactSwitch.setCoords();
+    }
+    if (c.copy()) {
+      c.copy.set({left: c.left + 55, top: c.top + 15});
+      c.copy.setCoords();
     }
   }
 
   /**
    * Reposition attached nodes of the component when it's being resized
-   * @param component - The component that is being resized
+   * @param c - The component that is being resized
    */
-  function repositionNodes(component) {
-    for (var i = 0; i < component.nodes.length; ++i) {
-      let node = component.nodes[i];
+  function repositionNodes(c) {
+    for (var i = 0; i < c.nodes.length; ++i) {
+      let node = c.nodes[i];
       if (node.origLeft === origLeft)
-        node.set('left', component.left);
+        node.set('left', c.left);
       if (node.origLeft === origRight)
-        node.set('left', component.left + component.scaleX * component.width);
+        node.set('left', c.left + c.scaleX * c.width);
       if (node.origTop === origTop)
-        node.set('top', component.top);
+        node.set('top', c.top);
       if (node.origTop === origBottom)
-        node.set('top', component.top + component.scaleY * component.height);
+        node.set('top', c.top + c.scaleY * c.height);
       snapToComponent(node, node.parent)
     }
   }
