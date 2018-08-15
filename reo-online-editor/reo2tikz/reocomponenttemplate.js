@@ -78,8 +78,8 @@ ReoComponentTemplate.prototype.implement = async function (binding) {
     }
     // output += '\\def \\reodraw@@ !#1,#2@@!{\n'.format(this.typeName, argList);
     output += 'function reodraw@@(@@) {\n'.format(this.typeName, argList);
-    output += `${this.typeName} = createComponent(50,50,container.clientWidth-50,container.clientHeight-50,"${this.typeName}");\n`;
-    output += `${this.typeName}.set({id: '${this.typeName}', fill: 'transparent', hasBorders: false, hasControls: false, evented: false});\n`;
+    output += `${this.typeName} = createComponent(25,25,container.clientWidth-25,container.clientHeight-25,"${this.typeName}");\n`;
+    output += `${this.typeName}.set({id: '${this.typeName}', evented: false});\n`;
     output += "id = '0';\n";
     // output += '  \\begin{scope}[shift=(#1),rotate around={#2:(#1)}]\n';
     // output += '    \\draw[line width=1pt, draw=gray] (@@,@@) rectangle (@@,@@);\n'.format(component.bound[0][0], component.bound[0][1], component.bound[1][0], component.bound[1][1]);
