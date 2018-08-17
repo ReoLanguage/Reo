@@ -235,15 +235,15 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     fabric.Image.fromURL('img/delete.svg', function(img) {
       var scale = (nodeFactor * 4) / img.height;
-      img.scale(scale).set({left: node.left - 15, top: node.top + 15, class: 'delete', node: node, visible: false,
-        hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+      img.scale(scale).set({left: node.left - 15, top: node.top + 15, class: 'delete', parent: node, visible: false,
+        selectable: true, hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
       node.set('delete', img);
       canvas.add(img)
     });
     fabric.Image.fromURL('img/split.svg', function(img) {
       var scale = (nodeFactor * 4) / img.height;
-      img.scale(scale).set({left: node.left + 15, top: node.top + 15, class: 'split', node: node, visible: false,
-        hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+      img.scale(scale).set({left: node.left + 15, top: node.top + 15, class: 'split', parent: node, visible: false,
+        selectable: true, hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
       node.set({'split': img});
       canvas.add(img)
     });
@@ -896,14 +896,23 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               }
               break;
             case 'delete':
-              deleteComponent(p.component);
+              switch (p.parent.class) {
+                case 'component':
+                  deleteComponent(p.parent);
+                  break;
+                case 'node':
+                  deleteNode(p.parent)
+              }
               break;
             case 'compactSwitch':
-              compactComponent(p.component);
+              compactComponent(p.parent);
               canvas.discardActiveObject();
               break;
             case 'copy':
-              copyComponent(p.component)
+              copyComponent(p.parent);
+              break;
+            case 'split':
+              console.log("split")
           }
         }
         break;
@@ -1029,9 +1038,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
         p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY});
         if (p.delete)
-          p.delete.set({left: p.left - 15, top: p.top + 15});
+          p.delete.set({left: p.left - 15, top: p.top + 15}).setCoords();
         if (p.split)
-          p.split.set({left: p.left + 15, top: p.top + 15});
+          p.split.set({left: p.left + 15, top: p.top + 15}).setCoords();
         for (i = 0; i < p.channels.length; ++i)
           updateChannel(p.channels[i]);
         break;
@@ -1417,20 +1426,20 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     if (name !== 'main') {
       fabric.Image.fromURL('img/delete.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 15, top: component.top + 15, class: 'delete', component: component});
+        img.scale(scale).set({left: component.left + 15, top: component.top + 15, class: 'delete', parent: component});
         component.set('delete', img);
         canvas.add(img)
       });
       fabric.Image.fromURL('img/compact.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 35, top: component.top + 15, class: 'compactSwitch', component: component,
+        img.scale(scale).set({left: component.left + 35, top: component.top + 15, class: 'compactSwitch', parent: component,
           hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
         component.set({compactSwitch: img, compact: false});
         canvas.add(img)
       });
       fabric.Image.fromURL('img/copy.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 55, top: component.top + 15, class: 'copy', component: component,
+        img.scale(scale).set({left: component.left + 55, top: component.top + 15, class: 'copy', parent: component,
         hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
         component.set('copy', img);
         canvas.add(img)
