@@ -233,6 +233,21 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       label.object.set('id', label.text)
     });
 
+    fabric.Image.fromURL('img/delete.svg', function(img) {
+      var scale = (nodeFactor * 4) / img.height;
+      img.scale(scale).set({left: node.left - 15, top: node.top + 15, class: 'delete', node: node, visible: false,
+        hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+      node.set('delete', img);
+      canvas.add(img)
+    });
+    fabric.Image.fromURL('img/split.svg', function(img) {
+      var scale = (nodeFactor * 4) / img.height;
+      img.scale(scale).set({left: node.left + 15, top: node.top + 15, class: 'split', node: node, visible: false,
+        hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+      node.set({'split': img});
+      canvas.add(img)
+    });
+
     nodes.push(node);
     setParent(node);
     canvas.add(node, node.label);
@@ -526,8 +541,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     }
     else
       node.set({nodetype: 'sink', fill: nodeFillColourSink});
-    canvas.requestRenderAll();
-    console.log("Node " + node.id + " is " + node.nodetype);
+    canvas.requestRenderAll()
   }
 
   function updateChannel(channel) {
@@ -755,6 +769,46 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     updateText()
   }); //text:editing:exited
 
+  canvas.on('selection:created', function(e) {
+    if (e.target.type === 'node') {
+      console.log("selection:created");
+      if (e.target.delete)
+        e.target.delete.set('visible', true);
+      if (e.target.split)
+        e.target.split.set('visible', true);
+      canvas.requestRenderAll()
+    }
+  });
+
+  canvas.on('selection:updated', function(e) {
+    var i;
+    console.log("selection:updated");
+    for (i = 0; i < nodes.length; ++i) {
+      if (nodes[i].delete)
+        nodes[i].delete.set('visible', false);
+      if (nodes[i].split)
+        nodes[i].split.set('visible', false)
+    }
+    if (e.target.type === 'node') {
+      if (e.target.delete)
+        e.target.delete.set('visible', true);
+      if (e.target.split)
+        e.target.split.set('visible', true)
+    }
+    canvas.requestRenderAll()
+  });
+
+  canvas.on('before:selection:cleared', function(e) {
+    if (e.target.type === 'node') {
+      console.log("before:selection:cleared");
+      if (e.target.delete)
+        e.target.delete.set('visible', false);
+      if (e.target.split)
+        e.target.split.set('visible', false);
+      canvas.requestRenderAll()
+    }
+  });
+
   /*canvas.on('mouse:over', function(e) {
     if (e.target) {
       switch (e.target.class) {
@@ -974,6 +1028,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         }
 
         p.label.set({left: p.left + p.labelOffsetX, top: p.top + p.labelOffsetY});
+        if (p.delete)
+          p.delete.set({left: p.left - 15, top: p.top + 15});
+        if (p.split)
+          p.split.set({left: p.left + 15, top: p.top + 15});
         for (i = 0; i < p.channels.length; ++i)
           updateChannel(p.channels[i]);
         break;
@@ -1022,7 +1080,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }); //mouse:up
 
   function mergeNodes(destination, source) {
-    console.log("Merging nodes " + source.id + " and " + destination.id);
     var j, i;
     for (j = 0; j < source.channels.length; ++j) {
       let loop = false;
@@ -1120,7 +1177,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         source.parent.nodes.splice(i,1);
         break
       }
-    canvas.remove(source.label, source);
+    canvas.remove(source.label, source.delete, source.split, source);
     updateNodeColouring(destination);
     destination.bringToFront()
   }
@@ -1181,6 +1238,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       p.channels[i].node2.bringToFront()
     }
     p.label.bringToFront();
+    p.delete.bringToFront();
+    p.split.bringToFront()
   }
 
   function deleteNode(node) {
@@ -1282,13 +1341,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   function copyComponent(p) {
-    console.log(p);
     var i, c, component = createComponent(p.left + 20, p.top + 20, p.left + p.width + 20, p.top + p.height + 20, p.id);
     for (i = 0; i < p.channels.length; ++i) {
       c = p.channels[i];
       createChannel(c.name, {x: c.node1.left + 20, y: c.node1.top + 20, name: c.node1.id}, {x: c.node2.left + 20, y: c.node2.top + 20, name: c.node2.id});
     }
-    console.log(component)
   }
 
   document.addEventListener("keydown", function(e) {
@@ -1373,7 +1430,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       });
       fabric.Image.fromURL('img/copy.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 55, top: component.top + 15, class: 'copy', component: component});
+        img.scale(scale).set({left: component.left + 55, top: component.top + 15, class: 'copy', component: component,
+        hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
         component.set('copy', img);
         canvas.add(img)
       });
@@ -1414,7 +1472,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     };
 
     canvas.setActiveObject(component);
-    console.log("Component " + component.id + " is now active");
     component.set('index', components.length);
     components.push(component);
     return component
