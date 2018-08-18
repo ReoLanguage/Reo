@@ -73,16 +73,24 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   loopRadius           =     25;
 
   function buttonClick(button) {
+    var i;
     canvas.discardActiveObject();
     canvas.requestRenderAll();
     document.getElementById(mode).style.border = buttonBorderOff;
     mode = button.id;
     button.style.border = buttonBorderOn;
-    canvas.forEachObject(function(obj) {
-      if (obj.class === 'component' || obj.class === 'node' || obj.class === 'label') {
-        obj.set('selectable', mode === 'select')
-      }
-    })
+
+    for (i = 0; i < components.length; ++i) {
+      components[i].set('selectable', mode === 'select');
+      components[i].label.set('selectable', mode === 'select');
+    }
+    for (i = 0; i < nodes.length; ++i) {
+      nodes[i].set('selectable', mode === 'select');
+      nodes[i].label.set('selectable', mode === 'select');
+    }
+    for (i = 0; i < channels.length; ++i)
+      channels[i].parts[0].set({'selectable': mode === 'select'});
+    canvas.requestRenderAll()
   }
 
   document.getElementById("select").onclick    = function() {buttonClick(document.getElementById("select"))};
@@ -305,8 +313,20 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   function completeChannelCreation(channel, node1, node2, manual) {
     var diffX = Math.abs(node1.x - node2.x), diffY = Math.abs(node1.y - node2.y), i, p;
 
-    // ...a reference rectangle...
-    channel.parts[0].set({left: Math.min(node1.x,node2.x) + diffX / 2, top: Math.min(node1.y,node2.y) + diffY / 2});
+    // Create a reference rectangle...
+    var reference = new fabric.Rect({
+      left: Math.min(node1.x,node2.x) + diffX / 2,
+      top: Math.min(node1.y,node2.y) + diffY / 2,
+      width: 5,
+      height: 100,
+      fill: 'transparent',
+      angle: 90,
+      hasControls: false,
+      lockMovementX: true,
+      lockMovementY: true,
+      baseLength: 100
+    });
+    channel.parts.splice(0, 0, reference);
     canvas.add(channel.parts[0]);
 
     // ...two nodes...
