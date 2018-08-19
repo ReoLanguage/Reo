@@ -596,12 +596,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   function updateChannel(channel) {
-    var x1 = channel.node1.get('left'),
-      y1 = channel.node1.get('top'),
-      x2 = channel.node2.get('left'),
-      y2 = channel.node2.get('top'),
-      diffX = Math.abs(x1-x2),
-      diffY = Math.abs(y1-y2),
+    var x1 = channel.node1.get('left'), y1 = channel.node1.get('top'),
+      x2 = channel.node2.get('left'), y2 = channel.node2.get('top'),
+      diffX = Math.abs(x1-x2), diffY = Math.abs(y1-y2),
       i;
 
     // update the reference rectangle
@@ -635,14 +632,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         var relationship = o.relationship;
         var newTransform = fabric.util.multiplyTransformMatrices(channel.parts[0].calcTransformMatrix(), relationship);
         let opt = fabric.util.qrDecompose(newTransform);
-        o.set({
-          flipX: false,
-          flipY: false,
-        });
+        o.set({flipX: false, flipY: false});
         o.setPositionByOrigin(
           {x: opt.translateX, y: opt.translateY},
           'center',
-          'center',
+          'center'
         );
         o.set(opt);
         if (o.scale === false) {
