@@ -72,6 +72,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   headerHeight         =     30;
   loopRadius           =     25;
 
+  splitSelected        = 'lightgreen';
+  splitDeselected      = 'lightblue';
+
   function buttonClick(button) {
     var i;
     canvas.discardActiveObject();
@@ -222,7 +225,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       padding: nodeFactor * lineStrokeWidth,
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
-      class: 'node',
       hasControls: false,
       selectable: mode === 'select'
     });
@@ -240,6 +242,17 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     label.on('editing:exited', function() {
       label.object.set('id', label.text)
     });
+
+    var selection = new fabric.Circle({
+      left: left,
+      top: top,
+      fill: splitSelected,
+      radius: 10,
+      evented: false,
+      visible: false
+    })
+    node.set('selection', selection);
+    canvas.add(selection);
 
     fabric.Image.fromURL('img/delete.svg', function(img) {
       var scale = (nodeFactor * 4) / img.height;
@@ -319,16 +332,18 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     var reference = new fabric.Rect({
       left: left,
       top:  top,
-      width: 5,
+      width: 10,
       height: 100,
       fill: 'transparent',
       angle: 90,
+      parent: channel,
       hasControls: false,
       lockMovementX: true,
       lockMovementY: true,
       baseLength: 100
     });
     channel.parts.splice(0, 0, reference);
+    channel.reference = reference;
     canvas.add(channel.parts[0]);
 
     // ...a delete button...
@@ -599,7 +614,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     var x1 = channel.node1.get('left'), y1 = channel.node1.get('top'),
       x2 = channel.node2.get('left'), y2 = channel.node2.get('top'),
       diffX = Math.abs(x1-x2), diffY = Math.abs(y1-y2),
-      i;
+      i, scale;
 
     // update the reference rectangle
     switch (channel.parts[0].type) {
@@ -612,7 +627,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
         // convert new size to scaling
         var length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
-        var scale = length/channel.parts[0].baseLength;
+        scale = length/channel.parts[0].baseLength;
         channel.parts[0].set({scaleX: scale, scaleY: scale});
         channel.parts[0].setCoords();
         break;
@@ -670,6 +685,13 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         })
       }
       o.setCoords()
+    }
+
+    // If the delete button has been loaded, reset the width of the reference object
+    if (channel.reference && channel.reference.delete) {
+      console.log("resize");
+      channel.parts[0].set({scaleX: 1});
+      channel.parts[0].setCoords();
     }
     canvas.requestRenderAll()
   } //updateChannel
@@ -958,12 +980,23 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               copyComponent(p.parent);
               break;
             case 'split':
-              console.log("split")
+              console.log("split");
+              mode = 'split';
+              p.parent.selection.set('visible', true);
+              for (i = 0; i < p.parent.channels.length; ++i)
+                p.parent.channels[i].parts[0].set({fill: splitDeselected});
+              canvas.requestRenderAll()
           }
         }
         break;
       case 'component':
         createComponent(pointer.x, pointer.y, pointer.x, pointer.y, undefined, true);
+        break;
+      case 'split':
+        if (p && p.parent && p.parent.class === 'channel') {
+          p.set('fill', p.fill === "lightgreen" ? 'lightblue' : 'lightgreen');
+          canvas.requestRenderAll()
+        }
         break;
       default:
         createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y}, true);
@@ -1087,6 +1120,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           p.delete.set({left: p.left - 15, top: p.top + 15}).setCoords();
         if (p.split)
           p.split.set({left: p.left + 15, top: p.top + 15}).setCoords();
+        p.selection.set({left: p.left, top: p.top}).setCoords();
         for (i = 0; i < p.channels.length; ++i)
           updateChannel(p.channels[i]);
         break;
