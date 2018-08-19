@@ -311,12 +311,14 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   } //createChannel
 
   function completeChannelCreation(channel, node1, node2, manual) {
-    var diffX = Math.abs(node1.x - node2.x), diffY = Math.abs(node1.y - node2.y), i, p;
+    var left = Math.min(node1.x,node2.x) + Math.abs(node1.x - node2.x) / 2,
+        top = Math.min(node1.y,node2.y) + Math.abs(node1.y - node2.y) / 2,
+        i, p;
 
     // Create a reference rectangle...
     var reference = new fabric.Rect({
-      left: Math.min(node1.x,node2.x) + diffX / 2,
-      top: Math.min(node1.y,node2.y) + diffY / 2,
+      left: left,
+      top:  top,
       width: 5,
       height: 100,
       fill: 'transparent',
@@ -328,6 +330,35 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     });
     channel.parts.splice(0, 0, reference);
     canvas.add(channel.parts[0]);
+
+    // ...a delete button...
+    fabric.Image.fromURL('img/delete.svg', function(img) {
+        var scale = (nodeFactor * 4) / img.height;
+        img.scale(scale).set({
+          left: left,
+          top: top + 15,
+          class: 'delete',
+          parent: channel,
+          hasBorders: false,
+          hasControls: false,
+          visible: false,
+          baseAngle: 90,
+          baseScaleX: scale,
+          baseScaleY: scale,
+          referenceAngle: 180,
+          referenceDistance: 15,
+          referencePoint: 'middle',
+          rotate: false,
+          scale: false
+        });
+
+        // Wait until the image is loaded to create the relationship and add it to the channel
+        var invertedBossTransform = fabric.util.invertTransform(channel.parts[0].calcTransformMatrix());
+        img.relationship = fabric.util.multiplyTransformMatrices(invertedBossTransform, img.calcTransformMatrix());
+        channel.parts.splice(1, 0, img);
+        reference.set('delete', img);
+        canvas.add(img)
+      });
 
     // ...two nodes...
     channel.node1 = createNode(node1.x, node1.y, node1.name, manual);
@@ -357,8 +388,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     // calculate the relation matrix between the channel component and the reference rectangle
     // then save it as a channel component property
     var bossTransform = channel.parts[0].calcTransformMatrix();
+    var invertedBossTransform = fabric.util.invertTransform(bossTransform);
     for (i = 1; i < channel.parts.length; ++i) {
-      var invertedBossTransform = fabric.util.invertTransform(bossTransform);
       var desiredTransform = fabric.util.multiplyTransformMatrices(invertedBossTransform, channel.parts[i].calcTransformMatrix());
       channel.parts[i].relationship = desiredTransform;
       canvas.add(channel.parts[i])
@@ -614,8 +645,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           'center',
         );
         o.set(opt);
-        if (o.scale === false)
-          o.set({scaleX: 1, scaleY: 1});
+        if (o.scale === false) {
+          if (o.type === 'image')
+            o.set({scaleX: o.baseScaleX, scaleY: o.baseScaleY});
+          else
+            o.set({scaleX: 1, scaleY: 1})
+        }
         if (o.rotate === false)
           o.set('angle', o.baseAngle);
         let reference;
@@ -790,31 +825,28 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }); //text:editing:exited
 
   canvas.on('selection:created', function(e) {
-    if (e.target.type === 'node') {
-      console.log("selection:created");
-      if (e.target.delete)
-        e.target.delete.set('visible', true);
-      if (e.target.split)
-        e.target.split.set('visible', true);
-      canvas.requestRenderAll()
-    }
+    if (e.target.delete)
+      e.target.delete.set('visible', true);
+    if (e.target.split)
+      e.target.split.set('visible', true);
+    canvas.requestRenderAll()
   });
 
   canvas.on('selection:updated', function(e) {
     var i;
-    console.log("selection:updated");
     for (i = 0; i < nodes.length; ++i) {
       if (nodes[i].delete)
         nodes[i].delete.set('visible', false);
       if (nodes[i].split)
         nodes[i].split.set('visible', false)
     }
-    if (e.target.type === 'node') {
-      if (e.target.delete)
-        e.target.delete.set('visible', true);
-      if (e.target.split)
-        e.target.split.set('visible', true)
-    }
+    for (i = 0; i < channels.length; ++i)
+      if (channels[i].parts[0].delete)
+        channels[i].parts[0].delete.set('visible', false);
+    if (e.target.delete)
+      e.target.delete.set('visible', true);
+    if (e.target.split)
+      e.target.split.set('visible', true)
     canvas.requestRenderAll()
   });
 
@@ -919,6 +951,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               switch (p.parent.class) {
                 case 'component':
                   deleteComponent(p.parent);
+                  break;
+                case 'channel':
+                  deleteChannel(p.parent);
                   break;
                 case 'node':
                   deleteNode(p.parent)
