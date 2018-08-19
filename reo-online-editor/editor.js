@@ -845,14 +845,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   });
 
   canvas.on('before:selection:cleared', function(e) {
-    if (e.target.type === 'node') {
-      console.log("before:selection:cleared");
-      if (e.target.delete)
-        e.target.delete.set('visible', false);
-      if (e.target.split)
-        e.target.split.set('visible', false);
-      canvas.requestRenderAll()
-    }
+    if (e.target.delete)
+      e.target.delete.set('visible', false);
+    if (e.target.split)
+      e.target.split.set('visible', false);
+    canvas.requestRenderAll()
   });
 
   /*canvas.on('mouse:over', function(e) {
