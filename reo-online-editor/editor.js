@@ -88,15 +88,17 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       components[i].label.set('selectable', mode === 'select');
     }
     for (i = 0; i < nodes.length; ++i) {
-      nodes[i].set('selectable', mode === 'select');
+      nodes[i].set('selectable', mode === 'select' || mode === 'split');
       nodes[i].label.set('selectable', mode === 'select');
+      nodes[i].selection.set('visible', false)
     }
     for (i = 0; i < channels.length; ++i)
-      channels[i].parts[0].set({'selectable': mode === 'select'});
+      channels[i].parts[0].set({fill: 'transparent', selectable: mode === 'select'});
     canvas.requestRenderAll()
   }
 
   document.getElementById("select").onclick    = function() {buttonClick(document.getElementById("select"))};
+  document.getElementById("split").onclick     = function() {buttonClick(document.getElementById("split"))};
   document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))};
 
   document.getElementById("downloadsvg").onclick = function () {
@@ -688,11 +690,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     }
 
     // If the delete button has been loaded, reset the width of the reference object
-    if (channel.reference && channel.reference.delete) {
-      console.log("resize");
-      channel.parts[0].set({scaleX: 1});
-      channel.parts[0].setCoords();
-    }
+    if (channel.reference && channel.reference.delete)
+      channel.parts[0].set('scaleX', 1).setCoords();
     canvas.requestRenderAll()
   } //updateChannel
 
@@ -981,11 +980,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               break;
             case 'split':
               console.log("split");
-              mode = 'split';
-              p.parent.selection.set('visible', true);
-              for (i = 0; i < p.parent.channels.length; ++i)
-                p.parent.channels[i].parts[0].set({fill: splitDeselected});
-              canvas.requestRenderAll()
+              buttonClick(document.getElementById("split"));
+              prepareSplit(p.parent)
           }
         }
         break;
@@ -993,9 +989,16 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         createComponent(pointer.x, pointer.y, pointer.x, pointer.y, undefined, true);
         break;
       case 'split':
-        if (p && p.parent && p.parent.class === 'channel') {
-          p.set('fill', p.fill === "lightgreen" ? 'lightblue' : 'lightgreen');
-          canvas.requestRenderAll()
+        if (p) {
+          if (p.class && p.class === 'node') {
+            if (p.selection.visible === true)
+              splitNode(p);
+            else
+              prepareSplit(p);
+          } else if (p.parent && p.parent.class === 'channel') {
+            p.set('fill', p.fill === 'lightgreen' ? 'lightblue' : 'lightgreen');
+            canvas.requestRenderAll()
+          }
         }
         break;
       default:
@@ -1269,6 +1272,26 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     canvas.remove(source.label, source.delete, source.split, source);
     updateNodeColouring(destination);
     destination.bringToFront()
+  }
+
+  function prepareSplit(node) {
+    var i, j;
+    for (j = 0; j < nodes.length; ++j) {
+      if (nodes[j].selection.visible === true) {
+        nodes[j].selection.set('visible', false);
+        for (i = 0; i < nodes[j].channels.length; ++i)
+          nodes[j].channels[i].parts[0].set({fill: 'transparent', selectable: false});
+        break
+      }
+    }
+    node.selection.set('visible', true);
+    for (i = 0; i < node.channels.length; ++i)
+      node.channels[i].parts[0].set({fill: splitDeselected, selectable: true});
+    canvas.requestRenderAll()
+  }
+
+  function splitNode(source) {
+    // TODO
   }
 
   /**
