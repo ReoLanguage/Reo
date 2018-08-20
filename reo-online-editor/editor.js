@@ -228,7 +228,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
-      selectable: mode === 'select'
+      selectable: mode === 'select' || mode === 'split'
     });
 
     var label = new fabric.IText(name ? name : node.id, {
@@ -979,7 +979,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               copyComponent(p.parent);
               break;
             case 'split':
-              console.log("split");
               buttonClick(document.getElementById("split"));
               prepareSplit(p.parent)
           }
@@ -991,12 +990,16 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       case 'split':
         if (p) {
           if (p.class && p.class === 'node') {
-            if (p.selection.visible === true)
-              splitNode(p);
-            else
+            if (p.selection.visible === true) {
+              for (i = 0; i < p.channels.length; ++i)
+                if (p.channels[i].parts[0].fill === splitSelected) {
+                  splitNode(p);
+                  break
+                }
+            } else
               prepareSplit(p);
           } else if (p.parent && p.parent.class === 'channel') {
-            p.set('fill', p.fill === 'lightgreen' ? 'lightblue' : 'lightgreen');
+            p.set('fill', p.fill === splitSelected ? splitDeselected : splitSelected);
             canvas.requestRenderAll()
           }
         }
@@ -1041,16 +1044,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         repositionParts(p);
         break;
       case 'node':
-        p.set({left: x, top: y});
-        p.setCoords();
-        if (p.link) {
-          p.link.set({x1: p.link.nodes[0].left, y1: p.link.nodes[0].top, x2: p.link.nodes[1].left, y2: p.link.nodes[1].top});
-          p.link.setCoords();
-        }
+        p.set({left: x, top: y}).setCoords();
+        if (p.link)
+          p.link.set({x1: p.link.nodes[0].left, y1: p.link.nodes[0].top, x2: p.link.nodes[1].left, y2: p.link.nodes[1].top}).setCoords();
         for (i = 0; i < nodes.length; ++i)
           if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
-            p.set({left: nodes[i].left, top: nodes[i].top});
-            p.setCoords()
+            p.set({left: nodes[i].left, top: nodes[i].top}).setCoords();
           }
 
         if (!fromBoundary) {
@@ -1141,7 +1140,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       p.setCoords();
       switch (p.class) {
         case 'node':
-          updateNode(p, !(fromBoundary || p.parent === main));
+          if (mode !== 'split')
+            updateNode(p, !(fromBoundary || p.parent === main));
           break;
         case 'component':
           p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
@@ -1186,7 +1186,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
             loop = true
         }
         else
-          throw new Error("Error merging nodes")
+          throw new Error("channel is not connected to node")
       }
       if (loop) {
         // if the source node is equal to the destination node, create a loop and update the position of all channel parts
@@ -1291,7 +1291,36 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   function splitNode(source) {
-    // TODO
+    var i, destination = createNode(source.left, source.top, null, true);
+    source.parent.nodes.push(destination);
+    for (i = 0; i < source.channels.length; ++i)
+      if (source.channels[i].parts[0].fill === splitSelected) {
+        if (source.channels[i].node1 === source)
+          source.channels[i].node1 = destination;
+        if (source.channels[i].node2 === source)
+          source.channels[i].node2 = destination;
+        destination.channels.push(source.channels[i]);
+        source.channels.splice(i, 1);
+        --i;
+      }
+    source.selection.set('visible', false);
+    destination.selection.set('visible', true);
+    updateNodeColouring(destination);
+    canvas.discardActiveObject();
+    source.set({lockMovementX: true, lockMovementY: true});
+    canvas.setActiveObject(destination);
+    bringNodeToFront(destination);
+    fromBoundary = true;
+    for (i = 0; i < destination.channels.length; ++i) {
+      if (destination.channels[i].node1 === destination)
+        otherNode = 'node2';
+      else
+        otherNode = 'node1';
+      if (!isBoundaryNode(destination.channels[i][otherNode])) {
+        fromBoundary = false;
+        break
+      }
+    }
   }
 
   /**
@@ -1343,6 +1372,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
    */
   function bringNodeToFront(p) {
     var i, j;
+    p.selection.bringToFront();
     for (i = 0; i < p.channels.length; ++i) {
       for (j = 1; j < p.channels[i].parts.length; ++j)
         p.channels[i].parts[j].bringToFront();
@@ -1350,8 +1380,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       p.channels[i].node2.bringToFront()
     }
     p.label.bringToFront();
-    p.delete.bringToFront();
-    p.split.bringToFront()
+    if (p.delete)
+      p.delete.bringToFront();
+    if (p.split)
+      p.split.bringToFront()
   }
 
   function deleteNode(node) {
@@ -1377,24 +1409,26 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   function deleteChannel(channel) {
     var j;
     // delete the channel reference from the connecting nodes
-    for (j = 0; j < channel.node1.channels.length; ++j)
-      if (channel.node1.channels[j] === channel) {
-        channel.node1.channels.splice(j,1);
-        if (channel.node1.channels.length === 0)
-          deleteNode(channel.node1);
-        else
-          updateNodeColouring(channel.node1);
-        break
-      }
-    for (j = 0; j < channel.node2.channels.length; ++j)
-      if (channel.node2.channels[j] === channel) {
-        channel.node2.channels.splice(j,1);
-        if (channel.node2.channels.length === 0)
-          deleteNode(channel.node2);
-        else
-          updateNodeColouring(channel.node2);
-        break
-      }
+    if (channel.node1)
+      for (j = 0; j < channel.node1.channels.length; ++j)
+        if (channel.node1.channels[j] === channel) {
+          channel.node1.channels.splice(j,1);
+          if (channel.node1.channels.length === 0)
+            deleteNode(channel.node1);
+          else
+            updateNodeColouring(channel.node1);
+          break
+        }
+    if (channel.node2)
+      for (j = 0; j < channel.node2.channels.length; ++j)
+        if (channel.node2.channels[j] === channel) {
+          channel.node2.channels.splice(j,1);
+          if (channel.node2.channels.length === 0)
+            deleteNode(channel.node2);
+          else
+            updateNodeColouring(channel.node2);
+          break
+        }
     // remove the channel from the global channels array
     for (j = 0; j < channels.length; ++j)
       if (channels[j] === channel) {
