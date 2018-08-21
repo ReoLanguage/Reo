@@ -372,8 +372,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         // Wait until the image is loaded to create the relationship and add it to the channel
         var invertedBossTransform = fabric.util.invertTransform(channel.parts[0].calcTransformMatrix());
         img.relationship = fabric.util.multiplyTransformMatrices(invertedBossTransform, img.calcTransformMatrix());
-        channel.parts.splice(1, 0, img);
-        reference.set('delete', img);
+        channel.parts.push(img);
+        channel.parts[0].set('delete', img);
+        channel.delete = img;
         canvas.add(img)
       });
 
@@ -1140,8 +1141,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       p.setCoords();
       switch (p.class) {
         case 'node':
-          if (mode !== 'split')
-            updateNode(p, !(fromBoundary || p.parent === main));
+          updateNode(p, !(fromBoundary || p.parent === main));
+          if (mode === 'split')
+            buttonClick(document.getElementById("select"));
           break;
         case 'component':
           p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
@@ -1204,9 +1206,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           fill: 'transparent',
           radius: loopRadius,
           stroke: lineStrokeColour,
-          hasBorders: false,
           hasControls: false,
-          evented: false,
+          lockMovementX: true,
+          lockMovementY: true,
+          selectable: mode === 'select',
           hoverCursor: 'default'
         });
         canvas.add(curve);
@@ -1253,6 +1256,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           canvas.add(o)
         }
         channel.parts[0] = curve;
+        channel.reference = curve;
+        curve.set('delete', channel.delete);
         channel.parts.splice(1,1);
         canvas.remove(line)
       }
