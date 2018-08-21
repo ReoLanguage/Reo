@@ -85,15 +85,28 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     for (i = 0; i < components.length; ++i) {
       components[i].set('selectable', mode === 'select');
-      components[i].label.set('selectable', mode === 'select');
+      components[i].label.set({selectable: mode === 'select', hoverCursor: mode === 'select' ? 'text' : 'default'});
+      if (components[i].copy)
+        components[i].copy.set({selectable: mode === 'select', hoverCursor: mode === 'select' ? 'pointer' : 'default'});
+      if (components[i].delete)
+        components[i].delete.set({selectable: mode === 'select', hoverCursor: mode === 'select' ? 'pointer' : 'default'});
+      if (components[i].compactSwitch)
+        components[i].compactSwitch.set({selectable: mode === 'select', hoverCursor: mode === 'select' ? 'pointer' : 'default'});
     }
     for (i = 0; i < nodes.length; ++i) {
-      nodes[i].set('selectable', mode === 'select' || mode === 'split');
-      nodes[i].label.set('selectable', mode === 'select');
+      nodes[i].set({
+        selectable:  mode === 'select' || mode === 'split',
+        hoverCursor: mode === 'select' || mode === 'split' ? 'move' : 'default'
+      });
+      nodes[i].label.set({selectable: mode === 'select', hoverCursor: mode === 'select' ? 'text' : 'default'});
       nodes[i].selection.set('visible', false)
     }
     for (i = 0; i < channels.length; ++i)
-      channels[i].parts[0].set({fill: 'transparent', selectable: mode === 'select'});
+      channels[i].parts[0].set({
+        fill: 'transparent',
+        selectable:  mode === 'select',
+        hoverCursor: mode === 'select' ? 'pointer' : 'default'
+      });
     canvas.requestRenderAll()
   }
 
@@ -228,7 +241,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       radius: nodeFactor * lineStrokeWidth,
       stroke: lineStrokeColour,
       hasControls: false,
-      selectable: mode === 'select' || mode === 'split'
+      selectable:  mode === 'select' || mode === 'split',
+      hoverCursor: mode === 'select' || mode === 'split' ? 'move' : 'default'
     });
 
     var label = new fabric.IText(name ? name : node.id, {
@@ -237,7 +251,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       fontSize: 20,
       object: node,
       class: 'label',
-      hasControls: false
+      hasControls: false,
+      hoverCursor: mode === 'select' ? 'text' : 'default'
     });
 
     node.set({label: label, labelOffsetX: 10, labelOffsetY: -20});
@@ -258,15 +273,37 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
     fabric.Image.fromURL('img/delete.svg', function(img) {
       var scale = (nodeFactor * 4) / img.height;
-      img.scale(scale).set({left: node.left - 15, top: node.top + 15, class: 'delete', parent: node, visible: false,
-        selectable: true, hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+      img.scale(scale).set({
+        left: node.left - 15,
+        top:  node.top  + 15,
+        class: 'delete',
+        parent: node,
+        visible: false,
+        selectable: true,
+        hasControls: false,
+        hasBorders: false,
+        lockMovementX: true,
+        lockMovementY: true,
+        hoverCursor: 'pointer'
+      });
       node.set('delete', img);
       canvas.add(img)
     });
     fabric.Image.fromURL('img/split.svg', function(img) {
       var scale = (nodeFactor * 4) / img.height;
-      img.scale(scale).set({left: node.left + 15, top: node.top + 15, class: 'split', parent: node, visible: false,
-        selectable: true, hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+      img.scale(scale).set({
+        left: node.left + 15,
+        top: node.top + 15,
+        class: 'split',
+        parent: node,
+        visible: false,
+        selectable: true,
+        hasControls: false,
+        hasBorders: false,
+        lockMovementX: true,
+        lockMovementY: true,
+        hoverCursor: 'pointer'
+      });
       node.set({'split': img});
       canvas.add(img)
     });
@@ -342,6 +379,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       hasControls: false,
       lockMovementX: true,
       lockMovementY: true,
+      selectable: mode === 'select',
+      hoverCursor: mode === 'select' ? 'pointer' : 'default',
       baseLength: 100
     });
     channel.parts.splice(0, 0, reference);
@@ -366,7 +405,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           referenceDistance: 15,
           referencePoint: 'middle',
           rotate: false,
-          scale: false
+          scale: false,
+          hoverCursor: 'pointer'
         });
 
         // Wait until the image is loaded to create the relationship and add it to the channel
@@ -867,7 +907,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   });
 
   canvas.on('before:selection:cleared', function(e) {
-    if (e.target.delete)
+    console.log(e.target);
+    if (e.target.delete && (!e.target.class || e.target.class !== 'component'))
       e.target.delete.set('visible', false);
     if (e.target.split)
       e.target.split.set('visible', false);
@@ -1210,7 +1251,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           lockMovementX: true,
           lockMovementY: true,
           selectable: mode === 'select',
-          hoverCursor: 'default'
+          hoverCursor: mode === 'select' ? 'pointer' : 'default'
         });
         canvas.add(curve);
 
@@ -1285,13 +1326,13 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       if (nodes[j].selection.visible === true) {
         nodes[j].selection.set('visible', false);
         for (i = 0; i < nodes[j].channels.length; ++i)
-          nodes[j].channels[i].parts[0].set({fill: 'transparent', selectable: false});
+          nodes[j].channels[i].parts[0].set({fill: 'transparent', selectable: false, hoverCursor: 'default'});
         break
       }
     }
     node.selection.set('visible', true);
     for (i = 0; i < node.channels.length; ++i)
-      node.channels[i].parts[0].set({fill: splitDeselected, selectable: true});
+      node.channels[i].parts[0].set({fill: splitDeselected, selectable: true, hoverCursor: 'pointer'});
     canvas.requestRenderAll()
   }
 
@@ -1555,7 +1596,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       fontSize: 24,
       class: 'title',
       object: component,
-      hoverCursor: 'text',
+      hoverCursor: mode === 'select' ? 'text' : 'default',
       hasControls: false,
       lockMovementX: true,
       lockMovementY: true,
@@ -1568,21 +1609,45 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     if (name !== 'main') {
       fabric.Image.fromURL('img/delete.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 15, top: component.top + 15, class: 'delete', parent: component});
+        img.scale(scale).set({
+          left: component.left + 15,
+          top:  component.top  + 15,
+          class: 'delete',
+          parent: component,
+          hoverCursor: 'pointer'
+        });
         component.set('delete', img);
         canvas.add(img)
       });
       fabric.Image.fromURL('img/compact.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 35, top: component.top + 15, class: 'compactSwitch', parent: component,
-          hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+        img.scale(scale).set({
+          left: component.left + 35,
+          top:  component.top  + 15,
+          class: 'compactSwitch',
+          parent: component,
+          hasControls: false,
+          hasBorders: false,
+          lockMovementX: true,
+          lockMovementY: true,
+          hoverCursor: 'pointer'
+        });
         component.set({compactSwitch: img, compact: false});
         canvas.add(img)
       });
       fabric.Image.fromURL('img/copy.svg', function(img) {
         var scale = (nodeFactor * 4) / img.height;
-        img.scale(scale).set({left: component.left + 55, top: component.top + 15, class: 'copy', parent: component,
-        hasControls: false, hasBorders: false, lockMovementX: true, lockMovementY: true});
+        img.scale(scale).set({
+          left: component.left + 55,
+          top:  component.top  + 15,
+          class: 'copy',
+          parent: component,
+          hasControls: false,
+          hasBorders: false,
+          lockMovementX: true,
+          lockMovementY: true,
+          hoverCursor: 'pointer'
+        });
         component.set('copy', img);
         canvas.add(img)
       });
