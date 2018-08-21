@@ -311,8 +311,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     nodes.push(node);
     setParent(node);
     canvas.add(node, node.label);
-    if (!manual)
-      updateNode(node);
     return node
   } //createNode
 
@@ -431,6 +429,13 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     channel.node1.channels.push(channel);
     channel.node2.channels.push(channel);
 
+    if (manual)
+      updateNodeColouring(channel.node1);
+    else {
+      updateNode(channel.node1);
+      updateNode(channel.node2);
+    }
+
     // code generation functions
     channel.positionMetadata = function() {
       return ` /*! ${this.node1.positionMetadata()}, ${this.node2.positionMetadata()} !*/`
@@ -491,7 +496,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     }
     fromBoundary = isBoundaryNode(channel.node1);
     canvas.setActiveObject(channel.node2);
-    isDown = true;
+    if (manual)
+      isDown = true;
   }
 
   function createLink(node) {
@@ -639,7 +645,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           source = true;
         else
           sink = true
-      } else throw new Error("Error updating nodes")
+      } else throw new Error("Internal datastructure has broken down at node " + node.id)
     }
 
     if (source) {
@@ -907,7 +913,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   });
 
   canvas.on('before:selection:cleared', function(e) {
-    console.log(e.target);
     if (e.target.delete && (!e.target.class || e.target.class !== 'component'))
       e.target.delete.set('visible', false);
     if (e.target.split)
@@ -1315,9 +1320,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         source.parent.nodes.splice(i,1);
         break
       }
-    canvas.remove(source.label, source.delete, source.split, source);
     updateNodeColouring(destination);
-    destination.bringToFront()
+    destination.bringToFront();
+    canvas.remove(source.label, source.delete, source.split, source)
   }
 
   function prepareSplit(node) {
