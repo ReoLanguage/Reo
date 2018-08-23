@@ -42,7 +42,7 @@ var channeltypes = [
         "y1": 0,
         "y2": 0,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       },
       {
         "type": "triangle",
@@ -83,7 +83,7 @@ var channeltypes = [
         "rotate": true,
         "scale": false,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       }
     ]
   },
@@ -133,7 +133,7 @@ var channeltypes = [
         "y1": 0,
         "y2": 0,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       },
       {
         "type": "triangle",
@@ -174,7 +174,7 @@ var channeltypes = [
         "rotate": true,
         "scale": false,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       }
     ]
   },
@@ -221,7 +221,7 @@ var channeltypes = [
         "y1": 0,
         "y2": 0,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       },
       {
         "type": "triangle",
@@ -262,7 +262,7 @@ var channeltypes = [
         "rotate": true,
         "scale": false,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       },
       {
         "type": "triangle",
@@ -303,7 +303,7 @@ var channeltypes = [
         "rotate": true,
         "scale": false,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       }
     ]
   },
@@ -350,7 +350,7 @@ var channeltypes = [
         "y1": 0,
         "y2": 0,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       },
       {
         "type": "triangle",
@@ -391,7 +391,7 @@ var channeltypes = [
         "rotate": true,
         "scale": false,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       },
       {
         "type": "triangle",
@@ -432,7 +432,7 @@ var channeltypes = [
         "rotate": true,
         "scale": false,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       }
     ]
   },
@@ -475,7 +475,7 @@ var channeltypes = [
         "y1": 0,
         "y2": 0,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       },
       {
         "type": "triangle",
@@ -516,7 +516,7 @@ var channeltypes = [
         "rotate": true,
         "scale": false,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       },
       {
         "type": "rect",
@@ -557,7 +557,7 @@ var channeltypes = [
         "rotate": true,
         "scale": false,
         "evented": false,
-        "hoverCursor": 'default'
+        "hoverCursor": "default"
       }
     ]
   },

@@ -114,23 +114,23 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   document.getElementById("split").onclick     = function() {buttonClick(document.getElementById("split"))};
   document.getElementById("component").onclick = function() {buttonClick(document.getElementById("component"))};
 
-  document.getElementById("downloadsvg").onclick = function () {
+  document.getElementById("downloadSVG").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.svg";
     a.href = "data:image/svg+xml;base64," + window.btoa(canvas.toSVG());
     a.click()
   };
 
-  document.getElementById("downloadpng").onclick = function () {
+  document.getElementById("downloadPNG").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.png";
     a.href = canvas.toDataURL("image/png");
     a.click()
   };
 
-  document.getElementById("downloadCode").onclick = function () {
+  document.getElementById("downloadReo").onclick = function () {
     var a = document.getElementById("download");
-    a.download = "reo.treo";
+    a.download = "reo.reo";
     a.href = window.URL.createObjectURL(new Blob([document.getElementById("text").value], {type: "text/plain"}));
     a.click()
   };
@@ -171,6 +171,25 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   document.getElementById("commentSwitch").onclick = function () {
     updateText()
+  };
+
+  var modal = document.getElementById('newChannelModal');
+
+  document.getElementById("newChannel").onclick = function () {
+    modal.style.display = "block"
+  };
+
+  document.getElementsByClassName("close")[0].onclick = function () {
+    modal.style.display = "none"
+  };
+
+  document.getElementById("createChannel").onclick = function () {
+    loadChannel(JSON.parse(document.getElementById("channelProperties").value));
+    modal.style.display = "none"
+  };
+
+  window.onclick = function(event) {
+    if (event.target === modal) modal.style.display = "none"
   };
 
   // generate a new object ID
@@ -328,7 +347,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   } //createAnchor
 
   /**
-   *
+   * Creates a channel
    * @param {string} type - type of channel to be created
    * @param {Object} node1
    * @param {string} [node1.name] - optional name of the first node
@@ -342,7 +361,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
    * @returns {{class: string, parts: Array}}
    */
   function createChannel(type, node1, node2, manual) {
-    // create a channel...
     var channel, i, validChannel = false;
     isDown = false;
 
@@ -523,27 +541,39 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     canvas.requestRenderAll();
   }
 
+  /**
+   * Creates a span, representing a channel from given properties, and appends it to channels div
+   * @param {Object} properties
+   * @param {string} properties.name - name of the channel
+   * @param {string} properties.class - class attribute of channel
+   */
+  function loadChannel(properties) {
+    var img = document.createElement("img");
+    img.setAttribute("src", "img/" + properties.name + ".svg");
+    img.setAttribute("alt", properties.name);
+    var a = document.createElement("a");
+    a.setAttribute("title", properties.name);
+    a.appendChild(img);
+    var span = document.createElement("span");
+    span.setAttribute("id", properties.name);
+    span.setAttribute("class", properties.class);
+    span.appendChild(a);
+    span.appendChild(document.createElement("br"));
+    span.appendChild(document.createTextNode(properties.name));
+    document.getElementById("channels").appendChild(span);
+    span.onclick = function() {buttonClick(this)}
+  }
+
+  /**
+   * Loads predefined channels at load time
+   */
   function loadChannels() {
     if (typeof Storage !== "undefined" && localStorage.getItem("channels"))
       channeltypes = JSON.parse(localStorage.getItem("channels"));
 
-    for (var i = 0; i < channeltypes.length; ++i) {
-      var img = document.createElement("img");
-      img.setAttribute("src","img/" + channeltypes[i].name + ".svg");
-      img.setAttribute("alt",channeltypes[i].name);
-      var a = document.createElement("a");
-      a.setAttribute("title",channeltypes[i].name);
-      a.appendChild(img);
-      var span = document.createElement("span");
-      span.setAttribute("id",channeltypes[i].name);
-      span.setAttribute("class",channeltypes[i].class);
-      span.appendChild(a);
-      span.appendChild(document.createElement("br"));
-      span.appendChild(document.createTextNode(channeltypes[i].name));
-      document.getElementById("channels").appendChild(span);
-      span.onclick = function() {buttonClick(this)}
-    }
-  } //loadChannels
+    for (var i = 0; i < channeltypes.length; ++i)
+      loadChannel(channeltypes[i])
+  }
 
   function calculateAngle(channel, baseAngle) {
     var angle = 0;

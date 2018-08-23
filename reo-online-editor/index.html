@@ -25,15 +25,28 @@
         <div class="tool" id="split"><a title="Split nodes"><img src="img/split.svg" alt="Split nodes"></a></div>
         <div class="tool" id="component"><a title="New component"><img src="img/component.svg" alt="New component"></a></div>
         <a id="download"></a>
-        <input type="button" id="downloadsvg" value="Download SVG"><br/>
-        <input type="button" id="downloadpng" value="Download PNG"><br/>
-        <input type="button" id="downloadCode" value="Download Code"><br/>
+        <input type="button" id="downloadSVG" value="Download as SVG"><br/>
+        <input type="button" id="downloadPNG" value="Download as PNG"><br/>
+        <input type="button" id="downloadReo" value="Download as Reo"><br/>
         <h2>Channels</h2>
-        <div id="channels">
-          <!--<input type="button" id="newchannel" value="New channel"><br/>-->
+	  	<input type="button" id="newChannel" value="New channel"><br/>
+	  	<div id="channels" style="height: 49%; overflow-y: scroll"></div>
+      </div>
+    </div>
+
+    <div id="newChannelModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="close">&times;</span>
+          <h2>Create Channel</h2>
+        </div>
+        <div class="modal-body">
+          <textarea id="channelProperties" style="width: 90%; height: 150px;" title="Channel Properties">{}</textarea><br/>
+          <input type="button" id="createChannel" value="Create">
         </div>
       </div>
     </div>
+
     <script src="reo2tikz/globalutil.js"></script>
     <script src="fabric.js-2.2.2/dist/fabric.js"></script>
 
