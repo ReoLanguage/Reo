@@ -570,7 +570,7 @@ var channeltypes = [
       {
         type: "line",
         stroke: "#000",
-        evented: false,
+        evented: false
       },
       {
         type: "triangle",
@@ -595,7 +595,7 @@ var channeltypes = [
         referenceDistance: 42,
         referencePoint: "middle",
         scale: false,
-        evented: false,
+        evented: false
       },
       {
         type: "rect",
@@ -607,7 +607,7 @@ var channeltypes = [
         referenceDistance: 28,
         referencePoint: "middle",
         scale: false,
-        evented: false,
+        evented: false
       },
       {
         type: "rect",
@@ -619,7 +619,7 @@ var channeltypes = [
         referenceDistance: 14,
         referencePoint: "middle",
         scale: false,
-        evented: false,
+        evented: false
       },
       {
         type: "rect",
@@ -631,7 +631,7 @@ var channeltypes = [
         referenceDistance: 0,
         referencePoint: "middle",
         scale: false,
-        evented: false,
+        evented: false
       },
       {
         type: "rect",
@@ -643,7 +643,7 @@ var channeltypes = [
         referenceDistance: -14,
         referencePoint: "middle",
         scale: false,
-        evented: false,
+        evented: false
       },
       {
         type: "rect",
@@ -655,7 +655,7 @@ var channeltypes = [
         referenceDistance: -28,
         referencePoint: "middle",
         scale: false,
-        evented: false,
+        evented: false
       },
       {
         type: "rect",
@@ -667,7 +667,7 @@ var channeltypes = [
         referenceDistance: -42,
         referencePoint: "middle",
         scale: false,
-        evented: false,
+        evented: false
       },
       {
         type: "rect",
