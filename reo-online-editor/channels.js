@@ -679,8 +679,48 @@ var channeltypes = [
         referenceDistance: -56,
         referencePoint: "middle",
         scale: false,
-        evented: false,
+        evented: false
+      }
+    ]
+  },
+  {
+    class: "channel",
+    name: "transformer",
+    end1: "source",
+    end2: "sink",
+    parts: [
+      {
+        type: "line",
+        stroke: "#000",
+        evented: false
       },
+      {
+        type: "triangle",
+        width: 8,
+        height: 8,
+        fill: "#000",
+        angle: 90,
+        baseAngle: 90,
+        referenceAngle: 270,
+        referenceDistance: 8,
+        referencePoint: "node2",
+        scale: false,
+        evented: false
+      },
+      {
+        type: "triangle",
+        width: 20,
+        height: 20,
+        fill: "#FFF",
+        stroke: "rgb(0, 0, 0)",
+        angle: 90,
+        baseAngle: 90,
+        referenceAngle: 270,
+        referenceDistance: 0,
+        referencePoint: "middle",
+        scale: false,
+        evented: false
+      }
     ]
   }
 ];
