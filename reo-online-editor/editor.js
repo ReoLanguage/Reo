@@ -39,7 +39,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   var canvas = this.__canvas = new fabric.Canvas('c', {selection: false, preserveObjectStacking: true, backgroundColor: '#eee'});
   fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
   fabric.Object.prototype.objectCaching = false;
-  var active, isDown, origX, origY, origLeft, origTop, origRight, origBottom, fromBoundary;
+  var isDown, origX, origY, origLeft, origTop, origRight, origBottom, fromBoundary;
   var mode = 'select';
   var id = '0';
   var nodes = [], channels = [], components = [];
@@ -47,7 +47,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   loadChannels();
 
   // drawing parameters
-
   nodeFillColourSource = '#fff';
   nodeFillColourSink   = '#fff';
   nodeFillColourMixed  = '#000';
@@ -91,7 +90,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       if (components[i].delete)
         components[i].delete.set({selectable: mode === 'select', hoverCursor: mode === 'select' ? 'pointer' : 'default'});
       if (components[i].compactSwitch)
-        components[i].compactSwitch.set({selectable: mode === 'select', hoverCursor: mode === 'select' ? 'pointer' : 'default'});
+        components[i].compactSwitch.set({selectable: mode === 'select', hoverCursor: mode === 'select' ? 'pointer' : 'default'})
     }
     for (i = 0; i < nodes.length; ++i) {
       nodes[i].set({
@@ -106,7 +105,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         fill: 'transparent',
         selectable:  mode === 'select',
         hoverCursor: mode === 'select' ? 'pointer' : 'default'
-      });
+      })
     canvas.requestRenderAll()
   }
 
@@ -195,8 +194,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   // generate a new object ID
   // ID will only contain letters, i.e. z is followed by aa
   function generateId() {
-    id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g, 'a');
-    return id
+    return (id = ((parseInt(id, 36)+1).toString(36)).replace(/[0-9]/g, 'a'))
   }
 
   // Extend the default Fabric.js object type to include additional positional parameters
@@ -286,7 +284,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       radius: 10,
       evented: false,
       visible: false
-    })
+    });
     node.set('selection', selection);
     canvas.add(selection);
 
@@ -451,7 +449,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       updateNodeColouring(channel.node1);
     else {
       updateNode(channel.node1);
-      updateNode(channel.node2);
+      updateNode(channel.node2)
     }
 
     // code generation functions
@@ -515,7 +513,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     fromBoundary = isBoundaryNode(channel.node1);
     canvas.setActiveObject(channel.node2);
     if (manual)
-      isDown = true;
+      isDown = true
   }
 
   function createLink(node) {
@@ -538,7 +536,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     canvas.add(link, clone, clone.label);
     node.bringToFront();
     canvas.setActiveObject(clone);
-    canvas.requestRenderAll();
+    canvas.requestRenderAll()
   }
 
   /**
@@ -576,9 +574,9 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   function calculateAngle(channel, baseAngle) {
-    var angle = 0;
-    var x = (channel.node2.get('left') - channel.node1.get('left'));
-    var y = (channel.node2.get('top')  - channel.node1.get('top'));
+    var angle = 0,
+      x = (channel.node2.get('left') - channel.node1.get('left')),
+      y = (channel.node2.get('top')  - channel.node1.get('top'));
 
     if (x === 0)
       angle = (y === 0) ? 0 : (y > 0) ? Math.PI / 2 : Math.PI * 3 / 2;
@@ -622,11 +620,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           if (p.intersectsWithObject(components[i])) {
             p.parent = components[i];
             components[i].nodes.push(p);
-            break;
+            break
           }
         // set a parent for the channels if necessary
         for (i = 0; i < p.channels.length; ++i)
-          setParent(p.channels[i]);
+          setParent(p.channels[i])
         break;
       case 'channel':
         if (p.node1.parent.index < p.node2.parent.index)
@@ -644,12 +642,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }
 
   function updateNode(node, keepParent) {
-    var i;
-
     // set node coordinates
     node.label.setCoords();
     node.set({labelOffsetX: node.label.left - node.left, labelOffsetY: node.label.top - node.top});
-    for (i = nodes.length - 1; i >= 0; --i) {
+    for (var i = nodes.length - 1; i >= 0; --i) {
       // prevent comparing the node with itself
       if (nodes[i] === node) continue;
       // merge nodes that overlap
@@ -712,8 +708,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         break;
       case 'circle':
         channel.parts[0].set({left: x1, top: y1 - loopRadius});
-        channel.parts[0].setCoords();
-        break;
+        channel.parts[0].setCoords()
     }
 
     // update all channel components
@@ -803,9 +798,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               isBoundaryNode(node2) &&
               node1.parent !== node2.parent
              )
-        ) {
-          textMainScope += spaceScope + obj.generateCode(commentSwitch) + '\n';
-        }
+        )
+          textMainScope += spaceScope + obj.generateCode(commentSwitch) + '\n'
       }
 
       for (q = 0; q < components.length; ++q) {
@@ -831,12 +825,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               textComponent += '\n' + spaceScope.repeat(2) + obj2.generateCode(commentSwitch)
           }
           textComponent += '\n' + spaceScope + '}';
-          textMainScope += '\n' + textComponent;
+          textMainScope += '\n' + textComponent
         }
       }
 
       textMain += ') {\n' + textMainScope + '\n}\n';
-      codeEditor.setValue(textMain);
+      codeEditor.setValue(textMain)
     }
   }
 
@@ -855,7 +849,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     node.label.setCoords();
     node.label.bringToFront();
     for (i = 0; i < node.channels.length; ++i)
-      updateChannel(node.channels[i]);
+      updateChannel(node.channels[i])
     updateText()
   }
 
@@ -865,19 +859,20 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
    */
   function repositionParts(c) {
     c.label.set({left: c.left + (c.scaleX * c.width) / 2, top: c.top + 15});
+    c.label.setCoords();
     c.header.set({x1: c.left, y1: c.top + headerHeight, x2: c.left + c.scaleX * c.width, y2: c.top + headerHeight});
     c.header.setCoords();
     if (c.delete) {
       c.delete.set({left: c.left + 15, top: c.top + 15});
-      c.delete.setCoords();
+      c.delete.setCoords()
     }
     if (c.compactSwitch) {
       c.compactSwitch.set({left: c.left + 35, top: c.top + 15});
-      c.compactSwitch.setCoords();
+      c.compactSwitch.setCoords()
     }
     if (c.copy) {
       c.copy.set({left: c.left + 55, top: c.top + 15});
-      c.copy.setCoords();
+      c.copy.setCoords()
     }
   }
 
@@ -938,7 +933,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     if (e.target.delete)
       e.target.delete.set('visible', true);
     if (e.target.split)
-      e.target.split.set('visible', true)
+      e.target.split.set('visible', true);
     canvas.requestRenderAll()
   });
 
@@ -996,11 +991,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   }); //mouse:out*/
 
   canvas.on('mouse:down', function(e) {
+    var pointer = canvas.getPointer(e.e), p = canvas.getActiveObject(), i, otherNode;
     isDown = true;
-    var pointer = canvas.getPointer(e.e), i, otherNode;
     origX = pointer.x;
     origY = pointer.y;
-    var p = canvas.getActiveObject();
     if (p && mode !== 'select')
       canvas.discardActiveObject();
     switch (mode) {
@@ -1028,13 +1022,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               origTop = p.top;
               origBottom = p.top + p.height;
               p.nodes = [];
-              for (i = 0; i < nodes.length; ++i) {
+              for (i = 0; i < nodes.length; ++i)
                 if (nodes[i].parent === p) {
                   p.nodes.push(nodes[i]);
                   nodes[i].origLeft = nodes[i].left;
                   nodes[i].origTop = nodes[i].top
                 }
-              }
               break;
             case 'delete':
               switch (p.parent.class) {
@@ -1074,7 +1067,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
                   break
                 }
             } else
-              prepareSplit(p);
+              prepareSplit(p)
           } else if (p.parent && p.parent.class === 'channel') {
             p.set('fill', p.fill === splitSelected ? splitDeselected : splitSelected);
             canvas.requestRenderAll()
@@ -1082,7 +1075,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         }
         break;
       default:
-        createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y}, true);
+        createChannel(mode, {x: pointer.x, y: pointer.y}, {x: pointer.x, y: pointer.y}, true)
     }
   }); //mouse:down
 
@@ -1091,7 +1084,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     var i, j, x, y, p = canvas.getActiveObject(), index = -1;
     if (!p) return;
     var pointer = canvas.getPointer(e.e);
-    x = pointer.x, y = pointer.y;
+    x = pointer.x;
+    y = pointer.y;
     switch (p.class) {
       case 'component':
         if (p.status === 'drawing') {
@@ -1125,9 +1119,8 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         if (p.link)
           p.link.set({x1: p.link.nodes[0].left, y1: p.link.nodes[0].top, x2: p.link.nodes[1].left, y2: p.link.nodes[1].top}).setCoords();
         for (i = 0; i < nodes.length; ++i)
-          if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance) {
+          if (Math.abs(p.left-nodes[i].left) < mergeDistance && Math.abs(p.top-nodes[i].top) < mergeDistance)
             p.set({left: nodes[i].left, top: nodes[i].top}).setCoords();
-          }
 
         if (!fromBoundary) {
           // Limit the node position to the parent
@@ -1149,7 +1142,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
               p.top  > components[i].top  - mergeDistance &&
               p.left < components[i].left + components[i].width  + mergeDistance &&
               p.top  < components[i].top  + components[i].height + mergeDistance)
-              index = i;
+              index = i
           }
 
           if (index >= 0 && components[index] !== p.parent && components[index] !== main) {
@@ -1201,7 +1194,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           p.split.set({left: p.left + 15, top: p.top + 15}).setCoords();
         p.selection.set({left: p.left, top: p.top}).setCoords();
         for (i = 0; i < p.channels.length; ++i)
-          updateChannel(p.channels[i]);
+          updateChannel(p.channels[i])
         break;
       default:
         return
@@ -1231,7 +1224,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
             p.label.set({left: p.left + (p.width/2), top: p.top + 15});
             p.label.setCoords()
           }
-
           p.set('selectable', mode === 'select');
           bringComponentToFront(p);
           if (mode !== 'select')
@@ -1240,7 +1232,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         case 'label':
           p.setCoords();
           p.object.set({labelOffsetX: p.left - p.object.left, labelOffsetY: p.top - p.object.top});
-          break;
+          break
       }
       if (mode !== 'select')
         canvas.discardActiveObject();
@@ -1361,13 +1353,13 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       if (nodes[j].selection.visible === true) {
         nodes[j].selection.set('visible', false);
         for (i = 0; i < nodes[j].channels.length; ++i)
-          nodes[j].channels[i].parts[0].set({fill: 'transparent', selectable: false, hoverCursor: 'default'});
+          nodes[j].channels[i].parts[0].set({fill: 'transparent', selectable: false, hoverCursor: 'default'})
         break
       }
     }
     node.selection.set('visible', true);
     for (i = 0; i < node.channels.length; ++i)
-      node.channels[i].parts[0].set({fill: splitDeselected, selectable: true, hoverCursor: 'pointer'});
+      node.channels[i].parts[0].set({fill: splitDeselected, selectable: true, hoverCursor: 'pointer'})
     canvas.requestRenderAll()
   }
 
@@ -1382,7 +1374,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           source.channels[i].node2 = destination;
         destination.channels.push(source.channels[i]);
         source.channels.splice(i, 1);
-        --i;
+        --i
       }
     source.selection.set('visible', false);
     destination.selection.set('visible', true);
@@ -1423,7 +1415,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       }
     // Update the other index parameters accordingly
     for (; i < limit; ++i)
-      components[i].set('index', i);
+      components[i].set('index', i)
     p.bringToFront();
     p.header.bringToFront();
     if (p.delete)
@@ -1435,7 +1427,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     p.label.bringToFront();
     // Set a new parent for the channels if necessary
     for (i = p.channels.length - 1; i >= 0; --i)
-      setParent(p.channels[i]);
+      setParent(p.channels[i])
     for (i = 0; i < p.channels.length; ++i)
       for (j = 1; j < p.channels[i].parts.length; ++j)
         p.channels[i].parts[j].bringToFront();
@@ -1445,7 +1437,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     }
     for (i = 0; i < p.components.length; ++i)
       bringComponentToFront(p.components[i])
-    canvas.requestRenderAll();
+    canvas.requestRenderAll()
   }
 
   /**
@@ -1456,7 +1448,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     p.selection.bringToFront();
     for (i = 0; i < p.channels.length; ++i) {
       for (j = 1; j < p.channels[i].parts.length; ++j)
-        p.channels[i].parts[j].bringToFront();
+        p.channels[i].parts[j].bringToFront()
       p.channels[i].node1.bringToFront();
       p.channels[i].node2.bringToFront()
     }
@@ -1471,7 +1463,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     var i;
     // delete the connecting channels
     for (i = node.channels.length - 1; i >= 0; --i)
-      deleteChannel(node.channels[i]);
+      deleteChannel(node.channels[i])
     // remove the node from the global nodes array
     for (i = 0; i < nodes.length; ++i)
       if (nodes[i] === node) {
@@ -1484,7 +1476,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         node.parent.nodes.splice(i,1);
         break
       }
-    canvas.remove(node, node.label);
+    canvas.remove(node, node.label)
   }
 
   function deleteChannel(channel) {
@@ -1535,10 +1527,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     var k;
     // delete underlying components
     for (k = 0; k < component.components.length; ++k)
-      deleteComponent(component.components[k], true);
+      deleteComponent(component.components[k], true)
     // delete all nodes that are in this component
     for (k = 0; k < component.nodes.length; ++k)
-      deleteNode(component.nodes[k]);
+      deleteNode(component.nodes[k])
     // remove the component from the global components array
     for (k = 0; k < components.length; ++k)
       if (components[k] === component) {
@@ -1550,7 +1542,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       for (k = 0; k < component.parent.components.length; ++k)
         if (component.parent.components[k] === component) {
           component.parent.components.splice(k,1);
-          break;
+          break
         }
     if (component !== main)
       canvas.remove(component.delete, component.compactSwitch, component.copy);
@@ -1571,7 +1563,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     var i, c, component = createComponent(p.left + 20, p.top + 20, p.left + p.width + 20, p.top + p.height + 20, p.id);
     for (i = 0; i < p.channels.length; ++i) {
       c = p.channels[i];
-      createChannel(c.name, {x: c.node1.left + 20, y: c.node1.top + 20, name: c.node1.id}, {x: c.node2.left + 20, y: c.node2.top + 20, name: c.node2.id});
+      createChannel(c.name, {x: c.node1.left + 20, y: c.node1.top + 20, name: c.node1.id}, {x: c.node2.left + 20, y: c.node2.top + 20, name: c.node2.id})
     }
   }
 
@@ -1685,7 +1677,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         });
         component.set('copy', img);
         canvas.add(img)
-      });
+      })
     }
 
     /*var options = new fabric.Circle({
@@ -1745,5 +1737,5 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   //createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
   //createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
   document.getElementById("select").click();
-  updateText();
+  updateText()
 });
