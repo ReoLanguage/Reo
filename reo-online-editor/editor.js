@@ -911,6 +911,10 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     updateText()
   }); //text:editing:exited
 
+  canvas.on('mouse:up', function() {
+    onMouseUp()
+  });
+
   canvas.on('selection:created', function(e) {
     if (e.target.delete)
       e.target.delete.set('visible', true);
@@ -1203,7 +1207,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
     canvas.requestRenderAll()
   }); //mouse:move
 
-  canvas.on('mouse:up', function() {
+  function onMouseUp() {
     isDown = false;
     var p = canvas.getActiveObject();
     if (p) {
@@ -1217,17 +1221,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         case 'component':
           p.set({width: p.scaleX * p.width, height: p.scaleY * p.height, scaleX: 1, scaleY: 1});
           p.setCoords();
-          if (p.status === 'drawing') {
+          if (p.status === 'drawing')
             p.set('status', 'design');
-            p.header.set({x1: p.left, y1: p.top + headerHeight, x2: p.left + p.width, y2: p.top + headerHeight});
-            p.header.setCoords();
-            p.label.set({left: p.left + (p.width/2), top: p.top + 15});
-            p.label.setCoords()
-          }
           p.set('selectable', mode === 'select');
           bringComponentToFront(p);
           if (mode !== 'select')
-            document.getElementById("select").click();
+            buttonClick(document.getElementById("select"));
           break;
         case 'label':
           p.setCoords();
@@ -1239,7 +1238,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       canvas.requestRenderAll();
       updateText()
     }
-  }); //mouse:up
+  }
 
   function mergeNodes(destination, source) {
     var j, i;
@@ -1580,6 +1579,11 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         case 'component':
           deleteComponent(p)
       }
+    if (e.code === "Escape" && mode !== 'select') {
+      if (isDown)
+        onMouseUp()
+      buttonClick(document.getElementById("select"))
+    }
   });
 
   function createComponent(x1, y1, x2, y2, name, manual) {
@@ -1736,6 +1740,6 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   //createChannel('syncdrain',{x: 100, y: 350},{x: 200, y: 350});
   //createChannel('syncspout',{x: 100, y: 450},{x: 200, y: 450});
   //createChannel('fifo1',{x: 100, y: 550},{x: 200, y: 550});
-  document.getElementById("select").click();
+  buttonClick(document.getElementById("select"));
   updateText()
 });
