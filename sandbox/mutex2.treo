@@ -1,0 +1,32 @@
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+import reo.fifofull;
+import reo.lossy;
+
+mutex2(){
+	process0(a, b, c) process1(d, e, f)
+	sync(a, y) sync(d, y) sync(y, request)
+	sync(c, x) sync(f, x) sync(x, leave)
+	chooser(leave, request, output1, output2)
+	sync(output1, b) sync(output2, e)	
+}
+
+xrouter(in, out0, out1) {
+  sync(in, s) syncdrain(s, m)
+  lossy(s, x) sync(x, m) sync(x, out0)
+  lossy(s, y) sync(y, m) sync(y, out1)
+}
+
+process0(a!String, b?String, c!String) {
+   #JAVA "process.process0"
+}
+
+process1(a!String, b?String, c!String) {
+   #JAVA "process.process1"
+}
+
+chooser(a, b, c, d){
+	fifofull<"0">(a, x) fifo1(b, y) syncdrain(x, z) sync(y, z) 
+	xrouter(z, c, d)
+}

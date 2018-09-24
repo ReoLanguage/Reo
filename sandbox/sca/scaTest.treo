@@ -1,0 +1,131 @@
+import reo.syncfifo1;
+import reo.sync;
+import reo.syncdrain;
+import reo.shiftlossyfifo1;
+import reo.xrouter;
+
+scaTest(charge,discharge1,discharge2,move,pass,snap){
+
+sync(a,charge)
+sync(b,discharge1)
+sync(c,discharge2)
+sync(d,move)
+sync(e,pass)
+sync(f,snap)
+
+sca2<t1,E1>(a,b,c)
+cas(a,b,c,d,e,f)
+sca1<t2,E2>(d,e,f)
+
+|
+	t1=5,
+	t2=3,
+	E1 = "WSemiring.lowerEqual.1",
+	E2 = "WSemiring.lowerEqual.2"
+
+}
+
+cas(a,b,c,d,e,f){
+syncdrain(a,e)
+syncdrain(b,f)
+syncdrain(c,d)
+}
+
+sca1<t:int,E:String>(move,pass,snap){
+
+sync(t1,pred1) pred<E,1,t>(pred1,pass)
+sync(t2,pred2) pred<E,0,t>(pred2,move)
+sync(t3,pred3) pred<E,2,t>(pred3,move)
+sync(t4,pred4) pred<E,1,t>(pred4,pass)
+sync(t5,pred5) pred<E,0,t>(pred5,snap)
+
+syncfifo1(q1,b1)
+xrouter(b1,t1,t2)
+asyncdrain(b1,b2)
+sync(t1,q1)
+sync(t2,q2)
+
+syncfifo1full<"0">(q2,b2)
+xrouter(b2,t3,t4,t5)
+sync(t3,q2)
+sync(t4,q2)
+sync(t5,q1)
+
+}
+
+sca2<t:int,E:String>(charge,discharge1,discharge2){
+
+sync(t1,pred1) pred<E,2,t>(pred1,discharge1)
+sync(t2,pred2) pred<E,5,t>(pred2,discharge2)
+
+sync(t3,pred3) pred<E,2,t>(pred3,discharge1)
+sync(t4,pred4) pred<E,5,t>(pred4,discharge2)
+sync(t5,pred5) pred<E,0,t>(pred5,charge)
+
+sync(t6,pred6) pred<E,2,t>(pred6,discharge1)
+sync(t7,pred7) pred<E,5,t>(pred7,discharge2)
+sync(t8,pred8) pred<E,0,t>(pred8,charge)
+
+sync(t9,pred9) pred<E,2,t>(pred9,discharge1)
+sync(t10,pred10) pred<E,0,t>(pred10,charge)
+
+sync(t11,pred11) pred<E,0,t>(t11,charge)
+
+syncfifo1full<"0">(q4,b4)
+xrouter(b4,t1,t2)
+asyncdrain(b4,b1)
+asyncdrain(b4,b2)
+asyncdrain(b4,b3)
+asyncdrain(b4,b0)
+sync(t1,q3)
+sync(t2,q2)
+
+syncfifo1(q3,b3)
+xrouter(b3,t3,t4,t5)
+asyncdrain(b3,b2)
+asyncdrain(b3,b1)
+asyncdrain(b3,b0)
+sync(t3,q2)
+sync(t4,q1)
+sync(t5,q4)
+
+syncfifo1(q2,b2)
+xrouter(b2,t6,t7,t8)
+asyncdrain(b2,b1)
+asyncdrain(b2,b0)
+sync(t6,q1)
+sync(t7,q0)
+sync(t8,q3)
+
+syncfifo1(q1,b1)
+xrouter(b1,t9,t10)
+asyncdrain(b1,b0)
+sync(t9,q0)
+sync(t10,q2)
+
+syncfifo1(q0,b0)
+xrouter(b0,t11)
+sync(t11,q1)
+
+}
+
+asyncdrain(a?,b?){
+	#RBA
+	{a,~b} true
+}
+
+syncfifo1full<k:String>(a?,b!) {
+	#RBA
+	$m=k;
+	{a, ~b} $m = null, $m' = a
+	{a, b} $m != null, b=$m, a= $m'
+	{~a, b} $m != null, b = $m, $m' = null
+}
+
+pred<P:string,e:int,t:int>(a?, b!) {
+	#RBA
+	{a,b} P(e,t), a=b
+}
+
+
+

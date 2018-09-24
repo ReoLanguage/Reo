@@ -1,0 +1,27 @@
+
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+producer(a!String) {
+	#PROMELA "producer"
+	#RBA {a} true
+}
+
+consumer(a?String) {
+	#PROMELA "consumer"
+	#RBA {a} true
+}
+
+test_promela() {
+
+	producer(a)
+	producer(b)
+	consumer(d)
+
+	syncdrain(a,b)
+	fifo1(c,d)
+	sync(a,d)
+	sync(b,c)
+}
+
