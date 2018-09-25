@@ -130,7 +130,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   document.getElementById("downloadReo").onclick = function () {
     var a = document.getElementById("download");
     a.download = "reo.reo";
-    a.href = window.URL.createObjectURL(new Blob([document.getElementById("text").value], {type: "text/plain"}));
+    a.href = window.URL.createObjectURL(new Blob([codeEditor.getValue()], {type: "text/plain"}));
     a.click()
   };
 
