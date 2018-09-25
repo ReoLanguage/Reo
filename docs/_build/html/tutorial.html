@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; Reo 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Reo 1.0 documentation" href="index.html"/>
+        <link rel="next" title="Library of components" href="library.html"/>
+        <link rel="prev" title="Introduction" href="introduction.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Reo
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#a-simple-concurrent-program">A simple concurrent program</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#analysis">Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#reo-protocols">Reo protocols</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#compilation">Compilation</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#components-and-interfaces">Components and interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference-to-java-source-code">1. Reference to Java source code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#definition-of-formal-semantics">2. Definition of formal semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#definition-as-composition">3. Definition as composition</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#predicates">Predicates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#terms">Terms</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#sections-and-imports">Sections and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="library.html">Library of components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="library.html#atomic-components">1. Atomic components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="library.html#sync">Sync</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#fifo1">Fifo1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#syncdrain">Syncdrain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#lossysync">Lossysync</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#filter">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="library.html#connector-components">2. Connector components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="library.html#regulatorwwr">Regulatorwwr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#barrier">Barrier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#alternator">Alternator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#circulator">Circulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#ovflfifo">Ovflfifo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#regulatorwrr">Regulatorwrr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#seqp">Seqp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#seqc">Seqc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#shiftlossyfifo">Shiftlossyfifo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#variable">Variable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#xrouter">Xrouter</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="library.html#boundary-components">3. Boundary components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="library.html#java">3.1 Java</a></li>
+<li class="toctree-l3"><a class="reference internal" href="library.html#promela">3.2 Promela</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#build-the-project">Build the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#documentation-by-javadoc">Documentation by Javadoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#setting-up-eclipse">Setting up Eclipse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#adding-new-semantics-to-the-compiler">Adding new semantics to the compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#future-work">Future work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Reo</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tutorial.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="components-and-interfaces">
+<h2>Components and interfaces<a class="headerlink" href="#components-and-interfaces" title="Permalink to this headline">¶</a></h2>
+<p>Reo programs consist of <em>components</em> that interact via shared <em>nodes</em>.
+Each component has access to a given set of nodes, called its <em>interface</em>.
+To distinguish them from other nodes, the nodes that comprise the interface of a component are also called its <em>ports</em>.
+An atomic component uses each of its ports either for input or for output, but not both.
+Ports of a component comprise the only means of communication between the component and its environment:
+a component has no means of communication or concurrency control other than blocking I/O operations that it can perform on its own ports.
+A component may synchronize with its environment via <em>put</em> operations on its own output ports and <em>get</em> operations on its own input ports.
+The put and get operations may specify an optional time-out.
+A put or get operation blocks until either it succeeds, or its specified time-out expires.
+A put or get operation with no time-out blocks for ever, or until it succeeds.</p>
+<p>To define a component in Reo, we refer to Java source code and/or define its behavior as a constraint automaton, or, define it as a composition of other components.</p>
+</div>
+<div class="section" id="reference-to-java-source-code">
+<h2>1. Reference to Java source code<a class="headerlink" href="#reference-to-java-source-code" title="Permalink to this headline">¶</a></h2>
+<p>First of all, we can define a component by referring to Java source code.</p>
+<div class="highlight-text"><div class="highlight"><pre>// buffer.treo
+buffer&lt;init:String&gt;(a?String, b!String) {
+   Java: &quot;MyClass.myBuffer&quot;
+}
+</pre></div>
+</div>
+<p>This code in buffer.treo defines an atomic component called buffer with an input port a of type String, an output port b of type String, and an parameter init of type String.
+The Java-tag indicates that the implementation of this component consists of a piece of Java code.
+The type tags, String, are optional. On default, type tags are Object.
+The parameter block <tt class="docutils literal"><span class="pre">&lt;init:String&gt;</span></tt> is also optional, as we will see for the second possibility to define a component.</p>
+<p>The provided reference links to a Java class that implements the producer component as a Java method myProducer in class MyClass.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="c1">// MyClass.java</span>
+<span class="kn">import</span> <span class="nn">nl.cwi.reo.runtime.Input</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">nl.cwi.reo.runtime.Output</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyClass</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">myBuffer</span><span class="o">(</span><span class="n">String</span> <span class="n">init</span><span class="o">,</span> <span class="n">Input</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">a</span><span class="o">,</span> <span class="n">Output</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">String</span> <span class="n">content</span> <span class="o">=</span> <span class="n">init</span><span class="o">;</span>
+      <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+         <span class="n">b</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">content</span><span class="o">);</span>
+         <span class="n">content</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+      <span class="o">}</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Note that the order of the parameters and ports in <tt class="docutils literal"><span class="pre">buffer.treo</span></tt> is identical to the order of the arguments of the static function <tt class="docutils literal"><span class="pre">myBuffer</span></tt>.
+Furthermore, the type tags of the parameter and ports correspond to the data types of the arguments:
+<tt class="docutils literal"><span class="pre">a?String</span></tt> corresponds to <tt class="docutils literal"><span class="pre">Input&lt;String&gt;</span> <span class="pre">a</span></tt>, <tt class="docutils literal"><span class="pre">b!String</span></tt> corresponds to <tt class="docutils literal"><span class="pre">Output&lt;String&gt;</span> <span class="pre">b</span></tt>, and <tt class="docutils literal"><span class="pre">init:String</span></tt> corresponds to <tt class="docutils literal"><span class="pre">String</span> <span class="pre">init</span></tt>.</p>
+<p>Ensure that the current directory <tt class="docutils literal"><span class="pre">.</span></tt> and the Reo runtime <tt class="docutils literal"><span class="pre">reo-runtime-java-1.0.jar</span></tt> are added to the Java classpath.
+Then, we can compile the producer via:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt; ls
+MyClass.java buffer.treo
+&gt; reo buffer.treo -p &quot;Hello world!&quot;
+&gt; javac buffer.java
+&gt; java buffer
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">p</span></tt> option allows us to speficy the initial string in the buffer. Using commas in a string splits the string into multiple arguments.
+The last command runs the generated application and brings up two <em>port windows</em> that allow us to put data into the buffer and take it out of the buffer.</p>
+<p>The current version of Reo can generate only Java code, and therefore, only Java components can be defined.
+It is only a matter of time until Reo can generate code for other languages, such as C/C++, and that components defined in these languages can be defined.</p>
+<p>Arguments of the Java function are automatically linked to the ports in the interface of its respective atomic component.
+The exclamation mark (<tt class="docutils literal"><span class="pre">!</span></tt>) indicates that the Reo component <tt class="docutils literal"><span class="pre">producer</span></tt> uses the node  <tt class="docutils literal"><span class="pre">a</span></tt> as its output port.
+A question mark (<tt class="docutils literal"><span class="pre">?</span></tt>) after a node <tt class="docutils literal"><span class="pre">a</span></tt> in an interface indicates that its component uses <tt class="docutils literal"><span class="pre">a</span></tt> as an input node.
+A colon (<tt class="docutils literal"><span class="pre">:</span></tt>) after a node <tt class="docutils literal"><span class="pre">a</span></tt> indicates that its component uses <tt class="docutils literal"><span class="pre">a</span></tt> both as input and as output
+(this is not allowed for non-atomic components).</p>
+</div>
+<div class="section" id="definition-of-formal-semantics">
+<h2>2. Definition of formal semantics<a class="headerlink" href="#definition-of-formal-semantics" title="Permalink to this headline">¶</a></h2>
+<p>Second, we can define a component by defining its behavior in a formal semantics.</p>
+<div class="highlight-text"><div class="highlight"><pre>// buffer.treo
+buffer&lt;init:String&gt;(a?String,b!String) {
+   #RBA
+   $m=init
+   {a, ~b} $m = null, $m&#39; = a
+   {~a, b} $m != null, b = $m, $m&#39; = null
+}
+</pre></div>
+</div>
+<p>The buffer consists of a single memory cell m, whose initial value is given by init.
+If the buffer is empty ($m = null), it can perform an I/O operation on port a and blocks port b (indicated by the synchronization constraint {a, ~b}) and assign the observed value at a to the next value of memory cell $m&#8217;.
+If the buffer is full ($m != null), it can perform an I/O operation on port b and block  port a (indicated by the synchronization constraint {~a, b}) and assign the current value in memory cell m to port b, and clears the value of m ($m&#8217; = null).</p>
+<p>We can define a component as a Java component and a constraint automaton with memory simultaniously:</p>
+<div class="highlight-text"><div class="highlight"><pre>// buffer.treo
+buffer(a?,b!) {
+   Java: &quot;MyClass.myBuffer&quot;
+   #RBA
+   $m=init
+   {a, ~b} $m = null, $m&#39; = a
+   {~a, b} $m != null, b = $m, $m&#39; = null
+}
+</pre></div>
+</div>
+<p>In this case, the Reo compiler treats the Java code as the definition of the component, while the constraint automaton with memory is used only as annotation.
+Although the current version of Reo simply ignores this annotation, future versions of can use the constraint automaton for tools like deadlock detection.</p>
+<p>The syntax for constraint automata is completely independent of the syntax of the rest of the language.
+This seperation makes is very easy to extend the current language with other types of formal semantics of components.</p>
+</div>
+<div class="section" id="definition-as-composition">
+<h2>3. Definition as composition<a class="headerlink" href="#definition-as-composition" title="Permalink to this headline">¶</a></h2>
+<p>The most expressive way to define a component in Reo is via composition.</p>
+<div class="highlight-text"><div class="highlight"><pre>// buffer2.treo
+buffer2(a?,b!) {
+   buffer&lt;&quot;*&quot;&gt;(a,x)
+   buffer&lt;&quot;*&quot;&gt;(x,b)
+}
+
+buffer&lt;init:String&gt;(a?String,b!String) {
+   #RBA
+   $m=init
+   {a, ~b} $m = null, $m&#39; = a
+   {~a, b} $m != null, b = $m, $m&#39; = null
+}
+</pre></div>
+</div>
+<p>This Reo program defines an atomic buffer component and a composite buffer2 component.
+Since Reo is declarative, the order of the definitions of buffer and buffer2 is not important.</p>
+<p>In the composite buffer2 component, we created implicitly a new Reo node x.
+This new node is local to the definition of buffer2, as it is not exposed in the interface.</p>
+<p>This node is shared between two instances of the atomic buffer component, with a and b substituted by respectively a and x in the first instance, and by respectively x and b in the second instance.
+As seen from the signature of the atomic buffer component, instance buffer(a,x) writes to x, while instance buffer(x,b) reads from x.
+The two buffer instances communicate via shared node x using the <strong>broadcast</strong> mechanism:
+a <em>put/send operation</em> by a <strong>single</strong> component that uses node x as an <em>output node</em>
+synchronizes with a <em>get/receive operation</em> by <strong>all</strong> components that use node x as an <em>input node</em>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This broadcast communication mechanism should not be confused with broadcast communication
+as used by other models of concurrency. Usually a single send operation on a node A (also
+called a <em>channel</em> in the literature) synchronizes with multiple, but <strong>arbitrary</strong> number,
+receive operations on A.</p>
+</div>
+<div class="section" id="predicates">
+<h3>Predicates<a class="headerlink" href="#predicates" title="Permalink to this headline">¶</a></h3>
+<p>The definition of buffer2 as a composition of two atomic buffer instances is explicit in the sense that every subcomponent instance is defined directly.
+In this case, may can obtain the same construction using only one explicit instantiation using a <strong>predicate</strong></p>
+<div class="highlight-text"><div class="highlight"><pre>{ buffer(a[i],a[i+1]) | i : &lt;0..1&gt; }
+</pre></div>
+</div>
+<p>This for loop unfolds to the composition</p>
+<div class="highlight-text"><div class="highlight"><pre>{ fifo1(a[0],a[1]) fifo1(a[1],a[2]) }
+</pre></div>
+</div>
+<p>Although predicates are already expressive enough, we add some syntactic sugar for if-then-else and for loops.
+For example,</p>
+<div class="highlight-text"><div class="highlight"><pre>for i : &lt;1..n&gt; { buffer(a[i],a[i+1]) }
+</pre></div>
+</div>
+<p>is equivalent to</p>
+<div class="highlight-text"><div class="highlight"><pre>{ buffer(a[i],a[i+1]) | i : &lt;1..n&gt; }
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-text"><div class="highlight"><pre>if (x=1) { buffer(a,b) }
+else (x=2) { buffer(a,c) }
+else { buffer(a,d) }
+</pre></div>
+</div>
+<p>is equivalent to</p>
+<div class="highlight-text"><div class="highlight"><pre>{ buffer(a,b) | x=1 }
+{ buffer(a,c) | x!=1, x=2 }
+{ buffer(a,d) | x!=1, x!=2 }
+</pre></div>
+</div>
+</div>
+<div class="section" id="terms">
+<h3>Terms<a class="headerlink" href="#terms" title="Permalink to this headline">¶</a></h3>
+<p>Besides the ordinary terms in predicates, such as 0, 1, n and &lt;1..n&gt;, we can also have component definitions as terms.
+For example,</p>
+<div class="highlight-text"><div class="highlight"><pre>section slides.main;
+
+import reo.fifo1;
+import reo.sync;
+import reo.lossy;
+import slides.variable.variable;
+import slides.lossyfifo.lossyfifo1;
+import slides.shiftlossyfifo.shiftlossyfifo;
+
+import slides.main.red;
+import slides.main.blue;
+import slides.sequencer.seqc;
+
+main11()
+{
+   { red(a[i]) | i : &lt;1..n&gt; }
+   blue(b)
+   connector11&lt;ileg[1..n], sync&gt;(a[1..n], b)
+|
+   ileg[1..n] = &lt;sync, lossy, fifo1, variable, shiftlossyfifo, lossyfifo1&gt;
+}
+
+connector11&lt;ileg[1..n](?, !), oleg(?, !)&gt;(a[1..n], b)
+{
+   seqc(x[1..n])
+   { ileg[i](a[i], x[i]) sync(x[i], m) | i : &lt;1..n&gt; }
+   oleg(m, b)
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="sections-and-imports">
+<h2>Sections and Imports<a class="headerlink" href="#sections-and-imports" title="Permalink to this headline">¶</a></h2>
+<p>In large application, it is likely that different component would get the same name.
+To be able to distinguish between the two components, we put the components in different sections.
+For example, we can put the <tt class="docutils literal"><span class="pre">buffer</span></tt> component defined above in a section called MySection by adding the statement <tt class="docutils literal"><span class="pre">section</span> <span class="pre">mySection;</span></tt> to the beginning of the file.</p>
+<div class="highlight-text"><div class="highlight"><pre>// buffer.treo
+section mySection;
+
+buffer(a?,b!) {
+   Java: &quot;MyClass.myBuffer&quot;
+   q0 -&gt; q1 : {a}, x&#39; == a
+   q1 -&gt; q0 : {b}, b == x
+}
+</pre></div>
+</div>
+<p>In other files, we can reuse this buffer by simply importing it as follows:</p>
+<div class="highlight-text"><div class="highlight"><pre>// other.treo
+import mySection.buffer;
+
+other() {
+        buffer(a,b)            // #1
+        mySection.buffer(a,b)  // #2
+}
+</pre></div>
+</div>
+<p>Option 1 is the simplest way to use an imported component, as it does not explicitly defines from which section it comes.
+However, if we imported two buffer components from different sections, then Option 2 allows us to be precise on which buffer we mean.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="library.html" class="btn btn-neutral float-right" title="Library of components" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="introduction.html" class="btn btn-neutral" title="Introduction" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2017, Kasper Dokter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

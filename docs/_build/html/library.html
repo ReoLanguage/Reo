@@ -1,0 +1,590 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Library of components &mdash; Reo 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Reo 1.0 documentation" href="index.html"/>
+        <link rel="next" title="Contribute" href="contribute.html"/>
+        <link rel="prev" title="Tutorial" href="tutorial.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Reo
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#a-simple-concurrent-program">A simple concurrent program</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#analysis">Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#reo-protocols">Reo protocols</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html#compilation">Compilation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#components-and-interfaces">Components and interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#reference-to-java-source-code">1. Reference to Java source code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#definition-of-formal-semantics">2. Definition of formal semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#definition-as-composition">3. Definition as composition</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorial.html#predicates">Predicates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial.html#terms">Terms</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#sections-and-imports">Sections and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Library of components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#atomic-components">1. Atomic components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sync">Sync</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fifo1">Fifo1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#syncdrain">Syncdrain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lossysync">Lossysync</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filter">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#connector-components">2. Connector components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#regulatorwwr">Regulatorwwr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#barrier">Barrier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#alternator">Alternator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#circulator">Circulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ovflfifo">Ovflfifo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#regulatorwrr">Regulatorwrr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqp">Seqp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seqc">Seqc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shiftlossyfifo">Shiftlossyfifo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variable">Variable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#xrouter">Xrouter</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#boundary-components">3. Boundary components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#java">3.1 Java</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#promela">3.2 Promela</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contribute</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#build-the-project">Build the project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#documentation-by-javadoc">Documentation by Javadoc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#setting-up-eclipse">Setting up Eclipse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#adding-new-semantics-to-the-compiler">Adding new semantics to the compiler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#future-work">Future work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contribute.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Reo</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Library of components</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/library.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="library-of-components">
+<h1>Library of components<a class="headerlink" href="#library-of-components" title="Permalink to this headline">¶</a></h1>
+<p>We list all components written in the &#8221;./example/slide/&#8221; folder, and shortly explain their behavior.</p>
+<div class="section" id="atomic-components">
+<h2>1. Atomic components<a class="headerlink" href="#atomic-components" title="Permalink to this headline">¶</a></h2>
+<p>We list a set of atomic components, and use a logical formula as semantic (see tutorial).</p>
+<div class="section" id="sync">
+<h3>Sync<a class="headerlink" href="#sync" title="Permalink to this headline">¶</a></h3>
+<p>The sync channel atomically get data from input port a, to output port b.</p>
+<div class="highlight-text"><div class="highlight"><pre>// sync.treo
+sync(a?String, b!String) {
+   a=b
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="fifo1">
+<h3>Fifo1<a class="headerlink" href="#fifo1" title="Permalink to this headline">¶</a></h3>
+<p>The fifo1 channel behaves as a buffer of size one, where a is its input port, and b is its ouput port. The internal memory $m is hidden.</p>
+<div class="highlight-text"><div class="highlight"><pre>// fifo1.treo
+fifo1(a?String, b!String) {
+   a!=*, $m&#39; = a, b=*, $m=*
+   a!=*, $m&#39; = a, b=*, $m=*
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="syncdrain">
+<h3>Syncdrain<a class="headerlink" href="#syncdrain" title="Permalink to this headline">¶</a></h3>
+<p>The syncdrain channel ensures that data flows atomically at port a and b, without any constraint on the data.</p>
+<div class="highlight-text"><div class="highlight"><pre>// syncdrain.treo
+syncdrain(a?String, b?String) {
+   a!=*, b!=*
+   a=*, b=*
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="lossysync">
+<h3>Lossysync<a class="headerlink" href="#lossysync" title="Permalink to this headline">¶</a></h3>
+<p>The lossysync channel either get atomically data from the input a, to the output port b; or dropes the data from input port a.</p>
+<div class="highlight-text"><div class="highlight"><pre>// lossysync.treo
+lossysync(a?String, b?String) {
+   a!=*, b!=*, a=b
+   a!=*
+   a=*, b=*
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="filter">
+<h3>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
+<p>The fileter channel</p>
+<div class="highlight-text"><div class="highlight"><pre>// filter.treo
+filter&lt;P:string&gt;(a?, b!) {
+        #RBA
+        a!=*, P(a), a=b
+        a!=*, b=*, !P(a)
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="connector-components">
+<h2>2. Connector components<a class="headerlink" href="#connector-components" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="regulatorwwr">
+<h3>Regulatorwwr<a class="headerlink" href="#regulatorwwr" title="Permalink to this headline">¶</a></h3>
+<p>The regulator write/write/read (regulatorwwr)</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.sync;
+import reo.syncdrain;
+
+regulatorwwr(a, b, c) {
+  sync(a, m) syncdrain(m, b) sync(m, c)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="barrier">
+<h3>Barrier<a class="headerlink" href="#barrier" title="Permalink to this headline">¶</a></h3>
+<p>The barrier connector</p>
+<div class="highlight-text"><div class="highlight"><pre>// barrier.treo
+import reo.sync;
+import slides.regulatorwwr.regulatorwwr;
+
+barrier(a, b, c, d) {
+  regulatorwwr(a, m, c) sync(b,m) sync(m, d)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="alternator">
+<h3>Alternator<a class="headerlink" href="#alternator" title="Permalink to this headline">¶</a></h3>
+<p>The alternator connector</p>
+<div class="highlight-text"><div class="highlight"><pre>// alternator.treo
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+alternator(a, b, c) {
+  syncdrain(a, b) sync(b, x) fifo1(x, c)
+  sync(a, c)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="circulator">
+<h3>Circulator<a class="headerlink" href="#circulator" title="Permalink to this headline">¶</a></h3>
+<p>The circulator connector</p>
+<div class="highlight-text"><div class="highlight"><pre>// circ1.treo
+import slides.regulatorwwr.regulatorwwr;
+import reo.syncdrain;
+import reo.sync;
+
+circ1(a?, b?, c?, d!) {
+ regulatorwwr(a, x, d) sync(b, x) sync(c, x)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="ovflfifo">
+<h3>Ovflfifo<a class="headerlink" href="#ovflfifo" title="Permalink to this headline">¶</a></h3>
+<p>The over flow fifo connector</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.lossy;
+import reo.fifo1;
+
+ovflfifo(a,b){
+        lossy(a,m) fifo1(m,b)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="regulatorwrr">
+<h3>Regulatorwrr<a class="headerlink" href="#regulatorwrr" title="Permalink to this headline">¶</a></h3>
+<p>The regulatorwrr connector</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.sync;
+
+regulatorwrr(a, b, c) {
+  sync(a, m) sync(m, b) sync(m, c)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="seqp">
+<h3>Seqp<a class="headerlink" href="#seqp" title="Permalink to this headline">¶</a></h3>
+<p>The sequencer producer connector</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.fifo1;
+import reo.fifofull;
+import reo.sync;
+
+seqp(p[1..n]) {
+  {
+    fifo1(x[i], x[i+1])
+    sync(x[i+1], p[i])
+  |
+    i : &lt;2..n&gt;
+  }
+  fifofull&lt;&quot;0&quot;&gt;(x[1], x[2])
+  sync(x[2],p[1])
+  sync(x[n+1], x[1])
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="seqc">
+<h3>Seqc<a class="headerlink" href="#seqc" title="Permalink to this headline">¶</a></h3>
+<p>The sequencer consumer connector</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.syncdrain;
+import slides.sequencer.seqp;
+
+seqc(p[1..n]) {
+  seqp(x[1..n])
+  { syncdrain(x[i], p[i]) | i : &lt;1..n&gt; }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="shiftlossyfifo">
+<h3>Shiftlossyfifo<a class="headerlink" href="#shiftlossyfifo" title="Permalink to this headline">¶</a></h3>
+<p>The shiftlossyfifo connector</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.sync;
+import reo.fifo1;
+import reo.fifofull;
+import reo.syncdrain;
+import slides.xrouter.xrouter;
+import reo.sync;
+import reo.syncdrain;
+import reo.lossy;
+
+shiftlossyfifo(in, out) {
+  sync(in,a) fifo1(a, b) fifo1(b, c)
+  xrouter (c,d,e)
+  syncdrain(a,g) sync(d,f) sync(e,g) sync(f,out) fifofull&lt;&quot;0&quot;&gt;(f,g)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="variable">
+<h3>Variable<a class="headerlink" href="#variable" title="Permalink to this headline">¶</a></h3>
+<p>The variable connector</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.sync;
+import slides.shiftlossyfifo.shiftlossyfifo;
+
+variable(a, b) {
+  sync(a, x) sync(x, y) shiftlossyfifo(y, z)
+  sync(z, b) sync(z, t)  shiftlossyfifo(t, y)
+  sync(x, t)
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="xrouter">
+<h3>Xrouter<a class="headerlink" href="#xrouter" title="Permalink to this headline">¶</a></h3>
+<p>The xrouter connector</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.sync;
+import reo.syncdrain;
+import reo.lossy;
+
+xrouter(in, out[1..n]) {
+  sync(in, s) syncdrain(s, m)
+  {lossy(s, x[i]) sync(x[i], m) sync(x[i], out[i]) | i:&lt;1..n&gt; }
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="boundary-components">
+<h2>3. Boundary components<a class="headerlink" href="#boundary-components" title="Permalink to this headline">¶</a></h2>
+<p>Depending on your target language, you may want to compose your protocol with specific functions in say Java, C, Promela, Maude, . . . . We list some examples of boundary components for target languages currently supported.</p>
+<div class="section" id="java">
+<h3>3.1 Java<a class="headerlink" href="#java" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="producer">
+<h4>Producer<a class="headerlink" href="#producer" title="Permalink to this headline">¶</a></h4>
+<p>A producer component with a single output port, and a Java method as semantic.</p>
+<div class="highlight-text"><div class="highlight"><pre>//producer.treo
+producer(a!String)
+{
+  #JAVA &quot;Producer.produce&quot;
+}
+</pre></div>
+</div>
+<p>The producer component is linked with the following class, where the datum &#8221; Hello &#8221; is produced 100 times. For more information on the runtime of ports, see runtime section.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">nl.cwi.reo.runtime.Input</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">nl.cwi.reo.runtime.Output</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Producer</span> <span class="o">{</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">produce</span><span class="o">(</span><span class="n">Output</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">port</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+                        <span class="n">port</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot; Hello &quot;</span><span class="o">);</span>
+                <span class="o">}</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Producer finished.&quot;</span><span class="o">);</span>
+        <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="consumer">
+<h4>Consumer<a class="headerlink" href="#consumer" title="Permalink to this headline">¶</a></h4>
+<p>A consumer component with a single intput port, and a Java method as semantic.</p>
+<div class="highlight-text"><div class="highlight"><pre>//consumer.treo
+consumer(a!String)
+{
+  #JAVA &quot;Consumer.consume&quot;
+}
+</pre></div>
+</div>
+<p>The consumer component is linked with the following class, where the method get() is performed 100 times, and the datume is displayed. For more information on the runtime of ports, see runtime section.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">nl.cwi.reo.runtime.Input</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">nl.cwi.reo.runtime.Output</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Consumer</span> <span class="o">{</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">consume</span><span class="o">(</span><span class="n">Input</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">a</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+                        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="na">get</span><span class="o">());</span>
+                <span class="o">}</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Consumer finished.&quot;</span><span class="o">);</span>
+        <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="evenfilter">
+<h4>EvenFilter<a class="headerlink" href="#evenfilter" title="Permalink to this headline">¶</a></h4>
+<p>An EvenFilter component instantiates a filter (see atomic filter component) with a boolean java method called Relation.Even .</p>
+<div class="highlight-text"><div class="highlight"><pre>import reo.filter;
+
+filterJava(a?String,b!String){
+        filter&lt;&quot;Relation.Even&quot;&gt;(a,b)
+}
+</pre></div>
+</div>
+<p>The Java class Relation linked to the component contains two boolean methods: Even and Odd.</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Relation</span> <span class="o">{</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">Even</span><span class="o">(</span><span class="n">String</span> <span class="n">datum</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">datum</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+                <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">datum</span><span class="o">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">Odd</span><span class="o">(</span><span class="n">String</span> <span class="n">datum</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">datum</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+                <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">datum</span><span class="o">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="promela">
+<h3>3.2 Promela<a class="headerlink" href="#promela" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="contribute.html" class="btn btn-neutral float-right" title="Contribute" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorial.html" class="btn btn-neutral" title="Tutorial" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016-2017, Kasper Dokter.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

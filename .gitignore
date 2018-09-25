@@ -3,7 +3,6 @@
 /**/.project
 /**/target
 /**/build.properties
-/**/docs/_build
 /**/Debug
 
 !FreeRTOSv9.0.0/FreeRTOS/Demo/WIN32-MingW/.project
