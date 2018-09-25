@@ -12,8 +12,7 @@ function ReoNetwork(sourceLoader) {
 }
 
 ReoNetwork.prototype.includeSource = async function (inclIdent) {
-  let src = await this.sourceLoader(inclIdent);
-  await this.processSource(src);
+  this.sourceLoader(inclIdent).then(source => this.processSource(source)).catch(error => alert(error));
 };
 
 ReoNetwork.prototype.processSource = async function (src) {
@@ -87,7 +86,7 @@ ReoNetwork.prototype.getImplementationFor = async function (cName, binding) {
   // not yet existing, generate...
   if (!this.componentTemplates[cName]) {
     // no template known
-    throw ("no template defined for " + cName);
+    throw "no template defined for " + cName;
   }
 
   let implementation = await this.componentTemplates[cName].implement(binding);

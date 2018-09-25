@@ -1,10 +1,30 @@
 require.config({paths: {'vs': 'monaco-editor/min/vs'}});
 require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, reoIMonarchLanguage) {
+  // Initialize code editor
   monaco.languages.register({id: 'reo'});
   monaco.languages.setMonarchTokensProvider('reo', reoIMonarchLanguage.language);
   monaco.languages.setLanguageConfiguration('reo', reoIMonarchLanguage.conf);
   var codeEditor = monaco.editor.create(document.getElementById('text'), {language: 'reo'});
 
+  // Initialize graphics generator
+  async function sourceLoader(fname) {
+    return new Promise(function (resolve, reject) {
+      let client = new XMLHttpRequest();
+      // tell the client that we do not expect XML as response
+      client.overrideMimeType("text/plain");
+      client.open('GET', fname);
+      client.onreadystatechange = function () {
+        console.log(this);
+        if (this.readyState === 4)
+          return this.status === 200 ? resolve(this.responseText) : reject(`Error returned with status ${this.status}: ${this.statusText}`)
+      };
+      client.send()
+    })
+  }
+  let network = new ReoNetwork(sourceLoader);
+  network.includeSource("default.treo");
+
+  // Initialize graphical editor
   var c = document.getElementById("c"), container = document.getElementById("canvas");
 
   function resizeCanvas() {
@@ -135,37 +155,16 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
   };
 
   document.getElementById("submit").onclick = async function () {
-    async function sourceLoader(fname) {
-      return new Promise(function (resolve, reject) {
-        let client = new XMLHttpRequest();
-        // tell the client that we do not expect XML as response
-        client.overrideMimeType("text/plain");
-        client.open('GET', fname);
-        client.onreadystatechange = function () {
-          if (this.readyState === 4) {
-            if (this.status !== 200)
-              return reject(this.status);
-            return resolve(this.responseText)
-          }
-        };
-        client.send()
-      })
-    }
-    let text = codeEditor.getValue();
-    let network = new ReoNetwork(sourceLoader);
-    await network.includeSource("default.treo");
-    await network.parseComponent(text.replace(/\n/g, ''));
-
-    try {
+    network.parseComponent(codeEditor.getValue().replace(/\n/g, '')).then(() => {
       // TODO generate positions if there were no geometry metadata comments
-      let output = await network.generateCode();
-      // console.log(output);
-      clearAll();
-      eval(output)
-    } catch (e) {
-      console.log(e);
-      alert(e)
-    }
+      network.generateCode().then(output => {
+        clearAll();
+        eval(output)
+      }).catch(err => {
+        console.log(err);
+        alert(err)
+      })
+    })
   };
 
   document.getElementById("commentSwitch").onclick = function () {
