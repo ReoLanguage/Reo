@@ -4,32 +4,36 @@ main(S) ::= <<
 
 mod CONNECTOR is 
 		inc SIGNATURE .
-		
+        inc CONSTRAINT-SEMIRING .
+
+	
 	<S.components:component(); separator="\n\n">
 endm
 >>
 
 component(c) ::= <<
-<if(c.protocol)>vars <c:memorycell(); separator=""><S.ports:newVar(); separator=" "> : Data .
-<c:protocol()><endif>
+<if(c.protocol)><c:protocol()><endif>
 >>
 
-newVar(p) ::= <<
-d<p.name>
->>
-
-memorycell(c) ::= <<
-<c.initial.keys:{m |d_<m.name>}; separator = " "> 
->>
 
 protocol(c) ::= <<
+subsort String \< Data .
+vars <c.variables:{ v | <v> } ; separator=" "> : Data .
+vars <c.thVar:{ v | <v> } ; separator=" "> : Value .
+op th : String Value -> Fact .
+var sl : StepSetList .
+op m : Nat Data* -> Fact [ctor] .
+op sv : Value -> Step [ctor] .
+
 <c.transitions:transition(); separator="\n">
-	
-eq startc = <c.state:{p | <p>}; separator=" "> .
+
+op makestart : Nat Nat -> Facts .
+vars i j : Nat .
+
+eq makestart(i,j) = <c.state:{p | <p>}; separator=" "> .
 >>
 
 
 transition(t) ::= << 
-rl [<t.nb>] : <t.mapInM.keys:{p | m(<p>,<t.mapInM.(p)>)}; separator=" " > <t.mapInP.keys:{p | p(<p>,<t.mapInP.(p)>)}; separator=" " > =>
-<t.mapOutP.keys:{p | p(<p>,<t.mapOutP.(p)>)}; separator=" " > <t.mapOutM.keys:{p | m(<p>,<t.mapOutM.(p)>)}; separator=" " >  .
+<t.rewString>
 >>

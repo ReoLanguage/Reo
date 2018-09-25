@@ -1,0 +1,13 @@
+.*
+!/.gitignore
+!/.gitkeep
+bin/
+target/
+build/
+.gradle/
+generated/
+generated-sources/
+src-gen/
+xtend-gen/
+.DS_Store
+*.xml_gen

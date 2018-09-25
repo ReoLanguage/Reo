@@ -5,147 +5,163 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
-import nl.cwi.reo.interpret.values.BooleanValue;
-import nl.cwi.reo.interpret.values.DecimalValue;
-import nl.cwi.reo.interpret.values.IntegerValue;
-import nl.cwi.reo.interpret.values.StringValue;
-import nl.cwi.reo.interpret.values.Value;
-import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Equality;
-import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.Function;
-import nl.cwi.reo.semantics.predicates.MemCell;
-import nl.cwi.reo.semantics.predicates.Node;
-import nl.cwi.reo.semantics.predicates.Relation;
+import nl.cwi.reo.semantics.predicates.Formulas;
+import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Terms;
+import nl.cwi.reo.semantics.predicates.TruthValue;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * Constraint hypergraph semantics of Reo connectors.
+ */
 public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 
+	/**
+	 * List of hyperedges.
+	 */
 	private final Set<HyperEdge> hyperedges;
 
-	private final Map<Term, Term> initial;
+	/**
+	 * Map that assigns an initial value to each memory cell.
+	 */
+	private final Map<MemoryVariable, Term> initial;
 
 	/**
 	 * Constructs an automaton, with an empty set of rules.
 	 */
 	public ConstraintHypergraph() {
-		hyperedges = new HashSet<HyperEdge>();
-		initial = new HashMap<Term, Term>();
+		hyperedges = new HashSet<>();
+		initial = new HashMap<>();
 	}
 
 	/**
 	 * Constructs a new automaton from a given set of rules.
-	 * 
-	 * @param f
-	 *            formula
+	 *
+	 * @param s
+	 *            the s
 	 */
-	public ConstraintHypergraph(Set<Rule> s) {
-		hyperedges = new HashSet<HyperEdge>();
 
-		for (Rule r : s) {
-			RuleNode rule = new RuleNode(r);
-			for (Port v : r.getSync().keySet()) {
-				if (r.getSync().get(v)) {
-					if (!getHyperedges(v).isEmpty()) {
-						rule.addToHyperedge(getHyperedges(v).get(0));
-					} else {
-						Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
-						ruleNodes.add(rule);
-						hyperedges.add(new HyperEdge(new PortNode(v), ruleNodes));
-					}
-				}
-			}
-
-		}
-		this.initial = new HashMap<Term, Term>();
-	}
 
 	/**
 	 * Constructs a new automaton from a given set of rules and initial values.
-	 * 
-	 * @param f
-	 *            formula
+	 *
+	 * @param h
+	 *            the h
+	 * @param initial
+	 *            the initial
 	 */
-	public ConstraintHypergraph(List<HyperEdge> h, Map<Term, Term> initial) {
+	public ConstraintHypergraph(List<HyperEdge> h, Map<MemoryVariable, Term> initial) {
 		this.hyperedges = new HashSet<HyperEdge>(h);
 		this.initial = new HashMap<>(initial);
 	}
 
 	/**
 	 * Constructs a new automaton from a given set of rules and initial values.
-	 * 
-	 * @param f
-	 *            formula
+	 *
+	 * @param s
+	 *            the s
+	 * @param initial
+	 *            the initial
 	 */
-	public ConstraintHypergraph(Set<Rule> s, Map<Term, Term> initial) {
+	public ConstraintHypergraph(Set<Set<Rule>> s, Map<MemoryVariable, Term> initial) {
 		hyperedges = new HashSet<HyperEdge>();
-		for (Rule r : s) {
-			RuleNode rule = new RuleNode(r);
-			for (Port v : r.getSync().keySet()) {
-				if (r.getSync().get(v)) {
+		for (Set<Rule> rules : s) {
+			for(Rule r : rules){
+				RuleNode rule = new RuleNode(new HashSet<>(Arrays.asList(r)));
+				if(rule.getSync().isEmpty()){
+					Port v = new Port("hidden");
 					if (!getHyperedges(v).isEmpty()) {
 						rule.addToHyperedge(getHyperedges(v).get(0));
 					} else {
 						Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
 						ruleNodes.add(rule);
-						hyperedges.add(new HyperEdge(new PortNode(v), ruleNodes));
+						hyperedges.add(new HyperEdge(v, ruleNodes));
+					}
+				}
+				for (Map.Entry<Port, Boolean> sc : rule.getSync().entrySet()) {
+					if (sc.getValue() == true) {
+						Port v = sc.getKey();
+						if (!getHyperedges(v).isEmpty()) {
+							rule.addToHyperedge(getHyperedges(v).get(0));
+						} else {
+							Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
+							ruleNodes.add(rule);
+							hyperedges.add(new HyperEdge(v, ruleNodes));
+						}
 					}
 				}
 			}
-
 		}
 		this.initial = initial;
 	}
 
+	/**
+	 * Gets all hyperedges that have a given port as their root.
+	 * 
+	 * @param p
+	 *            port
+	 * @return list of hyperedges that have the given port as their root.
+	 */
 	public List<HyperEdge> getHyperedges(Port p) {
 		List<HyperEdge> hyperedgeList = new ArrayList<HyperEdge>();
 		for (HyperEdge h : hyperedges) {
-			if (h.getRoot().getPort().equals(p) && !h.getLeaves().isEmpty()) {
+			if (h.getSource().equals(p) && !h.getTarget().isEmpty()) {
 				hyperedgeList.add(h);
 			}
 		}
 		return hyperedgeList;
 	}
 
+	/**
+	 * Gets the list of hyperedges of this constraint hypergraph.
+	 * 
+	 * @return list of hyperedges of this constraint hypergraph.
+	 */
 	public Set<HyperEdge> getHyperedges() {
 		return hyperedges;
 	}
 
-	public Set<PortNode> getVariables() {
-		Set<PortNode> s = new HashSet<>();
-		for (HyperEdge h : hyperedges) {
-			s.add(h.getRoot());
-		}
+	/**
+	 * Gets the variables of that occur in this constraint hypergraph.
+	 * 
+	 * @return set of all variables that occur in this constraint hypergraph.
+	 */
+	public Set<Port> getVariables() {
+		Set<Port> s = new HashSet<>();
+		for (HyperEdge h : hyperedges)
+			s.add(h.getSource());
 		return s;
 	}
 
 	/**
-	 * Get rules for commandification
+	 * Gets the set of rules of this constraint hypergraph.
 	 * 
-	 * @return
+	 * @return set of rules of this constraint hypergraph.
 	 */
 	public Set<Rule> getRules() {
 		Set<Rule> s = new HashSet<>();
 
 		for (HyperEdge g : hyperedges) {
-			for (RuleNode r : g.getLeaves()) {
+			for (RuleNode r : g.getTarget()) {
 				s.add(r.getRule());
 			}
 		}
@@ -154,21 +170,44 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	}
 
 	/**
-	 * Get rules for commandification
+	 * Gets the set of rules of this constraint hypergraph.
 	 * 
-	 * @return
+	 * @return set of rules of this constraint hypergraph.
+	 */
+	public Set<Formula> getFormulas() {
+		Set<Formula> f = new HashSet<>();
+
+		for (HyperEdge g : hyperedges) {
+			for (RuleNode r : g.getTarget()) {
+				f.add(r.getFormula());
+			}
+		}
+
+		return f;
+	}
+	
+	/**
+	 * Gets the set of nodes in this constraint hypergraph that represent a
+	 * rule.
+	 * 
+	 * @return set of nodes in this constraint hypergraph that represent a rule.
 	 */
 	public Set<RuleNode> getRuleNodes() {
 		Set<RuleNode> s = new HashSet<>();
 
 		for (HyperEdge g : hyperedges) {
-			s.addAll(g.getLeaves());
+			s.addAll(g.getTarget());
 		}
 
 		return s;
 	}
 
-	public Map<Term, Term> getInitials() {
+	/**
+	 * Gets the assignment of an initial value to each memory cell.
+	 * 
+	 * @return map that assigns an initial value to each memory cell.
+	 */
+	public Map<MemoryVariable, Term> getInitials() {
 		return initial;
 	}
 
@@ -176,29 +215,24 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public @Nullable ConstraintHypergraph evaluate(Scope s, Monitor m) {
-		for (RuleNode r : getRuleNodes()) {
+	@Nullable
+	public ConstraintHypergraph evaluate(Scope s, Monitor m) {
+
+		Set<Set<Rule>> rules = new HashSet<>();
+		for (RuleNode r : getRuleNodes()){
 			r.evaluate(s, m);
+			rules.add(r.getRules());
 		}
 
-		for (Term t : initial.keySet()) {
-			if (s.get(new Identifier(initial.get(t).toString())) != null) {
-				Value v = s.get(new Identifier(initial.get(t).toString()));
-				if (v instanceof StringValue)
-					initial.put(t, new Function("constant", ((StringValue) v).getValue(), new ArrayList<Term>()));
-				if (v instanceof BooleanValue)
-					initial.put(t, new Function("constant", ((BooleanValue) v).getValue(), new ArrayList<Term>()));
-				if (v instanceof IntegerValue)
-					initial.put(t, new Function("constant", ((IntegerValue) v).getValue(), new ArrayList<Term>()));
-				if (v instanceof DecimalValue)
-					initial.put(t, new Function("constant", ((DecimalValue) v).getValue(), new ArrayList<Term>()));
-			}
+		Map<MemoryVariable, Term> _initial = new HashMap<>();
+
+		for (Map.Entry<MemoryVariable, Term> init : initial.entrySet()) {
+			Term t = init.getValue().evaluate(s, m);
+			if (t == null)
+				return null;
+			_initial.put(init.getKey(), t);
 		}
-		return new ConstraintHypergraph(getRules(), initial);
-		// If a new constraint hypergraph is not created, all instances of the
-		// same component definition will have shared rules and shared
-		// hyperedges.
-		// return new ConstraintHypergraph(new ArrayList<>(hyperedges),initial);
+		return new ConstraintHypergraph(rules, _initial);
 	}
 
 	/**
@@ -207,8 +241,8 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public Set<Port> getInterface() {
 		Set<Port> p = new HashSet<Port>();
-		for (Rule r : getRules()) {
-			p.addAll(r.getFiringPorts());
+		for (RuleNode r : getRuleNodes()) {
+			p.addAll(r.getActivePorts());
 		}
 		return p;
 	}
@@ -218,7 +252,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	 */
 	@Override
 	public SemanticsType getType() {
-		return SemanticsType.RBA;
+		return SemanticsType.CH;
 	}
 
 	/**
@@ -227,12 +261,10 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public ConstraintHypergraph getNode(Set<Port> node) {
 
-		Set<Port> ports = new HashSet<Port>(node);
-
 		Set<Port> inps = new HashSet<Port>();
 		Set<Port> outs = new HashSet<Port>();
 
-		for (Port p : ports) {
+		for (Port p : node) {
 			if (p.getType() == PortType.IN) {
 				outs.add(new Port(p.getName(), (p.isInput() ? PortType.OUT : PortType.IN), p.getPrioType(),
 						p.getTypeTag(), true));
@@ -242,50 +274,69 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			}
 		}
 
-		Set<Rule> rules = new HashSet<Rule>();
-		/*
-		 * Instantiate merger/relicator
-		 */
+		Set<Set<Rule>> rules = new HashSet<>();
+
 		for (Port p : inps) {
-			Formula transition = null;
+			Set<Rule> transition = new HashSet<>();
+			transition.add(new Rule(new TruthValue(true)));
 			Map<Port, Boolean> map = new HashMap<>();
 			map.put(p, true);
 			for (Port x : inps) {
 				if (!x.equals(p)) {
-					map.put(x, false);
+					transition.add(new Rule(new Equality(new PortVariable(p),Terms.Null)));
 				}
 			}
 			for (Port x : outs) {
-				map.put(x, true);
-				Formula eq = new Equality(new Node(p), new Node(x));
-				if (transition == null)
-					transition = eq;
-				else
-					transition = new Conjunction(Arrays.asList(transition, eq));
+				transition.add(new Rule(new Equality(new PortVariable(x),Terms.NonNull)));
+				transition.add(new Rule(new Equality(new PortVariable(p),new PortVariable(p))));
 			}
-			rules.add(new Rule(map, transition));
+			rules.add(transition);
 		}
 
 		return new ConstraintHypergraph(rules, initial);
 	}
 
-	public ConstraintHypergraph getDefault(Set<Port> ports) {
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ConstraintHypergraph getDefault(Set<Port> iface) {
 
 		Set<Rule> rules = new HashSet<Rule>();
 
-		for (Port p : ports) {
+		for (Port p : iface) {
 			Map<Port, Boolean> map = new HashMap<>();
 			map.put(p, true);
-			for (Port x : ports)
+			for (Port x : iface)
 				if (!x.equals(p))
 					map.put(x, false);
-			Formula guard = new Relation("true", "true", null);
-			rules.add(new Rule(map, guard));
+			rules.add(new Rule(map, new TruthValue(true)));
 		}
 
 		return new ConstraintHypergraph(rules);
 	}
+	
+	public ConstraintHypergraph(Set<Rule> s) {
+		hyperedges = new HashSet<>();
 
+		for (Rule r : s) {
+			RuleNode rule = new RuleNode(new HashSet<>(Arrays.asList(r)));
+			for (Map.Entry<Port, Boolean> sc : r.getSync().entrySet()) {
+				if (sc.getValue() == true) {
+					Port v = sc.getKey();
+					if (!getHyperedges(v).isEmpty()) {
+						rule.addToHyperedge(getHyperedges(v).get(0));
+					} else {
+						Set<RuleNode> ruleNodes = new HashSet<RuleNode>();
+						ruleNodes.add(rule);
+						hyperedges.add(new HyperEdge(v, ruleNodes));
+					}
+				}
+			}
+
+		}
+		this.initial = new HashMap<>();
+	}
 	/**
 	 * {@inheritDoc}
 	 */
@@ -294,130 +345,54 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		for (RuleNode r : getRuleNodes()) {
 			r.rename(links);
 		}
-		for (PortNode p : getVariables()) {
-			p.rename(links);
+		for (Port p : getVariables()) {
+			p.rename(links.get(p).getName());
 		}
 		return new ConstraintHypergraph(new ArrayList<>(hyperedges), initial);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ConstraintHypergraph compose(List<ConstraintHypergraph> components) {
 
 		// Rename all memory cells and put *all* components into a list.
-		List<ConstraintHypergraph> list = new ArrayList<>(components);
-		List<ConstraintHypergraph> newList = new ArrayList<>(components);
-		int i = 1;
-		for (ConstraintHypergraph A : list) {
-			Map<String, String> rename = new HashMap<>();
-			for (Rule r : A.getRules()) {
-				for (Variable v : r.getFormula().getFreeVariables()) {
-					if (v instanceof MemCell) {
-						String name = ((MemCell) v).getName();
-						if (!rename.containsKey(name))
-							rename.put(name, "m" + i++);
-					}
-				}
-			}
-			for (RuleNode r : A.getRuleNodes()) {
-				r.substitute(rename);
-			}
+		components = renameMemoryCells(components);
 
-			Map<Term, Term> init = new HashMap<>(A.getInitials());
-			for (Term t : init.keySet()) {
-				if (t instanceof MemCell) {
-					A.getInitials().put(new MemCell(rename.get(((MemCell) t).getName()), ((MemCell) t).hasPrime()),
-							A.getInitials().get(t));
-				}
-			}
+		// Compose the list of CHs into a single CH.
+		ConstraintHypergraph composition = new ConstraintHypergraph();
 
-			newList.add(new ConstraintHypergraph(new ArrayList<>(A.getHyperedges()), A.getInitials()));
+		for (ConstraintHypergraph h : components) {
+			composition.getHyperedges().addAll(h.getHyperedges());
+			composition.getInitials().putAll(h.getInitials());
 		}
 
-		// Compose the list of RBAs into a single list of rules.
-
-		ConstraintHypergraph composedAutomaton = new ConstraintHypergraph();
-		for (ConstraintHypergraph h : newList) {
-			composedAutomaton.getHyperedges().addAll(h.getHyperedges());
-			composedAutomaton.getInitials().putAll(h.getInitials());
-		}
-		composedAutomaton = composedAutomaton.distributeSingleEdge();
-		composedAutomaton.distributeMultiEdge();
-
-		return composedAutomaton;
-		// return new
-		// ConstraintHypergraph(composedAutomaton.getRules(),initialValue);
-
+		composition.distribute();
+		return composition;
 	}
-
+	
 	/**
-	 * Distribute single hyperedges
-	 * 
-	 * @return
+	 * Distribute multi rules hyperedges.
 	 */
-	public ConstraintHypergraph distributeSingleEdge() {
-		Set<Port> variables = new HashSet<>();
-		for (HyperEdge h : hyperedges) {
-			variables.add(h.getRoot().getPort());
-		}
+	public void distribute() {
+		Set<Port> variables = getVariables();
 
 		for (Port p : variables) {
-			List<HyperEdge> singleEdge = new ArrayList<>();
-			List<HyperEdge> multiEdge = new ArrayList<>();
-
-			for (HyperEdge h : getHyperedges(p)) {
-				if (h.getLeaves().size() == 1)
-					singleEdge.add(h);
-				else
-					multiEdge.add(h);
-			}
-			if (singleEdge.size() > 1) {
-				HyperEdge e = singleEdge.get(0);
-				singleEdge.remove(0);
-				for (HyperEdge h : singleEdge) {
-					e.compose(h);
-				}
-				singleEdge.clear();
-				singleEdge.add(e);
-			}
+			List<HyperEdge> multiEdge = getHyperedges(p);
+			
 			if (!multiEdge.isEmpty()) {
-				HyperEdge e = multiEdge.get(0);
-				for (HyperEdge h : singleEdge) {
-					e.compose(h);
-
-				}
-				if (!multiEdge.isEmpty()) {
-					hyperedges.removeAll(singleEdge);
-				}
-			}
-		}
-		return new ConstraintHypergraph(new ArrayList<>(hyperedges), initial);
-	}
-
-	/**
-	 * Distribute multi rules hyperedges
-	 * 
-	 * @return
-	 */
-	public void distributeMultiEdge() {
-		Set<Port> variables = new HashSet<>();
-		for (HyperEdge h : hyperedges) {
-			variables.add(h.getRoot().getPort());
-		}
-
-		for (Port p : variables) {
-			List<HyperEdge> multiEdge = new ArrayList<>();
-
-			multiEdge.addAll(getHyperedges(p));
-			if(!multiEdge.isEmpty()){
-				HyperEdge toDistribute = multiEdge.get(0);
-				multiEdge.remove(0);
+				HyperEdge toDistribute = multiEdge.remove(0);
 				boolean mult = false;
 				for (HyperEdge h : multiEdge) {
-					if (!h.getLeaves().isEmpty()) {
-						toDistribute = h.compose(toDistribute);
+					if (!h.getTarget().isEmpty()) {
+						toDistribute.compose(h);
 						mult = true;
 					}
 				}
+				/*
+				 * Remove empty hyperedges
+				 */
 				if (mult) {
 					Set<HyperEdge> s = new HashSet<>(hyperedges);
 					hyperedges.clear();
@@ -426,44 +401,89 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			}
 		}
 	}
-
 	/**
-	 * Distributes all hyperedges in this hypergraph.
-	 * 
-	 * @return new hypergraphs wherein each variable has only a single
-	 *         hyperegde.
+	 * Rename all memory cells consistently
+	 * @param components
+	 * @return
 	 */
-	public ConstraintHypergraph distribute() {
-		return null;
+	public List<ConstraintHypergraph> renameMemoryCells(List<ConstraintHypergraph> components){
+		List<ConstraintHypergraph> list = new ArrayList<>();
+
+		int i = 1;
+		for (ConstraintHypergraph A : components) {
+			Map<String, String> rename = new HashMap<>();
+			for (RuleNode rn : A.getRuleNodes()) {
+				for(Rule r : rn.getRules()){
+					for (Variable v : r.getFormula().getFreeVariables()) {
+						if (v instanceof MemoryVariable) {
+							String name = ((MemoryVariable) v).getName();
+							if (!rename.containsKey(name)){
+								rename.put(name, "m" + i++);
+								
+							}
+						}
+					}
+				}
+			}
+			Map<String, String> _rename = new HashMap<>();
+			for(String name : rename.keySet()){
+				if(rename.containsKey(rename.get(name))|| _rename.containsValue("m"+i)){
+					while( _rename.containsValue("m"+i) || ("m"+i).equals(name))
+						i++;
+					_rename.put(name, "m"+i);
+				}
+				else
+					_rename.put(name, rename.get(name));
+			}
+			
+			for (RuleNode r : A.getRuleNodes())
+				r.substitute(_rename);
+
+			Map<MemoryVariable, Term> newInit = new HashMap<>();
+			for (Map.Entry<MemoryVariable, Term> e : A.getInitials().entrySet()) {
+				String newName = _rename.get(e.getKey().getName());
+				if (newName == null)
+					newName = e.getKey().getName();
+				newInit.put(new MemoryVariable(newName, e.getKey().hasPrime(), e.getKey().getTypeTag()), e.getValue());
+			}
+
+			list.add(new ConstraintHypergraph(new ArrayList<>(A.getHyperedges()), newInit));
+		}
+		return list;
 	}
 
-	public void removeEmptyHyperedge() {
-		Set<HyperEdge> s = new HashSet<>();
-		Queue<HyperEdge> q = new LinkedList<>(hyperedges);
-		while (!q.isEmpty()) {
-			HyperEdge e = q.poll();
-			if (!(e.getLeaves().size() == 0))
-				s.add(e);
-		}
-		hyperedges.clear();
-		hyperedges.addAll(s);
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ConstraintHypergraph restrict(Collection<? extends Port> intface) {
+		Set<Rule> setRules = new HashSet<Rule>();
+		
+		for (RuleNode ruleNodes : getRuleNodes()) {
+			List<Formula> list = new ArrayList<>();
+			for(Rule _r : ruleNodes.getRules())
+				list.add(_r.getFormula());
+			Formula g = new Conjunction(list);
+			for (Port p : ruleNodes.getPorts()) {
+				if (!intface.contains(p)) {
+					g = Formulas.eliminate(((Conjunction) g).getClauses(), Arrays.asList(new PortVariable(p)));
+				}
+			}
+			setRules.add(new Rule(g));
+		}
+		return new ConstraintHypergraph(new HashSet<>(Arrays.asList(setRules)), initial);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	// @Override
-	// public String toString() {
-	// ST st = new ST("<hyperedges; separator=\"\n\">");
-	// st.add("hyperedges", getHyperedges());
-	// return st.render();
-	// }
-
+	@Override
 	public String toString() {
+		
 		Set<Port> variables = new HashSet<>();
 		for (HyperEdge h : hyperedges) {
-			variables.add(h.getRoot().getPort());
+			variables.add(h.getSource());
 		}
 		String s = "";
 		for (Port var : variables) {
@@ -476,22 +496,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			s = s + "}\n \n";
 		}
 		return s;
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public ConstraintHypergraph restrict(Collection<? extends Port> intface) {
-		Set<Rule> setRules = new HashSet<Rule>();
-		for (Rule r : getRules()) {
-			Formula g = r.getFormula();
-			for (Port p : r.getFiringPorts())
-				if (!intface.contains(p))
-					g = new Existential(new Node(p), g);
-			setRules.add(new Rule(r.getSync(), g));
-		}
-		return new ConstraintHypergraph(setRules, initial);
 	}
 
 }

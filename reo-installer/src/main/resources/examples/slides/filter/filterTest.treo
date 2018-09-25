@@ -1,0 +1,5 @@
+import reo.filter;
+
+filterTest(a?String,b!String){
+	filter<"Relation.Even">(a,b)
+}

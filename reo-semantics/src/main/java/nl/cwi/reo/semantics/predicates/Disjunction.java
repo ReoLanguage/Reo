@@ -1,6 +1,7 @@
 package nl.cwi.reo.semantics.predicates;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,24 +10,59 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.stringtemplate.v4.ST;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.util.Monitor;
 
-public class Disjunction implements Formula {
-	
+/**
+ * A disjunction of formulas.
+ */
+public final class Disjunction implements Formula {
+
 	/**
 	 * Flag for string template.
 	 */
 	public static final boolean disjunction = true;
-	
+
+	/**
+	 * List of formulas in this disjunction.
+	 */
 	private final List<Formula> clauses;
 	
+	/**
+	 * Free variables of this term.
+	 */
+	private final Set<Variable> vars;
+
+	/**
+	 * Constructs the disjunction of a list of formulas.
+	 * 
+	 * @param clauses
+	 *            list of formulas
+	 */
 	public Disjunction(List<Formula> clauses) {
-		this.clauses = clauses;
+		this.clauses = Collections.unmodifiableList(new ArrayList<>(clauses));
+		Set<Variable> vars = new HashSet<Variable>();
+		for (Formula f : clauses)
+			vars.addAll(f.getFreeVariables());
+		this.vars = Collections.unmodifiableSet(vars);
 	}
 
+	/**
+	 * Returns the list of clauses in this conjunction.
+	 * 
+	 * @return list of clauses of this conjunction.
+	 */
+	public List<Formula> getClauses() {
+		return clauses;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula rename(Map<Port, Port> links) {
 		List<Formula> h = new ArrayList<Formula>();
@@ -35,32 +71,47 @@ public class Disjunction implements Formula {
 		return new Disjunction(h);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Set<Port> getInterface() {
+	public Set<Port> getPorts() {
 		Set<Port> P = new HashSet<Port>();
 		for (Formula f : clauses)
-			if(f instanceof Disjunction || f instanceof Conjunction || f instanceof Existential)
-				P.addAll(f.getInterface());
+			if (f instanceof Disjunction || f instanceof Conjunction || f instanceof Existential)
+				P.addAll(f.getPorts());
 		return P;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public @Nullable Formula evaluate(Scope s, Monitor m) {
-		return this;
-	}
-	
-	public String toString(){
-		String s = "[" + clauses.get(0).toString() +"]";
-		for(int i=1;i<clauses.size(); i++){
-			s = s + "OR" + "[" + clauses.get(i).toString() + "]";
-		}
-		return s;
+	public boolean isQuantifierFree() {
+		for (Formula f : clauses)
+			if (!f.isQuantifierFree())
+				return false;
+		return true;
 	}
 
-	public List<Formula> getClauses(){
-		return clauses;
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public @Nullable Formula evaluate(Scope s, Monitor m) {
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses) {
+			Formula g = f.evaluate(s, m);
+			if (g == null)
+				return null;
+			_clauses.add(g);
+		}
+		return new Conjunction(_clauses);
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Disjunction DNF() {
 		List<Formula> list = new ArrayList<Formula>();
@@ -68,62 +119,77 @@ public class Disjunction implements Formula {
 			list.add(f.DNF());
 		return new Disjunction(list);
 	}
+	
+	@Override
+	public Set<Set<Term>> inferTermType(Set<Set<Term>> termTypeSet) {
+		for(Formula f : clauses)
+			termTypeSet=f.inferTermType(termTypeSet);
+		return termTypeSet;
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Formula NNF() {
 		List<Formula> list = new ArrayList<Formula>();
-		
-		if(clauses.size()==1)
+
+		if (clauses.size() == 1)
 			return clauses.get(0).NNF();
-		
+
 		for (Formula f : clauses)
 			list.add(f.NNF());
 		return new Disjunction(list);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Formula QE() {
-		List<Formula> list = new ArrayList<Formula>();
-		
-		if(clauses.size()==1)
-			return clauses.get(0).QE();
-		
-		for (Formula f : clauses){
-			if(f instanceof Equality && ((Equality) f).getLHS().equals(((Equality) f).getRHS()))
-				return new Relation("true","true",null);
-			list.add(f.QE());
-		}
-		return new Disjunction(list);
+	public Formula substitute(Term t, Variable x) {
+		if (!vars.contains(x))
+			return this;
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses)
+			_clauses.add(f.substitute(t, x));
+		return new Disjunction(_clauses);
 	}
+	
 
 	@Override
-	public Formula Substitute(Term t, Variable x) {
-		List<Formula> list = new ArrayList<Formula>();
-		if(clauses.size()==1)
-			return clauses.get(0).Substitute(t,x);
-		for (Formula f : clauses){
-			Formula formula = f.Substitute(t, x);
-			if(formula instanceof Relation && ((Relation) formula).getValue().equals("true"))
-				return formula;
-			list.add(formula);
-		}
-		return new Disjunction(list);
+	public Formula getTypedFormula(Map<Term, TypeTag> typeMap) {
+		List<Formula> _clauses = new ArrayList<>();
+		for (Formula f : clauses)
+			_clauses.add(f.getTypedFormula(typeMap));
+		return new Disjunction(_clauses);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = new HashSet<Variable>();
-		for (Formula f : clauses)
-			vars.addAll(f.getFreeVariables());
 		return vars;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Map<Variable, Integer> getEvaluation() {
-		// TODO Auto-generated method stub
 		return new HashMap<Variable, Integer>();
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		ST st = new ST("(<clauses;separator=\" \u2228 \">)");
+		st.add("clauses", clauses);
+		return st.render();
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -136,8 +202,8 @@ public class Disjunction implements Formula {
 		if (!(other instanceof Disjunction))
 			return false;
 		Set<Formula> s = new HashSet<>(this.getClauses());
-		Set<Formula> s2 = new HashSet<>(((Disjunction)other).getClauses());
-		
+		Set<Formula> s2 = new HashSet<>(((Disjunction) other).getClauses());
+
 		return Objects.equals(s, s2);
 	}
 
@@ -148,6 +214,16 @@ public class Disjunction implements Formula {
 	public int hashCode() {
 		Set<Formula> s = new HashSet<>(clauses);
 		return Objects.hash(s);
+	}
+
+	
+	@Override
+	public Set<Set<Term>> getSynchronousSet() {
+		Set<Set<Term>> s = new HashSet<>();
+		for(Formula g : this.getClauses()){
+			s.addAll(g.getSynchronousSet());
+		}
+		return s;
 	}
 
 }

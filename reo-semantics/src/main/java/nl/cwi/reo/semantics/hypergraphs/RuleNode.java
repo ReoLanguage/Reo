@@ -9,174 +9,388 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Conjunction;
-import nl.cwi.reo.semantics.predicates.Disjunction;
-import nl.cwi.reo.semantics.predicates.Existential;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.MemCell;
-import nl.cwi.reo.semantics.predicates.Node;
+import nl.cwi.reo.semantics.predicates.Formulas;
+import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Variable;
+import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * Constraint hypergraph node that represent a rule.
+ */
 public class RuleNode {
-	
-	static int incId = 0;
-	private Set<HyperEdge> hyperedges;
-	private List<RuleNode> exclusiveRules = new ArrayList<>();
-	private Rule rule;
+
+	/**
+	 * Current total number of RuleNodes. Used to provide each node with a
+	 * unique identifier that avoids repeated computation of the hash value of
+	 * the formula of this rule.
+	 */
+	static int N = 0;
+
+	/**
+	 * Unique identifier of this node.
+	 */
 	private int id;
 
-	public RuleNode(Rule r, Set<HyperEdge> hyperedge) {
-		this.rule = r;
+	/**
+	 * Set of hyperedges that have this rule in their target.
+	 */
+	private Set<HyperEdge> hyperedges;
+
+	/**
+	 * List of rules that are excluded (i.e., cannot fire) whenever this rule
+	 * fires.
+	 */
+	private List<RuleNode> exclusiveRules = new ArrayList<>();
+
+	/**
+	 * Rule of this node.
+	 */
+	private Set<Rule> rules;
+
+	/**
+	 * Synchronous set.
+	 */
+	private final Map<Port, Boolean> sync;
+
+	
+	/**
+	 * Constructs a new node from a given rule and a set of adjacent hyperedges.
+	 * 
+	 * @param r
+	 *            rule of this node
+	 * @param hyperedge
+	 *            set of adjacent hyperedges
+	 */
+	public RuleNode(Set<Rule> r, Set<HyperEdge> hyperedge) {
+		this.rules = r;
 		this.hyperedges = new HashSet<>();
-		for(HyperEdge h : hyperedge)
-			addToHyperedge(h);
-		incId++;
-		id=incId;
+		this.sync = new HashMap<>();
+
+		for(Rule rule : r)
+			sync.putAll(rule.getSync());
+		
+		id = ++N;
+		for (HyperEdge h : hyperedge)
+			addToHyperedge(h); // TODO cannot call this.addToHyperedge, because
+								// this is not fully initialized.
 	}
-	
-	public RuleNode(Rule r){
-		this.rule = r;
+
+	/**
+	 * Constructs a new node from a given rule with an empty set of adjacent
+	 * hyperedges.
+	 * 
+	 * @param r
+	 *            rule of this node
+	 */
+	public RuleNode(Set<Rule> r) {
+		this.rules = r;
 		this.hyperedges = new HashSet<HyperEdge>();
-		incId++;
-		id=incId;
+		this.sync = new HashMap<>();
+		for(Rule rule : r)
+			sync.putAll(rule.getSync());
+		
+		id = ++N;
+	}
+
+	/**
+	 * Gets the set of rules of this node.
+	 * 
+	 * @return rule of this node.
+	 */
+	public Set<Rule> getRules() {
+		return rules;
+	}
+
+	/**
+	 * Gets the rule of this node.
+	 * 
+	 * @return rule of this node.
+	 */
+	public Rule getRule() {
+		List<Formula> f = new ArrayList<>();
+		for(Rule r : rules)
+			f.add(r.getFormula());
+		return new Rule(new Conjunction(f));
 	}
 	
-	public Rule getRule(){
-		return rule;
+	/**
+	 * Get the formula of this node
+	 * @return
+	 */
+	public Formula getFormula() {
+		List<Formula> f = new ArrayList<>();
+		for(Rule r : rules)
+			f.add(r.getFormula());
+		return new Conjunction(f);
 	}
 	
-	public Set<HyperEdge> getHyperedges(){
+	/**
+	 * Gets the rule of this node.
+	 * 
+	 * @return rule of this node.
+	 */
+	public Map<Port,Boolean> getSync() {
+		return sync;
+	}
+
+	/**
+	 * Gets the set of hyperedges adjacent to this rule.
+	 * 
+	 * @return set of adjacent hyperedges.
+	 */
+	public Set<HyperEdge> getHyperedges() {
 		return hyperedges;
 	}
-	
-	public HyperEdge getHyperedges(PortNode p){
-		for(HyperEdge h : hyperedges)
-			if(h.getRoot().getPort().equals(p.getPort()))
+
+	/**
+	 * Gets an arbitrary hyperedges adjacent to this rule and a given port.
+	 * 
+	 * @param p
+	 *            port
+	 * @return an arbitrary hyperedge adjacent to this rule and port p, if it
+	 *         exists, and null otherwise.
+	 */
+	@Nullable
+	public HyperEdge getHyperedges(Port p) {
+		for (HyperEdge h : hyperedges)
+			if (h.getSource().equals(p))
 				return h;
 		return null;
 	}
-	
-	public void addToHyperedge(HyperEdge h){
+
+	/**
+	 * Adds a hyperedge to the set of hyperedges adjacent to this rule.
+	 * 
+	 * @param h
+	 *            hyperedge
+	 */
+	public void addToHyperedge(HyperEdge h) {
 		hyperedges.add(h);
 		h.addLeave(this);
 	}
-	
-	public void rmFromHyperedge(HyperEdge h){
+
+	/**
+	 * Removes a hyperedge from the set of hyperedges adjacent to this rule.
+	 * 
+	 * @param h
+	 *            hyperedge
+	 */
+	public void rmFromHyperedge(HyperEdge h) {
 		hyperedges.remove(h);
 		h.rmLeave(this);
 	}
-	
-	public List<RuleNode> getExclRules(){
+
+	/**
+	 * Gets the list of rules that are excluded by this rule, i.e., rules that
+	 * cannot fire when this rule fires.
+	 * 
+	 * @return list of rules that are excluded by this rule.
+	 */
+	public List<RuleNode> getExclRules() {
 		return exclusiveRules;
 	}
-	
-	public void addExclRules(RuleNode n){
+
+	/**
+	 * Add a node to the list of rules excluded by this rule.
+	 * 
+	 * @param n
+	 *            rule node
+	 */
+	public void addExclRules(RuleNode n) {
 		exclusiveRules.add(n);
 	}
-	
-	public RuleNode compose(Formula f){
-		boolean canSync = true;
-		List<Formula> clauses = new ArrayList<Formula>();
-		if(f instanceof Disjunction){
-			for(Formula clause : ((Disjunction) f).getClauses()){
-				for(Variable v : clause.getFreeVariables()){
-					if(v instanceof Node && rule.getSync().get(((Node)v).getPort())!=null && !rule.getSync().get(((Node)v).getPort())){
-						canSync=false;
-					}
-				}
-				if(canSync){
-					clauses.add(clause);
-				}
-			}
-		}
-		Formula formula;
-		if(clauses.size()==1)
-			formula = new Conjunction(Arrays.asList(rule.getFormula(),clauses.get(0)));
-		else
-			formula = new Conjunction(Arrays.asList(rule.getFormula(),new Disjunction(clauses)));
-		rule=new Rule(rule.getSync(),formula);
-		return this;
-	}
-	
-	public RuleNode compose(RuleNode r){
-		if(!rule.canSync(r.getRule())){
-			return null;
-		}
-		Map<Port,Boolean> map = new HashMap<>(rule.getSync());
-		map.putAll(r.getRule().getSync());
 
-		Rule r1;
-		if(rule.getFormula().equals(r.getRule().getFormula())){
-			if(r.getRule().getSync().equals(rule.getSync()))
+
+
+	/**
+	 * Joins this node with a given rule node by conjunction of the rules and
+	 * union of the adjacent hyperedges.
+	 * 
+	 * @param r
+	 *            rule node
+	 * @return conjunction this node with the given rule node, if the rules of
+	 *         both node can synchronize, or null otherwise.
+	 */
+	
+	public RuleNode composeF(RuleNode r) {
+		// If the two rules can not synchronize, the composition fails.
+		if (!canSync(sync, r.getSync()))
+			return null;
+
+		Map<Port, Boolean> map = new HashMap<>(getSync());
+		map.putAll(r.getSync());
+
+		Set<Rule> r1;
+		// If the two rules are equals, return one this.rule (idempotency)
+		// otherwise, return the conjunction.
+		if (rules.equals(r.getRules())) {
+			if (r.getSync().equals(getSync()))
 				return this;
 			else
-				r1 = new Rule(map,rule.getFormula());
+				r1 = new HashSet<>(rules);
+		} else {
+			r1 = new HashSet<>(rules);
+			r1.addAll(r.getRules());
 		}
-		else{
-			r1 = new Rule(map,new Conjunction(Arrays.asList(rule.getFormula(),r.getRule().getFormula())));
-		}
-		
+
+		// Add the new rule to the hyperegde.
 		Set<HyperEdge> set = new HashSet<>(hyperedges);
-		for(HyperEdge h : r.getHyperedges()){
-			if(!h.getLeaves().isEmpty())
+		for (HyperEdge h : r.getHyperedges()) {
+			if (!h.getTarget().isEmpty())
 				set.add(h);
 		}
-		
-		return new RuleNode(r1,set);
+
+		return new RuleNode(r1, set);
 	}
-	
-	public void erase(){
+
+	/**
+	 * Removes this node from every adjacent hyperedge, and clears the set of
+	 * hyperedges of this node.
+	 */
+	public void erase() {
+		// TODO This creation of a new HashSet can be expensive.
 		Set<HyperEdge> s = new HashSet<>(hyperedges);
-		for(HyperEdge h : s){
+		for (HyperEdge h : s) {
 			rmFromHyperedge(h);
 		}
 	}
-	
-	public void isolate(){
+
+	/**
+	 * Removes this node from every adjacent hyperedge.
+	 */
+	public void isolate() {
+		// TODO This creation of a new HashSet can be expensive.
 		Set<HyperEdge> s = new HashSet<>(hyperedges);
-		for(HyperEdge h : s){
+		for (HyperEdge h : s) {
 			h.rmLeave(this);
 		}
-		hyperedges=s;
+		hyperedges = s;
 	}
-	
-	public RuleNode duplicate(){
-		return new RuleNode(this.getRule(),this.getHyperedges());
+
+	/**
+	 * Returns a new instance of a rule node with the same rule and hyperedges.
+	 * 
+	 * @return new instance of the this node.
+	 */
+	public RuleNode duplicate() {
+		return new RuleNode(this.getRules(), this.getHyperedges());
 	}
-	
-	public RuleNode rename(Map<Port,Port> links){
-		rule=rule.rename(links);
+
+	/**
+	 * Renames the ports in this rule node.
+	 * 
+	 * @param links
+	 *            map that assigns a new port to old ports.
+	 * @return node with rule whose port variables are renamed.
+	 */
+	public RuleNode rename(Map<Port, Port> links) {
+		Set<Rule> _rules = new HashSet<>();
+		for(Rule r : rules)
+			_rules.add(r.rename(links));
 		return this;
 	}
-	
-	public RuleNode substitute(Map<String,String> rename){
+
+	/**
+	 * Renames the memory cells in the rule of this node.
+	 * 
+	 * @param rename
+	 *            map that assigns a new name to each old name
+	 * @return reference to this node.
+	 */
+	public RuleNode substitute(Map<String, String> rename) {
+		Set<Rule> _rules = new HashSet<>();
 		for (Map.Entry<String, String> entry : rename.entrySet()) {
-			rule = new Rule(rule.getSync(),rule.getFormula().Substitute(new MemCell(entry.getValue(), false), new MemCell(entry.getKey(), false)));
-			rule = new Rule(rule.getSync(),rule.getFormula().Substitute(new MemCell(entry.getValue(), true), new MemCell(entry.getKey(), true)));
+			for(Rule r : rules){
+				Rule _r = new Rule(r.getFormula().substitute(
+						new MemoryVariable(entry.getValue(), false), new MemoryVariable(entry.getKey(), false)));
+				_r = new Rule(_r.getFormula().substitute(
+						new MemoryVariable(entry.getValue(), true), new MemoryVariable(entry.getKey(), true)));
+				_rules.add(_r);
+			}
+			rules = new HashSet<>(_rules);
+			_rules.clear();
 		}
 		return this;
 	}
+
+	public boolean canSync(Map<Port,Boolean> r1, Map<Port,Boolean> r2) {
+
+		boolean hasEdge = false;
+		for (Port p : r1.keySet()) {
+			if (r1.get(p)) {
+				if (r2.get(p)!=null && r2.get(p)) {
+					hasEdge = true;
+				} else if(r2.get(p)!=null && !r2.get(p)){ 
+					return false;
+				}
+			}
+			else if(r2!=null && r2.get(p)!=null &&r2.get(p))
+				return false;
+		}
+		return hasEdge;
+}
 	
-	public RuleNode hide(PortNode p){
-		rule = new Rule(rule.getSync(),(new Existential(new Node(p.getPort()),rule.getFormula())).QE());
+	
+	/**
+	 * Hides a port from this rule via existential quantification.
+	 * 
+	 * @param p
+	 *            port node
+	 * @return reference to this rule node.
+	 */
+	public RuleNode hide(Port p) {
+		List<Variable> V = Arrays.asList(new PortVariable(p));
+//		Formula f = this.getRule().getFormula();
+//		rules = new HashSet<>(Arrays.asList(new Rule(Formulas.eliminate(f, V))));
+		List<Formula> list = new ArrayList<>();
+		for(Rule r : rules){
+			list.add(r.getFormula());
+		}
+		rules = new HashSet<>(Arrays.asList(new Rule(Formulas.eliminate(list, V)))); 
 		return this;
 	}
-	
-	public RuleNode evaluate(Scope s, Monitor m) {
-		rule= rule.evaluate(s, m);
-		return this;
+
+	/**
+	 * Evaluates the rule of this node.
+	 * 
+	 * @param s
+	 *            scope
+	 * @param m
+	 *            monitor
+	 */
+	public void evaluate(Scope s, Monitor m) {
+		Set<Rule>_rules = new HashSet<>();
+		for(Rule r : rules)
+			_rules.add(r.evaluate(s, m));
+		rules = _rules;
 	}
 	
-	public int getId(){
-		return id;
+	public Set<Port> getActivePorts() {
+		Set<Port> N = new HashSet<>();
+		for (Rule r : rules)
+			N.addAll(r.getActivePorts());
+		return N;
 	}
+
 	
+	public Set<Port> getPorts() {
+		Set<Port> N = new HashSet<>();
+		for (Rule r : rules)
+			for(Variable v :r.getFormula().getFreeVariables())
+				if(v instanceof PortVariable)
+					N.add(((PortVariable) v).getPort());
+		return N;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -189,7 +403,7 @@ public class RuleNode {
 		if (!(other instanceof RuleNode))
 			return false;
 		RuleNode rule = (RuleNode) other;
-		return Objects.equals(id,rule.getId());
+		return Objects.equals(this.id, rule.id);
 	}
 
 	/**
@@ -199,10 +413,12 @@ public class RuleNode {
 	public int hashCode() {
 		return Objects.hash(id);
 	}
-	
-	public String toString(){
-		String s = "("+rule.toString()+")";
 
-		return s;
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return rules.toString();
 	}
 }

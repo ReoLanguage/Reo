@@ -1,0 +1,10 @@
+
+transformer2<k:string>(a?String,b?String,c!String){
+	#RBA
+	{a,b,c} c=k(a,b)
+}
+
+transformerTest2(a?String,b?String,c!String){
+	transformer2<"Function.concatenate">(a,b,c)
+}
+

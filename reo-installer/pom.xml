@@ -15,7 +15,7 @@
   <name>Installer</name>
 
   <properties>
-    <izpack.version>5.0.9</izpack.version>
+    <izpack.version>5.1.2</izpack.version>
     <izpack.staging>${project.build.directory}/staging</izpack.staging>
   </properties>
 
@@ -167,9 +167,9 @@
       </plugin>
 
       <plugin>
+	<version>5.1.2</version>
         <groupId>org.codehaus.izpack</groupId>
         <artifactId>izpack-maven-plugin</artifactId>
-	<version>5.1.1</version>
         <executions>
           <execution>
             <phase>package</phase>

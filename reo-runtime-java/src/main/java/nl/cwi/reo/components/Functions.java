@@ -1,4 +1,5 @@
 package nl.cwi.reo.components;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -63,7 +64,7 @@ public class Functions {
 
 		return result;
 	}
-	
+
 	public static Integer add(Object left, Object right) {
 		if (left == null)
 			throw new NullPointerException();
@@ -76,5 +77,5 @@ public class Functions {
 
 		return ((Integer) left) + ((Integer) right);
 	}
-	
+
 }

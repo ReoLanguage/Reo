@@ -1,0 +1,57 @@
+import reo.sync;
+import reo.binop;
+import reo.fifo1;
+import reo.transformer;
+import reo.syncdrain;
+import reo.filter;
+import reo.fifofull;
+
+chess3 = (){
+
+
+//	fifofull<"0">(x,whiteC)
+	
+      	{ transformer<PARSE>(blackR,blackM) | PARSE = "Function.parse"}
+      	{ transformer<PARSE>(whiteR,whiteM) | PARSE = "Function.parse"}
+
+	{
+		Engine(whiteC,whiteR)	
+		fifofull<"">(whiteR,blackC)
+		Engine(blackC,blackR)
+		fifo1(blackR,whiteC)
+	|
+	
+		Engine=(a?String,b!String){
+			#JAVA
+			"Workers.Engine"
+		}
+	}
+	
+	{ 
+	Display(whiteM,blackM)
+	|
+	  Display(a?String,b?String){
+		#JAVA
+		"Workers.Display"
+
+	  }
+	}
+	
+}
+
+visualize(C?,R?,M!,O!){
+	//
+	// This function take :
+	//	the input port of an engine (C?)
+	//	the output port of an engine (R?)
+	//	the port of the display (M)
+	//
+	// display the visualisation of engines playing.
+	//
+
+	fifo1(C,k)
+      	{ transformer<PARSE>(R,M) | PARSE = "Function.parse"}
+	{ binop<CONCATENATE>(k,M,O) | CONCATENATE = "Function.concatenate" }
+
+}
+

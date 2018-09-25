@@ -1,7 +1,6 @@
 package nl.cwi.reo.pr.autom.libr;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import nl.cwi.reo.pr.autom.UserDefinedAutomaton;

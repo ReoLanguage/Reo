@@ -1,0 +1,25 @@
+section slides.main;
+
+import reo.fifo1;
+//import reo.sync;
+//import reo.lossy;
+//import slides.variable.variable;
+
+//import slides.producer.red;
+//import slides.consumer.blue;
+
+connector11<ileg[1..1](?, !),n:int>(a[1..n], b) 
+{
+  { ileg[i](a[i], b) | i : <1..1> }
+}
+test() 
+{
+  connector11<ileg[1..1],1> (a[1..n], b)
+	ileg[1](a,b)
+//	ileg[3](c,d)
+//	ileg[n](a,d)
+|
+  ileg[1..n] = <fifo1>
+}
+
+

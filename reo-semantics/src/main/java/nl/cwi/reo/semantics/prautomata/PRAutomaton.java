@@ -10,6 +10,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
@@ -17,56 +18,105 @@ import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Parameter;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PRAutomaton.
+ */
 public class PRAutomaton implements Semantics<PRAutomaton> {
 
+	/** The name. */
 	private final String name;
 
+	/** The parameter. */
 	@Nullable
 	private final Value parameter;
 
+	/** The value. */
+	@Nullable
 	private Value value;
 
+	/** The ports. */
 	private final List<Port> ports;
 
+	/**
+	 * Instantiates a new PR automaton.
+	 */
 	public PRAutomaton() {
 		this.name = "";
 		this.parameter = null;
+		this.value = null;
 		this.ports = new ArrayList<Port>();
 	}
 
-	public PRAutomaton(String name, @Nullable Value variable, Value value, List<Port> port) {
+	/**
+	 * Instantiates a new PR automaton.
+	 *
+	 * @param name
+	 *            the name
+	 * @param variable
+	 *            the variable
+	 * @param value
+	 *            the value
+	 * @param port
+	 *            the port
+	 */
+	public PRAutomaton(String name, @Nullable Value variable, @Nullable Value value, List<Port> port) {
 		this.name = name;
-		if(variable instanceof StringValue)
-		this.parameter =  new StringValue(variable.toString().replaceAll("\"", ""));
+		if (variable instanceof StringValue)
+			this.parameter = new StringValue(variable.toString().replaceAll("\"", ""));
 		else
 			this.parameter = variable;
 		this.value = value;
 		this.ports = port;
 	}
 
+	/**
+	 * Instantiates a new PR automaton.
+	 *
+	 * @param name
+	 *            the name
+	 * @param variable
+	 *            the variable
+	 * @param port
+	 *            the port
+	 */
 	public PRAutomaton(String name, @Nullable Value variable, List<Port> port) {
 		this.name = name;
 		this.parameter = variable;
+		this.value = null;
 		this.ports = port;
 	}
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Gets the value.
+	 *
+	 * @return the value
+	 */
+	@Nullable
 	public Value getValue() {
-		
 		return value;
 	}
 
+	/**
+	 * Gets the variable.
+	 *
+	 * @return the variable
+	 */
 	public Value getVariable() {
-		if(name.equals("FifoFull")&& parameter instanceof StringValue){
-			return new StringValue("\""+parameter.toString()+"\"");
-		}
-		else
+		if (name.equals("FifoFull") && parameter instanceof StringValue) {
+			return new StringValue("\"" + parameter.toString() + "\"");
+		} else
 			return parameter;
 	}
 
@@ -151,8 +201,8 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 		// Value v = s.get(variable);
 		if (parameter != null) {
 			Value l = s.get(new Parameter(parameter.toString(), new TypeTag("int")));
-			this.value=l;
-						
+			this.value = l;
+
 			return new PRAutomaton(name, l, l, ports);
 		}
 		return new PRAutomaton(name, null, null, ports);
@@ -171,6 +221,12 @@ public class PRAutomaton implements Semantics<PRAutomaton> {
 	 */
 	@Override
 	public PRAutomaton restrict(Collection<? extends Port> intface) {
+		return null;
+	}
+
+	@Override
+	public PRAutomaton getDefault(Set<Port> iface) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -2,6 +2,11 @@ grammar P;
 
 import Tokens;
 
+/*
+ * This is a grammar for predicate semantics. The current compiler 
+ * does not use this grammar.
+ */
+
 p      : '#P' p_form ;
 
 p_form : '(' p_form ')'         #p_brackets     

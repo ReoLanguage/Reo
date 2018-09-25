@@ -11,10 +11,10 @@ import slides.main.red;
 import slides.main.blue;
 import slides.sequencer.seqc;
 
-main11() 
+main11(a[1..6],b) 
 {
-  { red(a[i]) | i : <1..n> }
-  blue(b) 
+//  { red(a[i]) | i : <1..n> }
+//  blue(b) 
   connector11<ileg[1..n], sync>(a[1..n], b)
 |
   ileg[1..n] = <sync, lossy, fifo1, variable, shiftlossyfifo, lossyfifo1>

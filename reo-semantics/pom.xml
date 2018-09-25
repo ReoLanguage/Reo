@@ -22,11 +22,17 @@
       <artifactId>antlr4</artifactId>
       <version>4.3</version>
     </dependency>
-
+<!--
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>ST4</artifactId>
       <version>4.0.8</version>
+    </dependency>
+-->
+    <dependency>
+      <groupId>nl.cwi.reo</groupId>
+      <artifactId>reo-interpreter</artifactId>
+      <version>1.0</version>
     </dependency>
 
   </dependencies>

@@ -3,37 +3,53 @@ package nl.cwi.reo.semantics.predicates;
 import java.util.Map;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.Expression;
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.util.Monitor;
+import nl.cwi.reo.interpret.typetags.TypeTag;
 
-public interface Formula {
+/**
+ * A first-order formula over the language of constraints.
+ * 
+ * <p>
+ * Every implementing class is immutable.
+ */
+public interface Formula extends Expression<Formula> {
 
-//	/**
-//	 * Computes the condition on input ports by existentially quantifying over
-//	 * output ports.
-//	 * 
-//	 * @return existential quantification of this constraint over all output
-//	 *         ports.
-//	 */
-//	@Deprecated
-//	public Formula getGuard();
-//
-//	/**
-//	 * Computes an assignment of data terms to output ports that satisfies this
-//	 * data constraint.
-//	 * 
-//	 * @return Assignment of data terms to output ports.
-//	 */
-//	@Deprecated
-//	public Map<Variable, Term> getAssignment();
+	/**
+	 * Gets the set of all free variables in this formula.
+	 * 
+	 * @return set of all free variables.
+	 */
+	public Set<Variable> getFreeVariables();
 
-	public @Nullable Formula evaluate(Scope s, Monitor m);
+	/**
+	 * Returns the set of ports that occur as a variables in this formula
+	 * 
+	 * @return set of port variables in this formula.
+	 */
+	public Set<Port> getPorts();
 
-	public Set<Port> getInterface();
+	/**
+	 * Checks if this formula contains a quantifier.
+	 * 
+	 * @return true if this formula contains a quantifier.
+	 */
+	public boolean isQuantifierFree();
 
+	/**
+	 * Get synchronous set of variables.
+	 * 
+	 * @return map with synchronous information.
+	 */
+	public Set<Set<Term>> getSynchronousSet();
+
+	/**
+	 * Renames the free port variables in the formula.
+	 * 
+	 * @param links
+	 *            assignment from old to new port variables.
+	 * @return Formula with renamed port variables.
+	 */
 	public Formula rename(Map<Port, Port> links);
 
 	/**
@@ -51,14 +67,24 @@ public interface Formula {
 	public Formula DNF();
 
 	/**
-	 * Tries to eliminate quantifiers via substitution.
+	 * Infer type of a term from a set of set of term.
 	 * 
-	 * @return equivalent formula, possibly without any quantifiers.
+	 * Each set of term represents terms with the same type.
+	 * @param termTypeList
+	 * @return
 	 */
-	public Formula QE();
+	public Set<Set<Term>> inferTermType(Set<Set<Term>> termTypeList);
 
 	/**
-	 * Substitutes a term t for every free occurrence of a variable x in this
+	 * Type the term of the formula according to the termTypedList.
+	 * 
+	 * @param termTypeList
+	 * @return
+	 */
+	public Formula getTypedFormula(Map<Term,TypeTag> typeMap);
+	
+	/**
+	 * Substitutes a term t for every occurrence of a variable x in this
 	 * formula.
 	 * 
 	 * @param t
@@ -67,14 +93,7 @@ public interface Formula {
 	 *            free variable
 	 * @return substituted formula.
 	 */
-	public Formula Substitute(Term t, Variable x);
-
-	/**
-	 * Gets the set of all free variables in this formula.
-	 * 
-	 * @return set of all free variables.
-	 */
-	public Set<Variable> getFreeVariables();
+	public Formula substitute(Term t, Variable x);
 
 	/**
 	 * Tries to determine which variables in this formula must evaluate to null

@@ -1,0 +1,66 @@
+import reo.syncdrain;
+import reo.sync;
+import reo.fifo1;
+
+main() {
+	prod_H(H) prod_E(E) prod_L(L) prod_O(O) 
+	prod_W(W) prod_R(R) prod_D(D) prod_e(e) prod_s(s) cons(b)
+	connector(H,E,L,O,e,W,R,D,s,b)
+}
+
+connector(H,E,L,O,e,W,R,D,s,b){
+
+	syncdrain(H,E)
+	syncdrain(E,L)
+	syncdrain(L,O)
+	syncdrain(O,e)
+	syncdrain(e,W)
+	syncdrain(W,R)
+	syncdrain(R,D)
+	syncdrain(D,s)
+
+	sync(H,b)
+	sync(E,x1)fifo1(x1,b)
+	sync(L,x2)fifo1(x2,x1)
+	sync(L,x3)fifo1(x3,x2)
+	sync(O,x4)fifo1(x4,x3)
+	sync(s,x5)fifo1(x5,x4)
+	sync(W,x6)fifo1(x6,x5)
+	sync(O,x7)fifo1(x7,x6)
+	sync(R,x8)fifo1(x8,x7)
+	sync(L,x9)fifo1(x9,x8)
+	sync(D,x10)fifo1(x10,x9)
+	sync(e,x11)fifo1(x11,x10)
+}
+
+
+cons(a?String) {
+	#JAVA "Components.cons"
+}
+prod_H(a!String) {
+	#JAVA "Components.prod_H"
+}
+prod_E(a!String) {
+	#JAVA "Components.prod_E"
+}
+prod_L(a!String) {
+	#JAVA "Components.prod_L"
+}
+prod_O(a!String) {
+	#JAVA "Components.prod_O"
+}
+prod_W(a!String) {
+	#JAVA "Components.prod_W"
+}
+prod_R(a!String) {
+	#JAVA "Components.prod_R"
+}
+prod_D(a!String) {
+	#JAVA "Components.prod_D"
+}
+prod_e(a!String) {
+	#JAVA "Components.prod_e"
+}
+prod_s(a!String) {
+	#JAVA "Components.prod_s"
+}

@@ -1,4 +1,3 @@
-// Does not compile.
 
 section slides.main;
 
@@ -11,7 +10,8 @@ import slides.main.blue;
 import slides.sequencer.seqc;
 
 main8() {
-  red(a) green(b) blue(c) connector8(a, b, c)
+	red(a) green(b) blue(c)
+	connector8(a, b, c)
 }
 
 connector8(a, b, c) {

@@ -1,0 +1,6 @@
+
+transformer2<k>(a?String,b?String,c!String){
+	#RBA
+	{a,b,c} c=k(a,b)
+}
+

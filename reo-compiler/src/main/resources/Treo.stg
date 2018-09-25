@@ -1,0 +1,113 @@
+main(S) ::= <<
+// Generated from <S.file> by Reo 1.0.
+
+<S.name>(){
+	<S.components:instance(); separator="\n\n">
+	|
+	<S.components:definition(); separator=", \n">
+}
+>>
+
+instance(c) ::= <<
+<c.name>(<c.renamedPorts:signature(); separator=",">)
+>>
+
+definition(c) ::= <<
+<c.name> = (<c.renamedPorts:port(); separator=",">) {
+	<if(c.atomic)><c:atomic()><else><c:protocol()><endif>
+}
+>>
+
+signature(p) ::= <<
+<p.name>
+>>
+
+port(p) ::= <<
+<p.name><if(p.input)>?<else>!<endif><p:typetag()>
+>>
+
+typetag(p) ::= <<
+<if(p.typeTag)><p.typeTag><else>Object<endif>
+>>
+
+atomic(c) ::= <<
+#JAVA
+"<c.call>"
+>>
+
+protocol(c) ::= <<
+#RBA
+<c.transitions:transition(); separator="\n">
+>>
+
+memorycell(c) ::= <<
+<c.initial.keys:{m | private <if(m.type)><m.type><else>String<endif> <m.name> <if(c.initial.(m))> = <c.initial.(m).value><else> = null <endif>; }; separator = "\n"> 
+>>
+
+transition(t) ::= <<
+<guard(t); wrap, anchor><action(t)>
+>>
+
+guard(t) ::= <<
+<t.renamedGuard:formula()>
+>>
+
+formula(f) ::= <<
+<if(f.negation)>!(<f.formula:formula()>)<!
+!><elseif(f.equality)><f:equality()><!
+!><elseif(f.relation)><f:relation()><!
+!><elseif(f.conjunction)><f:conjunction()><!
+!><elseif(f.disjunction)><f:disjunction()><!
+!><endif>
+>>
+
+disjunction(f) ::= <<
+(<f.clauses:formula(); separator=" OR ">)
+>>
+
+conjunction(f) ::=<<
+<f.clauses:formula(); separator=" , ">
+>>
+
+relation(t) ::=<<
+<t.STGName><if(t.args)>(<t.args:{p | <if(p.input)> <p.name> <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif><!
+<f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif>!>
+>>
+
+equality(f) ::= <<
+<f.LHS:term()> = <f.RHS:term()>
+>>
+
+term(t) ::= <<
+<if(t.constant)><t.name><!
+!><elseif(t.node)><t.name><!
+!><elseif(t.memory)>$<t.name><!
+!><elseif(t.isnull)>*<!
+!><elseif(t.function)><t:function()><!
+!><else><t.name><endif>
+>>
+
+function(t) ::=<<
+<t.STGName><if(t.args)>(<t.args:{p | <if(p.function)><p:function()><else><p.name><endif>}; separator=",">)<endif>
+>>
+
+
+action(t) ::= <<
+<t:output(); separator=""><t:memoryUpdateNonNull(); separator=""><t:memoryUpdateNull(); separator="">
+>>
+
+output(a) ::= <<
+<a.renamedOutput.keys:{p | <if(!a.renamedOutput.(p).isnull)>, <p.name> = <a.renamedOutput.(p):term()> <endif>}; separator=" "> 
+>>
+
+memory(m) ::= <<
+<m.renamedMemory.keys:{p |, $<p.name>' = <m.renamedMemory.(p):term()>}; separator=" "> 
+>>
+
+memoryUpdateNonNull(m) ::= <<
+<m.renamedMemory.keys:{p | <if(!m.renamedMemory.(p).isnull)>, $<p.name>' = <m.renamedMemory.(p):term()> <endif>}; separator=" "> 
+>>
+
+memoryUpdateNull(m) ::= <<
+<m.renamedMemory.keys:{p | <if(m.renamedMemory.(p).isnull)>, $<p.name>' = <m.renamedMemory.(p):term()> <endif>}; separator=" "> 
+>>

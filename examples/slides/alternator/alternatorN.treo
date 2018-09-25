@@ -1,0 +1,12 @@
+section slides.alternator;
+
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+alternatorN(a[1..n], d[1]) {
+  syncdrain(a[i], a[i+1]) sync(a[i+1], x[i+1]) fifo1(x[i+1], d[i])
+  sync(a[i], d[i])
+  |
+  i:<1..(n-1)>
+}

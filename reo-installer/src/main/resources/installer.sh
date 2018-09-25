@@ -46,10 +46,14 @@ Compile the file with :
 
         >$  javac *.java 
 
-Note that if you are using external java classes, you should first compile those classes before compiling the generated code. 
 Run the application with : 
 
         >$  java FILE
+
+Note that if you are using external java classes, compile and run with :
+        >$  javac -cp \"$CLASSPATH:folderWithClass\" *.java
+        >$  java -cp \"$CLASSPATH:folderWithClass\" FILE 
+
 
 
 " >> $BASEDIR/README

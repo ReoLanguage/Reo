@@ -1,0 +1,181 @@
+main(S) ::= <<
+/**
+ * Generated from <S.file> by Reo 1.0.
+ */
+<S.package:package(); separator="\n">
+
+import nl.cwi.reo.runtime.*;
+
+public class <S.name> {
+
+	public static void main(String[] args) {
+
+		<S.ports:newPort(); separator="\n">
+
+		<S.components:newComponent(); separator="\n"> 
+
+		<S.components:start(); separator="\n">
+	
+		try {
+			<S.components:join(); separator="\n">
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	<S.components:component(); separator="\n\n">
+}
+>>
+
+package(p) ::= <<
+<if(p)>package <p>;<endif>
+>>
+
+newPort(p) ::= <<
+Port\<<p:typetag()>\> <p.name> = new PortWaitNotify\<<p:typetag()>\>();
+>>
+
+newComponent(c) ::= <<
+<c.name> <c.name> = new <c.name>();
+<c.ports:{p | <p.name>.<if(p.input)>setConsumer<else>setProducer<endif>(<c.name>); }; separator="\n">
+<c.ports:{p | <c.name>.<p.name> = <p.name>;}; separator="\n">
+Thread thread_<c.name> = new Thread(<c.name>);
+>> 
+
+start(c) ::= <<
+thread_<c.name>.start();
+>>
+
+join(c) ::= <<
+<if(!c.deamon)>thread_<c.name>.join();<endif>
+>>
+
+component(c) ::= <<
+private static class <c.name> implements Component {
+
+	<c.ports:port(); separator="\n">
+	<c:memorycell(); separator="\n">
+	
+	<if(c.atomic)><c:atomic()><else><c:protocol()><endif>
+}
+>>
+
+port(p) ::= <<
+public volatile Port\<<p.typeTag>\> <p.name>;
+>>
+
+typetag(p) ::= <<
+<if(p.typeTag)><p.typeTag><else>Object<endif>
+>>
+
+atomic(c) ::= <<
+public void activate() {
+	synchronized (this) {
+		notify();
+	}
+}
+
+public void run() {
+	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p | <p.name>}; separator=", ">);
+}
+>>
+
+protocol(c) ::= <<
+public void activate() {
+	synchronized (this) {
+		notify();
+	}
+}
+
+interface Rule {
+    void fire();
+}
+
+private Rule[] rules = new Rule[] {
+    <c.transitions:transition(); separator="\n">
+};
+
+public void run() {
+	int i = 0;
+	int j = 0;
+	int s = rules.length;
+	
+	while (true) {
+		rules[(i+j) % s].fire();			
+		
+		i = (i+1) % s;
+		if (i == 0)
+			j = (j+1) % s;
+		
+		synchronized (this) {
+			while(true) {
+				<c.transitions:check_transition(); separator="\n">
+				try { 
+					wait(); 
+				} catch (InterruptedException e) { }
+			}	
+		}
+	}
+}
+>>
+
+memorycell(c) ::= <<
+<! <c.initial.keys:{m | private <if(m.type)><m.type><else>Object<endif> <m.name> <if(mem.get(m))> = <mem.get(m)> <endif>}; separator="\n">;  !>
+
+<c.initial.keys:{m | private <if(m.type)><m.type><else>String<endif> <m.name> <if(c.initial.(m))> = <c.initial.(m).value><else> = null <endif>; }; separator = "\n"> 
+>>
+
+check_transition(t) ::= <<
+if (<guard(t); wrap, anchor>) break;
+>>
+
+transition(t) ::= <<
+new Rule() { 
+	public void fire() { 
+		if (<guard(t); wrap, anchor>) {
+			<action(t)>
+		}
+	}
+},
+>>
+
+guard(t) ::= <<
+<if(t.equality)><endif><t.guard:formula()><t.output.keys:{p | <if(!p.void)> && <p.name>.hasGet()<endif>}; separator=" "><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif>
+<! <if(t.equality)><endif><t.guard:formula()><if(t.input)> && <t.input:{p | (<p.name>.peek())!=null}; separator=" && "><endif> !>
+>>
+
+formula(f) ::= <<
+<if(f.negation)>!(<f.formula:formula()>)<elseif(f.equality)><f:equality()><elseif(f.relation)><f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif><elseif(f.conjunction)>(<f.clauses:formula(); separator=" && ">)<elseif(f.disjunction)>(<f.clauses:formula(); separator=" || ">)<endif>
+>>
+
+equality(f) ::= <<
+<if(f.LHS.node)><if(!f.RHS.constant.value)>!<f.LHS.name>.hasGet()<else><f.LHS:term()> == <f.RHS:term()><endif><else><f.LHS:term()> == <f.RHS:term()><endif>
+>>
+
+term(t) ::= <<
+<if(t.function)><t:function()><elseif(t.constant)><t.name><elseif(t.node)><t.name>.peek()<elseif(t.memory)><t.name><else><t.name><endif>
+>>
+
+function(t) ::=<<
+<t.value><if(t.args)>(<t.args:{p | <if(p.input)> <p.name>.peek() <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
+>>
+
+
+action(t) ::= <<
+<t:output(); separator="\n">
+<t:memory(); separator="\n">
+<t.input:{p | <p:input()>}; separator="\n">
+>>
+
+output(a) ::= <<
+<a.output.keys:{p | <if(!p.void)><p.name>.put(<a.output.(p):term()>)<else><a.output.(p):term()><endif>;}; separator="\n"> 
+>>
+
+memory(m) ::= <<
+<m.memory.keys:{p | <p.name> = <m.memory.(p):term()>;}; separator="\n"> 
+>>
+
+input(p) ::= <<
+<p.name>.get();
+>>
+

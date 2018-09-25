@@ -12,14 +12,19 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.Scope;
+import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.semantics.Semantics;
-import nl.cwi.reo.semantics.SemanticsType;
 import nl.cwi.reo.util.Monitor;
 
-public class Predicate implements Semantics<Predicate> {
+// TODO: Auto-generated Javadoc
+/**
+ * Predicate semantics of Reo connectors.
+ */
+public final class Predicate implements Semantics<Predicate> {
 
+	/** Formula of this predicate. */
 	private final Formula f;
 
 	/**
@@ -27,7 +32,7 @@ public class Predicate implements Semantics<Predicate> {
 	 * composition.
 	 */
 	public Predicate() {
-		this.f = new Relation("constant", "true", null);
+		this.f = new TruthValue(true);
 	}
 
 	/**
@@ -53,8 +58,12 @@ public class Predicate implements Semantics<Predicate> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public @Nullable Predicate evaluate(Scope s, Monitor m) {
-		return new Predicate(f.evaluate(s, m));
+	@Nullable
+	public Predicate evaluate(Scope s, Monitor m) {
+		Formula g = f.evaluate(s, m);
+		if (g != null)
+			return new Predicate(g);
+		return null;
 	}
 
 	/**
@@ -62,7 +71,7 @@ public class Predicate implements Semantics<Predicate> {
 	 */
 	@Override
 	public Set<Port> getInterface() {
-		return f.getInterface();
+		return f.getPorts();
 	}
 
 	/**
@@ -94,28 +103,22 @@ public class Predicate implements Semantics<Predicate> {
 		List<Formula> transitions = new ArrayList<Formula>();
 
 		for (Port p : inps) {
-			Formula transition = null;
+			Formula transition = new TruthValue(true);
 			for (Port x : inps) {
 				if (!x.equals(p)) {
-					Term t_null = new Function("constant", null, new ArrayList<Term>());
-					Formula neq = new Negation(new Equality(new Node(x), t_null));
-					if (transition == null)
-						transition = neq;
-					else
-						transition = new Conjunction((Arrays.asList(transition, neq)));
+					Term t_null = Terms.Null;
+					Formula neq = new Negation(new Equality(new PortVariable(x), t_null));
+					transition = Formulas.conjunction(Arrays.asList(transition, neq));
 				}
 			}
 			for (Port x : outs) {
-				Formula eq = new Equality(new Node(p), new Node(x));
-				if (transition == null)
-					transition = eq;
-				else
-					transition = new Conjunction(Arrays.asList(transition, eq));
+				Formula eq = new Equality(new PortVariable(p), new PortVariable(x));
+				transition = Formulas.conjunction(Arrays.asList(transition, eq));
 			}
 			transitions.add(transition);
 		}
 
-		return new Predicate(new Conjunction(transitions));
+		return new Predicate(Formulas.conjunction(transitions));
 	}
 
 	/**
@@ -135,7 +138,7 @@ public class Predicate implements Semantics<Predicate> {
 		list.add(this.f);
 		for (Predicate A : components)
 			list.add(A.f);
-		return new Predicate(new Conjunction(list));
+		return new Predicate(Formulas.conjunction(list));
 	}
 
 	/**
@@ -143,14 +146,14 @@ public class Predicate implements Semantics<Predicate> {
 	 */
 	@Override
 	public Predicate restrict(Collection<? extends Port> intface) {
-		Set<Port> P = f.getInterface();
+		Set<Port> P = f.getPorts();
 		Formula g = f;
 		for (Port p : P)
 			if (!intface.contains(p))
-				g = new Existential(new Node(p), g);
+				g = new Existential(new PortVariable(p), g);
 		return new Predicate(g);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -162,7 +165,7 @@ public class Predicate implements Semantics<Predicate> {
 			return true;
 		if (!(other instanceof Predicate))
 			return false;
-		
+
 		Predicate p = (Predicate) other;
 		return Objects.equals(f, p.getFormula());
 	}
@@ -173,6 +176,12 @@ public class Predicate implements Semantics<Predicate> {
 	@Override
 	public int hashCode() {
 		return Objects.hash(f);
+	}
+
+	@Override
+	public Predicate getDefault(Set<Port> iface) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

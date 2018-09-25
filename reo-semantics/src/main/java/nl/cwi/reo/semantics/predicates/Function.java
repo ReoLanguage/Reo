@@ -13,100 +13,161 @@ import org.stringtemplate.v4.ST;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
+import nl.cwi.reo.interpret.typetags.TypeTags;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
-public class Function implements Term {
-	
+/**
+ * A function applied to a list of terms.
+ */
+public final class Function implements Term {
+
+	/**
+	 * Flag for string template.
+	 */
 	public static final boolean function = true;
-	
+
+	/**
+	 * Name of this function.
+	 */
 	private final String name;
-	
-	private Object value;
-	
+
+	/**
+	 * List of arguments of this function.
+	 */
 	private final List<Term> args;
-	
-	public Function(String name, List<Term> args) {
+
+	/**
+	 * Defines whether the function symbol can be used with infix notation. For
+	 * example, infix can be a+b, while prefix can be +(a,b).
+	 */
+	private final boolean infix;
+
+	/**
+	 * Type of returned data.
+	 */
+	private final TypeTag tag;
+
+	/**
+	 * Free variables of this term.
+	 */
+	private final Set<Variable> vars;
+
+	/**
+	 * Constructs a new function from a name, a value, and a list of arguments.
+	 *
+	 * @param name
+	 *            name of the function
+	 * @param args
+	 *            list of arguments
+	 * @param infix
+	 *            infix notation
+	 * @param tag
+	 *            type tag
+	 */
+	public Function(String name, List<Term> args, boolean infix, TypeTag tag) {
 		this.name = name;
 		this.args = args;
+		this.infix = infix;
+		this.tag = tag;
+		Set<Variable> vars = new HashSet<Variable>();
+		for (Term t : args)
+			vars.addAll(t.getFreeVariables());
+		this.vars = vars;
 	}
-	
-	public Function(String name, Object value, List<Term> args) {
-		this.name = name;
-		this.value = value;
-		this.args = args;
-	}
-	
+
+	/**
+	 * Gets the name of this function.
+	 * 
+	 * @return name of this function.
+	 */
 	public String getName() {
 		return name;
 	}
-	
-	public Object getValue() {
-		if(value == null)
-			return "null";
-		return value;
-	}
 
+	/**
+	 * Name for string template
+	 * @return
+	 */
+	public String getSTGName() {
+		return name.substring(1,name.length()-1);
+	}
+	
+	/**
+	 * Gets the list of arguments of this function.
+	 * 
+	 * @return list of arguments of this function.
+	 */
+	@Nullable
 	public List<Term> getArgs() {
 		return args;
 	}
 
-	@Override
-	public String toString() {
-		ST st = new ST("<name><if(args)>(<args; separator=\", \">)<endif>");
-		st.add("name", name);
-		st.add("args", args);
-		return st.render();
-	}
-	
-	@Override
-	public boolean hadOutputs() {
-		// TODO Auto-generated method stub
-		return false;
+	/**
+	 * Gets whether this function is written as infix.
+	 * 
+	 * @return true, is the function is written as infix.
+	 */
+	@Nullable
+	public boolean getInfix() {
+		return infix;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Term rename(Map<Port, Port> links) {
 		List<Term> list = new ArrayList<Term>();
 		for (Term s : args)
 			list.add(s.rename(links));
-		return new Function(name, value, list);
+		return new Function(name, list, infix, tag);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Term Substitute(Term t, Variable x) {
-		List<Term> list = new ArrayList<Term>();
-		if(args!=null){
-			for (Term s : args)
-				list.add(s.Substitute(t, x));
-		}
-		return new Function(name, value, list);
+	public Term substitute(Term t, Variable x) {
+		if (!vars.contains(x))
+			return this;
+		List<Term> _args = new ArrayList<>();
+		for (Term u : args)
+			_args.add(u.substitute(t, x));
+		return new Function(name, _args, infix, tag);
 	}
 
-	public Term evaluate(Scope s, Monitor m){
-		String valueEval = "";
-		if(value instanceof String && s.get(new Identifier((String)value))!=null){
-			valueEval = s.get(new Identifier((String)value)).toString();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Term evaluate(Scope s, Monitor m) {
+
+
+		// Evaluate the symbol
+		String _name = name;
+		Value v = s.get(new Identifier(name));
+		if (v != null)
+			_name = v.toString();
+
+		// Evaluate the arguments
+		List<Term> _args = new ArrayList<>();
+		for (Term t : args) {
+			Term u = t.evaluate(s, m);
+			if (u == null)
+				return null;
+			_args.add(u);
 		}
-		else
-			m.add("Cannot evaluate this function");
-		
-		if(valueEval.substring(0, 1).equals("\""))
-			valueEval = valueEval.substring(1, valueEval.length());
-		if(valueEval.substring(valueEval.length()-1,valueEval.length()).equals("\""))
-			valueEval = valueEval.substring(0, valueEval.length()-1);
-		
-		return new Function(name,valueEval, args);
+
+		return new Function(_name, _args, infix, tag);
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<Variable> getFreeVariables() {
-		Set<Variable> vars = new HashSet<Variable>();
-		if(args!=null){
-			for (Term t : args) 
-				if(t != null)
-					vars.addAll(t.getFreeVariables());
-		}
 		return vars;
 	}
 
@@ -115,8 +176,23 @@ public class Function implements Term {
 	 */
 	@Override
 	public TypeTag getTypeTag() {
-		// TODO infer type tags of functions.
-		return null;
+		return tag;
+	}
+	
+	public Function setTag(TypeTag t) {
+		return new Function(getName(), getArgs(), getInfix(), t);
+	}
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		ST st = new ST(
+				"<if(s.infix)>(<s.args; separator=s.name>)<else><s.name><if(s.args)>(<s.args; separator=\", \">)<endif><endif>");
+		st.add("s", this);
+		return st.render();
 	}
 
 	/**
@@ -131,8 +207,7 @@ public class Function implements Term {
 		if (!(other instanceof Function))
 			return false;
 		Function func = (Function) other;
-		return (Objects.equals(this.name, func.name)&&Objects.equals(this.value, func.value))&&
-				Objects.equals(this.args, func.args);
+		return Objects.equals(name, func.name) && Objects.equals(args, func.args);
 	}
 
 	/**
@@ -140,8 +215,25 @@ public class Function implements Term {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.name,this.value,this.args);
+		return Objects.hash(name, this.args);
 	}
-	
-	
+
+	@Override
+	public Term setTypeTag(TypeTag t) {
+		if(getTypeTag()!=null && getTypeTag()!=TypeTags.Object){
+			if(getTypeTag()!=t){
+				try {
+					throw new Exception("type mismatch");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			return this;
+		}
+		else
+			return setTag(getTypeTag());
+	}
+
 }
+

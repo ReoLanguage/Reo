@@ -1,5 +1,0 @@
-import fifofull;
-
-fifofullTest(a,b){
-	fifofull<"0">(a,b)
-}

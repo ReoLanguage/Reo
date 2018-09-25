@@ -1,7 +1,8 @@
 section reo;
 
-filter<k:string>(a?, b!) {
+filter<P:string>(a?, b!) {
 	#RBA
-	{a,b} k(b)=a
+	{a,b} P(a), a=b
+	{a,~b} !P(a)
 }
 

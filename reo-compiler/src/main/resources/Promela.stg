@@ -1,0 +1,55 @@
+main(S) ::= <<
+
+/* Generated from <S.file> by Reo 1.0.*/
+
+#include "runtime.pml"
+
+<S.components:component(); separator="\n\n">
+
+init {
+	<S.components:ports();separator="">
+	atomic{
+	<S.components:init(); separator="">
+	}
+}
+>>
+
+component(c) ::= <<
+<if(c.protocol)>
+<c:protocol()>
+<endif>
+>>
+
+protocol(c) ::= <<
+
+proctype <c.name>(<c.ports:{ p | port <p.name>}; separator ="; ">){
+	<c.initial.keys:{ m | chan <m.name> = [1] of {<if(m.typeTag)><m.typeTag><else>int<endif>\};  }; separator ="\n">
+	<c.initial.keys:{ m | <if(c.initial.(m))><m.name>!<c.initial.(m)>;<endif>  }; separator ="">
+	<c.initial.keys:{ m | <if(m.typeTag)><m.typeTag><else>int<endif> _<m.name>;  }; separator ="\n">
+	<c.ports:{ p | <if(p.typeTag)><p.typeTag><else>int<endif> _<p.name> ;}; separator ="\n">
+	do
+		<c.transitions:transitions(); separator ="\n">
+	od
+
+}
+>>
+ports(c) ::= <<
+	<if(c.protocol)>
+		<c.ports:{ p | port <p.name>}; separator =";\n">
+	<endif>
+>>
+
+init(c) ::= <<
+	<if(c.protocol)>
+		run <c.name>(<c.ports:{ p | <p.name>}; separator =",">)
+	<endif>
+	<if(c.atomic)>
+		run <c.atomicName>(<c.renamedPorts:{p | <p.name>}; separator=",">);<!
+	!><endif>
+	
+>>
+
+
+transitions(t) ::= <<
+	:: <t.transitionString>
+>>

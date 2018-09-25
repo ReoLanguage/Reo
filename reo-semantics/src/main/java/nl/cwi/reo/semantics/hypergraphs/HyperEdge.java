@@ -3,6 +3,7 @@ package nl.cwi.reo.semantics.hypergraphs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -13,176 +14,252 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
-import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Disjunction;
-import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.Node;
-import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Formulas;
+import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 
+// TODO: Auto-generated Javadoc
+/**
+ * A hyperedge in a constraint hypergraph that connects a single port node with
+ * a set of rule nodes.
+ */
 public class HyperEdge {
-	
-	static int incId = 0;
-	private PortNode root;
-	private Set<RuleNode> leaves;
+
+	/**
+	 * Current total number of hyperedges. Used to provide each hyperedge with a
+	 * unique identifier that avoids repeated computation of the hash value.
+	 */
+	static int N = 0;
+
+	/**
+	 * Unique identifier of this rule.
+	 */
 	private int id;
-	
-	public HyperEdge(PortNode root, Set<RuleNode> leaves){
-		this.root=root;
-		this.leaves = new HashSet<RuleNode>();
-		for(RuleNode r : leaves)
-			r.addToHyperedge(this);
-		incId++;
-		id=incId;
-	}
-	
-	public PortNode getRoot(){
-		return root;
-	}
-	
-	public Set<RuleNode> getLeaves(){
-		return leaves;
+
+	/**
+	 * The source node of this hyperedge.
+	 */
+	private Port port;
+
+	/**
+	 * The set of rules in the target of this hyperedge.
+	 */
+	private Set<RuleNode> rules;
+
+	/**
+	 * Constructs a new hyperedge from a given port and a set of rules.
+	 * 
+	 * @param root
+	 *            port
+	 * @param leaves
+	 *            set of rules
+	 */
+	public HyperEdge(Port root, Set<RuleNode> leaves) {
+		this.port = root;
+		this.rules = new HashSet<>();
+		id = ++N;
+		for (RuleNode r : leaves)
+			r.addToHyperedge(this); // TODO this object is not initialized and
+									// cannot be used here
 	}
 
-	public Rule getRule(){
+	/**
+	 * Gets the source port of this hyperedge.
+	 * 
+	 * @return source port of this hyperedge.
+	 */
+	public Port getSource() {
+		return port;
+	}
+	
+	/**
+	 * Gets the set of rules in the target of this hyperedge.
+	 * 
+	 * @return set of rules in the target of this hyperedge.
+	 */
+	public Set<RuleNode> getTarget() {
+		return rules;
+	}
+
+	/**
+	 * Gets the disjunction over all rules in the target of this hyperedge.
+	 * 
+	 * @return disjunction over all rules in the target of this hyperedge.
+	 */
+	public Rule getRule() {
 		List<Formula> list = new ArrayList<Formula>();
-		Map<Port,Boolean> map = new HashMap<>();
-		for(RuleNode r : leaves){
+		for (RuleNode r : rules) {
 			list.add(r.getRule().getFormula());
-			map.putAll(r.getRule().getSync());
 		}
-		return new Rule(map,new Disjunction(list));
+		return new Rule(new Disjunction(list));
 	}
-	
-	public HyperEdge addLeave(RuleNode r){
-		leaves=new HashSet<>(leaves);
-		leaves.add(r);
-		return this;
+
+	/**
+	 * Adds a rule to the target of this hyperedge.
+	 * 
+	 * @param r
+	 *            rule
+	 * @return reference to this hyperedge.
+	 */
+	public void addLeave(RuleNode r) {
+		rules.add(r);
 	}
-	
-	public HyperEdge addLeaves(List<RuleNode> r){
-		leaves=new HashSet<>(leaves);
-		leaves.addAll(r);
-		return this;
+
+	/**
+	 * Adds as a list of rules to the target of this hyperedge.
+	 * 
+	 * @param r
+	 *            list of rules
+	 * @return reference to this hyperedge.
+	 */
+	public void addLeaves(List<RuleNode> r) {
+		rules.addAll(r);
 	}
-	
-	public HyperEdge rmLeaves(Set<RuleNode> r){
-		for(RuleNode rule : r)
+
+	/**
+	 * Removes a set of rules from this hyperedge.
+	 * 
+	 * @param r
+	 *            set of rules
+	 * @return reference to this hyperedge.
+	 */
+	public void rmLeaves(Set<RuleNode> r) {
+		for (RuleNode rule : r)
 			rule.rmFromHyperedge(this);
-		return this;
-	}
-	
-	public HyperEdge rmLeave(RuleNode r){
-		leaves=new HashSet<>(leaves);
-		leaves.remove(r);
-		return this;
-	}
-	
-	public HyperEdge compose(Formula f){
-		leaves=new HashSet<>(leaves);
-		for(RuleNode r : leaves){
-			r.compose(f);
-		}
-		return this;
-	}
-	
-	public HyperEdge duplicate(){
-		return new HyperEdge(this.root,this.leaves);
 	}
 
-	public HyperEdge compose(HyperEdge h){ 
-		if(!root.getPort().equals(h.getRoot().getPort())){
-			new Exception("Those two hyperedges cannot compose because of two different roots");
-		}
-		
-		if(h.getLeaves().size()==1){
-			//Single rule to compose
-			RuleNode h_ruleNode = h.getLeaves().iterator().next();
+	/**
+	 * Removes a rule from the target of this hyperedge.
+	 * 
+	 * @param r
+	 *            rule
+	 */
+	public void rmLeave(RuleNode r) {
+		rules.remove(r);
+	}
+
+	/**
+	 * Construct a new instance of a hyperedge with the same ports and rules as
+	 * this hyperedge.
+	 * 
+	 * @return new hyperedge with the same ports and rules as this hyperedge.
+	 */
+	public HyperEdge duplicate() {
+		return new HyperEdge(this.port, this.rules);
+	}
+
+	/**
+	 * Composes this hyperedge with another hyperedge with the same source port
+	 * by distributing their rules.
+	 * 
+	 * @param h
+	 *            hyperedge
+	 * @return reference to this hyperedge.
+	 * @throws IllegalArgumentException
+	 *             if the hyperedges have different source ports.
+	 */
+	public void compose(HyperEdge h) {
+		if (!port.equals(h.getSource()))
+			new IllegalArgumentException("Hyperedges must have the same source.");
+
+		/*
+		 * Check if the hyperedge has a single leaf or several leaves
+		 */
+		if (h.getTarget().size() == 1) {
+
+			/*
+			 * Remove the leaf from the hypergraph, and store it in h_ruleNode.
+			 */
+			RuleNode h_ruleNode = h.getTarget().iterator().next();
 			h_ruleNode.rmFromHyperedge(h);
-			//Compose single rule
-			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(leaves);
 
-			while(!rulesToCompose.isEmpty()){
+			/*
+			 * Get all rules of this.hyperedge, and compose all of them with the previous rule stored in h_ruleNode.
+			 */
+			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(rules);
+			Boolean equal =false;
+			while (!rulesToCompose.isEmpty()) {
+				/*
+				 * take the next rule to compose
+				 */
 				RuleNode r = rulesToCompose.poll();
-				RuleNode rule = r.compose(h_ruleNode);
-				if(rule!=null)
-					r.erase();
+//				if(!r.equals(h_ruleNode)){
+					RuleNode rule = r.composeF(h_ruleNode); 
+					if (rule!=null){
+						if(!rule.equals(r))
+							r.erase();
+						else
+							equal=true;
+					}
+					if(rule==null)
+						r.erase();
+//				}
 			}
-			h_ruleNode.erase();
-			
-		}
-		
-		else{
-			Set<RuleNode> list = new HashSet<RuleNode>(leaves);
+			if(!equal)
+				h_ruleNode.erase();
 
-			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(h.getLeaves());
+		} else {
+
+			Set<RuleNode> list = new HashSet<RuleNode>(rules);
+
+			Queue<RuleNode> rulesToCompose = new LinkedList<RuleNode>(h.getTarget());
 			Set<RuleNode> areEqual = new HashSet<>();
 
-			while(!rulesToCompose.isEmpty()){
+			// Compose This hyperedge with rulesToCompose (where size must be greater than 1).
+			while (!rulesToCompose.isEmpty()) {
+				/*
+				 * Take out r1 from the hypergraph
+				 */
 				RuleNode r1 = rulesToCompose.poll();
-				r1.rmFromHyperedge(h);
+				r1.rmFromHyperedge(h); // TODO r1 may be null
 				Boolean equal = false;
-				for(RuleNode r2 : list){
-					RuleNode r = r1.compose(r2);
-					if(r!=null && r.equals(r2)){
+				/*
+				 * Compose r1 with all the rules of This rules (stored in list).
+				 */
+				for (RuleNode r2 : list) {
+					/*
+					 * compose both rules, and eventually add the new rule to the hypergraph
+					 */
+					RuleNode r = r1.composeF(r2);
+					if (r != null && r.equals(r2)) {
 						areEqual.add(r2);
-						equal=true;
+						equal = true;
 					}
 				}
-				if(!equal)
+				/*
+				 * remove old rules from the hypergraph.
+				 */
+				if (!equal)
 					r1.erase();
 				else
 					r1.rmFromHyperedge(h);
 			}
-//			list = new HashSet<>(leaves);
 
-			for(RuleNode r:list)
-				if(!areEqual.contains(r))
+			/*
+			 * remove duplicates
+			 */
+			for (RuleNode r : list)
+				if (!areEqual.contains(r))
 					r.erase();
 		}
-		
-
-		return this;
 	}
-	
-	public HyperEdge hide(PortNode p){
-		for(RuleNode r:leaves){
+
+	/**
+	 * Hides a given port node from each rule in the target of this
+	 * hyperedge.
+	 * 
+	 * @param p
+	 *            port node
+	 * @return reference to this hyperedge.
+	 */
+	public void hide(Port p) {
+		for (RuleNode r : rules)
 			r.hide(p);
-		}
-		return this;
+		// TODO shouldn't we also hide the source of the transition, if it
+		// equals p?
 	}
-	
-	public Formula getAssignement(){
-		List<Formula> f = new ArrayList<Formula>();
-		
-		for(RuleNode r : leaves){
-			Formula formula = r.getRule().getFormula();
-			List<Formula> literals = new ArrayList<>();
-			if(formula instanceof Conjunction)
-				literals = ((Conjunction) formula).getClauses();
-			if(formula instanceof Equality)
-				literals.add(formula);
-			for(Formula l : literals){
-				if (l instanceof Equality) {
-					Equality equality = (Equality) l;
-					Term t1 = equality.getLHS();
-					Term t2 = equality.getRHS();
-		
-					if (t1 instanceof Node && !((Node) t1).getPort().isInput() && ((Node) t1).getPort().equals(root.getPort())){
-						f.add(l);
-					} 
-					else if (t2 instanceof Node && !((Node) t2).getPort().isInput() && ((Node) t2).getPort().equals(root.getPort())){
-						f.add(l);
-					}
-		
-				}
-			}
-			
-		}
 
-		return new Disjunction(f);
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -194,30 +271,38 @@ public class HyperEdge {
 			return true;
 		if (!(other instanceof HyperEdge))
 			return false;
-		
 		HyperEdge p = (HyperEdge) other;
-		
-		return Objects.equals(root.getPort(),p.getRoot().getPort()) && Objects.equals(leaves,p.getLeaves());
+		return Objects.equals(this.id, p.id);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public int hashCode() {
 		return id;
-//		return Objects.hash(this.root.getPort(),leaves);
 	}
-	
-	public String toString(){
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
 		String s = "";
-		int i = leaves.size();
-		for(RuleNode r : leaves){
+		int i = rules.size();
+		for(RuleNode r : rules){
 			s=s+r.toString() + (i>1?" || \n ":"");
 			i--;
 		}
 		return s;
-		
+//
+//		String s = "";
+//		s += port.getPort().getName() + " -> { ";
+//		Iterator<RuleNode> iter = rules.iterator();
+//		while (iter.hasNext())
+//			s += iter.next() + (iter.hasNext() ? ", " : "");
+//		s += " }";
+//		return s;
 	}
-	
+
 }
