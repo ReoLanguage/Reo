@@ -36,9 +36,7 @@ The contents of the documentation is as follows:
 	installation
 	introduction
 	tutorial
-        library
 	contribute
-
 
 Indices and tables
 ==================
