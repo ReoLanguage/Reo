@@ -1568,22 +1568,35 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
 
   document.addEventListener("keydown", function(e) {
     var p = canvas.getActiveObject();
-    if (e.code === "Delete" && p)
-      switch (p.class) {
-        case 'node':
-          deleteNode(p);
-          break;
-        case 'component':
-          deleteComponent(p);
-          break;
-        default:
-          if (p.parent && p.parent.class && p.parent.class === 'channel')
-            deleteChannel(p.parent);
-      }
-    if (e.code === "Escape" && mode !== 'select') {
-      if (isDown)
-        onMouseUp()
-      buttonClick(document.getElementById("select"))
+    switch (e.code) {
+      case "Delete":
+        if (p)
+          switch (p.class) {
+            case 'node':
+              deleteNode(p);
+              break;
+            case 'component':
+              deleteComponent(p);
+              break;
+            default:
+              if (p.parent && p.parent.class && p.parent.class === 'channel')
+                deleteChannel(p.parent);
+          }
+        break;
+      case "Escape":
+        if (mode !== 'select') {
+          if (isDown)
+            onMouseUp();
+          buttonClick(document.getElementById("select"))
+        }
+        break;
+      case "KeyZ":
+        if (e.ctrlKey) {
+          if (e.shiftKey)
+            console.log("Ctrl + Shift + Z"); // redo
+          else
+            console.log("Ctrl + Z"); // undo
+        }
     }
   });
 
