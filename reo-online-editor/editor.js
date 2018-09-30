@@ -14,7 +14,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
       client.overrideMimeType("text/plain");
       client.open('GET', fname);
       client.onreadystatechange = function () {
-        console.log(this);
+        //console.log(this);
         if (this.readyState === 4)
           return this.status === 200 ? resolve(this.responseText) : reject(`Error returned with status ${this.status}: ${this.statusText}`)
       };
@@ -1267,6 +1267,7 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
           left: line.x1,
           top: line.y1 - loopRadius,
           angle: 0,
+          parent: channel,
           strokeWidth: lineStrokeWidth,
           strokeDashArray: line.strokeDashArray,
           fill: 'transparent',
@@ -1572,11 +1573,12 @@ require(['vs/editor/editor.main', "vs/language/reo/reo"], function(mainModule, r
         case 'node':
           deleteNode(p);
           break;
-        case 'channel':
-          deleteChannel(p);
-          break;
         case 'component':
-          deleteComponent(p)
+          deleteComponent(p);
+          break;
+        default:
+          if (p.parent && p.parent.class && p.parent.class === 'channel')
+            deleteChannel(p.parent);
       }
     if (e.code === "Escape" && mode !== 'select') {
       if (isDown)
