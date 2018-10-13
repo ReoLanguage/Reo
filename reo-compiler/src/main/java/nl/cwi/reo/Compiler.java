@@ -148,6 +148,7 @@ public class Compiler {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(new Message(MessageType.ERROR, e.toString()));
+			compiler.monitor.print();
 		}
 	}
 

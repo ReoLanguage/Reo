@@ -146,7 +146,9 @@ public class Commands {
 				others.add(f);
 				return;
 			}
-			if(e.getRHS() instanceof PortVariable && !(e.getLHS() instanceof PortVariable)){
+			if((e.getRHS() instanceof PortVariable 
+					|| e.getRHS() instanceof MemoryVariable) 
+					&& !(e.getLHS() instanceof MemoryVariable || e.getLHS() instanceof PortVariable)){
 				recurseCommandify(new Equality(e.getRHS(),e.getLHS()));
 				return;
 			}			

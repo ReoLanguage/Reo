@@ -23,6 +23,21 @@ component(c) ::= <<
 protocol(c) ::= <<
 
 proctype <c.name>(<c.ports:{ p | port <p.name>}; separator ="; ">){
+	<c.initial.keys:{ m | chan <m.name> = [1] of {int\}}; separator ="\n">
+	<c.initial.keys:{ m | <if(c.initial.(m))><m.name>!<c.initial.(m)>;<endif>  }; separator ="">
+	<c.initial.keys:{ m | int _<m.name>;  }; separator ="\n">
+	<c.ports:{ p | int _<p.name> ;}; separator ="\n">
+	do
+		<c.transitions:transitions(); separator ="\n">
+	od
+
+}
+>>
+
+
+_protocol(c) ::= <<
+
+proctype <c.name>(<c.ports:{ p | port <p.name>}; separator ="; ">){
 	<c.initial.keys:{ m | chan <m.name> = [1] of {<if(m.typeTag)><m.typeTag><else>int<endif>\};  }; separator ="\n">
 	<c.initial.keys:{ m | <if(c.initial.(m))><m.name>!<c.initial.(m)>;<endif>  }; separator ="">
 	<c.initial.keys:{ m | <if(m.typeTag)><m.typeTag><else>int<endif> _<m.name>;  }; separator ="\n">

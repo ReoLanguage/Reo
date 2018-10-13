@@ -143,7 +143,8 @@ public final class PromelaTransition extends Transition{
 					LHS = LHS + "sync) ";		
 				}
 				else if(lstate.get(v) instanceof NonNullValue){
-					LHS = LHS + "data)";					
+					LHS = LHS + "data)";	
+					RHS = RHS + "take("+ v.getName() + ",_" + v.getName()+");";
 				}
 			}
 			if(v instanceof MemoryVariable){
@@ -152,6 +153,9 @@ public final class PromelaTransition extends Transition{
 				}
 				else if(lstate.get(v) instanceof NonNullValue){
 					LHS = LHS + "full("+v.getName()+ ")";
+					RHS = RHS + 
+//					v.getName() + "!_" + v.getName();
+					v.getName() + "?_" + v.getName()+";";
 				}
 			}
 			if(o!=lstate.size()-1)
@@ -171,16 +175,20 @@ public final class PromelaTransition extends Transition{
 				}
 				if(rstate.get(key) instanceof PortVariable){
 					PortVariable value = (PortVariable)rstate.get(key);
-					update = update + "take("+value.getName() + "," + value.getName()+"); put("+ key.getName()+",_" +value.getName()+");";
+					update = update 
+							//+ "take("+value.getName() + "," + value.getName()+"); "
+							+ "put("+ key.getName()+",_" +value.getName()+");";
 				}
 				if(rstate.get(key) instanceof MemoryVariable){
 					MemoryVariable value = (MemoryVariable)rstate.get(key);
-					update = update + value.getName() + "?_" + value.getName()+"; put("+ key.getName()+",_" +value.getName()+");";
+					update = update + 
+							" put("+ key.getName()+",_" +value.getName()+");";
 				}
 				if(rstate.get(key) instanceof Function){
 					Function value = (Function)rstate.get(key);
 					value.toString();
-					update = update + getFunctionString(value) + key.getName() + ");";
+					update = update + getFunctionString(value) + "_"+ key.getName() + ");"
+									+ "put("+ key.getName() + ",_" + key.getName()+");" ;
 				}
 			}
 			if(key instanceof MemoryVariable){			
@@ -190,15 +198,21 @@ public final class PromelaTransition extends Transition{
 				}
 				if(rstate.get(key) instanceof PortVariable){
 					PortVariable value = (PortVariable)rstate.get(key);
-					update = update + "take("+ value.getName() + ",_" + value.getName()+");"+ key.getName()+"!_" +value.getName()+";";
+					update = update + 
+//							"take("+ value.getName() + ",_" + value.getName()+");"+ 
+							key.getName()+"!_" +value.getName()+";";
 				}
 				if(rstate.get(key) instanceof MemoryVariable){
 					MemoryVariable value = (MemoryVariable)rstate.get(key);
-					update = update + value.getName() + "?_" + value.getName()+";"+ key.getName()+"!_" +value.getName()+";";
+					update = update + 
+//							value.getName() + "?_" + value.getName()+";"+ 
+							key.getName()+"!_" +value.getName()+";";
 				}
 				if(rstate.get(key) instanceof Function){
 					Function value = (Function)rstate.get(key);
-					update = update +  getFunctionString(value) + key.getName() + ");";
+					update = update + getFunctionString(value) + "_"+key.getName() + ");" 
+									+ key.getName() + "!_" + key.getName()+";" 
+									;
 				}
 			}
 		}
@@ -221,12 +235,12 @@ public final class PromelaTransition extends Transition{
 	}
 
 	public String getFunctionString(Function value){
-		String f = value.getName()+"(";
+		String f = value.getSTGName()+"(";
 		for(Term t : value.getArgs()){
 			if(t instanceof MemoryVariable)
-				f = f + ((MemoryVariable)t).getName()+",";
+				f = f + "_"+((MemoryVariable)t).getName()+",";
 			if(t instanceof PortVariable)
-				f = f + ((PortVariable)t).getName()+",";
+				f = f + "_"+((PortVariable)t).getName()+",";
 			if(t instanceof Function)
 				f = f + getFunctionString((Function)t)+","; 
 		}
