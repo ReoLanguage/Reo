@@ -4,24 +4,22 @@ if (typeof module !== 'undefined') {
 }
 
 function ReoNetwork(sourceLoader) {
-  this.componentTemplates = {};
   this.sourceLoader = sourceLoader;
+  this.componentTemplates = {};
   this.componentDefinitions = [];
-
   this.cfgBoundInferPush = 0.25;
 }
 
 ReoNetwork.prototype.includeSource = async function (inclIdent) {
-  this.sourceLoader(inclIdent).then(source => this.processSource(source)).catch(error => alert(error));
+  await this.processSource(await this.sourceLoader(inclIdent))
 };
 
 ReoNetwork.prototype.processSource = async function (src) {
-  await this.parseComponent(src.replace(/[\n\r]/g, ''));
+  await this.parseComponent(src.replace(/[\n\r]/g, ''))
 };
 
 function genShapeDef(cname, args, shapedef) {
   function ReoComponentTikz() {}
-
   ReoComponentTikz.prototype = Object.create(ReoComponent.prototype);
   ReoComponentTikz.prototype.typeName = cname;
   ReoComponentTikz.prototype.define = function (definestate) {
@@ -146,9 +144,7 @@ ReoNetwork.prototype.parseComponent = async function (str) {
   // first try to get some meta...
   let metaRes = this.parseMeta(str);
   str = metaRes[0];
-  for (let s of metaRes[1]) {
-    await this.processMeta(s, {});
-  }
+  for (let s of metaRes[1]) await this.processMeta(s, {});
 
   // scope matching: {(({(({(({.*?}|.)*?)}|.)*?)}|.)*?)} < up to 3 nested
   // cname<templargs>(inargs, ; outargs, ) { innerscope }
