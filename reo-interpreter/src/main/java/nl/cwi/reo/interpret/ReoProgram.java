@@ -1,5 +1,7 @@
 package nl.cwi.reo.interpret;
 
+import java.io.Serializable;
+
 import nl.cwi.reo.interpret.connectors.ReoConnector;
 
 // TODO: Auto-generated Javadoc
@@ -10,6 +12,7 @@ import nl.cwi.reo.interpret.connectors.ReoConnector;
  *            the generic type
  */
 public final class ReoProgram {
+
 
 	/** The name. */
 	private final String name;

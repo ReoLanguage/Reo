@@ -383,7 +383,7 @@ public final class ReoConnectorComposite implements ReoConnector {
 
 		return new ReoConnectorComposite(name, operator, components, Links.rename(links, r));
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

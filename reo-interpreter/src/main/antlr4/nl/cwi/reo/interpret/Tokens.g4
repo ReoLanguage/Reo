@@ -30,4 +30,3 @@ ID      : [a-zA-Z][a-zA-Z0-9_]*;
 STRING  : '\"' .*? '\"' ;
 SPACES  : [ \t\r\n]+ -> skip ;
 SL_COMM : '//' .*? ('\n'|EOF) -> skip ;
-ML_COMM : '/*' .*? '*/' -> skip ;

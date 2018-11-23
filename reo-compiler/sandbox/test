@@ -1,0 +1,28 @@
+proctype alternator(port p1; port p2; port c){
+	chan X = [1] of {int};
+	int a;
+	int b;
+	do
+		:: (empty(X) && full(p1.hasIn) && full(p2.hasIn) && full(c.hasOut))-> atomic{p1.p?a;p2.p?b;c.p!a;X!b}
+		:: (full(X) && full(c.hasOut))-> atomic{X?a;c.p!a}	
+	od
+}
+
+init {
+	port p1;
+	port p2;
+	port p3;
+	chan c1 = [0] of {int};
+	chan c2 = [0] of {int};
+	chan c3 = [0] of {int};
+	p1.p = c1;
+	p2.p = c2;
+	p3.p = c3;
+	
+	atomic{
+		run prod(p1,0);
+		run prod(p2,1);
+		run cons(p3);
+		run alternator(p1,p2,p3)
+	}
+}

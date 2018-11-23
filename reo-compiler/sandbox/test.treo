@@ -1,0 +1,31 @@
+import reo.fifo1;
+import reo.sync;
+
+test(b){
+
+	sync(a,b)
+	sync(b,c)
+	
+	producer(b)
+	
+/*	sync(c,a)
+	fifo1(a,b)
+	
+	producer(c)
+	consumer(b)
+	consumer(a)*/
+}
+
+producer(a!String) {
+	#JAVA "nl.cwi.reo.components.Workers2.producer"
+
+}
+
+consumer(a?String) {
+	#JAVA "nl.cwi.reo.components.Workers2.consumer"
+}
+
+Engine=(a?String,b!String){
+	#JAVA
+	"Workers.Engine"
+}

@@ -1,0 +1,11 @@
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+alternator(a[1..3],b[1]) {
+	{ syncdrain(a[i], a[i+1]) | i : <1..N> }
+	{ fifo1(b[i+1], b[i]) | i : <1..N> }
+	{ sync(a[i], b[i]) | i : <1..(N+1)> }
+  |
+	N=3
+}

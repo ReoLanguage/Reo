@@ -146,10 +146,15 @@ public class Commands {
 				others.add(f);
 				return;
 			}
+			//** "Normalization" of the formula
+			if(e.getRHS() instanceof Variable && !(e.getLHS() instanceof Variable)){
+				recurseCommandify(new Equality(e.getRHS(),e.getLHS()));
+				return;
+			}	
 			if(e.getRHS() instanceof PortVariable && !(e.getLHS() instanceof PortVariable)){
 				recurseCommandify(new Equality(e.getRHS(),e.getLHS()));
 				return;
-			}			
+			}		
 			if(e.getLHS() instanceof PortVariable) {
 				PortVariable p = (PortVariable) e.getLHS();
 				if(e.getRHS() instanceof NullValue)

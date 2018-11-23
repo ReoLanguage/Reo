@@ -61,11 +61,11 @@ private static class <c.name> implements Component {
 >>
 
 port(p) ::= <<
-public volatile Port\<<p.typeTag>\> <p.name>;
+public volatile Port\<<p:typetag()>\> <p.name>;
 >>
 
 typetag(p) ::= <<
-<if(p.typeTag)><p.typeTag><else>Object<endif>
+<if(p.typeTag)><p.typeTag><else>String<endif>
 >>
 
 atomic(c) ::= <<

@@ -53,7 +53,12 @@ public enum SemanticsType {
 	/**
 	 * Work automata.
 	 */
-	WA;
+	WA,
+	
+	/**
+	 * Reference to component defined in the target language.
+	 */
+	TXT;
 
 	/**
 	 * {@inheritDoc}
@@ -64,7 +69,7 @@ public enum SemanticsType {
 		case CAM:
 			return "cam";
 		case CH:
-			return "rba"; // TODO fix this
+			return "ch"; 
 		case P:
 			return "p";
 		case PA:
@@ -79,6 +84,10 @@ public enum SemanticsType {
 			return "sa";
 		case WA:
 			return "wa";
+		case REF:
+			return "ref";
+		case TXT:
+			return "txt";
 		default:
 			throw new IllegalArgumentException();
 		}

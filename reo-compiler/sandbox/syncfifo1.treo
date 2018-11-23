@@ -1,0 +1,8 @@
+
+syncfifo1(a?String,b!String) {
+	#RBA
+	{a, ~b} $m = null, $m' = a
+	{a, b} $m != null, b=$m, $m' = a
+	{~a, b} $m != null, b = $m, $m' = null
+}
+

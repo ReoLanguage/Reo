@@ -29,7 +29,6 @@ import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * Constraint hypergraph semantics of Reo connectors.
  */

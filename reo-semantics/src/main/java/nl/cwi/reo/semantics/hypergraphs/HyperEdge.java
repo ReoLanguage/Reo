@@ -1,12 +1,9 @@
 package nl.cwi.reo.semantics.hypergraphs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
@@ -16,7 +13,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.Disjunction;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 
 // TODO: Auto-generated Javadoc
@@ -295,14 +291,6 @@ public class HyperEdge {
 			i--;
 		}
 		return s;
-//
-//		String s = "";
-//		s += port.getPort().getName() + " -> { ";
-//		Iterator<RuleNode> iter = rules.iterator();
-//		while (iter.hasNext())
-//			s += iter.next() + (iter.hasNext() ? ", " : "");
-//		s += " }";
-//		return s;
 	}
 
 }

@@ -1,6 +1,6 @@
 grammar Reo;
 
-import Tokens, WA, CAM, SA, P, PR, RBA;
+import Tokens, WA, CAM, SA, P, PR, RBA, Comments;
 
 // Reo File
 file      : secn? imps* defn* EOF;
@@ -20,13 +20,14 @@ ref       : '#JAVA' STRING                                        # ref_java
 
 // Multisets
 multiset  : instance                                              # multiset_constraint
-          | ('|' term)? '{' multiset* ('|' formula)? '}'                # multiset_setbuilder
+          | ('|' term)? '{' multiset* ('|' formula)? '}'          # multiset_setbuilder
           | 'for' ID '=' term '..' term multiset                  # multiset_iteration
           | 'if' formula multiset ('else' formula multiset)* 
           ('else' multiset)?                                      # multiset_condition ;
 
 // Instances
 instance  : component list? ports                                 # instance_atomic
+		  | comment												  # instance_comment
           | instance '*' instance                                 # instance_product
           | instance '+' instance                                 # instance_sum	
           | instance ';' instance                                 # instance_semicolon;
@@ -95,4 +96,6 @@ port      : prio=(ADD | AMP)? var ;
 // Variables
 var       : name ('[' term ']')* ;
 name      : (ID '.')* ID ;
+
+
 
