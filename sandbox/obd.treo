@@ -14,7 +14,7 @@ ctlVelocity(a?){
 	#RBA {a} true
 }
 
-prodVmaz(a?int,b!int){
+prodVmaz(a?,b!){
 	#PROMELA "prodVmaz"
 	#RBA {a,b} true
 }
@@ -29,9 +29,11 @@ obd(){
 
 	prodVmaz(vmazReq,vmaz)
 	transformer<"computeVLMA">(vmaz,a1)
-	xrouter(a1,emgB,ctlV) emergencyBrake(emgB) ctlVelocity(ctlV)
+	xrouter(a1,emgB,ctlV) 
+	emergencyBrake(emgB) 
+	ctlVelocity(ctlV)
 	sync(a1,a)
-	fifofull<"0">(a,covReq)
+	fifofull<0>(a,covReq)
 	
 	coverture(covReq,uncovered,covered)
 	transformer<"update">(uncovered,a2)
