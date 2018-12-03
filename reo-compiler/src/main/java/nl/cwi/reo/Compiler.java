@@ -230,7 +230,7 @@ public class Compiler {
 		if ((program = interpreter.interpret(files.get(0))) == null)
 			return;
 
-//		serializeXML(program);
+		serializeXML(program);
 		
 		ReoConnector connector = program.getConnector();
 		connector = connector.propagate(monitor);
