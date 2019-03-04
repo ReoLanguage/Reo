@@ -91,7 +91,9 @@ public final class Function implements Term {
 	 * @return
 	 */
 	public String getSTGName() {
-		return name.substring(1,name.length()-1);
+		if(name.substring(0,1).contentEquals("\""))
+			return name.substring(1,name.length()-1);			
+		return name;
 	}
 	
 	/**

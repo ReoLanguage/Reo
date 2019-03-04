@@ -21,6 +21,7 @@ import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Terms;
@@ -466,7 +467,10 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			Formula g = new Conjunction(list);
 			for (Port p : ruleNodes.getPorts()) {
 				if (!intface.contains(p)) {
-					g = Formulas.eliminate(((Conjunction) g).getClauses(), Arrays.asList(new PortVariable(p)));
+					if(g instanceof Conjunction)
+						g = Formulas.eliminate(((Conjunction) g).getClauses(), Arrays.asList(new PortVariable(p)));
+					else if(g instanceof Negation)
+						g = Formulas.eliminate(Arrays.asList(g), Arrays.asList(new PortVariable(p)));
 				}
 			}
 			setRules.add(new Rule(g));

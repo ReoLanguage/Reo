@@ -4,10 +4,10 @@ import reo.syncdrain;
 import reo.shiftlossyfifo1;
 import reo.xrouter;
 
-/*
-*	This example assumes that the csemiring is the weighted csemiring.
-*	The csemiring implements an interface containing \otimes and \oplus methods. 
-*/ 
+
+//	This example assumes that the csemiring is the weighted csemiring.
+//	The csemiring implements an interface containing \otimes and \oplus methods. 
+ 
 
 sca(charge,discharge1,discharge2,move,pass,snap){
 
@@ -66,7 +66,7 @@ sync(t5,q1)
 
 |
 	//Semiring linked at run-time
-	E = "WSemiring.lowerEqual"
+	E = "WSemiring"
 
 }
 
@@ -125,7 +125,7 @@ xrouter(b0,t11)
 sync(t11,q1)
 
 |
-	E = "WSemiring.lowerEqual"
+	E = "WSemiring"
 }
 
 asyncdrain(a?,b?){

@@ -95,7 +95,7 @@ public class Commands {
 		}
 		
 		Formula guard = new Conjunction(guards);
-//		guard = composeCsemirings(guard);
+		guard = composeCsemirings(guard);
 		if(constraints.isEmpty()&& guards.isEmpty() && update.isEmpty())
 			return null;
 		Formula constraint = new Conjunction(constraints);
@@ -308,13 +308,13 @@ public class Commands {
 	
 	public static Formula composeCsemirings(Formula f){
 		//TODO: the guard is assumed to be a conjunction, extend to any formula
-		//		the  
-		Queue<Relation> relations = new LinkedList<>() ;
+		
+		Queue<Relation> semiringRelations = new LinkedList<>() ;
 		List<Formula> newGuard = new ArrayList<>();
 		if(f instanceof Conjunction){
 			for(Formula l : ((Conjunction) f).getClauses()){
-				if(l instanceof Relation){
-					relations.add((Relation)l);
+				if(l instanceof Relation && ((Relation) l).getName().contains("Semiring")){
+					semiringRelations.add((Relation)l);
 				}
 				else
 					newGuard.add(l);
@@ -322,28 +322,35 @@ public class Commands {
 		}
 		else 
 			newGuard.add(f);
-		Relation r1 = relations.poll();
-		if(r1!=null){
+
+
+			
+/*		if(r1!=null){
 			while(r1.getName().split("\\.").length>=2 && !r1.getName().split("\\.")[2].contains("1")){
 				relations.add(r1);
 				r1=relations.poll();
 			}
 			String name= r1.getName().substring(1, r1.getName().length()-1);		
 			String n = name.split("\\.")[0];
-			
-			
-			while(!relations.isEmpty()){
-				Relation r2 = relations.poll();
-				String nameComposition = "";
-				if(r1.getName().split("\\.").length>=2)
-					nameComposition = "*"+n+".lex.composition*";
-				else
-					nameComposition = "*"+n+".composition*";
-				Function compositionValue = new Function(nameComposition,Arrays.asList(r1.getArgs().get(0),r2.getArgs().get(0)),false,r1.getArgs().get(0).getTypeTag());
-				Function compositionThreshold = new Function(nameComposition,Arrays.asList(r1.getArgs().get(1),r2.getArgs().get(1)),false,r1.getArgs().get(1).getTypeTag());
-				r1 = new Relation(r1.getName(),Arrays.asList(compositionValue,compositionThreshold),false);
-			}
-			newGuard.add(r1);
+*/		
+		Relation composite = null;
+		if(!semiringRelations.isEmpty())
+			 composite = semiringRelations.poll();
+				
+		while(!semiringRelations.isEmpty()){
+			Relation r2 = semiringRelations.poll();
+			String nameComposition = composite.getName().concat(".join");
+//			if(r1.getName().split("\\.").length>=2)
+//				nameComposition = "*"+n+".lex.composition*";
+//			else
+//				nameComposition = "*"+n+".composition*";
+			Function compositionValue = new Function(nameComposition,Arrays.asList(composite.getArgs().get(0),r2.getArgs().get(0)),false,composite.getArgs().get(0).getTypeTag());
+			Function compositionThreshold = new Function(nameComposition,Arrays.asList(composite.getArgs().get(1),r2.getArgs().get(1)),false,composite.getArgs().get(1).getTypeTag());
+			composite = new Relation(composite.getName(),Arrays.asList(compositionValue,compositionThreshold),false);
+		}
+		if(composite != null) {
+			composite = new Relation(composite.getName()+".lowerEq",composite.getArgs(),false);
+			newGuard.add(composite);
 		}
 		return new Conjunction(newGuard);
 	}
