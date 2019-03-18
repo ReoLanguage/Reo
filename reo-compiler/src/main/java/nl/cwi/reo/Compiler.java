@@ -17,7 +17,6 @@ import org.stringtemplate.v4.STGroupFile;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.thoughtworks.xstream.XStream;
 
 import nl.cwi.reo.commands.Command;
 import nl.cwi.reo.commands.Commands;
@@ -229,8 +228,6 @@ public class Compiler {
 		ReoProgram program; 	
 		if ((program = interpreter.interpret(files.get(0))) == null)
 			return;
-
-		serializeXML(program);
 		
 		ReoConnector connector = program.getConnector();
 		connector = connector.propagate(monitor);
@@ -248,25 +245,6 @@ public class Compiler {
 
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
-	}
-	
-	/**
-	 * Serialize ReoProgram to XML
-	 * @param customer
-	 * @return
-	 */
-	private static void serializeXML(ReoProgram program) {
-
-		XStream xstream = new XStream();
-
-		String xml = xstream.toXML(program);
-		try {
-			File file = new File("../reo-runtime-java/src/main/java/"+program.getName()+".xml");
-			FileWriter out = new FileWriter(file);
-			out.write(xml);
-			out.close();
-		} catch (IOException e) {
-		}
 	}
 	
 	/**

@@ -1,0 +1,9 @@
+import reo.xrouter;
+import reo.sync;
+
+main3(a,b[1..3]){
+	xrouter(a,y[1..3])
+		{
+		sync(y[k],b[k]) | k:<1..3>
+	}
+}

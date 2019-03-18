@@ -1,0 +1,16 @@
+section reo;
+import reo.syncfifo1;
+import reo.xrouter;
+import reo.sync;
+
+State<t:int,j:int>(a[1..t],b[1..j]){
+	syncfifo1(q1,x)
+	
+	xrouter(x,b[1..j])
+	
+	{
+		sync(a[u],q1)
+		|
+		u:<1..t>
+	}
+}

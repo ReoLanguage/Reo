@@ -46,6 +46,9 @@ public final class MaudeTransition extends Transition{
 	/** Rewrite rule counter */
 	static int counter=0;
 	
+	/** Print trace */
+	static boolean printTrace = true;
+	
 	/** Rewrite rule number */
 	private int nb;
 	
@@ -227,7 +230,7 @@ public final class MaudeTransition extends Transition{
 				update = update + " m("+ var.getName().substring(1) + ", * )";
 			}
 			if(var instanceof PortVariable){
-				update = update + " p( "+ var.getName() + ", * )";
+				update = update + " p(\""+ var.getName() + "\", * )";
 			}
 		}
 		RHS = RHS + update;
@@ -244,6 +247,9 @@ public final class MaudeTransition extends Transition{
 			return "crl["+nb+"] : " + LHS + thState + " trace(sl) " + " => " + trace + RHS + thState + " if( "+ th +" <= "+ sem + ") .";			
 		}
 		semCounter=0;
+		
+//		if(printTrace)
+//			return "crl["+nb+"] : " + LHS + " trace(sl) " + " => " + trace + RHS + " .";
 		
 		return "rl["+nb+"] : " + LHS + " => " + RHS + " .";
 	}

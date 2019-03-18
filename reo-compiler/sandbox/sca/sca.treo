@@ -1,13 +1,16 @@
-import reo.syncfifo1;
 import reo.sync;
 import reo.syncdrain;
-import reo.shiftlossyfifo1;
-import reo.xrouter;
+import reo.asyncdrain;
+import reo.Transition;
+import reo.State;
+import reo.StateFull;
 
 
 //	This example assumes that the csemiring is the weighted csemiring.
 //	The csemiring implements an interface containing \otimes and \oplus methods. 
  
+
+
 
 sca(charge,discharge1,discharge2,move,pass,snap){
 
@@ -35,34 +38,57 @@ cas(a,b,c,d,e,f)
 	t2=3
 }
 
+
+
+
+
+
+
+
+
 cas(a,b,c,d,e,f){
+
 syncdrain(a,e)
 syncdrain(b,f)
 syncdrain(c,d)
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sca1<t:int>(move,pass,snap){
 
-sync(t1,pred1) pred<E,1,t>(pred1,pass)
-sync(t2,pred2) pred<E,0,t>(pred2,move)
-sync(t3,pred3) pred<E,2,t>(pred3,move)
-sync(t4,pred4) pred<E,1,t>(pred4,pass)
-sync(t5,pred5) pred<E,0,t>(pred5,snap)
+asyncdrain(move,pass)
+asyncdrain(move,snap)
+asyncdrain(pass,snap)
+
+Transition<E,1,t>(qNo1,pass,qNi1)
+Transition<E,1,t>(qYo1,pass,qYi1)
+
+Transition<E,2,t>(qNo2,move,qNi2)
+Transition<E,0,t>(qYo2,move,qNi3)
+
+Transition<E,0,t>(qNo3,snap,qYi2)
 
 //State qN
-syncfifo1(q1,b1)
-xrouter(b1,t1,t2)
-asyncdrain(b1,b2)
-sync(t1,q1)
-sync(t2,q2)
-
+StateFull<3,3>(qNi1,qNi2,qNi3,qNo1,qNo2,qNo3)
 
 //State qY
-syncfifo1full<"0">(q2,b2)
-xrouter(b2,t3,t4,t5)
-sync(t3,q2)
-sync(t4,q2)
-sync(t5,q1)
+State<2,2>(qYi1,qYi2,qYo1,qYo2)
 
 |
 	//Semiring linked at run-time
@@ -70,81 +96,52 @@ sync(t5,q1)
 
 }
 
+
+
+
+
+
+
+
+
+
 sca2<t:int>(charge,discharge1,discharge2){
 
-sync(t1,pred1) pred<E,2,t>(pred1,discharge1)
-sync(t2,pred2) pred<E,5,t>(pred2,discharge2)
+asyncdrain(charge,discharge1)
+asyncdrain(discharge2,discharge1)
+asyncdrain(discharge2,charge)
 
-sync(t3,pred3) pred<E,2,t>(pred3,discharge1)
-sync(t4,pred4) pred<E,5,t>(pred4,discharge2)
-sync(t5,pred5) pred<E,0,t>(pred5,charge)
+Transition<E,0,t>(q3o1,charge,q4i1)
+Transition<E,0,t>(q2o1,charge,q3i1)
+Transition<E,0,t>(q1o1,charge,q2i1)
+Transition<E,0,t>(q0o1,charge,q1i1)
 
-sync(t6,pred6) pred<E,2,t>(pred6,discharge1)
-sync(t7,pred7) pred<E,5,t>(pred7,discharge2)
-sync(t8,pred8) pred<E,0,t>(pred8,charge)
+Transition<E,0,t>(q4o1,discharge1,q3i2)
+Transition<E,0,t>(q3o2,discharge1,q2i2)
+Transition<E,0,t>(q2o2,discharge1,q1i2)
+Transition<E,0,t>(q1o2,discharge1,q0i1)
 
-sync(t9,pred9) pred<E,2,t>(pred9,discharge1)
-sync(t10,pred10) pred<E,0,t>(pred10,charge)
+Transition<E,0,t>(q4o2,discharge2,q2i3)
+Transition<E,0,t>(q3o3,discharge2,q1i3)
+Transition<E,0,t>(q2o3,discharge2,q0i2)
 
-sync(t11,pred11) pred<E,0,t>(t11,charge)
 
-syncfifo1full<"0">(q4,b4)
-xrouter(b4,t1,t2)
-asyncdrain(b4,b1)
-asyncdrain(b4,b2)
-asyncdrain(b4,b3)
-asyncdrain(b4,b0)
-sync(t1,q3)
-sync(t2,q2)
+//State q4
+StateFull<1,2>(q4i1,q4o1,q4o2)
 
-syncfifo1(q3,b3)
-xrouter(b3,t3,t4,t5)
-asyncdrain(b3,b2)
-asyncdrain(b3,b1)
-asyncdrain(b3,b0)
-sync(t3,q2)
-sync(t4,q1)
-sync(t5,q4)
+//State q3
+State<2,3>(q3i1,q3i2,q3o1,q3o2,q3o3)
 
-syncfifo1(q2,b2)
-xrouter(b2,t6,t7,t8)
-asyncdrain(b2,b1)
-asyncdrain(b2,b0)
-sync(t6,q1)
-sync(t7,q0)
-sync(t8,q3)
+//State q2
+State<3,3>(q2i1,q2i2,q2i3,q2o1,q2o2,q2o3)
 
-syncfifo1(q1,b1)
-xrouter(b1,t9,t10)
-asyncdrain(b1,b0)
-sync(t9,q0)
-sync(t10,q2)
+//State q1
+State<3,2>(q1i1,q1i2,q1i3,q1o1,q1o2)
 
-syncfifo1(q0,b0)
-xrouter(b0,t11)
-sync(t11,q1)
+//State q0
+State<2,1>(q0i1,q0i2,q0o1)
 
 |
 	E = "WSemiring"
 }
-
-asyncdrain(a?,b?){
-	#RBA
-	{a,~b} true
-}
-
-syncfifo1full<k:String>(a?,b!) {
-	#RBA
-	$m=k;
-	{a, ~b} $m = null, $m' = a
-	{a, b} $m != null, b=$m, a= $m
-	{~a, b} $m != null, b = $m, $m' = null
-}
-
-pred<P:string,e:int,t:int>(a?, b!) {
-	#RBA
-	{a,b} P(e,t), a=b
-}
-
-
 

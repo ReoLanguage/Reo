@@ -1,0 +1,51 @@
+section reo;
+import reo.Transition;
+import reo.asyncdrain;
+import reo.xrouter;
+import reo.sync;
+import reo.syncfifo1full;
+import reo.syncfifo1;
+
+sca1<t:int>(move,pass,snap){
+
+asyncdrain(move,pass)
+asyncdrain(move,snap)
+asyncdrain(pass,snap)
+
+Transition<E,1,t>(qNo1,pass,qNi1)
+Transition<E,1,t>(qYo1,pass,qYi1)
+
+Transition<E,2,t>(qNo2,move,qNi2)
+Transition<E,0,t>(qYo2,move,qNi3)
+
+Transition<E,0,t>(qNo3,snap,qYi2)
+
+//State qN
+StateFull<3,3>(qNi1,qNi2,qNi3,qNo1,qNo2,qNo3)
+
+//State qY
+State<2,2>(qYi1,qYi2,qYo1,qYo2)
+
+|
+	//Semiring linked at run-time
+	E = "WSemiring"
+
+}
+
+
+
+State<i:int,j:int>(a[1..i],b[1..j]){
+	syncfifo1(q1,x)
+	xrouter(x,b[1..j])
+	{
+		sync(a[k],q1)
+		|
+		k:<1..i>
+	}
+}
+
+StateFull<i:int,j:int>(a[1..i],b[1..j]){
+	syncfifo1full<"0">(q1,x)
+	xrouter(x,b[1..j])
+	{		sync(a[k],q1)		|		k:<1..i>	}
+}

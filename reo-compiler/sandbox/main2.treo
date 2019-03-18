@@ -1,0 +1,7 @@
+import reo.State;
+
+main2(q0i1,q0o1,q0o2) {
+  State<1,2>(q0i1,q0o1,q0o2)
+}
+
+

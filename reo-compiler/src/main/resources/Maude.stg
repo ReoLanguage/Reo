@@ -19,8 +19,9 @@ component(c) ::= <<
 protocol(c) ::= <<
 subsort String \< Data .
 vars <c.variables:{ v | <v> } ; separator=" "> : Data .
-vars <c.thVar:{ v | <v> } ; separator=" "> : Value .
+<if(c.thVar)>vars <c.thVar:{ v | <v> } ; separator=" "> : Value .
 op th : String Value -> Fact .
+<endif>
 var sl : StepSetList .
 op m : Nat Data* -> Fact [ctor] .
 op sv : Value -> Step [ctor] .
