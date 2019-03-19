@@ -17,7 +17,6 @@ import org.stringtemplate.v4.STGroupFile;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.thoughtworks.xstream.XStream;
 
 import nl.cwi.reo.commands.Command;
 import nl.cwi.reo.commands.Commands;
@@ -230,7 +229,7 @@ public class Compiler {
 		if ((program = interpreter.interpret(files.get(0))) == null)
 			return;
 
-		serializeXML(program);
+//		serializeXML(program);
 		
 		ReoConnector connector = program.getConnector();
 		connector = connector.propagate(monitor);
@@ -255,6 +254,7 @@ public class Compiler {
 	 * @param customer
 	 * @return
 	 */
+/*
 	private static void serializeXML(ReoProgram program) {
 
 		XStream xstream = new XStream();
@@ -268,7 +268,7 @@ public class Compiler {
 		} catch (IOException e) {
 		}
 	}
-	
+	*/
 	/**
 	 * Composes all sub-connectors in a given connector. 
 	 * Composition is defined per semantics. 
