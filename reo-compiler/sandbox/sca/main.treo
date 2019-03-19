@@ -1,0 +1,11 @@
+import reo.merger;
+import reo.syncfifo1;
+import reo.xrouter;
+
+
+state(a[1..2],b[1..2]){
+	syncfifo1(q1,x)
+	{ merger(a[1..2],q1)  | N=2 }
+	xrouter(x,b[1..2])
+}
+

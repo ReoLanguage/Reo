@@ -228,8 +228,6 @@ public class Compiler {
 		ReoProgram program; 	
 		if ((program = interpreter.interpret(files.get(0))) == null)
 			return;
-
-//		serializeXML(program);
 		
 		ReoConnector connector = program.getConnector();
 		connector = connector.propagate(monitor);
@@ -250,6 +248,7 @@ public class Compiler {
 	}
 	
 	/**
+<<<<<<< HEAD
 	 * Serialize ReoProgram to XML
 	 * @param customer
 	 * @return
@@ -270,6 +269,8 @@ public class Compiler {
 	}
 	*/
 	/**
+=======
+>>>>>>> fbd7cefef1afbd98a621cfe664caa5a7afed15eb
 	 * Composes all sub-connectors in a given connector. 
 	 * Composition is defined per semantics. 
 	 * The protocol consists of all components without a reference to code in a given target

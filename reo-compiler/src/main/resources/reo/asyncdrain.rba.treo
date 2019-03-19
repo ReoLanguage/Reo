@@ -1,0 +1,7 @@
+section reo;
+
+asyncdrain(a?,b?){
+	#RBA
+	{a,~b} true
+	{~a,b} true
+}

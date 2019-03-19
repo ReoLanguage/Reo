@@ -1,0 +1,9 @@
+section reo;
+
+syncfifo1full<k:String>(a?,b!) {
+	#RBA
+	$m=k;
+	{a, ~b} $m = null, $m' = a
+	{a, b} $m != null, b=$m, a= $m
+	{~a, b} $m != null, b = $m, $m' = null
+}

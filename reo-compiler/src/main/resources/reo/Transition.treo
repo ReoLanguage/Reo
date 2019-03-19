@@ -1,0 +1,11 @@
+section reo;
+import reo.pred;
+import reo.sync;
+
+Transition<E:String,e:int,t:int>(i,a,o){
+	sync(i,x) 
+	pred<E,e,t>(x,a) 
+	sync(x,o)
+}
+
+

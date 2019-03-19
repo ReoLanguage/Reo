@@ -1,0 +1,11 @@
+section reo;
+import reo.sync;
+
+merger(a[1..n],c!) {
+	{
+		sync(a[i],x)
+		|
+		i:<1..n>
+	}
+	sync(x,c)
+}
