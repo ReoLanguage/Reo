@@ -1,0 +1,6 @@
+import reo.sensor;
+
+station<update:Int>(charge!){
+	#RBA
+	{charge} charge = update 
+}

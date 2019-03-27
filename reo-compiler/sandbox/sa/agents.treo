@@ -1,0 +1,3 @@
+agent(moveL,moveR,moveD,moveU,readBat,readLoc,status){
+
+}

@@ -1,0 +1,12 @@
+
+binop<k:string>(a?, b?, c!) {
+	#RBA
+	{a,b,c} k(a,b)=c
+}
+
+testBinop(a?,b?,c!){
+
+	binop<"Function.add">(a,b,c)
+
+}
+

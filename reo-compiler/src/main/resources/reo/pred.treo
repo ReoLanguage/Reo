@@ -1,0 +1,6 @@
+section reo;
+
+pred<P:string,e:int,t:int>(a?, b!) {
+	#RBA
+	{a,b} P(e,t)
+}

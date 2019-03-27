@@ -1,0 +1,48 @@
+section reo;
+
+main(){
+
+	agent<id1>(moveA1[L,R,U,D],chargeA1,readBat,readLoc,statusA1)	
+	
+	agent<id2>(moveA2[L,R,U,D],chargeA2,readBat,readLoc,statusA2)	
+	
+	sync(chargeA1,charge)
+	sync(chargeA2,charge)
+		
+	station<position>(charge)
+	
+	sync(moveA1L,moveA1)
+	sync(moveA1R,moveA1)
+	sync(moveA1D,moveA1)
+	sync(moveA1U,moveA1)
+	
+	sync(moveA1,action)
+	sync(charge,action)
+	
+	sync(moveA1,updateLoc)
+	
+	sync(outLoc,x) 
+	sync(x,readLoc)
+	
+	lossy(x,agentLoc)
+	
+	gps<updateGps>(outLoc,updateLoc)
+
+	fence()
+	
+	equal(agentLoc, goalL, status)
+	
+	sync(goalLoc,goalL)
+	
+	goal<position::Location>(goalLoc,status)
+	goal<position2::Location>(goalLoc,status)
+	
+	battery<updateBat>(readBat,action)
+	
+	|
+	
+		updateGps = "inc MODULE1 updateGps(Fence,Location,Action)::Location",
+		updateBat = "inc MODULE2 updateBat(Nat,Action)::Nat"	
+	
+	
+}

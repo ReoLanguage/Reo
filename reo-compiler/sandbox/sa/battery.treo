@@ -1,0 +1,6 @@
+import reo.sensor;
+
+battery<update:String,N:Int>(readBat[1..N],modify[1..N]){
+	
+	{ sensor<update>(readBat[i],modify[i]) | i:<1..N> }
+}

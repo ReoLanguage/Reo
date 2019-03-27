@@ -1,0 +1,5 @@
+
+syncdrain(a?String,b?String){
+	#RBA
+	{a,b} true
+}

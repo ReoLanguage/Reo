@@ -1,0 +1,52 @@
+
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+import reo.shiftlossyfifo1;
+
+test(a[1..5],c){
+
+/*
+* Table and message concatenation
+*/
+
+//pair<"Function.pair">(c2,c1,e) 
+//fifo1(e,d) 
+//sync(e,b)
+//transformer<"Function.lookUp">
+
+/*
+* Table storage
+*/
+
+//variable(d,c1)
+//fifo1(v1,d)
+
+/*
+* Input ports and encoding
+*/
+
+
+transformer2<"Function.concatenate",2.5>(a[1],c)
+//	transformer2<"Function.concatenate", i >(a[i],c)
+
+//| 
+//	i : <1..5> 
+}
+
+pair<k:String>(a?String,b?String,c!String){
+	#RBA
+	{a,b,c} k(a,b)=c
+}
+
+transformer2<k:String,n:Double>(a?String,b!String){
+        #RBA
+        {a,b} b=k(a,n)
+}
+
+variable(a, b) {
+  sync(a, x) sync(x, y) shiftlossyfifo1(y, z) 
+  sync(z, b) sync(z, t)  shiftlossyfifo1(t, y)
+  sync(x, t)
+}
+

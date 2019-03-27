@@ -1,0 +1,53 @@
+import reo.sync;
+import reo.syncdrain;
+import reo.asyncdrain;
+import reo.Transition;
+import reo.State;
+import reo.StateFull;
+
+
+//    This example assumes that the csemiring is the weighted csemiring.
+//    The csemiring implements an interface containing \otimes and \oplus methods.
+
+
+alt(p1,p2,cons){
+     
+//     sync(a,p1)
+//     sync(b,p2)
+	 sync(p1,a)
+	 sync(p2,b)
+     sync(a,c)
+     sync(b,c)
+     sync(c,cons)
+
+     automata<t1>(a,b)
+
+     |
+         //threshold for the first sca
+         t1=5
+}
+
+
+automata<t:int>(p1,p2){
+
+     asyncdrain(p1,p2)
+
+     Transition<E,0,t>(q0o1,p1,q1i1)
+     Transition<E,0,t>(q1o1,p2,q0i1)
+     Transition<E,2,t>(q1o2,p1,q2i1)
+     Transition<E,0,t>(q2o1,p1,q2i2)
+
+     //State q0
+     StateFull<1,1>(q0i1,q0o1)
+
+     //State q1
+     State<1,2>(q1i1,q1o1,q1o2)
+
+     //State q2
+     State<2,1>(q2i1,q2i2,q2o1)
+
+     |
+         //Semiring linked at run-time
+         E = "WSemiring"
+
+}

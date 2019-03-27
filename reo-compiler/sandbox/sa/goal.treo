@@ -1,0 +1,4 @@
+goal< position:String >(readLoc?,getValue!,id?){
+	$m = position
+	{readLoc} readLoc = 
+}
