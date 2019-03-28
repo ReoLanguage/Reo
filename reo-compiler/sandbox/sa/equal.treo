@@ -1,0 +1,7 @@
+import sensor;
+
+equal(a?,b?,c?){
+	#RBA
+	{a,b,c} a=b
+
+}

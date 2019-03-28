@@ -1,0 +1,16 @@
+agent<id:String>(move,charge,readBat,readLoc,status){
+	#RBA
+	$m1 = "0";
+	$m2 = "0";
+	$m3 = "0";
+	$m4 = "10"; //charge
+	
+	{move} move = "L", $m4' = decrease($m4) , $m4 != "0"
+	{move} move = "D", $m4' = decrease($m4) , $m4 != "0"
+	{move} move = "U", $m4' = decrease($m4) , $m4 != "0"
+	{move} move = "R", $m4' = decrease($m4) , $m4 != "0"
+	{charge} $m4' = charge
+	{readBat} readBat = $m1'
+	{readLoc} readLoc = $m2'
+	{status} status = $m3'
+}	

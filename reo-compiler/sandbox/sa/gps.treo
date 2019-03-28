@@ -1,8 +1,8 @@
-import reo.sensor;
+import sensor;
 
-gps<update:String,N:Int>(readLoc[1..N],move[1..N]){
+gps<update:String>(readLoc,move){
 	
-	{ sensor<update>(readLoc[i],move[i]) | i:<1..N> }
+	sensor<update>(readLoc,move) 
 	
 	
 }

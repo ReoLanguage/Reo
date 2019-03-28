@@ -1,4 +1,8 @@
-goal< position:String >(readLoc?,getValue!,id?){
-	$m = position
-	{readLoc} readLoc = 
+
+goal< position:String >(readLoc!,getValue!){
+	#RBA
+	$m = position;
+	$m1 = "8";
+	{getValue}  getValue = $m1 , $m1 != *
+	{readLoc}  readLoc = $m , $m != *
 }

@@ -1,0 +1,7 @@
+import goal;
+
+test(readLoc,getValue){
+	
+	goal<"X:1,Y:2">(readLoc,getValue)
+
+}	

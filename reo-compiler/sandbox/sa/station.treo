@@ -1,6 +1,8 @@
-import reo.sensor;
+import sensor;
 
-station<update:Int>(charge!){
+//TODO: change the charge update
+
+station<position:String>(charge!){
 	#RBA
-	{charge} charge = update 
+	{charge} charge = "10"
 }
