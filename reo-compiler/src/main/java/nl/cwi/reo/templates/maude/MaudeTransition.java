@@ -1,7 +1,9 @@
 package nl.cwi.reo.templates.maude;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -64,6 +66,9 @@ public final class MaudeTransition extends Transition{
 	/** Threshold of the rewrite rule */	
 	private Term threshold;
 
+	/** List of user defined functions */	
+	private List<Function> functions = new ArrayList<>();
+
 	/** Rewrite rule counter */
 	int semCounter=0;
 	
@@ -87,7 +92,11 @@ public final class MaudeTransition extends Transition{
 		nb=++counter;
 		formulaToString(getGuard());
 		rstate.putAll(getOutput());
+		for(PortVariable p : getOutput().keySet()){
+			lstate.put(p, new NullValue());
+		}
 		rstate.putAll(getMemory());
+		setFunctions();
 		
 	}
 	
@@ -104,8 +113,10 @@ public final class MaudeTransition extends Transition{
 			Equality e = (Equality) ((Negation) f).getFormula();
 			if (e.getLHS() instanceof PortVariable && e.getRHS() instanceof NullValue) {
 				PortVariable p = (PortVariable) e.getLHS();
-				if(p.isInput())
+				if(p.isInput()){
 					f = new Equality(p,new NonNullValue());
+					rstate.put(p, new NullValue());
+				}
 				else
 					f = new Equality(p,new NullValue());
 				formulaToString(f);
@@ -119,10 +130,12 @@ public final class MaudeTransition extends Transition{
 		else if(f instanceof Equality){
 			Term lhs = ((Equality) f).getLHS();
 			Term rhs = ((Equality) f).getRHS();
-			if(lhs instanceof PortVariable)
-				lstate.put((PortVariable)lhs, rhs);
-			if(lhs instanceof MemoryVariable)
-				lstate.put((MemoryVariable)lhs, rhs);
+			if(lhs instanceof Variable)
+				lstate.put((Variable)lhs, rhs);
+			if(lhs instanceof Function)
+				functions.add((Function)lhs);
+			if(rhs instanceof Function)
+				functions.add((Function)rhs);	
 		}
 		else  if(f instanceof Relation){
 			if(((Relation) f).getName().contains("Semiring")){
@@ -142,98 +155,15 @@ public final class MaudeTransition extends Transition{
 		String LHS = "";
 		
 		//Convert lstate to string :
-		for(Variable v : lstate.keySet()){
-			if(v instanceof PortVariable){
-				LHS = LHS + " p(\"" + v.getName() + "\",";
-				if(lstate.get(v) instanceof NullValue){
-					LHS = LHS + " *) ";		
-					if(!rstate.containsKey(v)){
-						RHS = RHS + "p(\"" + v.getName() + "\", *) ";
-					}
-				}
-				else if(lstate.get(v) instanceof NonNullValue){
-					LHS = LHS + "d_" + v.getName()+")";					
-				}
-			}
-			if(v instanceof MemoryVariable){
-				LHS = LHS + " m("+ v.getName().substring(1) + ",";
-				if(lstate.get(v) instanceof NullValue){
-					LHS = LHS + " *) ";
-					MemoryVariable v_prime = new MemoryVariable(v.getName(),!((MemoryVariable) v).hasPrime(),v.getTypeTag());
-					if(!rstate.containsKey(v) && !rstate.containsKey(v_prime)){
-						RHS = RHS + "m("+ v.getName().substring(1) + ", *) ";
-					}
-				}
-				else if(lstate.get(v) instanceof NonNullValue){
-					LHS = LHS + "d_" + v.getName()+")";					
-				}
-			}
-		}
-		
-		//Convert rstate to string :
-		String update = "";
-		
-		Map<Variable,Term> endRule = new HashMap<>();
+		for(Variable key : lstate.keySet()){
+			LHS = LHS + getVarString(key,lstate.get(key));
+		}		
+				
 		for(Variable key : rstate.keySet()){
-			if(key instanceof PortVariable){
-//				MemoryVariable v_prime = new MemoryVariable(v.getName(),!((MemoryVariable) v).hasPrime(),v.getTypeTag());
-				if(!lstate.containsKey(key)){
-					LHS = LHS + " p(\"" + key.getName() + "\", *) ";
-				}
-				if(rstate.get(key) instanceof PortVariable){
-					PortVariable value = (PortVariable)rstate.get(key);
-					update = update + " p(\"" + key.getName() + "\", d_"+ value.getName()+")";
-//					update = update + " p(\"" + value.getName() + "\", * )";
-					endRule.put((PortVariable)rstate.get(key), new NullValue());
-					trace = trace + " a(\""+ key.getName() + "\") ";
-				}
-				if(rstate.get(key) instanceof MemoryVariable){
-					MemoryVariable value = (MemoryVariable)rstate.get(key);
-					update = update + " p(\"" + key.getName() + "\", d_"+ value.getName()+")";
-//					update = update + " m( "+ value.getName() + ", * )";
-					MemoryVariable m_prime = new MemoryVariable(((MemoryVariable)rstate.get(key)).getName(),!((MemoryVariable)rstate.get(key)).hasPrime(),((MemoryVariable)rstate.get(key)).getTypeTag());
-					if(!rstate.containsKey(m_prime))
-						endRule.put((MemoryVariable)rstate.get(key), new NullValue());
-					trace = trace + " a(\""+ key.getName() + "\") ";
-
-				}
-			}
-			if(key instanceof MemoryVariable){			
-				MemoryVariable m_prime = new MemoryVariable(key.getName(),!((MemoryVariable) key).hasPrime(),key.getTypeTag());
-				if(!rstate.containsKey(key) && !rstate.containsKey(m_prime)){
-					RHS = RHS + "m("+ key.getName().substring(1) + ", *) ";
-				}
-				if(rstate.get(key) instanceof PortVariable){
-					PortVariable value = (PortVariable)rstate.get(key);
-					update = update + " m("+ key.getName().substring(1) + ", d_"+ value.getName()+")";
-//					update = update + " p(\"" + value.getName() + "\", * )";
-					endRule.put((PortVariable)rstate.get(key), new NullValue());
-				}
-				if(rstate.get(key) instanceof MemoryVariable){
-					MemoryVariable value = (MemoryVariable)rstate.get(key);
-					update = update + " m("+ key.getName().substring(1) + ", d_"+ value.getName()+")";
-					MemoryVariable _m = new MemoryVariable(((MemoryVariable)rstate.get(key)).getName(),!((MemoryVariable)rstate.get(key)).hasPrime(),((MemoryVariable)rstate.get(key)).getTypeTag());
-					if(!rstate.containsKey(_m))
-						endRule.put((MemoryVariable)rstate.get(key), new NullValue());
-//					endRule.put((MemoryVariable)rstate.get(key), new NullValue());
-//					update = update + " m("+ value.getName() + ", * )";
-				}
-				if(key instanceof MemoryVariable && rstate.get(key) instanceof NullValue){
-					update = update + " m("+ key.getName().substring(1) + ", * )";
-				}
-			}
-			
+			RHS  = RHS + getVarString(key, rstate.get(key));
+			if(key instanceof PortVariable)
+				trace = trace + " a(\""+ key.getName() + "\") ";
 		}
-		
-		for(Variable var : endRule.keySet()){
-			if(var instanceof MemoryVariable){
-				update = update + " m("+ var.getName().substring(1) + ", * )";
-			}
-			if(var instanceof PortVariable){
-				update = update + " p(\""+ var.getName() + "\", * )";
-			}
-		}
-		RHS = RHS + update;
 		
 		if(semiring!=null && threshold !=null){
 			
@@ -247,12 +177,72 @@ public final class MaudeTransition extends Transition{
 			return "crl["+nb+"] : " + LHS + thState + " trace(sl) " + " => " + trace + RHS + thState + " if( "+ th +" <= "+ sem + ") .";			
 		}
 		semCounter=0;
-		
-//		if(printTrace)
-//			return "crl["+nb+"] : " + LHS + " trace(sl) " + " => " + trace + RHS + " .";
-		
 		return "rl["+nb+"] : " + LHS + " => " + RHS + " .";
 	}
+	
+	
+	public String getDataPortString(PortVariable p){
+		String s = "d_" + p.getName();	
+		return s;
+	}
+	
+	public String getDataMemString(MemoryVariable m){
+		String s = "d_m" + m.getName().substring(1);	
+		return s;
+	}
+	
+	public String getDataFunctString(Function f){
+		String s = f.getName().replace("\"", "") + "(";
+		for(Term t : f.getArgs()){
+			s = s + getDataString(t) + ", ";
+		}
+		return s.substring(0, s.length()-2)+")";
+	}
+	
+	public String getDataString(Term t){
+		String s = "";
+		if(t instanceof PortVariable)
+			s = s + getDataPortString((PortVariable)t);
+		if(t instanceof MemoryVariable)
+			s = s + getDataMemString((MemoryVariable)t);
+		if(t instanceof Function)
+			s = s + getDataFunctString((Function)t);
+		if(t instanceof NullValue)
+			s = s + "*";
+		if(t instanceof Constant)
+			s = s + ((Constant)t).toString();
+			
+		return s;
+	}
+	
+	public String getMemString(MemoryVariable m, Term t){
+		String s = "";
+		if(t instanceof NonNullValue)
+			s = " m("+m.getName().substring(1)+", d_m"+ m.getName().substring(1) + ")";
+		else
+			s = " m("+m.getName().substring(1)+", "+ getDataString(t) + ")";
+		return s;
+	}
+	
+	public String getVarString( Variable t1, Term t2 ){
+		if(t1 instanceof PortVariable)
+			return getPortString((PortVariable) t1, t2);
+		if(t1 instanceof MemoryVariable)
+			return getMemString((MemoryVariable) t1, t2);
+		return "";
+	}
+	
+	public String getPortString(PortVariable p, Term t){
+		String s = "";
+		if(t instanceof NonNullValue)
+			s = " p(\""+p.getName()+"\", "+ "d_"+p.getName() + ")";
+		else
+			s = " p(\""+p.getName()+"\", "+ getDataString(t) + ")";
+		return s;
+	}
+	
+	
+	
 	
 	public String thresholdToStr(Term t){
 		String s = "";
@@ -325,6 +315,21 @@ public final class MaudeTransition extends Transition{
 		}
 		
 		return s;
+	}
+	
+	public void setFunctions(){
+		for(Term t : lstate.values()){
+			if(t instanceof Function)
+				functions.add((Function) t);
+		}
+		for(Term t : rstate.values()){
+			if(t instanceof Function)
+				functions.add((Function) t);
+		}
+	}
+	
+	public List<Function> getFunction(){
+		return functions;
 	}
 	
 	/**

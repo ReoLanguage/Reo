@@ -51,6 +51,7 @@ public final class MaudeProtocol extends Protocol {
 	public MaudeProtocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {	
 		super(name,ports,transitions,initial);
 		getState();
+		getFunctions();
 	}
 
 	/**
@@ -108,6 +109,23 @@ public final class MaudeProtocol extends Protocol {
 		}
 		
 		return s;
+	}
+	
+	
+	/**
+	 * Returns user defined functions appearing in the rewrite rules of the protocol
+	 * @param t
+	 * @return
+	 */
+	public String getFunctions(){
+		for(Transition t : getTransitions()){
+			if(t instanceof MaudeTransition)
+				for(Function f : ((MaudeTransition) t).getFunction()){
+					String s = f.getName();
+					
+				}
+		}
+		return "";
 	}
 	
 	/** Set of threshold */
