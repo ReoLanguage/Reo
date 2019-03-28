@@ -248,7 +248,6 @@ public class Compiler {
 	}
 	
 	/**
-<<<<<<< HEAD
 	 * Serialize ReoProgram to XML
 	 * @param customer
 	 * @return
@@ -269,8 +268,6 @@ public class Compiler {
 	}
 	*/
 	/**
-=======
->>>>>>> fbd7cefef1afbd98a621cfe664caa5a7afed15eb
 	 * Composes all sub-connectors in a given connector. 
 	 * Composition is defined per semantics. 
 	 * The protocol consists of all components without a reference to code in a given target
