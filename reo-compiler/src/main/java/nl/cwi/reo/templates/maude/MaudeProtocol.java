@@ -3,8 +3,10 @@
  */
 package nl.cwi.reo.templates.maude;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -117,15 +119,25 @@ public final class MaudeProtocol extends Protocol {
 	 * @param t
 	 * @return
 	 */
-	public String getFunctions(){
+	public List<String> getFunctions(){
+		Set<Function> SetF = new HashSet<>();
 		for(Transition t : getTransitions()){
 			if(t instanceof MaudeTransition)
 				for(Function f : ((MaudeTransition) t).getFunction()){
-					String s = f.getName();
-					
+					if(!SetF.stream().anyMatch(o -> o.getName().equals(f.getName())))
+						SetF.add(f);
 				}
 		}
-		return "";
+		List<String> listS = new ArrayList<>();
+		for(Function f : SetF){
+			String s = "op "  + f.getName().substring(1, f.getName().length()-1) + " : ";
+			for(int i = 0; i< f.getArgs().size();i++) {
+				s = s + " Data ";
+			}
+			s = s + " -> Data* .";
+			listS.add(s);
+		}
+		return listS;
 	}
 	
 	/** Set of threshold */

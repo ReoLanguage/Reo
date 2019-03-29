@@ -60,6 +60,9 @@ public final class MaudeTransition extends Transition{
 	/** Right Hand Side of the rewrite rule */	
 	private Map<Variable, Term> rstate = new HashMap<>();
 
+	/** Condition of the rewrite rule */	
+	private Set<Formula> condition = new HashSet<>();
+
 	/** Semiring value of the rewrite rule */	
 	private Term semiring;
 
@@ -97,7 +100,6 @@ public final class MaudeTransition extends Transition{
 		}
 		rstate.putAll(getMemory());
 		setFunctions();
-		
 	}
 	
 	/**
@@ -125,6 +127,13 @@ public final class MaudeTransition extends Transition{
 				MemoryVariable m = (MemoryVariable) e.getLHS();
 				f = new Equality(m,new NonNullValue());
 				formulaToString(f);
+				MemoryVariable mP = new MemoryVariable( m.getName(), true, m.getTypeTag());
+				if(! getMemory().keySet().stream().anyMatch(o -> o.getName().equals(m.getName()))) {
+					rstate.put(mP, m);
+				}
+			}
+			else if (e.getLHS() instanceof Function) {
+					condition.add(f);
 			}
 		}
 		else if(f instanceof Equality){
@@ -165,7 +174,7 @@ public final class MaudeTransition extends Transition{
 				trace = trace + " a(\""+ key.getName() + "\") ";
 		}
 		
-		if(semiring!=null && threshold !=null){
+/*		if(semiring!=null && threshold !=null){
 			
 			String sem = semiringToStr(semiring);
 			semCounter=0;
@@ -176,10 +185,32 @@ public final class MaudeTransition extends Transition{
 			
 			return "crl["+nb+"] : " + LHS + thState + " trace(sl) " + " => " + trace + RHS + thState + " if( "+ th +" <= "+ sem + ") .";			
 		}
-		semCounter=0;
-		return "rl["+nb+"] : " + LHS + " => " + RHS + " .";
+		semCounter=0;*/
+		
+		if(condition.isEmpty())
+			return "rl["+nb+"] : " + LHS + " => " + RHS + " .";
+		else
+			return "crl["+nb+"] : " + LHS + " => " + RHS + " if(" + getCondition() + ") .";
 	}
 	
+	
+	public String getCondition() {
+		String s = "";
+		
+		for(Formula f : condition) {
+			if (f instanceof Negation && ((Negation) f).getFormula() instanceof Equality) {
+				Equality e = (Equality) ((Negation) f).getFormula();
+				s = s + getDataString(e.getLHS()) + " =/= " + getDataString(e.getRHS()) + " and " ;	
+			}
+			else if(f instanceof Equality) {
+				Equality e = ((Equality) f);
+				s = s + getDataString(e.getLHS()) + " == " + getDataString(e.getRHS()) + " and " ;	
+			}
+		}
+		s = s.substring(0, s.length()-5);
+		
+		return s;
+	}
 	
 	public String getDataPortString(PortVariable p){
 		String s = "d_" + p.getName();	
@@ -329,6 +360,7 @@ public final class MaudeTransition extends Transition{
 	}
 	
 	public List<Function> getFunction(){
+		
 		return functions;
 	}
 	

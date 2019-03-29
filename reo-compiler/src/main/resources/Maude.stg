@@ -26,12 +26,15 @@ var sl : StepSetList .
 op m : Nat Data* -> Fact [ctor] .
 op sv : Value -> Step [ctor] .
 
+<c.functions:{ f | <f> } ; separator="\n">
+
 <c.transitions:transition(); separator="\n">
 
-op makestart : Nat Nat -> Facts .
+<!op makestart : Nat Nat -> Facts .
 vars i j : Nat .
 
-eq makestart(i,j) = <c.state:{p | <p>}; separator=" "> .
+eq makestart(i,j) = <c.state:{p | <p>}; separator=" "> .!>
+eq startc = <c.state:{p | <p>}; separator=" "> .
 >>
 
 
