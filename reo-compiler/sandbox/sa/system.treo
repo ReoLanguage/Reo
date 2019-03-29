@@ -7,7 +7,14 @@ import reo.sync;
 import reo.lossy;
 import equal;
 
-system<id:int>(move,charge,readBat,readLoc,status){
+system<id:int>(s1,s2,s3,s4,s5){
+
+	sync(move, s1)
+	sync(charge, s2)
+	sync(readBat, s3)
+	sync(readLoc, s4)
+	sync(status, s5)
+	
 
 	agent<id>(move,charge,readBat,readLoc,status)	
 			
@@ -22,7 +29,7 @@ system<id:int>(move,charge,readBat,readLoc,status){
 	
 	lossy(x,agentLoc)
 	
-	gps<updateGps>(outLoc,updateLoc)
+	gps<updateGps,initialPos>(outLoc,updateLoc)
 
 	equal(agentLoc, goalL, status)
 
@@ -30,13 +37,15 @@ system<id:int>(move,charge,readBat,readLoc,status){
 
 	goal<position>(goalLoc,status)
 	
-	battery<updateBat>(readBat,action)
+	battery<updateBat,initialBat>(readBat,action)
 	
 	|
 	
 		updateGps = "updateGps",
 		updateBat = "updateBat",
-		position  = "X:1,Y:1"
+		position  = "goal position: X:1,Y:1",
+		initialPos  = "agent position: X:20,Y:20",
+		initialBat  = "battery level: 100"
 	
 	
 }

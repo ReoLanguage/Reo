@@ -2,7 +2,7 @@ import system;
 
 main(moveA1,chargeA1,readBatA1,readLocA1,statusA1){
 
-	system<"1">(moveA1,chargeA1,readBatA1,readLocA1,statusA1)	
+	system<"agent1">(moveA1,chargeA1,readBatA1,readLocA1,statusA1)	
 //	system<"2">(moveA2,chargeA2,readBatA2,readLocA2,statusA2)	
 	
 }

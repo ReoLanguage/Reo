@@ -1,15 +1,16 @@
-agent<id:String>(move,charge,readBat,readLoc,status){
+agent<id:String>(move!,charge!,readBat?,readLoc?,status?){
 	#RBA
-	$m1 = "0";
-	$m2 = "0";
-	$m3 = "0";
+	$mid = id;
+	$m1 = "agent knowledge battery: 0";
+	$m2 = "agent knowledge location: 0";
+	$m3 = "agent knowledge goal status: 0";
 	
-	{move, readBat} move = "L", readBat != "0"
-	{move, readBat} move = "D", readBat != "0"
-	{move, readBat} move = "U", readBat != "0"
-	{move, readBat} move = "R", readBat != "0"
-	{charge} true
-	{readBat} readBat = $m1'
-	{readLoc} readLoc = $m2'
-	{status} status = $m3'
+	{move} move = "L"
+	{move} move = "D"
+	{move} move = "U"
+	{move} move = "R"
+	{charge} charge = $mid
+	{readBat} $m1' = readBat, $m1 != *
+	{readLoc} $m2' = readLoc, $m2 != *
+	{status} $m3' = status, $m3 != *
 }	

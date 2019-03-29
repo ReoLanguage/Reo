@@ -1,5 +1,5 @@
 
-sensor<write:string>(read!, toWrite?) {
+sensor<write:string,initial:String>(read!, toWrite?) {
 //	#MAUDE
 //	inc MYFUNCTION
 //	var $m : Nat .
@@ -7,6 +7,9 @@ sensor<write:string>(read!, toWrite?) {
 //	var toWrite : Nat .
 	
 	#RBA
-	{read} 	read = $m , $m != *
+	
+	$m = initial;
+	
+	{read} 	read = $m , $m != *, $m' = $m
 	{toWrite}	$m' = write($m,toWrite) , $m != *
 }

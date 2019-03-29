@@ -4,5 +4,5 @@ import sensor;
 
 station<position:String>(charge!){
 	#RBA
-	{charge} charge = "10"
+	{charge} charge = "10 units charging"
 }
