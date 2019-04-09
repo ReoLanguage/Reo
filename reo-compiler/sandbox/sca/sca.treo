@@ -116,14 +116,14 @@ Transition<E,0,t>(q2o1,charge,q3i1)
 Transition<E,0,t>(q1o1,charge,q2i1)
 Transition<E,0,t>(q0o1,charge,q1i1)
 
-Transition<E,0,t>(q4o1,discharge1,q3i2)
-Transition<E,0,t>(q3o2,discharge1,q2i2)
-Transition<E,0,t>(q2o2,discharge1,q1i2)
-Transition<E,0,t>(q1o2,discharge1,q0i1)
+Transition<E,2,t>(q4o1,discharge1,q3i2)
+Transition<E,2,t>(q3o2,discharge1,q2i2)
+Transition<E,2,t>(q2o2,discharge1,q1i2)
+Transition<E,2,t>(q1o2,discharge1,q0i1)
 
-Transition<E,0,t>(q4o2,discharge2,q2i3)
-Transition<E,0,t>(q3o3,discharge2,q1i3)
-Transition<E,0,t>(q2o3,discharge2,q0i2)
+Transition<E,5,t>(q4o2,discharge2,q2i3)
+Transition<E,5,t>(q3o3,discharge2,q1i3)
+Transition<E,5,t>(q2o3,discharge2,q0i2)
 
 
 //State q4
