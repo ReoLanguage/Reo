@@ -2,7 +2,7 @@
 goal< position:String >(readLoc!,getValue!){
 	#RBA
 	$m = position;
-	$m1 = "goal value: 8";
+	$m1 = "g(8)";
 	{getValue}  getValue = $m1 
 	{readLoc}  readLoc = $m 
 }

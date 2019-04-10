@@ -16,9 +16,13 @@ system<id:int>(s1,s2,s3,s4,s5){
 	sync(status, s5)
 	
 
-	agent<id>(move,charge,readBat,readLoc,status)	
-			
-	station<position>(charge)
+	agent<id>(move,chargeIn,readBat,readLoc,status)	
+	
+	
+	syncdrain(chargeIn, y)
+	syncdrain(y,chargeOut)
+	
+	station<position>(chargeOut,location)
 	
 	sync(move,action)
 	sync(charge,action)
@@ -43,9 +47,9 @@ system<id:int>(s1,s2,s3,s4,s5){
 	
 		updateGps = "updateGps",
 		updateBat = "updateBat",
-		position  = "goal position: X:1,Y:1",
-		initialPos  = "agent position: X:20,Y:20",
-		initialBat  = "battery level: 100"
+		position  = "c(1,1)",
+		initialPos  = "c(20,20)",
+		initialBat  = "b(100)"
 	
 	
 }

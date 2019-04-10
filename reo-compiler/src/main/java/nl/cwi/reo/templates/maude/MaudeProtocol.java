@@ -66,7 +66,8 @@ public final class MaudeProtocol extends Protocol {
 		for (MemoryVariable m : getInitial().keySet()) {
 			variables.add("d_"+m.getName());
 			if (getInitial().get(m) != null){
-				s = s + "m(" + m.getName().substring(1) + "," + getInitial().get(m).toString() + ") ";
+				// Remove ' " ' present in the value of the memories
+				s = s + "m(" + m.getName().substring(1) + "," + getInitial().get(m).toString().replace("\"", "") + ") ";
 			}
 			else{
 				s = s + "m(" + m.getName().substring(1) + "," + "*) ";
