@@ -11,6 +11,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.semantics.predicates.Conjunction;
 import nl.cwi.reo.semantics.predicates.Constant;
 import nl.cwi.reo.semantics.predicates.Equality;
@@ -241,10 +242,24 @@ public final class MaudeTransition extends Transition{
 		if(t instanceof NullValue)
 			s = s + "*";
 		if(t instanceof Constant)
-			s = s + ((Constant)t).toString();
+			s = s + getConstantString((Constant) t);
 			
 		return s;
 	}
+	
+	public String getConstantString(Constant c) {
+		String s ="";
+/*		if(c.getValue() instanceof StringValue) {
+			s = c.getValue().toString().replace("\"", "");
+					
+		}
+		else*/
+			s = c.toString();
+			
+		return s;
+		
+	}
+	
 	
 	public String getMemString(MemoryVariable m, Term t){
 		String s = "";
