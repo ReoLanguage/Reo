@@ -140,8 +140,17 @@ public final class MaudeTransition extends Transition{
 		else if(f instanceof Equality){
 			Term lhs = ((Equality) f).getLHS();
 			Term rhs = ((Equality) f).getRHS();
-			if(lhs instanceof Variable)
+			if(lhs instanceof Variable) {
+				if(lhs instanceof PortVariable && ((PortVariable) lhs).isInput() ||
+				   lhs instanceof MemoryVariable && !((MemoryVariable) lhs).hasPrime()) {
+					if(rhs instanceof MemoryVariable && !((MemoryVariable) rhs).hasPrime() ||
+					   rhs instanceof PortVariable && ((PortVariable) rhs).isInput() ||
+					   rhs instanceof Function)
+						condition.add(f);
+				}
+					
 				lstate.put((Variable)lhs, rhs);
+			}
 			if(lhs instanceof Function)
 				functions.add((Function)lhs);
 			if(rhs instanceof Function)

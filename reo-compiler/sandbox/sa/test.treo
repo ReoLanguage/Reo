@@ -1,0 +1,27 @@
+import equal;
+
+test(a,b,c){
+	equal(a,b,c)
+	
+	
+	syncdrain(chargeIn, y)
+	syncdrain(y,chargeOut)
+	
+	station<position>(chargeOut,location)
+	
+	sync(move,action)
+	sync(charge,action)
+	sync(move,updateLoc)
+	
+	sync(outLoc,x) 
+	sync(x,readLoc)
+	
+	lossy(x,agentLoc)
+	
+	equal(agentLoc, goalL, status)
+
+	sync(goalLoc,goalL)
+
+	goal<position>(goalLoc,status)
+	
+}

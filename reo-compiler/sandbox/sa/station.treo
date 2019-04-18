@@ -1,10 +1,7 @@
-import sensor;
-
 //TODO: change the charge update
 
 station<position:String>(charge!,location?){
 	#RBA
 	$m = position;
-	
 	{charge,location} charge = "10 units charging", location = position
 }
