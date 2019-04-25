@@ -79,6 +79,8 @@ public class Commands {
 		Set<Formula> guards = new HashSet<>(this.guards);
 		Set<Formula> constraints = new HashSet<>();
 		
+//		if(guards.isEmpty() && update.isEmpty())
+//			return null;
 		
 		for (Formula g : others) {
 			Formula _g = g;

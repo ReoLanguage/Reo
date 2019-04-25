@@ -409,7 +409,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	public List<ConstraintHypergraph> renameMemoryCells(List<ConstraintHypergraph> components){
 		List<ConstraintHypergraph> list = new ArrayList<>();
 
-		int i = 1;
+		int i = 0;
 		for (ConstraintHypergraph A : components) {
 			Map<String, String> rename = new HashMap<>();
 			for (RuleNode rn : A.getRuleNodes()) {
@@ -418,7 +418,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 						if (v instanceof MemoryVariable) {
 							String name = ((MemoryVariable) v).getName();
 							if (!rename.containsKey(name)){
-								rename.put(name, "m" + i++);
+								rename.put(name, "m" + ++i);
 								
 							}
 						}
@@ -428,7 +428,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			Map<String, String> _rename = new HashMap<>();
 			for(String name : rename.keySet()){
 				if(rename.containsKey(rename.get(name))|| _rename.containsValue("m"+i)){
-					while( _rename.containsValue("m"+i) || ("m"+i).equals(name))
+					while( _rename.containsValue("m"+i) || ("m"+i).equals(name) || rename.containsKey("m"+i))
 						i++;
 					_rename.put(name, "m"+i);
 				}

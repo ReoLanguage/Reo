@@ -5,6 +5,7 @@ import gps;
 import station;
 import reo.sync;
 import reo.lossy;
+import reo.syncdrain;
 import equal;
 
 system<id:int>(s1,s2,s3,s4,s5){
@@ -14,13 +15,13 @@ system<id:int>(s1,s2,s3,s4,s5){
 	sync(readBat, s3)
 	sync(readLoc, s4)
 	sync(status, s5)
-	
 
-	agent<id>(move,charge,readBat,readLoc,status)	
-	sync(y,status)
-		
-	station<position>(chargeOut,location)
-	
+	agent<id>(move,chargeIn,readBat,readLoc,status)	
+
+	gps<updateGps,initialPos>(outLoc,updateLoc)
+
+	battery<updateBat,initialBat>(readBat,action)
+
 	sync(move,action)
 	sync(charge,action)
 	sync(move,updateLoc)
@@ -28,18 +29,6 @@ system<id:int>(s1,s2,s3,s4,s5){
 	sync(outLoc,x) 
 	sync(x,readLoc)
 	
-	lossy(x,agentLoc)
-	
-	gps<updateGps,initialPos>(outLoc,updateLoc)
-
-	equal(agentLoc, goalL, y)
-
-	sync(goalLoc,goalL)
-
-	sync(goalStatus, y)
-	goal<position>(goalLoc,goalStatus)
-	
-	battery<updateBat,initialBat>(readBat,action)
 	
 	|
 	

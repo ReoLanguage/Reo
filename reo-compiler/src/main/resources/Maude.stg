@@ -26,9 +26,13 @@ var sl : StepSetList .
 op m : Nat Data* -> Fact [ctor] .
 op sv : Value -> Step [ctor] .
 
+<c.injection.keys:{ inj | op <inj> : <c.injection.(inj)> . } ; separator="\n">
+
 <c.functions:{ f | <f> } ; separator="\n">
 
-<c.transitions:transition(); separator="\n">
+<c.transitions:{t | <if(t.rewString)>
+<t.rewString>
+<endif> }; separator="">
 
 <!op makestart : Nat Nat -> Facts .
 vars i j : Nat .

@@ -1,11 +1,35 @@
-import reo.merger;
-import reo.syncfifo1;
-import reo.xrouter;
+import reo.asyncdrain;
+import reo.Transition;
+import reo.StateFull;
+import reo.State;
+import reo.sync;
 
 
-state(a[1..2],b[1..2]){
-	syncfifo1(q1,x)
-	{ merger(a[1..2],q1)  | N=2 }
-	xrouter(x,b[1..2])
+main(pass){
+
+// asyncdrain(move,pass)
+// asyncdrain(move,snap)
+// asyncdrain(pass,snap)
+
+sync(y,pass)
+Transition<E,1,t>(qNo1,y,qNi1)
+Transition<E,1,t>(qYo1,y,qYi1)
+
+// sync(x,move)
+// Transition<E,2,t>(qNo2,x,qNi2)
+// Transition<E,0,t>(qYo2,x,qNi3)
+
+// Transition<E,0,t>(qNo3,snap,qYi2)
+
+//State qN
+StateFull<1,1>(qNi1,qNo1)
+
+//State qY
+State<1,1>(qYi1,qYo1)
+
+|
+	//Semiring linked at run-time
+	E = "WSemiring",
+	t = 5
+
 }
-

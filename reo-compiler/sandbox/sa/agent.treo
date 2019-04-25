@@ -3,7 +3,6 @@ agent<id:String>(move!,charge!,readBat?,readLoc?,status?){
 	$m5 = id;
 	$m1 = "b(0)";
 	$m2 = "c(0,0)";
-	$m3 = "g(0)";
 	
 	{move} move = "L"
 	{move} move = "D"
@@ -12,5 +11,4 @@ agent<id:String>(move!,charge!,readBat?,readLoc?,status?){
 	{charge} charge = $m5
 	{readBat} $m1' = readBat, $m1 != *
 	{readLoc} $m2' = readLoc, $m2 != *
-	{status} $m3' = status, $m3 != *
 }	

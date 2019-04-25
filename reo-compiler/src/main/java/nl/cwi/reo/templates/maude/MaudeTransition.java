@@ -140,8 +140,20 @@ public final class MaudeTransition extends Transition{
 		else if(f instanceof Equality){
 			Term lhs = ((Equality) f).getLHS();
 			Term rhs = ((Equality) f).getRHS();
-			if(lhs instanceof Variable)
-				lstate.put((Variable)lhs, rhs);
+			if(lhs instanceof Variable) {
+				if(lhs instanceof PortVariable && ((PortVariable) lhs).isInput() ||
+				   lhs instanceof MemoryVariable && !((MemoryVariable) lhs).hasPrime()) {
+					lstate.put((Variable)lhs, lhs);
+					if(rhs instanceof MemoryVariable && !((MemoryVariable) rhs).hasPrime() ||
+					   rhs instanceof PortVariable && ((PortVariable) rhs).isInput() ||
+					   rhs instanceof Function) {
+						condition.add(f);
+						lstate.put((Variable)rhs, rhs);
+					}
+				}
+				else
+					lstate.put((Variable)lhs, rhs);
+			}
 			if(lhs instanceof Function)
 				functions.add((Function)lhs);
 			if(rhs instanceof Function)
@@ -187,6 +199,10 @@ public final class MaudeTransition extends Transition{
 			return "crl["+nb+"] : " + LHS + thState + " trace(sl) " + " => " + trace + RHS + thState + " if( "+ th +" <= "+ sem + ") .";			
 		}
 		semCounter=0;*/
+		
+		if(LHS.contentEquals(RHS)) {
+			return null;
+		}
 		
 		if(condition.isEmpty())
 			return "rl["+nb+"] : " + LHS + " => " + RHS + " .";
