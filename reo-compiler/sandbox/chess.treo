@@ -50,7 +50,7 @@ visualize(C?,R?,M!,O!){
 	//
 
 	fifo1(C,k)
-      	{ transformer<PARSE>(R,M) | PARSE = "Function.parse"}
+  	{ transformer<PARSE>(R,M) | PARSE = "Function.parse"}
 	{ binop<CONCATENATE>(k,M,O) | CONCATENATE = "Function.concatenate" }
 
 }

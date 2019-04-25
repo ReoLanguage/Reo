@@ -143,13 +143,16 @@ public final class MaudeTransition extends Transition{
 			if(lhs instanceof Variable) {
 				if(lhs instanceof PortVariable && ((PortVariable) lhs).isInput() ||
 				   lhs instanceof MemoryVariable && !((MemoryVariable) lhs).hasPrime()) {
+					lstate.put((Variable)lhs, lhs);
 					if(rhs instanceof MemoryVariable && !((MemoryVariable) rhs).hasPrime() ||
 					   rhs instanceof PortVariable && ((PortVariable) rhs).isInput() ||
-					   rhs instanceof Function)
+					   rhs instanceof Function) {
 						condition.add(f);
+						lstate.put((Variable)rhs, rhs);
+					}
 				}
-					
-				lstate.put((Variable)lhs, rhs);
+				else
+					lstate.put((Variable)lhs, rhs);
 			}
 			if(lhs instanceof Function)
 				functions.add((Function)lhs);
@@ -196,6 +199,10 @@ public final class MaudeTransition extends Transition{
 			return "crl["+nb+"] : " + LHS + thState + " trace(sl) " + " => " + trace + RHS + thState + " if( "+ th +" <= "+ sem + ") .";			
 		}
 		semCounter=0;*/
+		
+		if(LHS.contentEquals(RHS)) {
+			return null;
+		}
 		
 		if(condition.isEmpty())
 			return "rl["+nb+"] : " + LHS + " => " + RHS + " .";

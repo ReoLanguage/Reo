@@ -32,6 +32,10 @@ public final class MaudeProtocol extends Protocol {
 	/** Set of threshold variables involved in rew system. */
 	private Set<String> thVar = new HashSet<>(); 
 
+	/** Set of injection functions. */
+	private Map<String,String> injection = new HashMap<>(); 
+
+	
 	/** Port renaming */
 	public Map<Port,String> renaming = new HashMap<>();
 
@@ -56,6 +60,15 @@ public final class MaudeProtocol extends Protocol {
 		getFunctions();
 	}
 
+	public String getInitialValue(MemoryVariable m) {
+		String[] s = getInitial().get(m).toString().replace("\"","").split(":");
+		String[] n = s[0].split("[(]");
+		if(s.length>1 && n.length>0)
+			injection.put(n[0],s[1]);		
+		return s[0];
+		
+	}
+	
 	/**
 	 * Gets initial state.
 	 *
@@ -67,7 +80,7 @@ public final class MaudeProtocol extends Protocol {
 			variables.add("d_"+m.getName());
 			if (getInitial().get(m) != null){
 				// Remove ' " ' present in the value of the memories
-				s = s + "m(" + m.getName().substring(1) + "," + getInitial().get(m).toString().replace("\"", "") + ") ";
+				s = s + "m(" + m.getName().substring(1) + "," + getInitialValue(m) + ") ";
 			}
 			else{
 				s = s + "m(" + m.getName().substring(1) + "," + "*) ";
@@ -147,6 +160,14 @@ public final class MaudeProtocol extends Protocol {
 		return thVar;
 	}
 	
+	/**
+	 * Get injection function
+	 */
+	
+	public Map<String,String> getInjection(){
+		
+		return injection;
+	}
 	
 	/**
 	 * Get rewrite system variables

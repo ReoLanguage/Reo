@@ -17,7 +17,7 @@ system<id:int>(s1,s2,s3,s4,s5){
 	sync(status, s5)
 
 	agent<id>(move,chargeIn,readBat,readLoc,status)	
-	
+
 	gps<updateGps,initialPos>(outLoc,updateLoc)
 
 	battery<updateBat,initialBat>(readBat,action)

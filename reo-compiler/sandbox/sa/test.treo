@@ -1,27 +1,62 @@
+import reo.syncdrain;
+import reo.sync;
 import equal;
 
-test(a,b,c){
-	equal(a,b,c)
+test(Move,ReadLoc,Charge){
+
+	sync(move, Move)
+	sync(readLoc, ReadLoc)
+	sync(charge, Charge)
+
+	agent<id>(move,charge,getId)	
 	
-	
-	syncdrain(chargeIn, y)
-	syncdrain(y,chargeOut)
-	
-	station<position>(chargeOut,location)
-	
-	sync(move,action)
-	sync(charge,action)
 	sync(move,updateLoc)
+	sync(move,updateBat)
 	
-	sync(outLoc,x) 
-	sync(x,readLoc)
-	
-	lossy(x,agentLoc)
-	
-	equal(agentLoc, goalL, status)
+	sensor<updateGps,initialPos>(readLoc,updateLoc)
+	sensor<updateB,initialBat>(readBat,updateBat)
 
-	sync(goalLoc,goalL)
+	sync(readLoc,agentLoc)
+	syncdrain(charge,chargeIn)
+	equal(agentLoc,stationLoc,chargeIn)
+	
+	station<stationPos>(stationLoc, chargeOut)
+	sync(chargeOut, updateBat)
+		
+	|
+		id = "id(1): Nat -> Data",
+		updateGps = "updateGps",
+		position  = "c(1,1): Nat Nat -> Data",
+		initialPos  = "c(20,20): Nat Nat -> Data",
+		initialBat  = "b(100): Nat -> Data",
+		updateB = "updateBat",
+		stationPos = "c(30,10)"
+}
 
-	goal<position>(goalLoc,status)
+station<location:String>(getLoc!,charge!){
+	#RBA
+	$m = location;
+	
+	{charge,getLoc} charge = "b(10)", getLoc = $m, $m!=*
 	
 }
+
+sensor<write:string,initial:String>(read!, toWrite?) {
+	#RBA
+	$m = initial;
+	
+	{read} 	read = $m , $m != *, $m' = $m
+	{toWrite}	$m' = write($m,toWrite) , $m != *
+}
+
+agent<id:String>(move!,charge!,getId!){
+	#RBA
+	$m1 = id;
+	
+	{move} move = "L"
+	{move} move = "D"
+	{move} move = "U"
+	{move} move = "R"
+	{charge} true
+	{getId} getId = $m1, $m1 != *
+}	

@@ -50,6 +50,10 @@ public class Function {
 			System.out.println(i + ": " + a.get() + " ");
 		System.exit(0);
 	}
+	
+	public static boolean iscross(String a) {
+		return a.contentEquals("X");
+	}
 
 	public static String pair(Object object1, Object object2) {
 		if (object1 == null)
@@ -73,15 +77,20 @@ public class Function {
 			throw new NullPointerException();
 		if (object2 == null)
 			throw new NullPointerException();
-//		if (!(object1 instanceof String))
-//			throw new IllegalArgumentException();
-//		if (!(object2 instanceof String))
-//			throw new IllegalArgumentException();
 
-		String string = (object1.toString() + " " + object2.toString()).trim();
-		if (string.length() > 10000)
-			string = "";
 
+		String string = (String)object1 + ":" + (String) object2;
+		return string;
+	}
+	
+	public static String formatting(Object object1, Object object2) {
+		if (object1 == null)
+			throw new NullPointerException();
+		if (object2 == null)
+			throw new NullPointerException();
+
+
+		String string = (String)object1 + ":" + (String) object2;
 		return string;
 	}
 

@@ -1,0 +1,73 @@
+import reo.sync;
+import reo.xrouter;
+import reo.syncdrain;
+import reo.alternator;
+import reo.fifo1;
+import reo.fifofull;
+import reo.filter;
+import cell;
+
+
+tictactoe(){
+
+	constant<"X">(a1)
+//	{ filter<ISCROSS>(a3,a1) 	|	ISCROSS = "Function.iscross"	}
+
+	constant<"O">(a2)
+	alternate(a1,a2)
+	sync(a1,a)
+	sync(a2,a)
+	
+	alternate(a,d)
+
+
+
+	
+	xrouter(a,b[1..9])
+	{
+		cell(b[i],c[i])
+	  	syncdrain(c[i],c[i+1])
+	  	|
+	  	i:<1..9>
+
+	}
+  	
+	concatenate<"Function.formatting">(c[1],c[2],d[1]) 
+  	{ 
+		concatenate<"Function.formatting">(d[i],c[i+2],d[i+1])  		
+  		| 
+
+		i:<1..7>  
+	}
+
+	sync(d[8],d)
+
+	{ 
+	Display(d)
+	|
+	  Display(a?String){
+		#JAVA
+		"WorkersTTT.Display"
+
+	  }
+	}
+	
+}
+
+alternate(a?,b?){
+	syncdrain(a,q1)
+	fifofull<" ">(q2,q1)
+	fifo1(q1,q2)
+	syncdrain(b,q2)	
+}
+
+concatenate<f:String>(a?,b?,c!){
+	#RBA
+	{a,b,c} c = f(a,b)
+}
+
+constant<init:String>(a!){
+	#RBA
+	$m= init;
+	{a} a = $m, $m'=$m
+}
