@@ -1,6 +1,6 @@
 agent<id:String>(move!,charge!,readBat?,readLoc?,status?){
 	#RBA
-	$mid = id;
+	$m5 = id;
 	$m1 = "b(0)";
 	$m2 = "c(0,0)";
 	$m3 = "g(0)";
@@ -9,7 +9,7 @@ agent<id:String>(move!,charge!,readBat?,readLoc?,status?){
 	{move} move = "D"
 	{move} move = "U"
 	{move} move = "R"
-	{charge} charge = $mid
+	{charge} charge = $m5
 	{readBat} $m1' = readBat, $m1 != *
 	{readLoc} $m2' = readLoc, $m2 != *
 	{status} $m3' = status, $m3 != *

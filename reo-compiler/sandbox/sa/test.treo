@@ -1,0 +1,5 @@
+import equal;
+
+test(a,b,c){
+	equal(a,b,c)
+}

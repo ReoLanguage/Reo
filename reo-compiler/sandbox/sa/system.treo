@@ -16,12 +16,9 @@ system<id:int>(s1,s2,s3,s4,s5){
 	sync(status, s5)
 	
 
-	agent<id>(move,chargeIn,readBat,readLoc,status)	
-	
-	
-	syncdrain(chargeIn, y)
-	syncdrain(y,chargeOut)
-	
+	agent<id>(move,charge,readBat,readLoc,status)	
+	sync(y,status)
+		
 	station<position>(chargeOut,location)
 	
 	sync(move,action)
@@ -35,11 +32,12 @@ system<id:int>(s1,s2,s3,s4,s5){
 	
 	gps<updateGps,initialPos>(outLoc,updateLoc)
 
-	equal(agentLoc, goalL, status)
+	equal(agentLoc, goalL, y)
 
 	sync(goalLoc,goalL)
 
-	goal<position>(goalLoc,status)
+	sync(goalStatus, y)
+	goal<position>(goalLoc,goalStatus)
 	
 	battery<updateBat,initialBat>(readBat,action)
 	
