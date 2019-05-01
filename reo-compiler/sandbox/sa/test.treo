@@ -1,24 +1,37 @@
 import reo.syncdrain;
 import reo.sync;
+import reo.xrouter;
+import reo.fifofull;
+import reo.fifo1;
 import equal;
 
-test(Move,ReadLoc,Charge){
+test(ReadLoc,Charge){
 
-	sync(move, Move)
-	sync(readLoc, ReadLoc)
-	sync(charge, Charge)
+//	sync(move, Move)
+//	sync(readLoc, ReadLoc)
+//	sync(charge, Charge)
 
 	agent<id>(move,charge,getId)	
 	
 	sync(move,updateLoc)
 	sync(move,updateBat)
+	sync(move,mgoal)
+	sync(move, amove)
+	
+	alternate(amove,rLoc)
+	
+	goal<f>(mgoal,rLoc,rbat,sLoc)
+	sync(readBat,rbat)
 	
 	sensor<updateGps,initialPos>(readLoc,updateLoc)
 	sensor<updateB,initialBat>(readBat,updateBat)
 
-	sync(readLoc,agentLoc)
+	xrouter(readLoc,agentLoc,rLoc)
+	xrouter(stationLoc,statLoc,sLoc)
+	
 	syncdrain(charge,chargeIn)
-	equal(agentLoc,stationLoc,chargeIn)
+	equal(agentLoc,statLoc,chargeIn)
+	
 	
 	station<stationPos>(stationLoc, chargeOut)
 	sync(chargeOut, updateBat)
@@ -30,14 +43,31 @@ test(Move,ReadLoc,Charge){
 		initialPos  = "c(20,20): Nat Nat -> Data",
 		initialBat  = "b(100): Nat -> Data",
 		updateB = "updateBat",
-		stationPos = "c(30,10)"
+		stationPos = "c(30,10)",
+		f = "nextMove"
+}
+
+alternate(a?,b?){
+	syncdrain(a,q1)
+	fifofull<"v(0): Nat -> Data">(q2,q1)
+	fifo1(q1,q2)
+	syncdrain(b,q2)	
+}
+
+
+goal<f:String>(move?,rloc?,rbat?,sloc?){
+	#RBA
+	$m = "s(0) : String -> Data";
+	
+	{move}	move = $m 
+	{rloc,rbat,sloc} $m' = f(rloc,sloc,rbat) , $m != *
 }
 
 station<location:String>(getLoc!,charge!){
 	#RBA
 	$m = location;
 	
-	{charge,getLoc} charge = "b(10)", getLoc = $m, $m!=*
+	{charge,getLoc} charge = b(10), getLoc = $m, $m!=*
 	
 }
 
@@ -53,10 +83,10 @@ agent<id:String>(move!,charge!,getId!){
 	#RBA
 	$m1 = id;
 	
-	{move} move = "L"
-	{move} move = "D"
-	{move} move = "U"
-	{move} move = "R"
+	{move} move = s("L")
+	{move} move = s("D")
+	{move} move = s("U")
+	{move} move = s("R")
 	{charge} true
 	{getId} getId = $m1, $m1 != *
 }	
