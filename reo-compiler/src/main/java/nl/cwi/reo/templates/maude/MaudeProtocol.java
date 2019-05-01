@@ -144,7 +144,11 @@ public final class MaudeProtocol extends Protocol {
 		}
 		List<String> listS = new ArrayList<>();
 		for(Function f : SetF){
-			String s = "op "  + f.getName().substring(1, f.getName().length()-1) + " : ";
+			String s = "";
+			if(f.getName().contains("\""))
+				s = "op "  + f.getName().substring(1, f.getName().length()-1) + " : ";
+			else
+				s = "op "  + f.getName() + " : ";
 			for(int i = 0; i< f.getArgs().size();i++) {
 				s = s + " Data ";
 			}

@@ -8,13 +8,13 @@ import reo.filter;
 import cell;
 
 
-tictactoe(){
+tictactoe(a3){
 
-	constant<"X">(a1)
-//	{ filter<ISCROSS>(a3,a1) 	|	ISCROSS = "Function.iscross"	}
+//	constant<"X">(a1)
+	{ filter<ISCROSS>(a3,a1) 	|	ISCROSS = "Function.iscross"	}
 
 	constant<"O">(a2)
-	alternate(a1,a2)
+//	alternate(a1,a2)
 	sync(a1,a)
 	sync(a2,a)
 	

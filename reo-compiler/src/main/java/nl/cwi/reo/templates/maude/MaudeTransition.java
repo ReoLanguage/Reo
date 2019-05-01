@@ -146,9 +146,15 @@ public final class MaudeTransition extends Transition{
 					lstate.put((Variable)lhs, lhs);
 					if(rhs instanceof MemoryVariable && !((MemoryVariable) rhs).hasPrime() ||
 					   rhs instanceof PortVariable && ((PortVariable) rhs).isInput() ||
-					   rhs instanceof Function) {
+					   rhs instanceof Function ||
+					   rhs instanceof Constant) {
 						condition.add(f);
-						lstate.put((Variable)rhs, rhs);
+						if(rhs instanceof MemoryVariable && !((MemoryVariable) rhs).hasPrime() ||
+								   rhs instanceof PortVariable && ((PortVariable) rhs).isInput() )
+							lstate.put((Variable)rhs, rhs);
+					}
+					if(rhs instanceof NullValue) {
+						lstate.put((Variable)lhs, rhs);
 					}
 				}
 				else
