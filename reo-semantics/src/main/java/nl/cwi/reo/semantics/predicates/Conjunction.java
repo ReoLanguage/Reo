@@ -34,7 +34,7 @@ public final class Conjunction implements Formula {
 	/**
 	 * List of formulas in this conjunction.
 	 */
-	private final List<Formula> clauses;
+	private final Set<Formula> clauses;
 	
 	/**
 	 * Free variables of this term.
@@ -48,7 +48,7 @@ public final class Conjunction implements Formula {
 	 *            collection of formulas
 	 */
 	public Conjunction(Collection<Formula> clauses) {
-		this.clauses = Collections.unmodifiableList(new ArrayList<>(clauses));
+		this.clauses = Collections.unmodifiableSet(new HashSet<>(clauses));
 		Set<Variable> vars = new HashSet<Variable>();
 		for (Formula f : clauses)
 			vars.addAll(f.getFreeVariables());

@@ -160,10 +160,18 @@ public final class MaudeTransition extends Transition{
 				else
 					lstate.put((Variable)lhs, rhs);
 			}
-			if(lhs instanceof Function)
-				functions.add((Function)lhs);
-			if(rhs instanceof Function)
-				functions.add((Function)rhs);	
+			if(lhs instanceof Function){
+				if(rhs instanceof Constant ||
+						rhs instanceof Function ||
+						rhs instanceof NullValue)
+					condition.add(f);
+				else 
+					functions.add((Function)lhs);				
+			}
+			else if(rhs instanceof Function){
+				f = new Equality(rhs,lhs);
+				formulaToString(f);
+			}
 		}
 		else  if(f instanceof Relation){
 			if(((Relation) f).getName().contains("Semiring")){

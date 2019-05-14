@@ -1,8 +1,7 @@
 
-goal< position:String >(readLoc!,getValue!){
+goal<f:String>(anymove?,output!,rloc?,rbat?,sloc?){
 	#RBA
-	$m = position;
-	$m1 = "g(8)";
-	{getValue}  getValue = $m1 
-	{readLoc}  readLoc = $m 
+	anymove = *, output!=*, rloc!=*, sloc!=*, rbat!=*, output = f(rloc,sloc,rbat)
+	anymove!=* , output=*, rloc!=*, sloc!=*, rbat!=*, * = f(rloc,sloc,rbat)
 }
+

@@ -1,15 +1,8 @@
-
-sensor<write:string,initial:String>(read!, toWrite?) {
-//	#MAUDE
-//	inc MYFUNCTION
-//	var $m : Nat .
-//	var read : Nat .
-//	var toWrite : Nat .
-	
+sensor<write:string,initial:String>(read!, lock!, toWrite?) {
 	#RBA
-	
 	$m = initial;
 	
-	{read} 	read = $m , $m != *, $m' = $m
-	{toWrite}	$m' = write($m,toWrite) , $m != *
+	read = $m , $m != *, $m' = $m, toWrite=*, lock = *
+	toWrite!=*, read=*, $m' = write($m,toWrite) , $m != *, lock = *
+	toWrite!=*, read!=*, $m' = write($m,toWrite) , read = $m, lock !=* 
 }

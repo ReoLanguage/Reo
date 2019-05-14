@@ -2,5 +2,5 @@ import sensor;
 
 gps<update:String,initial:String>(readLoc,move){
 	
-	sensor<update,initial>(readLoc,move) 	
+	sensor<update,initial>(readLoc,lock, move) 	
 }

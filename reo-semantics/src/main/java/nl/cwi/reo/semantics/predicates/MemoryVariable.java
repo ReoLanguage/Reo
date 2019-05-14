@@ -181,7 +181,7 @@ public final class MemoryVariable implements Variable, Comparable<MemoryVariable
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getName(), this.prime);
+		return Objects.hash(this.name, this.prime);
 	}
 
 	/**

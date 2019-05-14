@@ -369,6 +369,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		}
 
 		composition.distribute();
+
 		return composition;
 	}
 	
@@ -459,9 +460,10 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public ConstraintHypergraph restrict(Collection<? extends Port> intface) {
 		Set<Rule> setRules = new HashSet<Rule>();
+		Set<Formula> setFormula = new HashSet<>();
 		
 		for (RuleNode ruleNodes : getRuleNodes()) {
-			List<Formula> list = new ArrayList<>();
+			Set<Formula> list = new HashSet<>();
 			for(Rule _r : ruleNodes.getRules())
 				list.add(_r.getFormula());
 			Formula g = new Conjunction(list);
@@ -473,8 +475,10 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 						g = Formulas.eliminate(Arrays.asList(g), Arrays.asList(new PortVariable(p)));
 				}
 			}
-			setRules.add(new Rule(g));
+			setFormula.add(g);
 		}
+		for(Formula g : setFormula)
+			setRules.add(new Rule(g));
 		return new ConstraintHypergraph(new HashSet<>(Arrays.asList(setRules)), initial);
 	}
 

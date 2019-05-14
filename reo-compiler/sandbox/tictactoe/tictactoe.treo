@@ -5,53 +5,111 @@ import reo.alternator;
 import reo.fifo1;
 import reo.fifofull;
 import reo.filter;
+import reo.transformer;
+import reo.asyncdrain;
 import cell;
 
 
-tictactoe(a3){
+tictactoe(X,O,end){
 
-//	constant<"X">(a1)
-	{ filter<ISCROSS>(a3,a1) 	|	ISCROSS = "Function.iscross"	}
+//  { filter<ISCROSS>(X,cross)  |   ISCROSS  = "Function.iscross"   }
+//  { filter<ISCIRCLE>(O,circle)    |   ISCIRCLE = "Function.iscircle"  }
 
-	constant<"O">(a2)
-//	alternate(a1,a2)
-	sync(a1,a)
-	sync(a2,a)
+    constant<"X">(cross)
+    constant<"O">(circle)
+
+
+    sync(cross,move)
+    sync(circle,move)
+
+    alternateAfterMove(player1,player2,e[1..9])
+
+    xrouter(move,b[1..9])
+
+    {
+        cell(e[i],c[i])
+        syncdrain(c[i],c[i+1])
+
+        |
+
+        i:<1..9>
+
+    }
+
+    concatenate<"Function.formatting">(c[1],c[2],d[1])
+    {
+        concatenate<"Function.formatting">(d[i],c[i+2],d[i+1])
+        |
+
+        i:<1..7>
+    }
+
+    sync(d[8],d)
+    sync(d,display)
+    alternate(display,move)
+    {
+    Display(d)
+    |
+      Display(a?String){
+        #JAVA
+        "WorkersTTT.Display"
+
+      }
+    }
+
 	
-	alternate(a,d)
+}
 
+syncdraineq(a?,b?){
+	#RBA
+	{a,b} a=b
+}
 
+haswon<f:String>(state?,y!){
+	#RBA
+	{y,state} y = f(state), y!= *
+	{state} true
+}
 
+alternateAfterMove(p1,p2,c[1..9]){
 	
-	xrouter(a,b[1..9])
+	alternate(p1,p2)
+	
+	sync(p1,x)
+	sync(p2,x)
+	syncdrain(x,y)
 	{
-		cell(b[i],c[i])
-	  	syncdrain(c[i],c[i+1])
-	  	|
-	  	i:<1..9>
-
-	}
-  	
-	concatenate<"Function.formatting">(c[1],c[2],d[1]) 
-  	{ 
-		concatenate<"Function.formatting">(d[i],c[i+2],d[i+1])  		
-  		| 
-
-		i:<1..7>  
+		sync(c[i],y)
+		|
+		i : <1..9>
+		
 	}
 
-	sync(d[8],d)
+}
 
-	{ 
-	Display(d)
-	|
-	  Display(a?String){
-		#JAVA
-		"WorkersTTT.Display"
+parseAndCheck<i:String>(a?,b!){
 
-	  }
-	}
+		filterPosition<i,P>(a,x)
+		transformer<"Function.filterSymbol">(x,b)
+		|
+		
+		P = "Function.isSymbolAllowed"
+		
+
+}
+
+overwritefifo1(a?,b!){
+	#RBA
 	
+	{a} $m' = a
+	{b} b = $m, $m' = $m, $m != * 
+
+}
+
+filterPosition<i:String,P:String>(a?,b!){
+	#RBA
+	a!= *, b = a, P(a,i)
+
 }
 
 alternate(a?,b?){
@@ -61,9 +119,24 @@ alternate(a?,b?){
 	syncdrain(b,q2)	
 }
 
+
 concatenate<f:String>(a?,b?,c!){
 	#RBA
 	{a,b,c} c = f(a,b)
+}
+
+yvalue(a!){
+	#RBA
+	{a} a = "a"
+	{a} a = "b"
+	{a} a = "c"
+}
+
+xvalue(a!){
+	#RBA
+	{a} a = "1"
+	{a} a = "2"
+	{a} a = "3"
 }
 
 constant<init:String>(a!){

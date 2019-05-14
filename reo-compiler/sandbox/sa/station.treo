@@ -1,6 +1,8 @@
-
-station<position:String>(charge!,location?){
+station<location:String>(getLoc!,charge!){
 	#RBA
-	$m = position;
-	{charge,location} charge = "10 units charging", location = position
+	$m = location;
+	
+	charge!=*, charge = b(10), getLoc = *
+	charge = *, getLoc = $m, $m!=*, getLoc !=*
+	charge!=*, charge= b(10), getLoc !=*, getLoc = $m, $m = $m'	
 }

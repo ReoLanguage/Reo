@@ -1,14 +1,20 @@
-agent<id:String>(move!,charge!,readBat?,readLoc?,status?){
-	#RBA
-	$m5 = id;
-	$m1 = "b(0)";
-	$m2 = "c(0,0)";
-	
-	{move} move = "L"
-	{move} move = "D"
-	{move} move = "U"
-	{move} move = "R"
-	{charge} charge = $m5
-	{readBat} $m1' = readBat, $m1 != *
-	{readLoc} $m2' = readLoc, $m2 != *
+agent<id:String>(move!,getId!){
+
+	moveActions(lock1,lock2,move)
+	getId<id>(getId)
 }	
+
+getId<id:String>(getId!){
+	#RBA
+	$m1 = id;
+	
+	getId = $m1 , $m1'=$m1, getId!=*
+}
+
+moveActions(lock1!,lock2!,move!){
+	#RBA	
+	move = s("L"), move != *, lock1=*, lock2!=*
+	move = s("D"), move != *, lock1!=*, lock2=*
+	move = s("U"), move != *, lock2!=*, lock1 !=*
+	move = s("R"), move != *, lock2=*, lock1 =*
+}
