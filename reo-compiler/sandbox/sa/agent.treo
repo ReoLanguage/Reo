@@ -1,14 +1,12 @@
-agent<id:String>(move!,getId!){
-
+agent<id:String>(move!,agentId!){
 	moveActions(lock1,lock2,move)
-	getId<id>(getId)
+	getId<id>(agentId)
 }	
 
-getId<id:String>(getId!){
+getId<id:String>(agentId!){
 	#RBA
 	$m1 = id;
-	
-	getId = $m1 , $m1'=$m1, getId!=*
+	agentId = $m1 , $m1'=$m1, agentId!=*
 }
 
 moveActions(lock1!,lock2!,move!){

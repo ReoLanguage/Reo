@@ -19,8 +19,6 @@ agentgoal(){
 	sync(chargeOut,updatebattery)
 	syncdraineq(sLoc2,rLoc3)
 	syncdrain(sLoc2,chargeOut)
-	
-	
 
 	xrouter(move,moveE,move2,move3)
 	syncdraineq(moveE,moveg1)
