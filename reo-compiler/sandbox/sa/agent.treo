@@ -1,11 +1,21 @@
 import reo.sync;
+import reo.syncdrain;
+import reo.fifo1;
+import reo.fifofull;
 
 agent<id:String,updateGps:String,initPos:String,updateB:String,initB:String>(getMove!,getCoord?,getId!,recharge?,readGps!,readBat!){
 	core(move,lock1,lock2)	
-		sync(move,getMove)
+		sync(move,altmove)
+			sync(altmove,getMove)
+			fifo1(tmpmove,tmpgps)
+			fifofull<"0">(tmpgps,tmpmove)
+			syncdrain(altgps,tmpgps)
+			syncdrain(altmove,tmpmove)
+			sync(altgps,write)
 		sync(move,x)
+		
 	gps<updateGps,initPos>(read,write)
-		sync(getCoord,write)
+		sync(getCoord,altgps)
 		sync(read,readGps)
 	battery<updateB,initB>(readB,writeB)
 		sync(x,writeB)

@@ -3,7 +3,7 @@ main(S) ::= <<
  *** Generated from <S.file> by Reo 1.0.
 
 mod CONNECTOR is 
-		inc SIGNATURE .
+		inc RUNTIMESIGNATURE .
         inc CONSTRAINT-SEMIRING .
 
 	

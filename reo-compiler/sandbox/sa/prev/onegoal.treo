@@ -53,8 +53,6 @@ main(){
 		initB  = "b(100): Nat -> Data",
 		updateB = "updateBat",
 		stationPos = "c(30,10)",
-		goalPos = "c(70,20)",
-		computeMove = "computeMove",
 		f = "nextMove"
 	
 }
@@ -75,8 +73,8 @@ goal<goalLoc:String,f:String>(anymove?,output!,rloc?,rbat?){
 
 goal2<goalLoc:String,f:String>(anymove?,output!,rloc?){
 	#RBA
-	anymove = *, output!=*, rloc!=*, output = f(rloc,goalLoc)
-	anymove!=* , output=*, rloc!=*,   * = f(rloc,goalLoc)
+	anymove = *, output!=*, rloc!=*, rbat!=*, output = f(rloc,goalLoc,rbat)
+	anymove!=* , output=*, rloc!=*,  rbat!=*, * = f(rloc,goalLoc,rbat)
 }
 
 station<initLoc:String>(location!,charge!){
