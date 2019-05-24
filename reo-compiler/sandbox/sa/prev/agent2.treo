@@ -1,0 +1,39 @@
+import reo.sync;
+
+agent<id:String,updateGps:String,initPos:String,updateB:String,initB:String>(getMove!,getCoord?,getId!,recharge?,readGps!,readBat!){
+	core(move)	
+		sync(move,getMove)
+		sync(move,x)
+	sensor<updateGps,initPos>(read,write)
+		sync(getCoord,write)
+		sync(read,readGps)
+	sensor<updateB,initB>(readB,writeB)
+		sync(x,writeB)
+		sync(recharge,x)
+		sync(readB,readBat)
+	getId<id>(myId)
+		sync(myId,getId)
+}	
+
+getId<id:String>(getId!){
+	#RBA
+	$m1 = id;
+	getId = $m1 , $m1'=$m1, getId!=*
+}
+
+core(move!,lock1!,lock2!){
+	#RBA	
+	move = s("L"), move != *
+	move = s("D"), move != *
+	move = s("U"), move != *
+	move = s("R"), move != *
+}
+
+sensor<write:string,initial:String>(read!, toWrite?) {
+	#RBA
+	$m = initial;
+	
+	read = $m , $m != *, $m' = $m, toWrite=*
+	toWrite!=*, read=*, $m' = write($m,toWrite) , $m != *
+	toWrite!=*, read!=*, $m' = write($m,toWrite) , read = $m 
+}

@@ -1,0 +1,32 @@
+import reo.sync;
+
+environment<getPos:String,updatePos:String,goalLoc:String,f:String,initLoc:String>(sendCoord,getId,update,anymove,output,rloc,rbat,location,charge){
+
+	field<getPos,updatePos>(sendCoord, getId, update)	
+
+	goal<getLoc,f>(anymove,output,rloc,rbat)
+
+	station<initLoc>(location,charge)
+
+}	
+
+field<getPos:String,updatePos:String>(sendCoord!,getId?,update?){
+	#RBA
+	sendCoord != * , sendCoord = getPos(getId)
+	$m1' = updatePos(getId,update), getId != *, update !=*
+}
+
+goal<goalLoc:String,f:String>(anymove?,output!,rloc?,rbat?){
+	#RBA
+	anymove = *, output!=*, rloc!=*, rbat!=*, output = f(rloc,goalLoc,rbat)
+	anymove!=* , output=*, rloc!=*,  rbat!=*, * = f(rloc,goalLoc,rbat)
+}
+
+station<initLoc:String>(charge!,location!){
+	#RBA
+	$m = initLoc;
+	
+//	charge!=*, charge = b(10), location = *
+	charge = *, location = $m, $m!=*, location !=*
+	charge!=*, charge= b(10), location !=*, location = $m, $m = $m'	 
+}

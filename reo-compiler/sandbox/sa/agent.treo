@@ -1,20 +1,48 @@
-agent<id:String>(move!,getId!){
+import reo.sync;
 
-	moveActions(lock1,lock2,move)
-	getId<id>(getId)
+agent<id:String,updateGps:String,initPos:String,updateB:String,initB:String>(getMove!,getCoord?,getId!,recharge?,readGps!,readBat!){
+	core(move,lock1,lock2)	
+		sync(move,getMove)
+		sync(move,x)
+	gps<updateGps,initPos>(read,write)
+		sync(getCoord,write)
+		sync(read,readGps)
+	battery<updateB,initB>(readB,writeB)
+		sync(x,writeB)
+		sync(recharge,x)
+		sync(readB,readBat)
+	getId<id>(myId)
+		sync(myId,getId)
 }	
 
 getId<id:String>(getId!){
 	#RBA
 	$m1 = id;
-	
-	getId = $m1 , $m1'=$m1, getId!=*
+	getId = $m1 , $m1'=$m1, getId!=*, $m1!=*
 }
 
-moveActions(lock1!,lock2!,move!){
+core(move!,lock1!,lock2!){
 	#RBA	
-	move = s("L"), move != *, lock1=*, lock2!=*
-	move = s("D"), move != *, lock1!=*, lock2=*
-	move = s("U"), move != *, lock2!=*, lock1 !=*
-	move = s("R"), move != *, lock2=*, lock1 =*
+	move = s("L"), move != *, lock1 =*, lock2 !=*
+	move = s("D"), move != *, lock1 !=*, lock2 =*
+	move = s("U"), move != *, lock1 !=*, lock2 !=*
+	move = s("R"), move != *, lock1 =*, lock2 =*
+}
+
+gps<write:string,initial:String>(read!, toWrite?) {
+	#RBA
+	$m = initial;
+	
+	read = $m , $m != *, $m' = $m, toWrite=*
+	toWrite!=*, read=*, $m' = write($m,toWrite) , $m != *
+//	toWrite!=*, read!=*, $m' = write($m,toWrite) , read = $m , $m != *
+}
+
+battery<write:string,initial:String>(read!, toWrite?) {
+	#RBA
+	$m = initial;
+	
+	read = $m , $m != *, $m' = $m, toWrite=*
+	toWrite!=*, read=*, $m' = write($m,toWrite) , $m != *
+	toWrite!=*, read!=*, $m' = write($m,toWrite) , read = $m , $m != *
 }

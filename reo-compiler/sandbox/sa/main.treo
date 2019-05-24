@@ -1,8 +1,81 @@
-import system;
+import agent;
+import reo.sync;
+import reo.syncdrain;
+import reo.xrouter;
 
-main(moveA1,chargeA1,readBatA1,readLocA1,statusA1){
+//main(getMove,getCoord,getId,recharge,readGps,readBat){
+main(){
 
-	system<"agent1">(moveA1,chargeA1,readBatA1,readLocA1,statusA1)	
-//	system<"2">(moveA2,chargeA2,readBatA2,readLocA2,statusA2)	
+	agent<id,updateGps,initPos,updateB,initB>(getMove,getCoord,sendId,recharge,readGps,readBat)
+		sync(sendId,x)
+			xrouter(x,a,b)
+				syncdrain(a,tmpsendcoord)
+				sync(a,xgetId)
+				syncdrain(b,movea)
+				sync(b,xgetId)
+					sync(xgetId,getId)
+		sync(getMove,movea)
+			sync(movea,moveEq)
+		sync(readGps,gpsrouter)
+			xrouter(gpsrouter,stationloc,rloc)
+		sync(readBat,rbat)
+		
+	field<initPos,getPos,updatePos>(sendCoord, getId, update)	
+		sync(sendCoord,tmpsendcoord)
+		sync(tmpsendcoord,getCoord)
+		sync(movea,update)
+
+	goal<stationPos,f>(anymove,output,rloc,rbat)
+		sync(anymove,nextmove)
+		sync(output,nextmove)
+		syncdraineq(nextmove,moveEq)
+		
+	station<stationPos>(location,charge)
+		syncdraineq(stationloc,location)
+		syncdrain(location,ischarge)
+		sync(charge,ischarge)
+		sync(ischarge,recharge)
+		
 	
+	|
+		id = "id(1): Nat -> Data",
+		updateGps = "updateGps",
+		getPos = "getPos",
+		updatePos = "updatePos",
+		position  = "c(1,1): Nat Nat -> Data",
+		initPos  = "c(20,20): Nat Nat -> Data",
+		initB  = "b(100): Nat -> Data",
+		updateB = "updateBat",
+		stationPos = "c(30,10)",
+		f = "nextMove"
+	
+}
+	
+
+field<init:String, getPos:String,updatePos:String>(sendCoord!,getId?,update?){
+	#RBA
+	$m1 = init;
+	sendCoord != * , sendCoord = getPos(getId), getId!=*, update = *
+	$m1' = updatePos(getId,update), getId != *, update !=*, $m1!=*, sendCoord = *
+}
+
+goal<goalLoc:String,f:String>(anymove?,output!,rloc?,rbat?){
+	#RBA
+	anymove = *, output!=*, rloc!=*, rbat!=*, output = f(rloc,goalLoc,rbat)
+	anymove!=* , output=*, rloc!=*,  rbat!=*, * = f(rloc,goalLoc,rbat)
+}
+
+station<initLoc:String>(charge!,location!){
+	#RBA
+	$m = initLoc;
+	
+//	charge!=*, charge = b(10), location = *
+	charge = *, location = $m, $m!=*, location !=*
+	charge!=*, charge= b(10), location !=*, location = $m, $m = $m'	 
+}
+
+
+syncdraineq(a?,b?){
+	#RBA
+	a!=*, b!=*, b=a
 }
