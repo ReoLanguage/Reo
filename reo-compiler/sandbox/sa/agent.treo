@@ -15,10 +15,10 @@ agent<id:String,updateGps:String,initPos:String,updateB:String,initB:String>(get
 		sync(myId,getId)
 }	
 
-getId<id:String>(getId!){
+getId<id:String>(agentId!){
 	#RBA
 	$m1 = id;
-	getId = $m1 , $m1'=$m1, getId!=*, $m1!=*
+	agentId = $m1 , $m1'=$m1, agentId!=*
 }
 
 core(move!,lock1!,lock2!){
