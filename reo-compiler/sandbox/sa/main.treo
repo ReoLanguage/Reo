@@ -3,7 +3,6 @@ import reo.sync;
 import reo.syncdrain;
 import reo.xrouter;
 
-//main(getMove,getCoord,getId,recharge,readGps,readBat){
 main(){
 
 	agent<id,updateGps,initPos,updateB,initB>(getMove,getCoord,sendId,recharge,readGps,readBat)
