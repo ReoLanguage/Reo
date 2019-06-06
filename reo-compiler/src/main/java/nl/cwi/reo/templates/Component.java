@@ -20,4 +20,12 @@ public interface Component {
 	 */
 	public Set<Port> getPorts();
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
+	public String getName();
+
+	
 }

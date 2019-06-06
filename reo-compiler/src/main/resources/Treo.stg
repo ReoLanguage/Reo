@@ -9,11 +9,11 @@ main(S) ::= <<
 >>
 
 instance(c) ::= <<
-<c.name>(<c.ports:signature(); separator=",">)
+<c.name>(<if(c.atomic)><c.ports:signature(); separator=","><else><c.renamedPorts:signature(); separator=","><endif>)
 >>
 
 definition(c) ::= <<
-<c.name> = (<c.ports:port(); separator=",">) {
+<c.name> = (<if(c.atomic)><c.ports:port(); separator=","><else><c.renamedPorts:port(); separator=","><endif>) {
 	<if(c.atomic)><c:atomic()><else><c:protocol()><endif>
 }
 >>

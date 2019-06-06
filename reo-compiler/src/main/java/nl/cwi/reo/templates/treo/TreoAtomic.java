@@ -54,7 +54,14 @@ public final class TreoAtomic implements Component {
 	public TreoAtomic(String name, List<String> params, Set<Port> ports, String call) {
 		this.name = name;
 		this.params = params;
-		this.ports = ports;
+		this.ports = new HashSet<>();
+		for(Port p : ports) {
+			if(p.getName().substring(0, 1).contains("$")) {
+				this.ports.add(p.rename("p"+p.getName().substring(1,p.getName().length())));
+			}
+			else
+				this.ports.add(p);
+		}
 		this.call = call;
 	}
 
@@ -97,14 +104,6 @@ public final class TreoAtomic implements Component {
 	 */
 	public Set<Port> getPorts() {
 		return ports;
-	}
-	
-	public Set<Port> getRenamedPorts() {
-		Set<Port> set = new HashSet<>();
-		for(Port p :  ports){
-			set.add(p.rename("p"+p.getName().substring(1)));
-		}
-		return set;
 	}
 
 	/**

@@ -30,7 +30,10 @@ import nl.cwi.reo.templates.Transition;
  */
 
 public final class TreoTransition extends Transition{
-
+	
+	//Renaming map
+	private Map<Port,Port> m = new HashMap<>();
+	
 	/**
 	 * Instantiates a new transition.
 	 *
@@ -45,9 +48,34 @@ public final class TreoTransition extends Transition{
 	 */
 	public TreoTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory) {
 		super(guard,output,memory);
+		for(Port p : getInterface())
+			if(p.getName().substring(0, 1).contains("$")) {
+				m.put(p, p.rename("p"+p.getName().substring(1,p.getName().length())));
+			}
 	}
-
 	
+	@Override
+	public Map<PortVariable, Term> getOutput() {
+		Map<PortVariable, Term> map = super.getOutput();
+		Map<PortVariable, Term> mapRenamed = new HashMap<>();
+		for(PortVariable pv : map.keySet())
+			mapRenamed.put(pv.rename(m),map.get(pv).rename(m));
+		return mapRenamed;
+	}
+	
+	@Override
+	public Formula getGuard() {
+		return super.getGuard().rename(m);
+	}
+	
+	@Override
+	public Map<MemoryVariable, Term> getMemory() {
+		Map<MemoryVariable, Term> map = super.getMemory();
+		Map<MemoryVariable, Term> mapRenamed = new HashMap<>();
+		for(MemoryVariable pv : map.keySet())
+			mapRenamed.put(pv,map.get(pv).rename(m));
+		return mapRenamed;
+	}
 	/**
 	 * {@inheritDoc}
 	 */
