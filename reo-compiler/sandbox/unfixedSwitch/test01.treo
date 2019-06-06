@@ -1,0 +1,74 @@
+import reo.transformer;
+import reo.filter;
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+import reo.shiftlossyfifo1;
+//import reo.variable;
+import reo.fifofull;
+import reo.xrouter;
+
+
+
+test01(a[1..2],p0,p1,p2){
+	transformer2<"TransformerFunction.AddPort",i>(a[i],m)
+	//sync(m,m1)  
+	//sync(e1,e)
+	pair<"Pair.Merge">(m,d,e)
+	variable2<d>(c,d) 
+	filter<"FilterFunction.RegularMessage">(e,g)
+	filter<"FilterFunction.ControllerMessage">(e,f)
+	transformer<"TransformerFunction.Update">(f,c)
+	transformer<"TransformerFunction.Matching">(g,h)
+	filter<"FilterFunction.Sendout_q0">(h,q0)
+	filter<"FilterFunction.Sendout_q1">(h,q1)
+	filter<"FilterFunction.Sendout_q2">(h,q2)
+	transformer<"TransformerFunction.PutOut">(q0,p0)
+	transformer<"TransformerFunction.PutOut">(q1,p1)
+	transformer<"TransformerFunction.PutOut">(q2,p2)
+	
+|
+	i : <1..2>,
+	d="*/RULE/100/*/*/q0"
+
+}
+
+transformer2<k:String,n:String>(a?String,b!String){
+        #RBA
+        {a,b} b=k(n,a)
+}
+
+transformer3<k:String,n:String>(a?String,b!String){
+		#RBA
+		{a,b} b=k(n,b)
+
+}
+
+pair<k:String> (a?String,b?String,c!String){
+		#RBA
+		{a,b,c} c=k(a,b)
+}
+
+variable2<d:String>(a?String, b!String) {
+		sync(a, x) sync(x, y) shiftlossyfifo2<d>(y, z) 
+		sync(z, b) sync(z, t)  shiftlossyfifo2<d>(t, y)
+		sync(x, t)
+}
+
+
+
+shiftlossyfifo2<d:String>(in?String, out!String) {
+		sync(in,a) fifo1(a, b) fifo1(b, c) xrouter (c,d,e) 
+		syncdrain(a,g) sync(d,f) sync(e,g) sync(f,out) fifofull<d>(f,g)
+}
+
+variable3(a?String, b!String) {
+		sync(a, x) sync(x, y) shiftlossyfifo3(y, z) 
+		sync(z, b) sync(z, t)  shiftlossyfifo3(t, y)
+		sync(x, t)
+}
+
+shiftlossyfifo3(in?String, out!String) {
+		sync(in,a) fifo1(a, b) fifo1(b, c) xrouter (c,d,e) 
+		syncdrain(a,g) sync(d,f) sync(e,g) sync(f,out) fifofull<"*/RULE/100/*/*/q0">(f,g)
+}

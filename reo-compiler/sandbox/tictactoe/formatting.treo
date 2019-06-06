@@ -1,0 +1,23 @@
+
+cell(a,b){
+	blocking1(a)
+	sync(a,y)
+	variable<" ">(y,z)
+	sync(z,y)
+	sync(z,b)
+}
+
+
+
+variable<init:String>(a?,b!){
+	#RBA
+	$m = init;
+	
+	{a} $m' = a
+	{b} b = $m, $m' = $m, $m != * 
+}	
+
+blocking1(a?){
+	#RBA
+	{a} $m=*, $m'=a
+}

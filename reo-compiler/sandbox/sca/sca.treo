@@ -1,0 +1,147 @@
+import reo.sync;
+import reo.syncdrain;
+import reo.asyncdrain;
+import reo.Transition;
+import reo.State;
+import reo.StateFull;
+
+
+//	This example assumes that the csemiring is the weighted csemiring.
+//	The csemiring implements an interface containing \otimes and \oplus methods. 
+ 
+
+
+
+sca(charge,discharge1,discharge2,move,pass,snap){
+
+//Ports at the interface, representing the actions of each sca
+sync(a,charge)
+sync(b,discharge1)
+sync(c,discharge2)
+sync(d,move)
+sync(e,pass)
+sync(f,snap)
+
+//SCA representing the battery component.
+sca2<t1>(a,b,c)
+
+//SCA representing the snapshot component.
+sca1<t2>(d,e,f)
+
+//Component action system
+cas(a,b,c,d,e,f)
+
+|
+	//threshold for the first sca
+	t1=5,
+	//threshold for the second sca
+	t2=3
+}
+
+
+
+
+
+
+
+
+
+cas(a,b,c,d,e,f){
+
+syncdrain(a,e)
+syncdrain(b,f)
+syncdrain(c,d)
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sca1<t:int>(move,pass,snap){
+
+asyncdrain(move,pass)
+asyncdrain(move,snap)
+asyncdrain(pass,snap)
+
+Transition<E,1,t>(qNo1,pass,qNi1)
+Transition<E,1,t>(qYo1,pass,qYi1)
+
+Transition<E,2,t>(qNo2,move,qNi2)
+Transition<E,0,t>(qYo2,move,qNi3)
+
+Transition<E,0,t>(qNo3,snap,qYi2)
+
+//State qN
+StateFull<3,3>(qNi1,qNi2,qNi3,qNo1,qNo2,qNo3)
+
+//State qY
+State<2,2>(qYi1,qYi2,qYo1,qYo2)
+
+|
+	//Semiring linked at run-time
+	E = "WSemiring"
+
+}
+
+
+
+
+
+
+
+
+
+
+sca2<t:int>(charge,discharge1,discharge2){
+
+asyncdrain(charge,discharge1)
+asyncdrain(discharge2,discharge1)
+asyncdrain(discharge2,charge)
+
+Transition<E,0,t>(q3o1,charge,q4i1)
+Transition<E,0,t>(q2o1,charge,q3i1)
+Transition<E,0,t>(q1o1,charge,q2i1)
+Transition<E,0,t>(q0o1,charge,q1i1)
+
+Transition<E,2,t>(q4o1,discharge1,q3i2)
+Transition<E,2,t>(q3o2,discharge1,q2i2)
+Transition<E,2,t>(q2o2,discharge1,q1i2)
+Transition<E,2,t>(q1o2,discharge1,q0i1)
+
+Transition<E,5,t>(q4o2,discharge2,q2i3)
+Transition<E,5,t>(q3o3,discharge2,q1i3)
+Transition<E,5,t>(q2o3,discharge2,q0i2)
+
+
+//State q4
+StateFull<1,2>(q4i1,q4o1,q4o2)
+
+//State q3
+State<2,3>(q3i1,q3i2,q3o1,q3o2,q3o3)
+
+//State q2
+State<3,3>(q2i1,q2i2,q2i3,q2o1,q2o2,q2o3)
+
+//State q1
+State<3,2>(q1i1,q1i2,q1i3,q1o1,q1o2)
+
+//State q0
+State<2,1>(q0i1,q0i2,q0o1)
+
+|
+	E = "WSemiring"
+}
+

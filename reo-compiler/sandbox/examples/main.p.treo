@@ -1,0 +1,16 @@
+
+fifo(a?,b!){
+	#P
+	(b=a)&(a=null)
+	(b=$q1)&($q1!=null)&($q1'=null)
+}
+sync(a?,b!){
+	#P
+	(a=b)
+	(a=*)&(b=*)
+}
+main(a?,b!){
+	sync(a,c)fifo(c,b)
+}
+
+

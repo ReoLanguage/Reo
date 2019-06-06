@@ -1,0 +1,94 @@
+import agent;
+import reo.sync;
+import reo.syncdrain;
+import reo.xrouter;
+
+//main(getMove,getCoord,getId,recharge,readGps,readBat){
+main(){
+
+	agent<id,updateGps,initPos,updateB,initB>(getMove,getCoord,sendId,recharge,readGps,readBat)
+		sync(sendId,x)
+			xrouter(x,a,b)
+				syncdrain(a,tmpsendcoord)
+				sync(a,xgetId)
+				syncdrain(b,movea)
+				sync(b,xgetId)
+					sync(xgetId,getId)
+		sync(getMove,movea)
+			xrouter(movea,moveEq1,moveEq2)
+		sync(readGps,gpsrouter)
+			xrouter(gpsrouter,stationloc,rloc,rloc2)
+		sync(readBat,rbat)
+		
+	field<initPos,getPos,updatePos>(sendCoord, getId, update)	
+		sync(sendCoord,tmpsendcoord)
+		sync(tmpsendcoord,getCoord)
+		sync(movea,update)
+
+	goal<stationPos,f>(anymove,output,rloc,rbat)
+		sync(anymove,nextmove)
+		sync(output,nextmove)
+		syncdraineq(nextmove,moveEq1)
+
+	goal2<goalPos,computeMove>(anymove2,output2,rloc2)
+		sync(anymove2,nextmove2)
+		sync(output2,nextmove2)
+		syncdraineq(nextmove2,moveEq2)
+
+		
+	station<stationPos>(location,charge)
+		syncdraineq(stationloc,location)
+		syncdrain(location,ischarge)
+		sync(charge,ischarge)
+		sync(ischarge,recharge)
+		
+	
+	|
+		id = "id(1): Nat -> Data",
+		updateGps = "updateGps",
+		getPos = "getPos",
+		updatePos = "updatePos",
+		position  = "c(1,1): Nat Nat -> Data",
+		initPos  = "c(20,20): Nat Nat -> Data",
+		initB  = "b(100): Nat -> Data",
+		updateB = "updateBat",
+		stationPos = "c(30,10)",
+		goalPos = "c(70,20)",
+		computeMove = "computeMove",
+		f = "nextMove"
+	
+}
+	
+
+field<init:String, getPos:String,updatePos:String>(sendCoord!,getId?,update?){
+	#RBA
+	$m1 = init;
+	sendCoord != * , sendCoord = getPos(getId,$m1), $m1' = $m1, $m1 !=*, getId!=*, update = *
+	$m1' = updatePos(getId,update,$m1), getId != *, update !=*, $m1!=*, sendCoord = *
+}
+
+goal<goalLoc:String,f:String>(anymove?,output!,rloc?,rbat?){
+	#RBA
+	anymove = *, output!=*, rloc!=*, rbat!=*, output = f(rloc,goalLoc,rbat)
+	anymove!=* , output=*, rloc!=*,  rbat!=*, * = f(rloc,goalLoc,rbat)
+}
+
+goal2<goalLoc:String,f:String>(anymove?,output!,rloc?){
+	#RBA
+	anymove = *, output!=*, rloc!=*, output = f(rloc,goalLoc)
+	anymove!=* , output=*, rloc!=*,   * = f(rloc,goalLoc)
+}
+
+station<initLoc:String>(location!,charge!){
+	#RBA
+	$m = initLoc;
+	
+	charge = *, location = $m, $m!=*, location !=*
+	charge!=*, charge= b(10), location !=*, location = $m, $m = $m'	 
+}
+
+
+syncdraineq(a?,b?){
+	#RBA
+	a!=*, b!=*, b=a
+}

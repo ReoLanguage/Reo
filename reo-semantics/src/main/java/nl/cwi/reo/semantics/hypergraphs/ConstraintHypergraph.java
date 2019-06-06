@@ -21,6 +21,7 @@ import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Formulas;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
+import nl.cwi.reo.semantics.predicates.Negation;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.Terms;
@@ -29,7 +30,6 @@ import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.util.Monitor;
 
-// TODO: Auto-generated Javadoc
 /**
  * Constraint hypergraph semantics of Reo connectors.
  */
@@ -369,6 +369,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		}
 
 		composition.distribute();
+
 		return composition;
 	}
 	
@@ -409,7 +410,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	public List<ConstraintHypergraph> renameMemoryCells(List<ConstraintHypergraph> components){
 		List<ConstraintHypergraph> list = new ArrayList<>();
 
-		int i = 1;
+		int i = 0;
 		for (ConstraintHypergraph A : components) {
 			Map<String, String> rename = new HashMap<>();
 			for (RuleNode rn : A.getRuleNodes()) {
@@ -418,7 +419,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 						if (v instanceof MemoryVariable) {
 							String name = ((MemoryVariable) v).getName();
 							if (!rename.containsKey(name)){
-								rename.put(name, "m" + i++);
+								rename.put(name, "m" + ++i);
 								
 							}
 						}
@@ -428,7 +429,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 			Map<String, String> _rename = new HashMap<>();
 			for(String name : rename.keySet()){
 				if(rename.containsKey(rename.get(name))|| _rename.containsValue("m"+i)){
-					while( _rename.containsValue("m"+i) || ("m"+i).equals(name))
+					while( _rename.containsValue("m"+i) || ("m"+i).equals(name) || rename.containsKey("m"+i))
 						i++;
 					_rename.put(name, "m"+i);
 				}
@@ -459,19 +460,25 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 	@Override
 	public ConstraintHypergraph restrict(Collection<? extends Port> intface) {
 		Set<Rule> setRules = new HashSet<Rule>();
+		Set<Formula> setFormula = new HashSet<>();
 		
 		for (RuleNode ruleNodes : getRuleNodes()) {
-			List<Formula> list = new ArrayList<>();
+			Set<Formula> list = new HashSet<>();
 			for(Rule _r : ruleNodes.getRules())
 				list.add(_r.getFormula());
 			Formula g = new Conjunction(list);
 			for (Port p : ruleNodes.getPorts()) {
 				if (!intface.contains(p)) {
-					g = Formulas.eliminate(((Conjunction) g).getClauses(), Arrays.asList(new PortVariable(p)));
+					if(g instanceof Conjunction)
+						g = Formulas.eliminate(((Conjunction) g).getClauses(), Arrays.asList(new PortVariable(p)));
+					else if(g instanceof Negation)
+						g = Formulas.eliminate(Arrays.asList(g), Arrays.asList(new PortVariable(p)));
 				}
 			}
-			setRules.add(new Rule(g));
+			setFormula.add(g);
 		}
+		for(Formula g : setFormula)
+			setRules.add(new Rule(g));
 		return new ConstraintHypergraph(new HashSet<>(Arrays.asList(setRules)), initial);
 	}
 

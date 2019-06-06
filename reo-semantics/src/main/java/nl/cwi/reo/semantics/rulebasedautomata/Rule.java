@@ -81,28 +81,33 @@ public class Rule {
 	public Rule(Formula f) {
 		this.f = f;
 		Set<Set<Term>> __sync = this.f.getSynchronousSet();
-		Map<Port,Boolean>_sync = new HashMap<>();
-		for(Set<Term> set : __sync){
-			if(set.contains(Terms.NonNull)){
-				for(Term t: set){
-					if(t instanceof PortVariable){
-						_sync.put(((PortVariable) t).getPort(), true);
+		if(__sync != null) {
+			Map<Port,Boolean>_sync = new HashMap<>();
+			for(Set<Term> set : __sync){
+				if(set.contains(Terms.NonNull)){
+					for(Term t: set){
+						if(t instanceof PortVariable){
+							_sync.put(((PortVariable) t).getPort(), true);
+						}
 					}
 				}
+				if(set.contains(Terms.Null)){
+					for(Term t: set){
+						if(t instanceof PortVariable){
+							_sync.put(((PortVariable) t).getPort(), false);
+						}
+					}
+				}	
 			}
-			if(set.contains(Terms.Null)){
-				for(Term t: set){
-					if(t instanceof PortVariable){
-						_sync.put(((PortVariable) t).getPort(), false);
-					}
-				}
-			}	
+			if(_sync != null)
+				this.sync = _sync;
+			else
+				this.sync = new HashMap<>();
 		}
-		if(_sync != null)
-			this.sync = _sync;
 		else
 			this.sync = new HashMap<>();
 		this.hash = Objects.hash(sync, f);
+		
 	}
 
 	public Map<Port, Boolean> getSync() {

@@ -1,0 +1,101 @@
+import reo.transformer;
+
+import reo.filter;
+import reo.sync;
+import reo.shiftlossyfifo;
+
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+import reo.shiftlossyfifo1;
+
+
+trans(a,b,c,d,e,f,g,h,m,q0,q1,q2){
+	
+	transformer2<"TransformerFunction.AddPort","a">(a,m)
+	transformer2<"TransformerFunction.AddPort","b">(b,m)
+
+  	sync(c, x) sync(x, y)  shiftlossyfifo1(y, z) 
+ 	sync(z, d) sync(z, t)  shiftlossyfifo1(t, y)
+ 	sync(x, t)
+
+	pair(m,d,e)
+	filter<"FilterFunction.ControllerMessage">(e,f)
+	filter<"FilterFunction.RegularMessage">(e,g)
+	transformer<"TransformerFunction.Update">(f,c)
+	transformer<"TransformerFunction.Matching">(g,h)
+	filter<"Filter.Sendout_q0">(h,q0)
+	filter<"Filter.Sendout_q1">(h,q1)
+	filter<"Filter.Sendout_q2">(h,q2)
+	
+	
+	
+	
+	//	transformer2<"TransformerFunction.AddPort",i>(a[i],m)
+//	sync(m,m1)  
+//	sync(e1,e)
+//	pair<"Pair.Merge">(m1,d,e1)
+
+
+	variable(e,d) 
+//	sync(e,b)
+//	filter<"FilterFunction.RegularMessage">(e,g)
+//	filter<"FilterFunction.ControllerMessage">(e,f)
+//	transformer<"TransformerFunction.Update">(f,c)
+	
+//	transformer<"TransformerFunction.Matching">(g,h)
+
+//	filter<"FilterFunction.Sendout_q0">(h,q0)
+//	filter<"FilterFunction.Sendout_q1">(h,q1)
+//	filter<"FilterFunction.Sendout_q2">(h,q2)
+
+	
+	
+	
+//|
+//	i : <1..2>,
+//	d="*/RULE/100/*/*/q0"
+}
+
+
+
+pair<k:String>(a?String,b?String,c!String){
+	#RBA
+	{a,b,c} k(a,b)=c
+}
+
+
+
+transformer2<k:String,n:String>(a?String,b!String){
+        #RBA
+        {a,b} b=k(n,a)
+}
+
+
+
+
+
+/**
+*test(a[1..5],c){
+*	transformer2<"Function.concatenate", i >(a[i],c)
+*
+*| 
+*	i : <1..5> 
+*}
+**/
+
+
+
+/**
+*variable(a, b) {
+*  sync(a, x) sync(x, y) shiftlossyfifo1(y, z) 
+*  sync(z, b) sync(z, t)  shiftlossyfifo1(t, y)
+*  sync(x, t)
+*}
+**/
+
+transformer3<k:String, n:String>(a?String,na?String,b!String){
+		#RBA
+		{a,na,b} k(na,a)=b
+
+}

@@ -3,8 +3,10 @@
  */
 package nl.cwi.reo.templates.maude;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +32,10 @@ public final class MaudeProtocol extends Protocol {
 	/** Set of threshold variables involved in rew system. */
 	private Set<String> thVar = new HashSet<>(); 
 
+	/** Set of injection functions. */
+	private Map<String,String> injection = new HashMap<>(); 
+
+	
 	/** Port renaming */
 	public Map<Port,String> renaming = new HashMap<>();
 
@@ -51,8 +57,18 @@ public final class MaudeProtocol extends Protocol {
 	public MaudeProtocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {	
 		super(name,ports,transitions,initial);
 		getState();
+		getFunctions();
 	}
 
+	public String getInitialValue(MemoryVariable m) {
+		String[] s = getInitial().get(m).toString().replace("\"","").split(":");
+		String[] n = s[0].split("[(]");
+		if(s.length>1 && n.length>0)
+			injection.put(n[0],s[1]);		
+		return s[0];
+		
+	}
+	
 	/**
 	 * Gets initial state.
 	 *
@@ -63,7 +79,8 @@ public final class MaudeProtocol extends Protocol {
 		for (MemoryVariable m : getInitial().keySet()) {
 			variables.add("d_"+m.getName());
 			if (getInitial().get(m) != null){
-				s = s + "m(" + m.getName().substring(1) + "," + getInitial().get(m).toString() + ") ";
+				// Remove ' " ' present in the value of the memories
+				s = s + "m(" + m.getName().substring(1) + "," + getInitialValue(m) + ") ";
 			}
 			else{
 				s = s + "m(" + m.getName().substring(1) + "," + "*) ";
@@ -110,12 +127,51 @@ public final class MaudeProtocol extends Protocol {
 		return s;
 	}
 	
+	
+	/**
+	 * Returns user defined functions appearing in the rewrite rules of the protocol
+	 * @param t
+	 * @return
+	 */
+	public List<String> getFunctions(){
+		Set<Function> SetF = new HashSet<>();
+		for(Transition t : getTransitions()){
+			if(t instanceof MaudeTransition)
+				for(Function f : ((MaudeTransition) t).getFunction()){
+					if(!SetF.stream().anyMatch(o -> o.getName().equals(f.getName())))
+						SetF.add(f);
+				}
+		}
+		List<String> listS = new ArrayList<>();
+		for(Function f : SetF){
+			String s = "";
+			if(f.getName().contains("\""))
+				s = "op "  + f.getName().substring(1, f.getName().length()-1) + " : ";
+			else
+				s = "op "  + f.getName() + " : ";
+			for(int i = 0; i< f.getArgs().size();i++) {
+				s = s + " Data ";
+			}
+			s = s + " -> Data* .";
+			listS.add(s);
+		}
+		return listS;
+	}
+	
 	/** Set of threshold */
 	
 	public Set<String> getThVar(){
 		return thVar;
 	}
 	
+	/**
+	 * Get injection function
+	 */
+	
+	public Map<String,String> getInjection(){
+		
+		return injection;
+	}
 	
 	/**
 	 * Get rewrite system variables

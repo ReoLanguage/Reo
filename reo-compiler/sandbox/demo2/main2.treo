@@ -1,0 +1,36 @@
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+alternator(a[1..N],b[1]){
+	{ syncdrain(a[i], a[i+1]) | i : <1..N> }
+	{ fifo1(b[i+1], b[i]) | i : <1..N> }
+	{ sync(a[i], b[i]) | i : <1..(N+1)> }
+}
+
+transformerTern<f:String>(a?,b?,c!){
+	#RBA
+	{a,b,c} c = f(a,b)
+}
+
+prodTime(a!String){
+	#JAVA 
+		"Timer.getTime"
+}
+
+prodValue(b!String){
+	#JAVA 
+		"CPUFreq.getValue"
+}
+
+cons(c?String){
+	#JAVA 
+	"Screen.display"
+}
+
+main2() {
+	prodTime(a)
+	prodValue(b)
+	transformerTern<"Function.aggregate">(a,b,c)
+	cons(c)
+}

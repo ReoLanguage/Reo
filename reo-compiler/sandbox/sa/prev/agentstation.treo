@@ -1,0 +1,13 @@
+import agentgoal;
+
+agentstation(){
+	station<stationPos>(stationLoc, chargeOut)
+	
+	
+	
+	agentgoal(sLoc,upBat)
+
+	|
+		stationPos = "c(30,10)"
+		
+}

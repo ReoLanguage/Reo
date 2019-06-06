@@ -1,0 +1,16 @@
+import reo.syncdrain;
+import reo.sync;
+import reo.fifo1;
+import reo.lossy;
+
+test<N:int>(x,y){
+    repeater<N>(x,y)
+}
+
+repeater<k:int>(a, b) {
+	{
+		fifo1(a, b)
+		|
+		i : <1..k> 
+	}
+}

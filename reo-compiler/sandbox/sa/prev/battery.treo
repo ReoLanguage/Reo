@@ -1,0 +1,6 @@
+import sensor;
+
+battery<update:String,initial:String>(readBat,modify){
+	
+	sensor<update,initial>(readBat,lock,modify) 
+}

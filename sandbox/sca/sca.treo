@@ -125,7 +125,7 @@ xrouter(b0,t11)
 sync(t11,q1)
 
 |
-	E = "WSemiring.lowerEqual"
+	E = "WSemiring"
 }
 
 asyncdrain(a?,b?){
@@ -143,7 +143,8 @@ syncfifo1full<k:String>(a?,b!) {
 
 pred<P:string,e:int,t:int>(a?, b!) {
 	#RBA
-	{a,b} P(e,t), a=b
+	$m=P;
+	{a,b} $m.lowerEq(e,t), a=b
 }
 
 

@@ -129,15 +129,13 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 	@Override
 	public Atom getNode(Set<Port> node) {
 
-		// TODO It seems not necessary to flip the port type here (or in
-		// insertNodes() method).
 		Set<Port> inps = new HashSet<>();
 		Set<Port> outs = new HashSet<>();
 		for (Port p : node) {
 			if (p.isInput()) {
-				outs.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), true));
+				outs.add(new Port(p.getName(), PortType.OUT, p.getPrioType(), p.getTypeTag(), !p.isHidden()));
 			} else {
-				inps.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), true));
+				inps.add(new Port(p.getName(), PortType.IN, p.getPrioType(), p.getTypeTag(), !p.isHidden()));
 			}
 		}
 
@@ -210,7 +208,8 @@ public final class RuleBasedAutomaton implements Semantics<RuleBasedAutomaton> {
 		_rules.add(part);
 		return new RuleBasedAutomaton(_rules, new HashMap<>());
 	}
-
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */

@@ -3,7 +3,7 @@ main(S) ::= <<
  *** Generated from <S.file> by Reo 1.0.
 
 mod CONNECTOR is 
-		inc SIGNATURE .
+		inc RUNTIMESIGNATURE .
         inc CONSTRAINT-SEMIRING .
 
 	
@@ -19,18 +19,26 @@ component(c) ::= <<
 protocol(c) ::= <<
 subsort String \< Data .
 vars <c.variables:{ v | <v> } ; separator=" "> : Data .
-vars <c.thVar:{ v | <v> } ; separator=" "> : Value .
+<if(c.thVar)>vars <c.thVar:{ v | <v> } ; separator=" "> : Value .
 op th : String Value -> Fact .
+<endif>
 var sl : StepSetList .
 op m : Nat Data* -> Fact [ctor] .
 op sv : Value -> Step [ctor] .
 
-<c.transitions:transition(); separator="\n">
+<c.injection.keys:{ inj | op <inj> : <c.injection.(inj)> . } ; separator="\n">
 
-op makestart : Nat Nat -> Facts .
+<c.functions:{ f | <f> } ; separator="\n">
+
+<c.transitions:{t | <if(t.rewString)>
+<t.rewString>
+<endif> }; separator="">
+
+<!op makestart : Nat Nat -> Facts .
 vars i j : Nat .
 
-eq makestart(i,j) = <c.state:{p | <p>}; separator=" "> .
+eq makestart(i,j) = <c.state:{p | <p>}; separator=" "> .!>
+eq startc = <c.state:{p | <p>}; separator=" "> .
 >>
 
 

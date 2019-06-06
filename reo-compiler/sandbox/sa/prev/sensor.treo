@@ -1,0 +1,8 @@
+sensor<write:string,initial:String>(read!, lock!, toWrite?) {
+	#RBA
+	$m = initial;
+	
+	read = $m , $m != *, $m' = $m, toWrite=*, lock = *
+	toWrite!=*, read=*, $m' = write($m,toWrite) , $m != *, lock = *
+	toWrite!=*, read!=*, $m' = write($m,toWrite) , read = $m, lock !=* 
+}

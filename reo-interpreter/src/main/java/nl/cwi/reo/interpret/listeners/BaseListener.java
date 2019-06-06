@@ -12,8 +12,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.components.ComponentDefinition;
 import nl.cwi.reo.interpret.components.ComponentExpression;
 import nl.cwi.reo.interpret.components.ComponentVariable;
+import nl.cwi.reo.interpret.connectors.Comment;
 import nl.cwi.reo.interpret.connectors.Language;
 import nl.cwi.reo.interpret.connectors.Reference;
+import nl.cwi.reo.interpret.instances.CommentInstance;
 import nl.cwi.reo.interpret.instances.ComponentInstance;
 import nl.cwi.reo.interpret.instances.ProductInstance;
 import nl.cwi.reo.interpret.instances.InstanceExpression;
@@ -61,6 +63,7 @@ import nl.cwi.reo.interpret.ReoBaseListener;
 import nl.cwi.reo.interpret.ReoFile;
 import nl.cwi.reo.interpret.ReoParser;
 import nl.cwi.reo.interpret.ReoParser.AtomContext;
+import nl.cwi.reo.interpret.ReoParser.CommentContext;
 import nl.cwi.reo.interpret.ReoParser.Component_atomicContext;
 import nl.cwi.reo.interpret.ReoParser.Component_compositeContext;
 import nl.cwi.reo.interpret.ReoParser.Component_variableContext;
@@ -81,6 +84,7 @@ import nl.cwi.reo.interpret.ReoParser.Formula_universalContext;
 import nl.cwi.reo.interpret.ReoParser.Formula_variableContext;
 import nl.cwi.reo.interpret.ReoParser.ImpsContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_atomicContext;
+import nl.cwi.reo.interpret.ReoParser.Instance_commentContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_productContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_semicolonContext;
 import nl.cwi.reo.interpret.ReoParser.Instance_sumContext;
@@ -128,7 +132,7 @@ public class BaseListener extends ReoBaseListener {
 
 	/** The name of the Treo source file. */
 	private String filename = "";
-
+	
 	/** The parsed program in the Treo file. */
 	@Nullable
 	private ReoFile program;
@@ -190,6 +194,10 @@ public class BaseListener extends ReoBaseListener {
 	/** The atoms. */
 	protected ParseTreeProperty<Atom> atoms = new ParseTreeProperty<>();
 
+	/** The comments. */
+	protected ParseTreeProperty<String> comments = new ParseTreeProperty<>();
+
+	
 	/**
 	 * Constructs a new generic listener.
 	 * 
@@ -521,6 +529,15 @@ public class BaseListener extends ReoBaseListener {
 		instances.put(ctx, new ProductInstance(s, i1, i2, new Location(ctx.start, filename)));
 	}
 
+	public void exitComment(CommentContext ctx) {
+		comments.put(ctx, ctx.getText());
+	}
+	
+	
+	public void exitInstance_comment(Instance_commentContext ctx) {
+		instances.put(ctx, new CommentInstance(comments.get(ctx.comment())));
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

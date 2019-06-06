@@ -1,0 +1,36 @@
+import agent;
+import gps;
+import battery;
+import reo.sync;
+
+
+agentbatgps(moveI,readLocI,readBatI,getIdI,updatebatteryI){
+
+	sync(x,moveI)
+	sync(readLoc,readLocI)
+	sync(readBat,readBatI)
+	sync(getId,getIdI)
+	sync(updatebatteryI,updateBatNode)
+	
+	agent<id>(moveActionAgent,getId)	
+	
+	sync(moveActionAgent,move)
+
+	sync(move,x)
+	
+	sync(x,updateLoc)
+	sync(x,updateBatNode)
+	
+	gps<updateGps,initialPos>(readLoc,updateLoc)
+	battery<updateB,initialBat>(readBat,updateBat)
+	
+	sync(updateBatNode,updateBat)
+	
+	|
+		id = "id(1): Nat -> Data",
+		updateGps = "updateGps",
+		initialPos  = "c(20,20): Nat Nat -> Data",
+		initialBat  = "b(100): Nat -> Data",
+		updateB = "updateBat",
+		stationPos = "c(30,10)"
+}

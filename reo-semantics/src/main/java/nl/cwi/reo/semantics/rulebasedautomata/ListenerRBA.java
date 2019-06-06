@@ -42,6 +42,11 @@ import nl.cwi.reo.interpret.ReoParser.Rba_syncBlockContext;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.typetags.TypeTag;
 import nl.cwi.reo.interpret.typetags.TypeTags;
+import nl.cwi.reo.interpret.values.BooleanValue;
+import nl.cwi.reo.interpret.values.DecimalValue;
+import nl.cwi.reo.interpret.values.IntegerValue;
+import nl.cwi.reo.interpret.values.StringValue;
+import nl.cwi.reo.semantics.predicates.Constant;
 import nl.cwi.reo.semantics.predicates.Equality;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.Formulas;
@@ -304,7 +309,8 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_nat(Rba_natContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Integer));
+//		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Integer));
+		terms.put(ctx,  new Constant(new IntegerValue(Integer.valueOf(ctx.getText()))));
 	}
 
 	/*
@@ -315,8 +321,12 @@ public class ListenerRBA extends BaseListener {
 	 * ReoParser.Rba_boolContext)
 	 */
 	@Override
-	public void exitRba_bool(Rba_boolContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Boolean));
+	public void exitRba_bool(Rba_boolContext ctx) {	
+//		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Boolean));
+		if(ctx.getText() == "true")
+			terms.put(ctx, new Constant(new BooleanValue(true)));
+		else
+			terms.put(ctx, new Constant(new BooleanValue(false)));
 	}
 
 	/*
@@ -328,7 +338,8 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_string(Rba_stringContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.String));
+//		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.String));
+		terms.put(ctx, new Constant(new StringValue(ctx.getText())));
 	}
 
 	/*
@@ -340,7 +351,8 @@ public class ListenerRBA extends BaseListener {
 	 */
 	@Override
 	public void exitRba_decimal(Rba_decimalContext ctx) {
-		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Decimal));
+//		terms.put(ctx, new Function(ctx.getText(), new ArrayList<>(), false, TypeTags.Decimal));
+		terms.put(ctx,  new Constant(new DecimalValue(Double.valueOf(ctx.getText()))));
 	}
 
 	/*

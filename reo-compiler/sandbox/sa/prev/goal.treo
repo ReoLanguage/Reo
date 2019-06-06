@@ -1,0 +1,7 @@
+
+goal<f:String>(anymove?,output!,rloc?,rbat?,sloc?){
+	#RBA
+	anymove = *, output!=*, rloc!=*, sloc!=*, rbat!=*, output = f(rloc,sloc,rbat)
+	anymove!=* , output=*, rloc!=*, sloc!=*, rbat!=*, * = f(rloc,sloc,rbat)
+}
+

@@ -1,0 +1,138 @@
+import reo.syncfifo1;
+import reo.sync;
+import reo.syncdrain;
+import reo.shiftlossyfifo1;
+import reo.xrouter;
+
+sca(move,pass,snap,charge,discharge1,discharge2){
+
+sync(m,move)
+sync(p,pass)
+sync(s,snap)
+sync(c,discharge1)
+sync(d,discharge2)
+
+ sca1<t1>(m,p,s)
+// cas(m,p,s,charge,discharge1,discharge2)
+
+sca3<t2>(c,d)
+syncdrain(m,c)
+syncdrain(p,s)
+
+// sca2<t2>(charge,discharge1,discharge2)
+	|
+		t1=2,
+		t2=6
+}
+
+cas(move,pass,snap,charge,discharge1,discharge2){
+syncdrain(move,discharge2)
+syncdrain(pass,charge)
+syncdrain(snap,discharge1)
+}
+
+sca3<t:int>(c,d){
+
+pred<E,0,t>(t1,c)
+pred<E,0,t>(t2,d)
+
+syncfifo1full<"0">(q,b)
+xrouter(b,t1,t2)
+sync(t1,q)
+sync(t2,q)
+
+|
+	E = "WSemiring.lowerEqual"
+}
+
+sca2<t:int>(charge,discharge1,discharge2){
+
+pred<E,2,t>(t1,discharge1)
+pred<E,5,t>(t2,discharge2)
+
+pred<E,2,t>(t3,discharge1)
+pred<E,5,t>(t4,discharge2)
+pred<E,0,t>(t5,charge)
+
+pred<E,2,t>(t6,discharge1)
+pred<E,5,t>(t7,discharge2)
+pred<E,0,t>(t8,charge)
+
+pred<E,2,t>(t9,discharge1)
+pred<E,0,t>(t10,charge)
+
+pred<E,0,t>(t11,charge)
+
+syncfifo1full<"0">(q4,b4)
+xrouter(b4,t1,t2)
+sync(t1,q3)
+sync(t2,q2)
+
+syncfifo1(q3,b3)
+xrouter(b3,t3,t4,t5)
+sync(t3,q2)
+sync(t4,q1)
+sync(t5,q4)
+
+syncfifo1(q2,b2)
+xrouter(b2,t6,t7,t8)
+sync(t6,q1)
+sync(t7,q0)
+sync(t8,q3)
+
+syncfifo1(q1,b1)
+xrouter(b1,t9,t10)
+sync(t9,q0)
+sync(t10,q2)
+
+syncfifo1(q0,b0)
+xrouter(b0,t11)
+sync(t11,q1)
+
+|
+	E = "WSemiring.lowerEqual"
+}
+
+sca1<t:int>(move,pass,snap){
+
+pred<E,1,t>(t1,pass)
+pred<E,0,t>(t2,move)
+pred<E,2,t>(t3,move)
+pred<E,1,t>(t4,pass)
+pred<E,0,t>(t5,snap)
+
+syncfifo1full<"0">(q1,b1)
+xrouter(b1,t1,t2)
+sync(t1,q1)
+sync(t2,q2)
+
+syncfifo1(q2,b2)
+xrouter(b2,t3,t4,t5)
+sync(t3,q2)
+sync(t4,q2)
+sync(t5,q1)
+
+|
+	E = "WSemiring.lowerEqual"
+
+}
+
+syncfifo1full<k:String>(a?,b!) {
+	#RBA
+	$m=k;
+	{a, ~b} $m = null, $m' = a
+	{a, b} $m != null, b=$m, $m' = a
+	{~a, b} $m != null, b = $m, $m' = null
+}
+
+pred<P:string,e:int,t:int>(a?, b!) {
+	#RBA
+	{a,b} P(e,t), a=b
+}
+
+state<n:int>(a[1..n]?,b[1..m]!){
+	{sync(a[i],c) | i:<1..n>}
+	syncfifo1(c,d)
+	xrouter(d,b[1..m])
+
+}

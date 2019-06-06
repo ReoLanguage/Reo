@@ -17,7 +17,7 @@ import nl.cwi.reo.util.Monitor;
  * 
  * @see ReoConnectorComposite
  */
-public interface ReoConnector {
+public interface ReoConnector{
 
 	/**
 	 * Gets the component.

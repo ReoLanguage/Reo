@@ -1,0 +1,7 @@
+section reo;
+
+readwrite<write:string>(read!, toWrite?) {
+	#RBA
+	{read} 	read = $m 
+	{toWrite}	$m' = write($m,toWrite)
+}

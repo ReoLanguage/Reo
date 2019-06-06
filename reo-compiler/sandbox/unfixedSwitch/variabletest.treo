@@ -1,0 +1,15 @@
+import reo.transformer;
+import reo.filter;
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+import reo.shiftlossyfifo1;
+//import reo.variable;
+import reo.fifofull;
+import reo.xrouter;
+
+
+
+variabletest(in,out){
+  sync(in,out) 
+ }

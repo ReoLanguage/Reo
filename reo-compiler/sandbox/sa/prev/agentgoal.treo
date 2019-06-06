@@ -1,0 +1,51 @@
+import goal;
+import reo.sync;
+import agentbatgps;
+import station;
+import reo.lossy;
+import reo.syncdrain;
+import reo.xrouter;
+import reo.fifo1;
+
+agentgoal(){
+
+	agentbatgps(move,readLoc,readBat,getId,updatebattery)
+	
+	station<stationPos>(stationLoc,chargeOut)
+	
+	xrouter(stationLoc,sLoc1,sLoc2)
+	xrouter(readLoc,rLoc1,rLoc2,rLoc3)
+	
+	sync(chargeOut,updatebattery)
+	syncdraineq(sLoc2,rLoc3)
+	syncdrain(sLoc2,chargeOut)
+
+	xrouter(move,moveE,move2,move3)
+	syncdraineq(moveE,moveg1)
+	sync(move2,anymoveg1)
+	goal<f>(anymoveg1,moveg1,rLoc1,readBat1,sLoc1)
+
+	sync(move2,anymoveg2)
+	syncdraineq(move3,moveg2)
+	goal<g>(anymoveg2,moveg2,rLoc2,readBat2,position)
+	location<"c(50,15)">(position)
+
+	xrouter(readBat, readBat1, readBat2)
+	
+	|
+		stationPos = "c(30,10)",
+		f = "goCharge",
+		g = "goToGoal",
+		P = "isAllowd"
+}
+
+location<pos:String>(position!){
+	#RBA
+	position != *, position = pos
+}
+
+
+syncdraineq(a?,b?){
+	#RBA
+	a!=*, b!=*, b=a
+}

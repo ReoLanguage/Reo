@@ -3,7 +3,6 @@ package nl.cwi.reo;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -42,15 +39,12 @@ import nl.cwi.reo.interpret.values.DecimalValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
-import nl.cwi.reo.semantics.Semantics;
 import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
 import nl.cwi.reo.semantics.predicates.Formula;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
-import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.rulebasedautomata.ListenerRBA;
-import nl.cwi.reo.semantics.rulebasedautomata.Rule;
 import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
 import nl.cwi.reo.templates.Atomic;
 import nl.cwi.reo.templates.Component;
@@ -85,7 +79,7 @@ public class Compiler {
 	 * Compiler type.
 	 */
 	@Parameter(names = { "-c" }, description = "compiler")
-	public CompilerType compilertype = CompilerType.CH;
+	public CompilerType compilertype = CompilerType.DEFAULT;
 
 	/** List of of directories that contain all necessary Reo components. */
 	@Parameter(names = {
@@ -166,9 +160,6 @@ public class Compiler {
 		case LYKOS:
 			compilePR();
 			break;
-		case CH:
-			compileCH();
-			break;
 		case DEFAULT:
 			compile();
 			break;
@@ -206,63 +197,6 @@ public class Compiler {
 		c.compile();
 	}
 
-	/**
-	 * Default compilation method.
-	 */
-	private void compile() {
-
-		long t0 = System.nanoTime();
-		
-		Interpreter interpreter = getInterpreter(lang);
-
-		ReoProgram program;
-		if ((program = interpreter.interpret(files.get(0))) == null)
-			return;
-		
-		long t1 = System.nanoTime();
-		System.out.println("Interpret        : \t" + (t1-t0)/1E9);
-		
-		ReoConnector connector = addPortWindows(program.getConnector(), lang);
-		connector = connector.propagate(monitor);
-		connector = connector.flatten();
-		connector = connector.insertNodes(true, false, new RuleBasedAutomaton());
-		connector = connector.integrate();
-
-		List<Component> components = buildAtomics(connector, lang);
-
-		Set<Port> intface = getDualInterface(components);
-
-		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
-		
-		long t2 = System.nanoTime();
-		System.out.println("Flatten          : \t" + (t2-t1)/1E9);
-
-		RuleBasedAutomaton composition = new RuleBasedAutomaton().compose(protocol);
-
-		composition = composition.restrict(intface);
-
-		long t3 = System.nanoTime();
-		System.out.println("Compose & hide   : \t" + (t3-t2)/1E9);
-
-		Set<Transition> transitions = buildTransitions(composition);
-		
-		long t4 = System.nanoTime();
-		System.out.println("Commandification : \t" + (t4-t3)/1E9);
-
-		Set<Set<Transition>> partition = partition(transitions,false);
-
-		List<Component> protocols = buildProtocols(composition, partition);
-
-		components.addAll(protocols);
-
-		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
-		generateCode(template);
-
-		long t5 = System.nanoTime();
-		System.out.println("Template         : \t" + (t5-t4)/1E9);
-		System.out.println("Total            : \t" + (t5-t1)/1E9);
-	}
-
 	private Interpreter getInterpreter(Language lang) {
 		switch (lang) {
 		case PRISM:
@@ -288,130 +222,114 @@ public class Compiler {
 	/**
 	 * Compile.
 	 */
-	private void compileCH() {
+	private void compile() {
 
-		Long t1 = System.nanoTime();
 		Interpreter interpreter = getInterpreter(lang);
 
 		ReoProgram program; 	
 		if ((program = interpreter.interpret(files.get(0))) == null)
 			return;
-
-		ReoConnector connector = addPortWindows(program.getConnector(), lang);
+		
+		ReoConnector connector = program.getConnector();
 		connector = connector.propagate(monitor);
 		connector = connector.flatten();
-		connector = connector.insertNodes(true, false, new RuleBasedAutomaton());
+		connector = connector.insertNodes(true, true, new RuleBasedAutomaton());
 		connector = connector.integrate();
+		connector = compose(connector);
 		
-		List<Component> components = buildAtomics(connector, lang);
-
-		Set<Port> intface = getDualInterface(components);
-		List<RuleBasedAutomaton> protocol = getProtocol(connector, lang, RuleBasedAutomaton.class);
-		
-		List<ConstraintHypergraph> ch = new ArrayList<>();
-
-		for(RuleBasedAutomaton rba : protocol){
-			ch.add(new ConstraintHypergraph(rba.getRules(),rba.getInitial()));
-		}
-		
-		ConstraintHypergraph composition = new ConstraintHypergraph().compose(ch);
-
-		composition = composition.restrict(intface);
-		
-		Set<Transition> transitions = buildTransitions(composition);
-		
+	  	Set<Transition> transitions = buildTransitions(connector);			
 		Set<Set<Transition>> partition = partition(transitions,false);
 
-		List<Component> protocols = buildProtocols(composition, partition);
-
-		components.addAll(protocols);
+		List<Component> components = new ArrayList<>();
+		components.addAll(buildProtocols(connector, partition));
+		components.addAll(buildAtomics(connector, lang));
 
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
-		Long t2 = System.nanoTime();
-//		try{
-//			PrintWriter writer = new PrintWriter(outdir+"compilation_time.txt", "UTF-8");
-//			writer.println("Compilation time : "+(t2-t1) + " nanosecondes");
-//			writer.close();
-//		} catch (IOException e) { e.printStackTrace();  
-//		}
 	}
-
+	
 	/**
-	 * Closes a given connector by attaching port windows to visible ports.
+	 * Serialize ReoProgram to XML
+	 * @param customer
+	 * @return
+	 */
+/*
+	private static void serializeXML(ReoProgram program) {
+
+		XStream xstream = new XStream();
+
+		String xml = xstream.toXML(program);
+		try {
+			File file = new File("../reo-runtime-java/src/main/java/"+program.getName()+".xml");
+			FileWriter out = new FileWriter(file);
+			out.write(xml);
+			out.close();
+		} catch (IOException e) {
+		}
+	}
+	*/
+	/**
+	 * Composes all sub-connectors in a given connector. 
+	 * Composition is defined per semantics. 
+	 * The protocol consists of all components without a reference to code in a given target
+	 * language.
 	 * 
 	 * @param connector
-	 *            potentially open connector
+	 *            connector
 	 * @param lang
 	 *            target language
-	 * @return Connector with all ports hidden.
+	 * @param unit
+	 *            unit
+	 * @return Composition of all protocol connectors.
 	 */
-	private ReoConnector addPortWindows(ReoConnector connector, Language lang) {
-		if (lang != Language.JAVA && lang != Language.MAUDE && lang != Language.PROMELA && lang != Language.TREO)
-			return connector;
-		List<ReoConnector> list = new ArrayList<>();
-		list.add(connector);
-		for (Port p : connector.getInterface()) {
-			if (!p.isHidden()) {
-				if(lang == Language.JAVA){
-					Value v = new StringValue(p.getName());
-					List<Value> values = Arrays.asList(v);
-					String call = p.isInput() ? "Windows.producer" : "Windows.consumer";
-					Reference ref = new Reference(call, Language.JAVA, new ArrayList<>(), values);
-	
-					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
-					Map<Port, Port> links = new HashMap<>();
-					links.put(q.rename(p.getName()), q);
-	
-					ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
-					list.add(window);
+	private ReoConnector compose(ReoConnector connector) {
+		Atom composition = null;
+		Set<SemanticsType> semType = new HashSet<>();
+		for(ReoConnectorAtom reoConAtom : connector.getAtoms()) {
+			for(Atom atom : reoConAtom.getSemantics()) {
+				semType.add(atom.getType());
 				}
-				if(lang == Language.MAUDE){
-					Value v = new StringValue(p.getName());
-					List<Value> values = Arrays.asList(v);
-					String call = p.isInput() ? "prod" : "cons";
-					Reference ref = new Reference(call, Language.MAUDE, new ArrayList<>(), values);
-	
-					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
-					Map<Port, Port> links = new HashMap<>();
-					links.put(q, q);
-	
-					ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
-					list.add(window);
-				}
-				if(lang == Language.PROMELA){
-					Value v = new StringValue(p.getName());
-					List<Value> values = Arrays.asList(v);
-					String call = p.isInput() ? "prod" : "cons";
-					Reference ref = new Reference(call, Language.PROMELA, new ArrayList<>(), values);
-	
-					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
-					Map<Port, Port> links = new HashMap<>();
-					links.put(q, q);
-	
-					ReoConnectorAtom window = new ReoConnectorAtom(call, Arrays.asList(ref), links);
-					list.add(window);
-				}
-				if(lang == Language.TREO){
-					Value v = new StringValue(p.getName());
-					List<Value> values = Arrays.asList(v);
-					String call = p.isInput() ? "prod" : "cons";
-					Reference ref = new Reference(call, Language.TREO, new ArrayList<>(), values);
-	
-					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-					Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
-					Map<Port, Port> links = new HashMap<>();
-					links.put(q, q);
-	
-					ReoConnectorAtom window = new ReoConnectorAtom(call, Arrays.asList(ref), links);
-					list.add(window);
+			}
+		List<ReoConnector> atomics = new ArrayList<>();
+		Set<Port> nonHidden = new HashSet<>();
+		
+		/** Atoms with Java references */
+		if(semType.contains(SemanticsType.REF)) {
+			for (ReoConnectorAtom atom : connector.getAtoms()) {
+				Reference r = atom.getReference(lang);
+				if (r != null) {
+					atomics.add(atom);
+					nonHidden.addAll(atom.getInterface());
 				}
 			}
 		}
-		return new ReoConnectorComposite(null, "", list).rename(new HashMap<>());
+		
+		/** Composition using rule based automaton and constraint hypergraph */
+		if(semType.contains(SemanticsType.RBA)) {
+			RuleBasedAutomaton semantic = new RuleBasedAutomaton();
+			List<RuleBasedAutomaton> protocols = new ArrayList<>();
+			for (ReoConnectorAtom atom : connector.getAtoms()) {
+				for (Atom x : atom.getSemantics()) {
+					if (semantic.getType() == x.getType()) {
+						protocols.add((RuleBasedAutomaton)x);
+					}
+				}
+			}
+			//Use of constraint hypergraph composition
+			List<ConstraintHypergraph> ch = new ArrayList<>();
+			for(RuleBasedAutomaton rba : protocols){
+				ch.add(new ConstraintHypergraph(rba.getRules(),rba.getInitial()));
+			}
+			
+			ConstraintHypergraph compositionCH = new ConstraintHypergraph().compose(ch);
+			Set<Port> intface = connector.getInterface();
+			intface.addAll(nonHidden);
+			composition = compositionCH.restrict(intface);
+		}
+		
+		ReoConnectorAtom protocol = new ReoConnectorAtom(connector.getName(), Arrays.asList(composition), connector.getLinks());
+		atomics.add(protocol);
+		return new ReoConnectorComposite("composite", "",atomics);
 	}
 
 	/**
@@ -427,7 +345,41 @@ public class Compiler {
 		List<Component> components = new ArrayList<>();
 		Map<Port,Port> renaming = connector.getLinks();
 		int n_atom = 1;
-		for (ReoConnectorAtom atom : connector.getAtoms()) {
+
+		/** Hide non hidden ports with i/o components */
+		List<ReoConnectorAtom> list = new ArrayList<>();
+		for (Port p : connector.getInterface()) {
+			if (!p.isHidden()) {
+				String call ="";
+				if(lang == Language.JAVA){
+					call = p.isInput() ? "Windows.producer" : "Windows.consumer";
+				}
+				if(lang == Language.MAUDE){
+					call = p.isInput() ? "prod" : "cons";	
+				}
+				if(lang == Language.PROMELA){
+					call = p.isInput() ? "prod" : "cons";
+				}
+				if(lang == Language.TREO){
+					call = p.isInput() ? "prod" : "cons";
+				}
+				
+				Value v = new StringValue(p.getName());
+				List<Value> values = Arrays.asList(v);
+				Reference ref = new Reference(call, lang, new ArrayList<>(), values);
+				PortType t = p.isInput() ? PortType.OUT : PortType.IN;
+				Port q = new Port(p.getName(), t, p.getPrioType(), new TypeTag("String"), true);
+				Map<Port, Port> links = new HashMap<>();
+				links.put(q.rename(p.getName()), q);
+/*				links.put(q, q); */
+				ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
+				list.add(window);
+			}
+		}
+		
+		/** Build components using constructors specific to each target languages */
+		list.addAll(connector.getAtoms());
+		for (ReoConnectorAtom atom : list) {
 			Reference r = atom.getReference(lang);
 			if (r != null) { 
 				String call = r.getCall();
@@ -435,8 +387,8 @@ public class Compiler {
 				if (name == null)
 					name = "Component";
 
-//				 TODO the string representation of parameter values is target
-//				 language dependent.
+//				 TODO the string representation of parameter values is target language dependent.
+				
 				List<String> params = new ArrayList<>();
 				for (Value v : r.getValues()) {
 					if (v instanceof BooleanValue) {
@@ -458,160 +410,61 @@ public class Compiler {
 
 			}
 		}
-//		connector.rename(renaming);
+		
 		return components;
 	}
 
-	/**
-	 * Gets the dual of the interface from atomic components to protocol
-	 * components.
-	 * 
-	 * @param atoms
-	 *            list of atomic components
-	 * @return Dual interface
-	 */
-	private Set<Port> getDualInterface(List<Component> atomics) {
-		Set<Port> intface = new HashSet<>();
-		for (Component atom : atomics) {
-			for (Port p : atom.getPorts()) {
-					PortType t = p.isInput() ? PortType.OUT : PortType.IN;
-					intface.add(new Port(p.getName(), t, p.getPrioType(), p.getTypeTag(), true));
+	private Set<Transition> buildTransitions(ReoConnector connector) {
+		List<ReoConnectorAtom> protocol = connector.getAtoms();
+		Set<Transition> transitions = new HashSet<>();
+		for(ReoConnectorAtom atom : protocol) {
+			if(atom.getSemantics().size()==1 && atom.getSemantics().get(0) instanceof ConstraintHypergraph) {
+				ConstraintHypergraph _atom = (ConstraintHypergraph) atom.getSemantics().get(0);
+				for (Formula f : _atom.getFormulas()){
+					Command _cmd = new Commands().getCommand(f);
+					if(_cmd !=null)
+						transitions.add(_cmd.toTransition(lang));
 				}
-		}
-		return intface;
-	}
-
-	/**
-	 * Composes all protocol connector in a given connector. The protocol
-	 * consists of all components without a reference to code in a given target
-	 * language.
-	 * 
-	 * @param connector
-	 *            connector
-	 * @param lang
-	 *            target language
-	 * @param unit
-	 *            unit
-	 * @return Composition of all protocol connectors.
-	 */
-	private <T extends Semantics<T>> List<T> getProtocol(ReoConnector connector, Language lang, Class<T> type) {
-		List<T> protocols = new ArrayList<>();
-		for (ReoConnectorAtom atom : connector.getAtoms()) {
-			Reference r = atom.getReference(lang);
-			if (r == null) {
-				T semantics = null;
-				for (Atom x : atom.getSemantics())
-					if (type.isInstance(x))
-						semantics = type.cast(x);
-				if (semantics == null) {
-					monitor.add("Not all components have semantics.");
-					return new ArrayList<>();
-				}
-				protocols.add(semantics);
 			}
-		}
-
-		return protocols;
-	}
-
-	private Set<Transition> buildTransitions(ConstraintHypergraph protocol) {
-		Set<Transition> transitions = new HashSet<>();
-		for (Formula f : protocol.getFormulas()){
-			Command _cmd = new Commands().getCommand(f);
-			if(_cmd !=null)
-				transitions.add(_cmd.toTransition(lang));
-		}
-		return transitions;
-	}
-	
-	private Set<Transition> buildTransitions(RuleBasedAutomaton protocol) {
-		Set<Transition> transitions = new HashSet<>();
-		for (Rule rule : protocol.getAllRules()) {
-			Command cmd = new Commands().getCommand(rule.getFormula());
-			transitions.add(cmd.toTransition(lang));
 		}
 		return transitions;
 	}
 
-	/**
-	 * Build the protocol templates from a constraint hypergraph and a
-	 * partition.
-	 * 
-	 * @param protocol
-	 *            composed protocol
-	 * @param partition
-	 *            partitioned set of transitions
-	 * 
-	 * @return list of protocol templates
-	 */
-	private List<Component> buildProtocols(RuleBasedAutomaton protocol, Set<Set<Transition>> partition) {
+	private List<Component> buildProtocols(ReoConnector protocol, Set<Set<Transition>> partition) {
 		List<Component> components = new ArrayList<>();
 		int n_protocol = 1;
-		for (Set<Transition> part : partition) {
-
-			// Get the interface of this part
-			Set<Port> ports = new HashSet<>();
-			for (Transition t : part)
-				ports.addAll(t.getInterface());
-
-			// Find the type of each memory cell that occurs in this part
-			Map<String, TypeTag> tags = new HashMap<>();
-			for (Map.Entry<MemoryVariable, Term> init : protocol.getInitial().entrySet())
-				tags.put(init.getKey().getName(), init.getValue().getTypeTag());
-			for (Transition t : part)
-				for (Map.Entry<MemoryVariable, Term> upd : t.getMemory().entrySet())
-					tags.put(upd.getKey().getName(), upd.getValue().getTypeTag());
-
-			// Get the initial value of each memory cell
-			SortedMap<MemoryVariable, Object> initial = new TreeMap<>();
-			for (Map.Entry<String, TypeTag> e : tags.entrySet())
-				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitial().get(e.getKey()));
-
-			components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
-		}
-		return components;
-	}
-
-	private List<Component> buildProtocols(ConstraintHypergraph protocol, Set<Set<Transition>> partition) {
-		List<Component> components = new ArrayList<>();
-		int n_protocol = 1;
-		for (Set<Transition> part : partition) {
-
-			// Get the interface of this part
-			Set<Port> ports = new HashSet<>();
-			for (Transition t : part)
-				ports.addAll(t.getInterface());
-
-			// Find the type of each memory cell that occurs in this part
-//			Map<String, TypeTag> tags = new HashMap<>();
-//			for (Map.Entry<MemoryVariable, Term> init : protocol.getInitials().entrySet())
-//				tags.put(init.getKey().getName(), init.getValue().getTypeTag());
-//			for (Transition t : part)
-//				for (Map.Entry<MemoryVariable, Term> upd : t.getMemory().entrySet())
-//					tags.put(upd.getKey().getName(), upd.getValue().getTypeTag());
-			// Get the initial value of each memory cell
-//			Map<MemoryVariable, Object> initial = new HashMap<>();
-//			for (Map.Entry<String, TypeTag> e : tags.entrySet())
-//				initial.put(new MemoryVariable(e.getKey(), false, e.getValue()), protocol.getInitials().get(new MemoryVariable(e.getKey(),false,e.getValue())));
-
-			//Add all memory variables
-			Map<MemoryVariable, Object> initial = new HashMap<>();
-			for (Transition t : part){
-				initial.putAll(t.getInitial());
-			}
+		for(ReoConnectorAtom atom : protocol.getAtoms()) {
 			
-			//Initialize value of some memory cells
-			for (MemoryVariable mv : protocol.getInitials().keySet())
-				initial.put(new MemoryVariable(mv.getName(),false,mv.getTypeTag()), protocol.getInitials().get(mv));
-
-			if(lang == Language.JAVA)
-				components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
-			if(lang == Language.MAUDE)
-				components.add(new MaudeProtocol("Protocol" + n_protocol++, ports, part, initial));
-			if(lang == Language.PROMELA)
-				components.add(new PromelaProtocol("Protocol" + n_protocol++, ports, part, initial));
-			if(lang == Language.TREO)
-				components.add(new TreoProtocol("Protocol" + n_protocol++, ports, part, initial));
+			
+			if(atom.getSemantics().size()==1 && atom.getSemantics().get(0) instanceof ConstraintHypergraph) {
+				ConstraintHypergraph _atom = (ConstraintHypergraph) atom.getSemantics().get(0);
+				for (Set<Transition> part : partition) {
+		
+					// Get the interface of this part
+					Set<Port> ports = new HashSet<>();
+					for (Transition t : part)
+						ports.addAll(t.getInterface());
+		
+					//Add all memory variables
+					Map<MemoryVariable, Object> initial = new HashMap<>();
+					for (Transition t : part){
+						initial.putAll(t.getInitial());
+					}
+					
+					//Initialize value of some memory cells
+					for (MemoryVariable mv : _atom.getInitials().keySet())
+						initial.put(new MemoryVariable(mv.getName(),false,mv.getTypeTag()), _atom.getInitials().get(mv));
+		
+					if(lang == Language.JAVA)
+						components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
+					if(lang == Language.MAUDE)
+						components.add(new MaudeProtocol("Protocol" + n_protocol++, ports, part, initial));
+					if(lang == Language.PROMELA)
+						components.add(new PromelaProtocol("Protocol" + n_protocol++, ports, part, initial));
+					if(lang == Language.TREO)
+						components.add(new TreoProtocol("Protocol" + n_protocol++, ports, part, initial));
+				}
+			}
 		}
 		return components;
 	}

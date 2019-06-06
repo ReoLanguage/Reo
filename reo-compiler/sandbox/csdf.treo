@@ -1,0 +1,56 @@
+import reo.fifo;
+
+csdf() {
+  A1(a,b,c)
+  fifo<2>(a,d)
+  fifo<2>(b,i)
+  fifo<3>(c,f)
+
+  A2(d,e)
+  fifo<2>(e,h)
+
+  A3(f,g)
+  fifo<2>(g,j)
+
+  A4(h,i,j)
+}
+
+A1(a,b,c) { 
+  #WA
+
+  q0* : x <= 5
+  q0 -> q1 	: {a,b}, true, {}
+
+  q1 : x >= 5 && x <= 10
+  q1 -> q2 	: {a,b}, true, {}
+
+  q2 : x >= 10 && x <= 15
+  q2 -> q0 	: {b,c}, x == 15, {x}
+}
+
+A2(a,b) { 
+  #WA
+
+  q0* : x <= 8
+  q0 -> q0 	: {a,b}, x == 8, {x}
+}
+
+A3(a,b) {
+  #WA
+
+  q0* : x <= 24
+  q0 -> q0 	: {a,b}, x == 24, {x}
+}
+
+A4(a,b,c) { 
+  #WA
+
+  q0* : x <= 4
+  q0 -> q1 	: {a,b}, x == 4, {x}
+
+  q1 : x <= 4
+  q1 -> q2 	: {a,b}, x == 4, {x}
+
+  q2 : x <= 4
+  q2 -> q0 	: {b,c}, x == 4, {x}
+}

@@ -1,0 +1,4 @@
+consumer(a?String) {
+        #RBA {a} true
+        Java:"Workers2.consumer"
+}

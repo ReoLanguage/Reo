@@ -158,7 +158,7 @@ public class Formulas {
 				}
 			}
 
-			return new Conjunction(clauses);
+			return conjunction(clauses);
 //		}
 
 //		if (f instanceof Equality)

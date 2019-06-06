@@ -1,0 +1,11 @@
+import reo.sca1;
+
+//	This example assumes that the csemiring is the weighted csemiring.
+//	The csemiring implements an interface containing \otimes and \oplus methods. 
+ 
+
+scaM(move,pass,snap){
+
+	sca1<5>(move,pass,snap)
+
+}

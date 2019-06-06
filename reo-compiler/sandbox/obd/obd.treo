@@ -1,0 +1,42 @@
+import reo.transformer;
+import reo.xrouter;
+import reo.fifo1;
+import reo.sync;
+import reo.fifofull;
+
+emergencyBrake(a?){
+	#PROMELA "emergencyBrake"
+	#RBA {a} true
+}
+
+ctlVelocity(a?){
+	#PROMELA "ctlVelocity"
+	#RBA {a} true
+}
+
+prodVmaz(a?int,b!int){
+	#PROMELA "prodVmaz"
+	#RBA {a,b} true
+}
+
+coverture(a?,b!,c!){
+	#PROMELA "coverture"
+	#RBA {a,b,~c} true
+	{a,~b,c} true
+}
+
+obd(){
+
+	prodVmaz(vmazReq,vmaz)
+	transformer<"computeVLMA">(vmaz,a1)
+	xrouter(a1,emgB,ctlV) emergencyBrake(emgB) ctlVelocity(ctlV)
+	sync(a1,a)
+	fifofull<"0">(a,covReq)
+	
+	coverture(covReq,uncovered,covered)
+	transformer<"update">(uncovered,a2)
+	sync(a2,a)
+	fifo1(covered,vmazReq)
+	
+}
+

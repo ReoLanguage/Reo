@@ -79,6 +79,8 @@ public final class Relation implements Formula {
 	 * @return name of this relation.
 	 */
 	public String getName() {
+		if(name.substring(0,1).contentEquals("\""))
+			return name.substring(1,name.length()-1);			
 		return name;
 	}
 
@@ -87,7 +89,9 @@ public final class Relation implements Formula {
 	 * @return
 	 */
 	public String getSTGName() {
-		return name.substring(1,name.length()-1);
+		if(name.substring(0,1).contentEquals("\""))
+			return name.substring(1,name.length()-1);			
+		return name;
 	}
 	
 	/**

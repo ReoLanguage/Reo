@@ -1,0 +1,42 @@
+import agent;
+import battery;
+import goal;
+import gps;
+import station;
+import reo.sync;
+import reo.lossy;
+import reo.syncdrain;
+import equal;
+
+system<id:int>(s1,s2,s3,s4,s5){
+
+	sync(move, s1)
+	sync(charge, s2)
+	sync(readBat, s3)
+	sync(readLoc, s4)
+	sync(status, s5)
+
+	agent<id>(move,chargeIn,readBat,readLoc,status)	
+
+	gps<updateGps,initialPos>(outLoc,updateLoc)
+
+	battery<updateBat,initialBat>(readBat,action)
+
+	sync(move,action)
+	sync(charge,action)
+	sync(move,updateLoc)
+	
+	sync(outLoc,x) 
+	sync(x,readLoc)
+	
+	
+	|
+	
+		updateGps = "updateGps",
+		updateBat = "updateBat",
+		position  = "c(1,1)",
+		initialPos  = "c(20,20)",
+		initialBat  = "b(100)"
+	
+	
+}

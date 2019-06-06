@@ -1,0 +1,6 @@
+
+sync(a?String,b!String){
+	#RBA
+	{a,b} a=b
+}
+
