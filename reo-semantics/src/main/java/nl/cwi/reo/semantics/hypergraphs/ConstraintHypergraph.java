@@ -87,7 +87,7 @@ public class ConstraintHypergraph implements Semantics<ConstraintHypergraph> {
 		for (Set<Rule> rules : s) {
 			for(Rule r : rules){
 				RuleNode rule = new RuleNode(new HashSet<>(Arrays.asList(r)));
-				if(rule.getSync().isEmpty()){
+				if(!rule.getSync().values().contains(Boolean.TRUE)){
 					Port v = new Port("hidden");
 					if (!getHyperedges(v).isEmpty()) {
 						rule.addToHyperedge(getHyperedges(v).get(0));
