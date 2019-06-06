@@ -37,15 +37,5 @@ public final class TreoProtocol extends Protocol {
 	public TreoProtocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {	
 		super(name,ports,transitions,initial);
 	}
-
-
-	public Set<Port> getRenamedPorts() {
-		Set<Port> set = new HashSet<>();
-		for(Port p :  super.getPorts()){
-			set.add(p.rename("p"+p.getName().substring(1)));
-		}
-		return set;
-	}
-
 	
 }

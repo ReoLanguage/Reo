@@ -9,11 +9,11 @@ main(S) ::= <<
 >>
 
 instance(c) ::= <<
-<c.name>(<c.renamedPorts:signature(); separator=",">)
+<c.name>(<c.ports:signature(); separator=",">)
 >>
 
 definition(c) ::= <<
-<c.name> = (<c.renamedPorts:port(); separator=",">) {
+<c.name> = (<c.ports:port(); separator=",">) {
 	<if(c.atomic)><c:atomic()><else><c:protocol()><endif>
 }
 >>
@@ -49,7 +49,7 @@ transition(t) ::= <<
 >>
 
 guard(t) ::= <<
-<t.renamedGuard:formula()>
+<t.guard:formula()>
 >>
 
 formula(f) ::= <<
@@ -97,17 +97,17 @@ action(t) ::= <<
 >>
 
 output(a) ::= <<
-<a.renamedOutput.keys:{p | <if(!a.renamedOutput.(p).isnull)>, <p.name> = <a.renamedOutput.(p):term()> <endif>}; separator=" "> 
+<a.output.keys:{p | <if(!a.output.(p).isnull)>, <p.name> = <a.output.(p):term()> <endif>}; separator=" "> 
 >>
 
 memory(m) ::= <<
-<m.renamedMemory.keys:{p |, $<p.name>' = <m.renamedMemory.(p):term()>}; separator=" "> 
+<m.memory.keys:{p |, $<p.name>' = <m.memory.(p):term()>}; separator=" "> 
 >>
 
 memoryUpdateNonNull(m) ::= <<
-<m.renamedMemory.keys:{p | <if(!m.renamedMemory.(p).isnull)>, $<p.name>' = <m.renamedMemory.(p):term()> <endif>}; separator=" "> 
+<m.memory.keys:{p | <if(!m.memory.(p).isnull)>, $<p.name>' = <m.memory.(p):term()> <endif>}; separator=" "> 
 >>
 
 memoryUpdateNull(m) ::= <<
-<m.renamedMemory.keys:{p | <if(m.renamedMemory.(p).isnull)>, $<p.name>' = <m.renamedMemory.(p):term()> <endif>}; separator=" "> 
+<m.memory.keys:{p | <if(m.memory.(p).isnull)>, $<p.name>' = <m.memory.(p):term()> <endif>}; separator=" "> 
 >>
