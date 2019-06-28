@@ -58,11 +58,10 @@ public final class PromelaTransition extends Transition{
 	public PromelaTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory,
 			Set<Port> input) {
 		super(guard, output, memory);
-		Set<Port> s = guard.getPorts();
-		for(Port p : s)
-			m.put(p, p.rename("p"+p.getName().substring(1)));
-		for(PortVariable pv : output.keySet())
-			m.put(pv.getPort(), pv.getPort().rename("p"+pv.getPort().getName().substring(1)));
+		for(Port p : getInterface())
+			if(p.getName().substring(0, 1).contains("$")) {
+				m.put(p, p.rename("p"+p.getName().substring(1,p.getName().length())));
+			}
 	}
 
 	@Override
@@ -72,52 +71,35 @@ public final class PromelaTransition extends Transition{
 		return guard;
 	}
 	
-	public void guardToString(){
-		Formula g = getGuard();
-		
+	public void guardToString(Formula g){		
 		if(g instanceof Conjunction){
-			for(Formula f : ((Conjunction) g).getClauses()){
-				if (f instanceof Negation && ((Negation) f).getFormula() instanceof Equality) {
-					Equality e = (Equality) ((Negation) f).getFormula();
-					if (e.getLHS() instanceof PortVariable && e.getRHS() instanceof NullValue) {
-						PortVariable p = (PortVariable) e.getLHS();
-						if(p.isInput())
-							f = new Equality(p,new NonNullValue());
-						else
-							f = new Equality(p,new NullValue());
-					}
-					else if (e.getLHS() instanceof MemoryVariable && e.getRHS() instanceof NullValue) {
-						MemoryVariable m = (MemoryVariable) e.getLHS();
-						f = new Equality(m,new NonNullValue());
-					}
-				}
-				if(f instanceof Equality){
-					Term lhs = ((Equality) f).getLHS();
-					Term rhs = ((Equality) f).getRHS();
-					if(lhs instanceof PortVariable)
-						lstate.put((PortVariable)lhs, rhs);
-					if(lhs instanceof MemoryVariable)
-						lstate.put((MemoryVariable)lhs, rhs);
-				}
-			}
+			for(Formula f : ((Conjunction) g).getClauses())
+				guardToString(f);
 		}
-		
-		if (g instanceof Negation && ((Negation) g).getFormula() instanceof Equality) {
+		else if (g instanceof Negation && ((Negation) g).getFormula() instanceof Equality) {
 			Equality e = (Equality) ((Negation) g).getFormula();
 			if (e.getLHS() instanceof PortVariable && e.getRHS() instanceof NullValue) {
 				PortVariable p = (PortVariable) e.getLHS();
-				if(p.isInput())
+				if(p.isInput()){
 					g = new Equality(p,new NonNullValue());
+					rstate.put(p, new NullValue());
+				}
 				else
 					g = new Equality(p,new NullValue());
+				guardToString(g);
 			}
 			else if (e.getLHS() instanceof MemoryVariable && e.getRHS() instanceof NullValue) {
 				MemoryVariable m = (MemoryVariable) e.getLHS();
 				g = new Equality(m,new NonNullValue());
-			}
+				guardToString(g);
+				MemoryVariable mP = new MemoryVariable( m.getName(), true, m.getTypeTag());
+				if(! getMemory().keySet().stream().anyMatch(o -> o.getName().equals(m.getName()))) {
+					rstate.put(mP, m);
+				}
+			}			
 		}
 		
-		if(g instanceof Equality){
+		else if(g instanceof Equality){
 			Term lhs = ((Equality) g).getLHS();
 			Term rhs = ((Equality) g).getRHS();
 			if(lhs instanceof PortVariable)
@@ -133,7 +115,7 @@ public final class PromelaTransition extends Transition{
 	public String getTransitionString() {
 		String RHS = "";
 		String LHS = "";
-		guardToString();
+		guardToString(getGuard());
 		//Convert lstate to string :
 		int o=0;
 		for(Variable v : lstate.keySet()){
@@ -218,7 +200,7 @@ public final class PromelaTransition extends Transition{
 		}
 		RHS = RHS + update;
 		
-		return "("+ LHS + ") -> " + "atomic{"+ RHS +"}" ;
+		return "("+ LHS + ") -> " + "("+ RHS +")" ;
 	}
 	
 	/**

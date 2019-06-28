@@ -10,32 +10,15 @@ import java.util.Set;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.templates.Component;
+import nl.cwi.reo.templates.Protocol;
 import nl.cwi.reo.templates.Transition;
 
 /**
  * Compiled automaton that is independent of the target language.
  */
-public class PromelaProtocol implements Component {
+public class PromelaProtocol extends Protocol {
 
-	/*
-	 * Rule to name ports in template :
-	 * 	- $4 is renamed as p4 for ports and m4 for mem_cells
-	 */
-	
-	/** The protocol. */
-	public final boolean protocol = true;
-
-	/** The name. */
-	private final String name;
-
-	/** The ports. */
-	private final Set<Port> ports;
-
-	/** The transitions. */
-	public final Set<Transition> transitions;
-
-	/** The initial. */
-	private final Map<MemoryVariable, Object> initial;
+	private final Set<Port> renamedPorts;
 
 	/**
 	 * Instantiates a new protocol.
@@ -50,60 +33,20 @@ public class PromelaProtocol implements Component {
 	 *            the initial
 	 */
 	public PromelaProtocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {
-		this.name = name;
-		this.ports = ports;
-		this.transitions = transitions;
-		this.initial = initial;
-	}
-
-	/**
-	 * Gets the transitions.
-	 *
-	 * @return the transitions
-	 */
-	public Set<Transition> getTransitions() {
-		return transitions;
-	}
-
-	/**
-	 * Gets the initial.
-	 *
-	 * @return the initial
-	 */
-	public Map<MemoryVariable, Object> getInitial() {
-		return initial;
-	}
-
-	/**
-	 * Gets the name.
-	 *
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Gets the port in the interface of this protocol.
-	 *
-	 * @return the port
-	 */
-	public Set<Port> getPorts() {
-		Set<Port> setPorts = new HashSet<>();
-		for(Port p : ports){
-			setPorts.add(p.rename("p"+p.getName().substring(1)));
+		super(name,ports,transitions,initial);
+		this.renamedPorts = new HashSet<>();
+		for(Port p : ports) {
+			if(p.getName().substring(0, 1).contains("$")) {
+				renamedPorts.add(p.rename("p"+p.getName().substring(1,p.getName().length())));
+			}
+			else
+				renamedPorts.add(p);
 		}
-		return setPorts;
 	}
+
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		String s = "protocol: " + name + ports + "\n";
-		for (Transition t : transitions)
-			s += "\t" + t.toString() + "\n";
-		return s;
+	public Set<Port> getRenamedPorts() {
+		return renamedPorts;
 	}
+
 }
