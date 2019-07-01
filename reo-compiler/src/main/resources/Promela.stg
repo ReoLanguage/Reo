@@ -8,7 +8,7 @@ main(S) ::= <<
 
 <S.components:properties();separator="">
 
-<S.components:component(); separator="\n\n">
+<S.components:component(); separator="">
 
 init {
 
@@ -19,15 +19,13 @@ init {
 >>
 
 component(c) ::= <<
-<if(c.protocol)>
-<c:protocol()>
-<endif>
+<if(c.protocol)><c:protocol()><endif>
 >>
 
 properties(c) ::= <<
 <if(c.protocol)>
-<c.ports:{ p | #define <p.name>_fires ((len(<p.name>.trig) != 0 && len(<p.name>.data) != 0) && X(len(<p.name>.trig) == 0 || len(<p.name>.data) == 0)) }; separator ="\n">
-<c.ports:{ p | #define <p.name>_silent (!(<p.name>_fires)) }; separator ="\n">
+<c.renamedPorts:{ p | #define <p.name>_fires ((len(<p.name>.trig) != 0 && len(<p.name>.data) != 0) && X(len(<p.name>.trig) == 0 || len(<p.name>.data) == 0)) }; separator ="\n">
+<c.renamedPorts:{ p | #define <p.name>_silent (!(<p.name>_fires)) }; separator ="\n">
 <endif>
 >>
 
@@ -37,7 +35,7 @@ proctype <c.name>(<c.renamedPorts:{ p | port <p.name>}; separator ="; ">){
 	<c.initial.keys:{ m | chan <m.name> = [1] of {int\}}; separator ="\n">
 	<c.initial.keys:{ m | <if(c.initial.(m))><m.name>!<c.initial.(m)>;<endif>  }; separator ="">
 	<c.initial.keys:{ m | int _<m.name>;  }; separator ="\n">
-	<c.ports:{ p | int _<p.name> ;}; separator ="\n">
+	<c.renamedPorts:{ p | int _<p.name> ;}; separator ="\n">
 	do
 		<c.transitions:transitions(); separator ="\n">
 	od
@@ -61,13 +59,13 @@ proctype <c.name>(<c.ports:{ p | port <p.name>}; separator ="; ">){
 >>
 ports(c) ::= <<
 	<if(c.protocol)>
-<c.ports:{ p | port <p.name>}; separator ="\n">
+<c.renqmedPorts:{ p | port <p.name>}; separator ="\n">
 	<endif>
 >>
 
 init(c) ::= <<
 	<if(c.protocol)>
-		run <c.name>(<c.ports:{ p | <p.name>}; separator =",">)
+		run <c.name>(<c.renamedPorts:{ p | <p.name>}; separator =",">)
 	<endif>
 	<if(c.atomic)>
 		run <c.atomicName>(<c.renamedPorts:{p | <p.name>}; separator=",">);<!
