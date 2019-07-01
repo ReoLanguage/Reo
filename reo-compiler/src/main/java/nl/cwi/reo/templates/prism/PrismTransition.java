@@ -20,6 +20,7 @@ import nl.cwi.reo.semantics.predicates.Function;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.predicates.PortVariable;
 import nl.cwi.reo.semantics.predicates.Term;
+import nl.cwi.reo.semantics.predicates.Variable;
 import nl.cwi.reo.templates.Transition;
 
 /**
@@ -57,9 +58,8 @@ public final class PrismTransition extends Transition{
 	 * @param input
 	 *            the input
 	 */
-	public PrismTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory,
-			Set<Port> input) {
-		super(guard, output, memory);
+	public PrismTransition(Formula guard,  Map<Variable, Term> update, Formula constraint) {
+		super(guard, update, constraint);
 		getPRISMUpdate();
 	}
 

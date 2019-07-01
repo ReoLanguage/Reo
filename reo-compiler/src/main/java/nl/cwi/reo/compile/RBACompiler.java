@@ -218,7 +218,7 @@ public class RBACompiler {
 //					mem_substitution.put(m, memory.get(v).substitute(memory.get(v), v));
 //			}
 //		}
-		return new Transition(guard, output, memory);
+		return new Transition(guard, assignements, guard);
 	}
 
 	/**

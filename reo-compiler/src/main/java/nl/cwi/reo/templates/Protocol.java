@@ -3,10 +3,13 @@
  */
 package nl.cwi.reo.templates;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.semantics.predicates.Term;
 import nl.cwi.reo.semantics.predicates.MemoryVariable;
 
 /**
@@ -27,7 +30,7 @@ public class Protocol implements Component {
 	public final Set<Transition> transitions;
 
 	/** The initial. */
-	private final Map<MemoryVariable, Object> initial;
+	private final Map<MemoryVariable, Term> initial;
 
 	/**
 	 * Instantiates a new protocol.
@@ -41,11 +44,21 @@ public class Protocol implements Component {
 	 * @param initial
 	 *            the initial
 	 */
-	public Protocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {
+	public Protocol(String name,  Set<Transition> transitions, Map<MemoryVariable, Term> initial) {
 		this.name = name;
+		Set<Port> ports = new HashSet<>();
+		for (Transition t : transitions)
+			ports.addAll(t.getInterface());
 		this.ports = ports;
 		this.transitions = transitions;
-		this.initial = initial;
+
+		this.initial = new HashMap<>();
+		for (Transition t : transitions){
+			this.initial.putAll(t.getInitial());
+		}
+		//Overwrite initial if not null
+		for (MemoryVariable mv : initial.keySet())
+			this.initial.put(new MemoryVariable(mv.getName(),false,mv.getTypeTag()),initial.get(mv));
 	}
 
 	/**
@@ -62,7 +75,7 @@ public class Protocol implements Component {
 	 *
 	 * @return the initial
 	 */
-	public Map<MemoryVariable, Object> getInitial() {
+	public Map<MemoryVariable, Term> getInitial() {
 		return initial;
 	}
 

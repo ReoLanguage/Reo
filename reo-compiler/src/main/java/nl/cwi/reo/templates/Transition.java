@@ -51,18 +51,20 @@ public class Transition {
 	 * @param input
 	 *            the input
 	 */
-	public Transition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory) {
+	public Transition(Formula guard, Map<Variable,Term> update, Formula constraint) {
 		if (guard == null)
 			throw new IllegalArgumentException("No guard specified.");
-		if (output == null)
-			throw new IllegalArgumentException("No output values specified.");
-		if (memory == null)
-			throw new IllegalArgumentException("No memory update specified.");
 		this.guard = guard;
-		this.output = Collections.unmodifiableMap(output);
-		this.memory = Collections.unmodifiableMap(memory);
+		this.output = new HashMap<>();
+		this.memory = new HashMap<>();
+		for(Variable v : update.keySet()) {
+			if(v instanceof PortVariable)
+				output.put((PortVariable) v, update.get(v));
+			if(v instanceof MemoryVariable)
+				memory.put((MemoryVariable) v, update.get(v));
+		}
 	}
-
+	
 	/**
 	 * Gets the set of guards.
 	 * 
@@ -95,20 +97,6 @@ public class Transition {
 		}
 		return new Conjunction(guards);
 	}
-	
-	/**
-	 * Gets the set of guards sorted by inclusion of domain definition (ie a<f(a))
-	 * 
-	 * @return guard
-	 */
-//	public Formula getSortedGuard() {
-//		if(this.guard instanceof Conjunction){
-//			Conjunction c = (Conjunction) guard;
-//			c.getClauses();
-//			
-//		}
-//		return this.guard;
-//	}
 	
 	/**
 	 * Gets the set of input port
@@ -151,8 +139,8 @@ public class Transition {
 	 * 
 	 * @return assignment of terms to output ports.
 	 */
-	public Map<MemoryVariable, Object> getInitial() {
-		Map<MemoryVariable, Object> initial = new HashMap<>();
+	public Map<MemoryVariable, Term> getInitial() {
+		Map<MemoryVariable, Term> initial = new HashMap<>();
 		for (Map.Entry<MemoryVariable, Term> upd : getMemory().entrySet()){
 			initial.put(new MemoryVariable(upd.getKey().getName(),false,upd.getKey().getTypeTag()), null);
 		}
@@ -178,7 +166,11 @@ public class Transition {
 	 * @return set of ports that participate in this transition
 	 */
 	public Set<Port> getInterface() {
-		Set<Port> ports = new HashSet<Port>(guard.getPorts());
+		
+		Set<Port> ports = new HashSet<Port>();
+		for(Variable v : guard.getFreeVariables())
+			if(v instanceof PortVariable)
+				ports.add(((PortVariable) v).getPort());
 		for (PortVariable x : output.keySet()){
 			ports.add(new Port(x.getPort().getName(),PortType.OUT,x.getPort().getPrioType(),x.getPort().getTypeTag(),false));
 			if(output.get(x) instanceof PortVariable){

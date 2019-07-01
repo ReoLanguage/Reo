@@ -1,0 +1,10 @@
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+
+fifo2(a?String,c!String) {
+	fifo1(a,b)
+	fifo1(b,c)
+}
+

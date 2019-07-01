@@ -3,8 +3,15 @@ main(S) ::= <<
 /* Generated from <S.file> by Reo 1.0.*/
 
 #include "runtime.pml"
+#include "functions.pml"
+#include "agents.pml"
 
+/* port declarations */
 <S.components:ports();separator="">
+
+/* memory declarations */
+<S.components:memories(); separator="">
+
 
 <S.components:properties();separator="">
 
@@ -13,9 +20,13 @@ main(S) ::= <<
 init {
 
 	atomic{
-	<S.components:init(); separator="">
+	<S.components:init(); separator=";\n">
 	}
 }
+>>
+
+memories(c)::=<<
+<if(c.protocol)><c.initial.keys:{ m | chan <m.name> = [1] of {bit\}}; separator ="\n"><endif>
 >>
 
 component(c) ::= <<
@@ -25,17 +36,19 @@ component(c) ::= <<
 properties(c) ::= <<
 <if(c.protocol)>
 <c.renamedPorts:{ p | #define <p.name>_fires ((len(<p.name>.trig) != 0 && len(<p.name>.data) != 0) && X(len(<p.name>.trig) == 0 || len(<p.name>.data) == 0)) }; separator ="\n">
+<c.initial.keys:{ m | #define <m.name>_fires ((len(<m.name>) != 0 && len(<m.name>) != 0) && X(len(<m.name>) == 0 || len(<m.name>) == 0))}; separator ="\n">
+
 <c.renamedPorts:{ p | #define <p.name>_silent (!(<p.name>_fires)) }; separator ="\n">
+<c.initial.keys:{ m | #define <m.name>_silent (!(<m.name>_fires)) }; separator ="\n">
 <endif>
 >>
 
 protocol(c) ::= <<
 
-proctype <c.name>(<c.renamedPorts:{ p | port <p.name>}; separator ="; ">){
-	<c.initial.keys:{ m | chan <m.name> = [1] of {int\}}; separator ="\n">
-	<c.initial.keys:{ m | <if(c.initial.(m))><m.name>!<c.initial.(m)>;<endif>  }; separator ="">
-	<c.initial.keys:{ m | int _<m.name>;  }; separator ="\n">
-	<c.renamedPorts:{ p | int _<p.name> ;}; separator ="\n">
+proctype <c.name>(<c.renamedPorts:{ p | port n<p.name>}; separator ="; ">){
+	<c.initial.keys:{ m | <if(c.initial.(m))><m.name>!1;<endif>  }; separator ="">
+	<c.initial.keys:{ m | bit _<m.name>;  }; separator ="\n">
+	<c.renamedPorts:{ p | bit _n<p.name> ;}; separator ="\n">
 	do
 		<c.transitions:transitions(); separator ="\n">
 	od
@@ -43,37 +56,15 @@ proctype <c.name>(<c.renamedPorts:{ p | port <p.name>}; separator ="; ">){
 }
 >>
 
-
-_protocol(c) ::= <<
-
-proctype <c.name>(<c.ports:{ p | port <p.name>}; separator ="; ">){
-	<c.initial.keys:{ m | chan <m.name> = [1] of {<if(m.typeTag)><m.typeTag><else>int<endif>\};  }; separator ="\n">
-	<c.initial.keys:{ m | <if(c.initial.(m))><m.name>!<c.initial.(m)>;<endif>  }; separator ="">
-	<c.initial.keys:{ m | <if(m.typeTag)><m.typeTag><else>int<endif> _<m.name>;  }; separator ="\n">
-	<c.ports:{ p | <if(p.typeTag)><p.typeTag><else>int<endif> _<p.name> ;}; separator ="\n">
-	do
-		<c.transitions:transitions(); separator ="\n">
-	od
-
-}
->>
 ports(c) ::= <<
-	<if(c.protocol)>
-<c.renqmedPorts:{ p | port <p.name>}; separator ="\n">
-	<endif>
+<if(c.protocol)><c.renamedPorts:{ p | port <p.name>}; separator ="\n"><endif>
 >>
 
 init(c) ::= <<
-	<if(c.protocol)>
-		run <c.name>(<c.renamedPorts:{ p | <p.name>}; separator =",">)
-	<endif>
-	<if(c.atomic)>
-		run <c.atomicName>(<c.renamedPorts:{p | <p.name>}; separator=",">);<!
-	!><endif>
-	
+		run <c.name>(<c.renamedPorts:{ p | <p.name>}; separator =",">)	
 >>
 
 
 transitions(t) ::= <<
-	:: <t.transitionString>
+	:: <t.rewString>
 >>

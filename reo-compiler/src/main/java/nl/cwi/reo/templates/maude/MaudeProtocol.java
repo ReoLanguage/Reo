@@ -54,8 +54,8 @@ public final class MaudeProtocol extends Protocol {
 	 * @param initial
 	 *            the initial
 	 */
-	public MaudeProtocol(String name, Set<Port> ports, Set<Transition> transitions, Map<MemoryVariable, Object> initial) {	
-		super(name,ports,transitions,initial);
+	public MaudeProtocol(String name, Set<Transition> transitions, Map<MemoryVariable, Term> initial) {	
+		super(name,transitions,initial);
 		getState();
 		getFunctions();
 	}

@@ -91,8 +91,8 @@ public final class MaudeTransition extends Transition{
 	 * @param input
 	 *            the input
 	 */
-	public MaudeTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory) {
-		super(guard, output, memory);
+	public MaudeTransition(Formula guard, Map<Variable, Term> update, Formula constraint) {
+		super(guard, update, constraint);
 		nb=++counter;
 		formulaToString(getGuard());
 		rstate.putAll(getOutput());

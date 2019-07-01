@@ -46,8 +46,8 @@ public final class TreoTransition extends Transition{
 	 * @param input
 	 *            the input
 	 */
-	public TreoTransition(Formula guard, Map<PortVariable, Term> output, Map<MemoryVariable, Term> memory) {
-		super(guard,output,memory);
+	public TreoTransition(Formula guard,  Map<Variable, Term> update, Formula constraint) {
+		super(guard, update, constraint);
 		for(Port p : getInterface())
 			if(p.getName().substring(0, 1).contains("$")) {
 				m.put(p, p.rename("p"+p.getName().substring(1,p.getName().length())));

@@ -110,33 +110,19 @@ public class Command {
 	}
 
 	public Transition toTransition(Language lang) {
-		Map<PortVariable, Term> output = new HashMap<>();
-		Map<MemoryVariable, Term> memory = new HashMap<>();
-		for (Map.Entry<Variable, Term> entry : update.entrySet()) {
-			if (entry.getKey() instanceof PortVariable)
-				output.put((PortVariable) entry.getKey(), entry.getValue());
-			if (entry.getKey() instanceof MemoryVariable)
-				memory.put((MemoryVariable) entry.getKey(), entry.getValue());
-		}
-		Set<Port> inputs = new HashSet<Port>();
-		for(Port p : getPorts()){
-			if(p.isInput()){
-				inputs.add(p);
-			}
-		}
-		
+				
 		switch (lang) {
 		case PRISM:
-			return new PrismTransition(guard, output, memory, inputs);
+			return new PrismTransition(guard, update, constraint);
 		case PROMELA:
-			return new PromelaTransition(guard, output, memory, inputs);
+			return new PromelaTransition(guard, update, constraint);
 		case JAVA:
 		case C11:
-			return new Transition(guard, output, memory);
+			return new Transition(guard, update, constraint);
 		case MAUDE:
-			return new MaudeTransition(guard, output, memory);
+			return new MaudeTransition(guard, update, constraint);
 		case TREO:
-			return new TreoTransition(guard,output,memory);
+			return new TreoTransition(guard, update, constraint);
 		case PRT:
 			break;
 		case TEXT:

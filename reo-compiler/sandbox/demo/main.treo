@@ -2,24 +2,20 @@ import reo.fifo1;
 import reo.sync;
 import reo.syncdrain;
 
-prod1(a?){
+prod1(a!){
 	#PROMELA "prod1"
-	#RBA {a} true
 }
 
-prod2(a?){
+prod2(a!){
 	#PROMELA "prod2"
-	#RBA {a} true
 }
 
-prod3(a?){
+prod3(a!){
 	#PROMELA "prod3"
-	#RBA {a} true
 }
 
 cons(a?){
 	#PROMELA "cons"
-	#RBA {a} true
 }
 
 alternator(a[1..N],b[1]){
@@ -29,13 +25,13 @@ alternator(a[1..N],b[1]){
 }
 
 main() {
-	prod1(a[1])
-	prod2(a[2])
-	prod3(a[3])
+	prod1(a)
+	prod2(c)
+	prod3(d)
 	cons(b[1])
 
 
-	alternator(a[1..3],b[1])
+	alternator(a,c,d,b[1])
 
 }
 

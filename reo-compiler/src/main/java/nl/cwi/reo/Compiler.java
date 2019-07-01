@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -236,6 +237,8 @@ public class Compiler {
 		connector = connector.insertNodes(true, true, new RuleBasedAutomaton());
 		connector = connector.integrate();
 		connector = compose(connector);
+	
+//		connector = rename(connector,program.getConnector().getLinks());
 		
 	  	Set<Transition> transitions = buildTransitions(connector);			
 		Set<Set<Transition>> partition = partition(transitions,false);
@@ -268,6 +271,20 @@ public class Compiler {
 		}
 	}
 	*/
+	
+/*	private ReoConnector rename(ReoConnector connector,Map<Port,Port> links) {
+		Map<Port,Port> backlinks = new HashMap<>(links);
+		for(Port p: links.keySet())
+			if(connector.getInterface().contains(p))
+				backlinks.put(links.get(p), p);
+			else
+				backlinks.put(p,links.get(p));
+		if(connector instanceof ReoConnectorComposite) {
+			connector = new ReoConnectorComposite(connector.getName(), "void", ((ReoConnectorComposite) connector).getComponents() ,backlinks);
+			connector.integrate();
+		}
+		return connector;
+	}*/
 	/**
 	 * Composes all sub-connectors in a given connector. 
 	 * Composition is defined per semantics. 
@@ -372,7 +389,7 @@ public class Compiler {
 				Map<Port, Port> links = new HashMap<>();
 				links.put(q.rename(p.getName()), q);
 /*				links.put(q, q); */
-				ReoConnectorAtom window = new ReoConnectorAtom("PortWindow", Arrays.asList(ref), links);
+				ReoConnectorAtom window = new ReoConnectorAtom("PortWindow"+n_atom++, Arrays.asList(ref), links);
 				list.add(window);
 			}
 		}
@@ -386,27 +403,14 @@ public class Compiler {
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
-
-//				 TODO the string representation of parameter values is target language dependent.
-				
-				List<String> params = new ArrayList<>();
-				for (Value v : r.getValues()) {
-					if (v instanceof BooleanValue) {
-						params.add(((BooleanValue) v).getValue() ? "true" : "false");
-					} else if (v instanceof StringValue) {
-						params.add("\"" + ((StringValue) v).getValue() + "\"");
-					} else if (v instanceof DecimalValue) {
-						params.add(Double.toString(((DecimalValue) v).getValue()));
-					}
-				}
 				if(lang == Language.JAVA)
-					components.add(new Atomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
+					components.add(new Atomic(name, r.getValues(), atom.rename(renaming).getInterface(), call));
 				if(lang == Language.PROMELA)
-					components.add(new PromelaAtomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
+					components.add(new PromelaAtomic(name, r.getValues(), atom.rename(renaming).getInterface(), call));
 				if(lang == Language.MAUDE)
-					components.add(new MaudeAtomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
+					components.add(new MaudeAtomic(name, r.getValues(), atom.rename(renaming).getInterface(), call));
 				if(lang == Language.TREO)
-					components.add(new TreoAtomic(name + n_atom++, params, atom.rename(renaming).getInterface(), call));
+					components.add(new TreoAtomic(name, r.getValues(),  atom.rename(renaming).getInterface(), call));
 
 			}
 		}
@@ -440,29 +444,14 @@ public class Compiler {
 				ConstraintHypergraph _atom = (ConstraintHypergraph) atom.getSemantics().get(0);
 				for (Set<Transition> part : partition) {
 		
-					// Get the interface of this part
-					Set<Port> ports = new HashSet<>();
-					for (Transition t : part)
-						ports.addAll(t.getInterface());
-		
-					//Add all memory variables
-					Map<MemoryVariable, Object> initial = new HashMap<>();
-					for (Transition t : part){
-						initial.putAll(t.getInitial());
-					}
-					
-					//Initialize value of some memory cells
-					for (MemoryVariable mv : _atom.getInitials().keySet())
-						initial.put(new MemoryVariable(mv.getName(),false,mv.getTypeTag()), _atom.getInitials().get(mv));
-		
 					if(lang == Language.JAVA)
-						components.add(new Protocol("Protocol" + n_protocol++, ports, part, initial));
+						components.add(new Protocol("Protocol" + n_protocol++, part, _atom.getInitials()));
 					if(lang == Language.MAUDE)
-						components.add(new MaudeProtocol("Protocol" + n_protocol++, ports, part, initial));
+						components.add(new MaudeProtocol("Protocol" + n_protocol++, part, _atom.getInitials()));
 					if(lang == Language.PROMELA)
-						components.add(new PromelaProtocol("Protocol" + n_protocol++, ports, part, initial));
+						components.add(new PromelaProtocol("Protocol" + n_protocol++, part, _atom.getInitials()));
 					if(lang == Language.TREO)
-						components.add(new TreoProtocol("Protocol" + n_protocol++, ports, part, initial));
+						components.add(new TreoProtocol("Protocol" + n_protocol++, part, _atom.getInitials()));
 				}
 			}
 		}
