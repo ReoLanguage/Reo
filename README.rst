@@ -1,3 +1,9 @@
+====
+:warning:This branch is not maintained anymore.
+====
+
+**The graphical editor has been moved to a separate repository: https://github.com/ReoLanguage/reo-graphical-editor**
+
 .. image:: https://travis-ci.org/ReoLanguage/Reo.svg?branch=master
    :target: https://travis-ci.org/ReoLanguage/Reo
    :alt: Latest Version
