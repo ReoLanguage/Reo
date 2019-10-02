@@ -28,6 +28,9 @@ public enum Language {
 
 	/** Input language */
 	TREO,
+
+	/** Q# language */
+	QSHARP,
 	
 	/** Pr text. */
 	TEXT;
@@ -52,6 +55,8 @@ public enum Language {
 			return "Text";
 		case TREO:
 			return "Treo";
+		case QSHARP:
+			return "Q#";
 		case PROMELA:
 			return "Promela";
 		default:

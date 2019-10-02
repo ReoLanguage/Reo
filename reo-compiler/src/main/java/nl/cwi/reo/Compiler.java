@@ -208,6 +208,7 @@ public class Compiler {
 		case PROMELA:
 		case MAUDE:
 		case TREO:
+		case QSHARP:
 			ListenerRBA listenerRba = new ListenerRBA(monitor);
 			return new Interpreter(SemanticsType.RBA, listenerRba, directories, params, monitor);
 		case PRT:
@@ -403,7 +404,7 @@ public class Compiler {
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
-				if(lang == Language.JAVA)
+				if(lang == Language.JAVA || lang == Language.QSHARP)
 					components.add(new Atomic(name, r.getValues(), atom.rename(renaming).getInterface(), call));
 				if(lang == Language.PROMELA)
 					components.add(new PromelaAtomic(name, r.getValues(), atom.rename(renaming).getInterface(), call));
@@ -443,8 +444,7 @@ public class Compiler {
 			if(atom.getSemantics().size()==1 && atom.getSemantics().get(0) instanceof ConstraintHypergraph) {
 				ConstraintHypergraph _atom = (ConstraintHypergraph) atom.getSemantics().get(0);
 				for (Set<Transition> part : partition) {
-		
-					if(lang == Language.JAVA)
+					if(lang == Language.JAVA || lang == Language.QSHARP)
 						components.add(new Protocol("Protocol" + n_protocol++, part, _atom.getInitials()));
 					if(lang == Language.MAUDE)
 						components.add(new MaudeProtocol("Protocol" + n_protocol++, part, _atom.getInitials()));
@@ -516,6 +516,10 @@ public class Compiler {
 		case TREO:
 			group = new STGroupFile("Treo.stg");
 			extension = ".treo";
+			break;
+		case QSHARP:
+			group = new STGroupFile("QSharp.stg");
+			extension = ".qs";
 			break;
 		default:
 			return;

@@ -118,6 +118,7 @@ public class Command {
 			return new PromelaTransition(guard, update, constraint);
 		case JAVA:
 		case C11:
+		case QSHARP:
 			return new Transition(guard, update, constraint);
 		case MAUDE:
 			return new MaudeTransition(guard, update, constraint);

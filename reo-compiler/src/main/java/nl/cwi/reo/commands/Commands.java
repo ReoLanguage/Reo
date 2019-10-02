@@ -269,7 +269,7 @@ public class Commands {
 		return;
 	}
 
-	public void update(Variable v, Term t){
+	private void update(Variable v, Term t){
 		if (defs.get(v) == null) {
 			Set<Term> set = new HashSet<>();
 			set.add(t);

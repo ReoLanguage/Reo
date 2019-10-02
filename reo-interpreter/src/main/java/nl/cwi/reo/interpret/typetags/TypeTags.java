@@ -12,4 +12,5 @@ public class TypeTags {
 	
 	public static final TypeTag String = new TypeTag("String");
 
+	public static final TypeTag Qubit = new TypeTag("Qubit");
 }

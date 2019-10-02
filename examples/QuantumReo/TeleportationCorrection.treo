@@ -1,0 +1,142 @@
+import reo.sync;
+import reo.syncdrain;
+import reo.xrouter;
+import reo.fifo1;
+import reo.filter;
+import reo.merger;
+import reo.transformer;
+
+Teleport() {
+    Alice(a)
+    Entangle(b1, b2)
+
+    join(a, b1, c)
+    CNOT(c, c1)
+    sync(c1, d)
+
+    L(d, d1)
+    R(d, d2)
+
+    H(d1, e)
+    M(e, f)
+
+    M(d2, g)
+
+    fifo1(b2, h)
+    syncdrain(h, f)
+
+    TeleportationCorrection(f, g, b1, z)
+
+    Bob(z)
+}
+
+CNOT(a?Qubit, b!Qubit) {
+    transformer<"QuantumFunctions.CNOT">(a, t)
+    fifo1(t, b)
+}
+
+L(a?Qubit, b!Qubit) {
+    transformer<"QuantumFunctions.L">(a, t)
+    fifo1(t, b)
+}
+
+R(a?Qubit, b!Qubit) {
+    transformer<"QuantumFunctions.R">(a, t)
+    fifo1(t, b)
+}
+
+M(a?Qubit, b!String) {
+    transformer<"QuantumFunctions.M">(a, t)
+    fifo1(t, b)
+}
+
+H(a?Qubit, b!Qubit) {
+    transformer<"QuantumFunctions.H">(a, t)
+    fifo1(t, b)
+}
+
+Alice(a!Qubit) { #JAVA "TeleportProcesses.Alice" }
+Bob(a?Qubit) { #JAVA "TeleportProcesses.Bob" }
+Entangle(a!Qubit, b!Qubit) { #JAVA "TeleportProcesses.Entangle" }
+
+TeleportationCorrection(here?, message?, target?Qubit, output!Qubit) {
+    // here(a)
+    sync(here, a)
+
+    // message(k)
+    sync(message, k)
+
+    syncdrain(a, k)
+
+    sync(a, b)
+    xrouter(b, b1, b2)
+    filter<"isOne">(b1, c)
+    filter<"!isOne">(b2, f)
+    fifo1(c, d)
+    fifo1(f, g)
+    syncdrain(d, j)
+    syncdrain(g, h)
+    I(h, e)
+    X(j, e)
+
+    sync(i1, h)
+    sync(i2, j)
+    xrouter(i, i1, i2)
+
+    sync(k, l)
+    xrouter(l, l1, l2)
+    filter<"isOne">(l1, m)
+    filter<"!isOne">(l2, o)
+    syncdrain(m, r)
+    syncdrain(o, p)
+    I(p, n)
+    Z(r, n)
+    sync(n, i)
+    sync(q1, p)
+    sync(q2, r)
+    xrouter(q, q1, q2)
+
+    // target(q)
+    sync(target, q)
+
+    // output(e)
+    sync(e, output)
+}
+
+// Correction Components
+X(a?Qubit, b!Qubit) {
+    transformer<"X">(a, t)
+    fifo1(t, b)
+}
+
+Z(a?Qubit, b!Qubit) {
+    transformer<"Z">(a, t)
+    fifo1(t, b)
+}
+
+I(a?Qubit, b!Qubit) {
+    transformer<"I">(a, t)
+    fifo1(t, b)
+}
+
+// Test Components
+here(a!String) { #JAVA "TeleportationCorrectionProcesses.here" }
+message(a!String) { #JAVA "TeleportationCorrectionProcesses.message" }
+target(a!Qubit) { #JAVA "TeleportationCorrectionProcesses.target" }
+output(a?Qubit) { #JAVA "TeleportationCorrectionProcesses.output" }
+
+TeleportTest() {
+    here(a)
+    sync(a, a1)
+
+    message(b)
+    sync(b, b1)
+
+    target(c)
+    target(c, c1)
+
+    TeleportationCorrection(a1, b1, c1, d1)
+
+    sync(d1, d)
+    output(d)
+}

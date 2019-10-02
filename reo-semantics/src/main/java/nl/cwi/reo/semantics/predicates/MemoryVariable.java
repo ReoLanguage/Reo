@@ -63,7 +63,7 @@ public final class MemoryVariable implements Variable, Comparable<MemoryVariable
 	public MemoryVariable(String name, boolean prime) {
 		this.name = name;
 		this.prime = prime;
-		this.type = TypeTags.Object;
+		this.type = TypeTags.Qubit;
 	}
 
 	/**

@@ -1,0 +1,121 @@
+main(S) ::= <<
+<S.components:component(); separator="\n\n">
+>>
+
+component(c) ::= <<
+operation <c.name> (<c.ports:port(); separator=", ">) : Unit {
+    body {
+        <if(c.initial)>
+        using ((<c.initial:variableName(); separator=", ">) = (<c.initial:variableType(); separator=", ">)) {
+            <!<if(c.atomic)><c:atomic()><else><c:protocol()><endif>!>
+            <c.transitions:newGuard();separator="\n">
+        }
+        <else>
+        <c.transitions:newGuard();separator="\n">
+        <endif>
+    }
+}
+>>
+
+atomic(c) ::= <<
+// Nothing yet
+>>
+
+protocol(c) ::= <<
+<c.transitions:newCommand(); separator="\n">
+>>
+
+port(t) ::= <<
+<t.name> : <t:typetag()>
+>>
+
+variableName(t) ::= <<
+<t.name>
+>>
+
+variableType(t) ::= <<
+<t:typetag()>()
+>>
+
+typetag(p) ::= <<
+<if(p.typeTag)><p.typeTag><else>Bool<endif>
+>>
+
+newGuard(t) ::= <<
+if (<guard(t); wrap, anchor>) {
+    <action(t)>
+}
+>>
+
+newCommand(t) ::= <<
+<action(t)>
+>>
+
+guard(t) ::= <<
+<t.output.keys:{p | <if(!t.output.(p).isnull)><p.name>.hasGet() && <endif>}; separator=" "><!
+<t.input:{p | !(<p.name>.peek() == null) && }; separator=" ">
+!><t.guard:formula()>
+>>
+
+formula(f) ::= <<
+<if(f.negation)>not(<f.formula:formula()>)<!
+!><elseif(f.equality)><f:equality()><!
+!<elseif(f.equality)>false<!
+!><elseif(f.relation)><f:relation()><!
+!><elseif(f.conjunction)><f:conjunction()><!
+!><elseif(f.disjunction)><f:disjunction()><!
+!><endif>
+>>
+
+disjunction(f) ::= <<
+(<f.clauses:formula(); separator=" or ">)
+>>
+
+conjunction(f) ::=<<
+(<f.clauses:formula(); separator=" and\n ">)
+>>
+
+relation(t) ::=<<
+<t.STGName><if(t.args)>(<t.args:{p | <if(p.input)> <p.name> <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif><!
+<f.value><if(f.args)>(<f.args:term(); separator=", ">)<endif>!>
+>>
+
+equality(f) ::= <<
+<f.LHS:term()> == <f.RHS:term()>
+>>
+
+term(t) ::= <<
+<if(t.constant)><t.name><!
+!><elseif(t.node)><t.name><!
+!><elseif(t.memory)><t.name><!
+!><elseif(t.isnull)>Zero<!
+!><elseif(t.function)><t:function()><!
+!><else><t.name><endif>
+>>
+
+function(t) ::=<<
+<t.STGName><if(t.args)>(<t.args:{p | <if(p.input)> <p.name> <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
+>>
+
+action(t) ::= <<
+<t:output(); separator="\n">
+<t:memoryUpdateNonNull(); separator="\n">
+<t:memoryUpdateNull(); separator="\n">
+<!<t.input:{p | <p:input()>}; separator="\n">!>
+>>
+
+output(a) ::= <<
+<a.output.keys:{p | <if(!a.output.(p).isnull)><p.name>.put(<a.output.(p):term()>);<endif>}; separator="\n">
+>>
+
+memoryUpdateNonNull(m) ::= <<
+<m.memory.keys:{p | <if(!m.memory.(p).isnull)>set <p.name> = <m.memory.(p):term()>;<endif>}; separator="\n">
+>>
+
+memoryUpdateNull(m) ::= <<
+<m.memory.keys:{p | <if(m.memory.(p).isnull)>set <p.name> = <m.memory.(p):term()>;<endif>}; separator="\n">
+>>
+
+input(p) ::= <<
+<p.name>.get();
+>>
