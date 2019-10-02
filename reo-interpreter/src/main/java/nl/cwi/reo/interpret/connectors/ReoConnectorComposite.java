@@ -369,11 +369,11 @@ public final class ReoConnectorComposite implements ReoConnector {
 			TypeTag tag = null;
 			for (Port p : part) {
 				TypeTag p_tag = p.getTypeTag();
-				if (p.getTypeTag() != null) {
-					if (tag != null && !tag.equals(p_tag)) {
-						m.add("Conflicting port types: " + tag + " and " + p_tag + ".");
-						return null;
-					}
+				if (p.getTypeTag() != null) {  // FIXME needs to check the types in data flow properly
+//					if (tag != null && !tag.equals(p_tag)) {
+//						m.add("Conflicting port types: " + tag + " and " + p_tag + ".");
+//						return null;
+//					}
 					tag = p_tag;
 				}
 			}
