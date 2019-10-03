@@ -45,7 +45,7 @@ R(a?Qubit, b!Qubit) {
     fifo1(t, b)
 }
 
-M(a?Qubit, b!String) {
+M(a?Qubit, b!Bool) {
     transformer<"QuantumFunctions.M">(a, t)
     fifo1(t, b)
 }
@@ -59,7 +59,7 @@ Alice(a!Qubit) { #JAVA "TeleportProcesses.Alice" }
 Bob(a?Qubit) { #JAVA "TeleportProcesses.Bob" }
 Entangle(a!Qubit, b!Qubit) { #JAVA "TeleportProcesses.Entangle" }
 
-TeleportationCorrection(here?, message?, target?Qubit, output!Qubit) {
+TeleportationCorrection(here?Bool, message?Bool, target?Qubit, output!Qubit) {
     // here(a)
     sync(here, a)
 
