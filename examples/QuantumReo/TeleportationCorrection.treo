@@ -97,7 +97,10 @@ TeleportationCorrection(here?Bool, message?Bool, target?Qubit, output!Qubit) {
     xrouter(q, q1, q2)
 
     // target(q)
-    sync(target, q)
+    sync(target, target_r)
+    syncdrain(target_r, k)
+    syncdrain(target_r, a)
+    sync(target_r, q)
 
     // output(e)
     sync(e, output)
@@ -105,17 +108,17 @@ TeleportationCorrection(here?Bool, message?Bool, target?Qubit, output!Qubit) {
 
 // Correction Components
 X(a?Qubit, b!Qubit) {
-    transformer<"X">(a, t)
+    transformer<"X_op">(a, t)
     fifo1(t, b)
 }
 
 Z(a?Qubit, b!Qubit) {
-    transformer<"Z">(a, t)
+    transformer<"Z_op">(a, t)
     fifo1(t, b)
 }
 
 I(a?Qubit, b!Qubit) {
-    transformer<"I">(a, t)
+    transformer<"I_op">(a, t)
     fifo1(t, b)
 }
 
