@@ -1,6 +1,6 @@
-operation isOne (input : Bool) : Bool {
+operation isOne (input : Int) : Bool {
     body {
-        if (input) {
+        if (input == 1) {
             return true;
         } else {
             return false;
