@@ -240,8 +240,11 @@ public class Compiler {
 		connector = compose(connector);
 	
 //		connector = rename(connector,program.getConnector().getLinks());
-		
-	  	Set<Transition> transitions = buildTransitions(connector);			
+
+	  	Set<Transition> transitions = buildTransitions(connector);
+//		for (Transition i : transitions) {
+//			System.out.println(i);
+//		}
 		Set<Set<Transition>> partition = partition(transitions,false);
 
 		List<Component> components = new ArrayList<>();
@@ -420,6 +423,8 @@ public class Compiler {
 	}
 
 	private Set<Transition> buildTransitions(ReoConnector connector) {
+//		System.out.println(connector);
+//		System.out.println();
 		List<ReoConnectorAtom> protocol = connector.getAtoms();
 		Set<Transition> transitions = new HashSet<>();
 		for(ReoConnectorAtom atom : protocol) {
@@ -432,6 +437,9 @@ public class Compiler {
 				}
 			}
 		}
+//		System.out.println(transitions.size());
+//		for (Transition t : transitions)
+//			System.out.println(t);
 		return transitions;
 	}
 
