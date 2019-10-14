@@ -126,7 +126,7 @@ public final class ReoFile {
 			if (mainComp != null)
 				s.put(new Identifier(getName()), mainComp);
 			else
-				m.add(filename + " must define a component " + main + ".");  // FIXME gives this message for any error
+				m.add(filename + " must define a component " + main + ".");
 		}
 	}
 

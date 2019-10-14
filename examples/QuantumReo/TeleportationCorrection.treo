@@ -59,7 +59,7 @@ Alice(a!Qubit) { #JAVA "TeleportProcesses.Alice" }
 Bob(a?Qubit) { #JAVA "TeleportProcesses.Bob" }
 Entangle(a!Qubit, b!Qubit) { #JAVA "TeleportProcesses.Entangle" }
 
-TeleportationCorrection(here?Int, message?Int, target?Qubit, output!Qubit) {
+TeleportationCorrection(here?Bool, message?Bool, target?Qubit, output!Qubit) {
     // here(a)
     sync(here, a)
 
@@ -97,7 +97,10 @@ TeleportationCorrection(here?Int, message?Int, target?Qubit, output!Qubit) {
     xrouter(q, q1, q2)
 
     // target(q)
-    sync(target, q)
+    sync(target, target_r)
+    syncdrain(target_r, k)
+    syncdrain(target_r, a)
+    sync(target_r, q)
 
     // output(e)
     sync(e, output)

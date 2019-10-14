@@ -73,9 +73,6 @@ public final class ReoConnectorComposite implements ReoConnector {
 		this.name = name;
 		this.operator = operator;
 		this.components = Collections.unmodifiableList(components);
-//		System.out.println(components.get(0).getClass());
-//		System.out.println(components.get(0));
-//		System.out.println();
 		Map<Port, Port> links = new HashMap<Port, Port>();
 		for (ReoConnector C : components)
 			for (Map.Entry<Port, Port> link : C.getLinks().entrySet())

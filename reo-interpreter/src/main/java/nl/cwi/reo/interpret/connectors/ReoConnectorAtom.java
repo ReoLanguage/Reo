@@ -52,11 +52,6 @@ public final class ReoConnectorAtom implements ReoConnector {
 	 */
 	public ReoConnectorAtom(@Nullable String name, List<Atom> semantics, Map<Port, Port> links) {
 		this.name = name;
-//		for (Atom a : semantics)
-//			if (!(a instanceof Reference)) {
-//				System.out.println(a.getClass());
-//				System.out.println(a);
-//			}
 		this.semantics = semantics;
 		this.links = Collections.unmodifiableMap(links);
 	}

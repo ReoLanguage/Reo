@@ -31,7 +31,7 @@ import nl.cwi.reo.semantics.predicates.Variable;
 public class Transition {
 
 	/** Guard. */
-	protected final Formula guard;
+	private final Formula guard;
 
 	/** Ports update. */
 	private final Map<PortVariable, Term> output;
