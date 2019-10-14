@@ -6,19 +6,12 @@ component(c) ::= <<
 operation <c.name> (<c.ports:port(); separator=", ">) : Unit {
     body {
         <if(c.initial)>
-        using ((<c.initial:variableName(); separator=", ">) = (<c.initial:variableType(); separator=", ">)) {
-            <!<if(c.atomic)><c:atomic()><else><c:protocol()><endif>!>
-            <c.transitions:newGuard();separator="\n">
-        }
-        <else>
-        <c.transitions:newGuard();separator="\n">
+        <c.initial:variable(); separator="\n">
         <endif>
+
+        <c.transitions:newGuard();separator="\n">
     }
 }
->>
-
-atomic(c) ::= <<
-// Nothing yet
 >>
 
 protocol(c) ::= <<
@@ -37,8 +30,12 @@ variableType(t) ::= <<
 <t:typetag()>()
 >>
 
+variable(t) ::= <<
+mutable <t.name> = <t:typetag()>;
+>>
+
 typetag(p) ::= <<
-<if(p.typeTag)><p.typeTag><else>Bool<endif>
+<if(p.typeTag)><p.typeTag><else>Int<endif>
 >>
 
 newGuard(t) ::= <<
@@ -52,15 +49,12 @@ newCommand(t) ::= <<
 >>
 
 guard(t) ::= <<
-<t.output.keys:{p | <if(!t.output.(p).isnull)><p.name>.hasGet() && <endif>}; separator=" "><!
-<t.input:{p | !(<p.name>.peek() == null) && }; separator=" ">
-!><t.guard:formula()>
+<t.guard:formula()>
 >>
 
 formula(f) ::= <<
-<if(f.negation)>not(<f.formula:formula()>)<!
+<if(f.negation)>!(<f.formula:formula()>)<!
 !><elseif(f.equality)><f:equality()><!
-!<elseif(f.equality)>false<!
 !><elseif(f.relation)><f:relation()><!
 !><elseif(f.conjunction)><f:conjunction()><!
 !><elseif(f.disjunction)><f:disjunction()><!
@@ -68,11 +62,11 @@ formula(f) ::= <<
 >>
 
 disjunction(f) ::= <<
-(<f.clauses:formula(); separator=" or ">)
+(<f.clauses:formula(); separator=" || ">)
 >>
 
 conjunction(f) ::=<<
-(<f.clauses:formula(); separator=" and\n ">)
+(<f.clauses:formula(); separator=" &&\n ">)
 >>
 
 relation(t) ::=<<
@@ -88,24 +82,23 @@ term(t) ::= <<
 <if(t.constant)><t.name><!
 !><elseif(t.node)><t.name><!
 !><elseif(t.memory)><t.name><!
-!><elseif(t.isnull)>Zero<!
+!><elseif(t.isnull)>-1<!
 !><elseif(t.function)><t:function()><!
 !><else><t.name><endif>
 >>
 
 function(t) ::=<<
-<t.STGName><if(t.args)>(<t.args:{p | <if(p.input)> <p.name> <elseif(p.function)><p:function()><else> <p.name> <endif>}; separator=",">)<endif>
+<t.STGName><if(t.args)>(<t.args:{p | <if(p.input)><p.name><elseif(p.function)><p:function()><elseif(p.memory)>target<else> <p.name> <endif>}; separator=", ">)<endif>
 >>
 
 action(t) ::= <<
 <t:output(); separator="\n">
 <t:memoryUpdateNonNull(); separator="\n">
 <t:memoryUpdateNull(); separator="\n">
-<!<t.input:{p | <p:input()>}; separator="\n">!>
 >>
 
 output(a) ::= <<
-<a.output.keys:{p | <if(!a.output.(p).isnull)><p.name>.put(<a.output.(p):term()>);<endif>}; separator="\n">
+<a.output.keys:{p | <if(!a.output.(p).isnull)>I(<p.name>);<endif>}; separator="\n">
 >>
 
 memoryUpdateNonNull(m) ::= <<
@@ -114,8 +107,4 @@ memoryUpdateNonNull(m) ::= <<
 
 memoryUpdateNull(m) ::= <<
 <m.memory.keys:{p | <if(m.memory.(p).isnull)>set <p.name> = <m.memory.(p):term()>;<endif>}; separator="\n">
->>
-
-input(p) ::= <<
-<p.name>.get();
 >>
