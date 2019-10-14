@@ -63,7 +63,7 @@ public final class MemoryVariable implements Variable, Comparable<MemoryVariable
 	public MemoryVariable(String name, boolean prime) {
 		this.name = name;
 		this.prime = prime;
-		this.type = TypeTags.Qubit;
+		this.type = TypeTags.QSharpInt;  // FIXME should not be hard-coded
 	}
 
 	/**
