@@ -25,6 +25,7 @@ import nl.cwi.reo.templates.Transition;
 import nl.cwi.reo.templates.maude.MaudeTransition;
 import nl.cwi.reo.templates.prism.PrismTransition;
 import nl.cwi.reo.templates.promela.PromelaTransition;
+import nl.cwi.reo.templates.qsharp.QSharpTransition;
 import nl.cwi.reo.templates.treo.TreoTransition;
 
 /**
@@ -110,7 +111,6 @@ public class Command {
 	}
 
 	public Transition toTransition(Language lang) {
-				
 		switch (lang) {
 		case PRISM:
 			return new PrismTransition(guard, update, constraint);
@@ -118,8 +118,9 @@ public class Command {
 			return new PromelaTransition(guard, update, constraint);
 		case JAVA:
 		case C11:
-		case QSHARP:
 			return new Transition(guard, update, constraint);
+		case QSHARP:
+			return new QSharpTransition(guard, update, constraint);
 		case MAUDE:
 			return new MaudeTransition(guard, update, constraint);
 		case TREO:
