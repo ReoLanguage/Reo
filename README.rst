@@ -31,7 +31,7 @@ Installation
 
 Documentation
 -------------
-The `Reo documentation <https://benjaminlion.fr/reo/>`_.
+The `Reo documentation <https://reo.readthedocs.io/en/latest/>`_.
    
 Contribute
 ----------
