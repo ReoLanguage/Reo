@@ -3,4 +3,5 @@ section slides.main;
 blue(a?String) 
 {
   #JAVA "Consumer.blue"
+  #PROMELA "cons"
 }

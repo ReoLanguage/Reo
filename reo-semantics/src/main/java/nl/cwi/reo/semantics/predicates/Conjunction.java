@@ -88,7 +88,7 @@ public final class Conjunction implements Formula {
 	public Set<Port> getPorts() {
 		Set<Port> P = new HashSet<Port>();
 		for (Formula f : clauses)
-			if (!(f instanceof Equality) && (f.getPorts() != null))
+//			if (!(f instanceof Equality) && (f.getPorts() != null))
 				P.addAll(f.getPorts());
 		return P;
 	}

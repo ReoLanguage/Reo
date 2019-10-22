@@ -3,8 +3,6 @@ main(S) ::= <<
 /* Generated from <S.file> by Reo 1.0.*/
 
 #include "runtime.pml"
-#include "functions.pml"
-#include "agents.pml"
 
 /* port declarations */
 <S.components:ports();separator="">

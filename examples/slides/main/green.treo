@@ -3,4 +3,5 @@ section slides.main;
 green(a!String) 
 {
  #JAVA "Producer.green"
+ #PROMELA "prod"
 }
