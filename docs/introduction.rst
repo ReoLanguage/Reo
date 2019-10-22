@@ -4,10 +4,7 @@ Introduction
 A simple concurrent program
 ---------------------------
 
-Writing correct concurrent programs is far more difficult than writing correct sequential programs.
-Let us start with very simple program that repeatedly prints "Hello, " and "world!" in alternating order.
-We split this program into three different processes: two producers that output a string "Hello, " and "world!", respectively, 
-and a consumer that **alternately** prints the produced strings "Hello, " and "world!", starting of course with "Hello, ". 
+Writing correct concurrent programs is far more difficult than writing correct sequential programs. Let us start with a very simple program that repeatedly prints “Hello, ” and “world!” in alternating order. We split this program into three different processes: two producers that output strings “Hello, ” and “world!”, respectively, and a consumer that **alternately** prints the strings that it obtains from these producers, starting of course with “Hello, ”. 
 
 If you are asked to write a small program that implements the above informal specification, you may come up with the following Java code:
 
@@ -89,20 +86,20 @@ If you are asked to write a small program that implements the above informal spe
 		}
 	}
 
-The main method in the above Java code instantiates three different Java `threads <https://docs.oracle.com/javase/tutorial/essential/concurrency/runthread.html>`_, namely a Red and Green producer and a Blue consumer.
+The main method in the above Java code instantiates three different Java `threads <https://docs.oracle.com/javase/tutorial/essential/concurrency/runthread.html>`_, namely a Red and a Green producer and a Blue consumer.
 These threads communicate with each other via a shared buffer that is protected by a `semaphore <https://en.wikipedia.org/wiki/Semaphore_(programming)>`_.
-If a thread wants to operate on the buffer, it tries acquire a token from the semaphore that protects the buffer.
+If a thread wants to operate on the buffer, it tries acquire the semaphore that protects the buffer.
 Once acquired, the process can write to the buffer without being disturbed by any other process.
-Finally, the process releases the token, which allows other processes to operate on the buffer.
+Finally, the process releases the semaphore, which allows other processes to acquire it and operate on the buffer undisturbed.
 
-The same stategy is used to alternate the writes to the buffer. Each producer has its own semaphore. 
-If a producer wants to write to a buffer, it first tries to acquire a token from its semaphore.
-After writing to the buffer, the producer hands over the token to the other producer.
+This program uses additional *turn-keeping* semaphores to alternate the writes by producers to the buffer: each producer has its own turn-keeping semaphore. 
+If a producer wants to write to the buffer, it first tries to acquire its turn-keeping semaphore.
+After writing to the buffer, the producer hands over the *turn to write* to the other producer, by releasing the latter's turn-keeping semaphore.
 
 Analysis
 --------
 
-Let us now analyze the Java implementation by answering a few simple questions.
+Let us now analyze this Java implementation by answering a few simple questions.
 
 1. Where is the "Hello, " string computed?
 
@@ -112,49 +109,53 @@ On line 15: `String redText = "Hello, ";`.
 
 On line 53: `System.out.print(buffer);`.
 
-For the next question, however, it is not possible to point at a single line of code:
+For the next question, however, it is not possible to point at a single line (or even a contiguous segment) of code:
 
 3. Where is the protocol?
 
-		a. What determines which producers goes first? 
+		a. What determines which producer goes first? 
 
-		This is determined by the initial value of the semaphores on lines 5 and 6, together with the acquire and release statements of the semaphores on lines 17, 21, 33, and 37.
+		This is determined by the initial values of the semaphores on lines 5 and 6, together with the acquire statements of semaphores on lines 17, and 33.
 
-		b. What takes care of buffer protection? 
+		b. What determines that the two producers alternate?
+		
+		This is determined by the initial values of the semaphores on lines 5 and 6, together with the acquire and release statements of the semaphores on lines 17, 21, 33, and 37.  Observe that 4 out of these 6 lines are the same lines involved in the answer to question 3.a; a fact that means if we change one of these common lines of code with the intention of modifying one aspect of the protocol, we must simultaneously consider whether and how this change affects the other aspect of the protocol. 
+		
+		c. What takes care of buffer protection? 
 
 		This is established by the acquire and release statements of the buffer semaphore on lines 18, 20, 34, 36, 51, and 57.
 
-The reason why this third question is much more difficult to answer is because the protocol is **implicit**.
+The reason why Question 3 is much more difficult and has a more complicated answer is that unlike the *computation* in this application, its protocol is **implicit**.  Modern programming languages provide suitable constructs to explicitly specify computation as concrete, contiguous segments of code; however, the constructs that they provide to program concurrent software allows programmers to specify concurrency protocols only indirectly, as the side-effect of the execution of (concurrency) primitive actions scattered throughout the code of various processes.  
 
 For such a simple program, you may argue that the fact that the protocol is implicit is not big deal.
-However, if you really think this, then you may be surprised by the output:
+However, if you really think this, then you may be surprised by the output when you run the above application:
 
 .. code-block:: text
 
 	Hello, world! Hello, Hello, world! Hello, Hello, Hello, Hello, Hello, 
 
-There is a bug! Can you spot the error?
+If you expected to see nothing but "Hello, world!" as output, then you must agree that there is a bug! Can you spot the error?
 
 Reo protocols
 -------------
 
-The Reo language offers a solution by providing a domain specific language that allow you to declare your protocol explicitly.
+The Reo language offers a solution by providing a domain specific language that allow you to specify your protocol explicitly, as a concrete, identifiable piece of software.
 The following diagram shows an example of such an explicit protocol:
 
 .. image:: https://github.com/kasperdokter/Reo/blob/master/docs/ProdCons.jpg?raw=true
 
-Every process is represented as a box together with a set of ports that define the interface of each process. 
-These boxes, called components, are connected via a network of channels and nodes, which constitutes the protocol.
-The components now interact with each other by offering messages to the protocol. 
-The protocol, then, synchonizes components and exchanges the messages.
+Every process is represented as a box together with a set of **ports** that define the interface of each process. 
+These boxes, called **components**, are connected via a network of **channels** and **nodes**, which constitutes the protocol.
+The components now interact with each other by offering values to the protocol. 
+The protocol, then, coordinates the exchanges of values amongst components.
 
-The channel between Red and Green is a *syncdrain* channel that accepts data from both its input ends simultaneously, and then it looses the data.
-The channel between Red and Blue is a *sync* channel that atomically takes data from its input end and offers this data to its output end.
-The other incoming channel connected to Blue is a *fifo1* channel that stores a single data item that it receives at its input end. 
-After the buffer became full, it offers this data to its output end. 
+The channel between Red and Green is a *syncdrain* channel that repeatedly accepts a data item from each of its input ends in a single atomic action, and loses both data items.
+The channel between Red and Blue is a *sync* channel that atomically takes a data item from its input end and passes this data item through its output end.
+The other incoming channel connected to Blue is a *fifo1* channel that has a buffer (depicted as the box in the middle of the arrow) with the capacity to store a single data item. The buffer of this channel is initially empty.  Whenever its buffer is empty, this channel can accept a single data item through its input end, which it then places in its buffer, making it full.  With its buffer full, this channel cannot accept input.  When its buffer is full, this channel allows a get operation on its output end to succeed by offering it the data item in its buffer, after which its buffer becomes empty.  As long as its buffer is empty, a get operation at its output end remains pending, because the channel has no data to offer.   
+
 Suppose Red wants to output some data. Then, Red issues a *put request* at its port. 
-As soon as Green has also issued a *put request*, and Blue issued a *get request*, the protocol synchronously accepts the data produced by Red and Green, offers Greens data to Blue, and stores Reds data in a buffer. 
-Upon the next get request by Blue, Blue receives the data from the buffer, after which the protocol returned to its initial configuration.
+As soon as Green has also issued a *put request*, and Blue has issued a *get request*, the protocol synchronously (i.e., atomically) accepts the data produced by Red and Green, offers Green's data to Blue, and stores Red's data in the buffer of the *fifo1* channel.  As long as this buffer remains full, the *fifo1* channel cannot accept any more data, which means further put requests by the producers will suspend until this buffer becomes empty. 
+Upon the next get request by Blue, Blue receives the data from the buffer, which empties the buffer and returns the protocol to its initial configuration.
 Therefore, this protocol implements the informal specification that prescribes alternation.
 
 Although we may think of such a protocol as `message passing <http://mpi-forum.org/>`_, the code that is generated by the compiler 
@@ -200,7 +201,7 @@ To this end, we create a Java class in ``Processes.java`` that contains the a me
 	}
 
 Note that the code of each Java method is completely independent of any other method, since no variables are explicitly shared.
-Synchronization and data transfer is delegated to put and get calls to output ports and input ports, respectively.
+Synchronization and data transfer is delegated to put and get calls on output ports and input ports, respectively.
 This way, we strictly separate computation from interaction, defined by the protocol.
 
 In the next step, we declare the protocol by means of the Reo file called ``main.treo``:
@@ -222,12 +223,12 @@ In the next step, we declare the protocol by means of the Reo file called ``main
 	// The alternator protocol
 	alternator(a,b,c) { syncdrain(a, b) sync(b, x) fifo1(x, c) sync(a, c) }
 
-This Reo file defines the main component, which is a set containing an instance of the Red, Green, and Blue process, and an instance of the alternator protocol.
-The definition Red, Green, and Blue processes just refers to the Java source code from ``Processes.java``.
+This Reo file defines the main component, which is a set containing one instance of each of Red, Green, and Blue processes, and an instance of the **alternator** protocol.
+The definitions of Red, Green, and Blue processes just refers to the Java source code from ``Processes.java``.
 The definition of the alternator protocol is expressed using primitive Reo channels, which are imported from the standard library.
 
 Before we can compile this Reo file into Java code, please first follow the instructions in :ref:`installation` to install the Reo compiler.
-Next, change directory to where ``main.treo`` and ``Processes.java`` are located, and execute::
+Next, change directory to where ``main.treo`` and ``Processes.java`` are located, and execute:
 
 	reo main.treo
 	javac Main.java
@@ -236,7 +237,7 @@ Next, change directory to where ``main.treo`` and ``Processes.java`` are located
 These commands respectively
 
 	(1) compile Reo code to Java source code (by generating ``main.java``), 
-	(2) compile Java source code to executable Java classes, and 
+	(2) compile the generated Java source code to executable Java classes, and 
 	(3) execute the complete program.
 
 Since the alternator protocol defined in ``main.treo`` matches the informal specification, and since the generated code correctly implements the alternator procotol, the output now looks as follows:
