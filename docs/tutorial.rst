@@ -15,7 +15,7 @@ The put and get operations may specify an optional time-out.
 A put or get operation blocks until either it succeeds, or its specified time-out expires. 
 A put or get operation with no time-out blocks for ever, or until it succeeds.
 
-To define a component in Reo, we refer to Java source code and/or define its behavior as a constraint automaton, or, define it as a composition of other components.
+To define a component in Reo, we refer to Java source code and/or define its behavior in a formal semantics, or, define it as a composition of other components.
 
 1. Reference to Java source code
 --------------------------------
@@ -26,11 +26,11 @@ First of all, we can define a component by referring to Java source code.
    
 	// buffer.treo
 	buffer<init:String>(a?String, b!String) {
-	   Java: "MyClass.myBuffer"
+	   #JAVA "MyClass.myBuffer"
 	}
 
 
-This code in buffer.treo defines an atomic component called buffer with an input port a of type String, an output port b of type String, and an parameter init of type String.
+This code in buffer.treo defines an atomic component called buffer with an input port **a** of type String, an output port **b** of type String, and an parameter init of type String.
 The Java-tag indicates that the implementation of this component consists of a piece of Java code. 
 The type tags, String, are optional. On default, type tags are Object.
 The parameter block ``<init:String>`` is also optional, as we will see for the second possibility to define a component.
@@ -88,32 +88,33 @@ Second, we can define a component by defining its behavior in a formal semantics
 	// buffer.treo
 	buffer<init:String>(a?String,b!String) {
 	   #RBA
-	   $m=init
-	   {a, ~b} $m = null, $m' = a
-	   {~a, b} $m != null, b = $m, $m' = null
+	   $m=init;
+
+	   b =*  , a!=* , $m = b, $m' = a
+	   b!=* , a =* , $m = b, $m' = a
 	}
 
 The buffer consists of a single memory cell m, whose initial value is given by init.
-If the buffer is empty ($m = null), it can perform an I/O operation on port a and blocks port b (indicated by the synchronization constraint {a, ~b}) and assign the observed value at a to the next value of memory cell $m'.
-If the buffer is full ($m != null), it can perform an I/O operation on port b and block  port a (indicated by the synchronization constraint {~a, b}) and assign the current value in memory cell m to port b, and clears the value of m ($m' = null).
+If the buffer is empty ($m = * = a), it can perform an I/O operation on port a and blocks port **b** (indicated by the constraint b=* and a!=* ) and assigns the observed value at **a** to the next value of memory cell $m'.
+If the buffer is full ($m = b != * ), it can perform an I/O operation on port b and block  port **a** (indicated by the constraint b!=* and a=* ) and assigns the current value in memory cell m to port **b**, and clears the value of m ($m' = * ).
 
-We can define a component as a Java component and a constraint automaton with memory simultaniously:
+We can define a component as a Java component and in the RBA semantics simultaniously:
 
 .. code-block:: text
    
 	// buffer.treo
 	buffer(a?,b!) {
-	   Java: "MyClass.myBuffer"
+	   #JAVA "MyClass.myBuffer"
 	   #RBA
-	   $m=init
-	   {a, ~b} $m = null, $m' = a
-	   {~a, b} $m != null, b = $m, $m' = null
+	   $m=init;
+	   b =*  , a!=* , $m = b, $m' = a
+	   b!=* , a =* , $m = b, $m' = a
 	}
 
-In this case, the Reo compiler treats the Java code as the definition of the component, while the constraint automaton with memory is used only as annotation.
+In this case, the Reo compiler treats the Java code as the definition of the component, while the formal semantics is used only as annotation.
 Although the current version of Reo simply ignores this annotation, future versions of can use the constraint automaton for tools like deadlock detection.
 
-The syntax for constraint automata is completely independent of the syntax of the rest of the language.
+The syntax for the formal definition of a component is completely independent of the syntax of the rest of the language.
 This seperation makes is very easy to extend the current language with other types of formal semantics of components.
 
 3. Definition as composition
@@ -131,9 +132,9 @@ The most expressive way to define a component in Reo is via composition.
 
 	buffer<init:String>(a?String,b!String) {
 	   #RBA
-	   $m=init
-	   {a, ~b} $m = null, $m' = a
-	   {~a, b} $m != null, b = $m, $m' = null
+	   $m=init;
+	   b =*  , a!=* , $m = b, $m' = a
+	   b!=* , a =* , $m = b, $m' = a
 	}
 
 This Reo program defines an atomic buffer component and a composite buffer2 component.
@@ -158,7 +159,7 @@ Predicates
 ~~~~~~~~~~
 
 The definition of buffer2 as a composition of two atomic buffer instances is explicit in the sense that every subcomponent instance is defined directly.
-In this case, may can obtain the same construction using only one explicit instantiation using a **predicate**
+We can obtain the same construction using only one explicit instantiation using a **predicate**
 
 .. code-block:: text
 	
@@ -170,28 +171,7 @@ This for loop unfolds to the composition
 	
 	{ fifo1(a[0],a[1]) fifo1(a[1],a[2]) }
 
-Although predicates are already expressive enough, we add some syntactic sugar for if-then-else and for loops.
-For example,
-
-.. code-block:: text
-	
-	for i : <1..n> { buffer(a[i],a[i+1]) }
-
-is equivalent to 
-
-.. code-block:: text
-	
-	{ buffer(a[i],a[i+1]) | i : <1..n> }
-
-and 
-
-.. code-block:: text
-	
-	if (x=1) { buffer(a,b) } 
-	else (x=2) { buffer(a,c) } 
-	else { buffer(a,d) } 
-
-is equivalent to 
+Additionally, predicates may contain variables. In that case, we assume that variables are grounded during instantiation.
 
 .. code-block:: text
 	
