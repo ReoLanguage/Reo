@@ -165,7 +165,7 @@ Predicates
 The definition of ``buffer2`` as a composition of two atomic buffer instances explicitly lists every one of its constituent component instances as in *extensional* specification of a set.
 More expressively, Reo also allows *intensional* set speficication for definition of composite components, using **predicates**.
 
-The following example shows a an intesional set definition where the predicate ``i : <0..1> `` simply means that the variable ``i`` can assume integer values in the (inclusive) range of 0 and 1:
+The following example shows a an intesional set definition where the predicate ``i : <0..1>`` simply means that the variable ``i`` can assume integer values in the (inclusive) range of 0 and 1:
 
 .. code-block:: text
 	
