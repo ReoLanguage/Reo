@@ -7,6 +7,11 @@ package nl.cwi.reo.interpret.connectors;
 public enum Language {
 
 	/**
+	 * Rust language.
+	 */
+	RUST,
+
+	/**
 	 * Java language.
 	 */
 	JAVA,
@@ -40,6 +45,8 @@ public enum Language {
 		switch (this) {
 		case JAVA:
 			return "Java";
+		case RUST:
+			return "Rust";
 		case C11:
 			return "C11";
 		case MAUDE:

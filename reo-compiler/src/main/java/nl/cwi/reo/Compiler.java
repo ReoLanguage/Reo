@@ -58,6 +58,7 @@ import nl.cwi.reo.templates.promela.PromelaAtomic;
 import nl.cwi.reo.templates.promela.PromelaProtocol;
 import nl.cwi.reo.templates.treo.TreoAtomic;
 import nl.cwi.reo.templates.treo.TreoProtocol;
+import nl.cwi.reo.templates.rust.RustTemplater;
 import nl.cwi.reo.util.Message;
 import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
@@ -205,6 +206,7 @@ public class Compiler {
 			return new Interpreter(SemanticsType.CH, listenerPRBA, directories, params, monitor);
 		case JAVA:
 		case C11:
+		case RUST:
 		case PROMELA:
 		case MAUDE:
 		case TREO:
@@ -240,8 +242,8 @@ public class Compiler {
 	
 //		connector = rename(connector,program.getConnector().getLinks());
 		
-	  	Set<Transition> transitions = buildTransitions(connector);			
-		Set<Set<Transition>> partition = partition(transitions,false);
+	  	Set<Transition> transitions = buildTransitions(connector);		
+		Set<Set<Transition>> partition = partition(transitions, false);
 
 		List<Component> components = new ArrayList<>();
 		components.addAll(buildProtocols(connector, partition));
@@ -368,6 +370,9 @@ public class Compiler {
 		for (Port p : connector.getInterface()) {
 			if (!p.isHidden()) {
 				String call ="";
+				if(lang == Language.RUST){
+					call = p.isInput() ? "Windows.producer" : "Windows.consumer";
+				}
 				if(lang == Language.JAVA){
 					call = p.isInput() ? "Windows.producer" : "Windows.consumer";
 				}
@@ -403,6 +408,8 @@ public class Compiler {
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
+				if(lang == Language.RUST)
+					components.add(new Atomic(name, r.getValues(), atom.rename(renaming).getInterface(), call));
 				if(lang == Language.JAVA)
 					components.add(new Atomic(name, r.getValues(), atom.rename(renaming).getInterface(), call));
 				if(lang == Language.PROMELA)
@@ -419,7 +426,7 @@ public class Compiler {
 	}
 
 	private Set<Transition> buildTransitions(ReoConnector connector) {
-		List<ReoConnectorAtom> protocol = connector.getAtoms();
+		List<ReoConnectorAtom> protocol = connector.getAtoms();	
 		Set<Transition> transitions = new HashSet<>();
 		for(ReoConnectorAtom atom : protocol) {
 			if(atom.getSemantics().size()==1 && atom.getSemantics().get(0) instanceof ConstraintHypergraph) {
@@ -444,6 +451,8 @@ public class Compiler {
 				ConstraintHypergraph _atom = (ConstraintHypergraph) atom.getSemantics().get(0);
 				for (Set<Transition> part : partition) {
 		
+					if(lang == Language.RUST)
+						components.add(new Protocol("Protocol" + n_protocol++, part, _atom.getInitials()));
 					if(lang == Language.JAVA)
 						components.add(new Protocol("Protocol" + n_protocol++, part, _atom.getInitials()));
 					if(lang == Language.MAUDE)
@@ -497,6 +506,10 @@ public class Compiler {
 		String extension = "";
 
 		switch (lang) {
+		case RUST:
+			String code = RustTemplater.generateCode(template);
+			writeGeneratedCode(code, template.getName() + ".rs");
+			return;
 		case JAVA:
 			group = new STGroupFile("Java.stg");
 			extension = ".java";
@@ -525,14 +538,18 @@ public class Compiler {
 		stringtemplate.add("S", template);
 
 		String code = stringtemplate.render(72);
+		writeGeneratedCode(code, template.getName() + extension);
+	}
 
+	private void writeGeneratedCode(String code, String fileName) {
 		try {
-			File file = new File(outdir + File.separator + template.getName() + extension);
+			File file = new File(outdir + File.separator + fileName);
 			file.getParentFile().mkdirs();
 			FileWriter out = new FileWriter(file);
 			out.write(code);
 			out.close();
 		} catch (IOException e) {
 		}
+
 	}
 }
