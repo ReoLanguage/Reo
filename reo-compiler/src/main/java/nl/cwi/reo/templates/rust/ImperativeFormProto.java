@@ -16,7 +16,17 @@ finished imperative form.
  */
 public class ImperativeFormProto {
     static abstract class TypeConstraint {
+        
         abstract void applyTo(Map<String, TypeClass> classes);
+
+        static String classContainingMember(Map<String, TypeClass> classes, String name) {
+            for (Map.Entry<String, TypeClass> e : classes.entrySet()) {
+                if (e.getValue().members.contains(name)) {
+                    return e.getKey();
+                }
+            }
+            return null;
+        }
 
         static class ExistsConstraint extends TypeConstraint {
             String name;
@@ -26,7 +36,10 @@ public class ImperativeFormProto {
             }
 
             void applyTo(Map<String, TypeClass> classes) {
-                classes.computeIfAbsent(name, k -> new TypeClass(name));
+                // ensure a typeclass exists with this member
+                if (classContainingMember(classes, name) == null) {
+                    classes.put(name, new TypeClass(name));
+                }
             }
 
             @Override
@@ -39,8 +52,14 @@ public class ImperativeFormProto {
             String type, trait;
 
             void applyTo(Map<String, TypeClass> classes) {
-                classes.computeIfAbsent(type, k -> new TypeClass(type));
-                classes.get(type).rawConstraints.add(trait);
+                // ensure a typeclass exists with this member with this KEY
+                String key = classContainingMember(classes, type);
+                if (key == null) {
+                    classes.put(type, new TypeClass(type));
+                    key = type;
+                }
+                // add a raw contraint to the typeclass with this KEY
+                classes.get(key).rawConstraints.add(trait);
             }
 
             TraitConstraint(String type, String trait) {
@@ -59,8 +78,14 @@ public class ImperativeFormProto {
             String type, fromType, arg;
 
             void applyTo(Map<String, TypeClass> classes) {
-                classes.computeIfAbsent(type, k -> new TypeClass(type));
-                classes.get(type).rawConstraints.add(String.format("From<%s>", fromType));
+                // ensure a typeclass exists with this member with this KEY
+                String key = classContainingMember(classes, type);
+                if (key == null) {
+                    classes.put(type, new TypeClass(type));
+                    key = type;
+                }
+                // add a raw contraint to the typeclass with this KEY
+                classes.get(key).rawConstraints.add(String.format("From<%s>", fromType));
             }
 
             FromConstraint(String type, String fromType, String arg) {
@@ -79,14 +104,27 @@ public class ImperativeFormProto {
         static class EqConstraint extends TypeConstraint {
             String lhs, rhs;
             void applyTo(Map<String, TypeClass> classes) {
-                classes.computeIfAbsent(lhs, k -> new TypeClass(lhs));
-                classes.computeIfAbsent(rhs, k -> new TypeClass(rhs));
-                TypeClass tLhs = classes.get(lhs);
-                TypeClass tRhs = classes.get(rhs);
-                tLhs.members.addAll(tRhs.members);
-                tLhs.members.addAll(tRhs.rawConstraints);
-                tLhs.isBoolean |= tRhs.isBoolean;
-                classes.put(rhs, tLhs);
+                // ensure lhs is member of class with this KEY
+                String key_lhs = classContainingMember(classes, lhs);
+                if (key_lhs == null) {
+                    classes.put(lhs, new TypeClass(lhs));
+                    key_lhs = lhs;
+                }
+                // ensure lhs is member of class with this KEY
+                String key_rhs = classContainingMember(classes, rhs);
+                if (key_rhs == null) {
+                    classes.put(rhs, new TypeClass(rhs));
+                    key_rhs = rhs;
+                }
+                // if classes are distinctly named, unify them
+                if (! key_lhs.equals(key_rhs)) {
+                    TypeClass tLhs = classes.get(key_lhs);
+                    TypeClass tRhs = classes.get(key_rhs);
+                    tLhs.members.addAll(tRhs.members);
+                    tLhs.rawConstraints.addAll(tRhs.rawConstraints);
+                    classes.remove(key_rhs);
+                    tLhs.isBoolean |= tRhs.isBoolean;
+                }
             }
 
             EqConstraint(String lhs, String rhs) {
@@ -152,7 +190,7 @@ public class ImperativeFormProto {
                 sb.append("\", func: \"");
                 sb.append(func);
                 sb.append("\", info: TypeInfo::of::<T");
-                int i = proto.finishedInfo.uniqueClasses.indexOf(proto.finishedInfo.typeClasses.get(resDest));
+                int i = proto.finishedInfo.uniqueClasses.indexOf(resDest);
                 sb.append(String.valueOf(i));
                 sb.append(">(), args: vec![");
                 for (String arg: resArgs) { // TODO TERMS not RESOURCES here
@@ -254,8 +292,10 @@ public class ImperativeFormProto {
         return nextTempIndex - 1;
     }
 
+    // ENTRYPOINT
     public ImperativeFormProto(Protocol proto) {
         // define all port names and memory cells
+        // System.out.println("OK");
         protoName = proto.getName().toLowerCase();
         for (Port x : proto.getPorts()) {
             String name = x.getName();
@@ -274,11 +314,15 @@ public class ImperativeFormProto {
             addRule(index, t);
             index++;
         }
+
+        // Discover generic types from list of constraints
         finishedInfo = new FinishedInfo();
         finishedInfo.typeClasses = new HashMap<>();
         for (TypeConstraint tc: typeConstraints) {
             tc.applyTo(finishedInfo.typeClasses);
+            // System.out.println("\n\ntc + " + tc.toString() + " = " + finishedInfo.typeClasses.toString());
         }
+        // System.out.println("FINFO::" + finishedInfo.typeClasses.toString());
         finishedInfo.uniqueClasses = new Vector<>(
             new HashSet<>(finishedInfo.typeClasses.values())
         );
@@ -289,18 +333,23 @@ public class ImperativeFormProto {
     }
 
     private void addRule(int index, Transition t) {
-        // 1. build the predicate
         RuleDef rd = new RuleDef();
         new MemReadTraverser(t.getGuard(), rd.predicate.fullMem);
         for (Port p : t.getInput()) {
+            // add input port to ready set
             String name = p.getName();
             rd.predicate.ready.add(name);
+            // add input port as the source of a movement
             rd.movements.put(name, new MovementDest(false));
         }
-        for (Map.Entry<PortVariable, Term> e : t.getOutput().entrySet()) {
+        for (Map.EntFry<PortVariable, Term> e : t.getOutput().entrySet()) {
             String name = e.getKey().getName();
-            rd.predicate.ready.add(name);
-            new MemReadTraverser(e.getValue(), rd.predicate.fullMem);
+            boolean isMemory = nameDefs.memWithInitial.containsKey(name);
+            if (isMemory) {
+                new MemReadTraverser(e.getValue(), rd.predicate.fullMem);
+            } else {
+                rd.predicate.ready.add(name);
+            }
         }
         Set<String> memAssignedNull = new HashSet<>();
         for (Map.Entry<MemoryVariable, Term> e : t.getMemory().entrySet()) {
@@ -310,13 +359,15 @@ public class ImperativeFormProto {
                 memAssignedNull.add(name);
                 rd.predicate.fullMem.add(name); // TODO reconsider. must it be full?
             } else {
-                rd.predicate.ready.add(name);
+                // rd.predicate.ready.add(name);
                 rd.predicate.emptyMem.add(name);
                 new MemReadTraverser(e.getValue(), rd.predicate.fullMem);
             }
         }
+        // TODO false positives on rwMemory
 
         // now predicate.fullMem and predicate.emptyMem may overlap!
+        // System.out.println("FULL:" + rd.predicate.fullMem + " EMPTY:" + rd.predicate.emptyMem);
         Set<String> rwMemory = new HashSet<>(rd.predicate.fullMem); // copy constructor
         rwMemory.retainAll(rd.predicate.emptyMem);
         rd.predicate.emptyMem.removeAll(rwMemory);
@@ -332,11 +383,11 @@ public class ImperativeFormProto {
             rd.movements.computeIfAbsent(resource, x -> new MovementDest(false));
             rd.movements.get(resource).getters.add(e.getKey().getName());
         }
-
         for(String s : rwMemory) {
-            String name = s + "_Next";
+            String name = s + "_NEXT";
             typeConstraints.add(new TypeConstraint.ExistsConstraint(name));
             rd.ins.add(new Instruction.MemSwap(s, name));
+            typeConstraints.add(new TypeConstraint.EqConstraint(s, name));
         }
         for (Map.Entry<MemoryVariable, Term> e : t.getMemory().entrySet()) {
             String name = e.getKey().getName();
@@ -383,7 +434,6 @@ public class ImperativeFormProto {
         // System.out.printf("RD %d %s%n", index, rd);
         ruleDefs.add(rd);
     }
-
 
     public void generateCode(StringBuilder sb) {
         // C API builder
@@ -462,8 +512,7 @@ public class ImperativeFormProto {
                 sb.append("false");
             }
             sb.append(", type_info: TypeInfo::of::<T");
-            TypeClass tc = finishedInfo.typeClasses.get(e.getKey());
-            int i = finishedInfo.uniqueClasses.indexOf(tc);
+            int i = typeIndexOf(e.getKey());
             sb.append(String.valueOf(i));
             sb.append(">() },\n");
         }
@@ -471,8 +520,7 @@ public class ImperativeFormProto {
             sb.append("        \"");
             sb.append(e.getKey());
             sb.append("\" => Mem(TypeInfo::of::<T");
-            TypeClass tc = finishedInfo.typeClasses.get(e.getKey());
-            int i = finishedInfo.uniqueClasses.indexOf(tc);
+            int i = typeIndexOf(e.getKey());
             sb.append(String.valueOf(i));
             sb.append(">()),\n");
         }
@@ -480,8 +528,7 @@ public class ImperativeFormProto {
             sb.append("        \"");
             sb.append(c);
             sb.append("\" => Mem(TypeInfo::of::<T");
-            TypeClass tc = finishedInfo.typeClasses.get(c);
-            int i = finishedInfo.uniqueClasses.indexOf(tc);
+            int i = typeIndexOf(c);
             sb.append(String.valueOf(i));
             sb.append(">()),\n");
         }
@@ -588,8 +635,11 @@ public class ImperativeFormProto {
     }
 
     private int typeIndexOf(String s) {
-        return finishedInfo.uniqueClasses.indexOf(
-            finishedInfo.typeClasses.get(s)
-        );
+        for (int i = 0; i < finishedInfo.uniqueClasses.size(); i++) {
+            if (finishedInfo.uniqueClasses.get(i).members.contains(s)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
