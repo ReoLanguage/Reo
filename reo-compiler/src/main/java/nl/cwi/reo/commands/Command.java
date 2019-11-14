@@ -117,6 +117,7 @@ public class Command {
 		case PROMELA:
 			return new PromelaTransition(guard, update, constraint);
 		case JAVA:
+		case RUST:
 		case C11:
 			return new Transition(guard, update, constraint);
 		case MAUDE:
