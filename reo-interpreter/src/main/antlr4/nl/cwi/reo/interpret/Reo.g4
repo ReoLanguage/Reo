@@ -13,10 +13,10 @@ component : var                                                   # component_va
           | sign '{' atom+ '}'                                    # component_atomic
           | sign multiset                                         # component_composite ;
 atom      : ref | cam | wa | sa | p | pr | rba ;
-ref       : '#JAVA' STRING                                        # ref_java
-	      | '#PROMELA' STRING                                     # ref_promela
-  	      | '#MAUDE' STRING                                       # ref_maude
-          | '#C' STRING                                           # ref_c ;
+ref       : '#JAVA' STRING                                    # ref_java
+	      | '#PROMELA' STRING                                 # ref_promela
+  	      | '#MAUDE' STRING                                   # ref_maude
+          | '#C' STRING                                       # ref_c ;
 
 // Multisets
 multiset  : instance                                              # multiset_constraint

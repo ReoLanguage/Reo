@@ -99,6 +99,10 @@ public final class Range implements TermExpression {
 			for (int k = ((IntegerValue) te1.get(te1.size() - 1)).getValue() + 1; k < ((IntegerValue) te2.get(0))
 					.getValue(); k++)
 				list.add(new IntegerValue(k));
+		else {
+			m.add("The list expression " + this.toString() + " cannot be interpreted.");
+			return null;
+		}
 		if (!te1.equals(te2))
 			list.addAll(te2);
 		return list;

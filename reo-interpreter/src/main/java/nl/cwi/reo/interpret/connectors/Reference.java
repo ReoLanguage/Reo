@@ -12,6 +12,7 @@ import nl.cwi.reo.interpret.Atom;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.SemanticsType;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.interpret.variables.VariableExpression;
@@ -136,9 +137,12 @@ public final class Reference implements Atom {
 			List<? extends Identifier> ids = v.evaluate(s, m);
 			if (ids != null) {
 				Value x;
-				for (Identifier id : ids)
+				for (Identifier id : ids) {
 					if ((x = s.get(id)) != null)
 						values.add(x);
+					else
+						values.add(new StringValue("argc"));
+				}
 			}
 		}
 		return new Reference(ref, lang, params, values);

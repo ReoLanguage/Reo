@@ -35,8 +35,12 @@ import nl.cwi.reo.interpret.components.Component;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.listeners.BaseListener;
 import nl.cwi.reo.interpret.listeners.ErrorListener;
+import nl.cwi.reo.interpret.typetags.TypeTags;
+import nl.cwi.reo.interpret.values.IntegerValue;
+import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
+import nl.cwi.reo.interpret.variables.Parameter;
 import nl.cwi.reo.util.Monitor;
 
 /**
@@ -65,7 +69,7 @@ public class Interpreter {
 	/**
 	 * List of parameters to instantiate the main component.
 	 */
-	private final List<String> params;
+	private final Scope params;
 
 	/**
 	 * Container for messages.
@@ -91,8 +95,26 @@ public class Interpreter {
 		this.semantics = semantics;
 		this.listener = listener;
 		this.dirs = Collections.unmodifiableList(dirs);
-		this.params = params;
+		this.params = getParameter(params);
 		this.m = monitor;
+	}
+	
+	public Scope getParameter(List<String> params){
+		Scope s = new Scope();
+		if (!params.isEmpty()) {
+			for(String p : params) {
+				String name = p.split(":|=")[0];
+				String type = p.split(":|=")[1];
+				String value = p.split(":|=")[2];
+				if(type == "int") {
+					s.put(new Identifier(name), new IntegerValue(Integer.parseInt(value)));
+				}
+				if(type == "string") {
+					s.put(new Identifier(name), new StringValue(value));
+				}
+			}
+		}
+		return s;
 	}
 
 	/**

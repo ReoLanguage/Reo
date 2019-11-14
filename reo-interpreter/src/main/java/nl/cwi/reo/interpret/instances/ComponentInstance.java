@@ -13,6 +13,7 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortListExpression;
 import nl.cwi.reo.interpret.terms.ListExpression;
 import nl.cwi.reo.interpret.terms.Term;
+import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.interpret.variables.Identifier;
 import nl.cwi.reo.util.Monitor;
 
@@ -62,9 +63,16 @@ public final class ComponentInstance implements InstanceExpression {
 		List<Term> v = values.evaluate(s, m);
 		List<Port> p = ports.evaluate(s, m);
 		Component c = component.evaluate(s, m);
-		if (v == null || p == null || c == null)
+		Scope param =  new Scope();
+		for(int i=0; i< v.size();i++) {
+			if(v.get(i) instanceof Value)
+			param.put(new Identifier(
+								// c.getSet().getName() + "." + 
+									Integer.toString(i)), (Value)v.get(i));
+		}
+		if (param ==null ||  p == null || c == null)
 			return null;
-		return c.instantiate(v, p, m);
+		return c.instantiate(param, p, m);
 	}
 
 	/**

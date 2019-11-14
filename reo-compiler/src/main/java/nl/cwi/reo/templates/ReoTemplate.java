@@ -1,8 +1,10 @@
 package nl.cwi.reo.templates;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import nl.cwi.reo.interpret.ports.Port;
@@ -99,7 +101,42 @@ public final class ReoTemplate {
 	public Set<Port> getPorts() {
 		return ports;
 	}
+	
+	/**
+	 * Get number of command line parameters
+	 * 
+	 * @return parameters
+	 */
+	public Integer getArgumentSize() {
+		return getParameter().size();
+	}
 
+	/**
+	 * Get number of command line parameters.
+	 * Cast the runtime argument to the correct type.
+	 * 
+	 * @return parameters
+	 */
+	public HashMap<String,String> getParameter() {
+		HashMap<String, String> m = new HashMap<>();
+		for(Component c : components) {
+			if(c instanceof Atomic) {
+				for(String p : ((Atomic) c).getParameters()) {
+					if(p.contains("args")) {
+						String t = p.split(":")[1];
+						if (t.contains("double") || t.contains("Double")) {
+							t=" = Double.parseDouble(";
+						}
+						else if (t.contains("int") || t.contains("Integer")) {
+							t=" = Integer.parseInt(";
+						}
+						else if (t.contains("string") || t.contains("String")) {
+							t=" = ( ";
+						}
+						m.put(c.getName() +"." + p.split(":")[0].substring(1) + t, "\""+p.split(":")[0].substring(1).replaceAll("\"", "")+"\"");
+		}}}}
+		return m;
+	}
 	/**
 	 * Gets the components.
 	 *

@@ -5,14 +5,18 @@ main(S) ::= <<
 <S.package:package(); separator="\n">
 
 import nl.cwi.reo.runtime.*;
+import java.util.HashMap;
 
 public class <S.name> {
 
 	public static void main(String[] args) {
 
+		<S.argumentSize:wrapper(); separator="\n">
+
 		<S.ports:newPort(); separator="\n">
 
 		<S.components:newComponent(); separator="\n"> 
+		<S:instantiate(); separator="\n">
 
 		<S.components:start(); separator="\n">
 	
@@ -25,6 +29,41 @@ public class <S.name> {
 
 	<S.components:component(); separator="\n\n">
 }
+>>
+
+wrapper(s) ::= <<
+HashMap\<String,String> m = new HashMap\<>();
+if(args.length \< <s>) {
+			System.out.println("Must input 2 arguments. \nThe argument should be written in the form 'Name:Type=Value'.");
+	return ; 
+}
+else{
+	for(int i=0; i\< args.length;i++) {
+		String s = args[i];
+		if(s.contains("=")) {
+			String t = s.split("=")[0].split(":")[1];
+			if (t.equals("double") || t.equals("Double")) {
+				Double.parseDouble(s.split("=")[1]);
+				m.put(s.split("=")[0].split(":")[0], s.split("=")[1]);
+			}
+			else if (t.equals("int") || t.equals("Integer")) {
+				Integer.parseInt(s.split("=")[1]);
+				m.put(s.split("=")[0].split(":")[0], s.split("=")[1]);
+			}
+			else if (t.equals("string") || t.equals("String")) {
+				m.put(s.split("=")[0].split(":")[0], s.split("=")[1]);
+			}
+			else
+				System.out.println("Only types 'String', 'Integer', and 'Double' are supported.");
+		}
+		else			
+			System.out.println("The argument should be written in the form 'Name:Type=Value'.");					
+	}
+}
+>>
+
+instantiate(s) ::= <<
+<s.parameter.keys:{m | <m> m.get(<s.parameter.(m)>) ); }; separator = "\n">
 >>
 
 package(p) ::= <<
@@ -69,6 +108,7 @@ typetag(p) ::= <<
 >>
 
 atomic(c) ::= <<
+<c.parametersName:{p | public volatile  <p> ;}; separator="\n">
 public void activate() {
 	synchronized (this) {
 		notify();
@@ -76,7 +116,7 @@ public void activate() {
 }
 
 public void run() {
-	<c.call>(<c.parameters:{p | <p>, }><c.ports:{p |<p.name>}; separator=", ">);
+	<c.call>(<c.parametersRT:{p | <p>, }><c.ports:{p |<p.name>}; separator=", ">);
 }
 >>
 

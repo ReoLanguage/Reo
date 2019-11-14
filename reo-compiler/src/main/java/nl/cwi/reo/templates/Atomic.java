@@ -79,12 +79,51 @@ public class Atomic implements Component {
 	}
 
 	/**
-	 * Gets the parameters.
+	 * Gets the parameters, cast runtime arguments to their type.
 	 *
 	 * @return the parameters
 	 */
 	public List<String> getParameters() {
 		return params;
+	}
+	
+	/**
+	 * Gets the parameters, cast runtime arguments to their type.
+	 *
+	 * @return the parameters
+	 */
+	public List<String> getParametersRT() {
+		List<String> parameters = new ArrayList<>();
+		for(String s : params)
+			if(s.contains("args")) {
+				parameters.add(s.split(":")[0].substring(1));
+			}
+			else
+				parameters.add(s);
+		return parameters;
+	}
+	
+	/**
+	 * Get runtime parameter name
+	 */
+	public List<String> getParametersName() {
+		List<String> parameters = new ArrayList<>();
+		for(String s : params)
+			if(s.contains("args")) {
+				String t = s.split(":")[1];
+				if (t.contains("double") || t.contains("Double")) {
+					parameters.add("double "+s.split(":")[0].substring(1));
+				}
+				else if (t.contains("int") || t.contains("Integer")) {
+					parameters.add("int "+s.split(":")[0].substring(1));
+				}
+				else if (t.contains("string") || t.contains("String")) {
+					parameters.add("String "+s.split(":")[0].substring(1));
+				}
+			}
+//			else
+//				parameters.add(s);
+		return parameters;
 	}
 
 	/**

@@ -43,7 +43,7 @@ public class Windows {
 	 * @param inputPorts
 	 *            the input ports
 	 */
-	public static void producer(String name, Port<String> inputPorts) {
+	public static void producer(String name, Output<String> inputPorts) {
 
 		Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 
@@ -77,7 +77,7 @@ public class Windows {
 	 *            the port name
 	 * @return the j frame
 	 */
-	public static JFrame openAndGetOutput(final Port<String> port, String portName) {
+	public static JFrame openAndGetOutput(final Output<String> port, String portName) {
 		JFrame window = new JFrame("Port: " + portName);
 
 		final JTextArea textArea = new JTextArea();

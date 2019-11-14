@@ -34,6 +34,13 @@ public class Identifier implements Term {
 	/**
 	 * {@inheritDoc}
 	 */
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return name;

@@ -8,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.instances.Instance;
 import nl.cwi.reo.interpret.ports.Port;
+import nl.cwi.reo.interpret.sets.SetAtom;
 import nl.cwi.reo.interpret.sets.SetExpression;
 import nl.cwi.reo.interpret.signatures.Signature;
 import nl.cwi.reo.interpret.signatures.SignatureExpression;
@@ -66,9 +67,9 @@ public final class Component implements Value {
 	 * @return a list of instances and unifications.
 	 */
 	@Nullable
-	public Instance instantiate(List<?> values, @Nullable List<Port> ports, Monitor m) {
+	public Instance instantiate(Scope values, @Nullable List<Port> ports, Monitor m) {
 		Signature signature = sign.evaluate(values, ports, m);
-		if (signature == null)
+		if (signature == null) // || m.hasErrors() && !(set instanceof SetAtom ))
 			return null;
 		scope.putAll(signature.getAssignments());
 		Instance i = set.evaluate(scope, m);
@@ -79,6 +80,10 @@ public final class Component implements Value {
 		return i.reconnect(signature.getInterface());
 	}
 
+	public SetExpression getSet() {
+		return set;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

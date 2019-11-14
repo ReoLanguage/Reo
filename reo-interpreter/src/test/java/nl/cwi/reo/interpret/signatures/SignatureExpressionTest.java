@@ -9,11 +9,11 @@ import java.util.List;
 
 import org.junit.Test;
 
+import nl.cwi.reo.interpret.Scope;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.ports.PrioType;
 import nl.cwi.reo.interpret.terms.Range;
-import nl.cwi.reo.interpret.terms.Term;
 import nl.cwi.reo.interpret.terms.TermExpression;
 import nl.cwi.reo.interpret.terms.VariableTermExpression;
 import nl.cwi.reo.interpret.typetags.TypeTag;
@@ -59,7 +59,7 @@ public class SignatureExpressionTest {
 
 		SignatureExpression signature = new SignatureExpression(params, nodes, loc);
 
-		List<Term> values = new ArrayList<Term>();
+		Scope values = new Scope();
 		List<Port> ports = Arrays.asList(new Port("x"), new Port("y"), new Port("z"));
 
 		Signature sign = signature.evaluate(values, ports, m);
@@ -103,7 +103,8 @@ public class SignatureExpressionTest {
 
 		SignatureExpression signature = new SignatureExpression(params, nodes, loc);
 
-		List<Term> values = Arrays.asList(new IntegerValue(1));
+		Scope values = new Scope();
+		values.put(new Identifier("0"), new IntegerValue(1));
 		List<Port> ports = new ArrayList<Port>();
 
 		signature.evaluate(values, ports, m);
@@ -139,7 +140,7 @@ public class SignatureExpressionTest {
 
 		SignatureExpression signature = new SignatureExpression(params, nodes, loc);
 
-		List<Term> values = new ArrayList<Term>();
+		Scope values = new Scope();
 		List<Port> ports = Arrays.asList(new Port("x"), new Port("y"), new Port("z"));
 
 		Signature sign = signature.evaluate(values, ports, m);

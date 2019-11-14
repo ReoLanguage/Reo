@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
@@ -35,8 +34,6 @@ import nl.cwi.reo.interpret.interpreters.Interpreter;
 import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.ports.PortType;
 import nl.cwi.reo.interpret.typetags.TypeTag;
-import nl.cwi.reo.interpret.values.BooleanValue;
-import nl.cwi.reo.interpret.values.DecimalValue;
 import nl.cwi.reo.interpret.values.StringValue;
 import nl.cwi.reo.interpret.values.Value;
 import nl.cwi.reo.pr.comp.CompilerSettings;
@@ -44,7 +41,6 @@ import nl.cwi.reo.semantics.hypergraphs.ConstraintHypergraph;
 import nl.cwi.reo.semantics.prautomata.ListenerPR;
 import nl.cwi.reo.semantics.prba.ListenerPRBA;
 import nl.cwi.reo.semantics.predicates.Formula;
-import nl.cwi.reo.semantics.predicates.MemoryVariable;
 import nl.cwi.reo.semantics.rulebasedautomata.ListenerRBA;
 import nl.cwi.reo.semantics.rulebasedautomata.RuleBasedAutomaton;
 import nl.cwi.reo.templates.Atomic;
@@ -97,7 +93,7 @@ public class Compiler {
 	 * List of parameters for the main component.
 	 */
 	@Parameter(names = {
-			"-p" }, variableArity = true, description = "list of parameters to instantiate the main component")
+			"-p" }, variableArity = true, description = "list of parameters to instantiate the main component name1:type1=value1 ")
 	public List<String> params = new ArrayList<String>();
 
 	/** Package. */
@@ -151,12 +147,12 @@ public class Compiler {
 	 * Run.
 	 */
 	public void run() {
-
+		
 		directories.add(".");
 		String comppath = System.getenv("COMPATH");
 		if (comppath != null)
-			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));
-
+			directories.addAll(Arrays.asList(comppath.split(File.pathSeparator)));			
+				
 		switch (compilertype) {
 		case LYKOS:
 			compilePR();
@@ -199,6 +195,7 @@ public class Compiler {
 	}
 
 	private Interpreter getInterpreter(Language lang) {
+
 		switch (lang) {
 		case PRISM:
 			ListenerPRBA listenerPRBA = new ListenerPRBA(monitor);
@@ -250,41 +247,7 @@ public class Compiler {
 		ReoTemplate template = new ReoTemplate(program.getFile(), version, packagename, program.getName(), components);
 		generateCode(template);
 	}
-	
-	/**
-	 * Serialize ReoProgram to XML
-	 * @param customer
-	 * @return
-	 */
-/*
-	private static void serializeXML(ReoProgram program) {
 
-		XStream xstream = new XStream();
-
-		String xml = xstream.toXML(program);
-		try {
-			File file = new File("../reo-runtime-java/src/main/java/"+program.getName()+".xml");
-			FileWriter out = new FileWriter(file);
-			out.write(xml);
-			out.close();
-		} catch (IOException e) {
-		}
-	}
-	*/
-	
-/*	private ReoConnector rename(ReoConnector connector,Map<Port,Port> links) {
-		Map<Port,Port> backlinks = new HashMap<>(links);
-		for(Port p: links.keySet())
-			if(connector.getInterface().contains(p))
-				backlinks.put(links.get(p), p);
-			else
-				backlinks.put(p,links.get(p));
-		if(connector instanceof ReoConnectorComposite) {
-			connector = new ReoConnectorComposite(connector.getName(), "void", ((ReoConnectorComposite) connector).getComponents() ,backlinks);
-			connector.integrate();
-		}
-		return connector;
-	}*/
 	/**
 	 * Composes all sub-connectors in a given connector. 
 	 * Composition is defined per semantics. 

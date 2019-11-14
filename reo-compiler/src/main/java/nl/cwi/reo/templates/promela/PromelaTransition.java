@@ -47,8 +47,9 @@ public final class PromelaTransition extends Transition{
 		for(Port p : getInterface())
 			if(p.getName().substring(0, 1).contains("$")) {
 				m.put(p, p.rename("np"+p.getName().substring(1,p.getName().length())));
-			}
-	}
+			}else
+				m.put(p, p.rename("n"+p.getName()));
+		}
 	
 
 	@Override

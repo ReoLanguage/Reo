@@ -27,6 +27,8 @@ import nl.cwi.reo.interpret.variables.Parameter;
 import nl.cwi.reo.interpret.variables.ParameterExpression;
 import nl.cwi.reo.interpret.variables.ParameterType;
 import nl.cwi.reo.util.Location;
+import nl.cwi.reo.util.Message;
+import nl.cwi.reo.util.MessageType;
 import nl.cwi.reo.util.Monitor;
 
 // TODO: Auto-generated Javadoc
@@ -102,7 +104,7 @@ public final class SignatureExpression implements ParameterType {
 	 *         assignments.
 	 */
 	@Nullable
-	public Signature evaluate(List<?> values, @Nullable List<Port> ports, Monitor m) {
+	public Signature evaluate(Scope values, @Nullable List<Port> ports, Monitor m) {
 		Scope s = new Scope();
 
 		// Try to find the parameter value for a correct number of parameters
@@ -122,7 +124,7 @@ public final class SignatureExpression implements ParameterType {
 				}
 			}
 		}
-		int size_params = values.size() - k_params;
+		int size_params = values.getKeys().size() - k_params;
 
 		if (rng_params != null) {
 			Scope defs = rng_params.findParamFromSize(size_params);
@@ -134,8 +136,8 @@ public final class SignatureExpression implements ParameterType {
 			}
 		} else {
 			if (size_params != 0) {
-				m.add(location, "Wrong number of parameter values.");
-				return null;
+//				m.add(location, "Wrong number of parameter values.");
+		//		return null;
 			}
 		}
 
@@ -147,68 +149,37 @@ public final class SignatureExpression implements ParameterType {
 				parameters.addAll(p);
 		}
 		Iterator<Parameter> param = parameters.iterator();
-		Iterator<?> value = values.iterator();
-
-		while (param.hasNext() && value.hasNext()) {
+		int i = 0;
+		while (param.hasNext()) {
 			Parameter x = param.next();
-			Object v = value.next();
-			if (v instanceof Value) {
-				s.put(x, (Value) v);
-			} else if (v instanceof String) {
-				String t = "";
-				if (x.getType() instanceof TypeTag)
-					t = ((TypeTag) x.getType()).toString();
-				if (t.equals("int") || t.equals("Integer"))
-					s.put(x, new IntegerValue(Integer.parseInt((String) v)));
-				else if (t.equals("double") || t.equals("Double"))
-					s.put(x, new DecimalValue(Double.parseDouble((String) v)));
-				else if (t.equals("string") || t.equals("String"))
-					s.put(x, new StringValue((String) v));
-				else
-					m.add(location, "Failed to cast parameter " + s + " to " + t);
-			} else {
-				m.add(location, "Term " + v + " has undefined type.");
-				return null;
+			String t = "";
+			Value v;
+			//The scope 'values' either assign a parameter by its name, or by its place in the param array.
+			if (values.getKeys().contains(new Identifier(x.getName()))) {
+				v = values.get(new Identifier(x.getName()));
 			}
-
-			// if (x.getType() instanceof TypeTag) {
-			// String t = ((TypeTag) x.getType()).toString();
-			//
-			// if (v instanceof Value) {
-			// Value val = (Value) v;
-			// if ((t.equals("int") || t.equals("Integer")) && val instanceof
-			// IntegerValue)
-			// s.put(x, val);
-			// else if ((t.equals("double") || t.equals("Double")) && val
-			// instanceof DecimalValue)
-			// s.put(x, new DecimalValue(Double.parseDouble((String) v)));
-			// else if ((t.equals("string") || t.equals("String")) && val
-			// instanceof StringValue)
-			// s.put(x, new StringValue(v.toString()));
-			// else {
-			// m.add(location, "Value assigned to " + x + " is of wrong type.");
-			// return null;
-			// }
-			// } else if (v instanceof String) {
-			// String str = (String) v;
-			// if (t.equals("int") || t.equals("Integer"))
-			// s.put(x, new IntegerValue(Integer.parseInt(str)));
-			// else if (t.equals("double") || t.equals("Double"))
-			// s.put(x, new DecimalValue(Double.parseDouble(str)));
-			// else if (t.equals("string") || t.equals("String"))
-			// s.put(x, new StringValue(str));
-			// else {
-			// m.add(location, "Failed to cast parameter " + x + " to " + t +
-			// ".");
-			// return null;
-			// }
-			// } else {
-			// m.add(location, "Term " + v + " has undefined type.");
-			// return null;
-			// }
-			// } else if (x.getType() instanceof SignatureExpression) {
-			// //TODO type-checking for component values
-			// }
+			else if (values.getKeys().contains(new Identifier(Integer.toString(i)))) {
+				v = values.get(new Identifier(Integer.toString(i)));				
+			}
+			else {
+				Message mes = new Message(MessageType.WARNING, location, "The parameter " + x.toString() + " has no values. Expect value to be provided at runtime.");
+				m.add(mes);
+				v = new StringValue(x.toString()+":args");
+//				return null;
+			}
+			if (x.getType() instanceof TypeTag)
+				t = ((TypeTag) x.getType()).toString();
+			else
+				m.add(location, "The type " + t + " is non standard. Please use 'double', 'int', or 'string'.");
+			
+			if ((t.equals("double") || t.equals("Double")) 	&& (v instanceof DecimalValue) ||
+				(t.equals("int") 	|| t.equals("Integer")) && (v instanceof IntegerValue) ||
+				(t.equals("string") || t.equals("String")) 	&& (v instanceof StringValue)  ||
+				v.toString().contains("args"))
+				s.put(x,v);
+			else
+				m.add(location, "Type mismatch. Expected " + t + " and received " + v); 
+			i++;				 
 		}
 
 		// Find the links of the interface.
