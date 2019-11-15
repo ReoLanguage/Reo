@@ -60,7 +60,7 @@ public class Atomic implements Component {
 			if (v instanceof BooleanValue) {
 				this.params.add(((BooleanValue) v).getValue() ? "true" : "false");
 			} else if (v instanceof StringValue) {
-				this.params.add("\"" + ((StringValue) v).getValue() + "\"");
+				this.params.add("\"" + ((StringValue) v).getValue().replaceAll("\"","") + "\"");
 			} else if (v instanceof DecimalValue) {
 				this.params.add(Double.toString(((DecimalValue) v).getValue()));
 			}
@@ -96,7 +96,7 @@ public class Atomic implements Component {
 		List<String> parameters = new ArrayList<>();
 		for(String s : params)
 			if(s.contains("args")) {
-				parameters.add(s.split(":")[0].substring(1));
+				parameters.add(s.split(":")[0].substring(1).replaceAll("\"", ""));
 			}
 			else
 				parameters.add(s);

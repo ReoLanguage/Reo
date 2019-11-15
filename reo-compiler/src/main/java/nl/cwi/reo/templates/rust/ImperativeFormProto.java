@@ -342,7 +342,7 @@ public class ImperativeFormProto {
             // add input port as the source of a movement
             rd.movements.put(name, new MovementDest(false));
         }
-        for (Map.EntFry<PortVariable, Term> e : t.getOutput().entrySet()) {
+        for (Map.Entry<PortVariable, Term> e : t.getOutput().entrySet()) {
             String name = e.getKey().getName();
             boolean isMemory = nameDefs.memWithInitial.containsKey(name);
             if (isMemory) {

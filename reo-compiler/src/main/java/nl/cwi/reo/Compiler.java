@@ -362,8 +362,12 @@ public class Compiler {
 			}
 		}
 		
-		/** Build components using constructors specific to each target languages */
+		/** Build components using constructors specific to each target languages 
+		 * 	If several atomics have the same name, rename to avoid name conflicts.
+		 * */
 		list.addAll(connector.getAtoms());
+		List<String> names = new ArrayList<>();
+		int counter = 1;
 		for (ReoConnectorAtom atom : list) {
 			Reference r = atom.getReference(lang);
 			if (r != null) { 
@@ -371,6 +375,11 @@ public class Compiler {
 				String name = atom.getName();
 				if (name == null)
 					name = "Component";
+				if(names.contains(name)) {
+					name = name + Integer.toString(counter);
+					counter++;
+				}
+				names.add(name);
 				if(lang == Language.RUST)
 					components.add(new Atomic(name, r.getValues(), atom.rename(renaming).getInterface(), call));
 				if(lang == Language.JAVA)
