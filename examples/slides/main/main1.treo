@@ -1,29 +1,12 @@
-// Generated from main1.treo by Reo 1.0.
 
-main1(){
-	Protocol1(p1,p2,p3)
+section slides.main;
 
-	Component(p1)
+import slides.alternator.alternator;
 
-	Component(p2)
+import slides.main.red;
+import slides.main.green;
+import slides.main.blue;
 
-	Component(p3)
-	|
-	Protocol1 = (p1?String,p2?String,p3!String) {
-		#RBA
-		!($m2 = *), p3 = $m2   , $m2' = *  
-		!(p2 = *) , !(p1 = *) , $m2 = *, p3 = p1  , $m2' = p2   
-	}, 
-	Component = (p1!String) {
-		#JAVA
-		"Producer.red"
-	}, 
-	Component = (p2!String) {
-		#JAVA
-		"Producer.green"
-	}, 
-	Component = (p3?String) {
-		#JAVA
-		"Consumer.blue"
-	}
+main1() {
+  red(a) green(b) blue(c) alternator(a, b, c)
 }
