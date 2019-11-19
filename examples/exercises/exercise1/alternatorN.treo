@@ -1,0 +1,9 @@
+import alternator;
+
+/*
+*  Using the alternator you just built, define an N input alternator
+*/
+
+alternatorN<N:int>(a[1..N],b){
+
+}

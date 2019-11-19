@@ -1,0 +1,20 @@
+
+/*
+*  Use the xrouter you just built, define an N output xrouter.
+*/
+
+xrouterN<N:int>(a,b[1..N]) {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

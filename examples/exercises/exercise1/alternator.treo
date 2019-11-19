@@ -1,0 +1,14 @@
+
+import reo.syncdrain;
+import reo.sync;
+import reo.fifo1;
+import reo.lossy;
+
+/*
+*  Write a connector that output at 'c' in alternation the inputs from 'a' and 'b'.
+*  Use the primitives listed above.
+*/
+
+alternator(a,b,c){
+
+}

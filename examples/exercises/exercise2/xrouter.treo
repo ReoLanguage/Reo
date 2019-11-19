@@ -1,0 +1,23 @@
+import reo.sync;
+import reo.syncdrain;
+import reo.lossy;
+
+/*
+*  Write a connector that routes the data from 'a' to either 'b' or 'c'.
+*/
+
+xrouter(a,b,c) {
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

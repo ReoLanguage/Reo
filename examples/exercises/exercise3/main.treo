@@ -1,0 +1,10 @@
+import cons;
+import prod;
+
+/*
+*  Use one of your precedent connector to coordinate input and output to the java thread in 'cons' and 'prod'. 
+*/
+
+main() { 
+
+}
