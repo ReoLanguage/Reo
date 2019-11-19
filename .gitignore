@@ -5,5 +5,8 @@
 /**/build.properties
 /**/Debug
 /**/docs/_build
+reo-compiler/sandbox
+reo-runtime-java/src/main/java/*.*
+archive
 
 !FreeRTOSv9.0.0/FreeRTOS/Demo/WIN32-MingW/.project
