@@ -34,7 +34,7 @@ public class <S.name> {
 wrapper(s) ::= <<
 HashMap\<String,String> m = new HashMap\<>();
 if(args.length \< <s>) {
-			System.out.println("Must input 2 arguments. \nThe argument should be written in the form 'Name:Type=Value'.");
+			System.out.println("Must input <s> arguments. \nThe argument should be written in the form 'Name:Type=Value'.");
 	return ; 
 }
 else{
