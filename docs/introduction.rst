@@ -213,12 +213,12 @@ In the next step, we declare the protocol by means of the Reo file called ``main
 	import reo.fifo1;
 
 	// The main component
-	main(a,b,c) { green(a) red(b) blue(c) alternator(a,b,c) }
+	main() { green(a) red(b) blue(c) alternator(a,b,c) }
 	
 	// The atomic components
-	red(a!String) { Java: "Processes.Red" }
-	green(a!String) { Java: "Processes.Green" }
-	blue(a?String) { Java: "Processes.Blue" }
+	red(a!String) { #JAVA "Processes.Red" }
+	green(a!String) { #JAVA "Processes.Green" }
+	blue(a?String) { #JAVA "Processes.Blue" }
 	
 	// The alternator protocol
 	alternator(a,b,c) { syncdrain(a, b) sync(b, x) fifo1(x, c) sync(a, c) }
