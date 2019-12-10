@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="reo-compiler" />
+        <module name="reo-compiler-lykos" />
+        <module name="reo-interpreter" />
+        <module name="reo-runtime-java" />
+        <module name="reo-semantics" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="reo" target="1.5" />
+      <module name="reo-compiler" target="1.8" />
+      <module name="reo-compiler-lykos" target="1.8" />
+      <module name="reo-interpreter" target="1.8" />
+      <module name="reo-runtime-java" target="1.8" />
+      <module name="reo-semantics" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

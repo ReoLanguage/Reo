@@ -1,0 +1,10 @@
+import reo.fifo1;
+import reo.sync;
+import reo.syncdrain;
+
+alternator2(a,b,c) {
+	sync(a,c)
+	fifo1(b,c)
+	syncdrain(a,b)
+}
+
