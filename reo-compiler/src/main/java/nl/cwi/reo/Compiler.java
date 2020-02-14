@@ -374,7 +374,7 @@ public class Compiler {
 				String call = r.getCall();
 				String name = atom.getName();
 				if (name == null)
-					name = "Component";
+					name = "Worker";
 				if(names.contains(name)) {
 					name = name + Integer.toString(counter);
 					counter++;

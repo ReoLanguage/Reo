@@ -106,10 +106,10 @@ public class Interpreter {
 				String name = p.split(":|=")[0];
 				String type = p.split(":|=")[1];
 				String value = p.split(":|=")[2];
-				if(type == "int") {
+				if(type.equals("int")) {
 					s.put(new Identifier(name), new IntegerValue(Integer.parseInt(value)));
 				}
-				if(type == "string") {
+				if(type.contentEquals("string")) {
 					s.put(new Identifier(name), new StringValue(value));
 				}
 			}
