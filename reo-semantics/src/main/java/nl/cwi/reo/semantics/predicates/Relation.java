@@ -156,6 +156,10 @@ public final class Relation implements Formula {
 		return new Relation(_name, _args, infix);
 	}
 
+	public boolean isInfix() {
+		return isInfix();
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */

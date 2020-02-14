@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/reo.iml" filepath="$PROJECT_DIR$/reo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reo-compiler/reo-compiler.iml" filepath="$PROJECT_DIR$/reo-compiler/reo-compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reo-compiler-lykos/reo-compiler-lykos.iml" filepath="$PROJECT_DIR$/reo-compiler-lykos/reo-compiler-lykos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reo-interpreter/reo-interpreter.iml" filepath="$PROJECT_DIR$/reo-interpreter/reo-interpreter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reo-runtime-java/reo-runtime-java.iml" filepath="$PROJECT_DIR$/reo-runtime-java/reo-runtime-java.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reo-semantics/reo-semantics.iml" filepath="$PROJECT_DIR$/reo-semantics/reo-semantics.iml" />
+    </modules>
+  </component>
+</project>

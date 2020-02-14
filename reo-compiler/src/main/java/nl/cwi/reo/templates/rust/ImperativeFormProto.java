@@ -3,6 +3,7 @@ import nl.cwi.reo.interpret.ports.Port;
 import nl.cwi.reo.interpret.values.BooleanValue;
 import nl.cwi.reo.semantics.predicates.*;
 import nl.cwi.reo.templates.*;
+
 import java.util.*;
 
 /*
@@ -174,14 +175,14 @@ public class ImperativeFormProto {
         }
         static class CreateFromFunc extends Instruction {
             String resDest, func;
-            List<String> resArgs;
-            CreateFromFunc(String resDest, String func, List<String> resArgs) {
+            List<RsTerm> resArgs;
+            CreateFromFunc(String resDest, String func, List<RsTerm> resArgs) {
                 this.resDest = resDest;
                 this.func = func;
                 this.resArgs = resArgs;
             }
             @Override public String toString() {
-                return String.format("CreateFromFunc { resDest: %s, func: %s, args: resArgs }",
+                return String.format("CreateFromFunc { resDest: %s, func: %s, args: %s }",
                         resDest, func, resArgs );
             }
             @Override public void generateCode(ImperativeFormProto proto, StringBuilder sb) {
@@ -190,12 +191,12 @@ public class ImperativeFormProto {
                 sb.append("\", func: \"");
                 sb.append(func);
                 sb.append("\", info: TypeInfo::of::<T");
-                int i = proto.finishedInfo.uniqueClasses.indexOf(resDest);
+                int i = proto.finishedInfo.uniqueClasses.indexOf(resDest); // TODO ??
                 sb.append(String.valueOf(i));
                 sb.append(">(), args: vec![");
-                for (String arg: resArgs) { // TODO TERMS not RESOURCES here
+                for (RsTerm arg: resArgs) {
                     sb.append("Named(\"");
-                    sb.append(arg);
+                    arg.generateCode(sb);
                     sb.append("\"), ");
                 }
                 sb.append("]}");
@@ -233,7 +234,7 @@ public class ImperativeFormProto {
         Set<String> fullMem = new HashSet<>();
         Set<String> emptyMem = new HashSet<>();
         @Override public String toString() {
-            return String.format("Predicate { %s, %s, %s }", ready, fullMem, emptyMem);
+            return String.format("Predicate { ready:%s, full:%s, empty:%s }", ready, fullMem, emptyMem);
         }
     }
     static class RuleDef {
@@ -309,10 +310,8 @@ public class ImperativeFormProto {
             // TODO add from initial
         }
 
-        int index = 0;
         for (Transition t : proto.getTransitions()) {
-            addRule(index, t);
-            index++;
+            addRulesFor(t);
         }
 
         // Discover generic types from list of constraints
@@ -332,110 +331,179 @@ public class ImperativeFormProto {
         // System.out.printf("uniqueClasses: %s%n%n", finishedInfo.uniqueClasses);
     }
 
-    private void addRule(int index, Transition t) {
+    // returns the number of rules added
+    private void addRulesFor(Transition t) {
+
+        // traverse all structures of the transition. collect vars compared to NULL with ==
+        NullEqCollector neq = new NullEqCollector();
+        neq.traverse(t.getGuard());
+
+        for (Term x : t.getOutput().values()) {
+            neq.traverse(x);
+        }
+        for (Term x : t.getMemory().values()) {
+            neq.traverse(x);
+        }
+
+        // order these variables
+        List<Variable> orderedComparedToNull = new ArrayList<>(neq.comparedToNull);
+        // System.out.println(">>> COMPARED TO NULL: " + orderedComparedToNull);
+
+        Map<Variable, Boolean> isNulled = new HashMap<>();
+        int combinations = 1 << orderedComparedToNull.size();
+        for (int combination = 0; combination < combinations; combination++) {
+            for (int var = 0; var < orderedComparedToNull.size(); var++) {
+                boolean isSet = (combination & 1 << var) > 0;
+                isNulled.put(orderedComparedToNull.get(var), isSet);
+            }
+            maybeAddRuleConcrete(t, isNulled);
+        }
+    }
+
+    // returns true IFF a rule was added
+    private void maybeAddRuleConcrete(Transition t, Map<Variable, Boolean> isNulled) {
+
+        // rewrite the given guard replacing equality checks between VARS and NULL with
+        // true and false constants.
+        Formula concreteGuard = new ConcreteGuardBuilder(isNulled).traverse(t.getGuard());
+
+        // attempt to statically evaluate the concrete guard.
+        // Returns:
+        // 1. True if the guard is a tautology (AKA. trivial guard)
+        // 2. False if the guard is a contradiction.
+        // 3. null if the guard's valuation isn't known statically.
+        Boolean staticEval = new StaticEvaluator().traverse(concreteGuard);
+
+        if (staticEval != null && !staticEval) {
+            // contradiction guard. Omit this rule.
+            return;
+        }
+
         RuleDef rd = new RuleDef();
-        new MemReadTraverser(t.getGuard(), rd.predicate.fullMem);
+
+        // represent the isNulled map in the rd.predicate
         for (Port p : t.getInput()) {
-            // add input port to ready set
-            String name = p.getName();
-            rd.predicate.ready.add(name);
-            // add input port as the source of a movement
-            rd.movements.put(name, new MovementDest(false));
+            rd.predicate.ready.add(p.getName());
         }
-        for (Map.Entry<PortVariable, Term> e : t.getOutput().entrySet()) {
-            String name = e.getKey().getName();
-            boolean isMemory = nameDefs.memWithInitial.containsKey(name);
-            if (isMemory) {
-                new MemReadTraverser(e.getValue(), rd.predicate.fullMem);
+        for (PortVariable p : t.getOutput().keySet()) {
+            rd.predicate.ready.add(p.getName());
+        }
+        for (Map.Entry<Variable, Boolean> e : isNulled.entrySet()) {
+            if (e.getKey() instanceof PortVariable) {
+                PortVariable p = (PortVariable) e.getKey();
+                if (e.getValue()) {
+                    rd.predicate.ready.add(p.getName());
+                }
+            } else if (e.getKey() instanceof MemoryVariable) {
+                MemoryVariable p = (MemoryVariable) e.getKey();
+                if (e.getValue()) {
+                    // value is initially null
+                    rd.predicate.emptyMem.add(p.getName());
+                } else {
+                    rd.predicate.fullMem.add(p.getName());
+                }
             } else {
-                rd.predicate.ready.add(name);
+                throw new Error("Neither port nor mem ???");
             }
         }
-        Set<String> memAssignedNull = new HashSet<>();
-        for (Map.Entry<MemoryVariable, Term> e : t.getMemory().entrySet()) {
-            String name = e.getKey().getName();
-            typeConstraints.add(new TypeConstraint.ExistsConstraint(name));
+
+        // populate rd.movements with movements for all putter ports and memory cells with
+        // default retention flags (mems retain by default, ports cannot).
+        // recall: a -> {a,b,c} is rendered as a -> (retains=true, {b,c})
+        // HENCEFORTH a resource is already in rd.movements.keySet() IFF it's a fresh variable
+        for (MemoryVariable m : t.getMemory().keySet()) {
+            typeConstraints.add(new TypeConstraint.ExistsConstraint(m.getName()));
+            rd.movements.put(m.getName(), new MovementDest(true));
+        }
+        for (Port p : t.getInput()) {
+            typeConstraints.add(new TypeConstraint.ExistsConstraint(p.getName()));
+            rd.movements.put(p.getName(), new MovementDest(false));
+        }
+
+        // traverse assigned terms and:
+        // 1. ensure fresh-variable resources are created in the correct order
+        // 2. for every assignment X:=Y add X to Y's movement list.
+
+        // traverse port variable terms...
+        ResourceBuilder resourceBuilder = new ResourceBuilder(isNulled);
+        for (Map.Entry<PortVariable, Term> e : t.getOutput().entrySet()) {
+            typeConstraints.add(new TypeConstraint.ExistsConstraint(e.getKey().getName()));
             if (e.getValue() instanceof NullValue) {
-                memAssignedNull.add(name);
-                rd.predicate.fullMem.add(name); // TODO reconsider. must it be full?
+                // TODO not sure what the frontend would mean by this. Maybe it's fine to assign null to a port.
+                throw new Error("CANNOT ASSIGN NULL TO PORT??");
             } else {
-                // rd.predicate.ready.add(name);
-                rd.predicate.emptyMem.add(name);
-                new MemReadTraverser(e.getValue(), rd.predicate.fullMem);
+                // add a new movement IFF this is a FRESH temp resource
+                String resource = resourceBuilder.termToResource(e.getValue());
+                rd.movements.computeIfAbsent(resource, k -> new MovementDest(false));
+                rd.movements.get(resource).getters.add(e.getKey().getName());
+                typeConstraints.add(new TypeConstraint.EqConstraint(resource, e.getKey().getName()));
             }
         }
-        // TODO false positives on rwMemory
 
-        // now predicate.fullMem and predicate.emptyMem may overlap!
-        // System.out.println("FULL:" + rd.predicate.fullMem + " EMPTY:" + rd.predicate.emptyMem);
-        Set<String> rwMemory = new HashSet<>(rd.predicate.fullMem); // copy constructor
-        rwMemory.retainAll(rd.predicate.emptyMem);
-        rd.predicate.emptyMem.removeAll(rwMemory);
-
-        for (String name : rd.predicate.fullMem) {
-            rd.movements.put(name, new MovementDest(!memAssignedNull.contains(name)));
-        }
-
-        // now add all resource creations
-        for (Map.Entry<PortVariable, Term> e : t.getOutput().entrySet()) {
-            RsTerm rt = new RsTermBuilder(this, rd.predicate, e.getValue()).root;
-            String resource = rt.newResource(this, rd);
-            rd.movements.computeIfAbsent(resource, x -> new MovementDest(false));
-            rd.movements.get(resource).getters.add(e.getKey().getName());
-        }
-        for(String s : rwMemory) {
-            String name = s + "_NEXT";
-            typeConstraints.add(new TypeConstraint.ExistsConstraint(name));
-            rd.ins.add(new Instruction.MemSwap(s, name));
-            typeConstraints.add(new TypeConstraint.EqConstraint(s, name));
-        }
+        // ... traverse more assigned terms. now for memory variables.
+        Set<MemoryVariable> gettingMemcells = new HashSet<>();
         for (Map.Entry<MemoryVariable, Term> e : t.getMemory().entrySet()) {
-            String name = e.getKey().getName();
-            if (memAssignedNull.contains(name)) {
-                continue; // TODO
-            }
-            RsTerm rt = new RsTermBuilder(this, rd.predicate, e.getValue()).root;
-            String resource = rt.newResource(this, rd);
-            rd.movements.computeIfAbsent(resource, x -> new MovementDest(false));
-            if (rwMemory.contains(name)) {
-                rd.movements.get(resource).getters.add(name + "_NEXT");
+            typeConstraints.add(new TypeConstraint.ExistsConstraint(e.getKey().getName()));
+            if (e.getValue() instanceof NullValue) {
+                // special case of M:=*. sets retains=false for M.
+                // - reo represents this as M acting as getter of special NULL domain element.
+                // - rust represents this as M acting as putter to a set NOT including itself.
+                rd.movements.get(e.getKey().getName()).retains = false;
             } else {
-                rd.movements.get(resource).getters.add(name);
+                // add a new movement IFF this is a FRESH temp resource
+                gettingMemcells.add(e.getKey());
+                String resource = resourceBuilder.termToResource(e.getValue());
+                rd.movements.computeIfAbsent(resource, k -> new MovementDest(false));
+                rd.movements.get(resource).getters.add(e.getKey().getName());
+                typeConstraints.add(new TypeConstraint.EqConstraint(resource, e.getKey().getName()));
             }
         }
 
+        // populate instruction list with CreateFromFunction and CreateFromFormula calls
+        if (!rd.ins.isEmpty()) {
+            throw new Error("OOPS programming error");
+        }
+        rd.ins = resourceBuilder.computeInstructionList();
+
+        // if necessary, insert a single check of a formula
+        if (staticEval == null) {
+            RsTerm toCheck = resourceBuilder.formulaToRsTerm(concreteGuard);
+            rd.ins.add(new Instruction.Check(toCheck));
+        }
+
+        // Insert a MemSwap instruction (with fresh variable) for all memory cells both PUTTING and GETTING.
+        // After the instruction, M acts as getter, with M' acting as putter.
+        for (MemoryVariable v : gettingMemcells) {
+            // this memory cell is acting as getter (ie. being written to)...
+            MovementDest md = rd.movements.get(v.getName());
+            if (md.getters.isEmpty() && md.retains) {
+                // the movement in which this memcell is a putter is TRIVIAL
+                // we remove it from the movement list so it doesn't interfere with it getting
+                rd.movements.remove(v.getName());
+            } else {
+                // ... and its acting as putter. Must use a SWAP variable!
+                String swapName = v.getName() + "_SWAP";
+                rd.ins.add(new Instruction.MemSwap(v.getName(), swapName));
+                rd.movements.put(swapName, md); // swap var acts as putter
+                rd.movements.remove(v.getName()); // original var acts as getter (has no resource)
+            }
+        }
+
+        // pass over movements to discover CLONE constraints
         for (Map.Entry<String, MovementDest> e : rd.movements.entrySet()) {
-            String putter = e.getKey();
             MovementDest md = e.getValue();
-            for (String getter : md.getters) {
-                typeConstraints.add(new TypeConstraint.EqConstraint(putter, getter));
-            }
-            int allowedGettersWithoutClone;
-            if (md.retains) {
-                allowedGettersWithoutClone = 0;
-            } else {
-                allowedGettersWithoutClone = 1;
-            }
-            if (md.getters.size() > allowedGettersWithoutClone) {
-                typeConstraints.add(new TypeConstraint.TraitConstraint(putter, "Clone"));
+            if ((md.retains && md.getters.size() >= 1) || (!md.retains && md.getters.size() >= 2)) {
+                // 2+ getters for this movement
+                typeConstraints.add(new TypeConstraint.TraitConstraint(e.getKey(), "Clone"));
             }
         }
-        RsTerm guardBefore = new RsTermBuilder(this, rd.predicate, t.getGuard()).root;
-        StringBuilder sb = new StringBuilder();
-        guardBefore.generateCode(sb);
-        sb.append("\n\n\n");
-        RsTerm guard = guardBefore.simplify();
-        guard.generateCode(sb);
 
-        // System.out.printf(":: %s%n", sb.toString());
-        if (!(guard instanceof RsTerm.RsTrue)) {
-            rd.ins.add(new Instruction.Check(guard));
-        }
-        // System.out.printf("RD %d %s%n", index, rd);
+//        System.out.println("RD: " + rd);
+//        System.out.println("guard eval was " + staticEval);
         ruleDefs.add(rd);
     }
 
-    public void generateCode(StringBuilder sb) {
+    void generateCode(StringBuilder sb) {
         // C API builder
         sb.append("#[no_mangle]\n");
         sb.append("pub extern fn reors_generated_proto_create() -> CProtoHandle {\n");
